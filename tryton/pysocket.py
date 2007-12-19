@@ -35,7 +35,6 @@ class PySocket:
         self.sock.close()
 
     def send(self, msg, exception=False, traceback=None):
-        print "msg:", msg
         msg = cPickle.dumps([msg, traceback])
         size = len(msg)
         self.sock.send('%8d' % size)
