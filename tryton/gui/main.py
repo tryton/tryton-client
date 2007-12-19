@@ -556,10 +556,10 @@ class Main(object):
     def sig_user_preferences(self, widget):
         try:
             actions = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.values', 'get', 'meta', False, [('res.users',False)],
+                    'ir.values', 'get', 'meta', False, [('res.user',False)],
                     True, rpc.session.context, True)
 
-            win = Preference('res.users', rpc.session.user,
+            win = Preference('res.user', rpc.session.user,
                     actions, parent=self.window)
             if win.run():
                 rpc.session.context_reload()
@@ -722,7 +722,7 @@ class Main(object):
             except_id=False):
         try:
             act_id = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'res.users', 'read', [rpc.session.user], [menu_type,'name'],
+                    'res.user', 'read', [rpc.session.user], [menu_type,'name'],
                     rpc.session.context)
         except:
             return False
@@ -747,7 +747,7 @@ class Main(object):
         Action.execute(act_id, {'window': self.window})
         try:
             user = rpc.session.rpc_exec_auth_wo('/object', 'execute',
-                    'res.users', 'read', [rpc.session.user],
+                    'res.user', 'read', [rpc.session.user],
                     [menu_type, 'name'], rpc.session.context)
             if user[0][menu_type]:
                 act_id = user[0][menu_type][0]

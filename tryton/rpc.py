@@ -302,7 +302,7 @@ class RPCSession(object):
         self.timezone = 'utc'
         # self.user
         context = self.rpc_exec_auth('/object', 'execute', 'ir.values', 'get',
-                'meta', False, [('res.users', self.user or False)], False, {},
+                'meta', False, [('res.user', self.user or False)], False, {},
                 True, True, False)
         for ctx in context:
             if ctx[2]:
