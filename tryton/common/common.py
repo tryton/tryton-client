@@ -312,6 +312,19 @@ def ask(question, parent):
     else:
         return entry.get_text()
 
+def node_attributes(node):
+    result = {}
+    attrs = node.attributes
+    if attrs is None:
+        return {}
+    for i in range(attrs.length):
+        result[attrs.item(i).localName] = str(attrs.item(i).nodeValue)
+        if attrs.item(i).localName == "digits" \
+                and isinstance(attrs.item(i).nodeValue, (str, unicode)):
+            result[attrs.item(i).localName] = eval(attrs.item(i).nodeValue)
+    return result
+
+
 COLORS = {
     'invalid':'#ff6969',
     'readonly':'#eeebe7',

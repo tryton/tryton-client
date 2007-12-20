@@ -16,12 +16,23 @@ _ = gettext.gettext
 class Tree(object):
     "Tree page"
 
-    def __init__(self, view, model, res_id=False, domain=None, context=None,
+    def __init__(self, model, res_id=False, view_id=False, domain=None, context=None,
             window=None, name=False):
         if domain is None:
             domain = {}
         if context is None:
             context = {}
+        if view_id:
+            view_base =  rpc.session.rpc_exec_auth('/object', 'execute',
+                    'ir.ui.view', 'read', view_id,
+                    ['model', 'type'], context)
+            view = rpc.session.rpc_exec_auth('/object', 'execute',
+                    view_base['model'], 'fields_view_get', view_id,
+                    view_base['type'],context)
+        else:
+            view = rpc.session.rpc_exec_auth('/object', 'execute', model,
+                    'fields_view_get', False, view_type, context)
+
         self.glade = glade.XML(GLADE, 'win_tree_container',
                 gettext.textdomain())
         self.widget = self.glade.get_widget('win_tree_container')
