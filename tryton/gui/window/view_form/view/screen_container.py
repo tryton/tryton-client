@@ -1,0 +1,72 @@
+import gtk
+import gettext
+
+_ = gettext.gettext
+
+class ScreenContainer(object):
+
+    def __init__(self):
+        self.old_widget = False
+        self.scrolledwindow = gtk.ScrolledWindow()
+        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_AUTOMATIC)
+        self.viewport = gtk.Viewport()
+        self.viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self.vbox = gtk.VBox()
+        self.vbox.pack_end(self.scrolledwindow)
+        self.filter_vbox = None
+        self.button = None
+
+    def widget_get(self):
+        return self.vbox
+
+    def add_filter(self, widget, fnct, clear_fnct):
+        self.filter_vbox = gtk.VBox(spacing=1)
+        self.filter_vbox.set_border_width(1)
+        label = gtk.Label(_('Search'))
+        label.set_alignment(0.0, 0.5)
+        label.show()
+        self.filter_vbox.pack_start(label, expand=True, fill=False)
+        hseparator = gtk.HSeparator()
+        hseparator.show()
+        self.filter_vbox.pack_start(hseparator, expand=True, fill=False)
+        self.filter_vbox.pack_start(widget, expand=True, fill=True)
+        hbuttonbox = gtk.HButtonBox()
+        hbuttonbox.set_spacing(5)
+        hbuttonbox.set_layout(gtk.BUTTONBOX_END)
+        button_clear = gtk.Button(stock=gtk.STOCK_CLEAR)
+        button_clear.connect('clicked', clear_fnct)
+        hbuttonbox.pack_start(button_clear, expand=False, fill=False)
+        self.button = gtk.Button(stock=gtk.STOCK_FIND)
+        self.button.connect('clicked', fnct)
+        self.button.set_property('can_default', True)
+        hbuttonbox.pack_start(self.button, expand=False, fill=False)
+        hbuttonbox.show_all()
+        self.filter_vbox.pack_start(hbuttonbox, expand=False, fill=False)
+        hseparator = gtk.HSeparator()
+        hseparator.show()
+        self.filter_vbox.pack_start(hseparator, expand=True, fill=False)
+        self.vbox.pack_start(self.filter_vbox, expand=False, fill=True)
+
+    def show_filter(self):
+        if self.filter_vbox:
+            self.filter_vbox.show()
+
+    def hide_filter(self):
+        if self.filter_vbox:
+            self.filter_vbox.hide()
+
+    def set(self, widget):
+        if self.viewport.get_child():
+            self.viewport.remove(self.viewport.get_child())
+        if self.scrolledwindow.get_child():
+            self.scrolledwindow.remove(self.scrolledwindow.get_child())
+        if not isinstance(widget, gtk.TreeView):
+            self.viewport.add(widget)
+            widget = self.viewport
+        self.scrolledwindow.add(widget)
+        self.scrolledwindow.show_all()
+
+    def size_get(self):
+        return self.scrolledwindow.get_child().size_request()

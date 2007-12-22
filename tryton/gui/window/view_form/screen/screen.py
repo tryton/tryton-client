@@ -2,9 +2,9 @@
 import xml.dom.minidom
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
-from widget.model.group import ModelRecordGroup
-from widget.view.screen_container import screen_container
-import widget_search
+from tryton.gui.window.view_form.model.group import ModelRecordGroup
+from tryton.gui.window.view_form.view.screen_container import ScreenContainer
+from tryton.gui.window.view_form.widget_search import Form
 from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 
@@ -60,7 +60,7 @@ class Screen(SignalEvent):
                 context=self.context)
         self.models_set(models)
         self.current_model = None
-        self.screen_container = screen_container()
+        self.screen_container = ScreenContainer()
         self.filter_widget = None
         self.widget = self.screen_container.widget_get()
         self.__current_view = 0
@@ -83,7 +83,7 @@ class Screen(SignalEvent):
                 view_form = rpc.session.rpc_exec_auth('/object', 'execute',
                         self.name, 'fields_view_get', False, 'form',
                         self.context)
-                self.filter_widget = widget_search.form(view_form['arch'],
+                self.filter_widget = Form(view_form['arch'],
                         view_form['fields'], self.name, self.window,
                         self.domain, (self, self.search_filter))
                 self.screen_container.add_filter(self.filter_widget.widget,
@@ -239,7 +239,7 @@ class Screen(SignalEvent):
         dom = xml.dom.minidom.parseString(arch)
         _parse_fields(dom, fields)
 
-        from widget.view.widget_parse import widget_parse
+        from tryton.gui.window.view_form.view.widget_parse import widget_parse
         models = self.models.models
         if self.current_model and (self.current_model not in models):
             models = models + [self.current_model]
