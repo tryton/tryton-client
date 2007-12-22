@@ -139,6 +139,10 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         del node[3]
 
     #Mandatory GenericTreeModel method
+    def on_get_path(self, node):
+        '''returns the tree path (a tuple of indices)'''
+        return tuple([x[0] for x in node])
+
     def on_get_flags(self):
         return 0
 
@@ -184,6 +188,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def on_iter_next(self, node):
         '''returns the next node at this level of the tree'''
+        node = node[:]
         (i, values) = node[-1]
         if i < len(values) - 1:
             node[-1] = (i + 1, values)
@@ -194,6 +199,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         '''returns the first child of this node'''
         if node == None:
             return [(0, self.tree)]
+        node = node[:]
         (i, values) = node[-1]
         if values[i][2] == None:
             self._node_expand(values[i])
@@ -222,14 +228,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
             if child < len(self.tree):
                 return [(child, self.tree)]
             return None
-        else:
-            (i, values) = node[-1]
-            if values[i][2] == None:
-                self._node_expand(values[i])
-            if child < len(values[i][2]):
-                node.append((child, values[i][2]))
-                return node
-            return None
+        node = node[:]
+        (i, values) = node[-1]
+        if values[i][2] == None:
+            self._node_expand(values[i])
+        if child < len(values[i][2]):
+            node.append((child, values[i][2]))
+            return node
+        return None
 
     def on_iter_parent(self, node):
         '''returns the parent of this node'''
@@ -274,7 +280,6 @@ class ViewTree(object):
             context=None):
         self.view = gtk.TreeView()
         self.view.set_headers_visible(not CONFIG['client.modepda'])
-        self.view.get_selection().set_mode('single')
         self.context = {}
         self.context.update(rpc.session.context)
         if context:

@@ -52,9 +52,6 @@ class Tree(object):
                 context=context)
         self.tree_res.view.connect('row-activated', self.sig_activate)
 
-        sel = self.tree_res.view.get_selection()
-        sel.connect('changed', self.expand_one)
-
         if not name:
             self.name = self.tree_res.name
         else:
@@ -149,11 +146,6 @@ class Tree(object):
             self.tree_res.ids = ids
             self.tree_res.reload()
         return False
-
-    def expand_one(self, selection):
-        i = selection.get_selected_rows()[1]
-        if i:
-            self.tree_res.view.expand_row(i[0], False)
 
     def sig_print(self, widget=None, keyword='client_print_multi'):
         self.sig_action(keyword='client_print_multi')
