@@ -86,7 +86,6 @@ class Action(object):
                     'res_id',
                     'res_model',
                     'view_type',
-                    'view_mode',
                     'limit',
                     'auto_refresh',
                     ):
@@ -96,9 +95,10 @@ class Action(object):
                 datas['limit'] = 80
 
             view_ids = False
+            datas['view_mode'] = None
             if action.get('views', []):
                 view_ids = [x[0] for x in action['views']]
-                datas['view_mode'] = ",".join([x[1] for x in action['views']])
+                datas['view_mode'] = [x[1] for x in action['views']]
             elif action.get('view_id', False):
                 view_ids = [action['view_id'][0]]
 
