@@ -42,5 +42,5 @@ class WidgetParse(ParserInterface):
                 widget = res
                 break
             else:
-                pass
+                raise Exception('Unknow view mode: %s' % node.localName)
         return widget
