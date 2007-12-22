@@ -10,7 +10,7 @@ import time
 
 from tryton.gui.window.view_form.view.form_gtk.many2one import Dialog \
         as M2ODialog
-from tryton.gui.window.win_search import win_search
+from tryton.gui.window.win_search import WinSearch
 
 import tryton.rpc as rpc
 import datetime as DT
@@ -46,13 +46,13 @@ class ParserTree(ParserInterface):
             treeview = EditableTreeView(editable)
         else:
             treeview = gtk.TreeView()
-            treeview.editable = editable
             treeview.cells = {}
+        treeview.colors = {}
         self.treeview = treeview
         for color_spec in attrs.get('colors', '').split(';'):
             if color_spec:
                 colour, test = color_spec.split(':')
-                treeview.colors[colour] = test
+                self.treeview.colors[colour] = test
         treeview.set_property('rules-hint', True)
         if not self.title:
             self.title = attrs.get('string', 'Unknown')
@@ -145,7 +145,8 @@ class Char(object):
             align = 1
         else:
             align = 0
-        if self.treeview.editable:
+        if hasattr(self.treeview, 'editable') \
+                and self.treeview.editable:
             field = model[self.field_name]
             if not field.get_state_attrs(model).get('valid', True):
                 cell.set_property('background',
@@ -368,7 +369,7 @@ class M2O(Char):
     def search_remote(self, relation, ids=None, domain=None, context=None):
         rpc_relation = RPCProxy(relation)
 
-        win = win_search(relation, sel_multi=False, ids=ids, context=context,
+        win = WinSearch(relation, sel_multi=False, ids=ids, context=context,
                 domain=domain)
         found = win.go()
         if found:
@@ -412,7 +413,7 @@ class M2M(Char):
         context = model[self.field_name].context_get(model)
         names = rpc_relation.name_search(text, domain, 'ilike', context)
         ids = [x[0] for x in names]
-        win = win_search(relation, sel_multi=True, ids=ids, context=context,
+        win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain)
         found = win.go()
         return found or []
@@ -432,7 +433,7 @@ class M2M(Char):
                 return True, ids
         else:
             ids = model[self.field_name].get_client(model)
-        win = win_search(relation, sel_multi=True, ids=ids, context=context,
+        win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain)
         found = win.go()
         if found:
@@ -474,4 +475,5 @@ CELLTYPES = {
     'integer': Int,
     'datetime': Datetime,
     'boolean': Boolean,
+    'text': Char,
 }

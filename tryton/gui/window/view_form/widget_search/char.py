@@ -10,7 +10,7 @@ class Char(Interface):
     def __init__(self, name, parent, attrs=None):
         if attrs is None:
             attrs = {}
-        super(Char, self).__init__(self, name, parent, attrs)
+        super(Char, self).__init__(name, parent, attrs)
 
         self.widget = gtk.Entry()
         self.widget.set_max_length(int(attrs.get('size', 16)))

@@ -4,7 +4,7 @@ import gettext
 from interface import WidgetInterface
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
-from tryton.gui.window.win_search import win_search
+from tryton.gui.window.win_search import WinSearch
 import tryton.rpc as rpc
 from tryton.action import Action
 
@@ -192,7 +192,7 @@ class Many2One(WidgetInterface):
             self.display(self._view.model, self._view.modelfield)
             self.activate = True
         else:
-            win = win_search(self.attrs['relation'], sel_multi=False,
+            win = WinSearch(self.attrs['relation'], sel_multi=False,
                     ids = [x[0] for x in ids], context=context,
                     domain=domain, window=self._window)
             ids = win.go()
@@ -255,7 +255,7 @@ class Many2One(WidgetInterface):
                     self.activate = True
                     return True
 
-                win = win_search(self.attrs['relation'], sel_multi=False,
+                win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids = [x[0] for x in ids], context=context,
                         domain=domain, parent=self._window)
                 ids = win.go()

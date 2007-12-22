@@ -1,6 +1,6 @@
 from interface import ParserInterface
 #import form_gtk
-import tree_gtk
+import list_gtk
 #import graph_gtk
 #import calendar_gtk
 #from form import ViewForm
@@ -10,7 +10,7 @@ from list import ViewList
 
 PARSERS = {
 #    'form': form_gtk.parser_form,
-    'tree': tree_gtk.parser_tree,
+    'tree': list_gtk.ParserTree,
 #    'graph': graph_gtk.parser_graph,
 #    'calendar': calendar_gtk.parser_calendar,
 }

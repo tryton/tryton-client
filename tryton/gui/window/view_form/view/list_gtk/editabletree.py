@@ -15,7 +15,6 @@ class EditableTreeView(gtk.TreeView):
         super(EditableTreeView, self).__init__()
         self.editable = position
         self.cells = {}
-        self.colors = dict()
 
     def on_quit_cell(self, current_model, fieldname, value):
         modelfield = current_model[fieldname]

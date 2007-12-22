@@ -173,7 +173,7 @@ class RPCSession(object):
                         rpc_exception.message)
         else:
             from gui import Main
-            common.error(_('Application Error'),
+            common.error(_('Application Error'), exception.faultCode,
                     Main.get_main().window, exception.faultString)
 
     def rpc_exec_auth(self, obj, method, *args):

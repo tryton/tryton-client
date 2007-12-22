@@ -93,11 +93,11 @@ class Screen(SignalEvent):
         else:
             self.screen_container.hide_filter()
 
-    def search_clear(self, widget):
+    def search_clear(self, widget=None):
         self.filter_widget.clear()
         self.clear()
 
-    def search_filter(self, widget):
+    def search_filter(self, widget=None):
         limit = self.filter_widget.get_limit()
         offset = self.filter_widget.get_offset()
         values = self.filter_widget.value
@@ -239,7 +239,7 @@ class Screen(SignalEvent):
         dom = xml.dom.minidom.parseString(arch)
         _parse_fields(dom, fields)
 
-        from tryton.gui.window.view_form.view.widget_parse import widget_parse
+        from tryton.gui.window.view_form.view.widget_parse import WidgetParse
         models = self.models.models
         if self.current_model and (self.current_model not in models):
             models = models + [self.current_model]
@@ -249,7 +249,7 @@ class Screen(SignalEvent):
             self.models.add_fields(fields, self.models, context=context)
         self.fields = self.models.fields
 
-        parser = widget_parse(parent=self.parent, window=self.window)
+        parser = WidgetParse(parent=self.parent, window=self.window)
         dom = xml.dom.minidom.parseString(arch)
         view = parser.parse(self, dom, self.fields, toolbar=toolbar)
 

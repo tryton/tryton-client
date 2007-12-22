@@ -6,7 +6,7 @@ class Selection(Interface):
     def __init__(self, name, parent, attrs=None):
         if attrs is None:
             attrs = {}
-        super(Selection, self).__init__(self, name, parent, attrs)
+        super(Selection, self).__init__(name, parent, attrs)
 
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(False)

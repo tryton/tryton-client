@@ -11,7 +11,7 @@ class SpinButton(Interface):
     def __init__(self, name, parent, attrs=None):
         if attrs is None:
             attrs = {}
-        super(SpinButton, self).__init__(self, name, parent, attrs)
+        super(SpinButton, self).__init__(name, parent, attrs)
 
         self.widget = gtk.HBox(spacing=3)
 

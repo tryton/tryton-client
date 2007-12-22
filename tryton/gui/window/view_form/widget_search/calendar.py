@@ -18,7 +18,7 @@ if not hasattr(locale, 'D_FMT'):
 class Calendar(Interface):
 
     def __init__(self, name, parent, attrs=None):
-        super(Calendar, self).__init__(self, name, parent, attrs)
+        super(Calendar, self).__init__(name, parent, attrs)
 
         tooltips = gtk.Tooltips()
         self.widget = gtk.HBox(spacing=3)

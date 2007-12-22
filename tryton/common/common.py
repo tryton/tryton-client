@@ -190,10 +190,9 @@ def error(title, msg, parent, details=''):
     log = logging.getLogger('common.message')
     log.error('MSG %s: %s' % (str(msg), details))
 
-    support_id = CONFIG['support.support_id']
-
     xml = glade.XML(GLADE, "win_error", gettext.textdomain())
     win = xml.get_widget('win_error')
+    print parent
     win.set_transient_for(parent)
     win.set_icon(TRYTON_ICON)
     xml.get_widget('error_title').set_text(str(title))
@@ -201,8 +200,6 @@ def error(title, msg, parent, details=''):
     buf = gtk.TextBuffer()
     buf.set_text(unicode(details,'latin1').encode('utf-8'))
     xml.get_widget('error_details').set_buffer(buf)
-
-    xml.get_widget('id_entry').set_text(support_id)
 
     xml.signal_connect('on_closebutton_clicked', lambda x : win.destroy())
 

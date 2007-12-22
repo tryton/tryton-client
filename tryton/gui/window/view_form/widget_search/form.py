@@ -100,7 +100,7 @@ class Parse(object):
                     self.add_widget_end.append((attrs, val))
 
     def add_widget(self, attrs, val):
-        ftype = attrs.get('widget', self.fields[str(attrs['name'])]['ftype'])
+        ftype = attrs.get('widget', self.fields[str(attrs['name'])]['type'])
         self.fields[str(attrs['name'])].update(attrs)
         self.fields[str(attrs['name'])]['model']=self.model
         if ftype not in WIDGETS_TYPE:
@@ -168,7 +168,7 @@ class Parse(object):
         table.attach(self.button_param, 0, 1, 0, 1,
                 yoptions=gtk.FILL, xoptions=gtk.FILL, ypadding=2, xpadding=0)
 
-        self.hb_param = self.container.wid_add(self.add_parameters(), l=8,
+        self.hb_param = self.container.wid_add(self.add_parameters(), length=8,
                 name=_('Parameters :'))
 
 
