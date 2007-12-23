@@ -65,6 +65,8 @@ class ParserTree(ParserInterface):
                     if boolean_fields in node_attrs:
                         node_attrs[boolean_fields] = \
                                 bool(int(node_attrs[boolean_fields]))
+                if fname not in fields:
+                    continue
                 fields[fname].update(node_attrs)
                 node_attrs.update(fields[fname])
                 cell = CELLTYPES.get(fields[fname]['type'])(fname, treeview,

@@ -90,14 +90,15 @@ class Parse(object):
         if name in ('form','tree'):
             self.title = attrs.get('string', self.title)
             self.container.new(self.col)
-        elif name=='field':
-            val  = attrs.get('select', False) \
-                    or self.fields[str(attrs['name'])].get('select', False)
-            if val:
-                if int(val) <= 1:
-                    self.add_widget(attrs, val)
-                else:
-                    self.add_widget_end.append((attrs, val))
+        elif name == 'field':
+            if attrs['name'] in self.fields:
+                val  = attrs.get('select', False) \
+                        or self.fields[attrs['name']].get('select', False)
+                if val:
+                    if int(val) <= 1:
+                        self.add_widget(attrs, val)
+                    else:
+                        self.add_widget_end.append((attrs, val))
 
     def add_widget(self, attrs, val):
         ftype = attrs.get('widget', self.fields[str(attrs['name'])]['type'])
