@@ -100,7 +100,8 @@ class Many2One(WidgetInterface):
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('button_press_event', self._menu_open)
-        self.wid_text.connect_after('changed', self.sig_changed)
+        self.sig_changed_id = self.wid_text.connect_after('changed',
+                self.sig_changed)
         self.wid_text.connect_after('activate', self.sig_activate)
         self.wid_text_focus_out_id = \
                 self.wid_text.connect_after('focus-out-event',
@@ -135,7 +136,6 @@ class Many2One(WidgetInterface):
         self.tooltips.set_tip(self.but_open, _('Open a resource'))
         self.tooltips.enable()
 
-        self.activate = True
         self._readonly = False
         self.model_type = attrs['relation']
         self._menu_loaded = False
@@ -191,7 +191,6 @@ class Many2One(WidgetInterface):
         if len(ids)==1:
             self._view.modelfield.set_client(self._view.model, ids[0])
             self.display(self._view.model, self._view.modelfield)
-            self.activate = True
         else:
             win = WinSearch(self.attrs['relation'], sel_multi=False,
                     ids = [x[0] for x in ids], context=context,
@@ -215,7 +214,9 @@ class Many2One(WidgetInterface):
         return self.wid_text
 
     def sig_activate(self, widget, event=None, leave=False):
-        self.activate = False
+        if self.sig_changed_id:
+            self.wid_text.disconnect(self.sig_changed_id)
+            self.sig_changed_id = False
         value = self._view.modelfield.get(self._view.model)
 
         self.wid_text.disconnect(self.wid_text_focus_out_id)
@@ -246,7 +247,8 @@ class Many2One(WidgetInterface):
                             self.wid_text.connect_after('focus-out-event',
                                     self.sig_activate, True)
                     self.display(self._view.model, self._view.modelfield)
-                    self.activate = True
+                    self.sig_changed_id = self.wid_text.connect_after('changed',
+                            self.sig_changed)
                     return True
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
@@ -263,7 +265,8 @@ class Many2One(WidgetInterface):
                 self.wid_text.connect_after('focus-out-event',
                         self.sig_activate, True)
         self.display(self._view.model, self._view.modelfield)
-        self.activate = True
+        self.sig_changed_id = self.wid_text.connect_after('changed',
+                self.sig_changed)
 
     def sig_new(self, *args):
         self.wid_text.disconnect(self.wid_text_focus_out_id)
@@ -294,22 +297,22 @@ class Many2One(WidgetInterface):
         return False
 
     def sig_changed(self, *args):
-        if self.activate:
-            if self._view.modelfield.get(self._view.model):
-                self._view.modelfield.set_client(self._view.model, False)
-                self.display(self._view.model, self._view.modelfield)
+        if self._view.modelfield.get(self._view.model):
+            self._view.modelfield.set_client(self._view.model, False)
+            self.display(self._view.model, self._view.modelfield)
         return False
 
     def set_value(self, model, model_field):
         pass # No update of the model, the model is updated in real time !
 
     def display(self, model, model_field):
+        if self.sig_changed_id:
+            self.wid_text.disconnect(self.sig_changed_id)
+            self.sig_changed_id = False
         if not model_field:
-            self.activate = False
             self.wid_text.set_text('')
             return False
         WidgetInterface.display(self, model, model_field)
-        self.activate = False
         res = model_field.get_client(model)
         self.wid_text.set_text((res and str(res)) or '')
         img = gtk.Image()
@@ -321,7 +324,8 @@ class Many2One(WidgetInterface):
             img.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Search a resource'))
-        self.activate = True
+        self.sig_changed_id = self.wid_text.connect_after('changed',
+                self.sig_changed)
 
     def _menu_open(self, obj, event):
         if event.button == 3:
