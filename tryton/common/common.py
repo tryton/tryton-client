@@ -192,7 +192,6 @@ def error(title, msg, parent, details=''):
 
     xml = glade.XML(GLADE, "win_error", gettext.textdomain())
     win = xml.get_widget('win_error')
-    print parent
     win.set_transient_for(parent)
     win.set_icon(TRYTON_ICON)
     xml.get_widget('error_title').set_text(str(title))
@@ -269,7 +268,7 @@ def sur(msg, parent):
     win.destroy()
     return response == gtk.RESPONSE_OK
 
-def sur_3b(msg, parent=None):
+def sur_3b(msg, parent):
     xml = glade.XML(GLADE, "win_quest_3b",
             gettext.textdomain())
     win = xml.get_widget('win_quest_3b')
@@ -330,4 +329,5 @@ COLORS = {
 }
 
 DT_FORMAT = '%Y-%m-%d'
-DHM_FORMAT = '%Y-%m-%d %H:%M:%S'
+HM_FORMAT = '%H:%M:%S'
+DHM_FORMAT = DT_FORMAT + ' ' + HM_FORMAT

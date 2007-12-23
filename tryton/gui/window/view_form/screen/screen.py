@@ -16,7 +16,7 @@ class Screen(SignalEvent):
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
             default_get=None, show_search=False, window=None, limit=80,
-            readonly=False):
+            readonly=False, form=None):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -67,6 +67,7 @@ class Screen(SignalEvent):
         self.tree_saves = tree_saves
         self.limit = limit
         self.readonly = readonly
+        self.form = form
 
         if view_type:
             self.view_to_load = view_type[1:]
@@ -233,7 +234,7 @@ class Screen(SignalEvent):
                     try:
                         fields[str(attrs['name'])].update(attrs)
                     except:
-                        raise
+                        pass
             for node2 in node.childNodes:
                 _parse_fields(node2, fields)
         dom = xml.dom.minidom.parseString(arch)
@@ -263,15 +264,16 @@ class Screen(SignalEvent):
 
     def editable_get(self):
         if hasattr(self.current_view, 'widget_tree'):
-            return self.current_view.widget_tree.editable
-        else:
-            return False
+            if hasattr(self.current_view.widget_tree, 'editable'):
+                return self.current_view.widget_tree.editable
+        return False
 
     def new(self, default=True, context=None):
         if context is None:
             context = {}
         if self.current_view and self.current_view.view_type == 'tree' \
-                and not self.current_view.widget_tree.editable:
+                and not (hasattr(self.current_view.widget_tree, 'editable') \
+                    and self.current_view.widget_tree.editable):
             self.switch_view()
         ctx = self.context.copy()
         ctx.update(context)
@@ -309,7 +311,7 @@ class Screen(SignalEvent):
         self.current_view.set_value()
         obj_id = False
         if self.current_model.validate():
-            obj_id = self.current_model.save(reload=True)
+            obj_id = self.current_model.save(force_reload=True)
         else:
             self.current_view.display()
             self.current_view.set_cursor()
@@ -318,7 +320,7 @@ class Screen(SignalEvent):
             for model in self.models.models:
                 if model.is_modified():
                     if model.validate():
-                        obj_id = model.save(reload=True)
+                        obj_id = model.save(force_reload=True)
                     else:
                         self.current_model = model
                         self.display()

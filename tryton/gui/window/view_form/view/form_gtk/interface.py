@@ -64,6 +64,7 @@ class WidgetInterface(object):
         if attrs is None:
             attrs = {}
         self.parent = parent
+        self.model = model
         self._window = window
         self._view = None
         self.attrs = attrs

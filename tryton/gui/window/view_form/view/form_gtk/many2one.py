@@ -7,6 +7,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 import tryton.rpc as rpc
 from tryton.action import Action
+from tryton.config import TRYTON_ICON
 
 _ = gettext.gettext
 
@@ -30,7 +31,7 @@ class Dialog(object):
         self.dia.set_property('default-width', 760)
         self.dia.set_property('default-height', 500)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        self.dia.set_icon(common.TINYERP_ICON)
+        self.dia.set_icon(TRYTON_ICON)
 
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
@@ -213,13 +214,6 @@ class Many2One(WidgetInterface):
     def _color_widget(self):
         return self.wid_text
 
-    def _menu_sig_pref(self, obj):
-        self._menu_sig_default_set()
-
-    def _menu_sig_default(self, obj):
-        rpc.session.rpc_exec_auth('/object', 'execute',
-                self.attrs['model'], 'default_get', [self.attrs['name']])
-
     def sig_activate(self, widget, event=None, leave=False):
         self.activate = False
         value = self._view.modelfield.get(self._view.model)
@@ -258,7 +252,7 @@ class Many2One(WidgetInterface):
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids = [x[0] for x in ids], context=context,
                         domain=domain, parent=self._window)
-                ids = win.go()
+                ids = win.run()
                 if ids:
                     name = rpc.session.rpc_exec_auth('/object', 'execute',
                             self.attrs['relation'], 'name_get', [ids[0]],

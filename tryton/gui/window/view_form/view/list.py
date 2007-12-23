@@ -226,7 +226,7 @@ class ViewList(ParserView):
         del self.widget
 
     def __sig_switch(self, treeview, *args):
-        self.screen.row_activate(self.screen)
+        self.screen.row_activate()
 
     def __select_changed(self, tree_sel):
         if tree_sel.get_mode() == gtk.SELECTION_SINGLE:

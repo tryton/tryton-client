@@ -48,7 +48,8 @@ class Form(object):
         self.screen = Screen(self.model, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
                 hastoolbar=CONFIG['form.toolbar'], show_search=True,
-                window=self.window, limit=limit, readonly=bool(auto_refresh))
+                window=self.window, limit=limit, readonly=bool(auto_refresh),
+                form=self)
         self.screen.signal_connect(self, 'record-message', self._record_message)
         self.screen.widget.show()
 
@@ -106,7 +107,7 @@ class Form(object):
         if auto_refresh and int(auto_refresh):
             gobject.timeout_add(int(auto_refresh) * 1000, self.sig_reload)
 
-    def sig_goto(self, widget):
+    def sig_goto(self, widget=None):
         if not self.modified_save():
             return
         glade2 = glade.XML(GLADE, 'dia_goto_id', gettext.textdomain())
@@ -136,7 +137,7 @@ class Form(object):
     def id_get(self):
         return self.screen.id_get()
 
-    def sig_attach(self, widget):
+    def sig_attach(self, widget=None):
         obj_id = self.screen.id_get()
         if obj_id:
             import win_attach
@@ -154,7 +155,7 @@ class Form(object):
     def _id_get(self):
         return self.screen.id_get()
 
-    def sig_logs(self, widget):
+    def sig_logs(self, widget=None):
         obj_id = self._id_get()
         if not obj_id:
             self.message_state(_('You have to select one resource!'))
@@ -177,21 +178,21 @@ class Form(object):
                         (key in ('create_uid', 'write_uid')):
                     line[key] = line[key][1]
                 message += val+': ' + str(line.get(key, False) or '/')+'\n'
-        common.message(message)
+        common.message(message, self.window)
         return True
 
-    def sig_remove(self, widget):
+    def sig_remove(self, widget=None):
         if self.screen.current_view.view_type == 'form':
             msg = _('Are you sure to remove this record?')
         else:
             msg = _('Are you sure to remove those records?')
-        if common.sur(msg):
+        if common.sur(msg, self.window):
             if not self.screen.remove(unlink=True):
                 self.message_state(_('Resources not removed!'))
             else:
                 self.message_state(_('Resources removed!'))
 
-    def sig_import(self, widget):
+    def sig_import(self, widget=None):
         fields = []
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
@@ -199,7 +200,7 @@ class Form(object):
                 parent=self.window)
         win.go()
 
-    def sig_save_as(self, widget):
+    def sig_save_as(self, widget=None):
         fields = []
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
@@ -207,14 +208,14 @@ class Form(object):
                 self.screen.fields, fields, parent=self.window)
         win.go()
 
-    def sig_new(self, widget, autosave=True):
+    def sig_new(self, widget=None, autosave=True):
         if autosave:
             if not self.modified_save():
                 return
         self.screen.new()
         self.message_state('')
 
-    def sig_copy(self, widget):
+    def sig_copy(self, widget=None):
         if not self.modified_save():
             return
         res_id = self._id_get()
@@ -226,7 +227,7 @@ class Form(object):
             self.screen.load([new_id])
             self.message_state(_('Working now on the duplicated document !'))
 
-    def sig_save(self, widget):
+    def sig_save(self, widget=None):
         if self.screen.save_current():
             self.message_state(_('Document saved !'))
             return True
@@ -251,7 +252,7 @@ class Form(object):
             return False
         if test_modified and self.screen.is_modified():
             res = common.sur_3b(_('This record has been modified\n' \
-                    'do you want to save it ?'))
+                    'do you want to save it ?'), self.window)
             if res == 'ok':
                 self.sig_save(None)
             elif res == 'ko':
@@ -312,7 +313,7 @@ class Form(object):
                 'type': 'ir.actions.report.xml',
                 }})
 
-    def sig_search(self, widget):
+    def sig_search(self, widget=None):
         if not self.modified_save():
             return
         win = win_search.win_search(self.model, domain=self.domain,
@@ -360,7 +361,8 @@ class Form(object):
         if self.screen.is_modified():
             value = common.sur_3b(
                     _('This record has been modified\n' \
-                            'do you want to save it ?'))
+                            'do you want to save it ?'),
+                    self.window)
             if value == 'ok':
                 return self.sig_save(None)
             elif value == 'ko':

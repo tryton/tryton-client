@@ -86,12 +86,11 @@ class EditableTreeView(gtk.TreeView):
 
     def set_cursor(self, path, focus_column=None, start_editing=False):
         if focus_column and (focus_column._type in ('many2one','many2many')):
-            self.warn('misc-message',
-                    _('Relation Field: F1: New F2: Open/Search'))
+            self.screen.form.message_state(_('Relation Field: F1: New F2: Open/Search'))
         elif focus_column and (focus_column._type in ('boolean')):
             start_editing = False
         else:
-            self.warn('misc-message', '')
+            self.screen.form.message_state('')
         return super(EditableTreeView, self).set_cursor(path, focus_column,
                 start_editing)
 
@@ -157,7 +156,7 @@ class EditableTreeView(gtk.TreeView):
                     if col.name in invalid_fields:
                         break
                 self.set_cursor(path, col, True)
-                self.warn('misc-message',
+                self.screen.form.message_state(
                         _('Warning; field "%s" is required !') % \
                                 invalid_fields[col.name])
                 return True
