@@ -121,9 +121,6 @@ class Reference(WidgetInterface):
         if not self.focus_out:
             return
         child = self.widget_combo.get_child()
-        if self.sig_changed_combo_id:
-            child.disconnect(self.sig_changed_combo_id)
-            self.sig_changed_combo_id = False
         self.changed = False
         value = self._view.modelfield.get_client(self._view.model)
 
@@ -155,8 +152,6 @@ class Reference(WidgetInterface):
                             (model, [obj_id, name]))
                     self.display(self._view.model, self._view.modelfield)
                     self.focus_out = True
-                    self.sig_changed_combo_id = child.connect('changed',
-                            self.sig_changed_combo)
                     self.changed = True
                     return True
 
@@ -171,8 +166,6 @@ class Reference(WidgetInterface):
                     self._view.modelfield.set_client(self._view.model,
                             (model, [obj_id, name]))
         self.focus_out = True
-        self.sig_changed_combo_id = child.connect('changed',
-                self.sig_changed_combo)
         self.changed = True
         self.display(self._view.model, self._view.modelfield)
 
@@ -190,7 +183,7 @@ class Reference(WidgetInterface):
             self.sig_new(widget, event)
         elif event.keyval == gtk.keysyms.F2:
             self.sig_focus_out(widget, event)
-        elif event.keyval  == gtk.keysyms.Tab:
+        elif event.keyval == gtk.keysyms.Tab:
             if self._view.modelfield.get(self._view.model) or \
                     not self.wid_text.get_text():
                 return False
@@ -199,6 +192,8 @@ class Reference(WidgetInterface):
         return False
 
     def sig_changed_combo(self, *args):
+        if not self.changed:
+            return
         self.wid_text.set_text('')
         self._view.modelfield.set_client(self._view.model,
                 (self.get_model(), [0, '']))
@@ -206,25 +201,23 @@ class Reference(WidgetInterface):
     def sig_changed(self, *args):
         if not self.changed:
             return False
-        if self._view.modelfield.get(self._view.model):
+        val = self._view.modelfield.get(self._view.model)
+        if val:
+            val = int(val.split(',')[1])
+        if val:
             self._view.modelfield.set_client(self._view.model,
-                    (self.get_model(), [0, '']))
+                    (self.get_model(), (0, '')))
             self.display(self._view.model, self._view.modelfield)
         return False
 
     def display(self, model, model_field):
         child = self.widget_combo.get_child()
-        if self.sig_changed_combo_id:
-            child.disconnect(self.sig_changed_combo_id)
-            self.sig_changed_combo_id = False
         self.changed = False
-        super(Reference, self).display(model, model_field)
         if not model_field:
             child.set_text('')
-            self.sig_changed_combo_id = child.connect('changed',
-                    self.sig_changed_combo)
             self.changed =True
             return False
+        super(Reference, self).display(model, model_field)
         value = model_field.get_client(model)
         img = gtk.Image()
         if not value:
@@ -243,8 +236,6 @@ class Reference(WidgetInterface):
             self.wid_text.set_text('')
             img.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
-        self.sig_changed_combo_id = child.connect('changed',
-                self.sig_changed_combo)
         self.changed = True
 
     def sig_key_pressed(self, *args):
