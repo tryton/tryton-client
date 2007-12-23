@@ -100,12 +100,12 @@ class Many2One(WidgetInterface):
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('button_press_event', self._menu_open)
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.wid_text.connect_after('changed', self.sig_changed)
+        self.changed = True
         self.wid_text.connect_after('activate', self.sig_activate)
-        self.wid_text_focus_out_id = \
-                self.wid_text.connect_after('focus-out-event',
+        self.wid_text.connect_after('focus-out-event',
                         self.sig_activate, True)
+        self.focus_out = True
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_new = gtk.Button()
@@ -214,12 +214,12 @@ class Many2One(WidgetInterface):
         return self.wid_text
 
     def sig_activate(self, widget, event=None, leave=False):
-        if self.sig_changed_id:
-            self.wid_text.disconnect(self.sig_changed_id)
-            self.sig_changed_id = False
+        if not self.focus_out:
+            return
+        self.changed = False
         value = self._view.modelfield.get(self._view.model)
 
-        self.wid_text.disconnect(self.wid_text_focus_out_id)
+        self.focus_out = False
         if value:
             if not leave:
                 domain = self._view.modelfield.domain_get(self._view.model)
@@ -243,12 +243,8 @@ class Many2One(WidgetInterface):
                 if len(ids)==1:
                     self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
-                    self.wid_text_focus_out_id = \
-                            self.wid_text.connect_after('focus-out-event',
-                                    self.sig_activate, True)
+                    self.focus_out = True
                     self.display(self._view.model, self._view.modelfield)
-                    self.sig_changed_id = self.wid_text.connect_after('changed',
-                            self.sig_changed)
                     return True
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
@@ -261,15 +257,12 @@ class Many2One(WidgetInterface):
                             rpc.session.context)[0]
                     self._view.modelfield.set_client(self._view.model, name,
                             force_change=True)
-        self.wid_text_focus_out_id = \
-                self.wid_text.connect_after('focus-out-event',
-                        self.sig_activate, True)
+        self.focus_out = True
         self.display(self._view.model, self._view.modelfield)
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.changed = True
 
     def sig_new(self, *args):
-        self.wid_text.disconnect(self.wid_text_focus_out_id)
+        self.focus_out = False
         domain = self._view.modelfield.domain_get(self._view.model)
         dia = Dialog(self.attrs['relation'], attrs=self.attrs,
                 window=self._window, domain=domain)
@@ -278,9 +271,8 @@ class Many2One(WidgetInterface):
             self._view.modelfield.set_client(self._view.model, value)
             self.display(self._view.model, self._view.modelfield)
         dia.destroy()
-        self.wid_text_focus_out_id = \
-                self.wid_text.connect_after('focus-out-event',
-                        self.sig_activate, True)
+        self.focus_out = True
+
     sig_edit = sig_activate
 
     def sig_key_press(self, widget, event, *args):
@@ -297,6 +289,8 @@ class Many2One(WidgetInterface):
         return False
 
     def sig_changed(self, *args):
+        if not self.changed:
+            return False
         if self._view.modelfield.get(self._view.model):
             self._view.modelfield.set_client(self._view.model, False)
             self.display(self._view.model, self._view.modelfield)
@@ -306,11 +300,10 @@ class Many2One(WidgetInterface):
         pass # No update of the model, the model is updated in real time !
 
     def display(self, model, model_field):
-        if self.sig_changed_id:
-            self.wid_text.disconnect(self.sig_changed_id)
-            self.sig_changed_id = False
+        self.changed = False
         if not model_field:
             self.wid_text.set_text('')
+            self.changed = True
             return False
         WidgetInterface.display(self, model, model_field)
         res = model_field.get_client(model)
@@ -324,8 +317,7 @@ class Many2One(WidgetInterface):
             img.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Search a resource'))
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.changed = True
 
     def _menu_open(self, obj, event):
         if event.button == 3:

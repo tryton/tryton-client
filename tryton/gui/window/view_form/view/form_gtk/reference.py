@@ -34,11 +34,12 @@ class Reference(WidgetInterface):
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('button_press_event', self._menu_open)
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.wid_text.connect_after('changed', self.sig_changed)
+        self.changed = True
         self.wid_text.connect_after('activate', self.sig_activate)
-        self.wid_text_focus_out_id = self.wid_text.connect_after(
-                'focus-out-event', self.focus_out, True)
+        self.wid_text.connect_after('focus-out-event', self.sig_focus_out,
+                True)
+        self.focus_out = True
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_new = gtk.Button()
@@ -114,19 +115,19 @@ class Reference(WidgetInterface):
         return
 
     def sig_activate(self, widget=None):
-        self.focus_out(widget, None)
+        self.sig_focus_out(widget, None)
 
-    def focus_out(self, widget, event, leave=False):
+    def sig_focus_out(self, widget, event, leave=False):
+        if not self.focus_out:
+            return
         child = self.widget_combo.get_child()
         if self.sig_changed_combo_id:
             child.disconnect(self.sig_changed_combo_id)
             self.sig_changed_combo_id = False
-        if self.sig_changed_id:
-            self.wid_text.disconnect(self.sig_changed_id)
-            self.sig_changed_id = False
+        self.changed = False
         value = self._view.modelfield.get_client(self._view.model)
 
-        self.wid_text.disconnect(self.wid_text_focus_out_id)
+        self.focus_out = False
         if not value:
             model, (obj_id, name) = self.get_model() or '', (0, '')
         else:
@@ -153,12 +154,10 @@ class Reference(WidgetInterface):
                     self._view.modelfield.set_client(self._view.model,
                             (model, [obj_id, name]))
                     self.display(self._view.model, self._view.modelfield)
-                    self.wid_text_focus_out_id = self.wid_text.connect_after(
-                        'focus-out-event', self.focus_out, True)
+                    self.focus_out = True
                     self.sig_changed_combo_id = child.connect('changed',
                             self.sig_changed_combo)
-                    self.sig_changed_id = self.wid_text.connect_after('changed',
-                            self.sig_changed)
+                    self.changed = True
                     return True
 
                 win = WinSearch(model, sel_multi=False,
@@ -171,12 +170,10 @@ class Reference(WidgetInterface):
                             rpc.session.context)[0]
                     self._view.modelfield.set_client(self._view.model,
                             (model, [obj_id, name]))
-        self.wid_text_focus_out_id = self.wid_text.connect_after(
-                'focus-out-event', self.focus_out, True)
+        self.focus_out = True
         self.sig_changed_combo_id = child.connect('changed',
                 self.sig_changed_combo)
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.changed = True
         self.display(self._view.model, self._view.modelfield)
 
     def sig_new(self, *args):
@@ -192,12 +189,12 @@ class Reference(WidgetInterface):
         if event.keyval == gtk.keysyms.F1:
             self.sig_new(widget, event)
         elif event.keyval == gtk.keysyms.F2:
-            self.focus_out(widget, event)
+            self.sig_focus_out(widget, event)
         elif event.keyval  == gtk.keysyms.Tab:
             if self._view.modelfield.get(self._view.model) or \
                     not self.wid_text.get_text():
                 return False
-            self.focus_out(widget, event, leave=True)
+            self.sig_focus_out(widget, event, leave=True)
             return True
         return False
 
@@ -207,6 +204,8 @@ class Reference(WidgetInterface):
                 (self.get_model(), [0, '']))
 
     def sig_changed(self, *args):
+        if not self.changed:
+            return False
         if self._view.modelfield.get(self._view.model):
             self._view.modelfield.set_client(self._view.model,
                     (self.get_model(), [0, '']))
@@ -218,16 +217,13 @@ class Reference(WidgetInterface):
         if self.sig_changed_combo_id:
             child.disconnect(self.sig_changed_combo_id)
             self.sig_changed_combo_id = False
-        if self.sig_changed_id:
-            self.wid_text.disconnect(self.sig_changed_id)
-            self.sig_changed_id = False
+        self.changed = False
         super(Reference, self).display(model, model_field)
         if not model_field:
             child.set_text('')
             self.sig_changed_combo_id = child.connect('changed',
                     self.sig_changed_combo)
-            self.sig_changed_id = self.wid_text.connect_after('changed',
-                    self.sig_changed)
+            self.changed =True
             return False
         value = model_field.get_client(model)
         img = gtk.Image()
@@ -249,8 +245,7 @@ class Reference(WidgetInterface):
             self.but_open.set_image(img)
         self.sig_changed_combo_id = child.connect('changed',
                 self.sig_changed_combo)
-        self.sig_changed_id = self.wid_text.connect_after('changed',
-                self.sig_changed)
+        self.changed = True
 
     def sig_key_pressed(self, *args):
         key = args[1].string.lower()
