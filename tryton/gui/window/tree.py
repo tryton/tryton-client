@@ -198,7 +198,8 @@ class Tree(object):
                 if child.get_active():
                     obj_id = child.get_data('id')
         if obj_id:
-            Window.create(None, self.model, obj_id, self.domain)
+            Window.create(None, self.model, obj_id, self.domain,
+                    window=self.window, mode=['form', 'tree'])
         else:
             common.message(_('No resource selected!'))
 
