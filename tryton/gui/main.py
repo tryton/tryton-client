@@ -492,7 +492,7 @@ class Main(object):
     def shortcut_set(self):
         def _action_shortcut(widget, action):
             ctx = rpc.session.context.copy()
-            Action.exec_keyword('tree_but_open', {'model': 'ir.ui.menu',
+            Action.exec_keyword('tree_open', {'model': 'ir.ui.menu',
                 'id': action, 'ids': [action], 'report_type': 'pdf',
                 'window': self.window}, context=ctx)
         user = rpc.session.user

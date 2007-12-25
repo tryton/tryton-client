@@ -138,14 +138,17 @@ class Action(object):
 
     @staticmethod
     def exec_keyword(keyword, data=None, adds=None, context=None):
-        actions = None
+        actions = []
         if 'id' in data:
             try:
                 model_id = data.get('id', False)
+#                actions = rpc.session.rpc_exec_auth('/object', 'execute',
+#                        'ir.values', 'get', 'action', keyword,
+#                        [(data['model'], model_id)], False, rpc.session.context)
+#                actions = [x[2] for x in actions]
                 actions = rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.values', 'get', 'action', keyword,
-                        [(data['model'], model_id)], False, rpc.session.context)
-                actions = [x[2] for x in actions]
+                        'ir.action.keyword', 'get_keyword', keyword,
+                        (data['model'], model_id))
             except rpc.RPCException, exp:
                 from tryton.gui import Main
                 error(_('Error: ')+str(exp.type), exp.message,

@@ -150,7 +150,7 @@ class Tree(object):
     def sig_print(self, widget=None, keyword='client_print_multi'):
         self.sig_action(keyword='client_print_multi')
 
-    def sig_action(self, widget=None, keyword='tree_but_action', obj_id=None,
+    def sig_action(self, widget=None, keyword='tree_action', obj_id=None,
             report_type='pdf'):
         ids = self.ids_get()
 
@@ -173,10 +173,10 @@ class Tree(object):
             common.message(_('No resource selected!'), self.window)
 
     def sig_activate(self, tree_view, path, view_column):
-        self.sig_action(tree_view, 'tree_but_open' )
+        self.sig_action(tree_view, 'tree_open' )
 
     def sig_open(self, widget=None, event=None):
-        self.sig_action(widget, 'tree_but_open' )
+        self.sig_action(widget, 'tree_open' )
 
     def sig_remove(self, widget=None):
         ids = self.ids_get()
@@ -230,7 +230,7 @@ class Tree(object):
     def sc_go(self, widget=None, *args):
         obj_id = self.tree_sc.sel_id_get()
         if obj_id != None:
-            self.sig_action(None, 'tree_but_open', obj_id)
+            self.sig_action(None, 'tree_open', obj_id)
 
     def ids_get(self):
         res = self.tree_res.sel_ids_get()
