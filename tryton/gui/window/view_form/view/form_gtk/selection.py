@@ -11,8 +11,8 @@ class Selection(WidgetInterface):
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.ComboBoxEntry()
         child = self.entry.get_child()
-        self.sig_changed_id = child.connect('changed',
-                lambda x, y: self.sig_changed)
+        child.connect('changed', self.sig_changed)
+        self.changed = True
         child.set_editable(False)
         child.connect('button_press_event', self._menu_open)
         child.connect('key_press_event', self.sig_key_pressed)
@@ -61,9 +61,7 @@ class Selection(WidgetInterface):
 
     def display(self, model, model_field):
         child = self.entry.get_child()
-        if self.sig_changed_id:
-            child.disconnect(self.sig_changed_id)
-            self.sig_changed_id = False
+        self.changed = False
         if not model_field:
             child.set_text('')
             return False
@@ -78,12 +76,12 @@ class Selection(WidgetInterface):
                     child.set_text(long_text)
                     found = True
                     break
-        self.sig_changed_id = child.connect('changed',
-                lambda x, y: self.sig_changed)
+        self.changed = True
 
-    def sig_changed(self):
-        super(Selection, self).sig_changed()
-        self._focus_out()
+    def sig_changed(self, *args):
+        if self.changed:
+            super(Selection, self).sig_changed()
+            self._focus_out()
 
     def sig_key_pressed(self, *args):
         key = args[1].string.lower()

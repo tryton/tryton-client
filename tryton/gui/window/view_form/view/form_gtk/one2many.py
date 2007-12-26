@@ -231,7 +231,7 @@ class One2Many(WidgetInterface):
     def destroy(self):
         self.screen.destroy()
 
-    def _on_activate(self, screen, *args):
+    def _on_activate(self):
         self._sig_edit()
 
     def switch_view(self, btn, arg):
@@ -265,7 +265,7 @@ class One2Many(WidgetInterface):
                         dia.new()
                 dia.destroy()
 
-    def _sig_edit(self, widget, event):
+    def _sig_edit(self, widget=None, event=None):
         if self.screen.current_model:
             dia = Dialog(self.attrs['relation'], parent=self._view.model,
                     model=self.screen.current_model, attrs=self.attrs,

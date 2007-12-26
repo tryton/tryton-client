@@ -22,7 +22,7 @@ class Reference(WidgetInterface):
         self.widget_combo = gtk.ComboBoxEntry()
         child = self.widget_combo.get_child()
         child.set_editable(False)
-        self.sig_changed_combo_id = child.connect('changed',
+        child.connect('changed',
                 self.sig_changed_combo)
         child.connect('key_press_event', self.sig_key_pressed)
         self.widget_combo.set_size_request(int(attrs.get('size', -1)), -1)
@@ -224,9 +224,9 @@ class Reference(WidgetInterface):
             model, (obj_id, name) = '', (0, '')
         else:
             model, (obj_id, name) = value
-        if obj_id:
+        if model:
             child.set_text(self._selection2[model])
-            if not name:
+            if not name and obj_id:
                 obj_id, name = RPCProxy(model).name_get(obj_id,
                         rpc.session.context)[0]
             self.wid_text.set_text(name)

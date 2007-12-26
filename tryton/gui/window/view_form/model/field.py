@@ -350,7 +350,7 @@ class ReferenceField(CharField):
         if result:
             model.value[self.name] = ref_model, result[0]
         else:
-            model.value[self.name] = False
+            model.value[self.name] = ref_model, (0, '')
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
