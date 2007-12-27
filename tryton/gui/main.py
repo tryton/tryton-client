@@ -575,14 +575,14 @@ class Main(object):
     def sig_request_new(self, widget):
         return Window.create(None, 'res.request', False,
                 [('act_from', '=', rpc.session.user)], 'form',
-                mode='form,tree', window=self.window,
+                mode=['form', 'tree'], window=self.window,
                 context={'active_test': False})
 
     def sig_request_open(self, widget):
         ids = self.request_set()[0]
         return Window.create(False, 'res.request', ids,
                 [('act_to', '=', rpc.session.user), ('active', '=', True)],
-                'form', mode='tree,form', window=self.window,
+                'form', mode=['tree', 'form'], window=self.window,
                 context={'active_test': False})
 
     def sig_request_wait(self, widget):
@@ -590,7 +590,7 @@ class Main(object):
         return Window.create(False, 'res.request', ids,
                 [('act_from', '=', rpc.session.user),
                     ('state', '=', 'waiting'), ('active', '=', True)],
-                'form', mode='tree,form', window=self.window,
+                'form', mode=['tree', 'form'], window=self.window,
                 context={'active_test': False})
 
     def request_set(self):
