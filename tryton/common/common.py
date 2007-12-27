@@ -91,8 +91,10 @@ def tipoftheday(parent=None):
             tip_file = False
             if lang:
                 tip_file = os.path.join(DATA_DIR, 'tipoftheday.'+lang+'.txt')
-            if not tip_file:
+            if not os.path.isfile(tip_file):
                 tip_file = os.path.join(DATA_DIR, 'tipoftheday.txt')
+            if not os.path.isfile(tip_file):
+                return
             tips = file(tip_file).read().split('---')
             tip = tips[self.number % len(tips)]
             del tips
