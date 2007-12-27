@@ -8,7 +8,10 @@ import re
 import translate
 import gettext
 import gtk
+
 _ = gettext.gettext
+
+_VIEW_CACHE = {}
 
 class RPCException(Exception):
 
@@ -79,7 +82,18 @@ class XMLRpcGW(GWInter):
             return result
 
     def execute(self, method, *args):
+        key = False
+        if len(args) >= 7 and args[3] == 'fields_view_get':
+            key = str(args)
+            if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
+                args = args[:]
+                args = args + (_VIEW_CACHE[key][0],)
         result = getattr(self._sock, method)(self._db, *args)
+        if key:
+            if result is True and key in _VIEW_CACHE:
+                result = _VIEW_CACHE[key][1]
+            else:
+                _VIEW_CACHE[key] = (result['md5'], result)
         return self.__convert(result)
 
 class PySocketGW(GWInter):
@@ -98,11 +112,22 @@ class PySocketGW(GWInter):
         return res
 
     def execute(self, method, *args):
+        key = False
+        if len(args) >= 7 and args[3] == 'fields_view_get':
+            key = str(args)
+            if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
+                args = args[:]
+                args = args + (_VIEW_CACHE[key][0],)
         self._sock.connect(self._url)
         self._sock.send((self._obj, method, self._db)+args)
-        res = self._sock.receive()
+        result = self._sock.receive()
         self._sock.disconnect()
-        return res
+        if key:
+            if result is True and key in _VIEW_CACHE:
+                result = _VIEW_CACHE[key][1]
+            else:
+                _VIEW_CACHE[key] = (result['md5'], result)
+        return result
 
 class RPCSession(object):
     __slots__ = ('_open', '_url', 'user', 'uname', '_passwd', '_gw', 'database',
