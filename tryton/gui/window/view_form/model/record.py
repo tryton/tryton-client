@@ -110,8 +110,11 @@ class ModelRecord(SignalEvent):
         if len(self.mgroup.fields):
             val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             for clause in domain:
-                if clause[0] in self.mgroup.fields and clause[1] == '=':
-                    val[clause[0]] = clause[2]
+                if clause[0] in self.mgroup.fields:
+                    if clause[1] == '=':
+                        val[clause[0]] = clause[2]
+                    if clause[1] == 'in' and len(d[2]) == 1:
+                        val[clause[0]] = clause[2][0]
             self.set_default(val)
 
     def name_get(self):

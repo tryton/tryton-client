@@ -239,6 +239,11 @@ class Screen(SignalEvent):
                 _parse_fields(node2, fields)
         dom = xml.dom.minidom.parseString(arch)
         _parse_fields(dom, fields)
+        for dom in self.domain:
+            if dom[0] in fields:
+                field_dom = str(fields[dom[0]].setdefault('domain',[]))
+                fields[dom[0]]['domain'] = field_dom[:1] + \
+                        str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
 
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
         models = self.models.models
