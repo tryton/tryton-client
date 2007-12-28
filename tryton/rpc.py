@@ -150,8 +150,8 @@ class RPCSession(object):
             return sock.execute(method, *args)
         except socket.error, exception:
             from gui import Main
-            common.error(_('Connection refused !'), Main.get_main().window,
-                    str(exception))
+            common.error(_('Connection refused !'), str(exception),
+                    Main.get_main().window)
             raise RPCException(69, _('Connection refused!'))
         except xmlrpclib.Fault, exception:
             raise RPCException(exception.faultCode, exception.faultString)
@@ -209,8 +209,8 @@ class RPCSession(object):
                 return sock.exec_auth(method, *args)
             except socket.error, exception:
                 from gui import Main
-                common.error(_('Connection refused !'), Main.get_main().window,
-                        str(exception))
+                common.error(_('Connection refused !'), str(exception),
+                        Main.get_main().window)
                 raise RPCException(69, 'Connection refused!')
             except xmlrpclib.Fault, exception:
                 self._process_exception(exception, obj, method, args)
@@ -218,8 +218,8 @@ class RPCSession(object):
                 self._process_exception(exception, obj, method, args)
             except Exception, exception:
                 from gui import Main
-                common.error(_('Application Error'), Main.get_main().window,
-                        str(exception))
+                common.error(_('Application Error'), str(exception),
+                        Main.get_main().window)
         else:
             raise RPCException(1, 'not logged')
 

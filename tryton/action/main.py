@@ -1,7 +1,7 @@
 import time
 import datetime
 import tryton.rpc as rpc
-#import tryton.wizard
+from tryton.wizard import Wizard
 #import tryton.printer
 from tryton.common import message, error, selection
 from tryton.gui.window import Window
@@ -76,7 +76,8 @@ class Action(object):
             datas = {}
         if 'type' not in action:
             return
-        win = None
+        from tryton.gui import Main
+        win = Main.get_main().window
         if 'window' in datas:
             win = datas['window']
             del datas['window']
@@ -120,14 +121,12 @@ class Action(object):
             if datas.get('domain', False):
                 domain.append(datas['domain'])
 
-            from tryton.gui import Main
             Window.create(view_ids, datas['res_model'], datas['res_id'], domain,
-                    action['view_type'], datas.get('window',
-                        Main.get_main().window), ctx,
+                    action['view_type'], win, ctx,
                     datas['view_mode'], name=action.get('name', False),
                     limit=datas['limit'], auto_refresh=datas['auto_refresh'])
         elif action['type'] == 'ir.actions.wizard':
-            wizard.execute(action['wiz_name'], datas, parent=win,
+            Wizard.execute(action['wiz_name'], datas, win,
                     context=context)
         elif action['type'] == 'ir.actions.report.custom':
             datas['report_id'] = action['report_id']
