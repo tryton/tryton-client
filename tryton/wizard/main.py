@@ -11,7 +11,7 @@ _ = gettext.gettext
 class Dialog(object):
     "Dialog for wizard"
 
-    def __init__(self, arch, fields, state, name, parent=None):
+    def __init__(self, arch, fields, state, obj_name, parent=None):
         self.states = []
         default = -1
         self.dia = gtk.Dialog('Tryton', parent,
@@ -36,7 +36,7 @@ class Dialog(object):
             if 'value' in fields[i]:
                 val[i] = fields[i]['value']
 
-        self.screen = Screen('wizard.'+name, view_type=[], window=self.dia)
+        self.screen = Screen(obj_name, view_type=[], window=self.dia)
         self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
         self.screen.current_model.set(val)
@@ -89,7 +89,7 @@ class Wizard(object):
                 datas['form'].update( res['datas'] )
             if res['type'] == 'form':
                 dia = Dialog(res['arch'], res['fields'], res['state'],
-                        action, parent)
+                        res['object'], parent)
                 dia.screen.current_model.set( datas['form'] )
                 res = dia.run(datas['form'])
                 if not res:
