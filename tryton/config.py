@@ -65,7 +65,7 @@ class ConfigManager(object):
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
-        parser.add_option("-v", "--verbose",
+        parser.add_option("-v", "--verbose", action="store_true",
                 default=False, dest="verbose",
                 help=_("enable basic debugging"))
         parser.add_option("-d", "--log", dest="log_logger", default='',
@@ -101,6 +101,8 @@ class ConfigManager(object):
                 if not len(option.split('.')) == 2:
                     continue
                 section, name = option.split('.')
+                if section in ('logging'):
+                    continue
                 if not configparser.has_section(section):
                     configparser.add_section(section)
                 configparser.set(section, name, self.options[option])
