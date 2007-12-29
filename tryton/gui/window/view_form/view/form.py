@@ -69,23 +69,22 @@ class ViewForm(ParserView):
                              for name, widget in children.items()])
 
         if toolbar and not CONFIG['client.modepda']:
-            hbox = gtk.HBox()
-            hbox.pack_start(self.widget)
-
-            #vbox = gtk.Toolbar()
-            #vbox.set_orientation(gtk.ORIENTATION_VERTICAL)
-            #vbox.set_style(gtk.TOOLBAR_BOTH_HORIZ)
-            #vbox.set_icon_size(gtk.ICON_SIZE_MENU)
             vbox = gtk.VBox()
-            hbox.pack_start(vbox, False, False)
-            self.widget = hbox
+            vbox.pack_start(self.widget)
+
+            hbox = gtk.HBox()
+            vbox.pack_start(hbox, False, False)
+            self.widget = vbox
 
             sep = False
             for icontype in ('print', 'action', 'relate'):
-                if icontype in ('action','relate') and sep:
-                    #vbox.insert(gtk.SeparatorToolItem(), -1)
-                    vbox.pack_start(gtk.HSeparator(), False, False, 2)
-                    sep = False
+                if not toolbar[icontype]:
+                    continue
+                gtktoolbar = gtk.Toolbar()
+                gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+                gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
+                hbox.pack_start(gtktoolbar, True, True)
+
                 for tool in toolbar[icontype]:
                     iconstock = {
                         'print': gtk.STOCK_PRINT,
@@ -93,30 +92,13 @@ class ViewForm(ParserView):
                         'relate': gtk.STOCK_JUMP_TO,
                     }.get(icontype, gtk.STOCK_ABOUT)
 
-
-
-                    icon = gtk.Image()
-                    icon.set_from_stock(iconstock, gtk.ICON_SIZE_BUTTON)
-                    hbox = gtk.HBox(False, 5)
-                    hbox.pack_start(icon, False, False)
-                    hbox.pack_start(gtk.Label(tool['string']), False, False)
-
-                    tbutton = gtk.Button()
-                    tbutton.add(hbox)
-                    tbutton.set_relief(gtk.RELIEF_NONE)
-                    vbox.pack_start(tbutton, False, False, 2)
-
-                    #tbutton = gtk.ToolButton()
-                    #tbutton.set_label_widget(hbox) #tool['string'])
-                    #tbutton.set_stock_id(iconstock)
-                    #vbox.insert(tbutton,-1)
+                    tbutton = gtk.ToolButton(iconstock)
+                    tbutton.set_label_widget(gtk.Label(tool['name']))
+                    gtktoolbar.insert(tbutton, -1)
 
                     tbutton.connect('clicked', self._action, tool, icontype)
-
                     tbutton.connect('button_press_event', self._translate_label,
                             tool, self.window)
-
-                    sep = True
 
     def _action(self, widget, action, atype):
         data = {}
