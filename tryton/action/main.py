@@ -136,7 +136,7 @@ class Action(object):
             Action.exec_report(action['report_name'], datas)
 
     @staticmethod
-    def exec_keyword(keyword, data=None, adds=None, context=None):
+    def exec_keyword(keyword, data=None, context=None):
         actions = []
         if 'id' in data:
             try:
@@ -157,8 +157,6 @@ class Action(object):
         keyact = {}
         for action in actions:
             keyact[action['name']] = action
-        if adds:
-            keyact.update(adds)
 
         from tryton.gui import Main
         res = selection(_('Select your action'), keyact, Main.get_main().window)

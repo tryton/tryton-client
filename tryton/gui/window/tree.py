@@ -71,7 +71,6 @@ class Tree(object):
         self.handlers = {
             'but_reload': self.sig_reload,
             'but_switch': self.sig_edit,
-            'but_open': self.sig_open,
             'but_action': self.sig_action,
             'but_print': self.sig_print,
             'but_save_as': self.sig_save_as,
@@ -147,13 +146,11 @@ class Tree(object):
             self.tree_res.reload()
         return False
 
-    def sig_print(self, widget=None, keyword='client_print_multi'):
-        self.sig_action(keyword='client_print_multi')
+    def sig_print(self):
+        self.sig_action('form_print')
 
-    def sig_action(self, widget=None, keyword='tree_action', obj_id=None,
-            report_type='pdf'):
+    def sig_action(self, keyword='tree_action', obj_id=None):
         ids = self.ids_get()
-
         if not obj_id and ids and len(ids):
             obj_id = ids[0]
         if obj_id:
@@ -166,42 +163,26 @@ class Tree(object):
                 'model': self.model,
                 'id': obj_id,
                 'ids':ids,
-                'report_type': report_type,
                 'window': self.window,
                 }, context=ctx)
         else:
             common.message(_('No resource selected!'), self.window)
 
     def sig_activate(self, tree_view, path, view_column):
-        self.sig_action(tree_view, 'tree_open' )
+        self.sig_action('tree_open')
 
-    def sig_open(self, widget=None, event=None):
-        self.sig_action(widget, 'tree_open' )
-
-    def sig_remove(self, widget=None):
-        ids = self.ids_get()
-        if len(ids):
-            if common.sur(_('Are you sure you want\nto remove this record?'),
-                    self.window):
-                rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                        'unlink', ids)
-                self.sig_reload()
-
-    def sig_edit(self, widget=None):
-        obj_id = False
-        ids = self.ids_get()
-        if ids:
-            obj_id = ids[0]
-        elif self.tree_res.toolbar:
+    def sig_edit(self):
+        obj_ids = self.ids_get()
+        if self.tree_res.toolbar:
             wid = self.glade.get_widget('tree_toolbar')
             for child in wid.get_children():
                 if child.get_active():
-                    obj_id = child.get_data('id')
-        if obj_id:
-            Window.create(None, self.model, obj_id, self.domain,
+                    obj_ids.append(child.get_data('id'))
+        if obj_ids:
+            Window.create(None, self.model, obj_ids, self.domain,
                     window=self.window, mode=['form', 'tree'])
         else:
-            common.message(_('No resource selected!'))
+            common.message(_('No resource selected!'), self.window)
 
     def sc_del(self, widget):
         obj_id = self.tree_sc.sel_id_get()

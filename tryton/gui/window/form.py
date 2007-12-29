@@ -87,7 +87,6 @@ class Form(object):
             'but_log': self.sig_logs,
             'but_print': self.sig_print,
             'but_reload': self.sig_reload,
-            'but_print_html': self.sig_print_html,
             'but_action': self.sig_action,
             'but_switch': self.sig_switch,
             'but_attach': self.sig_attach,
@@ -273,8 +272,7 @@ class Form(object):
         self.message_state('')
         return True
 
-    def sig_action(self, keyword='client_action_multi',
-            report_type='pdf', adds=None):
+    def sig_action(self, keyword='form_action'):
         ids = self.screen.ids_get()
         if self.screen.current_model:
             obj_id = self.screen.current_model.id
@@ -290,28 +288,25 @@ class Form(object):
             if sel_ids:
                 ids = sel_ids
         if len(ids):
+            ctx = self.context.copy()
+            if 'active_ids' in ctx:
+                del ctx['active_ids']
+            if 'active_id' in ctx:
+                del ctx['active_id']
             res = Action.exec_keyword(keyword, {
                 'model': self.screen.resource,
                 'id': obj_id or False,
                 'ids': ids,
-                'report_type': report_type,
-                }, adds=adds)
+                'window': self.window,
+                }, context=ctx)
             if res:
                 self.previous_action = res
             self.sig_reload(test_modified=False)
         else:
-            self.message_state(_('No record selected!'))
-
-    def sig_print_html(self):
-        self.sig_action('client_print_multi', report_type='html')
+            self.message_state(_('No record selected!'), self.window)
 
     def sig_print(self):
-        self.sig_action('client_print_multi', adds={
-            _('Print Screen'): {
-                'report_name': 'printscreen.list',
-                'name': _('Print Screen'),
-                'type': 'ir.actions.report.xml',
-                }})
+        self.sig_action('form_print')
 
     def sig_search(self, widget=None):
         if not self.modified_save():
