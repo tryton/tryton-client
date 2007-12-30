@@ -3326,7 +3326,7 @@ Please retry</property>
           <widget class="GtkVBox" id="vbox31">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkImage" id="tip_image_tinyerp">
+              <widget class="GtkImage" id="tip_image">
                 <property name="width_request">500</property>
                 <property name="height_request">71</property>
                 <property name="visible">True</property>

@@ -74,8 +74,8 @@ def tipoftheday(parent=None):
             self.win.show_all()
             self.label = winglade.get_widget('tip_label')
             self.check = winglade.get_widget('tip_checkbutton')
-            img = winglade.get_widget('tip_image_tinyerp')
-            img.set_from_file(os.path.join(PIXMAPS_DIR, 'tinyerp.png'))
+            img = winglade.get_widget('tip_image')
+            img.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
             signals = {
                 'on_but_next_activate': self.tip_next,
                 'on_but_previous_activate': self.tip_previous,
