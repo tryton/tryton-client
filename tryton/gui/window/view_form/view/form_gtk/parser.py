@@ -686,8 +686,8 @@ class ParserForm(ParserInterface):
         return True
 
 import calendar
-import spinbutton
-import spinint
+import float
+import integer
 import selection
 import char
 import float_time
@@ -705,8 +705,8 @@ import image
 WIDGETS_TYPE = {
     'date': (calendar.Calendar, 1, False, False),
     'datetime': (calendar.DateTime, 1, False, False),
-    'float': (spinbutton.SpinButton, 1, False, False),
-    'integer': (spinint.SpinInt, 1, False, False),
+    'float': (float.Float, 1, False, False),
+    'integer': (integer.Integer, 1, False, False),
     'selection': (selection.Selection, 1, False, False),
     'char': (char.Char, 1, False, False),
     'float_time': (float_time.FloatTime, 1, False, False),

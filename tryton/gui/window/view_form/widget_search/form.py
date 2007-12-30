@@ -216,7 +216,7 @@ class Form(object):
         self.spin_limit.connect_after('activate', self.sig_activate)
         self.spin_offset.connect_after('activate', self.sig_activate)
 
-    def clear(self, widget):
+    def clear(self):
         self.id = 0
         for i in self.widgets.values():
             i[0].clear()
@@ -279,8 +279,8 @@ class Form(object):
             _('The content of the form or excpetion if not valid'))
 
 import calendar
-import spinbutton
-import spinint
+import float
+import integer
 import selection
 import char
 import checkbox
@@ -289,8 +289,8 @@ import reference
 WIDGETS_TYPE = {
     'date': (calendar.Calendar, 2),
     'datetime': (calendar.Calendar, 2),
-    'float': (spinbutton.SpinButton, 2),
-    'integer': (spinint.SpinInt, 2),
+    'float': (float.Float, 2),
+    'integer': (integer.Integer, 2),
     'selection': (selection.Selection, 2),
     'many2one_selection': (selection.Selection, 2),
     'char': (char.Char, 2),
