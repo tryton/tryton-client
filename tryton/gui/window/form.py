@@ -82,7 +82,6 @@ class Form(object):
             'but_search': self.sig_search,
             'but_previous': self.sig_previous,
             'but_next': self.sig_next,
-            #'but_preference': self.sig_preference,
             'but_goto_id': self.sig_goto,
             'but_log': self.sig_logs,
             'but_print': self.sig_print,
@@ -338,19 +337,6 @@ class Form(object):
         statusbar = self.glade.get_widget('stat_form')
         cid = statusbar.get_context_id('message')
         statusbar.push(cid, msg)
-
-    def sig_preference(self, widget=None):
-        actions = rpc.session.rpc_exec_auth('/object', 'execute', 'ir.values',
-                'get', 'meta', False, [(self.model,False)], True,
-                rpc.session.context, True)
-        obj_id = self.screen.id_get()
-        if obj_id and len(actions):
-            win = Preference(self.model, obj_id, actions)
-            win.run()
-        elif obj_id:
-            self.message_state(_('No preference available for this resource !'))
-        else:
-            self.message_state(_('No resource selected !'))
 
     def modified_save(self, reload=True):
         if self.screen.is_modified():
