@@ -554,20 +554,16 @@ class Main(object):
         self.notebook.set_current_page(page - 1)
 
     def sig_user_preferences(self, widget):
-        try:
-            actions = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.values', 'get', 'meta', False, [('res.user',False)],
-                    True, rpc.session.context, True)
+        actions = rpc.session.rpc_exec_auth('/object', 'execute',
+                'ir.values', 'get', 'meta', False, [('res.user',False)],
+                True, rpc.session.context, True)
 
-            win = Preference('res.user', rpc.session.user,
-                    actions, parent=self.window)
-            if win.run():
-                rpc.session.context_reload()
-            self.window.present()
-            win.destroy()
-            return True
-        except:
-            return False
+        win = Preference('res.user', rpc.session.user,
+                actions, parent=self.window)
+        if win.run():
+            rpc.session.context_reload()
+        self.window.present()
+        return True
 
     def sig_win_close(self, widget):
         self._sig_child_call(widget, 'but_close')

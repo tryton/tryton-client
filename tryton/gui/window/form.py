@@ -11,7 +11,7 @@ from tryton.config import GLADE
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.gui.window.win_search import WinSearch
-#import win_preference
+from tryton.gui.window.preference import Preference
 #import win_export
 #import win_import
 
@@ -345,7 +345,7 @@ class Form(object):
                 rpc.session.context, True)
         obj_id = self.screen.id_get()
         if obj_id and len(actions):
-            win = win_preference.win_preference(self.model, obj_id, actions)
+            win = Preference(self.model, obj_id, actions)
             win.run()
         elif obj_id:
             self.message_state(_('No preference available for this resource !'))

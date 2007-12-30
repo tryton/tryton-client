@@ -1,11 +1,10 @@
 "Preference"
 import gettext
 import gtk
-from gtk import glade
 import tryton.rpc as rpc
 import copy
-#from tryton.widget.screen import Screen
-from tryton.config import TRYTON_ICON, GLADE
+from tryton.gui.window.view_form.screen import Screen
+from tryton.config import TRYTON_ICON
 
 _ = gettext.gettext
 
@@ -14,9 +13,15 @@ class Preference(object):
     "Preference window"
 
     def __init__(self, model, obj_id, preferences, parent):
-        self.glade = glade.XML(GLADE, 'win_preference',
-                gettext.textdomain())
-        self.win = self.glade.get_widget('win_preference')
+        self.win = gtk.Dialog(_('Tryton - Preferences'), parent,
+                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                    gtk.STOCK_OK, gtk.RESPONSE_OK))
+
+        self.win.set_default_response(gtk.RESPONSE_OK)
+        self.win.vbox.pack_start(gtk.Label(_('Edit ressource preferences')),
+                expand=False, fill=True)
+        self.win.vbox.pack_start(gtk.HSeparator())
         self.win.set_icon(TRYTON_ICON)
         self.win.set_transient_for(parent)
         self.parent = parent
@@ -48,8 +53,7 @@ class Preference(object):
         width, height = self.screen.screen_container.size_get()
         self.screen.widget.set_size_request(width, height)
 
-        vbox = self.glade.get_widget('preference_vbox')
-        vbox.pack_start(self.screen.widget)
+        self.win.vbox.pack_start(self.screen.widget)
 
         self.win.set_title(_('Preference')+' '+model)
         self.win.show_all()
@@ -59,21 +63,23 @@ class Preference(object):
         final = False
         while True:
             res = self.win.run()
-            if self.screen.current_model.validate():
+            if res == gtk.RESPONSE_OK:
+                if self.screen.current_model.validate():
+                    final = True
+
+                    val = copy.copy(self.screen.get())
+
+                    for key in val:
+                        if val[key]:
+                            rpc.session.rpc_exec_auth('/object', 'execute',
+                                    'ir.values', 'set', 'meta', key, key,
+                                    [(self.model, self.obj_id)], val[key])
+                        elif self.defaults.get(key, False):
+                            rpc.session.rpc_exec_auth('/common', 'ir_del',
+                                    self.defaults[key])
+                    break
+            else:
                 break
-        if res == gtk.RESPONSE_OK:
-            final = True
-
-            val = copy.copy(self.screen.get())
-
-            for key in val:
-                if val[key]:
-                    rpc.session.rpc_exec_auth('/object', 'execute',
-                            'ir.values', 'set', 'meta', key, key,
-                            [(self.model, self.obj_id)], val[key])
-                elif self.defaults.get(key, False):
-                    rpc.session.rpc_exec_auth('/common', 'ir_del',
-                            self.defaults[key])
         self.parent.present()
         self.win.destroy()
         return final
