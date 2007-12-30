@@ -10,8 +10,8 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.config import GLADE
 from tryton.action import Action
 from tryton.config import CONFIG
+from tryton.gui.window.win_search import WinSearch
 #import win_preference
-#import win_search
 #import win_export
 #import win_import
 
@@ -311,9 +311,9 @@ class Form(object):
     def sig_search(self, widget=None):
         if not self.modified_save():
             return
-        win = win_search.win_search(self.model, domain=self.domain,
+        win = WinSearch(self.model, domain=self.domain,
                 context=self.context, parent=self.window)
-        res = win.go()
+        res = win.run()
         if res:
             self.screen.clear()
             self.screen.load(res)
