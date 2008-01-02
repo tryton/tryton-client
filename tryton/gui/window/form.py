@@ -13,7 +13,7 @@ from tryton.config import CONFIG
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
-#import win_import
+from tryton.gui.window.win_import import WinImport
 
 _ = gettext.gettext
 
@@ -194,9 +194,9 @@ class Form(object):
         fields = []
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
-        win = win_import.win_import(self.model, self.screen.fields, fields,
+        win = WinImport(self.model, self.screen.fields, fields,
                 parent=self.window)
-        win.go()
+        win.run()
 
     def sig_save_as(self, widget=None):
         fields = []
