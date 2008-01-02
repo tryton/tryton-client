@@ -6,7 +6,7 @@ import tryton.common as common
 from view_tree import ViewTree, ViewTreeSC
 import tryton.rpc as rpc
 from tryton.config import CONFIG
-#import win_export
+from tryton.gui.window.win_export import WinExport
 from tryton.config import GLADE
 from window import Window
 from tryton.action import Action
@@ -218,6 +218,6 @@ class Tree(object):
         return res
 
     def sig_save_as(self, widget=None):
-        win = win_export.win_export(self.model, self.tree_res.sel_ids_get(),
+        win = WinExport(self.model, self.ids_get(),
                 self.tree_res.fields, [], parent=self.window)
-        win.go()
+        win.run()
