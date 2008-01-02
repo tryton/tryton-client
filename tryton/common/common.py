@@ -293,22 +293,34 @@ def sur_3b(msg, parent):
         return 'cancel'
 
 def ask(question, parent):
-    dia = glade.XML(GLADE, 'win_quest', gettext.textdomain())
-    win = dia.get_widget('win_quest')
-    label = dia.get_widget('label')
-    label.set_text(question)
-    entry = dia.get_widget('entry')
-
-    win.set_transient_for(parent)
+    win = gtk.Dialog(_('Tryton'), parent,
+            gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                gtk.STOCK_OK, gtk.RESPONSE_OK))
     win.set_icon(TRYTON_ICON)
+    win.set_default_response(gtk.RESPONSE_OK)
+
+    hbox = gtk.HBox()
+    image = gtk.Image()
+    image.set_from_stock(gtk.STOCK_DIALOG_QUESTION,
+            gtk.ICON_SIZE_DIALOG)
+    hbox.pack_start(image)
+    vbox = gtk.VBox()
+    vbox.pack_start(gtk.Label(question))
+    entry = gtk.Entry()
+    entry.set_activates_default(True)
+    vbox.pack_start(entry)
+    hbox.pack_start(vbox)
+    win.vbox.pack_start(hbox)
+    win.show_all()
 
     response = win.run()
     parent.present()
     win.destroy()
-    if response == gtk.RESPONSE_CANCEL:
-        return None
-    else:
+    if response == gtk.RESPONSE_OK:
         return entry.get_text()
+    else:
+        return None
 
 def node_attributes(node):
     result = {}
