@@ -94,22 +94,27 @@ class WinExport(object):
         self.glade.signal_connect('on_but_select_clicked', self.sig_sel)
         self.glade.signal_connect('on_but_unselect_clicked', self.sig_unsel)
         self.glade.signal_connect('on_but_predefined_clicked', self.add_predef)
+        self.glade.signal_connect('on_but_remove_predefined_clicked',
+                self.remove_predef)
 
         # Creating the predefined export view
         self.pref_export = gtk.TreeView()
         self.pref_export.append_column(gtk.TreeViewColumn('Export name',
-            gtk.CellRendererText(), text=1))
-        self.pref_export.append_column(gtk.TreeViewColumn('Exported fields',
             gtk.CellRendererText(), text=2))
+        self.pref_export.append_column(gtk.TreeViewColumn('Exported fields',
+            gtk.CellRendererText(), text=3))
         self.glade.get_widget('predefined_exports').add(self.pref_export)
 
         self.pref_export.connect("row-activated", self.sel_predef)
 
         # Fill the predefined export tree view and show everything
+        self.predef_model = gtk.ListStore(
+                gobject.TYPE_INT,
+                gobject.TYPE_PYOBJECT,
+                gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
         self.fill_predefwin()
         self.pref_export.show_all()
-        self.predef_model = gtk.ListStore(gobject.TYPE_PYOBJECT,
-                gobject.TYPE_STRING, gobject.TYPE_STRING)
 
     def sig_sel_all(self, widget=None):
         self.model2.clear()
@@ -139,23 +144,24 @@ class WinExport(object):
         self.model2.clear()
 
     def fill_predefwin(self):
-        self.predef_model = gtk.ListStore(gobject.TYPE_PYOBJECT,
-                gobject.TYPE_STRING, gobject.TYPE_STRING)
         ir_export = rpc.RPCProxy('ir.exports')
         ir_export_line = rpc.RPCProxy('ir.exports.line')
         export_ids = ir_export.search([('resource', '=', self.model)])
         for export in ir_export.read(export_ids):
             fields = ir_export_line.read(export['export_fields'])
-            self.predef_model.append(([f['name'] for f in fields],
+            self.predef_model.append((
+                export['id'],
+                [f['name'] for f in fields],
                 export['name'],
                 ', '.join([self.fields_data[f['name']]['string'] \
-                        for f in fields])))
+                        for f in fields]),
+                ))
         self.pref_export.set_model(self.predef_model)
 
     def add_predef(self, widget):
-        name = common.ask('What is the name of this export ?', self.parent)
+        name = common.ask('What is the name of this export?', self.parent)
         if not name:
-            return 
+            return
         ir_export = rpc.RPCProxy('ir.exports')
         iter = self.model2.get_iter_root()
         fields = []
@@ -163,14 +169,34 @@ class WinExport(object):
             field_name = self.model2.get_value(iter, 1)
             fields.append(field_name)
             iter = self.model2.iter_next(iter)
-        ir_export.create({'name' : name, 'resource' : self.model,
+        new_id = ir_export.create({'name' : name, 'resource' : self.model,
             'export_fields' : [(0, 0, {'name' : f}) for f in fields]})
-        self.predef_model.append((fields, name,
+        self.predef_model.append((
+            new_id,
+            fields,
+            name,
             ','.join([self.fields_data[f]['string'] for f in fields])))
+        self.pref_export.set_model(self.predef_model)
+
+    def remove_predef(self, widget):
+        sel = self.pref_export.get_selection().get_selected()
+        if sel == None:
+            return None
+        (model, i) = sel
+        if not i:
+            return None
+        ir_export = rpc.RPCProxy('ir.exports')
+        export_id = model.get_value(i, 0)
+        ir_export.unlink(export_id)
+        for i in range(len(self.predef_model)):
+            if self.predef_model[i][0] == export_id:
+                del self.predef_model[i]
+                break
+        self.pref_export.set_model(self.predef_model)
 
     def sel_predef(self, widget, path, column):
         self.model2.clear()
-        for field in self.predef_model[path[0]][0]:
+        for field in self.predef_model[path[0]][1]:
             self.model2.append((self.fields_data[field]['string'], field))
 
     def run(self):
