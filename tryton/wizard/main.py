@@ -115,6 +115,7 @@ class Wizard(object):
                 state = res['state']
             elif res['type'] == 'state':
                 state = res['state']
+        rpc.session.rpc_exec_auth('/wizard', 'delete', wiz_id)
 
 
 class WizardProgress(object):
