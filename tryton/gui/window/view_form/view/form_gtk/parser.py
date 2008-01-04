@@ -685,41 +685,41 @@ class ParserForm(ParserInterface):
         menu.popup(None, None, None, event.button, event.time)
         return True
 
-import calendar
-import float
-import integer
-import selection
-import char
-import float_time
-import checkbox
-import reference
-import binary
-import textbox
-import one2many
-import many2many
-import many2one
-import url
-import image
+from calendar import Calendar, DateTime
+from float import Float
+from integer import Integer
+from selection import Selection
+from char import Char
+from float_time import FloatTime
+from checkbox import CheckBox
+from reference import Reference
+from binary import Binary
+from textbox import TextBox
+from one2many import One2Many
+from many2many import Many2Many
+from many2one import Many2One
+from url import Email, URL, CallTo, SIP
+from image import Image
 
 
 WIDGETS_TYPE = {
-    'date': (calendar.Calendar, 1, False, False),
-    'datetime': (calendar.DateTime, 1, False, False),
-    'float': (float.Float, 1, False, False),
-    'integer': (integer.Integer, 1, False, False),
-    'selection': (selection.Selection, 1, False, False),
-    'char': (char.Char, 1, False, False),
-    'float_time': (float_time.FloatTime, 1, False, False),
-    'boolean': (checkbox.CheckBox, 1, False, False),
-    'reference': (reference.Reference, 1, False, False),
-    'binary': (binary.Binary, 1, False, False),
-    'text': (textbox.TextBox, 1, True, True),
-    'one2many': (one2many.One2Many, 1, True, True),
-    'many2many': (many2many.Many2Many, 1, True, True),
-    'many2one': (many2one.Many2One, 1, False, False),
-    'email' : (url.Email, 1, False, False),
-    'url' : (url.URL, 1, False, False),
-    'callto' : (url.CallTo, 1, False, False),
-    'sip' : (url.SIP, 1, False, False),
-    'image' : (image.Image, 1, False, False),
+    'date': (Calendar, 1, False, False),
+    'datetime': (DateTime, 1, False, False),
+    'float': (Float, 1, False, False),
+    'integer': (Integer, 1, False, False),
+    'selection': (Selection, 1, False, False),
+    'char': (Char, 1, False, False),
+    'float_time': (FloatTime, 1, False, False),
+    'boolean': (CheckBox, 1, False, False),
+    'reference': (Reference, 1, False, False),
+    'binary': (Binary, 1, False, False),
+    'text': (TextBox, 1, True, True),
+    'one2many': (One2Many, 1, True, True),
+    'many2many': (Many2Many, 1, True, True),
+    'many2one': (Many2One, 1, False, False),
+    'email' : (Email, 1, False, False),
+    'url' : (URL, 1, False, False),
+    'callto' : (CallTo, 1, False, False),
+    'sip' : (SIP, 1, False, False),
+    'image' : (Image, 1, False, False),
 }
