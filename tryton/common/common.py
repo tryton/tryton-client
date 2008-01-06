@@ -6,6 +6,9 @@ import os
 import logging
 from tryton.config import CONFIG
 from tryton.config import GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+import time
+import sys
+
 _ = gettext.gettext
 
 
@@ -130,8 +133,7 @@ def file_selection(title, filename='', parent=None,
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
             gtk.STOCK_SAVE, gtk.RESPONSE_OK)
     win = gtk.FileChooserDialog(title, None, action, buttons)
-    if parent:
-        win.set_transient_for(parent)
+    win.set_transient_for(parent)
     win.set_icon(TRYTON_ICON)
     win.set_current_folder(CONFIG['client.default_path'])
     if filename:
@@ -187,6 +189,35 @@ def file_selection(title, filename='', parent=None,
         parent.present()
         win.destroy()
         return filenames
+
+def file_open(filename, type, parent):
+    cmd = ''
+    if type in CONFIG['client.actions']:
+        cmd = CONFIG['client.actions'][type]
+    if not cmd:
+        #TODO add dialog box
+        pass
+    if not cmd:
+        save_name = file_selection(_('Save As...'), parent=parent,
+                action=gtk.FILE_CHOOSER_ACTION_SAVE)
+        if save_name:
+            file_p = file(filename, 'rb')
+            save_p = file(save_name, 'wb+')
+            save_p.write(file_p.read())
+            save_p.close()
+            file_p.close()
+        return
+    cmd = cmd % filename
+    pid = os.fork()
+    if not pid:
+        pid = os.fork()
+        if not pid:
+            prog, args = cmd.split(' ', 1)
+            args = [os.path.basename(prog)] + args.split(' ')
+            os.execv(prog, args)
+        time.sleep(0.1)
+        sys.exit(0)
+    os.waitpid(pid, 0)
 
 def error(title, msg, parent, details=''):
     log = logging.getLogger('common.message')

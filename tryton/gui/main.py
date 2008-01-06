@@ -11,6 +11,7 @@ from tryton.version import VERSION
 from tryton.action import Action
 from tryton.gui.window import Window
 from tryton.gui.window import Preference
+from tryton.gui.window import FilesActions
 import re
 import base64
 
@@ -392,6 +393,7 @@ class Main(object):
                     Main.sig_form_tab_orientation(0),
             'on_opt_form_tab_orientation_vertical_activate': lambda x: \
                     Main.sig_form_tab_orientation(90),
+            'on_opt_files_actions_activate': self.sig_files_actions,
             'on_help_tips_activate': self.sig_tips,
             'on_help_licence_activate': self.sig_licence,
             'on_about_activate': self.sig_about,
@@ -542,6 +544,9 @@ class Main(object):
     @staticmethod
     def sig_form_tab_orientation(option):
         CONFIG['client.form_tab_orientation'] = option
+
+    def sig_files_actions(self, widget):
+        FilesActions(self.window).run()
 
     def sig_win_next(self, widget):
         page = self.notebook.get_current_page()

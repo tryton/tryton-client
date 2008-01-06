@@ -1020,6 +1020,14 @@
                           </widget>
                         </child>
                         <child>
+                          <widget class="GtkMenuItem" id="actions">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">Files _Actions</property>
+                            <property name="use_underline">True</property>
+                            <signal name="activate" handler="on_opt_files_actions_activate"/>
+                          </widget>
+                        </child>
+                        <child>
                           <widget class="GtkSeparatorMenuItem" id="separator5">
                             <property name="visible">True</property>
                           </widget>

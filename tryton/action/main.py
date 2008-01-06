@@ -2,10 +2,12 @@ import time
 import datetime
 import tryton.rpc as rpc
 from tryton.wizard import Wizard
-#import tryton.printer
-from tryton.common import message, error, selection
+from tryton.common import message, error, selection, file_open
 from tryton.gui.window import Window
 import gettext
+import tempfile
+import base64
+import os
 
 _ = gettext.gettext
 
@@ -13,6 +15,7 @@ class Action(object):
 
     @staticmethod
     def exec_report(name, data, context=None):
+        from tryton.gui import Main
         if context is None:
             context = {}
         datas = data.copy()
@@ -22,34 +25,18 @@ class Action(object):
             ids =  rpc.session.rpc_exec_auth('/object', 'execute',
                     datas['model'], 'search', [])
             if ids == []:
-                from tryton.gui import Main
                 message(_('Nothing to print!'), Main.get_main().window)
                 return False
             datas['id'] = ids[0]
-        try:
-            ctx = rpc.session.context.copy()
-            ctx.update(context)
-            report_id = rpc.session.rpc_exec_auth('/report', 'report', name,
-                    ids, datas, ctx)
-            state = False
-            attempt = 0
-            while not state:
-                val = rpc.session.rpc_exec_auth('/report', 'report_get',
-                        report_id)
-                state = val['state']
-                if not state:
-                    time.sleep(1)
-                    attempt += 1
-                if attempt > 200:
-                    from tryton.gui import Main
-                    message(_('Printing aborted, too long delay !'),
-                            Main.get_main().window)
-                    return False
-            printer.print_data(val)
-        except rpc.RPCException, exp:
-            from tryton.gui import Main
-            error(_('Error: ') + str(exp.type), exp.message,
-                    Main.get_main().window, exp.data)
+        ctx = rpc.session.context.copy()
+        ctx.update(context)
+        (type, data) = rpc.session.rpc_exec_auth('/report', 'execute', name,
+                ids, datas, ctx)
+        (fileno, fp_name) = tempfile.mkstemp('.' + type, 'tryton_')
+        file_d = os.fdopen(fileno, 'wb+')
+        file_d.write(base64.decodestring(data))
+        file_d.close()
+        file_open(fp_name, type, Main.get_main().window)
         return True
 
     @staticmethod
@@ -128,11 +115,8 @@ class Action(object):
         elif action['type'] == 'ir.actions.wizard':
             Wizard.execute(action['wiz_name'], datas, win,
                     context=context)
-        elif action['type'] == 'ir.actions.report.custom':
-            datas['report_id'] = action['report_id']
-            Action.exec_report('custom', datas)
 
-        elif action['type'] == 'ir.actions.report.xml':
+        elif action['type'] == 'ir.actions.report':
             Action.exec_report(action['report_name'], datas)
 
     @staticmethod

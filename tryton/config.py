@@ -38,6 +38,17 @@ def get_home_dir():
     else:
         return '.'
 
+def find_path(progs):
+    #TODO check for win32
+    paths = [x for x in os.environ['PATH'].split(':')
+            if os.path.isdir(x)]
+    for dir in paths:
+        content = os.listdir(dir)
+        for prog in progs:
+            if prog in content:
+                return os.path.join(dir, prog) + ' %s'
+    return ''
+
 
 class ConfigManager(object):
     "Config manager"
@@ -61,6 +72,10 @@ class ConfigManager(object):
             'client.form_tab': 'left',
             'client.form_tab_orientation': 90,
             'client.lang': 'en_US',
+            'client.actions': {
+                'odt': find_path(['ooffice', 'ooffice2']),
+                'txt': find_path(['ooffice', 'ooffice2']),
+                },
         }
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
@@ -127,6 +142,8 @@ class ConfigManager(object):
                         value = True
                     elif value.lower() == 'false':
                         value = False
+                    if section == 'client' and name == 'actions':
+                        value = eval(value)
                     self.options[section + '.' + name] = value
         except:
             logging.getLogger('options').warn(
