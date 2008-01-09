@@ -30,8 +30,11 @@ class Action(object):
             datas['id'] = ids[0]
         ctx = rpc.session.context.copy()
         ctx.update(context)
-        (type, data) = rpc.session.rpc_exec_auth('/report', 'execute', name,
+        res = rpc.session.rpc_exec_auth('/report', 'execute', name,
                 ids, datas, ctx)
+        if not res:
+            return False
+        (type, data) = res
         (fileno, fp_name) = tempfile.mkstemp('.' + type, 'tryton_')
         file_d = os.fdopen(fileno, 'wb+')
         file_d.write(base64.decodestring(data))
