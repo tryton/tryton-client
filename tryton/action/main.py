@@ -50,12 +50,14 @@ class Action(object):
         ctx.update(context)
         if not action_type:
             res = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.actions.actions', 'read', act_id, ['type'], ctx)
+                    'ir.action', 'read', act_id, ['type'], ctx)
             if not res:
                 raise Exception, 'ActionNotFound'
             action_type = res['type']
+        act_id2 = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
+                'search', [('action', '=', act_id)], ctx)[0]
         res = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
-                'read', act_id, False, ctx)
+                'read', act_id2, False, ctx)
         Action._exec_action(res, datas)
 
     @staticmethod
@@ -72,7 +74,7 @@ class Action(object):
             win = datas['window']
             del datas['window']
 
-        if action['type'] == 'ir.actions.act_window':
+        if action['type'] == 'ir.action.act_window':
             for key in (
                     'res_id',
                     'res_model',
@@ -115,11 +117,11 @@ class Action(object):
                     action['view_type'], win, ctx,
                     datas['view_mode'], name=action.get('name', False),
                     limit=datas['limit'], auto_refresh=datas['auto_refresh'])
-        elif action['type'] == 'ir.actions.wizard':
+        elif action['type'] == 'ir.action.wizard':
             Wizard.execute(action['wiz_name'], datas, win,
                     context=context)
 
-        elif action['type'] == 'ir.actions.report':
+        elif action['type'] == 'ir.action.report':
             Action.exec_report(action['report_name'], datas)
 
     @staticmethod
@@ -128,10 +130,6 @@ class Action(object):
         if 'id' in data:
             try:
                 model_id = data.get('id', False)
-#                actions = rpc.session.rpc_exec_auth('/object', 'execute',
-#                        'ir.values', 'get', 'action', keyword,
-#                        [(data['model'], model_id)], False, rpc.session.context)
-#                actions = [x[2] for x in actions]
                 actions = rpc.session.rpc_exec_auth('/object', 'execute',
                         'ir.action.keyword', 'get_keyword', keyword,
                         (data['model'], model_id))
