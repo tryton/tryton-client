@@ -14,6 +14,7 @@ from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
+from tryton.gui.window.attachment import Attachment
 
 _ = gettext.gettext
 
@@ -138,11 +139,10 @@ class Form(object):
     def sig_attach(self, widget=None):
         obj_id = self.screen.id_get()
         if obj_id:
-            import win_attach
-            win = win_attach.win_attach(self.model, obj_id, parent=self.window)
-            win.go()
+            win = Attachment(self.model, obj_id, self.window)
+            win.run()
         else:
-            self.message_state(_('No resource selected !'))
+            self.message_state(_('No resource selected!'))
         return True
 
     def sig_switch(self, widget=None):
