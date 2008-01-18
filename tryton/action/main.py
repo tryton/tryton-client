@@ -125,7 +125,7 @@ class Action(object):
             Action.exec_report(action['report_name'], datas)
 
     @staticmethod
-    def exec_keyword(keyword, data=None, context=None):
+    def exec_keyword(keyword, data=None, context=None, warning=True):
         actions = []
         if 'id' in data:
             try:
@@ -149,6 +149,6 @@ class Action(object):
             (name, action) = res
             Action._exec_action(action, data, context=context)
             return (name, action)
-        elif not len(keyact):
+        elif not len(keyact) and warning:
             message(_('No action defined!'), Main.get_main().window)
         return False

@@ -149,7 +149,7 @@ class Tree(object):
     def sig_print(self):
         self.sig_action('form_print')
 
-    def sig_action(self, keyword='tree_action', obj_id=None):
+    def sig_action(self, keyword='tree_action', obj_id=None, warning=True):
         ids = self.ids_get()
         if not obj_id and ids and len(ids):
             obj_id = ids[0]
@@ -159,17 +159,22 @@ class Tree(object):
                 del ctx['active_ids']
             if 'active_id' in ctx:
                 del ctx['active_id']
-            Action.exec_keyword(keyword, {
+            return Action.exec_keyword(keyword, {
                 'model': self.model,
                 'id': obj_id,
                 'ids':ids,
                 'window': self.window,
-                }, context=ctx)
+                }, context=ctx, warning=warning)
         else:
             common.message(_('No resource selected!'), self.window)
+        return False
 
-    def sig_activate(self, tree_view, path, view_column):
-        self.sig_action('tree_open')
+    def sig_activate(self, widget, iter, path):
+        if not self.sig_action('tree_open', warning=False):
+            if self.tree_res.view.row_expanded(iter):
+                self.tree_res.view.collapse_row(iter)
+            else:
+                self.tree_res.view.expand_row(iter, False)
 
     def sig_edit(self):
         obj_ids = self.ids_get()
