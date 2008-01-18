@@ -36,6 +36,7 @@ class ModelRecord(SignalEvent):
         self.modified = False
         self.modified_fields = {}
         self.read_time = time.time()
+        self.attachment_count = -1
         for key, val in self.mgroup.mfields.items():
             self.value[key] = val.create(self)
             if (new and val.attrs['type']=='one2many') \
@@ -239,3 +240,12 @@ class ModelRecord(SignalEvent):
         for index, fname, value in values:
             data[fname] = value
         self.set_default(data)
+
+    def get_attachment_count(self):
+        if self.attachment_count < 0:
+            ir_attachment = RPCProxy('ir.attachment')
+            self.attachment_count = ir_attachment.search_count([
+                ('res_model', '=', self.resource),
+                ('res_id', '=', self.id),
+                ])
+        return self.attachment_count

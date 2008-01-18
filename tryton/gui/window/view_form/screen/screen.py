@@ -166,6 +166,10 @@ class Screen(SignalEvent):
             len(self.models.models or []) + offset,
             self.search_count,
             value and value.id))
+        attachment_count = 0
+        if value:
+            attachment_count = value.get_attachment_count()
+        self.signal('attachment-count', attachment_count)
         return True
     current_model = property(_get_current_model, _set_current_model)
 

@@ -1339,7 +1339,7 @@
               <widget class="GtkToolButton" id="but_attach">
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Add an attachment to this resource</property>
-                <property name="label" translatable="yes">Attachment</property>
+                <property name="label" translatable="yes">Attachment(0)</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-paste</property>
                 <signal name="clicked" handler="on_but_attach_clicked"/>

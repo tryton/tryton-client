@@ -15,16 +15,18 @@ from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
+from tryton.signal_event import SignalEvent
 
 _ = gettext.gettext
 
 
-class Form(object):
+class Form(SignalEvent):
     "Form"
 
     def __init__(self, model, res_id=False, domain=None, view_type=None,
             view_ids=None, window=None, context=None, name=False, limit=80,
             auto_refresh=False):
+        super(Form, self).__init__()
         if not view_type:
             view_type = ['tree', 'form']
         if domain is None:
@@ -52,6 +54,8 @@ class Form(object):
                 window=self.window, limit=limit, readonly=bool(auto_refresh),
                 form=self)
         self.screen.signal_connect(self, 'record-message', self._record_message)
+        self.screen.signal_connect(self, 'attachment-count',
+                self._attachment_count)
         self.screen.widget.show()
 
         if not name:
@@ -337,6 +341,9 @@ class Form(object):
         statusbar = self.glade.get_widget('stat_form')
         cid = statusbar.get_context_id('message')
         statusbar.push(cid, msg)
+
+    def _attachment_count(self, screen, signal_data):
+        self.signal('attachment-count', signal_data)
 
     def modified_save(self, reload=True):
         if self.screen.is_modified():

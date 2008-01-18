@@ -10,14 +10,16 @@ from tryton.gui.window.win_export import WinExport
 from tryton.config import GLADE
 from window import Window
 from tryton.action import Action
+from tryton.signal_event import SignalEvent
 
 _ = gettext.gettext
 
-class Tree(object):
+class Tree(SignalEvent):
     "Tree page"
 
     def __init__(self, model, res_id=False, view_id=False, domain=None, context=None,
             window=None, name=False):
+        super(Tree, self).__init__()
         if domain is None:
             domain = {}
         if context is None:

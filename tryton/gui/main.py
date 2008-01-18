@@ -793,19 +793,26 @@ class Main(object):
         self.pages.append(page)
         self.notebook.append_page(page.widget, gtk.Label(page.name))
         self.notebook.set_current_page(-1)
+        page.signal_connect(self, 'attachment-count', self._attachment_count)
 
     def sb_set(self, view=None):
         if not view:
             view = self._wid_get()
         for i in self.buttons:
             if self.buttons[i]:
-                self.buttons[i].set_sensitive(bool(view and (i in view.handlers)))
+                self.buttons[i].set_sensitive(
+                        bool(view and (i in view.handlers)))
+
+    def _attachment_count(self, widget, signal_data):
+        label = _('Attachment(%d)') % signal_data
+        self.buttons['but_attach'].set_label(label)
 
     def _win_del(self):
         page = int(self.notebook.get_current_page())
         if page != -1:
             self.notebook.disconnect(self.sig_id)
             page_widget = self.pages.pop(page)
+            page_widget.signal_unconnect(self)
             self.notebook.remove_page(page)
             self.sig_id = self.notebook.connect_after('switch-page',
                     self._sig_page_changt)
