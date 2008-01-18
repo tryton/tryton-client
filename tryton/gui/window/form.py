@@ -227,10 +227,10 @@ class Form(object):
 
     def sig_save(self, widget=None):
         if self.screen.save_current():
-            self.message_state(_('Document saved !'))
+            self.message_state(_('Document saved!'))
             return True
         else:
-            self.message_state(_('Invalid form !'))
+            self.message_state(_('Invalid form!'))
             return False
 
     def sig_previous(self, widget=None):
