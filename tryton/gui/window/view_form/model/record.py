@@ -242,6 +242,8 @@ class ModelRecord(SignalEvent):
         self.set_default(data)
 
     def get_attachment_count(self):
+        if not self.id:
+            return 0
         if self.attachment_count < 0:
             ir_attachment = RPCProxy('ir.attachment')
             self.attachment_count = ir_attachment.search_count([
