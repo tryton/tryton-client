@@ -20,6 +20,8 @@ class PySocket:
         else:
             self.sock = sock
         self.sock.settimeout(120)
+        self.host = None
+        self.port = None
 
     def connect(self, host, port=False):
         if not port:
@@ -29,10 +31,26 @@ class PySocket:
             host = DNS_CACHE[host]
         self.sock.connect((host, int(port)))
         DNS_CACHE[host], port = self.sock.getpeername()
+        self.host = host
+        self.port = port
 
     def disconnect(self):
-        self.sock.shutdown(socket.SHUT_RDWR)
-        self.sock.close()
+        try:
+            self.sock.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
+        try:
+            self.sock.close()
+        except:
+            pass
+
+    def reconnect(self):
+        if self.host and self.port:
+            self.disconnect()
+            self.sock = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.settimeout(120)
+            self.sock.connect((self.host, int(self.port)))
 
     def send(self, msg, exception=False, traceback=None):
         msg = cPickle.dumps([msg, traceback])

@@ -101,7 +101,6 @@ class PySocketGW(GWInter):
 
     def __init__(self, url, database, user, passwd, obj='/object'):
         GWInter.__init__(self, url, database, user, passwd, obj)
-        self._sock = pysocket.PySocket()
         self._obj = obj[1:]
 
     def exec_auth(self, method, *args):
@@ -118,10 +117,13 @@ class PySocketGW(GWInter):
             if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
                 args = args[:]
                 args = args + (_VIEW_CACHE[key][0],)
-        self._sock.connect(self._url)
-        self._sock.send((self._obj, method, self._db)+args)
-        result = self._sock.receive()
-        self._sock.disconnect()
+        try:
+            self._sock.send((self._obj, method, self._db)+args)
+            result = self._sock.receive()
+        except:
+            self._sock.reconnect()
+            self._sock.send((self._obj, method, self._db)+args)
+            result = self._sock.receive()
         if key:
             if result is True and key in _VIEW_CACHE:
                 result = _VIEW_CACHE[key][1]
@@ -129,9 +131,10 @@ class PySocketGW(GWInter):
                 _VIEW_CACHE[key] = (result['md5'], result)
         return result
 
+
 class RPCSession(object):
     __slots__ = ('_open', '_url', 'user', 'uname', '_passwd', '_gw', 'database',
-            'context', 'timezone')
+            'context', 'timezone', '_sock')
     def __init__(self):
         self._open = False
         self._url = None
@@ -142,6 +145,7 @@ class RPCSession(object):
         self._gw = None
         self.database = None
         self.timezone = 'utc'
+        self._sock = None
 
     def rpc_exec(self, obj, method, *args):
         try:
@@ -239,14 +243,16 @@ class RPCSession(object):
                 return -2
         else:
             _url = _protocol+url+':'+str(port)
-            _sock = pysocket.PySocket()
-            self._gw = PySocketGW
             try:
-                _sock.connect(url, int(port))
-                _sock.send(('common', 'login', database or '', uname or '',
+                if self._sock:
+                    self._sock.disconnect()
+                self._sock = pysocket.PySocket()
+                self._sock.connect(url, int(port))
+                self._gw = PySocketGW
+                self._gw._sock = self._sock
+                self._sock.send(('common', 'login', database or '', uname or '',
                     passwd or ''))
-                res = _sock.receive()
-                _sock.disconnect()
+                res = self._sock.receive()
             except socket.error:
                 return -1
             if not res:
@@ -276,12 +282,13 @@ class RPCSession(object):
             except:
                 return -1
         else:
-            sock = pysocket.PySocket()
             try:
-                sock.connect(match.group(2), int(match.group(3)))
-                sock.send(('db', 'list'))
-                res = sock.receive()
-                sock.disconnect()
+                if self._sock:
+                    self._sock.disconnect()
+                self._sock = pysocket.PySocket()
+                self._sock.connect(match.group(2), int(match.group(3)))
+                self._sock.send(('db', 'list'))
+                res = self._sock.receive()
                 return res
             except:
                 return -1
@@ -293,11 +300,12 @@ class RPCSession(object):
             sock = xmlrpclib.ServerProxy(url + '/xmlrpc/db')
             return getattr(sock, method)(*args)
         else:
-            sock = pysocket.PySocket()
-            sock.connect(match.group(2), int(match.group(3)))
-            sock.send(('db', method)+args)
-            res = sock.receive()
-            sock.disconnect()
+            if self._sock:
+                self._sock.disconnect()
+            self._sock = pysocket.PySocket()
+            self._sock.connect(match.group(2), int(match.group(3)))
+            self._sock.send(('db', method)+args)
+            res = self._sock.receive()
             return res
 
     def db_exec(self, url, method, *args):
@@ -367,6 +375,10 @@ class RPCSession(object):
             self._passwd = None
         else:
             pass
+        if self._sock:
+            self._sock.disconnect()
+        self._sock = None
+        self._gw = None
 
 SESSION = RPCSession()
 session = SESSION
