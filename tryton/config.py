@@ -57,8 +57,8 @@ class ConfigManager(object):
         self.options = {
             'login.login': 'demo',
             'login.server': 'localhost',
-            'login.port': '8069',
-            'login.protocol': 'http://',
+            'login.port': '8070',
+            'login.protocol': 'socket://',
             'login.db': False,
             'client.modepda': False,
             'client.toolbar': 'both',
