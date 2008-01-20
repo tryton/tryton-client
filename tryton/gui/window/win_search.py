@@ -1,5 +1,4 @@
 import gtk
-from gtk import glade
 import gettext
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
@@ -17,11 +16,22 @@ class WinSearch(object):
         self.context = context or {}
         self.context.update(rpc.session.context)
         self.sel_multi = sel_multi
-        self.glade = glade.XML(GLADE, 'win_search', gettext.textdomain())
-        self.win = self.glade.get_widget('win_search')
-        self.win.set_icon(TRYTON_ICON)
         self.parent = parent
-        self.win.set_transient_for(parent)
+
+        self.win = gtk.Dialog(_('Tryton - Search'), self.parent,
+                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+                (gtk.STOCK_FIND, gtk.RESPONSE_APPLY,
+                gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                gtk.STOCK_OK, gtk.RESPONSE_OK))
+        self.win.set_icon(TRYTON_ICON)
+        self.win.set_default_response(gtk.RESPONSE_OK)
+        hbox = gtk.HBox()
+        hbox.show()
+        self.win.vbox.pack_start(hbox, expand=False, fill=True)
+        self.win.vbox.pack_start(gtk.HSeparator(), expand=False, fill=True)
+        scrollwindow = gtk.ScrolledWindow()
+        scrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
         self.screen = Screen(model, view_type=['tree'], context=context,
                 parent=self.win)
@@ -36,7 +46,6 @@ class WinSearch(object):
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         viewport.add(self.screen.widget)
-        scrollwindow = self.glade.get_widget('search_sw')
         scrollwindow.add(viewport)
         scrollwindow.show_all()
         self.view.widget_tree.connect('row_activated', self.sig_activate)
@@ -54,7 +63,6 @@ class WinSearch(object):
                 self.form.name
         self.win.set_title(self.title)
 
-        hbox = self.glade.get_widget('search_hbox')
         hbox.pack_start(self.form.widget)
         self.ids = ids
         if self.ids:
@@ -69,6 +77,8 @@ class WinSearch(object):
         self.view.widget.show_all()
         if self.form.focusable:
             self.form.focusable.grab_focus()
+
+        self.win.set_size_request(700, 500)
 
     def sig_activate(self, *args):
         self.view.widget_tree.emit_stop_by_name('row_activated')
@@ -122,7 +132,7 @@ class WinSearch(object):
             if button == gtk.RESPONSE_OK:
                 res = self.sel_ids_get() or self.ids
                 end = True
-            elif button== gtk.RESPONSE_APPLY:
+            elif button == gtk.RESPONSE_APPLY:
                 end = not self.find()
                 if end:
                     res = self.sel_ids_get() or self.ids
