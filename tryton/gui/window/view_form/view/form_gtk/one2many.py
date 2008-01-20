@@ -32,7 +32,10 @@ class Dialog(object):
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
 
-        self.but_cancel = self.dia.add_button(gtk.STOCK_CANCEL,
+        icon_cancel = gtk.STOCK_CLOSE
+        if not model:
+            icon_cancel = gtk.STOCK_CANCEL
+        self.but_cancel = self.dia.add_button(icon_cancel,
                 gtk.RESPONSE_CANCEL)
         self.but_cancel.add_accelerator('clicked', self.accel_group,
                 gtk.keysyms.Escape, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
@@ -88,6 +91,7 @@ class Dialog(object):
                     or self.screen.current_model.validate()
             if not end:
                 self.screen.display()
+            self.but_cancel.set_label(gtk.STOCK_CLOSE)
 
         if res == gtk.RESPONSE_OK:
             self.screen.current_view.set_value()
