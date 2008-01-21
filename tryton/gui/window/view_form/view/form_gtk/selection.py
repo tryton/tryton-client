@@ -11,16 +11,16 @@ class Selection(WidgetInterface):
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.ComboBoxEntry()
         child = self.entry.get_child()
+        child.set_property('activates_default', True)
         child.connect('changed', self.sig_changed)
         self.changed = True
-        child.set_editable(False)
         child.connect('button_press_event', self._menu_open)
-        child.connect('key_press_event', self.sig_key_pressed)
+        child.connect('activate', self.sig_activate)
+        child.connect_after('focus-out-event', self.sig_activate)
         self.entry.set_size_request(int(attrs.get('size', -1)), -1)
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self._selection = {}
-        self.key_catalog = {}
         self.set_popdown(attrs.get('selection', []))
         self.last_key = (None, 0)
 
@@ -28,17 +28,12 @@ class Selection(WidgetInterface):
         model = gtk.ListStore(gobject.TYPE_STRING)
         self._selection = {}
         lst = []
-        for (i, j) in selection:
-            name = str(j)
+        for (value, name) in selection:
+            name = str(name)
             lst.append(name)
-            self._selection[name] = i
-        self.key_catalog = {}
-        for name in lst:
+            self._selection[name] = value
             i = model.append()
             model.set(i, 0, name)
-            if name:
-                key = name[0].lower()
-                self.key_catalog.setdefault(key, []).append(i)
         self.entry.set_model(model)
         self.entry.set_text_column(0)
         return lst
@@ -51,6 +46,20 @@ class Selection(WidgetInterface):
         child = self.entry.get_child()
         res = child.get_text()
         return self._selection.get(res, False)
+
+    def sig_activate(self, widget, event=None):
+        text = self.entry.child.get_text()
+        value = False
+        if text:
+            for txt, val in self._selection.items():
+                if not val:
+                    continue
+                if txt[:len(text)].lower() == text.lower():
+                    value = val
+                    if len(txt) == len(text):
+                        break
+        self._view.modelfield.set_client(self._view.model, value, force_change=True)
+        self.display(self._view.model, self._view.modelfield)
 
     def set_value(self, model, model_field):
         model_field.set_client(model, self.value_get())
@@ -82,14 +91,3 @@ class Selection(WidgetInterface):
         if self.changed:
             super(Selection, self).sig_changed()
             self._focus_out()
-
-    def sig_key_pressed(self, *args):
-        key = args[1].string.lower()
-        if self.last_key[0] == key:
-            self.last_key[1] += 1
-        else:
-            self.last_key = [ key, 1 ]
-        if not self.key_catalog.has_key(key):
-            return
-        self.entry.set_active_iter(self.key_catalog[key][self.last_key[1] % \
-                len(self.key_catalog[key])])
