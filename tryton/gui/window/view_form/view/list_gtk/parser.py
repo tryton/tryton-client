@@ -26,6 +26,8 @@ def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
     editable.editing_done_id = editable.connect('editing_done',
             treeview.on_editing_done)
+    if isinstance(editable, gtk.ComboBoxEntry):
+        editable.connect('changed', treeview.on_editing_done)
 
 def sort_model(column, treeview):
     model = treeview.get_model()
@@ -460,10 +462,14 @@ class Selection(Char):
 
     def value_from_text(self, model, text):
         selection = model[self.field_name].attrs['selection']
+        res = False
         for val, txt in selection:
-            if txt == text:
-                return val
-        return False
+            if txt[:len(text)].lower() == text.lower():
+                if len(txt) == len(text):
+                    return val
+                res = val
+        return res
+
 
 CELLTYPES = {
     'char': Char,
