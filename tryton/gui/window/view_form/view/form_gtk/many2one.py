@@ -101,13 +101,14 @@ class Many2One(WidgetInterface):
 
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('width-chars', 13)
+        self.wid_text.set_property('activates_default', True)
         self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('button_press_event', self._menu_open)
         self.wid_text.connect_after('changed', self.sig_changed)
         self.changed = True
         self.wid_text.connect_after('activate', self.sig_activate)
         self.wid_text.connect_after('focus-out-event',
-                        self.sig_activate, True)
+                        self.sig_activate)
         self.focus_out = True
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
@@ -216,26 +217,15 @@ class Many2One(WidgetInterface):
     def _color_widget(self):
         return self.wid_text
 
-    def sig_activate(self, widget, event=None, leave=False):
+    def sig_activate(self, widget, event=None):
         if not self.focus_out:
             return
         self.changed = False
         value = self._view.modelfield.get(self._view.model)
 
         self.focus_out = False
-        if value:
-            if not leave:
-                domain = self._view.modelfield.domain_get(self._view.model)
-                dia = Dialog(self.attrs['relation'],
-                        self._view.modelfield.get(self._view.model),
-                        attrs=self.attrs, window=self._window, domain=domain)
-                res, value = dia.run()
-                if res:
-                    self._view.modelfield.set_client(self._view.model, value,
-                            force_change=True)
-                dia.destroy()
-        else:
-            if not self._readonly and ( self.wid_text.get_text() or not leave):
+        if not value:
+            if not self._readonly and self.wid_text.get_text():
                 domain = self._view.modelfield.domain_get(self._view.model)
                 context = self._view.modelfield.context_get(self._view.model)
                 self.wid_text.grab_focus()
@@ -276,18 +266,27 @@ class Many2One(WidgetInterface):
         dia.destroy()
         self.focus_out = True
 
-    sig_edit = sig_activate
+    def sig_edit(self, widget):
+        domain = self._view.modelfield.domain_get(self._view.model)
+        dia = Dialog(self.attrs['relation'],
+                self._view.modelfield.get(self._view.model),
+                attrs=self.attrs, window=self._window, domain=domain)
+        res, value = dia.run()
+        if res:
+            self._view.modelfield.set_client(self._view.model, value,
+                    force_change=True)
+        dia.destroy()
 
     def sig_key_press(self, widget, event, *args):
         if event.keyval == gtk.keysyms.F1:
             self.sig_new(widget, event)
         elif event.keyval==gtk.keysyms.F2:
-            self.sig_activate(widget, event)
+            self.sig_edit(widget)
         elif event.keyval  == gtk.keysyms.Tab:
             if self._view.modelfield.get(self._view.model) or \
                     not self.wid_text.get_text():
                 return False
-            self.sig_activate(widget, event, leave=True)
+            self.sig_activate(widget, event)
             return True
         return False
 
