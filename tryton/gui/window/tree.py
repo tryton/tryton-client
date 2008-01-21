@@ -53,6 +53,7 @@ class Tree(SignalEvent):
         self.tree_res = ViewTree(view, [], True,
                 context=context)
         self.tree_res.view.connect('row-activated', self.sig_activate)
+        self.tree_res.view.connect('key_press_event', self.sig_key_press)
 
         if not name:
             self.name = self.tree_res.name
@@ -177,6 +178,18 @@ class Tree(SignalEvent):
                 self.tree_res.view.collapse_row(iter)
             else:
                 self.tree_res.view.expand_row(iter, False)
+
+    def sig_key_press(self, widget, event):
+        if event.keyval == gtk.keysyms.Left:
+            model, paths = self.tree_res.view.get_selection()\
+                    .get_selected_rows()
+            for path in paths:
+                self.tree_res.view.collapse_row(path)
+        elif event.keyval == gtk.keysyms.Right:
+            model, paths = self.tree_res.view.get_selection()\
+                    .get_selected_rows()
+            for path in paths:
+                self.tree_res.view.expand_row(path, False)
 
     def sig_edit(self):
         obj_ids = self.ids_get()
