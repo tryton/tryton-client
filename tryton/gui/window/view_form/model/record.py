@@ -233,13 +233,11 @@ class ModelRecord(SignalEvent):
         self.signal('record-changed')
 
     def cond_default(self, field_name, value):
-        ir_values = RPCProxy('ir.values')
-        values = ir_values.get('default', '%s=%s' % (field_name, value),
-                        [(self.resource, False)], False, {})
-        data = {}
-        for index, fname, value in values:
-            data[fname] = value
-        self.set_default(data)
+        ir_default = RPCProxy('ir.default')
+        ctx = rpc.session.context.copy()
+        ctx.update(self.context_get())
+        self.set_default(ir_default.get_default(self.resource,
+            field_name + '=' + str(value), ctx))
 
     def get_attachment_count(self):
         if not self.id:

@@ -1,5 +1,6 @@
 import gtk
 from gtk import glade
+from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.common import warning, COLORS
 from tryton.config import GLADE, TRYTON_ICON
@@ -31,11 +32,15 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
     vbox = win_gl.get_widget('pref_vbox')
     widgets = {}
     addwidget = False
-    for (fname, fvalue, rname, rvalue) in dependance:
-        if rvalue:
+    widget = None
+    if dependance:
+        widget = gtk.RadioButton(widget, _('Always'))
+        vbox.pack_start(widget)
+    for (fname, name, fvalue, value) in dependance:
+        if fvalue:
             addwidget = True
-            widget = gtk.CheckButton(fname+' = '+str(rname))
-            widgets[(fvalue, rvalue)] = widget
+            widget = gtk.RadioButton(widget, name+' = '+str(value))
+            widgets[(fname, fvalue)] = widget
             vbox.pack_start(widget)
     if not len(dependance) or not addwidget:
         vbox.pack_start(gtk.Label(_('Always applicable !')))
@@ -43,17 +48,20 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
 
     res = win.run()
 
-    deps = False
+    clause = False
     for val in widgets.keys():
         if widgets[val].get_active():
-            deps = val[0] + '=' + str(val[1])
+            clause = val[0] + '=' + str(val[1])
             break
+    user = False
+    if radio.get_active():
+        user = rpc.session.user
     window.present()
     win.destroy()
     if res == gtk.RESPONSE_OK:
-        rpc.session.rpc_exec_auth('/object', 'execute', 'ir.values', 'set',
-                'default', deps, field, [(model,False)], value, True, False,
-                False, radio.get_active(), True)
+        ir_default = RPCProxy('ir.default')
+        ir_default.set_default(model, field, clause, value, user,
+                rpc.session.context)
         return True
     return False
 
@@ -120,11 +128,12 @@ class WidgetInterface(object):
 
     def _menu_sig_default_set(self):
         deps = []
-        wid = self._view.view_form.widgets
         for wname, wview in self._view.view_form.widgets.items():
             if wview.modelfield.attrs.get('change_default', False):
-                value = wview.modelfield.get(self._view.model)
-                deps.append((wname, wname, value, value))
+                wvalue = wview.modelfield.get(self._view.model)
+                name = wview.modelfield.attrs.get('string', wname)
+                value = wview.modelfield.get_client(self._view.model)
+                deps.append((wname, name, wvalue, value))
         value = self._view.modelfield.get_default(self._view.model)
         model = self._view.modelfield.parent.resource
         field_pref_set(self._view.widget_name,
