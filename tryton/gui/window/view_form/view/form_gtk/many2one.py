@@ -267,15 +267,48 @@ class Many2One(WidgetInterface):
         self.focus_out = True
 
     def sig_edit(self, widget):
-        domain = self._view.modelfield.domain_get(self._view.model)
-        dia = Dialog(self.attrs['relation'],
-                self._view.modelfield.get(self._view.model),
-                attrs=self.attrs, window=self._window, domain=domain)
-        res, value = dia.run()
-        if res:
-            self._view.modelfield.set_client(self._view.model, value,
-                    force_change=True)
-        dia.destroy()
+        self.changed = False
+        value = self._view.modelfield.get(self._view.model)
+        self.focus_out = False
+        if value:
+            domain = self._view.modelfield.domain_get(self._view.model)
+            dia = Dialog(self.attrs['relation'],
+                    self._view.modelfield.get(self._view.model),
+                    attrs=self.attrs, window=self._window, domain=domain)
+            res, value = dia.run()
+            if res:
+                self._view.modelfield.set_client(self._view.model, value,
+                        force_change=True)
+            dia.destroy()
+        else:
+            if not self._readonly:
+                domain = self._view.modelfield.domain_get(self._view.model)
+                context = self._view.modelfield.context_get(self._view.model)
+                self.wid_text.grab_focus()
+
+                ids = rpc.session.rpc_exec_auth('/object', 'execute',
+                        self.attrs['relation'], 'name_search',
+                        self.wid_text.get_text(), domain, 'ilike', context)
+                if len(ids)==1:
+                    self._view.modelfield.set_client(self._view.model, ids[0],
+                            force_change=True)
+                    self.focus_out = True
+                    self.display(self._view.model, self._view.modelfield)
+                    return True
+
+                win = WinSearch(self.attrs['relation'], sel_multi=False,
+                        ids = [x[0] for x in ids], context=context,
+                        domain=domain, parent=self._window)
+                ids = win.run()
+                if ids:
+                    name = rpc.session.rpc_exec_auth('/object', 'execute',
+                            self.attrs['relation'], 'name_get', [ids[0]],
+                            rpc.session.context)[0]
+                    self._view.modelfield.set_client(self._view.model, name,
+                            force_change=True)
+        self.focus_out = True
+        self.display(self._view.model, self._view.modelfield)
+        self.changed = True
 
     def sig_key_press(self, widget, event, *args):
         if event.keyval == gtk.keysyms.F1:
