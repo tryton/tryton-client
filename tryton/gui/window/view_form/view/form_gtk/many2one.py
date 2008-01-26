@@ -5,6 +5,7 @@ from interface import WidgetInterface
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
+from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.action import Action
 from tryton.config import TRYTON_ICON
@@ -103,7 +104,7 @@ class Many2One(WidgetInterface):
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.set_property('activates_default', True)
         self.wid_text.connect('key_press_event', self.sig_key_press)
-        self.wid_text.connect('button_press_event', self._menu_open)
+        self.wid_text.connect('populate-popup', self._populate_popup)
         self.wid_text.connect_after('changed', self.sig_changed)
         self.changed = True
         self.wid_text.connect_after('activate', self.sig_activate)
@@ -142,14 +143,6 @@ class Many2One(WidgetInterface):
 
         self._readonly = False
         self.model_type = attrs['relation']
-        self._menu_loaded = False
-        self._menu_entries = []
-        self._menu_entries.append((None, None, None))
-        self._menu_entries.append((_('Action'),
-            lambda x: self.click_and_action('client_action_multi'),0))
-        self._menu_entries.append((_('Report'),
-            lambda x: self.click_and_action('client_print_multi'),0))
-
 
         self.completion = gtk.EntryCompletion()
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
@@ -354,35 +347,35 @@ class Many2One(WidgetInterface):
             self.tooltips.set_tip(self.but_open, _('Search a resource'))
         self.changed = True
 
-    def _menu_open(self, obj, event):
-        if event.button == 3:
-            value = self._view.modelfield.get(self._view.model)
-            if not self._menu_loaded:
-                resrelate = rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.values', 'get', 'action', 'client_action_relate',
-                        [(self.model_type, False)], False, rpc.session.context)
-                resrelate = [x[2] for x in resrelate]
-                self._menu_entries.append((None, None, None))
-                for i in resrelate:
-                    i['string'] = i['name']
-                    fct = lambda action: lambda x: self.click_and_relate(action)
-                    self._menu_entries.append(('... ' + i['name'], fct(i), 0))
-            self._menu_loaded = True
+    def _populate_popup(self, widget, menu):
+        value = self._view.modelfield.get(self._view.model)
+        ir_action_keyword = RPCProxy('ir.action.keyword')
+        relates = ir_action_keyword.get_keyword('form_relate',
+                (self.model_type, 0), rpc.session.context)
+        menu_entries = []
+        menu_entries.append((None, None, None))
+        menu_entries.append((_('Actions'),
+            lambda x: self.click_and_action('form_action'),0))
+        menu_entries.append((_('Reports'),
+            lambda x: self.click_and_action('form_print'),0))
+        menu_entries.append((None, None, None))
+        for relate in relates:
+            relate['string'] = relate['name']
+            fct = lambda action: lambda x: self.click_and_relate(action)
+            menu_entries.append(
+                    ('... ' + relate['name'], fct(relate), 0))
 
-            menu = gtk.Menu()
-            for stock_id, callback, sensitivity in self._menu_entries:
-                if stock_id:
-                    item = gtk.ImageMenuItem(stock_id)
-                    if callback:
-                        item.connect("activate", callback)
-                    item.set_sensitive(bool(sensitivity or value))
-                else:
-                    item = gtk.SeparatorMenuItem()
-                item.show()
-                menu.append(item)
-            menu.popup(None, None, None, event.button, event.time)
-            return True
-        return False
+        for stock_id, callback, sensitivity in menu_entries:
+            if stock_id:
+                item = gtk.ImageMenuItem(stock_id)
+                if callback:
+                    item.connect("activate", callback)
+                item.set_sensitive(bool(sensitivity or value))
+            else:
+                item = gtk.SeparatorMenuItem()
+            item.show()
+            menu.append(item)
+        return True
 
     def click_and_relate(self, action):
         data = {}

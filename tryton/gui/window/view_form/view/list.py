@@ -1,5 +1,6 @@
 import gobject
 import gtk
+from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 import locale
 from interface import ParserView
@@ -164,26 +165,41 @@ class ViewList(ParserView):
                 return False
             model = model.models[path[0][0]]
 
-            #TODO: add menu cache
             if path[1]._type == 'many2one':
                 value = model[path[1].name].get(model)
-                resrelate = rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.values', 'get', 'action', 'client_action_relate',
-                        [(self.screen.fields[path[1].name]['relation'], False)],
-                        False, rpc.session.context)
-                resrelate = [x[2] for x in resrelate]
-                menu = gtk.Menu()
-                for relate in resrelate:
+                ir_action_keyword = RPCProxy('ir.action.keyword')
+                relates = ir_action_keyword.get_keyword('form_relate',
+                        (self.screen.fields[path[1].name]['relation'], 0),
+                        rpc.session.context)
+                menu_entries = []
+                menu_entries.append((None, None, None))
+                menu_entries.append((_('Actions'),
+                    lambda x: self.click_and_action(
+                        'form_action', value, path), 0))
+                menu_entries.append((_('Reports'),
+                    lambda x: self.click_and_action(
+                        'form_print', value, path), 0))
+                menu_entries.append((None, None, None))
+                for relate in relates:
                     relate['string'] = relate['name']
-                    item = gtk.ImageMenuItem('... ' + relate['name'])
-                    item.connect('activate', self._click_and_relate,
-                            relate, value, path)
-                    item.set_sensitive(bool(value))
+                    fct = lambda action: lambda x: \
+                            self.click_and_relate(action, value, path)
+                    menu_entries.append(
+                            ('... ' + relate['name'], fct(relate), 0))
+                menu = gtk.Menu()
+                for stock_id, callback, sensitivity in menu_entries:
+                    if stock_id:
+                        item = gtk.ImageMenuItem(stock_id)
+                        if callback:
+                            item.connect('activate', callback)
+                        item.set_sensitive(bool(sensitivity or value))
+                    else:
+                        item = gtk.SeparatorMenuItem()
                     item.show()
                     menu.append(item)
                 menu.popup(None, None, None, event.button, event.time)
 
-    def _click_and_relate(self, widget, action, value, path):
+    def click_and_relate(self, action, value, path):
         data = {}
         context = {}
         act = action.copy()
@@ -198,6 +214,11 @@ class ViewList(ParserView):
         act['context'] = str(screen.current_model.expr_eval(act['context'],
             check_load=False))
         return Action._exec_action(act, data, context)
+
+    def click_and_action(self, atype, value, path):
+        return Action.exec_keyword(atype, {
+            'model': self.screen.fields[path[1].name]['relation'],
+            'id': value or False, 'ids': [value]})
 
     def signal_record_changed(self, signal, *args):
         if not self.store:
