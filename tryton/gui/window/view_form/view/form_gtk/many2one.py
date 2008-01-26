@@ -396,4 +396,4 @@ class Many2One(WidgetInterface):
     def click_and_action(self, atype):
         obj_id = self._view.modelfield.get(self._view.model)
         return Action.exec_keyword(atype, {'model': self.model_type,
-            'id': obj_id or False, 'ids': [obj_id], 'report_type': 'pdf'})
+            'id': obj_id or False, 'ids': [obj_id]})

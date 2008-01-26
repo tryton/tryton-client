@@ -117,7 +117,6 @@ class ViewForm(ParserView):
                 'model': self.screen.name,
                 'id': obj_id,
                 'ids': [obj_id],
-                'report_type': act.get('report_type', 'pdf'),
             }
         if atype == 'relate':
             obj_id = self.screen.current_model \

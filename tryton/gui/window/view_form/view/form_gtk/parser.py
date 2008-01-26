@@ -56,7 +56,6 @@ class Button(object):
                         'model': self.form.screen.name,
                         'id': obj_id or False,
                         'ids': obj_id and [obj_id] or [],
-                        'report_type': 'pdf',
                         })
                 else:
                     raise Exception('Unallowed button type')
