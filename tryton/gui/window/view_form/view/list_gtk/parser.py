@@ -248,10 +248,10 @@ class Datetime(Date):
         if not value:
             return ''
         date = time.strptime(value, self.server_format)
-        if 'tz' in rpc.session.context:
+        if 'timezone' in rpc.session.context:
             try:
                 import pytz
-                lzone = pytz.timezone(rpc.session.context['tz'])
+                lzone = pytz.timezone(rpc.session.context['timezone'])
                 szone = pytz.timezone(rpc.session.timezone)
                 datetime = DT.datetime(date[0], date[1], date[2], date[3],
                         date[4], date[5], date[6])
@@ -274,10 +274,10 @@ class Datetime(Date):
                 date = tuple(datetime)
             except:
                 return False
-        if 'tz' in rpc.session.context:
+        if 'timezone' in rpc.session.context:
             try:
                 import pytz
-                lzone = pytz.timezone(rpc.session.context['tz'])
+                lzone = pytz.timezone(rpc.session.context['timezone'])
                 szone = pytz.timezone(rpc.session.timezone)
                 datetime = DT.datetime(date[0], date[1], date[2], date[3],
                         date[4], date[5], date[6])

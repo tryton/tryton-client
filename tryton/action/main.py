@@ -55,7 +55,7 @@ class Action(object):
                 raise Exception, 'ActionNotFound'
             action_type = res['type']
         act_id2 = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
-                'search', [('action', '=', act_id)], ctx)[0]
+                'search', [('action', '=', act_id)], 0, None, None, ctx)[0]
         res = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
                 'read', act_id2, False, ctx)
         Action._exec_action(res, datas)

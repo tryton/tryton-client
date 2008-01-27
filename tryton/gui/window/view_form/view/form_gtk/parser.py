@@ -400,7 +400,7 @@ class ParserForm(ParserInterface):
         langs = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
                 'read', lang_ids, ['code', 'name'])
 
-        code = rpc.session.context.get('lang', 'en_US')
+        code = rpc.session.context.get('language', 'en_US')
 
         #change 'en' to false for context
         def adapt_context(val):
@@ -483,7 +483,7 @@ class ParserForm(ParserInterface):
         i = 0
         for lang in langs:
             context = copy.copy(rpc.session.context)
-            context['lang'] = adapt_context(lang['code'])
+            context['language'] = adapt_context(lang['code'])
             val = rpc.session.rpc_exec_auth('/object', 'execute', model,
                     'read', [obj_id], [name], context)
             val = val[0]
@@ -531,7 +531,7 @@ class ParserForm(ParserInterface):
                 if new_val['code'] == code:
                     value_set(widget_entry, new_val['value'])
                 context = copy.copy(rpc.session.context)
-                context['lang'] = adapt_context(new_val['code'])
+                context['language'] = adapt_context(new_val['code'])
                 rpc.session.rpc_exec_auth('/object', 'execute', model,
                         'write', [obj_id], {str(name):  new_val['value']},
                         context)

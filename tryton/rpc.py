@@ -333,28 +333,25 @@ class RPCSession(object):
     def context_reload(self):
         self.context = {}
         self.timezone = 'utc'
-        # self.user
-        context = self.rpc_exec_auth('/object', 'execute', 'ir.values', 'get',
-                'meta', False, [('res.user', self.user or False)], False, {},
-                True, True, False)
-        for ctx in context:
-            if ctx[2]:
-                self.context[ctx[1]] = ctx[2]
-            if ctx[1] == 'lang':
-                translate.setlang(ctx[2])
-                CONFIG['client.lang'] = ctx[2]
-                ids = self.rpc_exec_auth('/object', 'execute', 'res.lang',
-                        'search', [('code', '=', ctx[2])])
+        user = RPCProxy('res.user')
+        lang = RPCProxy('res.lang')
+        context = user.get_preferences(True, {})
+        for name in context:
+            value = context[name]
+            if value:
+                self.context[name] = value
+            if name == 'lang':
+                translate.setlang(value)
+                CONFIG['client.lang'] = value
+                ids = lang.search([('code', '=', value)])
                 if ids:
-                    lang = self.rpc_exec_auth('/object', 'execute', 'res.lang',
-                            'read', ids, ['direction'])
-                    if lang and 'direction' in lang[0]:
-                        common.DIRECTION = lang[0]['direction']
-                        if common.DIRECTION == 'rtl':
+                    lang = lang.read(ids[0], ['direction'])
+                    if lang and 'direction' in lang:
+                        if lang['direction'] == 'rtl':
                             gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
                         else:
                             gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
-            elif ctx[1] == 'tz':
+            elif name == 'timezone':
                 self.timezone = self.rpc_exec_auth('/common', 'timezone_get')
                 try:
                     import pytz

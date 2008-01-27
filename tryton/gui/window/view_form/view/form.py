@@ -166,7 +166,7 @@ class ViewForm(ParserView):
                 code = lang['code']
                 val = rpc.session.rpc_exec_auth('/object',
                         'execute', tool['type'], 'read',
-                        [tool['id']], ['name'], {'lang': code})
+                        [tool['id']], ['name'], {'language': code})
                 val = val[0]
 
                 label = gtk.Label(lang['name'])
@@ -201,7 +201,7 @@ class ViewForm(ParserView):
                     rpc.session.rpc_exec_auth('/object',
                             'execute', tool['type'],
                             'write', [tool['id']],
-                            {'name': val}, {'lang': code})
+                            {'name': val}, {'language': code})
             window.present()
             win.destroy()
             return res

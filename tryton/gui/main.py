@@ -559,12 +559,7 @@ class Main(object):
         self.notebook.set_current_page(page - 1)
 
     def sig_user_preferences(self, widget):
-        actions = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.values', 'get', 'meta', False, [('res.user',False)],
-                True, rpc.session.context, True)
-
-        win = Preference('res.user', rpc.session.user,
-                actions, parent=self.window)
+        win = Preference(rpc.session.user, self.window)
         if win.run():
             rpc.session.context_reload()
         self.window.present()
