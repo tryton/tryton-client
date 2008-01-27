@@ -144,8 +144,8 @@ class WinExport(object):
         self.model2.clear()
 
     def fill_predefwin(self):
-        ir_export = rpc.RPCProxy('ir.exports')
-        ir_export_line = rpc.RPCProxy('ir.exports.line')
+        ir_export = rpc.RPCProxy('ir.export')
+        ir_export_line = rpc.RPCProxy('ir.export.line')
         export_ids = ir_export.search([('resource', '=', self.model)])
         for export in ir_export.read(export_ids):
             fields = ir_export_line.read(export['export_fields'])
@@ -162,7 +162,7 @@ class WinExport(object):
         name = common.ask('What is the name of this export?', self.parent)
         if not name:
             return
-        ir_export = rpc.RPCProxy('ir.exports')
+        ir_export = rpc.RPCProxy('ir.export')
         iter = self.model2.get_iter_root()
         fields = []
         while iter:
@@ -185,7 +185,7 @@ class WinExport(object):
         (model, i) = sel
         if not i:
             return None
-        ir_export = rpc.RPCProxy('ir.exports')
+        ir_export = rpc.RPCProxy('ir.export')
         export_id = model.get_value(i, 0)
         ir_export.unlink(export_id)
         for i in range(len(self.predef_model)):
