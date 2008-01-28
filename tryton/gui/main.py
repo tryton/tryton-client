@@ -786,7 +786,21 @@ class Main(object):
 
     def win_add(self, page):
         self.pages.append(page)
-        self.notebook.append_page(page.widget, gtk.Label(page.name))
+        hbox = gtk.HBox()
+        label = gtk.Label(page.name)
+        label.set_alignment(0.0, 0.5)
+        hbox.pack_start(label, expand=True, fill=True)
+        button = gtk.Button()
+        img = gtk.Image()
+        img.set_from_stock('gtk-close', gtk.ICON_SIZE_MENU)
+        button.set_relief(gtk.RELIEF_NONE)
+        button.add(img)
+        hbox.pack_start(button, expand=False, fill=False)
+        hbox.show_all()
+        hbox.set_size_request(120, -1)
+        button.connect('clicked', self._sig_remove_book, page.widget)
+        self.notebook.append_page(page.widget, hbox)
+        self.notebook.set_tab_reorderable(page.widget, True)
         self.notebook.set_current_page(-1)
         page.signal_connect(self, 'attachment-count', self._attachment_count)
 
@@ -802,27 +816,42 @@ class Main(object):
         label = _('Attachment(%d)') % signal_data
         self.buttons['but_attach'].set_label(label)
 
-    def _win_del(self):
-        page = int(self.notebook.get_current_page())
-        if page != -1:
+    def _sig_remove_book(self, widget, page_widget):
+        self._win_del(page_widget)
+
+    def _win_del(self, page_widget=None):
+        if page_widget:
+            page_id = self.notebook.page_num(page_widget)
+        else:
+            page_id = int(self.notebook.get_current_page())
+            page_widget = self.notebook.get_nth_page(page_id)
+        if page_id != -1:
             self.notebook.disconnect(self.sig_id)
-            page_widget = self.pages.pop(page)
-            page_widget.signal_unconnect(self)
-            self.notebook.remove_page(page)
+            page = None
+            for i in range(len(self.pages)):
+                if self.pages[i].widget == page_widget:
+                    page = self.pages.pop(i)
+                    page.signal_unconnect(self)
+                    break
+            self.notebook.remove_page(page_id)
             self.sig_id = self.notebook.connect_after('switch-page',
                     self._sig_page_changt)
             self.sb_set()
 
-            if hasattr(page_widget, 'destroy'):
-                page_widget.destroy()
-            del page_widget
+            if hasattr(page, 'destroy'):
+                page.destroy()
+            del page
         return self.notebook.get_current_page() != -1
 
     def _wid_get(self):
-        page = self.notebook.get_current_page()
-        if page == -1:
+        page_id = self.notebook.get_current_page()
+        if page_id == -1:
             return None
-        return self.pages[page]
+        page_widget = self.notebook.get_nth_page(page_id)
+        for page in self.pages:
+            if page.widget == page_widget:
+                return page
+        return None
 
     def _sig_child_call(self, widget, button_name):
         wid = self._wid_get()
