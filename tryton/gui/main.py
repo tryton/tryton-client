@@ -865,6 +865,11 @@ class Main(object):
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
+        title = _('Tryton')
+        page = self._wid_get()
+        if page:
+            title += ' - ' + page.name
+        self.window.set_title(title)
         self.sb_set()
 
     def sig_db_new(self, widget):
