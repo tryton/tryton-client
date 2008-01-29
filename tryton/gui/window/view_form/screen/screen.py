@@ -470,6 +470,7 @@ class Screen(SignalEvent):
 
     def clear(self):
         self.models.clear()
+        self.current_model = None
 
     def on_change(self, callback):
         self.current_model.on_change(callback)
