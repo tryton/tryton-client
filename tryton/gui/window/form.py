@@ -3,9 +3,9 @@ import gettext
 import gtk
 import gobject
 from gtk import glade
+import locale
 import gc
 import tryton.rpc as rpc
-import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import GLADE
 from tryton.action import Action
@@ -16,6 +16,7 @@ from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
+from tryton.common import TRYTON_ICON, message, sur, sur_3b
 
 _ = gettext.gettext
 
@@ -113,16 +114,41 @@ class Form(SignalEvent):
     def sig_goto(self, widget=None):
         if not self.modified_save():
             return
-        glade2 = glade.XML(GLADE, 'dia_goto_id', gettext.textdomain())
-        widget = glade2.get_widget('goto_spinbutton')
-        win = glade2.get_widget('dia_goto_id')
-        win.set_transient_for(self.window)
+        win = gtk.Dialog(_('Go to ID'), self.window,
+                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                    gtk.STOCK_OK, gtk.RESPONSE_OK))
+        win.set_icon(TRYTON_ICON)
+        win.set_default_response(gtk.RESPONSE_OK)
+
+        table = gtk.Table(2, 2)
+        table.attach(gtk.Label(_('Go to ID:')), 1, 2, 0, 1, gtk.FILL)
+        img = gtk.Image()
+        img.set_from_stock('gtk-index', gtk.ICON_SIZE_DIALOG)
+        table.attach(img, 0, 1, 0, 2, gtk.FILL)
+
+        entry = gtk.Entry()
+        entry.set_property('activates_default', True)
+        entry.set_max_length(0)
+        entry.set_alignment(1.0)
+        def sig_insert_text(widget, new_text, new_text_length, position):
+            value = widget.get_text()
+            position = widget.get_position()
+            new_value = value[:position] + new_text + value[position:]
+            try:
+                locale.atoi(new_value)
+            except:
+                widget.stop_emission('insert-text')
+        entry.connect('insert_text', sig_insert_text)
+        table.attach(entry, 1, 2, 1, 2)
+
+        win.vbox.pack_start(table, expand=True, fill=True)
         win.show_all()
 
         response = win.run()
         win.destroy()
         if response == gtk.RESPONSE_OK:
-            self.screen.load( [int(widget.get_value())] )
+            self.screen.load([locale.atoi(entry.get_text())])
 
     def destroy(self):
         self.screen.signal_unconnect(self)
@@ -180,7 +206,7 @@ class Form(SignalEvent):
                         (key in ('create_uid', 'write_uid')):
                     line[key] = line[key][1]
                 message += val+': ' + str(line.get(key, False) or '/')+'\n'
-        common.message(message, self.window)
+        message(message, self.window)
         return True
 
     def sig_remove(self, widget=None):
@@ -188,7 +214,7 @@ class Form(SignalEvent):
             msg = _('Are you sure to remove this record?')
         else:
             msg = _('Are you sure to remove those records?')
-        if common.sur(msg, self.window):
+        if sur(msg, self.window):
             if not self.screen.remove(unlink=True):
                 self.message_state(_('Resources not removed!'))
             else:
@@ -253,7 +279,7 @@ class Form(SignalEvent):
         if not hasattr(self, 'screen'):
             return False
         if test_modified and self.screen.is_modified():
-            res = common.sur_3b(_('This record has been modified\n' \
+            res = sur_3b(_('This record has been modified\n' \
                     'do you want to save it ?'), self.window)
             if res == 'ok':
                 self.sig_save(None)
@@ -347,7 +373,7 @@ class Form(SignalEvent):
 
     def modified_save(self, reload=True):
         if self.screen.is_modified():
-            value = common.sur_3b(
+            value = sur_3b(
                     _('This record has been modified\n' \
                             'do you want to save it ?'),
                     self.window)
