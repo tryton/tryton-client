@@ -390,6 +390,7 @@ class ParserForm(ParserInterface):
                     parent=self.window)
             return False
 
+        obj_id = self.screen.current_model.save(reload=False)
         lang_ids = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
                 'search', [('translatable','=','1')])
 
@@ -539,6 +540,7 @@ class ParserForm(ParserInterface):
             self.window.present()
             win.destroy()
             return
+        self.screen.current_model.reload()
         self.window.present()
         win.destroy()
         return True
