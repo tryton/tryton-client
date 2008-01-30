@@ -31,17 +31,19 @@ class Calendar(WidgetInterface):
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
+        self.but_open = gtk.Button()
+        img_find = gtk.Image()
+        img_find.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+        self.but_open.set_image(img_find)
+        self.but_open.set_relief(gtk.RELIEF_NONE)
+        self.but_open.connect('clicked', self.cal_open)
+        self.but_open.set_alignment(0.5, 0.5)
+        self.but_open.set_property('can-focus', False)
+        self.widget.pack_start(self.but_open, expand=False, fill=False)
+
         tooltips = gtk.Tooltips()
-        self.eventbox = gtk.EventBox()
-        tooltips.set_tip(self.eventbox, _('Open the calendar widget'))
+        tooltips.set_tip(self.but_open, _('Open the calendar widget'))
         tooltips.enable()
-        self.eventbox.set_events(gtk.gdk.BUTTON_PRESS)
-        self.eventbox.connect('button_press_event', self.cal_open)
-        img = gtk.Image()
-        img.set_from_stock('gtk-zoom-in', gtk.ICON_SIZE_MENU)
-        img.set_alignment(0.5, 0.5)
-        self.eventbox.add(img)
-        self.widget.pack_start(self.eventbox, expand=False, fill=False)
 
         self.readonly = False
 
@@ -52,7 +54,7 @@ class Calendar(WidgetInterface):
         super(Calendar, self)._readonly_set(value)
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
-        self.eventbox.set_sensitive(not value)
+        self.but_open.set_sensitive(not value)
 
     def get_value(self, model):
         value = self.entry.get_text()
@@ -88,7 +90,7 @@ class Calendar(WidgetInterface):
             self.entry.set_text(value)
         return True
 
-    def cal_open(self, widget, event):
+    def cal_open(self, widget):
         if self.readonly:
             message(_('This widget is readonly!'), self._window)
             return True
@@ -141,17 +143,19 @@ class DateTime(WidgetInterface):
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
+        self.but_open = gtk.Button()
+        img_find = gtk.Image()
+        img_find.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+        self.but_open.set_image(img_find)
+        self.but_open.set_relief(gtk.RELIEF_NONE)
+        self.but_open.connect('clicked', self.cal_open)
+        self.but_open.set_alignment(0.5, 0.5)
+        self.but_open.set_property('can-focus', False)
+        self.widget.pack_start(self.but_open, expand=False, fill=False)
+
         tooltips = gtk.Tooltips()
-        eventbox = gtk.EventBox()
-        tooltips.set_tip(eventbox, _('Open the calendar widget'))
+        tooltips.set_tip(self.but_open, _('Open the calendar widget'))
         tooltips.enable()
-        eventbox.set_events(gtk.gdk.BUTTON_PRESS)
-        eventbox.connect('button_press_event', self.cal_open)
-        img = gtk.Image()
-        img.set_from_stock('gtk-zoom-in', gtk.ICON_SIZE_MENU)
-        img.set_alignment(0.5, 0.5)
-        eventbox.add(img)
-        self.widget.pack_start(eventbox, expand=False, fill=False)
 
         self.readonly = False
 
@@ -220,7 +224,7 @@ class DateTime(WidgetInterface):
             self.entry.set_text(value)
         return True
 
-    def cal_open(self, widget, event):
+    def cal_open(self, widget):
         if self.readonly:
             message(_('This widget is readonly!'), self._window)
             return True

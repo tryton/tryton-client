@@ -133,8 +133,7 @@ class Many2One(WidgetInterface):
         self.but_open.connect('clicked', self.sig_edit)
         self.but_open.set_alignment(0.5, 0.5)
         self.but_open.set_property('can-focus', False)
-        self.widget.pack_start(self.but_open, padding=2, expand=False,
-                fill=False)
+        self.widget.pack_start(self.but_open, expand=False, fill=False)
 
         self.tooltips = gtk.Tooltips()
         self.tooltips.set_tip(self.but_new, _('Create a new resource'))
