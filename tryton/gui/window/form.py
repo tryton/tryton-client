@@ -233,7 +233,8 @@ class Form(SignalEvent):
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
         win = WinExport(self.model, self.screen.ids_get(),
-                self.screen.fields, fields, parent=self.window)
+                self.screen.fields, fields, parent=self.window,
+                context=self.context)
         win.run()
 
     def sig_new(self, widget=None, autosave=True):

@@ -15,7 +15,8 @@ _ = gettext.gettext
 class WinExport(object):
     "Window export"
 
-    def __init__(self, model, ids, fields, preload=None, parent=None):
+    def __init__(self, model, ids, fields, preload=None, parent=None,
+            context=None):
         if preload is None:
             preload = []
         self.glade = glade.XML(GLADE, 'win_save_as',
@@ -24,6 +25,7 @@ class WinExport(object):
         self.ids = ids
         self.model = model
         self.fields_data = {}
+        self.context = context
 
         self.win.set_transient_for(parent)
         self.win.set_icon(TRYTON_ICON)
@@ -212,7 +214,8 @@ class WinExport(object):
             action = self.wid_action.get_active()
             self.parent.present()
             self.win.destroy()
-            result = WinExport.datas_read(self.ids, self.model, fields)
+            result = WinExport.datas_read(self.ids, self.model, fields,
+                    context=self.context)
 
             if action == 0:
                 pass
@@ -252,7 +255,11 @@ class WinExport(object):
             return False
 
     @staticmethod
-    def datas_read(ids, model, fields):
+    def datas_read(ids, model, fields, context=None):
+        if context is None:
+            context = {}
+        ctx = context.copy()
+        ctx.update(rpc.session.context)
         datas = rpc.session.rpc_exec_auth('/object', 'execute', model,
-                'export_data', ids, fields)
+                'export_data', ids, fields, ctx)
         return datas
