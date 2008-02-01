@@ -140,20 +140,17 @@ class _container(object):
             table.attach(eventbox, width, width + 1, height, height + rowspan,
                     yoptions=yopt, xoptions=gtk.FILL,
                     ypadding=ypadding, xpadding=2)
-        hbox = widget
-        hbox.show_all()
+        hbox = gtk.HBox(spacing=3)
+        hbox.pack_start(widget)
         if translate:
-            hbox = gtk.HBox(spacing=3)
-            hbox.pack_start(widget)
+            button = gtk.Button()
             img = gtk.Image()
-            img.set_from_stock('terp-translate', gtk.ICON_SIZE_MENU)
-            ebox = gtk.EventBox()
-            ebox.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-            self.trans_box.append((ebox, name, fname, widget))
-
-            ebox.add(img)
-            hbox.pack_start(ebox, fill=False, expand=False)
-            hbox.show_all()
+            img.set_from_stock('gtk-preferences', gtk.ICON_SIZE_BUTTON)
+            button.set_image(img)
+            button.set_relief(gtk.RELIEF_NONE)
+            self.trans_box.append((button, name, fname, widget))
+            hbox.pack_start(button, fill=False, expand=False)
+        hbox.show_all()
         table.attach(hbox, width + length, width + colspan,
                 height, height + rowspan,
                 yoptions=yopt, ypadding=ypadding, xpadding=2)
@@ -312,7 +309,7 @@ class ParserForm(ParserInterface):
                             int(attrs.get('width', -1)),
                             int(attrs.get('height', -1)))
                 container.wid_add(widget_act.widget, label, expand,
-                        translate=fields[name].get('translate',False),
+                        translate=fields[name].get('translate', False),
                         colspan=size, fname=name, help_tip=hlp, fill=fill)
 
             elif node.localName == 'group':
@@ -374,15 +371,15 @@ class ParserForm(ParserInterface):
                 container.wid_add(widget_act.widget,
                         colspan=int(attrs.get('colspan', 3)),
                         expand=True, fill=True)
-        for (ebox, src, name, widget) in container.trans_box:
-            ebox.connect('button_press_event', self.translate, model, name,
+        for (button, src, name, widget) in container.trans_box:
+            button.connect('clicked', self.translate, model, name,
                     src, widget)
         for (ebox, src, name) in container.trans_box_label:
             ebox.connect('button_press_event', self.translate_label, model,
                     name, src)
         return container.pop(), dict_widget, button_list, on_write
 
-    def translate(self, widget, event, model, name, src, widget_entry):
+    def translate(self, widget, model, name, src, widget_entry):
         obj_id = self.screen.current_model.id
         if not obj_id:
             common.message(
@@ -390,7 +387,7 @@ class ParserForm(ParserInterface):
                     parent=self.window)
             return False
 
-        obj_id = self.screen.current_model.save(reload=False)
+        obj_id = self.screen.current_model.save(force_reload=False)
         lang_ids = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
                 'search', [('translatable','=','1')])
 
