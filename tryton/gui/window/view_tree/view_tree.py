@@ -126,7 +126,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 tree.append([obj['id'], None, [],
                     obj[self.view['field_parent']]])
                 tree[-1][1] = [obj[y] for y in self.fields]
-                if len(obj[self.view['field_parent']]):
+                if obj[self.view['field_parent']]:
                     tree[-1][2] = None
         else:
             res = self._read(ids, self.fields)
