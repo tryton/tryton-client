@@ -68,6 +68,7 @@ class Screen(SignalEvent):
         self.limit = limit
         self.readonly = readonly
         self.form = form
+        self.fields_view_tree = None
 
         if view_type:
             self.view_to_load = view_type[1:]
@@ -81,11 +82,12 @@ class Screen(SignalEvent):
     def search_active(self, active=True):
         if active and self.show_search:
             if not self.filter_widget:
-                view_form = rpc.session.rpc_exec_auth('/object', 'execute',
-                        self.name, 'fields_view_get', False, 'form',
-                        self.context)
-                self.filter_widget = Form(view_form['arch'],
-                        view_form['fields'], self.name, self.window,
+                if not self.fields_view_tree:
+                    self.fields_view_tree = rpc.session.rpc_exec_auth('/object',
+                            'execute', self.name, 'fields_view_get', False,
+                            'tree', self.context)
+                self.filter_widget = Form(self.fields_view_tree['arch'],
+                        self.fields_view_tree['fields'], self.name, self.window,
                         self.domain, (self, self.search_filter))
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear)
@@ -241,13 +243,16 @@ class Screen(SignalEvent):
                         pass
             for node2 in node.childNodes:
                 _parse_fields(node2, fields)
-        dom = xml.dom.minidom.parseString(arch)
-        _parse_fields(dom, fields)
+        xml_dom = xml.dom.minidom.parseString(arch)
+        _parse_fields(xml_dom, fields)
         for dom in self.domain:
             if dom[0] in fields:
                 field_dom = str(fields[dom[0]].setdefault('domain',[]))
                 fields[dom[0]]['domain'] = field_dom[:1] + \
                         str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
+        for node in xml_dom.childNodes:
+            if node.localName == 'tree':
+                self.fields_view_tree = {'arch': arch, 'fields': fields}
 
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
         models = self.models.models
@@ -260,8 +265,7 @@ class Screen(SignalEvent):
         self.fields = self.models.fields
 
         parser = WidgetParse(parent=self.parent, window=self.window)
-        dom = xml.dom.minidom.parseString(arch)
-        view = parser.parse(self, dom, self.fields, toolbar=toolbar)
+        view = parser.parse(self, xml_dom, self.fields, toolbar=toolbar)
 
         self.views.append(view)
 

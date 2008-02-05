@@ -54,7 +54,7 @@ class WinSearch(object):
         self.model_name = model
 
         view_form = rpc.session.rpc_exec_auth('/object', 'execute',
-                self.model_name, 'fields_view_get', False, 'form', self.context)
+                self.model_name, 'fields_view_get', False, 'tree', self.context)
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
                 model, parent=self.win)
 
