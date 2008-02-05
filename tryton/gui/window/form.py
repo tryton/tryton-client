@@ -171,6 +171,9 @@ class Form(SignalEvent):
         if obj_id:
             win = Attachment(self.model, obj_id, self.window)
             win.run()
+            value = self.screen.current_model
+            attachment_count = value.get_attachment_count(reload=True)
+            self.signal('attachment-count', attachment_count)
         else:
             self.message_state(_('No resource selected!'))
         return True

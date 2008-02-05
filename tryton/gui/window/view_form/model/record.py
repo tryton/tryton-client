@@ -239,10 +239,10 @@ class ModelRecord(SignalEvent):
         self.set_default(ir_default.get_default(self.resource,
             field_name + '=' + str(value), ctx))
 
-    def get_attachment_count(self):
+    def get_attachment_count(self, reload=False):
         if not self.id:
             return 0
-        if self.attachment_count < 0:
+        if self.attachment_count < 0 or reload:
             ir_attachment = RPCProxy('ir.attachment')
             self.attachment_count = ir_attachment.search_count([
                 ('res_model', '=', self.resource),
