@@ -213,7 +213,7 @@ class Tree(SignalEvent):
         self.tree_sc.update()
 
     def sc_add(self, widget):
-        ids = self.tree_res.sel_ids_get()
+        ids = self.ids_get()
         if len(ids):
             res = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
                     'name_get', ids, rpc.session.context)
@@ -231,7 +231,7 @@ class Tree(SignalEvent):
     def sc_go(self, widget=None, *args):
         obj_id = self.tree_sc.sel_id_get()
         if obj_id != None:
-            self.sig_action(None, 'tree_open', obj_id)
+            self.sig_action(keyword='tree_open', obj_id=obj_id)
 
     def ids_get(self):
         res = self.tree_res.sel_ids_get()
