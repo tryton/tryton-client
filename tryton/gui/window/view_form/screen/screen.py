@@ -300,8 +300,9 @@ class Screen(SignalEvent):
 
     def new_model_position(self):
         position = -1
-        if self.current_view and self.current_view.view_type =='tree' \
-                and self.current_view.widget_tree.editable == 'top':
+        if self.current_view and self.current_view.view_type == 'tree' \
+                and hasattr(self.current_view.widget_tree, 'editable') \
+                    and self.current_view.widget_tree.editable == 'top':
             position = 0
         return position
 
