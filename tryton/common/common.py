@@ -359,7 +359,7 @@ def node_attributes(node):
     if attrs is None:
         return {}
     for i in range(attrs.length):
-        result[attrs.item(i).localName] = str(attrs.item(i).nodeValue)
+        result[str(attrs.item(i).localName)] = str(attrs.item(i).nodeValue)
         if attrs.item(i).localName == "digits" \
                 and isinstance(attrs.item(i).nodeValue, (str, unicode)):
             result[attrs.item(i).localName] = eval(attrs.item(i).nodeValue)
