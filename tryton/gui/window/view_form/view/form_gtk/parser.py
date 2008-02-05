@@ -66,15 +66,15 @@ class Button(object):
                         _('Invalid Form, correct red fields!'))
             self.form.screen.display()
 
-    def state_set(self, state):
+    def state_set(self, values):
         if self.attrs.get('states', False):
-            my_states = self.attrs.get('states', '').split(',')
-            if state not in my_states:
-                self.widget.hide()
-            else:
+            if eval(self.attrs.get('states', 'True'), values):
                 self.widget.show()
+            else:
+                self.widget.hide()
         else:
             self.widget.show()
+
 
 class _container(object):
     def __init__(self, tooltips):

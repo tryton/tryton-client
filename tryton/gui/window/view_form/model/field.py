@@ -87,16 +87,21 @@ class CharField(object):
     def create(self, model):
         return False
 
-    def state_set(self, model, state='draft'):
-        state_changes = dict(self.attrs.get('states', {}).get(state, []))
+    def state_set(self, model, values=None):
+        if values is None:
+            values = {'state': 'draft'}
+        state_changes = self.attrs.get('states', {})
         for key in ('readonly', 'required'):
             if key in state_changes:
-                self.get_state_attrs(model)[key] = state_changes[key]
+                self.get_state_attrs(model)[key] = \
+                        eval(state_changes[key], values)
             else:
                 self.get_state_attrs(model)[key] = self.attrs[key]
         if 'value' in state_changes:
-            self.set(model, state_changes['value'], test_state=False,
-                    modified=True)
+            value = eval(state_changes['value'], values)
+            if value:
+                self.set(model, value, test_state=False,
+                        modified=True)
 
     def get_state_attrs(self, model):
         if self.name not in model.state_attrs:

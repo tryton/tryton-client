@@ -18,13 +18,15 @@ class ViewWidget(object):
         self.widget._view = self
         self.widget_name = widget_name
 
-    def display(self, model, state='draft'):
+    def display(self, model, values=None):
+        if values is None:
+            values = {'state': 'draft'}
         if not model:
             self.widget.display(model, False)
             return False
         modelfield = model.mgroup.mfields.get(self.widget_name, None)
         if modelfield:
-            modelfield.state_set(model, state)
+            modelfield.state_set(model, values)
             self.widget.display(model, modelfield)
         elif isinstance(self.widget, Action):
             self.widget.display(model, False)
@@ -258,14 +260,14 @@ class ViewForm(ParserView):
 
     def display(self):
         model = self.screen.current_model
-        if model and ('state' in model.mgroup.fields):
-            state = model['state'].get(model)
-        else:
-            state = 'draft'
+        values = {'state': 'draft'}
+        if model:
+            for field in model.mgroup.fields:
+                values[field] = model[field].get(model)
         for widget in self.widgets.values():
-            widget.display(model, state)
+            widget.display(model, values)
         for button in self.buttons:
-            button.state_set(state)
+            button.state_set(values)
         return True
 
     def set_cursor(self, new=False):
