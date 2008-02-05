@@ -26,7 +26,7 @@ def _refresh_dblist(db_widget, url, dbtoload=None):
     result = rpc.session.list_db(url)
     if result == -1:
         return -1
-    for db_num, dbname in enumerate(rpc.session.list_db(url)):
+    for db_num, dbname in enumerate(result):
         liststore.append([dbname])
         if dbname == dbtoload:
             index = db_num
