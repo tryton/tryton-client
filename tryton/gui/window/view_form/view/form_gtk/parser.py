@@ -82,7 +82,6 @@ class _container(object):
         self.col = []
         self.tooltips = tooltips
         self.trans_box = []
-        self.trans_box_label = []
 
     def new(self, col=4):
         table = gtk.Table(1, col)
@@ -107,13 +106,12 @@ class _container(object):
             self.cont[-1] = (table, 0, height + 1)
         table.resize(height + 1, self.col[-1])
 
-    def wid_add(self, widget, name=None, expand=False, ypadding=2, rowspan=1,
-            colspan=1, translate=False, fname=None, help_tip=False, fill=False):
+    def wid_add(self, widget, name='', expand=False, ypadding=2, rowspan=1,
+            colspan=1, translate=False, fname=None, help_tip=False, fill=False, xexpand=True, xfill=True):
         (table, width, height) = self.cont[-1]
         if colspan > self.col[-1]:
             colspan = self.col[-1]
-        length = name and 1 or 0
-        if colspan + width + length > self.col[-1]:
+        if colspan + width > self.col[-1]:
             self.newline()
             (table, width, height) = self.cont[-1]
         yopt = False
@@ -121,27 +119,16 @@ class _container(object):
             yopt = yopt | gtk.EXPAND
         if fill:
             yopt = yopt | gtk.FILL
-        if colspan == 1 and length == 1:
-            colspan = 2
-        if name:
-            label = gtk.Label(name)
-            eventbox = gtk.EventBox()
-            eventbox.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-            self.trans_box_label.append((eventbox, name, fname))
-            eventbox.add(label)
-            if help_tip:
-                self.tooltips.set_tip(eventbox, help_tip)
-                self.tooltips.enable()
-                eventbox.show()
-            if '_' in name:
-                label.set_text_with_mnemonic(name)
-                label.set_mnemonic_widget(widget)
-            label.set_alignment(1.0, 0.5)
-            table.attach(eventbox, width, width + 1, height, height + rowspan,
-                    yoptions=yopt, xoptions=gtk.FILL,
-                    ypadding=ypadding, xpadding=2)
+        xopt = False
+        if xexpand:
+            xopt = xopt | gtk.EXPAND
+        if xfill:
+            xopt = xopt | gtk.FILL
         hbox = gtk.HBox(spacing=3)
         hbox.pack_start(widget)
+        if help_tip:
+            self.tooltips.set_tip(widget, help_tip)
+            self.tooltips.enable()
         if translate:
             button = gtk.Button()
             img = gtk.Image()
@@ -151,9 +138,10 @@ class _container(object):
             self.trans_box.append((button, name, fname, widget))
             hbox.pack_start(button, fill=False, expand=False)
         hbox.show_all()
-        table.attach(hbox, width + length, width + colspan,
+        table.attach(hbox, width, width + colspan,
                 height, height + rowspan,
-                yoptions=yopt, ypadding=ypadding, xpadding=2)
+                yoptions=yopt, ypadding=ypadding,
+                xoptions=xopt, xpadding=2)
         self.cont[-1] = (table, width + colspan, height)
         wid_list = table.get_children()
         wid_list.reverse()
@@ -190,15 +178,14 @@ class ParserForm(ParserInterface):
                         fill=int(attrs.get('fill', 0)))
             elif node.localName == 'separator':
                 vbox = gtk.VBox()
-                if 'string' in attrs:
-                    text = attrs.get('string', 'No String Attr.')
+                if 'string' in attrs or 'name' in attrs:
+                    text = attrs.get('string', '')
+                    if not text:
+                        if 'name' in attrs and attrs['name'] in fields:
+                            text = fields[attrs['name']]['string']
                     label = gtk.Label(text)
                     label.set_alignment(0.0, 0.5)
-                    eventbox = gtk.EventBox()
-                    eventbox.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-                    eventbox.add(label)
-                    container.trans_box_label.append((eventbox, text, None))
-                    vbox.pack_start(eventbox)
+                    vbox.pack_start(label)
                 vbox.pack_start(gtk.HSeparator())
                 container.wid_add(vbox, colspan=int(attrs.get('colspan', 1)),
                         expand=int(attrs.get('expand', 0)),
@@ -207,24 +194,28 @@ class ParserForm(ParserInterface):
             elif node.localName == 'label':
                 text = attrs.get('string', '')
                 if not text:
-                    for node in node.childNodes:
-                        if node.nodeType == node.TEXT_NODE:
-                            text += node.data
+                    if 'name' in attrs and attrs['name'] in fields:
+                        if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
+                            text = _(':') + fields[attrs['name']]['string']
                         else:
-                            text += node.toxml()
+                            text = fields[attrs['name']]['string'] + _(':')
+                        if 'align' not in attrs:
+                            attrs['align'] = 1.0
+                    else:
+                        for node in node.childNodes:
+                            if node.nodeType == node.TEXT_NODE:
+                                text += node.data
+                            else:
+                                text += node.toxml()
                 label = gtk.Label(text)
                 label.set_use_markup(True)
                 if 'align' in attrs:
                     label.set_alignment(float(attrs['align'] or 0.0), 0.5)
                 label.set_angle(int(attrs.get('angle', 0)))
-                eventbox = gtk.EventBox()
-                eventbox.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-                eventbox.add(label)
-                container.trans_box_label.append((eventbox, text, None))
-                container.wid_add(eventbox,
+                container.wid_add(label,
                         colspan=int(attrs.get('colspan', 1)),
                         expand=False, help_tip=attrs.get('help', False),
-                        fill=int(attrs.get('fill', 0)))
+                        fill=int(attrs.get('fill', 0)), xexpand=False)
 
             elif node.localName == 'newline':
                 container.newline()
@@ -293,12 +284,6 @@ class ParserForm(ParserInterface):
                     fields[name]['saves'] = attrs['saves']
                 widget_act = WIDGETS_TYPE[ftype][0](self.window, self.parent,
                         model, fields[name])
-                label = None
-                if not int(attrs.get('nolabel', 0)):
-                    if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
-                        label = _(':') + fields[name]['string']
-                    else:
-                        label = fields[name]['string'] + _(':')
                 dict_widget[name] = widget_act
                 size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
                 expand = WIDGETS_TYPE[ftype][2]
@@ -308,8 +293,8 @@ class ParserForm(ParserInterface):
                     widget_act.widget.set_size_request(
                             int(attrs.get('width', -1)),
                             int(attrs.get('height', -1)))
-                container.wid_add(widget_act.widget, label, expand,
-                        translate=fields[name].get('translate', False),
+                container.wid_add(widget_act.widget, fields[name]['string'],
+                        expand, translate=fields[name].get('translate', False),
                         colspan=size, fname=name, help_tip=hlp, fill=fill)
 
             elif node.localName == 'group':
@@ -374,9 +359,6 @@ class ParserForm(ParserInterface):
         for (button, src, name, widget) in container.trans_box:
             button.connect('clicked', self.translate, model, name,
                     src, widget)
-        for (ebox, src, name) in container.trans_box_label:
-            ebox.connect('button_press_event', self.translate_label, model,
-                    name, src)
         return container.pop(), dict_widget, button_list, on_write
 
     def translate(self, widget, model, name, src, widget_entry):
@@ -540,147 +522,6 @@ class ParserForm(ParserInterface):
         self.screen.current_model.reload()
         self.window.present()
         win.destroy()
-        return True
-
-    def translate_label(self, widget, event, model, name, src):
-        def callback_label(self, widget, event, model, name, src, window=None):
-            lang_ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'res.lang', 'search', [('translatable', '=', '1')])
-            if not lang_ids:
-                common.message(_('No other language available!'),
-                        parent=window)
-                return False
-            langs = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
-                    'read', lang_ids, ['code', 'name'])
-
-            win = gtk.Dialog(_('Add Translation'), window,
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-            win.vbox.set_spacing(5)
-            win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-            win.set_icon(TRYTON_ICON)
-            vbox = gtk.VBox(spacing=5)
-
-            entries_list = []
-            for lang in langs:
-                code = lang['code']
-                val = rpc.session.rpc_exec_auth('/object', 'execute', model,
-                        'read_string', False, [code], [name])
-                if val and code in val:
-                    val = val[code]
-                else:
-                    val = {'code': code, 'name': src}
-                label = gtk.Label(lang['name'])
-                entry = gtk.Entry()
-                entry.set_text(val[name])
-                entries_list.append((code, entry))
-                hbox = gtk.HBox(homogeneous=True)
-                hbox.pack_start(label, expand=False, fill=False)
-                hbox.pack_start(entry, expand=True, fill=True)
-                vbox.pack_start(hbox, expand=False, fill=True)
-            viewport = gtk.Viewport()
-            viewport.set_shadow_type(gtk.SHADOW_NONE)
-            viewport.add(vbox)
-            scrolledwindow = gtk.ScrolledWindow()
-            scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                    gtk.POLICY_AUTOMATIC)
-            scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-            scrolledwindow.add(viewport)
-            win.vbox.add(scrolledwindow)
-            win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-            win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-            win.resize(400, 200)
-            win.show_all()
-            res = win.run()
-            if res == gtk.RESPONSE_OK:
-                to_save = [(x[0], x[1].get_text()) for x in entries_list]
-                while to_save:
-                    code, val = to_save.pop()
-                    rpc.session.rpc_exec_auth('/object', 'execute', model,
-                            'write_string', False, [code], {name: val})
-            window.present()
-            win.destroy()
-            return res
-
-        def callback_view(self, widget, event, model, src, window=None):
-            lang_ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'res.lang', 'search', [('translatable', '=', '1')])
-            if not lang_ids:
-                common.message(_('No other language available!'),
-                        parent=window)
-                return False
-            langs = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
-                    'read', lang_ids, ['code', 'name'])
-
-            win = gtk.Dialog(_('Add Translation'), window,
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-            win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-            win.set_icon(TRYTON_ICON)
-            win.vbox.set_spacing(5)
-            vbox = gtk.VBox(spacing=5)
-
-            entries_list = []
-            for lang in langs:
-                code = lang['code']
-                view_item_ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.translation', 'search', [
-                            ('name', '=', model),
-                            ('type', '=', 'view'),
-                            ('lang', '=', code),
-                            ])
-                view_items = rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.translation', 'read', view_item_ids,
-                        ['src', 'value'])
-                label = gtk.Label(lang['name'])
-                vbox.pack_start(label, expand=False, fill=True)
-                for val in view_items:
-                    label = gtk.Label(val['src'])
-                    entry = gtk.Entry()
-                    entry.set_text(val['value'])
-                    entries_list.append((val['id'], entry))
-                    hbox = gtk.HBox(homogeneous=True)
-                    hbox.pack_start(label, expand=False, fill=False)
-                    hbox.pack_start(entry, expand=True, fill=True)
-                    vbox.pack_start(hbox, expand=False, fill=True)
-            viewport = gtk.Viewport()
-            viewport.set_shadow_type(gtk.SHADOW_NONE)
-            viewport.add(vbox)
-            scrolledwindow = gtk.ScrolledWindow()
-            scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                    gtk.POLICY_AUTOMATIC)
-            scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-            scrolledwindow.add(viewport)
-            win.vbox.add(scrolledwindow)
-            win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-            win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-            win.resize(400, 200)
-            win.show_all()
-            res = win.run()
-            if res == gtk.RESPONSE_OK:
-                to_save = [(x[0], x[1].get_text()) for x in entries_list]
-                while to_save:
-                    obj_id, val = to_save.pop()
-                    rpc.session.rpc_exec_auth('/object', 'execute',
-                            'ir.translation', 'write', [obj_id], {'value': val})
-            window.present()
-            win.destroy()
-            return res
-        if event.button != 3:
-            return
-        menu = gtk.Menu()
-        if name:
-            item = gtk.ImageMenuItem(_('Translate label'))
-            item.connect("activate", callback_label, widget, event, model,
-                    name, src, self.window)
-            item.set_sensitive(1)
-            item.show()
-            menu.append(item)
-        item = gtk.ImageMenuItem(_('Translate view'))
-        item.connect("activate", callback_view, widget, event, model, src,
-                self.window)
-        item.set_sensitive(1)
-        item.show()
-        menu.append(item)
-        menu.popup(None, None, None, event.button, event.time)
         return True
 
 from calendar import Calendar, DateTime
