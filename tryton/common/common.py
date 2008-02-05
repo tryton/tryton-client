@@ -137,8 +137,7 @@ def file_selection(title, filename='', parent=None,
     win.set_icon(TRYTON_ICON)
     win.set_current_folder(CONFIG['client.default_path'])
     if filename:
-        win.set_filename(os.path.join(CONFIG['client.default_path'],
-            filename))
+        win.set_current_name(filename)
     win.set_select_multiple(multi)
     win.set_default_response(gtk.RESPONSE_OK)
     if filters is not None:
