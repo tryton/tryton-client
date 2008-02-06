@@ -730,21 +730,6 @@
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkImageMenuItem" id="form_open">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Open</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_form_open_activate"/>
-                            <child internal-child="image">
-                              <widget class="GtkImage" id="image4231">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-open</property>
-                                <property name="icon_size">1</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                        <child>
                           <widget class="GtkImageMenuItem" id="form_reload">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Reloa_d / Undo</property>
@@ -762,20 +747,6 @@
                         </child>
                         <child>
                           <widget class="GtkSeparatorMenuItem" id="séparateur5">
-                            <property name="visible">True</property>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="GtkMenuItem" id="form_repeat">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Repeat latest _action</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_form_repeat_activate"/>
-                            <accelerator key="Z" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="GtkSeparatorMenuItem" id="séparateur7">
                             <property name="visible">True</property>
                           </widget>
                         </child>

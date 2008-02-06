@@ -416,7 +416,6 @@ class Main(object):
                 'but_previous',
                 'but_next',
                 'but_action',
-                'but_open',
                 'but_print',
                 'but_close',
                 'but_reload',
@@ -433,7 +432,6 @@ class Main(object):
             'form_copy': 'but_copy',
             'form_reload': 'but_reload',
             'form_log': 'but_log',
-            'form_open': 'but_open',
             'form_search': 'but_search',
             'form_previous': 'but_previous',
             'form_next': 'but_next',
@@ -444,7 +442,6 @@ class Main(object):
             'form_save_as': 'but_save_as',
             'form_import': 'but_import',
             'form_filter': 'but_filter',
-            'form_repeat': 'but_print_repeat'
         }
         for menu in menus:
             self.glade.signal_connect('on_'+menu+'_activate',
