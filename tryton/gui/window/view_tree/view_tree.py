@@ -332,15 +332,9 @@ class ViewTree(object):
         return [int(model.get_value(model.get_iter(x), 0)) for x in iters]
 
     def sel_id_get(self):
-        sel = self.view.get_selection().get_selected()
-        if sel == None:
-            return None
-        (model, i) = sel
-        if not i:
-            return None
-        res = model.get_value(i, 0)
-        if res != None:
-            return int(res)
+        res = self.sel_ids_get()
+        if res:
+            res = res[0]
         return res
 
     def value_get(self, col):

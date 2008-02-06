@@ -753,14 +753,14 @@ class Main(object):
                 except_id=except_id)
 
     def sig_plugin_execute(self, widget):
-        import plugins
+        import tryton.plugin
         page = self.notebook.get_current_page()
         datas = {
                 'model': self.pages[page].model,
                 'ids': self.pages[page].ids_get(),
                 'id': self.pages[page].id_get(),
                 }
-        plugins.execute(datas)
+        tryton.plugin.execute(datas, self.window)
 
     @staticmethod
     def sig_quit(widget):

@@ -237,6 +237,10 @@ class Tree(SignalEvent):
         res = self.tree_res.sel_ids_get()
         return res
 
+    def id_get(self):
+        res = self.tree_res.sel_id_get()
+        return res
+
     def sig_save_as(self, widget=None):
         win = WinExport(self.model, self.ids_get(),
                 self.tree_res.fields, [], parent=self.window,
