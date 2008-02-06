@@ -88,9 +88,7 @@ class PySocket:
         unpickler = cPickle.Unpickler(msgio)
         unpickler.find_global = None
         res = unpickler.load()
-        if isinstance(res[0], Exception):
-            if exception:
-                raise PySocketException(str(res[0]), str(res[1]))
-            raise res[0]
+        if exception:
+            raise PySocketException(str(res[0]), str(res[1]))
         else:
             return res[0]
