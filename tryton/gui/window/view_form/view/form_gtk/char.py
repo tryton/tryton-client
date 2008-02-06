@@ -19,6 +19,9 @@ class Char(WidgetInterface):
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry)
 
+    def _color_widget(self):
+        return self.entry
+
     def set_value(self, model, model_field):
         return model_field.set_client(model, self.entry.get_text() or False)
 
