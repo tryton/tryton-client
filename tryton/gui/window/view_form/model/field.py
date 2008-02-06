@@ -91,11 +91,13 @@ class CharField(object):
         if values is None:
             values = {'state': 'draft'}
         state_changes = self.attrs.get('states', {})
-        for key in ('readonly', 'required'):
+        if isinstance(state_changes, str):
+            state_changes = eval(state_changes)
+        for key in ('readonly', 'required', 'invisible'):
             if key in state_changes:
                 self.get_state_attrs(model)[key] = \
                         eval(state_changes[key], values)
-            else:
+            elif key in self.attrs:
                 self.get_state_attrs(model)[key] = self.attrs[key]
         if 'value' in state_changes:
             value = eval(state_changes['value'], values)

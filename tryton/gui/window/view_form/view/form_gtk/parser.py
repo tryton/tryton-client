@@ -67,7 +67,9 @@ class Button(object):
             self.form.screen.display()
 
     def state_set(self, values):
-        state_changes = eval(self.attrs.get('states', {}))
+        state_changes = self.attrs.get('states', {})
+        if isinstance(state_changes, str):
+            state_changes = eval(state_changes)
         if 'invisible' in state_changes:
             if eval(state_changes['invisible'], values):
                 self.widget.hide()
@@ -75,6 +77,43 @@ class Button(object):
                 self.widget.show()
         else:
             self.widget.show()
+
+class Label(gtk.Label):
+
+    def __init__(self, str=None, attrs=None):
+        super(Label, self).__init__(str=str)
+        self.attrs = attrs or {}
+
+    def state_set(self, values):
+        state_changes = self.attrs.get('states', {})
+        if isinstance(state_changes, str):
+            state_changes = eval(state_changes)
+        if 'invisible' in state_changes:
+            if eval(state_changes['invisible'], values):
+                self.hide()
+            else:
+                self.show()
+        else:
+            self.show()
+
+
+class VBox(gtk.VBox):
+
+    def __init__(self, homogeneous=False, spacing=0, attrs=None):
+        super(VBox, self).__init__(homogeneous, spacing)
+        self.attrs = attrs or {}
+
+    def state_set(self, values):
+        state_changes = self.attrs.get('states', {})
+        if isinstance(state_changes, str):
+            state_changes = eval(state_changes)
+        if 'invisible' in state_changes:
+            if eval(state_changes['invisible'], values):
+                self.hide()
+            else:
+                self.show()
+        else:
+            self.show()
 
 
 class _container(object):
@@ -108,7 +147,8 @@ class _container(object):
         table.resize(height + 1, self.col[-1])
 
     def wid_add(self, widget, name='', expand=False, ypadding=2, rowspan=1,
-            colspan=1, translate=False, fname=None, help_tip=False, fill=False, xexpand=True, xfill=True):
+            colspan=1, translate=False, fname=None, help_tip=False, fill=False,
+            xexpand=True, xfill=True):
         (table, width, height) = self.cont[-1]
         if colspan > self.col[-1]:
             colspan = self.col[-1]
@@ -125,24 +165,23 @@ class _container(object):
             xopt = xopt | gtk.EXPAND
         if xfill:
             xopt = xopt | gtk.FILL
-        hbox = gtk.HBox(spacing=3)
-        hbox.pack_start(widget)
+        widget = widget
         if help_tip:
             self.tooltips.set_tip(widget, help_tip)
             self.tooltips.enable()
-        if translate:
+        if translate and hasattr(widget, 'pack_start'):
             button = gtk.Button()
             img = gtk.Image()
             img.set_from_stock('gtk-preferences', gtk.ICON_SIZE_BUTTON)
             button.set_image(img)
             button.set_relief(gtk.RELIEF_NONE)
             self.trans_box.append((button, name, fname, widget))
-            hbox.pack_start(button, fill=False, expand=False)
-        hbox.show_all()
-        table.attach(hbox, width, width + colspan,
+            widget.pack_start(button, fill=False, expand=False)
+        widget.show_all()
+        table.attach(widget, width, width + colspan,
                 height, height + rowspan,
                 yoptions=yopt, ypadding=ypadding,
-                xoptions=xopt, xpadding=2)
+                xoptions=xopt, xpadding=0)
         self.cont[-1] = (table, width + colspan, height)
         wid_list = table.get_children()
         wid_list.reverse()
@@ -178,12 +217,17 @@ class ParserForm(ParserInterface):
                         help_tip=attrs.get('help', False),
                         fill=int(attrs.get('fill', 0)))
             elif node.localName == 'separator':
-                vbox = gtk.VBox()
+                text = attrs.get('string', '')
                 if 'string' in attrs or 'name' in attrs:
-                    text = attrs.get('string', '')
                     if not text:
                         if 'name' in attrs and attrs['name'] in fields:
+                            if 'states' in fields[attrs['name']]:
+                                attrs['states'] = \
+                                        fields[attrs['name']]['states']
                             text = fields[attrs['name']]['string']
+                vbox = VBox(attrs=attrs)
+                button_list.append(vbox)
+                if text:
                     label = gtk.Label(text)
                     label.set_alignment(0.0, 0.5)
                     vbox.pack_start(label)
@@ -196,6 +240,8 @@ class ParserForm(ParserInterface):
                 text = attrs.get('string', '')
                 if not text:
                     if 'name' in attrs and attrs['name'] in fields:
+                        if 'states' in fields[attrs['name']]:
+                            attrs['states'] = fields[attrs['name']]['states']
                         if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
                             text = _(':') + fields[attrs['name']]['string']
                         else:
@@ -208,7 +254,8 @@ class ParserForm(ParserInterface):
                                 text += node.data
                             else:
                                 text += node.toxml()
-                label = gtk.Label(text)
+                label = Label(text, attrs)
+                button_list.append(label)
                 label.set_use_markup(True)
                 if 'align' in attrs:
                     label.set_alignment(float(attrs['align'] or 0.0), 0.5)
@@ -276,8 +323,6 @@ class ParserForm(ParserInterface):
                 fields[name].update(attrs)
                 fields[name]['model'] = model
                 if not ftype in WIDGETS_TYPE:
-                    continue
-                if attrs.get('invisible', False):
                     continue
 
                 fields[name]['name'] = name

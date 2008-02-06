@@ -15,7 +15,6 @@ class URL(WidgetInterface):
 
         self.entry = gtk.Entry()
         self.entry.set_max_length(int(attrs.get('size', 16)))
-        self.entry.set_visibility(not attrs.get('invisible', False))
         self.entry.set_width_chars(5)
         self.entry.set_property('activates_default', True)
         self.entry.connect('activate', self.sig_activate)

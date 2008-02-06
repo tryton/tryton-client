@@ -116,6 +116,9 @@ class WidgetInterface(object):
     def _color_widget(self):
         return self.widget
 
+    def _invisible_widget(self):
+        return self.widget
+
     def color_set(self, name):
         widget = self._color_widget()
         colormap = widget.get_colormap()
@@ -125,6 +128,13 @@ class WidgetInterface(object):
         widget.modify_base(gtk.STATE_NORMAL, colour)
         widget.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
         widget.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("black"))
+
+    def invisible_set(self, value):
+        widget = self._invisible_widget()
+        if value and value != '0':
+            widget.hide()
+        else:
+            widget.show()
 
     def _menu_sig_default_set(self):
         deps = []
@@ -178,6 +188,8 @@ class WidgetInterface(object):
             self.color_set('required')
         else:
             self.color_set('normal')
+        self.invisible_set(modelfield.get_state_attrs(model).\
+                get('invisible', False))
 
     def sig_changed(self):
         if self.attrs.get('on_change', False):
