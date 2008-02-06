@@ -99,8 +99,6 @@ class ViewForm(ParserView):
                     gtktoolbar.insert(tbutton, -1)
 
                     tbutton.connect('clicked', self._action, tool, icontype)
-                    tbutton.connect('button_press_event', self._translate_label,
-                            tool, self.window)
 
     def _action(self, widget, action, atype):
         data = {}
@@ -137,86 +135,6 @@ class ViewForm(ParserView):
         if atype in ('print', 'action'):
             self.screen.reload()
         return value
-
-    def _translate_label(self, widget, event, tool, window):
-        if event.button != 3:
-            return False
-
-        def callback(widget, tool, window):
-            lang_ids = rpc.session.rpc_exec_auth('/object',
-                    'execute', 'res.lang', 'search',
-                    [('translatable', '=', '1')])
-            if not lang_ids:
-                message(
-                        _('No other language available!'),
-                        window)
-                return False
-            langs = rpc.session.rpc_exec_auth('/object',
-                    'execute', 'res.lang', 'read', lang_ids,
-                    ['code', 'name'])
-
-            win = gtk.Dialog(_('Add Translation'), window,
-                    gtk.DIALOG_MODAL | \
-                            gtk.DIALOG_DESTROY_WITH_PARENT)
-            win.vbox.set_spacing(5)
-            win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-            win.set_icon(TRYTON_ICON)
-            vbox = gtk.VBox(spacing=5)
-
-            entries_list = []
-            for lang in langs:
-                code = lang['code']
-                val = rpc.session.rpc_exec_auth('/object',
-                        'execute', tool['type'], 'read',
-                        [tool['id']], ['name'], {'language': code})
-                val = val[0]
-
-                label = gtk.Label(lang['name'])
-                entry = gtk.Entry()
-                entry.set_text(val['name'])
-                entries_list.append((code, entry))
-                hbox = gtk.HBox(homogeneous=True)
-                hbox.pack_start(label, expand=False, fill=False)
-                hbox.pack_start(entry, expand=True, fill=True)
-                vbox.pack_start(hbox, expand=False, fill=True)
-
-            viewport = gtk.Viewport()
-            viewport.set_shadow_type(gtk.SHADOW_NONE)
-            viewport.add(vbox)
-            scrolledwindow = gtk.ScrolledWindow()
-            scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                    gtk.POLICY_AUTOMATIC)
-            scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-            scrolledwindow.add(viewport)
-            win.vbox.add(scrolledwindow)
-            win.add_button(gtk.STOCK_CANCEL,
-                    gtk.RESPONSE_CANCEL)
-            win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-            win.resize(400, 200)
-            win.show_all()
-            res = win.run()
-            if res == gtk.RESPONSE_OK:
-                to_save = [(x[0],
-                    x[1].get_text()) for x in entries_list]
-                while to_save:
-                    code, val = to_save.pop()
-                    rpc.session.rpc_exec_auth('/object',
-                            'execute', tool['type'],
-                            'write', [tool['id']],
-                            {'name': val}, {'language': code})
-            window.present()
-            win.destroy()
-            return res
-
-        menu = gtk.Menu()
-        item = gtk.ImageMenuItem(_('Translate label'))
-        item.connect("activate", callback, tool, window)
-        item.set_sensitive(1)
-        item.show()
-        menu.append(item)
-        menu.popup(None, None, None, event.button, event.time)
-        return True
-
 
     def __getitem__(self, name):
         return self.widgets[name]
