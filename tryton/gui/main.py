@@ -630,10 +630,10 @@ class Main(object):
                 self.request_set()
             elif log_response==-1:
                 common.message(_('Connection error !\n' \
-                        'Unable to connect to the server !'))
+                        'Unable to connect to the server !'), self.window)
             elif log_response==-2:
                 common.message(_('Connection error !\n' \
-                        'Bad username or password !'))
+                        'Bad username or password !'), self.window)
             self.shortcut_set()
         except rpc.RPCException:
             rpc.session.logout()
@@ -734,7 +734,7 @@ class Main(object):
             common.warning(_('You can not log into the system !\n' \
                     'Ask the administrator to verify\n' \
                     'you have an action defined for your user.'),
-                    'Access Denied!')
+                    'Access Denied!', self.window)
             rpc.session.logout()
             return False
         act_id = act_id[0][menu_type][0]
