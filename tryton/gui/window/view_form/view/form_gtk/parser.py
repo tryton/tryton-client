@@ -67,11 +67,12 @@ class Button(object):
             self.form.screen.display()
 
     def state_set(self, values):
-        if self.attrs.get('states', False):
-            if eval(self.attrs.get('states', 'True'), values):
-                self.widget.show()
-            else:
+        state_changes = eval(self.attrs.get('states', {}))
+        if 'invisible' in state_changes:
+            if eval(state_changes['invisible'], values):
                 self.widget.hide()
+            else:
+                self.widget.show()
         else:
             self.widget.show()
 
