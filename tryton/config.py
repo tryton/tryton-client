@@ -75,6 +75,8 @@ class ConfigManager(object):
             'client.actions': {
                 'odt': find_path(['ooffice', 'ooffice2']),
                 'txt': find_path(['ooffice', 'ooffice2']),
+                'pdf': find_path(['evince', 'xpdf', 'gpdf',
+                    'kpdf', 'epdfview', 'acroread'])
                 },
         }
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
