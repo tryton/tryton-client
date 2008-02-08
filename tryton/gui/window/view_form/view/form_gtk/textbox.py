@@ -7,10 +7,12 @@ class TextBox(WidgetInterface):
     def __init__(self, window, parent, model, attrs=None):
         super(TextBox, self).__init__(window, parent, model, attrs)
 
-        self.widget = gtk.ScrolledWindow()
-        self.widget.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.widget.set_shadow_type(gtk.SHADOW_NONE)
-        self.widget.set_size_request(-1, 80)
+        self.widget = gtk.HBox()
+        self.scrolledwindow = gtk.ScrolledWindow()
+        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_AUTOMATIC)
+        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+        self.scrolledwindow.set_size_request(-1, 80)
 
         self.textview = gtk.TextView()
         self.textview.set_wrap_mode(gtk.WRAP_WORD)
@@ -18,16 +20,17 @@ class TextBox(WidgetInterface):
         #TODO better tab solution
         self.textview.set_accepts_tab(False)
         self.textview.connect('focus-out-event', lambda x, y: self._focus_out())
-        self.widget.add(self.textview)
+        self.scrolledwindow.add(self.textview)
+        self.scrolledwindow.show_all()
 
-        self.widget.show_all()
+        self.widget.pack_start(self.scrolledwindow)
 
     def _readonly_set(self, value):
         super(TextBox, self)._readonly_set(value)
         self.textview.set_editable(not value)
         self.textview.set_sensitive(not value)
 
-    def _color_widget(self):
+    def _color_scrolledwindow(self):
         return self.textview
 
     def set_value(self, model, model_field):

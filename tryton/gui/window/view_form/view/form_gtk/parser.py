@@ -175,7 +175,7 @@ class _container(object):
             img.set_from_stock('gtk-preferences', gtk.ICON_SIZE_BUTTON)
             button.set_image(img)
             button.set_relief(gtk.RELIEF_NONE)
-            self.trans_box.append((button, name, fname, widget))
+            self.trans_box.append((button, name, fname, widget.get_children()[0]))
             widget.pack_start(button, fill=False, expand=False)
         widget.show_all()
         table.attach(widget, width, width + colspan,
