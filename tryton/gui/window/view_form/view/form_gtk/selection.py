@@ -42,6 +42,9 @@ class Selection(WidgetInterface):
         super(Selection, self)._readonly_set(value)
         self.entry.set_sensitive(not value)
 
+    def _color_widget(self):
+        return self.entry.get_child()
+
     def value_get(self):
         child = self.entry.get_child()
         res = child.get_text()
