@@ -25,7 +25,7 @@ class Reference(WidgetInterface):
         child.connect('changed',
                 self.sig_changed_combo)
         child.connect('key_press_event', self.sig_key_pressed)
-        self.widget_combo.set_size_request(int(attrs.get('size', -1)), -1)
+        self.widget_combo.set_size_request(int(attrs.get('widget_size', -1)), -1)
         self.widget.pack_start(self.widget_combo, expand=False, fill=True)
 
         self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)

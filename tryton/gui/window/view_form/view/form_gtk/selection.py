@@ -17,7 +17,7 @@ class Selection(WidgetInterface):
         child.connect('button_press_event', self._menu_open)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
-        self.entry.set_size_request(int(attrs.get('size', -1)), -1)
+        self.entry.set_size_request(int(attrs.get('widget_size', -1)), -1)
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self._selection = {}
