@@ -37,7 +37,6 @@ def _refresh_langlist(lang_widget, url):
     liststore = lang_widget.get_model()
     liststore.clear()
     lang_list = rpc.session.db_exec_no_except(url, 'list_lang')
-    lang_list.append( ('en_US','English') )
     for key, val in lang_list:
         liststore.insert(0, (val, key))
     lang_widget.set_active(0)
