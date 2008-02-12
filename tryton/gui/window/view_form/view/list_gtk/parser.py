@@ -71,8 +71,8 @@ class ParserTree(ParserInterface):
                     continue
                 fields[fname].update(node_attrs)
                 node_attrs.update(fields[fname])
-                cell = CELLTYPES.get(fields[fname]['type'])(fname, treeview,
-                        node_attrs, self.window)
+                cell = CELLTYPES.get(fields[fname]['type'])(fname, model,
+                        treeview, node_attrs, self.window)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
                 if editable and not node_attrs.get('readonly', False):
@@ -132,8 +132,9 @@ class ParserTree(ParserInterface):
 
 class Char(object):
 
-    def __init__(self, field_name, treeview=None, attrs=None, window=None):
+    def __init__(self, field_name, model, treeview=None, attrs=None, window=None):
         self.field_name = field_name
+        self.model = model
         self.attrs = attrs or {}
         self.renderer = gtk.CellRendererText()
         self.treeview = treeview
@@ -451,19 +452,23 @@ class Selection(Char):
         super(Selection, self).__init__(*args)
         self.renderer = gtk.CellRendererCombo()
         selection_data = gtk.ListStore(str, str)
-        for i in self.attrs.get('selection', []):
+        selection = self.attrs.get('selection', [])
+        if not isinstance(selection, (list, tuple)):
+            selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                    self.model, selection, rpc.session.context)
+            self.attrs['selection'] = selection
+        self.selection = selection
+        for i in self.selection:
             selection_data.append(i)
         self.renderer.set_property('model', selection_data)
         self.renderer.set_property('text-column', 1)
 
     def get_textual_value(self, model):
-        selection = dict(model[self.field_name].attrs['selection'])
-        return selection.get(model[self.field_name].get(model), '')
+        return dict(self.selection).get(model[self.field_name].get(model), '')
 
     def value_from_text(self, model, text):
-        selection = model[self.field_name].attrs['selection']
         res = False
-        for val, txt in selection:
+        for val, txt in self.selection:
             if txt[:len(text)].lower() == text.lower():
                 if len(txt) == len(text):
                     return val

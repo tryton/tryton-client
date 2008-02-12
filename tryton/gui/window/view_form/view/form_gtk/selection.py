@@ -1,6 +1,7 @@
 import gtk
 import gobject
 from interface import WidgetInterface
+import tryton.rpc as rpc
 
 
 class Selection(WidgetInterface):
@@ -21,7 +22,12 @@ class Selection(WidgetInterface):
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self._selection = {}
-        self.set_popdown(attrs.get('selection', []))
+        selection = attrs.get('selection', [])
+        if not isinstance(selection, (list, tuple)):
+            selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                    self.model, selection, rpc.session.context)
+            attrs['selection'] = selection
+        self.set_popdown(selection)
         self.last_key = (None, 0)
 
     def set_popdown(self, selection):

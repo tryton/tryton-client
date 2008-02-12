@@ -112,10 +112,7 @@ class CharField(object):
 
 
 class SelectionField(CharField):
-
-    def set(self, model, value, test_state=True, modified=False):
-        if value in [sel[0] for sel in self.attrs['selection']]:
-            super(SelectionField, self).set(model, value, test_state, modified)
+    pass
 
 
 class FloatField(CharField):
