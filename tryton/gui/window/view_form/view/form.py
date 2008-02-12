@@ -181,7 +181,7 @@ class ViewForm(ParserView):
         values = {'state': 'draft'}
         if model:
             for field in model.mgroup.fields:
-                values[field] = model[field].get(model)
+                values[field] = model[field].get(model, check_load=False)
         for widget in self.widgets.values():
             widget.display(model, values)
         for button in self.buttons:
