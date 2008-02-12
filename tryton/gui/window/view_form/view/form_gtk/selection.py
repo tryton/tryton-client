@@ -23,10 +23,16 @@ class Selection(WidgetInterface):
 
         self._selection = {}
         selection = attrs.get('selection', [])
-        if not isinstance(selection, (list, tuple)):
+        if 'relation' in attrs:
             selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.model, selection, rpc.session.context)
-            attrs['selection'] = selection
+                    attrs['relation'], 'name_search', '',
+                    attrs.get('domain', []), 'ilike', rpc.session.context)
+        else:
+            if not isinstance(selection, (list, tuple)):
+                selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                        self.model, selection, rpc.session.context)
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        attrs['selection'] = selection
         self.set_popdown(selection)
         self.last_key = (None, 0)
 
@@ -85,6 +91,8 @@ class Selection(WidgetInterface):
             return False
         super(Selection, self).display(model, model_field)
         value = model_field.get(model)
+        if isinstance(value, (list, tuple)):
+            value = value[0]
         if not value:
             child.set_text('')
         else:

@@ -71,8 +71,9 @@ class ParserTree(ParserInterface):
                     continue
                 fields[fname].update(node_attrs)
                 node_attrs.update(fields[fname])
-                cell = CELLTYPES.get(fields[fname]['type'])(fname, model,
-                        treeview, node_attrs, self.window)
+                cell = CELLTYPES.get(node_attrs.get('widget',
+                    fields[fname]['type']))(fname, model,
+                    treeview, node_attrs, self.window)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
                 if editable and not node_attrs.get('readonly', False):
@@ -453,10 +454,16 @@ class Selection(Char):
         self.renderer = gtk.CellRendererCombo()
         selection_data = gtk.ListStore(str, str)
         selection = self.attrs.get('selection', [])
-        if not isinstance(selection, (list, tuple)):
+        if 'relation' in self.attrs:
             selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.model, selection, rpc.session.context)
-            self.attrs['selection'] = selection
+                    self.attrs['relation'], 'name_search', '',
+                    self.attrs.get('domain', []), 'ilike', rpc.session.context)
+        else:
+            if not isinstance(selection, (list, tuple)):
+                selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                        self.model, selection, rpc.session.context)
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        self.attrs['selection'] = selection
         self.selection = selection
         for i in self.selection:
             selection_data.append(i)
@@ -464,7 +471,10 @@ class Selection(Char):
         self.renderer.set_property('text-column', 1)
 
     def get_textual_value(self, model):
-        return dict(self.selection).get(model[self.field_name].get(model), '')
+        value = model[self.field_name].get(model)
+        if isinstance(value, (list, tuple)):
+            value = value[0]
+        return dict(self.selection).get(value, '')
 
     def value_from_text(self, model, text):
         res = False
