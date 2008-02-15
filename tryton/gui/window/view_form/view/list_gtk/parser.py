@@ -499,4 +499,8 @@ CELLTYPES = {
     'datetime': Datetime,
     'boolean': Boolean,
     'text': Char,
+    'url': Char,
+    'email': Char,
+    'callto': Char,
+    'sip': Char,
 }
