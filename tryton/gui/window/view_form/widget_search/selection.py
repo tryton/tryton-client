@@ -1,5 +1,6 @@
 import gtk
 from interface import Interface
+import tryton.rpc as rpc
 
 class Selection(Interface):
 
@@ -11,8 +12,18 @@ class Selection(Interface):
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(False)
         self._selection = {}
-        if 'selection' in attrs:
-            self.set_popdown(attrs.get('selection', []))
+        selection = attrs.get('selection', [])
+        if 'relation' in attrs:
+            selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                    attrs['relation'], 'name_search', '',
+                    attrs.get('domain', []), 'ilike', rpc.session.context)
+        else:
+            if not isinstance(selection, (list, tuple)):
+                selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                        attrs['model'], selection, rpc.session.context)
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        attrs['selection'] = selection
+        self.set_popdown(selection)
 
     def set_popdown(self, selection):
         model = self.widget.get_model()

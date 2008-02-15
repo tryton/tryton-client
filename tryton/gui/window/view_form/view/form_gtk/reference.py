@@ -73,7 +73,12 @@ class Reference(WidgetInterface):
         self._readonly = False
         self._selection = {}
         self._selection2 = {}
-        self.set_popdown(attrs.get('selection', []))
+        selection = attrs.get('selection', [])
+        if not isinstance(selection, (list, tuple)):
+            selection = rpc.session.rpc_exec_auth('/object', 'execute',
+                    self.model, selection, rpc.session.context)
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        self.set_popdown(selection)
 
         self.last_key = (None, 0)
         self.key_catalog = {}
