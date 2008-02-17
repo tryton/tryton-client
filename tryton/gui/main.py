@@ -705,12 +705,12 @@ class Main(object):
             if self.pages[page].model == 'ir.ui.menu':
                 self.notebook.set_current_page(page)
                 return True
-        res = self.sig_win_new(widget, menu_type='menu_id', quiet=quiet)
+        res = self.sig_win_new(widget, menu_type='menu', quiet=quiet)
         if not res:
-            return self.sig_win_new(widget, menu_type='action_id', quiet=quiet)
+            return self.sig_win_new(widget, menu_type='action', quiet=quiet)
         return res
 
-    def sig_win_new(self, widget=None, menu_type='menu_id', quiet=True,
+    def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
             except_id=False):
         try:
             act_id = rpc.session.rpc_exec_auth('/object', 'execute',
@@ -748,7 +748,7 @@ class Main(object):
         return act_id
 
     def sig_home_new(self, widget=None, quiet=True, except_id=False):
-        return self.sig_win_new(widget, menu_type='action_id', quiet=quiet,
+        return self.sig_win_new(widget, menu_type='action', quiet=quiet,
                 except_id=except_id)
 
     def sig_plugin_execute(self, widget):
