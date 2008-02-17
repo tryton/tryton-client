@@ -109,7 +109,6 @@ class Attachment(object):
                 obj_id = rpc.session.rpc_exec_auth('/object', 'execute',
                         'ir.attachment', 'create', {
                             'name': fname,
-                            'datas_fname': fname,
                             'res_model': self.ressource[0],
                             'res_id': self.ressource[1],
                             'link': filename,
@@ -130,7 +129,7 @@ class Attachment(object):
             if not data:
                 return None
             filename = common.file_selection(_('Save As...'),
-                    filename=data['datas_fname'], parent=self.win,
+                    filename=data['name'], parent=self.win,
                     action=gtk.FILE_CHOOSER_ACTION_SAVE)
             if not filename:
                 return None
@@ -167,7 +166,6 @@ class Attachment(object):
                     'ir.attachment', 'create', {
                         'name': name,
                         'datas': base64.encodestring(value),
-                        'datas_fname': name,
                         'res_model': self.ressource[0],
                         'res_id': self.ressource[1],
                         })
@@ -192,7 +190,7 @@ class Attachment(object):
             file_name = data['link']
             if not data['link']:
                 (fileno, file_name) = tempfile.mkstemp(
-                        data['datas_fname'], 'tryton_')
+                        data['name'], 'tryton_')
                 file_p = file(file_name, 'wb+')
                 file_p.write(base64.decodestring(data['datas']))
                 file_p.close()
@@ -211,7 +209,7 @@ class Attachment(object):
         iter_start = buf.get_start_iter()
         buf.insert(iter_start, data['description'] or '')
 
-        fname = str(data['datas_fname'])
+        fname = str(data['name'])
         label = self.glade.get_widget('attach_filename')
         label.set_text(fname)
 
