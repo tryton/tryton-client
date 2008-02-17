@@ -41,7 +41,7 @@ class Tree(SignalEvent):
         self.widget.show_all()
         self.model = view['model'] or model
         self.domain2 = domain
-        if view.get('field_parent', False):
+        if view.get('field_childs', False):
             self.domain = []
         else:
             self.domain = domain
@@ -142,8 +142,8 @@ class Tree(SignalEvent):
             obj_id = widget.get_data('id')
 
             ids = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                    'read', obj_id, [self.view['field_parent']])\
-                            [self.view['field_parent']]
+                    'read', obj_id, [self.view['field_childs']])\
+                            [self.view['field_childs']]
 
             self.tree_res.ids = ids
             self.tree_res.reload()
