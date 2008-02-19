@@ -33,7 +33,7 @@ class Preference(object):
         res = user.get_preferences_fields_view(rpc.session.context)
         arch = res['arch']
         fields = res['fields']
-        self.screen = Screen('res.user', view_type=[])
+        self.screen = Screen('res.user', view_type=[], window=self.win)
         self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
 
