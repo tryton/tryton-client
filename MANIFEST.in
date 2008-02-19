@@ -1,0 +1,4 @@
+include LICENSE
+include doc/*
+include share/pixmaps/*.png
+include share/tryton/tryton.glade
