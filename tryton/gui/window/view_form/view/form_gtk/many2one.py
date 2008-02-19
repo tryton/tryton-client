@@ -281,7 +281,7 @@ class Many2One(WidgetInterface):
                 ids = rpc.session.rpc_exec_auth('/object', 'execute',
                         self.attrs['relation'], 'name_search',
                         self.wid_text.get_text(), domain, 'ilike', context)
-                if len(ids)==1:
+                if ids and len(ids)==1:
                     self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
                     self.focus_out = True
@@ -289,7 +289,7 @@ class Many2One(WidgetInterface):
                     return True
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
-                        ids = [x[0] for x in ids], context=context,
+                        ids = [x[0] for x in (ids or [])], context=context,
                         domain=domain, parent=self._window)
                 ids = win.run()
                 if ids:
