@@ -4,6 +4,16 @@ import cStringIO
 
 DNS_CACHE = {}
 
+_ALLOWED_MODULES = {'datetime': ['datetime']}
+
+def checkfunction(module, klass):
+    if module in _ALLOWED_MODULES and klass in _ALLOWED_MODULES[module]:
+        mod = __import__(module, {}, {}, ['__all__'])
+        _class = getattr(mod, klass)
+        return _class
+    raise ValueError('Not supported: %s/%s' % (module, klass))
+
+
 class PySocketException(Exception):
 
     def __init__(self, code, string):
@@ -86,7 +96,7 @@ class PySocket:
             msg = msg + chunk
         msgio = cStringIO.StringIO(msg)
         unpickler = cPickle.Unpickler(msgio)
-        unpickler.find_global = None
+        unpickler.find_global = checkfunction
         res = unpickler.load()
         if exception:
             raise PySocketException(str(res[0]), str(res[1]))
