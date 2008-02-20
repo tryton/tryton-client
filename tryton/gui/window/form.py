@@ -202,14 +202,14 @@ class Form(SignalEvent):
 
         res = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
                 'read', [obj_id], [x[0] for x in fields])
-        message = ''
+        message_str = ''
         for line in res:
             for (key, val) in fields:
                 if line.get(key, False) and \
                         (key in ('create_uid', 'write_uid')):
                     line[key] = line[key][1]
-                message += val+': ' + str(line.get(key, False) or '/')+'\n'
-        message(message, self.window)
+                message_str += val+': ' + str(line.get(key, False) or '/')+'\n'
+        message(message_str, self.window)
         return True
 
     def sig_remove(self, widget=None):
