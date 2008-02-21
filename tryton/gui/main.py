@@ -713,18 +713,17 @@ class Main(object):
     def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
             except_id=False):
         try:
-            act_id = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'res.user', 'read', [rpc.session.user], [menu_type,'name'],
-                    rpc.session.context)
+            prefs = rpc.session.rpc_exec_auth('/object', 'execute',
+                    'res.user', 'get_preferences', False, rpc.session.context)
         except:
             return False
         sb_id = self.sb_username.get_context_id('message')
-        self.sb_username.push(sb_id, act_id[0]['name'] or '')
+        self.sb_username.push(sb_id, prefs['name'] or '')
         sb_id = self.sb_servername.get_context_id('message')
         data = urlparse.urlsplit(rpc.session._url)
         self.sb_servername.push(sb_id, data[0]+':'+(data[1] and '//'+data[1] \
                 or data[2])+' ['+CONFIG['login.db']+']')
-        if not act_id[0][menu_type]:
+        if not prefs[menu_type]:
             if quiet:
                 return False
             common.warning(_('You can not log into the system !\n' \
@@ -733,16 +732,15 @@ class Main(object):
                     'Access Denied!', self.window)
             rpc.session.logout()
             return False
-        act_id = act_id[0][menu_type][0]
+        act_id = prefs[menu_type]
         if except_id and act_id == except_id:
             return act_id
         Action.execute(act_id, {'window': self.window})
         try:
-            user = rpc.session.rpc_exec_auth_wo('/object', 'execute',
-                    'res.user', 'read', [rpc.session.user],
-                    [menu_type, 'name'], rpc.session.context)
-            if user[0][menu_type]:
-                act_id = user[0][menu_type][0]
+            prefs = rpc.session.rpc_exec_auth_wo('/object', 'execute',
+                    'res.user', 'get_preferences', False, rpc.session.context)
+            if prefs[menu_type]:
+                act_id = prefs[menu_type]
         except:
             pass
         return act_id
