@@ -64,4 +64,4 @@ class Preference(object):
                 break
         self.parent.present()
         self.win.destroy()
-        return
+        return res
