@@ -77,6 +77,13 @@ class Button(object):
                 self.widget.show()
         else:
             self.widget.show()
+        if 'readonly' in state_changes:
+            if eval(state_changes['readonly'], values):
+                self.widget.set_sensitive(False)
+            else:
+                self.widget.set_sensitive(True)
+        else:
+            self.widget.set_sensitive(True)
 
 class Label(gtk.Label):
 
