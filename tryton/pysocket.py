@@ -25,12 +25,7 @@ class PySocketException(Exception):
 class PySocket:
 
     def __init__(self, sock=None):
-        if sock is None:
-            self.sock = socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM)
-        else:
-            self.sock = sock
-        self.sock.settimeout(120)
+        self.sock = sock
         self.host = None
         self.port = None
 
@@ -40,8 +35,18 @@ class PySocket:
             host, port = buf.split(':')
         if host in DNS_CACHE:
             host = DNS_CACHE[host]
+        if not self.sock:
+            familly = socket.AF_INET
+            if socket.has_ipv6:
+                try:
+                    socket.getaddrinfo(host, int(port), socket.AF_INET6)
+                    familly = socket.AF_INET6
+                except:
+                    pass
+            self.sock = socket.socket(familly, socket.SOCK_STREAM)
+            self.sock.settimeout(120)
         self.sock.connect((host, int(port)))
-        DNS_CACHE[host], port = self.sock.getpeername()
+        DNS_CACHE[host], port = self.sock.getpeername()[:2]
         self.host = host
         self.port = port
 
@@ -58,8 +63,11 @@ class PySocket:
     def reconnect(self):
         if self.host and self.port:
             self.disconnect()
+            familly = socket.AF_INET
+            if socket.has_ipv6:
+                familly = socket.AF_INET6
             self.sock = socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM)
+                familly, socket.SOCK_STREAM)
             self.sock.settimeout(120)
             self.sock.connect((self.host, int(self.port)))
 

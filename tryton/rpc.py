@@ -271,7 +271,7 @@ class RPCSession(object):
         return 1
 
     def list_db(self, url):
-        match = re.match('^(http[s]?://|socket://)([\w.\-]+):(\d{1,5})$',
+        match = re.match('^(http[s]?://|socket://)([\w:.\-]+):(\d{1,5})$',
                 url or '')
         if not match:
             return -1
@@ -294,7 +294,7 @@ class RPCSession(object):
                 return -1
 
     def db_exec_no_except(self, url, method, *args):
-        match = re.match('^(http[s]?://|socket://)([\w.\-]+):(\d{1,5})$',
+        match = re.match('^(http[s]?://|socket://)([\w:.\-]+):(\d{1,5})$',
                 url or '')
         if match.group(1) == 'http://' or match.group(1) == 'https://':
             sock = xmlrpclib.ServerProxy(url + '/xmlrpc/db')
