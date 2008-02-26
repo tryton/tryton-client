@@ -228,8 +228,6 @@ class DBCreate(object):
         win.show_all()
         pass_widget = self.dialog.get_widget('ent_password_new')
         change_button = self.dialog.get_widget('but_server_new')
-        demo_widget = self.dialog.get_widget('check_demo')
-        demo_widget.set_active(True)
 
         change_button.connect_after('clicked', self.server_change, win)
         protocol = CONFIG['login.protocol']
@@ -258,7 +256,6 @@ class DBCreate(object):
 
             else:
                 break
-        demo_data = demo_widget.get_active()
 
         langidx = self.lang_widget.get_active_iter()
         langreal = langidx \
@@ -277,7 +274,7 @@ class DBCreate(object):
         if res == gtk.RESPONSE_OK:
             try:
                 users = rpc.session.db_exec_no_except(url, 'create', passwd, dbname,
-                            demo_data, langreal)
+                            langreal)
             except:
                 common.warning(_('The server crashed during installation.\n' \
                         'We suggest you to drop this database.'), parent,
