@@ -104,11 +104,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     if obj[field]:
                         obj[field] = dict(self.fields_type[field]['selection']
                                 ).get(obj[field],'')
-            if self.fields_type[field]['type'] in ('float',):
+            if self.fields_type[field]['type'] in ('float', 'numeric'):
                 digit = self.fields_type[field].get('digits', (16, 2))[1]
                 for obj in res_ids:
                     obj[field] = locale.format('%.' + str(digit) + 'f',
                             obj[field] or 0.0, True)
+            if self.fields_type[field]['type'] in ('interger',):
+                for obj in res_ids:
+                    obj[field] = locale.format('%d', obj[field] or 0, True)
             if self.fields_type[field]['type'] in ('float_time',):
                 for obj in res_ids:
                     val = '%02d:%02d' % (math.floor(abs(obj[field])),

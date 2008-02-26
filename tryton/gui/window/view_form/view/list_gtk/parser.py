@@ -494,6 +494,7 @@ CELLTYPES = {
     'many2many': M2M,
     'selection': Selection,
     'float': Float,
+    'numeric': Float,
     'float_time': FloatTime,
     'integer': Int,
     'datetime': Datetime,

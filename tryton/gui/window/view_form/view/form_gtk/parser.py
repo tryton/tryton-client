@@ -598,6 +598,7 @@ WIDGETS_TYPE = {
     'date': (Calendar, 1, False, False),
     'datetime': (DateTime, 1, False, False),
     'float': (Float, 1, False, False),
+    'numeric': (Float, 1, False, False),
     'integer': (Integer, 1, False, False),
     'selection': (Selection, 1, False, False),
     'char': (Char, 1, False, False),

@@ -363,6 +363,7 @@ TYPES = {
     'float_time': FloatField,
     'integer' : IntegerField,
     'float' : FloatField,
+    'numeric' : FloatField,
     'many2one' : M2OField,
     'many2many' : M2MField,
     'one2many' : O2MField,
