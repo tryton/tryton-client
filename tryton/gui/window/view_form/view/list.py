@@ -335,10 +335,6 @@ class ViewList(ParserView):
         sel.selected_foreach(_func_sel_get, models)
         return models
 
-    def on_change(self, callback):
-        self.set_value()
-        self.screen.on_change(callback)
-
     def unset_editable(self):
         self.widget_tree.editable = False
         for col in self.widget_tree.get_columns():

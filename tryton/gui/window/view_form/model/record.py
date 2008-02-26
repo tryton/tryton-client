@@ -213,23 +213,15 @@ class ModelRecord(SignalEvent):
         val = eval(dom, ctx)
         return val
 
-    #XXX Shoud use changes of attributes (ro, ...)
-    def on_change(self, callback):
-        match = re.match('^(.*?)\((.*)\)$', callback)
-        if not match:
-            raise Exception, 'ERROR: Wrong on_change trigger: %s' % callback
-        func_name = match.group(1)
-        arg_names = [n.strip() for n in match.group(2).split(',')]
-        args = [self.expr_eval(arg) for arg in arg_names]
+    def on_change(self, field, attr):
+        args = {}
+        for arg in attr:
+            args[arg] = self.expr_eval(arg)
         ids = self.id and [self.id] or []
-        response = getattr(self.rpc, func_name)(ids, *args)
-        if response:
-            self.set(response.get('value', {}), modified=True)
-            if 'domain' in response:
-                for fieldname, value in response['domain'].items():
-                    if fieldname not in self.mgroup.mfields:
-                        continue
-                    self.mgroup.mfields[fieldname].attrs['domain'] = value
+        res = getattr(self.rpc, 'on_change_' + field)(ids, args,
+                rpc.session.context)
+        if res:
+            self.set(res, modified=True)
         self.signal('record-changed')
 
     def cond_default(self, field_name, value):

@@ -32,15 +32,6 @@ class EditableTreeView(gtk.TreeView):
         except parser.UnsettableColumn:
             return
 
-        # And now the on_change stuff ... only 3 lines are enough.
-        #callback = modelfield.attrs.get('on_change', '')
-        #if callback:
-        #    current_model.on_change(callback)
-
-        # And finally the conditional default
-        #if modelfield.attrs.get('change_default', False):
-        #    current_model.cond_default(fieldname, real_value)
-
     def on_open_remote(self, current_model, fieldname, create, value):
         modelfield = current_model[fieldname]
         cell = self.cells[fieldname]

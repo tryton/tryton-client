@@ -191,9 +191,5 @@ class WidgetInterface(object):
         self.invisible_set(modelfield.get_state_attrs(model).\
                 get('invisible', False))
 
-    def sig_changed(self):
-        if self.attrs.get('on_change', False):
-            self._view.view_form.screen.on_change(self.attrs['on_change'])
-
     def set_value(self, model, model_field):
         pass

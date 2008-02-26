@@ -106,5 +106,4 @@ class Selection(WidgetInterface):
 
     def sig_changed(self, *args):
         if self.changed:
-            super(Selection, self).sig_changed()
             self._focus_out()
