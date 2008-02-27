@@ -423,14 +423,14 @@ class ParserForm(ParserInterface):
             return False
 
         obj_id = self.screen.current_model.save(force_reload=False)
-        lang_ids = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
+        lang_ids = rpc.session.rpc_exec_auth('/object', 'execute', 'ir.lang',
                 'search', [('translatable','=','1')])
 
         if not lang_ids:
             common.message(_('No other language available!'),
                     parent=self.window)
             return False
-        langs = rpc.session.rpc_exec_auth('/object', 'execute', 'res.lang',
+        langs = rpc.session.rpc_exec_auth('/object', 'execute', 'ir.lang',
                 'read', lang_ids, ['code', 'name'])
 
         code = rpc.session.context.get('language', 'en_US')

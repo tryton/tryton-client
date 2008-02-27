@@ -334,7 +334,7 @@ class RPCSession(object):
         self.context = {}
         self.timezone = 'utc'
         user = RPCProxy('res.user')
-        lang = RPCProxy('res.lang')
+        lang = RPCProxy('ir.lang')
         context = user.get_preferences(True, {})
         for name in context:
             value = context[name]
