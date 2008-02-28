@@ -24,7 +24,7 @@ class WinSearch(object):
                 gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
         self.win.set_icon(TRYTON_ICON)
-        self.win.set_default_response(gtk.RESPONSE_OK)
+        self.win.set_default_response(gtk.RESPONSE_APPLY)
         hbox = gtk.HBox()
         hbox.show()
         self.win.vbox.pack_start(hbox, expand=False, fill=True)
