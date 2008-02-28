@@ -63,11 +63,14 @@ class Dialog(object):
             self.screen.display()
         if res < len(self.states) and res >= 0:
             datas.update(self.screen.get())
-            self.dia.destroy()
+            self.dia.hide()
             return (self.states[res], datas)
         else:
-            self.dia.destroy()
+            self.dia.hide()
             return False
+
+    def destroy(self):
+        self.dia.destroy()
 
 
 class Wizard(object):
@@ -78,23 +81,32 @@ class Wizard(object):
         if not 'form' in datas:
             datas['form'] = {}
         wiz_id = rpc.session.rpc_exec_auth('/wizard', 'create', action)
+        dia = None
         while state != 'end':
             wizardprogress = WizardProgress(wiz_id, state, datas,
                     parent, context)
             res = wizardprogress.run()
             if not res:
-                return False
+                if dia:
+                    res = {'type': 'form'}
+                else:
+                    return
+            else:
+                if dia:
+                    dia.destroy()
+                    dia = None
 
             if 'datas' in res:
-                datas['form'].update( res['datas'] )
+                datas['form'] = res['datas']
             if res['type'] == 'form':
-                dia = Dialog(res['arch'], res['fields'], res['state'],
-                        res['object'], parent)
-                dia.screen.current_model.set( datas['form'] )
-                res = dia.run(datas['form'])
-                if not res:
+                if not dia:
+                    dia = Dialog(res['arch'], res['fields'], res['state'],
+                            res['object'], parent)
+                    dia.screen.current_model.set(datas['form'])
+                res2 = dia.run(datas['form'])
+                if not res2:
                     break
-                (state, new_data) = res
+                (state, new_data) = res2
                 for data in new_data:
                     if new_data[data] == None:
                         del new_data[data]
@@ -115,6 +127,9 @@ class Wizard(object):
                 state = res['state']
             elif res['type'] == 'state':
                 state = res['state']
+        if dia:
+            dia.destroy()
+            dia = None
         rpc.session.rpc_exec_auth('/wizard', 'delete', wiz_id)
 
 
