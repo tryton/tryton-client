@@ -881,9 +881,13 @@ class Main(object):
         if not dbname:
             return
 
-        rpc.session.db_exec(url, 'drop', passwd, dbname)
-        common.message(_("Database dropped successfully !"),
-                parent=self.window)
+        res = rpc.session.db_exec(url, 'drop', passwd, dbname)
+        if res:
+            common.message(_("Database dropped successfully!"),
+                    parent=self.window)
+        else:
+            common.message(_('Unable to drop the database!'),
+                    parent=self.window)
 
     def sig_db_restore(self, widget):
         filename = common.file_selection(_('Open...'), parent=self.window,
@@ -896,9 +900,13 @@ class Main(object):
             file_p = file(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
-            rpc.session.db_exec(url, 'restore', passwd, dbname, data_b64)
-            common.message(_("Database restored successfully !"),
-                    parent=self.window)
+            res = rpc.session.db_exec(url, 'restore', passwd, dbname, data_b64)
+            if res:
+                common.message(_("Database restored successfully!"),
+                        parent=self.window)
+            else:
+                common.message(_('Database restore failed!'),
+                        parent=self.window)
 
     def sig_db_password(self, widget):
         dialog = glade.XML(GLADE, "dia_passwd_change",
