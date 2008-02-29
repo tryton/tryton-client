@@ -65,7 +65,12 @@ class PySocket:
             self.disconnect()
             familly = socket.AF_INET
             if socket.has_ipv6:
-                familly = socket.AF_INET6
+                try:
+                    socket.getaddrinfo(self.host, int(self.port),
+                            socket.AF_INET6)
+                    familly = socket.AF_INET6
+                except:
+                    pass
             self.sock = socket.socket(
                 familly, socket.SOCK_STREAM)
             self.sock.settimeout(120)
