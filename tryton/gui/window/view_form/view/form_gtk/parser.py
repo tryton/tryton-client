@@ -267,10 +267,22 @@ class ParserForm(ParserInterface):
                 if 'align' in attrs:
                     label.set_alignment(float(attrs['align'] or 0.0), 0.5)
                 label.set_angle(int(attrs.get('angle', 0)))
+                expand = False
+                if 'expand' in attrs:
+                    expand = bool(eval(attrs['expand']))
+                fill = False
+                if 'fill' in attrs:
+                    fill = bool(eval(attrs['fill']))
+                xexpand = False
+                if 'xexpand' in attrs:
+                    xexpand = bool(eval(attrs['xexpand']))
+                xfill = True
+                if 'xfill' in attrs:
+                    xfill = bool(eval(attrs['xfill']))
                 container.wid_add(label,
                         colspan=int(attrs.get('colspan', 1)),
-                        expand=False, help_tip=attrs.get('help', False),
-                        fill=int(attrs.get('fill', 0)), xexpand=False)
+                        expand=expand, help_tip=attrs.get('help', False),
+                        fill=fill, xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'newline':
                 container.newline()
@@ -340,7 +352,17 @@ class ParserForm(ParserInterface):
                 dict_widget[name] = widget_act
                 size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
                 expand = WIDGETS_TYPE[ftype][2]
+                if 'expand' in attrs:
+                    expand = bool(eval(attrs['expand']))
                 fill = WIDGETS_TYPE[ftype][3]
+                if 'fill' in attrs:
+                    fill = bool(eval(attrs['fill']))
+                xexpand = True
+                if 'xexpand' in attrs:
+                    xexpand = bool(eval(attrs['xexpand']))
+                xfill = True
+                if 'xfill' in attrs:
+                    xfill = bool(eval(attrs['xfill']))
                 hlp = fields[name].get('help', attrs.get('help', False))
                 if attrs.get('height', False) or attrs.get('width', False):
                     widget_act.widget.set_size_request(
@@ -348,7 +370,8 @@ class ParserForm(ParserInterface):
                             int(attrs.get('height', -1)))
                 container.wid_add(widget_act.widget, fields[name]['string'],
                         expand, translate=fields[name].get('translate', False),
-                        colspan=size, fname=name, help_tip=hlp, fill=fill)
+                        colspan=size, fname=name, help_tip=hlp, fill=fill,
+                        xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
                 frame = gtk.Frame(attrs.get('string', None))
