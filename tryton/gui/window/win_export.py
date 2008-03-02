@@ -74,9 +74,13 @@ class WinExport(object):
                 self.fields[prefix_node+field] = (st_name,
                         fields[field].get('relation', False))
                 if fields[field].get('relation', False) and level>0:
-                    fields2 = rpc.session.rpc_exec_auth('/object', 'execute',
-                            fields[field]['relation'], 'fields_get', False,
-                            rpc.session.context)
+                    try:
+                        fields2 = rpc.execute('object', 'execute',
+                                fields[field]['relation'], 'fields_get', False,
+                                rpc.CONTEXT)
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.win)
+                        continue
                     model_populate(fields2, prefix_node+field+'/', node,
                             st_name+'/', level-1)
         model_populate(fields)
@@ -148,9 +152,17 @@ class WinExport(object):
     def fill_predefwin(self):
         ir_export = rpc.RPCProxy('ir.export')
         ir_export_line = rpc.RPCProxy('ir.export.line')
-        export_ids = ir_export.search([('resource', '=', self.model)])
+        try:
+            export_ids = ir_export.search([('resource', '=', self.model)])
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return
         for export in ir_export.read(export_ids):
-            fields = ir_export_line.read(export['export_fields'])
+            try:
+                fields = ir_export_line.read(export['export_fields'])
+            except Exception, exception:
+                rpc.process_exception(exception, self.win)
+                continue
             self.predef_model.append((
                 export['id'],
                 [f['name'] for f in fields],
@@ -171,8 +183,12 @@ class WinExport(object):
             field_name = self.model2.get_value(iter, 1)
             fields.append(field_name)
             iter = self.model2.iter_next(iter)
-        new_id = ir_export.create({'name' : name, 'resource' : self.model,
-            'export_fields' : [(0, 0, {'name' : f}) for f in fields]})
+        try:
+            new_id = ir_export.create({'name' : name, 'resource' : self.model,
+                'export_fields' : [(0, 0, {'name' : f}) for f in fields]})
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return
         self.predef_model.append((
             new_id,
             fields,
@@ -189,7 +205,11 @@ class WinExport(object):
             return None
         ir_export = rpc.RPCProxy('ir.export')
         export_id = model.get_value(i, 0)
-        ir_export.unlink(export_id)
+        try:
+            ir_export.unlink(export_id)
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
                 del self.predef_model[i]
@@ -214,7 +234,7 @@ class WinExport(object):
             action = self.wid_action.get_active()
             self.parent.present()
             self.win.destroy()
-            result = WinExport.datas_read(self.ids, self.model, fields,
+            result = self.datas_read(self.ids, self.model, fields,
                     context=self.context)
 
             if action == 0:
@@ -254,12 +274,15 @@ class WinExport(object):
                     "(%s)" % (exception[0],), self.parent)
             return False
 
-    @staticmethod
-    def datas_read(ids, model, fields, context=None):
+    def datas_read(self, ids, model, fields, context=None):
         if context is None:
             context = {}
         ctx = context.copy()
-        ctx.update(rpc.session.context)
-        datas = rpc.session.rpc_exec_auth('/object', 'execute', model,
-                'export_data', ids, fields, ctx)
+        ctx.update(rpc.CONTEXT)
+        try:
+            datas = rpc.execute('object', 'execute', model,
+                    'export_data', ids, fields, ctx)
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return []
         return datas

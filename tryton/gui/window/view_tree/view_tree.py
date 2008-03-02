@@ -51,10 +51,10 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def _read(self, ids, fields):
         ctx = {}
-        ctx.update(rpc.session.context)
+        ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
         try:
-            res_ids = rpc.session.rpc_exec_auth_try('/object', 'execute',
+            res_ids = rpc.execute('object', 'execute',
                     self.view['model'], 'read', ids, fields, ctx)
         except:
             res_ids = []
@@ -81,11 +81,11 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DHM_FORMAT)
-                        if 'timezone' in rpc.session.context:
+                        if 'timezone' in rpc.CONTEXT:
                             try:
                                 import pytz
-                                lzone = pytz.timezone(rpc.session.context['timezone'])
-                                szone = pytz.timezone(rpc.session.timezone)
+                                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                                szone = pytz.timezone(rpc.TIMEZONE)
                                 datetime = DT.datetime(date[0], date[1],
                                         date[2], date[3], date[4], date[5],
                                         date[6])
@@ -279,16 +279,21 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 class ViewTree(object):
     "View tree"
 
-    def __init__(self, view_info, ids, sel_multi=False,
+    def __init__(self, view_info, ids, window, sel_multi=False,
             context=None):
+        self.window = window
         self.view = gtk.TreeView()
         self.view.set_headers_visible(not CONFIG['client.modepda'])
         self.context = {}
-        self.context.update(rpc.session.context)
+        self.context.update(rpc.CONTEXT)
         if context:
             self.context.update(context)
-        self.fields = rpc.session.rpc_exec_auth('/object', 'execute',
-                view_info['model'], 'fields_get', False, self.context)
+        try:
+            self.fields = rpc.execute('object', 'execute',
+                    view_info['model'], 'fields_get', False, self.context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            raise
         parse = Parse(self.fields)
         parse.parse(view_info['arch'], self.view)
         self.toolbar = parse.toolbar

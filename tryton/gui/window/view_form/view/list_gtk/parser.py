@@ -250,11 +250,11 @@ class Datetime(Date):
         if not value:
             return ''
         date = time.strptime(value, self.server_format)
-        if 'timezone' in rpc.session.context:
+        if 'timezone' in rpc.CONTEXT:
             try:
                 import pytz
-                lzone = pytz.timezone(rpc.session.context['timezone'])
-                szone = pytz.timezone(rpc.session.timezone)
+                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                szone = pytz.timezone(rpc.TIMEZONE)
                 datetime = DT.datetime(date[0], date[1], date[2], date[3],
                         date[4], date[5], date[6])
                 sdt = szone.localize(datetime, is_dst=True)
@@ -276,11 +276,11 @@ class Datetime(Date):
                 date = tuple(datetime)
             except:
                 return False
-        if 'timezone' in rpc.session.context:
+        if 'timezone' in rpc.CONTEXT:
             try:
                 import pytz
-                lzone = pytz.timezone(rpc.session.context['timezone'])
-                szone = pytz.timezone(rpc.session.timezone)
+                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                szone = pytz.timezone(rpc.TIMEZONE)
                 datetime = DT.datetime(date[0], date[1], date[2], date[3],
                         date[4], date[5], date[6])
                 ldt = lzone.localize(datetime, is_dst=True)
@@ -336,7 +336,11 @@ class M2O(Char):
         domain = model[self.field_name].domain_get(model)
         context = model[self.field_name].context_get(model)
 
-        names = rpc_relation.name_search(text, domain, 'ilike', context)
+        try:
+            names = rpc_relation.name_search(text, domain, 'ilike', context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return '???'
         if len(names) != 1:
             return self.search_remote(relation, [x[0] for x in names],
                              domain=domain, context=context)[0]
@@ -355,7 +359,11 @@ class M2O(Char):
         else:
             rpc_relation = RPCProxy(relation)
 
-            names = rpc_relation.name_search(text, domain, 'ilike', context)
+            try:
+                names = rpc_relation.name_search(text, domain, 'ilike', context)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False, False
             if len(names) == 1:
                 return True, names[0]
             searched = self.search_remote(relation, [x[0] for x in names],
@@ -379,7 +387,11 @@ class M2O(Char):
                 domain=domain)
         found = win.go()
         if found:
-            return rpc_relation.name_get([found[0]], context)[0]
+            try:
+                return rpc_relation.name_get([found[0]], context)[0]
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False, None
         else:
             return False, None
 
@@ -417,7 +429,11 @@ class M2M(Char):
         rpc_relation = RPCProxy(relation)
         domain = model[self.field_name].domain_get(model)
         context = model[self.field_name].context_get(model)
-        names = rpc_relation.name_search(text, domain, 'ilike', context)
+        try:
+            names = rpc_relation.name_search(text, domain, 'ilike', context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return []
         ids = [x[0] for x in names]
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain)
@@ -434,7 +450,11 @@ class M2M(Char):
         if create:
             if text and len(text) and text[0] != '(':
                 domain.append(('name', '=', text))
-            ids = rpc_relation.search(domain)
+            try:
+                ids = rpc_relation.search(domain)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False, None
             if ids and len(ids)==1:
                 return True, ids
         else:
@@ -455,13 +475,21 @@ class Selection(Char):
         selection_data = gtk.ListStore(str, str)
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
-            selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.attrs['relation'], 'name_search', '',
-                    self.attrs.get('domain', []), 'ilike', rpc.session.context)
+            try:
+                selection = rpc.execute('object', 'execute',
+                        self.attrs['relation'], 'name_search', '',
+                        self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                selection = []
         else:
             if not isinstance(selection, (list, tuple)):
-                selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                        self.model, selection, rpc.session.context)
+                try:
+                    selection = rpc.execute('object', 'execute',
+                            self.model, selection, rpc.CONTEXT)
+                except Exception, exception:
+                    rpc.process_exception(exception, self.window)
+                    selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.attrs['selection'] = selection
         self.selection = selection

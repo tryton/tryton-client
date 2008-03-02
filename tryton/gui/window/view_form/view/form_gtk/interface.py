@@ -55,13 +55,17 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
             break
     user = False
     if radio.get_active():
-        user = rpc.session.user
+        user = rpc._USER
     window.present()
     win.destroy()
     if res == gtk.RESPONSE_OK:
         ir_default = RPCProxy('ir.default')
-        ir_default.set_default(model, field, clause, value, user,
-                rpc.session.context)
+        try:
+            ir_default.set_default(model, field, clause, value, user,
+                    rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, window)
+            return False
         return True
     return False
 
@@ -96,7 +100,7 @@ class WidgetInterface(object):
                     .get('readonly', False):
                 return False
             model = self._view.modelfield.parent.resource
-            res = rpc.session.rpc_exec_auth_try('/object', 'execute', model,
+            res = rpc.execute('object', 'execute', model,
                     'default_get', [self.attrs['name']])
             self._view.modelfield.set(self._view.model,
                     res.get(self.attrs['name'], False))

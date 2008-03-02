@@ -17,15 +17,15 @@ import base64
 
 _ = gettext.gettext
 
-def _refresh_dblist(db_widget, url, dbtoload=None):
+def _refresh_dblist(db_widget, host, port, dbtoload=None):
     if not dbtoload:
         dbtoload = CONFIG['login.db']
     index = 0
     liststore = db_widget.get_model()
     liststore.clear()
-    result = rpc.session.list_db(url)
-    if result == -1:
-        return -1
+    result = rpc.db_list(host, port)
+    if result is None:
+        return None
     for db_num, dbname in enumerate(result):
         liststore.append([dbname])
         if dbname == dbtoload:
@@ -33,10 +33,10 @@ def _refresh_dblist(db_widget, url, dbtoload=None):
     db_widget.set_active(index)
     return len(liststore)
 
-def _refresh_langlist(lang_widget, url):
+def _refresh_langlist(lang_widget, host, port):
     liststore = lang_widget.get_model()
     liststore.clear()
-    lang_list = rpc.session.db_exec_no_except(url, 'list_lang')
+    lang_list = rpc.db_exec(host, port, 'list_lang')
     for key, val in lang_list:
         liststore.insert(0, (val, key))
     lang_widget.set_active(0)
@@ -52,39 +52,20 @@ def _server_ask(server_widget, parent):
     win.set_default_response(gtk.RESPONSE_OK)
     host_widget = win_gl.get_widget('ent_host')
     port_widget = win_gl.get_widget('ent_port')
-    protocol_widget = win_gl.get_widget('protocol')
 
-    protocols = {
-            'XML-RPC': 'http://',
-            'XML-RPC secure': 'https://',
-            'NET-RPC (faster)': 'socket://',
-            }
-    listprotocol = gtk.ListStore(str)
-    protocol_widget.set_model(listprotocol)
-
-
-    url_m = re.match('^(http[s]?://|socket://)([\w.-]+):(\d{1,5})$',
+    url_m = re.match('^([\w.-]+):(\d{1,5})$',
             server_widget.get_text())
     if url_m:
-        host_widget.set_text(url_m.group(2))
-        port_widget.set_text(url_m.group(3))
-
-    index = 0
-    i = 0
-    for protocol in protocols:
-        listprotocol.append([protocol])
-        if url_m and protocols[protocol] == url_m.group(1):
-            index = i
-        i += 1
-    protocol_widget.set_active(index)
+        host_widget.set_text(url_m.group(1))
+        port_widget.set_text(url_m.group(2))
 
     res = win.run()
     if res == gtk.RESPONSE_OK:
-        protocol = protocols[protocol_widget.get_active_text()]
-        url = '%s%s:%s' % (protocol, host_widget.get_text(),
-                port_widget.get_text())
+        host = host_widget.get_text()
+        port = int(port_widget.get_text())
+        url = '%s:%d' % (host, port)
         server_widget.set_text(url)
-        result = url
+        result = (host, port)
     parent.present()
     win.destroy()
     return result
@@ -96,9 +77,9 @@ class DBLogin(object):
         self.win_gl = glade.XML(GLADE, "win_login", gettext.textdomain())
 
     @staticmethod
-    def refreshlist(widget, db_widget, label, url, butconnect=None):
-        res = _refresh_dblist(db_widget, url)
-        if res == -1:
+    def refreshlist(widget, db_widget, label, host, port, butconnect=None):
+        res = _refresh_dblist(db_widget, host, port)
+        if res is None:
             label.set_label('<b>'+_('Could not connect to server !')+'</b>')
             db_widget.hide()
             label.show()
@@ -120,9 +101,10 @@ class DBLogin(object):
 
     @staticmethod
     def refreshlist_ask(widget, server_widget, db_widget, label,
-            butconnect=False, url=False, parent=None):
-        url = _server_ask(server_widget, parent) or url
-        return DBLogin.refreshlist(widget, db_widget, label, url, butconnect)
+            butconnect=False, host=False, port=0, parent=None):
+        host, port = _server_ask(server_widget, parent) or (host, port)
+        return DBLogin.refreshlist(widget, db_widget, label, host, port,
+                butconnect)
 
     def run(self, dbname, parent):
         win = self.win_gl.get_widget('win_login')
@@ -141,10 +123,9 @@ class DBLogin(object):
         label.hide()
 
         host = CONFIG['login.server']
-        port = CONFIG['login.port']
-        protocol = CONFIG['login.protocol']
+        port = int(CONFIG['login.port'])
 
-        url = '%s%s:%s' % (protocol, host, port)
+        url = '%s:%d' % (host, port)
         server_widget.set_text(url)
         login.set_text(CONFIG['login.login'])
 
@@ -155,9 +136,9 @@ class DBLogin(object):
         db_widget.pack_start(cell, True)
         db_widget.add_attribute(cell, 'text', 0)
 
-        res = self.refreshlist(None, db_widget, label, url, but_connect)
+        res = self.refreshlist(None, db_widget, label, host, port, but_connect)
         change_button.connect_after('clicked', DBLogin.refreshlist_ask,
-                server_widget, db_widget, label, but_connect, url, win)
+                server_widget, db_widget, label, but_connect, host, port, win)
 
         if dbname:
             i = liststore.get_iter_root()
@@ -168,16 +149,15 @@ class DBLogin(object):
                 i = liststore.iter_next(i)
 
         res = win.run()
-        url_m = re.match('^(http[s]?://|socket://)([\w.\-]+):(\d{1,5})$',
+        url_m = re.match('^([\w.\-]+):(\d{1,5})$',
                 server_widget.get_text() or '')
         if url_m:
-            CONFIG['login.server'] = url_m.group(2)
+            CONFIG['login.server'] = url_m.group(1)
             CONFIG['login.login'] = login.get_text()
-            CONFIG['login.port'] = url_m.group(3)
-            CONFIG['login.protocol'] = url_m.group(1)
+            CONFIG['login.port'] = url_m.group(2)
             CONFIG['login.db'] = db_widget.get_active_text()
-            result = (login.get_text(), passwd.get_text(), url_m.group(2),
-                    url_m.group(3), url_m.group(1), db_widget.get_active_text())
+            result = (login.get_text(), passwd.get_text(), url_m.group(1),
+                    int(url_m.group(2)), db_widget.get_active_text())
         else:
             parent.present()
             win.destroy()
@@ -204,10 +184,10 @@ class DBCreate(object):
         return sensitive
 
     def server_change(self, widget, parent):
-        url = _server_ask(self.server_widget, parent)
+        host, port = _server_ask(self.server_widget, parent)
         try:
-            if self.lang_widget and url:
-                _refresh_langlist(self.lang_widget, url)
+            if self.lang_widget and host and port:
+                _refresh_langlist(self.lang_widget, host, port)
             self.set_sensitive(True)
         except:
             self.set_sensitive(False)
@@ -230,15 +210,15 @@ class DBCreate(object):
         change_button = self.dialog.get_widget('but_server_new')
 
         change_button.connect_after('clicked', self.server_change, win)
-        protocol = CONFIG['login.protocol']
-        url = '%s%s:%s' % (protocol, CONFIG['login.server'],
-                CONFIG['login.port'])
+        host = CONFIG['login.server']
+        port = int(CONFIG['login.port'])
+        url = '%s:%d' % (host, port)
 
         self.server_widget.set_text(url)
         liststore = gtk.ListStore(str, str)
         self.lang_widget.set_model(liststore)
         try:
-            _refresh_langlist(self.lang_widget, url)
+            _refresh_langlist(self.lang_widget, host, port)
         except:
             self.set_sensitive(False)
 
@@ -262,18 +242,17 @@ class DBCreate(object):
                 and self.lang_widget.get_model().get_value(langidx, 1)
         passwd = pass_widget.get_text()
         url = self.server_widget.get_text()
-        url_m = re.match('^(http[s]?://|socket://)([\w.\-]+):(\d{1,5})$',
+        url_m = re.match('^([\w.\-]+):(\d{1,5})$',
                 url or '')
         if url_m:
-            CONFIG['login.server'] = url_m.group(2)
-            CONFIG['login.port'] = url_m.group(3)
-            CONFIG['login.protocol'] = url_m.group(1)
+            CONFIG['login.server'] = host = url_m.group(1)
+            CONFIG['login.port'] = port = url_m.group(2)
         parent.present()
         win.destroy()
 
         if res == gtk.RESPONSE_OK:
             try:
-                users = rpc.session.db_exec_no_except(url, 'create', passwd, dbname,
+                users = rpc.db_exec(host, int(port), 'create', passwd, dbname,
                             langreal)
             except:
                 common.warning(_('The server crashed during installation.\n' \
@@ -486,14 +465,17 @@ class Main(object):
 
     def shortcut_set(self):
         def _action_shortcut(widget, action):
-            ctx = rpc.session.context.copy()
+            ctx = rpc.CONTEXT.copy()
             Action.exec_keyword('tree_open', {'model': 'ir.ui.menu',
                 'id': action, 'ids': [action],
                 'window': self.window}, context=ctx)
-        user = rpc.session.user
-        shortcuts = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                'ir.ui.view_sc', 'get_sc', user, 'ir.ui.menu',
-                rpc.session.context)
+        user = rpc._USER
+        try:
+            shortcuts = rpc.execute('object', 'execute',
+                    'ir.ui.view_sc', 'get_sc', user, 'ir.ui.menu',
+                    rpc.CONTEXT)
+        except:
+            shortcuts = []
         menu = gtk.Menu()
         for shortcut in shortcuts:
             menuitem = gtk.MenuItem(shortcut['name'])
@@ -599,37 +581,31 @@ class Main(object):
             return ([], [])
 
     def sig_login(self, widget=None, dbname=False, res=None):
-        try:
-            if not res:
-                try:
-                    dblogin = DBLogin()
-                    res = dblogin.run(dbname, self.window)
-                except Exception, exception:
-                    if exception.args == ('QueryCanceled',):
-                        return False
-                    raise
-            self.window.present()
-            self.sig_logout(widget)
-            log_response = rpc.session.login(*res)
-            if log_response == 1:
-                CONFIG.save()
-                menu_id = self.sig_win_menu(quiet=False)
-                if menu_id:
-                    self.sig_home_new(quiet=True, except_id=menu_id)
-                if res[4] == 'https://':
-                    self.secure_img.show()
-                else:
-                    self.secure_img.hide()
-                self.request_set()
-            elif log_response==-1:
-                common.message(_('Connection error !\n' \
-                        'Unable to connect to the server !'), self.window)
-            elif log_response==-2:
-                common.message(_('Connection error !\n' \
-                        'Bad username or password !'), self.window)
-            self.shortcut_set()
-        except rpc.RPCException:
-            rpc.session.logout()
+        if not res:
+            try:
+                dblogin = DBLogin()
+                res = dblogin.run(dbname, self.window)
+            except Exception, exception:
+                if exception.args == ('QueryCanceled',):
+                    return False
+                raise
+        self.window.present()
+        self.sig_logout(widget)
+        log_response = rpc.login(*res)
+        if log_response == 1:
+            CONFIG.save()
+            menu_id = self.sig_win_menu(quiet=False)
+            if menu_id:
+                self.sig_home_new(quiet=True, except_id=menu_id)
+            self.secure_img.hide()
+            self.request_set()
+        elif log_response==-1:
+            common.message(_('Connection error !\n' \
+                    'Unable to connect to the server !'), self.window)
+        elif log_response==-2:
+            common.message(_('Connection error !\n' \
+                    'Bad username or password !'), self.window)
+        self.shortcut_set()
         self.glade.get_widget('but_menu').set_sensitive(True)
         self.glade.get_widget('user').set_sensitive(True)
         self.glade.get_widget('form').set_sensitive(True)
@@ -660,7 +636,7 @@ class Main(object):
         self.glade.get_widget('user').set_sensitive(False)
         self.glade.get_widget('form').set_sensitive(False)
         self.glade.get_widget('plugins').set_sensitive(False)
-        rpc.session.logout()
+        rpc.logout()
         return True
 
     def sig_tips(self, *args):
@@ -710,16 +686,15 @@ class Main(object):
     def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
             except_id=False):
         try:
-            prefs = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'res.user', 'get_preferences', False, rpc.session.context)
+            prefs = rpc.execute('object', 'execute',
+                    'res.user', 'get_preferences', False, rpc.CONTEXT)
         except:
             return False
         sb_id = self.sb_username.get_context_id('message')
         self.sb_username.push(sb_id, prefs['name'] or '')
         sb_id = self.sb_servername.get_context_id('message')
-        data = urlparse.urlsplit(rpc.session._url)
-        self.sb_servername.push(sb_id, data[0]+':'+(data[1] and '//'+data[1] \
-                or data[2])+' ['+CONFIG['login.db']+']')
+        self.sb_servername.push(sb_id, '%s@%s:%d' % (rpc._USERNAME,
+            rpc._SOCK.host, rpc._SOCK.port))
         if not prefs[menu_type]:
             if quiet:
                 return False
@@ -727,15 +702,15 @@ class Main(object):
                     'Ask the administrator to verify\n' \
                     'you have an action defined for your user.'),
                     'Access Denied!', self.window)
-            rpc.session.logout()
+            rpc.logout()
             return False
         act_id = prefs[menu_type]
         if except_id and act_id == except_id:
             return act_id
         Action.execute(act_id, {'window': self.window})
         try:
-            prefs = rpc.session.rpc_exec_auth_wo('/object', 'execute',
-                    'res.user', 'get_preferences', False, rpc.session.context)
+            prefs = rpc.execute('object', 'execute',
+                    'res.user', 'get_preferences', False, rpc.CONTEXT)
             if prefs[menu_type]:
                 act_id = prefs[menu_type]
         except:
@@ -881,13 +856,16 @@ class Main(object):
         if not dbname:
             return
 
-        res = rpc.session.db_exec(url, 'drop', passwd, dbname)
-        if res:
-            common.message(_("Database dropped successfully!"),
-                    parent=self.window)
-        else:
+        host, port = url.split(':')
+
+        try:
+            rpc.db_exec(host, int(port), 'drop', passwd, dbname)
+        except:
             common.message(_('Unable to drop the database!'),
                     parent=self.window)
+            return
+        common.message(_("Database dropped successfully!"),
+                parent=self.window)
 
     def sig_db_restore(self, widget):
         filename = common.file_selection(_('Open...'), parent=self.window,
@@ -900,7 +878,9 @@ class Main(object):
             file_p = file(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
-            res = rpc.session.db_exec(url, 'restore', passwd, dbname, data_b64)
+            host, port = url.split(':')
+            res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
+                    data_b64)
             if res:
                 common.message(_("Database restored successfully!"),
                         parent=self.window)
@@ -924,9 +904,8 @@ class Main(object):
                 lambda a,b: _server_ask(b, win), server_widget)
 
         host = CONFIG['login.server']
-        port = CONFIG['login.port']
-        protocol = CONFIG['login.protocol']
-        url = '%s%s:%s' % (protocol, host, port)
+        port = int(CONFIG['login.port'])
+        url = '%s:%d' % (host, port)
         server_widget.set_text(url)
 
         res = win.run()
@@ -940,7 +919,7 @@ class Main(object):
                         "new password, operation cancelled!"),
                         _("Validation Error."), parent=win)
             else:
-                rpc.session.db_exec(url, 'change_admin_password',
+                rpc.db_exec(host, port, 'change_admin_password',
                         old_passwd, new_passwd)
         self.window.present()
         win.destroy()
@@ -954,7 +933,8 @@ class Main(object):
                 preview=False)
 
         if filename:
-            dump_b64 = rpc.session.db_exec(url, 'dump', passwd, dbname)
+            host, port = url.split(':')
+            dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
             dump = base64.decodestring(dump_b64)
             file_ = file(filename, 'wb')
             file_.write(dump)
@@ -963,8 +943,8 @@ class Main(object):
                     parent=self.window)
 
     def _choose_db_select(self, title=_("Backup a database")):
-        def refreshlist(widget, db_widget, label, url):
-            res = _refresh_dblist(db_widget, url)
+        def refreshlist(widget, db_widget, label, host, port):
+            res = _refresh_dblist(db_widget, host, port)
             if res == -1:
                 label.set_label('<b>' + \
                         _('Could not connect to server !') + '</b>')
@@ -982,11 +962,11 @@ class Main(object):
 
         def refreshlist_ask(widget, server_widget, db_widget, label,
                 parent=None):
-            url = _server_ask(server_widget, parent)
+            host, port = _server_ask(server_widget, parent)
             if not url:
                 return None
-            refreshlist(widget, db_widget, label, url)
-            return  url
+            refreshlist(widget, db_widget, label, host, port)
+            return (host, port)
 
         dialog = glade.XML(GLADE, "win_db_select",
                 gettext.textdomain())
@@ -1004,15 +984,15 @@ class Main(object):
 
         dialog.get_widget('db_select_label').set_markup('<b>'+title+'</b>')
 
-        protocol = CONFIG['login.protocol']
-        url = '%s%s:%s' % (protocol, CONFIG['login.server'],
-                CONFIG['login.port'])
+        host = CONFIG['login.server']
+        port = int(CONFIG['login.port'])
+        url = '%s:%d' % (host, port)
         server_widget.set_text(url)
 
         liststore = gtk.ListStore(str)
         db_widget.set_model(liststore)
 
-        refreshlist(None, db_widget, label, url)
+        refreshlist(None, db_widget, label, host, port)
         change_button = dialog.get_widget('but_server_select')
         change_button.connect_after('clicked', refreshlist_ask,
                 server_widget, db_widget, label, win)
@@ -1046,9 +1026,7 @@ class Main(object):
         widget_pass = dialog.get_widget('ent_password')
         widget_url = dialog.get_widget('ent_server')
 
-        protocol = CONFIG['login.protocol']
-        url = '%s%s:%s' % (protocol, CONFIG['login.server'],
-                CONFIG['login.port'])
+        url = '%s:%d' % (CONFIG['login.server'], int(CONFIG['login.port']))
         widget_url.set_text(url)
 
         change_button = dialog.get_widget('but_server_change')

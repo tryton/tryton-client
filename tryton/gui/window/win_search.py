@@ -14,7 +14,7 @@ class WinSearch(object):
             domain=None, parent=None):
         self.domain = domain or []
         self.context = context or {}
-        self.context.update(rpc.session.context)
+        self.context.update(rpc.CONTEXT)
         self.sel_multi = sel_multi
         self.parent = parent
 
@@ -53,8 +53,13 @@ class WinSearch(object):
 
         self.model_name = model
 
-        view_form = rpc.session.rpc_exec_auth('/object', 'execute',
-                self.model_name, 'fields_view_get', False, 'tree', self.context)
+        try:
+            view_form = rpc.execute('object', 'execute',
+                    self.model_name, 'fields_view_get', False, 'tree',
+                    self.context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.parent)
+            raise
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
                 model, parent=self.win)
 
@@ -103,9 +108,13 @@ class WinSearch(object):
         self.old_limit = limit
         value = self.form.value
         value += self.domain
-        self.ids = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                self.model_name, 'search', value, offset, limit, 0,
-                rpc.session.context)
+        try:
+            self.ids = rpc.execute('object', 'execute',
+                    self.model_name, 'search', value, offset, limit, 0,
+                    rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return False
         self.reload()
         self.old_search = self.form.value
         self.win.set_title(self.title_results % len(self.ids))

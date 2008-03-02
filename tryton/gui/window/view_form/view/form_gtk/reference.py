@@ -75,8 +75,12 @@ class Reference(WidgetInterface):
         self._selection2 = {}
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
-            selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.model, selection, rpc.session.context)
+            try:
+                selection = rpc.execute('object', 'execute',
+                        self.model, selection, rpc.CONTEXT)
+            except Exception, exception:
+                rpc.process_exception(exception, self._window)
+                selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.set_popdown(selection)
 
@@ -148,9 +152,15 @@ class Reference(WidgetInterface):
                 domain = self._view.modelfield.domain_get(self._view.model)
                 context = self._view.modelfield.context_get(self._view.model)
 
-                ids = rpc.session.rpc_exec_auth('/object', 'execute', model,
-                        'name_search', self.wid_text.get_text(), domain,
-                        'ilike', context)
+                try:
+                    ids = rpc.execute('object', 'execute', model,
+                            'name_search', self.wid_text.get_text(), domain,
+                            'ilike', context)
+                except Exception, exception:
+                    self.focus_out = True
+                    self.changed = True
+                    rpc.process_exception(exception, self._window)
+                    return False
                 if ids and len(ids) == 1:
                     obj_id, name = ids[0]
                     self._view.modelfield.set_client(self._view.model,
@@ -165,9 +175,15 @@ class Reference(WidgetInterface):
                         domain=domain, parent=self._window)
                 ids = win.run()
                 if ids:
-                    obj_id, name = rpc.session.rpc_exec_auth('/object',
-                            'execute', model, 'name_get', [ids[0]],
-                            rpc.session.context)[0]
+                    try:
+                        obj_id, name = rpc.execute('object',
+                                'execute', model, 'name_get', [ids[0]],
+                                rpc.CONTEXT)[0]
+                    except Exception, exception:
+                        self.focus_out = True
+                        self.changed = True
+                        rpc.process_exception(exception, self._window)
+                        return False
                     self._view.modelfield.set_client(self._view.model,
                             (model, [obj_id, name]))
         self.focus_out = True
@@ -232,8 +248,12 @@ class Reference(WidgetInterface):
         if model:
             child.set_text(self._selection2[model])
             if not name and obj_id:
-                obj_id, name = RPCProxy(model).name_get(obj_id,
-                        rpc.session.context)[0]
+                try:
+                    obj_id, name = RPCProxy(model).name_get(obj_id,
+                            rpc.CONTEXT)[0]
+                except Exception, exception:
+                    rpc.process_exception(exception, self._window)
+                    name = '???'
             self.wid_text.set_text(name)
             img.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)

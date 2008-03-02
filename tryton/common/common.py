@@ -322,7 +322,7 @@ def sur_3b(msg, parent):
     else:
         return 'cancel'
 
-def ask(question, parent):
+def ask(question, parent, visibility=True):
     win = gtk.Dialog(_('Tryton'), parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -339,6 +339,7 @@ def ask(question, parent):
     vbox.pack_start(gtk.Label(question))
     entry = gtk.Entry()
     entry.set_activates_default(True)
+    entry.set_visibility(visibility)
     vbox.pack_start(entry)
     hbox.pack_start(vbox)
     win.vbox.pack_start(hbox)

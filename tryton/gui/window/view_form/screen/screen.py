@@ -49,15 +49,15 @@ class Screen(SignalEvent):
         self.resource = model_name
         self.rpc = RPCProxy(model_name)
         self.context = context
-        self.context.update(rpc.session.context)
+        self.context.update(rpc.CONTEXT)
         self.views = []
         self.fields = {}
         self.view_ids = view_ids
         self.models = None
         self.parent = parent
         self.window = window
-        models = ModelRecordGroup(model_name, self.fields, parent=self.parent,
-                context=self.context)
+        models = ModelRecordGroup(model_name, self.fields, self.window,
+                parent=self.parent, context=self.context)
         self.models_set(models)
         self.current_model = None
         self.screen_container = ScreenContainer()
@@ -83,9 +83,12 @@ class Screen(SignalEvent):
         if active and self.show_search:
             if not self.filter_widget:
                 if not self.fields_view_tree:
-                    self.fields_view_tree = rpc.session.rpc_exec_auth('/object',
-                            'execute', self.name, 'fields_view_get', False,
-                            'tree', self.context)
+                    try:
+                        self.fields_view_tree = rpc.execute('object',
+                                'execute', self.name, 'fields_view_get', False,
+                                'tree', self.context)
+                    except:
+                        return
                 self.filter_widget = Form(self.fields_view_tree['arch'],
                         self.fields_view_tree['fields'], self.name, self.window,
                         self.domain, (self, self.search_filter))
@@ -112,10 +115,13 @@ class Screen(SignalEvent):
                     not (key == 'active' \
                     and self.context.get('active_test', False)):
                 values.append((key, operator, value))
-        ids = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                self.name, 'search', values, offset,limit, 0, self.context)
-        self.search_count = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                self.name, 'search_count', values, self.context)
+        try:
+            ids = rpc.execute('object', 'execute',
+                    self.name, 'search', values, offset,limit, 0, self.context)
+            self.search_count = rpc.execute('object', 'execute',
+                    self.name, 'search_count', values, self.context)
+        except:
+            ids = []
         self.clear()
         self.load(ids)
         return True
@@ -220,8 +226,12 @@ class Screen(SignalEvent):
                     toolbar=self.views_preload[view_type].get('toolbar', False),
                     context=context)
         else:
-            view = self.rpc.fields_view_get(view_id, view_type, self.context,
-                    self.hastoolbar)
+            try:
+                view = self.rpc.fields_view_get(view_id, view_type, self.context,
+                        self.hastoolbar)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                raise
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 
@@ -382,7 +392,11 @@ class Screen(SignalEvent):
         if self.current_view.view_type == 'form' and self.current_model:
             obj_id = self.current_model.id
             if unlink and obj_id:
-                if not self.rpc.unlink([obj_id]):
+                try:
+                    if not self.rpc.unlink([obj_id]):
+                        return False
+                except Exception, exception:
+                    rpc.process_exception(exception, self.window)
                     return False
             idx = self.models.models.index(self.current_model)
             self.models.remove(self.current_model)
@@ -397,7 +411,11 @@ class Screen(SignalEvent):
         if self.current_view.view_type == 'tree':
             ids = self.current_view.sel_ids_get()
             if unlink and ids:
-                if not self.rpc.unlink(ids):
+                try:
+                    if not self.rpc.unlink(ids):
+                        return False
+                except Exception, exception:
+                    rpc.process_exception(exception, self.window)
                     return False
             for model in self.current_view.sel_models_get():
                 self.models.remove(model)

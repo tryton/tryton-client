@@ -36,3 +36,10 @@ class Char(WidgetInterface):
         super(Char, self)._readonly_set(value)
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
+
+
+class Sha(Char):
+
+    def __init__(self, window, parent, model, attrs=None):
+        super(Sha, self).__init__(window, parent, model=model, attrs=attrs)
+        self.entry.set_visibility(False)

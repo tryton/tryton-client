@@ -80,7 +80,11 @@ class Wizard(object):
         from tryton.action import Action
         if not 'form' in datas:
             datas['form'] = {}
-        wiz_id = rpc.session.rpc_exec_auth('/wizard', 'create', action)
+        try:
+            wiz_id = rpc.execute('wizard', 'create', action)
+        except Exception, exception:
+            rpc.process_exception(exception, parent)
+            return
         dia = None
         while state != 'end':
             wizardprogress = WizardProgress(wiz_id, state, datas,
@@ -130,7 +134,10 @@ class Wizard(object):
         if dia:
             dia.destroy()
             dia = None
-        rpc.session.rpc_exec_auth('/wizard', 'delete', wiz_id)
+        try:
+            rpc.execute('wizard', 'delete', wiz_id)
+        except:
+            pass
 
 
 class WizardProgress(object):
@@ -148,10 +155,10 @@ class WizardProgress(object):
     def run(self):
 
         def start(wiz_id, datas, state, context):
-            ctx = rpc.session.context.copy()
+            ctx = rpc.CONTEXT.copy()
             ctx.update(context)
             try:
-                self.res = rpc.session.rpc_exec_auth_try('/wizard',
+                self.res = rpc.execute('wizard',
                         'execute', wiz_id, datas, state, ctx)
             except Exception, exception:
                 self.error = True
@@ -204,32 +211,5 @@ class WizardProgress(object):
             win.destroy()
             gtk.main_iteration()
         if self.exception:
-            import xmlrpclib
-            import socket
-            from tryton.pysocket import PySocketException
-            from tryton.rpc import RPCException
-            try:
-                raise self.exception
-            except socket.error, exception:
-                common.error(_('Connection refused !'), str(exception),
-                        self.parent, str(exception))
-            except xmlrpclib.Fault, err:
-                rpc_exception = RPCException(err.faultCode, err.faultString)
-                if rpc_exception.type in ('warning', 'UserError'):
-                    common.warning(rpc_exception.data, self.parent,
-                            rpc_exception.message)
-                else:
-                    common.error(_('Application Error'), err.faultCode,
-                            self.parent, err.faultString)
-            except PySocketException, err:
-                rpc_exception = RPCException(err.faultCode, err.faultString)
-                if rpc_exception.type in ('warning', 'UserError'):
-                    common.warning(rpc_exception.data, self.parent,
-                            rpc_exception.message)
-                else:
-                    common.error(_('Application Error'), err.faultCode,
-                            self.parent, err.faultString)
-            except Exception, exception:
-                common.error(_('Application Error'), _('View details'),
-                        self.parent, str(exception))
+            rpc.process_exception(self.exception, self.parent)
         return self.res

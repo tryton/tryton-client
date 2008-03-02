@@ -41,16 +41,22 @@ class Button(object):
                     common.sur(self.attrs['confirm']):
                 button_type = self.attrs.get('type', 'workflow')
                 if button_type == 'workflow':
-                    rpc.session.rpc_exec_auth('/object', 'exec_workflow',
-                                            self.form.screen.name,
-                                            self.attrs['name'], obj_id)
+                    try:
+                        rpc.execute('object', 'exec_workflow',
+                                self.form.screen.name,
+                                self.attrs['name'], obj_id)
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.form.window)
                 elif button_type == 'object':
                     if not obj_id:
                         return
-                    rpc.session.rpc_exec_auth('/object', 'execute',
-                                            self.form.screen.name,
-                                            self.attrs['name'],
-                                            [obj_id], model.context_get())
+                    try:
+                        rpc.execute('object', 'execute',
+                                self.form.screen.name,
+                                self.attrs['name'],
+                                [obj_id], model.context_get())
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.form.window)
                 elif button_type == 'action':
                     Action.execute(int(self.attrs['name']), {
                         'model': self.form.screen.name,
@@ -446,17 +452,25 @@ class ParserForm(ParserInterface):
             return False
 
         obj_id = self.screen.current_model.save(force_reload=False)
-        lang_ids = rpc.session.rpc_exec_auth('/object', 'execute', 'ir.lang',
-                'search', [('translatable','=','1')])
+        try:
+            lang_ids = rpc.execute('object', 'execute', 'ir.lang',
+                    'search', [('translatable','=','1')])
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
 
         if not lang_ids:
             common.message(_('No other language available!'),
                     parent=self.window)
             return False
-        langs = rpc.session.rpc_exec_auth('/object', 'execute', 'ir.lang',
-                'read', lang_ids, ['code', 'name'])
+        try:
+            langs = rpc.execute('object', 'execute', 'ir.lang',
+                    'read', lang_ids, ['code', 'name'])
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
 
-        code = rpc.session.context.get('language', 'en_US')
+        code = rpc.CONTEXT.get('language', 'en_US')
 
         #change 'en' to false for context
         def adapt_context(val):
@@ -538,10 +552,14 @@ class ParserForm(ParserInterface):
         table.set_border_width(1)
         i = 0
         for lang in langs:
-            context = copy.copy(rpc.session.context)
+            context = copy.copy(rpc.CONTEXT)
             context['language'] = adapt_context(lang['code'])
-            val = rpc.session.rpc_exec_auth('/object', 'execute', model,
-                    'read', [obj_id], [name], context)
+            try:
+                val = rpc.execute('/object', 'execute', model,
+                        'read', [obj_id], [name], context)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False
             val = val[0]
             if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
                 label = gtk.Label(_(':') + lang['name'])
@@ -586,11 +604,14 @@ class ParserForm(ParserInterface):
                 #update form field
                 if new_val['code'] == code:
                     value_set(widget_entry, new_val['value'])
-                context = copy.copy(rpc.session.context)
+                context = copy.copy(rpc.CONTEXT)
                 context['language'] = adapt_context(new_val['code'])
-                rpc.session.rpc_exec_auth('/object', 'execute', model,
-                        'write', [obj_id], {str(name):  new_val['value']},
-                        context)
+                args = ('object', 'execute', model, 'write', [obj_id],
+                        {str(name):  new_val['value']}, context)
+                try:
+                    rpc.execute(*args)
+                except Exception, exception:
+                    rpc.process_exception(exception, self.window, *args)
         if response == gtk.RESPONSE_CANCEL:
             self.window.present()
             win.destroy()
@@ -604,7 +625,7 @@ from calendar import Calendar, DateTime
 from float import Float
 from integer import Integer
 from selection import Selection
-from char import Char
+from char import Char, Sha
 from float_time import FloatTime
 from checkbox import CheckBox
 from reference import Reference
@@ -625,6 +646,7 @@ WIDGETS_TYPE = {
     'integer': (Integer, 1, False, False),
     'selection': (Selection, 1, False, False),
     'char': (Char, 1, False, False),
+    'sha': (Sha, 1, False, False),
     'float_time': (FloatTime, 1, False, False),
     'boolean': (CheckBox, 1, False, False),
     'reference': (Reference, 1, False, False),

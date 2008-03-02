@@ -9,9 +9,10 @@ _ = gettext.gettext
 
 class ViewTreeSC(object):
 
-    def __init__(self, tree, model):
+    def __init__(self, tree, model, window):
         self.model = model
         self.tree = tree
+        self.window = window
         self.tree.get_selection().set_mode('single')
         column = gtk.TreeViewColumn (_('ID'), gtk.CellRendererText(), text=0)
         self.tree.append_column(column)
@@ -25,10 +26,14 @@ class ViewTreeSC(object):
     def update(self):
         store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING,
                 gobject.TYPE_STRING)
-        user =  rpc.session.user
-        view_sc = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                'ir.ui.view_sc', 'get_sc', user, self.model,
-                rpc.session.context)
+        user =  rpc._USER
+        try:
+            view_sc = rpc.execute('object', 'execute',
+                    'ir.ui.view_sc', 'get_sc', user, self.model,
+                    rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return
         for shortcut in view_sc:
             num = store.append()
             store.set(num, 0, shortcut['res_id'], 1, shortcut['name'],

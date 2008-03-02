@@ -42,11 +42,12 @@ class ModelList(list):
 
 class ModelRecordGroup(SignalEvent):
 
-    def __init__(self, resource, fields, ids=None, parent=None, context=None):
+    def __init__(self, resource, fields, window, ids=None, parent=None, context=None):
         super(ModelRecordGroup, self).__init__()
+        self.window = window
         self.parent = parent
         self._context = context or {}
-        self._context.update(rpc.session.context)
+        self._context.update(rpc.CONTEXT)
         self.resource = resource
         self.rpc = RPCProxy(resource)
         self.fields = fields
@@ -74,7 +75,11 @@ class ModelRecordGroup(SignalEvent):
     def writen(self, edited_id):
         if not self.on_write:
             return
-        new_ids = getattr(self.rpc, self.on_write)(edited_id, self.context)
+        try:
+            new_ids = getattr(self.rpc, self.on_write)(edited_id, self.context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return
         model_idx = self.models.index(self[edited_id])
         result = False
         for new_id in new_ids:
@@ -85,7 +90,7 @@ class ModelRecordGroup(SignalEvent):
                     model.reload()
             if cont:
                 continue
-            newmod = ModelRecord(self.resource, new_id,
+            newmod = ModelRecord(self.resource, new_id, self.window,
                     parent=self.parent, group=self)
             newmod.reload()
             if not result:
@@ -100,7 +105,7 @@ class ModelRecordGroup(SignalEvent):
         if len(ids)>10:
             self.models.lock_signal = True
         for obj_id in ids:
-            newmod = ModelRecord(self.resource, obj_id,
+            newmod = ModelRecord(self.resource, obj_id, self.window,
                     parent=self.parent, group=self)
             self.model_add(newmod)
             if display:
@@ -114,7 +119,7 @@ class ModelRecordGroup(SignalEvent):
         if len(values)>10:
             self.models.lock_signal = True
         for value in values:
-            newmod = ModelRecord(self.resource, value['id'],
+            newmod = ModelRecord(self.resource, value['id'], self.window,
                     parent=self.parent, group=self)
             newmod.set(value)
             self.models.append(newmod)
@@ -128,9 +133,13 @@ class ModelRecordGroup(SignalEvent):
             return True
         if not self.fields:
             return self.pre_load(ids, display)
-        ctx = rpc.session.context.copy()
+        ctx = rpc.CONTEXT.copy()
         ctx.update(self.context)
-        values = self.rpc.read(ids, self.fields.keys(), ctx)
+        try:
+            values = self.rpc.read(ids, self.fields.keys(), ctx)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
         if not values:
             return False
         newmod = False
@@ -171,7 +180,7 @@ class ModelRecordGroup(SignalEvent):
         return model
 
     def model_new(self, default=True, domain=None, context=None):
-        newmod = ModelRecord(self.resource, None, group=self,
+        newmod = ModelRecord(self.resource, None, self.window, group=self,
                 parent=self.parent, new=True)
         newmod.signal_connect(self, 'record-changed', self._record_changed)
         if default:
@@ -253,9 +262,13 @@ class ModelRecordGroup(SignalEvent):
                 new.append(model)
         ctx = context.copy()
         if len(old) and len(to_add):
-            ctx.update(rpc.session.context)
+            ctx.update(rpc.CONTEXT)
             ctx.update(self.context)
-            values = self.rpc.read(old, to_add, ctx)
+            try:
+                values = self.rpc.read(old, to_add, ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False
             if values:
                 for value in values:
                     value_id = value['id']
@@ -264,7 +277,11 @@ class ModelRecordGroup(SignalEvent):
                     self[value_id].set(value, signal=False)
         if len(new) and len(to_add):
             ctx.update(self.context)
-            values = self.rpc.default_get(to_add, ctx)
+            try:
+                values = self.rpc.default_get(to_add, ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False
             for field_to_add in to_add:
                 if field_to_add not in values:
                     values[field_to_add] = False

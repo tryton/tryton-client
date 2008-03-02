@@ -57,9 +57,13 @@ class Many2Many(WidgetInterface):
         domain = self._view.modelfield.domain_get(self._view.model)
         context = self._view.modelfield.context_get(self._view.model)
 
-        ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                self.attrs['relation'], 'name_search',
-                self.wid_text.get_text(), domain, 'ilike', context)
+        try:
+            ids = rpc.execute('object', 'execute',
+                    self.attrs['relation'], 'name_search',
+                    self.wid_text.get_text(), domain, 'ilike', context)
+        except Exception, exception:
+            rpc.process_exception(exception, self._window)
+            return False
         ids = [x[0] for x in ids]
         if len(ids) != 1:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,

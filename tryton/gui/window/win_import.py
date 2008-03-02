@@ -74,10 +74,13 @@ class WinImport(object):
                     self.fields[prefix_node+field] = st_name
                     self.fields_invert[st_name] = prefix_node+field
                     if fields[field]['type'] == 'one2many' and level > 0:
-                        fields2 = rpc.session.rpc_exec_auth('/object',
-                                'execute', fields[field]['relation'],
-                                'fields_get', False,
-                                rpc.session.context)
+                        try:
+                            fields2 = rpc.execute('object',
+                                    'execute', fields[field]['relation'],
+                                    'fields_get', False, rpc.CONTEXT)
+                        except Exception, exception:
+                            rpc.process_exception(exception, self.win)
+                            continue
                         model_populate(fields2, prefix_node+field+'/', node,
                                 st_name+'/', level-1)
         model_populate(fields)
@@ -196,11 +199,10 @@ class WinImport(object):
             datas.append([x.decode(csv_data['combo']).encode('utf-8') \
                     for x in line])
         try:
-            res = rpc.session.rpc_exec_auth('/object', 'execute',
+            res = rpc.execute('object', 'execute',
                     model, 'import_data', fields, datas)
         except Exception, exception:
-            common.warning(str(exception), self.parent,
-                    _('XML-RPC error!'))
+            rpc.process_exception(exception, self.win)
             return False
         if res[0] >= 0:
             common.message(_('Imported %d objects!') % (res[0],), self.parent)

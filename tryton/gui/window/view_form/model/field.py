@@ -168,7 +168,10 @@ class M2OField(CharField):
     def set(self, model, value, test_state=False, modified=False):
         if value and isinstance(value, (int, str, unicode, long)):
             rpc2 = RPCProxy(self.attrs['relation'])
-            result = rpc2.name_get([value], rpc.session.context)
+            try:
+                result = rpc2.name_get([value], rpc.CONTEXT)
+            except:
+                return
             model.value[self.name] = result[0]
         else:
             model.value[self.name] = value
@@ -235,8 +238,8 @@ class O2MField(CharField):
 
     def create(self, model):
         from group import ModelRecordGroup
-        mod = ModelRecordGroup(resource=self.attrs['relation'],
-                fields={}, parent=model)
+        mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
+                parent=model)
         mod.signal_connect(mod, 'model-changed', self._model_changed)
         return mod
 
@@ -268,8 +271,8 @@ class O2MField(CharField):
 
     def set(self, model, value, test_state=False, modified=False):
         from group import ModelRecordGroup
-        mod =  ModelRecordGroup(resource=self.attrs['relation'],
-                fields={}, parent=model)
+        mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
+                parent=model)
         mod.signal_connect(mod, 'model-changed', self._model_changed)
         model.value[self.name] = mod
         #self.internal.signal_connect(self.internal, 'model-changed',
@@ -288,10 +291,13 @@ class O2MField(CharField):
         if value and len(value):
             context = self.context_get(model)
             rpc2 = RPCProxy(self.attrs['relation'])
-            fields = rpc2.fields_get(value[0].keys(), context)
+            try:
+                fields = rpc2.fields_get(value[0].keys(), context)
+            except:
+                return False
 
         model.value[self.name] = ModelRecordGroup(
-                resource=self.attrs['relation'], fields=fields, parent=model)
+                self.attrs['relation'], fields, model.window, parent=model)
         model.value[self.name].signal_connect(model.value[self.name],
                 'model-changed', self._model_changed)
         mod = None
@@ -349,7 +355,10 @@ class ReferenceField(CharField):
             return
         ref_model, ref_id = value.split(',')
         rpc2 = RPCProxy(ref_model)
-        result = rpc2.name_get([ref_id], rpc.session.context)
+        try:
+            result = rpc2.name_get([ref_id], rpc.CONTEXT)
+        except:
+            return
         if result:
             model.value[self.name] = ref_model, result[0]
         else:
@@ -359,7 +368,8 @@ class ReferenceField(CharField):
             model.modified_fields.setdefault(self.name)
 
 TYPES = {
-    'char' : CharField,
+    'char': CharField,
+    'sha': CharField,
     'float_time': FloatField,
     'integer' : IntegerField,
     'float' : FloatField,

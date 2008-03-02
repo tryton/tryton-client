@@ -25,15 +25,27 @@ class Tree(SignalEvent):
         if context is None:
             context = {}
         if view_id:
-            view_base =  rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.ui.view', 'read', view_id,
-                    ['model', 'type'], context)
-            view = rpc.session.rpc_exec_auth('/object', 'execute',
-                    view_base['model'], 'fields_view_get', view_id,
-                    view_base['type'],context)
+            try:
+                view_base =  rpc.execute('object', 'execute',
+                        'ir.ui.view', 'read', view_id,
+                        ['model', 'type'], context)
+            except Exception, exception:
+                rpc.process_exception(exception, window)
+                raise
+            try:
+                view = rpc.execute('object', 'execute',
+                        view_base['model'], 'fields_view_get', view_id,
+                        view_base['type'],context)
+            except Exception, exception:
+                rpc.process_exception(exception, window)
+                raise
         else:
-            view = rpc.session.rpc_exec_auth('/object', 'execute', model,
+            try:
+                view = rpc.execute('object', 'execute', model,
                     'fields_view_get', False, view_type, context)
+            except Exception, exception:
+                rpc.process_exception(exception, window)
+                raise
 
         self.glade = glade.XML(GLADE, 'win_tree_container',
                 gettext.textdomain())
@@ -50,7 +62,7 @@ class Tree(SignalEvent):
 
         self.context = context
 
-        self.tree_res = ViewTree(view, [], True,
+        self.tree_res = ViewTree(view, [], self.window, True,
                 context=context)
         self.tree_res.view.connect('row-activated', self.sig_activate)
         self.tree_res.view.connect('key_press_event', self.sig_key_press)
@@ -70,7 +82,7 @@ class Tree(SignalEvent):
         widget_sc = self.glade.get_widget('win_tree_sc')
 
         widget_sc.connect('row-activated', self.sc_go)
-        self.tree_sc = ViewTreeSC(widget_sc, self.model)
+        self.tree_sc = ViewTreeSC(widget_sc, self.model, self.window)
         self.handlers = {
             'but_reload': self.sig_reload,
             'but_switch': self.sig_edit,
@@ -91,8 +103,12 @@ class Tree(SignalEvent):
             self.glade.signal_connect(signal, signals[signal])
 
     def sig_reload(self, widget=None):
-        ids = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                'search', self.domain2)
+        try:
+            ids = rpc.execute('object', 'execute', self.model,
+                    'search', self.domain2)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return
         if self.tree_res.toolbar:
 
             icon_name = 'icon'
@@ -100,9 +116,13 @@ class Tree(SignalEvent):
             for child in wid.get_children():
                 wid.remove(child)
             ctx = {}
-            ctx.update(rpc.session.context)
-            results = rpc.session.rpc_exec_auth_try('/object', 'execute',
-                    self.view['model'], 'read', ids, ['name', icon_name], ctx)
+            ctx.update(rpc.CONTEXT)
+            try:
+                results = rpc.execute('object', 'execute',
+                        self.view['model'], 'read', ids, ['name', icon_name], ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return
             radiotb = None
             for res in results:
                 radiotb = gtk.RadioToolButton(group=radiotb)
@@ -141,9 +161,13 @@ class Tree(SignalEvent):
         if widget.get_active():
             obj_id = widget.get_data('id')
 
-            ids = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                    'read', obj_id, [self.view['field_childs']])\
-                            [self.view['field_childs']]
+            try:
+                ids = rpc.execute('object', 'execute', self.model,
+                        'read', obj_id, [self.view['field_childs']])\
+                                [self.view['field_childs']]
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False
 
             self.tree_res.ids = ids
             self.tree_res.reload()
@@ -208,24 +232,30 @@ class Tree(SignalEvent):
         obj_id = self.tree_sc.sel_id_get()
         if obj_id != None:
             sc_id = int(self.tree_sc.value_get(2))
-            rpc.session.rpc_exec_auth('/object', 'execute', 'ir.ui.view_sc',
-                    'unlink', [sc_id])
+            try:
+                rpc.execute('object', 'execute', 'ir.ui.view_sc',
+                        'unlink', [sc_id])
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
         self.tree_sc.update()
 
     def sc_add(self, widget):
         ids = self.ids_get()
         if len(ids):
-            res = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                    'name_get', ids, rpc.session.context)
-            for (obj_id, name) in res:
-                user = rpc.session.user
-                rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.ui.view_sc', 'create', {
-                            'resource': self.model,
-                            'user_id': user,
-                            'res_id': obj_id,
-                            'name': name,
-                            })
+            try:
+                res = rpc.execute('object', 'execute', self.model,
+                        'name_get', ids, rpc.CONTEXT)
+                for (obj_id, name) in res:
+                    user = rpc._USER
+                    rpc.execute('object', 'execute',
+                            'ir.ui.view_sc', 'create', {
+                                'resource': self.model,
+                                'user_id': user,
+                                'res_id': obj_id,
+                                'name': name,
+                                })
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
         self.tree_sc.update()
 
     def sc_go(self, widget=None, *args):

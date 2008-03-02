@@ -56,6 +56,7 @@ class Dialog(object):
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         scroll.add(viewport)
 
+        self.dia.show_all()
         self.screen = Screen(model_name, view_type=[], parent=parent,
                 window=self.dia)
         self.screen.models._context.update(model_ctx)
@@ -74,8 +75,8 @@ class Dialog(object):
         viewport.add(self.screen.widget)
         width, height = self.screen.screen_container.size_get()
         viewport.set_size_request(width, height + 30)
-        self.dia.show_all()
         self.screen.display()
+        self.dia.show_all()
 
     def new(self):
         model = self.screen.new(context=self.default_get_ctx)

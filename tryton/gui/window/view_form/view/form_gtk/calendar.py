@@ -176,11 +176,11 @@ class DateTime(WidgetInterface):
                 locale.D_FMT).replace('%y', '%Y') + ' ' + HM_FORMAT)
         except:
             return False
-        if 'timezone' in rpc.session.context and timezone:
+        if 'timezone' in rpc.CONTEXT and timezone:
             try:
                 import pytz
-                lzone = pytz.timezone(rpc.session.context['timezone'])
-                szone = pytz.timezone(rpc.session.timezone)
+                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                szone = pytz.timezone(rpc.TIMEZONE)
                 datetime = DT.datetime(date[0], date[1], date[2], date[3],
                         date[4], date[5], date[6])
                 ldt = lzone.localize(datetime, is_dst=True)
@@ -205,11 +205,11 @@ class DateTime(WidgetInterface):
             self.entry.set_text('')
         else:
             date = time.strptime(dt_val, DHM_FORMAT)
-            if 'timezone' in rpc.session.context and timezone:
+            if 'timezone' in rpc.CONTEXT and timezone:
                 try:
                     import pytz
-                    lzone = pytz.timezone(rpc.session.context['timezone'])
-                    szone = pytz.timezone(rpc.session.timezone)
+                    lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                    szone = pytz.timezone(rpc.TIMEZONE)
                     datetime = DT.datetime(date[0], date[1], date[2], date[3],
                             date[4], date[5], date[6])
                     sdt = szone.localize(datetime, is_dst=True)

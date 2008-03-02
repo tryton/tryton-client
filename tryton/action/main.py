@@ -22,16 +22,23 @@ class Action(object):
         ids = datas['ids']
         del datas['ids']
         if not ids:
-            ids =  rpc.session.rpc_exec_auth('/object', 'execute',
-                    datas['model'], 'search', [])
+            try:
+                ids =  rpc.execute('object', 'execute', datas['model'],
+                        'search', [])
+            except Exception, exception:
+                rpc.process_exception(exception, Main.get_main().window)
+                return False
             if ids == []:
                 message(_('Nothing to print!'), Main.get_main().window)
                 return False
             datas['id'] = ids[0]
-        ctx = rpc.session.context.copy()
+        ctx = rpc.CONTEXT.copy()
         ctx.update(context)
-        res = rpc.session.rpc_exec_auth('/report', 'execute', name,
-                ids, datas, ctx)
+        try:
+            res = rpc.execute('report', 'execute', name, ids, datas, ctx)
+        except Exception, exception:
+            rpc.process_exception(exception, Main.get_main().window)
+            return False
         if not res:
             return False
         (type, data) = res
@@ -44,20 +51,34 @@ class Action(object):
 
     @staticmethod
     def execute(act_id, datas, action_type=None, context=None):
+        from tryton.gui import Main
         if context is None:
             context = {}
-        ctx = rpc.session.context.copy()
+        ctx = rpc.CONTEXT.copy()
         ctx.update(context)
         if not action_type:
-            res = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.action', 'read', act_id, ['type'], ctx)
+            res = False
+            try:
+                res = rpc.execute('object', 'execute', 'ir.action', 'read',
+                        act_id, ['type'], ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, Main.get_main().window)
+                return
             if not res:
                 raise Exception, 'ActionNotFound'
             action_type = res['type']
-        act_id2 = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
+        try:
+            act_id2 = rpc.execute('object', 'execute', action_type,
                 'search', [('action', '=', act_id)], 0, None, None, ctx)[0]
-        res = rpc.session.rpc_exec_auth('/object', 'execute', action_type,
+        except Exception, exception:
+            rpc.process_exception(exception, Main.get_main().window)
+            return
+        try:
+            res = rpc.execute('object', 'execute', action_type,
                 'read', act_id2, False, ctx)
+        except Exception, exception:
+            rpc.process_exception(exception, Main.get_main().window)
+            return
         Action._exec_action(res, datas)
 
     @staticmethod
@@ -100,7 +121,7 @@ class Action(object):
             ctx = {
                     'active_id': datas.get('id',False),
                     'active_ids': datas.get('ids',[]),
-                    'user': rpc.session.user,
+                    'user': rpc._USER,
                     }
             ctx.update(eval(action.get('context','{}'), ctx.copy()))
             ctx.update(context)
@@ -126,17 +147,17 @@ class Action(object):
 
     @staticmethod
     def exec_keyword(keyword, data=None, context=None, warning=True):
+        from tryton.gui import Main
         actions = []
         if 'id' in data:
+            model_id = data.get('id', False)
             try:
-                model_id = data.get('id', False)
-                actions = rpc.session.rpc_exec_auth('/object', 'execute',
+                actions = rpc.execute('object', 'execute',
                         'ir.action.keyword', 'get_keyword', keyword,
                         (data['model'], model_id))
-            except rpc.RPCException, exp:
+            except Exception, exception:
                 from tryton.gui import Main
-                error(_('Error: ')+str(exp.type), exp.message,
-                        Main.get_main().window, exp.data)
+                rpc.process_exception(exception, Main.get_main().window)
                 return False
 
         keyact = {}

@@ -145,8 +145,13 @@ class Many2One(WidgetInterface):
         self.completion = gtk.EntryCompletion()
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         if attrs.get('completion', False):
-            ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.attrs['relation'], 'name_search', '', [], 'ilike', {})
+            try:
+                ids = rpc.execute('object', 'execute',
+                        self.attrs['relation'], 'name_search', '', [],
+                        'ilike', {})
+            except Exception, exception:
+                rpc.process_exception(exception, self._window)
+                ids = []
             if ids:
                 self.load_completion(ids)
 
@@ -180,9 +185,13 @@ class Many2One(WidgetInterface):
         name = model[iter][1]
         domain = self._view.modelfield.domain_get(self._view.model)
         context = self._view.modelfield.context_get(self._view.model)
-        ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                self.attrs['relation'], 'name_search', name, domain, 'ilike',
-                context)
+        try:
+            ids = rpc.execute('object', 'execute',
+                    self.attrs['relation'], 'name_search', name, domain, 'ilike',
+                    context)
+        except Exception, exception:
+            rpc.process_exception(exception, self._window)
+            return False
         if len(ids)==1:
             self._view.modelfield.set_client(self._view.model, ids[0])
             self.display(self._view.model, self._view.modelfield)
@@ -192,13 +201,15 @@ class Many2One(WidgetInterface):
                     domain=domain, window=self._window)
             ids = win.go()
             if ids:
-                name = rpc.session.rpc_exec_auth('/object', 'execute',
-                        self.attrs['relation'], 'name_get', [ids[0]],
-                        rpc.session.context)[0]
+                try:
+                    name = rpc.execute('object', 'execute',
+                            self.attrs['relation'], 'name_get', [ids[0]],
+                            rpc.CONTEXT)[0]
+                except Exception, exception:
+                    rpc.process_exception(exception, self._window)
+                    return False
                 self._view.modelfield.set_client(self._view.model, name)
         return True
-
-
 
     def _readonly_set(self, value):
         self._readonly = value
@@ -221,9 +232,15 @@ class Many2One(WidgetInterface):
                 context = self._view.modelfield.context_get(self._view.model)
                 self.wid_text.grab_focus()
 
-                ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                        self.attrs['relation'], 'name_search',
-                        self.wid_text.get_text(), domain, 'ilike', context)
+                try:
+                    ids = rpc.execute('object', 'execute',
+                            self.attrs['relation'], 'name_search',
+                            self.wid_text.get_text(), domain, 'ilike', context)
+                except Exception, exception:
+                    self.focus_out = True
+                    rpc.process_exception(exception, self._window)
+                    self.changed = True
+                    return False
                 if len(ids)==1:
                     self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
@@ -236,9 +253,15 @@ class Many2One(WidgetInterface):
                         domain=domain, parent=self._window)
                 ids = win.run()
                 if ids:
-                    name = rpc.session.rpc_exec_auth('/object', 'execute',
-                            self.attrs['relation'], 'name_get', [ids[0]],
-                            rpc.session.context)[0]
+                    try:
+                        name = rpc.execute('object', 'execute',
+                                self.attrs['relation'], 'name_get', [ids[0]],
+                                rpc.CONTEXT)[0]
+                    except Exception, exception:
+                        self.focus_out = True
+                        rpc.process_exception(exception, self._window)
+                        self.changed = True
+                        return False
                     self._view.modelfield.set_client(self._view.model, name,
                             force_change=True)
         self.focus_out = True
@@ -277,9 +300,15 @@ class Many2One(WidgetInterface):
                 context = self._view.modelfield.context_get(self._view.model)
                 self.wid_text.grab_focus()
 
-                ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                        self.attrs['relation'], 'name_search',
-                        self.wid_text.get_text(), domain, 'ilike', context)
+                try:
+                    ids = rpc.execute('object', 'execute',
+                            self.attrs['relation'], 'name_search',
+                            self.wid_text.get_text(), domain, 'ilike', context)
+                except Exception, exception:
+                    self.focus_out = True
+                    rpc.process_exception(exception, self._window)
+                    self.changed = True
+                    return False
                 if ids and len(ids)==1:
                     self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
@@ -292,9 +321,15 @@ class Many2One(WidgetInterface):
                         domain=domain, parent=self._window)
                 ids = win.run()
                 if ids:
-                    name = rpc.session.rpc_exec_auth('/object', 'execute',
-                            self.attrs['relation'], 'name_get', [ids[0]],
-                            rpc.session.context)[0]
+                    try:
+                        name = rpc.execute('object', 'execute',
+                                self.attrs['relation'], 'name_get', [ids[0]],
+                                rpc.CONTEXT)[0]
+                    except Exception, exception:
+                        self.focus_out = True
+                        rpc.process_exception(exception, self._window)
+                        self.changed = True
+                        return False
                     self._view.modelfield.set_client(self._view.model, name,
                             force_change=True)
         self.focus_out = True
@@ -349,7 +384,7 @@ class Many2One(WidgetInterface):
         value = self._view.modelfield.get(self._view.model)
         ir_action_keyword = RPCProxy('ir.action.keyword')
         relates = ir_action_keyword.get_keyword('form_relate',
-                (self.model_type, 0), rpc.session.context)
+                (self.model_type, 0), rpc.CONTEXT)
         menu_entries = []
         menu_entries.append((None, None, None))
         menu_entries.append((_('Actions'),

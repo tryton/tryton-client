@@ -178,7 +178,7 @@ class ViewForm(ParserView):
 
     def display(self):
         model = self.screen.current_model
-        values = rpc.session.context.copy()
+        values = rpc.CONTEXT.copy()
         values['state'] = 'draft'
         if model:
             for field in model.mgroup.fields:

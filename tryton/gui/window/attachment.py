@@ -36,8 +36,12 @@ class Attachment(object):
         selection.set_mode(gtk.SELECTION_SINGLE)
         selection.connect('changed', self._sig_changed)
 
-        view = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.attachment', 'fields_view_get', False, 'tree')
+        try:
+            view = rpc.execute('object', 'execute',
+                    'ir.attachment', 'fields_view_get', False, 'tree')
+        except Exception, exception:
+            rpc.process_exception(exception, parent)
+            raise
 
         parse = Parse(view['fields'])
         parse.parse(view['arch'], self.view)
@@ -73,16 +77,20 @@ class Attachment(object):
         end = textview.get_buffer().get_end_iter()
         comment = textview.get_buffer().get_text(start, end)
         model, iter = self.view.get_selection().get_selected()
-        context = copy.copy(rpc.session.context)
+        context = copy.copy(rpc.CONTEXT)
         if not iter:
             common.warning(_('You must put a text comment to an attachement.'),
                     self.win, _('Text not saved!'))
             return None
         obj_id = model.get_value(iter, 0)
         if obj_id:
-            rpc.session.rpc_exec_auth('/object', 'execute',
+            args = ('object', 'execute',
                     'ir.attachment', 'write', [int(obj_id)],
                     {'description': comment}, context)
+            try:
+                rpc.execute(*args)
+            except Exception, exception:
+                rpc.process_exception(exception, self.win, *args)
         else:
             common.warning(_('You must put a text comment to an attachement.'),
                     self.win, _('Text not saved!'))
@@ -95,8 +103,11 @@ class Attachment(object):
         if obj_id:
             if common.sur(_('Are you sure you want to remove this attachment?'),
                     self.win):
-                rpc.session.rpc_exec_auth('/object', 'execute',
-                        'ir.attachment', 'unlink', [int(obj_id)])
+                try:
+                    rpc.execute('object', 'execute',
+                            'ir.attachment', 'unlink', [int(obj_id)])
+                except Exception, exception:
+                    rpc.process_exception(exception, self.win, *args)
         self.reload()
 
     def _sig_link(self, widget):
@@ -106,13 +117,19 @@ class Attachment(object):
         try:
             if filename:
                 fname = os.path.basename(filename)
-                obj_id = rpc.session.rpc_exec_auth('/object', 'execute',
+                args = ('object', 'execute',
                         'ir.attachment', 'create', {
                             'name': fname,
                             'res_model': self.ressource[0],
                             'res_id': self.ressource[1],
                             'link': filename,
                             })
+                try:
+                    obj_id = rpc.execute(*args)
+                except Exception, exception:
+                    obj_id = rpc.process_exception(exception, self.win, *args)
+                    if not obj_id:
+                        return
                 self.reload(preview=False)
                 self.preview(int(obj_id))
         except IOError:
@@ -124,8 +141,12 @@ class Attachment(object):
             return None
         obj_id = model.get_value(iter, 0)
         if obj_id:
-            data = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.attachment', 'read', int(obj_id))
+            try:
+                data = rpc.execute('object', 'execute',
+                        'ir.attachment', 'read', int(obj_id))
+            except Exception, exception:
+                rpc.process_exception(exception, self.win)
+                return None
             if not data:
                 return None
             filename = common.file_selection(_('Save As...'),
@@ -162,13 +183,19 @@ class Attachment(object):
         for filename in filenames:
             value = file(filename, 'rb').read()
             name = os.path.basename(filename)
-            obj_id = rpc.session.rpc_exec_auth('/object', 'execute',
+            args = ('object', 'execute',
                     'ir.attachment', 'create', {
                         'name': name,
                         'datas': base64.encodestring(value),
                         'res_model': self.ressource[0],
                         'res_id': self.ressource[1],
                         })
+            try:
+                obj_id = rpc.execute(*args)
+            except Exception, exception:
+                obj_id = rpc.process_exception(exception, self.win, *args)
+                if not obj_id:
+                    return
             self.reload(preview=False)
             self.preview(int(obj_id))
 
@@ -183,8 +210,12 @@ class Attachment(object):
         iter = self.model.get_iter(path)
         obj_id = self.model.get_value(iter, 0)
         if obj_id:
-            data = rpc.session.rpc_exec_auth('/object', 'execute',
-                    'ir.attachment', 'read', int(obj_id))
+            try:
+                data = rpc.execute('object', 'execute',
+                        'ir.attachment', 'read', int(obj_id))
+            except Exception, exception:
+                rpc.process_exception(exception, self.win)
+                return None
             if not data:
                 return None
             file_name = data['link']
@@ -199,8 +230,12 @@ class Attachment(object):
             common.file_open(file_name, ext, self.parent)
 
     def preview(self, obj_id):
-        data = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.attachment', 'read', obj_id)
+        try:
+            data = rpc.execute('object', 'execute',
+                    'ir.attachment', 'read', obj_id)
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return None
         if not data:
             return None
 
@@ -254,14 +289,22 @@ class Attachment(object):
 
     def reload(self, preview=True):
         self.model.clear()
-        ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.attachment', 'search', [
-                    ('res_model', '=', self.ressource[0]),
-                    ('res_id', '=', self.ressource[1]),
-                    ])
-        res_ids = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.attachment', 'read', ids,
-                self.fields_order + ['link'])
+        try:
+            ids = rpc.execute('object', 'execute',
+                    'ir.attachment', 'search', [
+                        ('res_model', '=', self.ressource[0]),
+                        ('res_id', '=', self.ressource[1]),
+                        ])
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return
+        try:
+            res_ids = rpc.execute('object', 'execute',
+                    'ir.attachment', 'read', ids,
+                    self.fields_order + ['link'])
+        except Exception, exception:
+            rpc.process_exception(exception, self.win)
+            return
         for res in res_ids:
             num = self.model.append()
             args = []

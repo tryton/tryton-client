@@ -23,8 +23,9 @@ class EvalEnvironment(object):
 
 class ModelRecord(SignalEvent):
 
-    def __init__(self, resource, obj_id, group=None, parent=None, new=False ):
+    def __init__(self, resource, obj_id, window, group=None, parent=None, new=False ):
         super(ModelRecord, self).__init__()
+        self.window = window
         self.resource = resource
         self.rpc = RPCProxy(self.resource)
         self.id = obj_id
@@ -88,7 +89,13 @@ class ModelRecord(SignalEvent):
         self._check_load()
         if not self.id:
             value = self.get(get_readonly=False)
-            self.id = self.rpc.create(value, self.context_get())
+            try:
+                self.id = self.rpc.create(value, self.context_get())
+            except Exception, exception:
+                rpc.process_exception(exception, self.window, 'object',
+                        'execute', self.resource, 'create', value,
+                        self.context_get())
+                return False
         else:
             if not self.is_modified():
                 return self.id
@@ -97,8 +104,13 @@ class ModelRecord(SignalEvent):
             context = context.copy()
             #XXX must compute delta on server side
             context['read_delta'] = time.time() - self.read_time
-            if not rpc.session.rpc_exec_auth('/object', 'execute',
-                    self.resource, 'write', [self.id], value, context):
+            args = ('object', 'execute', self.resource, 'write',
+                    [self.id], value, context)
+            try:
+                if not rpc.execute(*args):
+                    return False
+            except Exception, exception:
+                rpc.process_exception(exception, self.window, *args)
                 return False
         self._loaded = False
         if force_reload:
@@ -109,7 +121,11 @@ class ModelRecord(SignalEvent):
         if domain is None:
             domain = []
         if len(self.mgroup.fields):
-            val = self.rpc.default_get(self.mgroup.fields.keys(), context)
+            try:
+                val = self.rpc.default_get(self.mgroup.fields.keys(), context)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return
             for clause in domain:
                 if clause[0] in self.mgroup.fields:
                     if clause[1] == '=':
@@ -119,7 +135,11 @@ class ModelRecord(SignalEvent):
             self.set_default(val)
 
     def name_get(self):
-        name = self.rpc.name_get([self.id], rpc.session.context)[0]
+        try:
+            name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
         return name
 
     def validate_set(self):
@@ -187,9 +207,13 @@ class ModelRecord(SignalEvent):
     def reload(self):
         if not self.id:
             return
-        ctx = rpc.session.context.copy()
+        ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
-        res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
+        try:
+            res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return
         if res:
             value = res[0]
             self.read_time = time.time()
@@ -218,26 +242,38 @@ class ModelRecord(SignalEvent):
         for arg in attr:
             args[arg] = self.expr_eval(arg)
         ids = self.id and [self.id] or []
-        res = getattr(self.rpc, 'on_change_' + field)(ids, args,
-                rpc.session.context)
+        try:
+            res = getattr(self.rpc, 'on_change_' + field)(ids, args,
+                    rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return
         if res:
             self.set(res, modified=True)
         self.signal('record-changed')
 
     def cond_default(self, field_name, value):
         ir_default = RPCProxy('ir.default')
-        ctx = rpc.session.context.copy()
+        ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
-        self.set_default(ir_default.get_default(self.resource,
-            field_name + '=' + str(value), ctx))
+        try:
+            self.set_default(ir_default.get_default(self.resource,
+                field_name + '=' + str(value), ctx))
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
 
     def get_attachment_count(self, reload=False):
         if not self.id:
             return 0
         if self.attachment_count < 0 or reload:
             ir_attachment = RPCProxy('ir.attachment')
-            self.attachment_count = ir_attachment.search_count([
-                ('res_model', '=', self.resource),
-                ('res_id', '=', self.id),
-                ])
+            try:
+                self.attachment_count = ir_attachment.search_count([
+                    ('res_model', '=', self.resource),
+                    ('res_id', '=', self.id),
+                    ])
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return 0
         return self.attachment_count

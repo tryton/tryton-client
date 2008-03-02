@@ -13,15 +13,23 @@ class Action(WidgetInterface):
         super(Action, self).__init__(window, parent, model, attrs)
 
         self.act_id = attrs['name']
-        res = rpc.session.rpc_exec_auth('/object', 'execute',
-                'ir.actions.actions', 'read', [self.act_id], ['type'],
-                rpc.session.context)
+        try:
+            res = rpc.execute('object', 'execute',
+                    'ir.actions.actions', 'read', [self.act_id], ['type'],
+                    rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, self._window)
+            raise
         if not res:
             raise Exception('ActionNotFound')
 
         atype = res[0]['type']
-        self.action = rpc.session.rpc_exec_auth('/object', 'execute', atype,
-                'read', self.act_id, False, rpc.session.context)
+        try:
+            self.action = rpc.execute('object', 'execute', atype,
+                    'read', self.act_id, False, rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, self._window)
+            raise
         if 'view_mode' in attrs:
             self.action['view_mode'] = attrs['view_mode']
 
@@ -85,9 +93,13 @@ class Action(WidgetInterface):
         return True
 
     def display(self, model, model_field):
-        res_id = rpc.session.rpc_exec_auth('/object', 'execute',
-                self.action['res_model'], 'search', self.domain, 0,
-                self.action.get('limit', 80))
+        try:
+            res_id = rpc.execute('object', 'execute',
+                    self.action['res_model'], 'search', self.domain, 0,
+                    self.action.get('limit', 80))
+        except Exception, exception:
+            rpc.process_exception(exception, self._window)
+            return False
         self.screen.clear()
         self.screen.load(res_id)
         return True

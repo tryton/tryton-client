@@ -168,9 +168,13 @@ class ViewList(ParserView):
             if path[1]._type == 'many2one':
                 value = model[path[1].name].get(model)
                 ir_action_keyword = RPCProxy('ir.action.keyword')
-                relates = ir_action_keyword.get_keyword('form_relate',
-                        (self.screen.fields[path[1].name]['relation'], 0),
-                        rpc.session.context)
+                try:
+                    relates = ir_action_keyword.get_keyword('form_relate',
+                            (self.screen.fields[path[1].name]['relation'], 0),
+                            rpc.CONTEXT)
+                except Exception, exception:
+                    rpc.process_exception(exception, self.window)
+                    return False
                 menu_entries = []
                 menu_entries.append((None, None, None))
                 menu_entries.append((_('Actions'),

@@ -30,14 +30,22 @@ class Preference(object):
 
         user = RPCProxy('res.user')
 
-        res = user.get_preferences_fields_view(rpc.session.context)
+        try:
+            res = user.get_preferences_fields_view(rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, parent)
+            raise
         arch = res['arch']
         fields = res['fields']
         self.screen = Screen('res.user', view_type=[], window=self.win)
         self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
 
-        preferences = user.get_preferences(False, rpc.session.context)
+        try:
+            preferences = user.get_preferences(False, rpc.CONTEXT)
+        except Exception, exception:
+            rpc.process_exception(exception, parent)
+            raise
         self.screen.current_model.set(preferences)
 
         width, height = self.screen.screen_container.size_get()
@@ -57,7 +65,11 @@ class Preference(object):
                 if self.screen.current_model.validate():
                     val = copy.copy(self.screen.get())
                     user = RPCProxy('res.user')
-                    user.set_preferences(val, rpc.session.context)
+                    try:
+                        user.set_preferences(val, rpc.CONTEXT)
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.win)
+                        break
                     res = True
                     break
             else:
