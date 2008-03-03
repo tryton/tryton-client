@@ -219,7 +219,8 @@ class Screen(SignalEvent):
     def add_view_custom(self, arch, fields, display=False, toolbar=None):
         return self.add_view(arch, fields, display, True, toolbar=toolbar)
 
-    def add_view_id(self, view_id, view_type, display=False, context=None):
+    def add_view_id(self, view_id, view_type, display=False,
+            exclude_field=None, context=None):
         if view_type in self.views_preload:
             return self.add_view(self.views_preload[view_type]['arch'],
                     self.views_preload[view_type]['fields'], display,
@@ -232,6 +233,9 @@ class Screen(SignalEvent):
             except Exception, exception:
                 rpc.process_exception(exception, self.window)
                 raise
+            if exclude_field:
+                if exclude_field in view['fields']:
+                    del view['fields'][exclude_field]
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 

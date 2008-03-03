@@ -67,10 +67,14 @@ class Dialog(object):
         if ('views' in attrs) and ('form' in attrs['views']):
             arch = attrs['views']['form']['arch']
             fields = attrs['views']['form']['fields']
+            if attrs.get('relation_field', False) \
+                    and attrs['relation_field'] in fields:
+                del fields[attrs['relation_field']]
             self.screen.add_view(arch, fields, display=True,
                     context=default_get_ctx)
         else:
             self.screen.add_view_id(False, 'form', display=True,
+                    exclude_field=attrs.get('relation_field', None),
                     context=default_get_ctx)
         viewport.add(self.screen.widget)
         width, height = self.screen.screen_container.size_get()
