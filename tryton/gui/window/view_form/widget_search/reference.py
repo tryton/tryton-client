@@ -1,6 +1,7 @@
 import gtk
 import gettext
 from interface import Interface
+import tryton.rpc as rpc
 
 _ = gettext.gettext
 
@@ -13,8 +14,27 @@ class Reference(Interface):
         super(Reference, self).__init__(name, parent, attrs)
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(False)
-        self.set_popdown(attrs.get('selection', []))
         self._selection = {}
+        selection = attrs.get('selection', [])
+        if 'relation' in attrs:
+            try:
+                selection = rpc.execute('object', 'execute',
+                        attrs['relation'], 'name_search', '',
+                        attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+            except Exception, exception:
+                rpc.process_exception(exception, parent)
+                selection = []
+        else:
+            if not isinstance(selection, (list, tuple)):
+                try:
+                    selection = rpc.execute('object', 'execute',
+                            attrs['model'], selection, rpc.CONTEXT)
+                except Exception, exception:
+                    rpc.process_exception(exception, parent)
+                    selection = []
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        attrs['selection'] = selection
+        self.set_popdown(selection)
 
     def get_model(self):
         res = self.widget.child.get_text()

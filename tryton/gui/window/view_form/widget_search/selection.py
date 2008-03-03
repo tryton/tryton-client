@@ -14,13 +14,21 @@ class Selection(Interface):
         self._selection = {}
         selection = attrs.get('selection', [])
         if 'relation' in attrs:
-            selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                    attrs['relation'], 'name_search', '',
-                    attrs.get('domain', []), 'ilike', rpc.session.context)
+            try:
+                selection = rpc.execute('object', 'execute',
+                        attrs['relation'], 'name_search', '',
+                        attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+            except Exception, exception:
+                rpc.process_exception(exception, parent)
+                selection = []
         else:
             if not isinstance(selection, (list, tuple)):
-                selection = rpc.session.rpc_exec_auth('/object', 'execute',
-                        attrs['model'], selection, rpc.session.context)
+                try:
+                    selection = rpc.execute('object', 'execute',
+                            attrs['model'], selection, rpc.CONTEXT)
+                except Exception, exception:
+                    rpc.process_exception(exception, parent)
+                    selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection
         self.set_popdown(selection)
