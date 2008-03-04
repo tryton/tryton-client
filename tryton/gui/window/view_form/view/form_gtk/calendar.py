@@ -198,7 +198,7 @@ class DateTime(WidgetInterface):
         super(DateTime, self).display(model, model_field)
         if not model_field:
             return self.show(False)
-        self.show(model_field.get(model))
+        self.show(model_field.get_client(model))
 
     def show(self, dt_val, timezone=True):
         if not dt_val:

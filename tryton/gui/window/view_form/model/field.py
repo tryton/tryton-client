@@ -115,6 +115,13 @@ class SelectionField(CharField):
     pass
 
 
+class DateTimeField(CharField):
+
+    def get_client(self, model):
+        value = super(DateTimeField, self).get_client(model)
+        return value and str(value) or False
+
+
 class FloatField(CharField):
 
     def validate(self, model):
@@ -380,4 +387,5 @@ TYPES = {
     'reference' : ReferenceField,
     'selection': SelectionField,
     'boolean': IntegerField,
+    'datetime': DateTimeField,
 }
