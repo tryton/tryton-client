@@ -597,7 +597,10 @@ class Main(object):
             menu_id = self.sig_win_menu(quiet=False)
             if menu_id:
                 self.sig_home_new(quiet=True, except_id=menu_id)
-            self.secure_img.hide()
+            if rpc.SECURE:
+                self.secure_img.show()
+            else:
+                self.secure_img.hide()
             self.request_set()
         elif log_response==-1:
             common.message(_('Connection error !\n' \

@@ -14,6 +14,7 @@ _DATABASE = ''
 CONTEXT = {}
 _VIEW_CACHE = {}
 TIMEZONE = 'utc'
+SECURE = False
 
 def db_list(host, port):
     global _SOCK
@@ -26,7 +27,8 @@ def db_list(host, port):
         _SOCK.send(('db', 'list'))
         res = _SOCK.receive()
         return res
-    except:
+    except Exception, e:
+        print e
         return None
 
 def db_exec(host, port, method, *args):
@@ -41,7 +43,7 @@ def db_exec(host, port, method, *args):
     return res
 
 def login(username, password, host, port, database):
-    global _SOCK, _USER, _USERNAME, _PASSWORD, _DATABASE, _VIEW_CACHE
+    global _SOCK, _USER, _USERNAME, _PASSWORD, _DATABASE, _VIEW_CACHE, SECURE
     if _SOCK:
         _SOCK.disconnect()
         _SOCK = None
@@ -50,6 +52,7 @@ def login(username, password, host, port, database):
     _PASSWORD = ''
     _DATABASE = ''
     _VIEW_CACHE = {}
+    SECURE = False
     try:
         _SOCK = pysocket.PySocket()
         _SOCK.connect(host, port)
@@ -63,6 +66,7 @@ def login(username, password, host, port, database):
     _USERNAME = username
     _PASSWORD = password
     _DATABASE = database
+    SECURE = _SOCK.ssl
     context_reload()
     return 1
 
