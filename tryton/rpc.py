@@ -136,7 +136,10 @@ def process_exception(exception, parent, obj='', method='', *args):
     type = 'error'
     data = str(exception.args[0])
     description = data
-    details = str(exception.args[1])
+    if len(exception.args) > 1:
+        details = str(exception.args[1])
+    else:
+        details = data
     if hasattr(data, 'split'):
         lines = data.split('\n')
         type = lines[0].split(' -- ')[0]
