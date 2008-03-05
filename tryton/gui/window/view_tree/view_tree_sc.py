@@ -27,13 +27,14 @@ class ViewTreeSC(object):
         store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING,
                 gobject.TYPE_STRING)
         user =  rpc._USER
+        args = ('object', 'execute', 'ir.ui.view_sc', 'get_sc', user,
+                self.model, rpc.CONTEXT)
         try:
-            view_sc = rpc.execute('object', 'execute',
-                    'ir.ui.view_sc', 'get_sc', user, self.model,
-                    rpc.CONTEXT)
+            view_sc = rpc.execute(*args)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
-            return
+            view_sc = rpc.process_exception(exception, self.window, *args)
+            if not view_sc:
+                return
         for shortcut in view_sc:
             num = store.append()
             store.set(num, 0, shortcut['res_id'], 1, shortcut['name'],

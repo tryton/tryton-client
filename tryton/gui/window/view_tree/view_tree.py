@@ -53,9 +53,10 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
+        args = ('object', 'execute', self.view['model'], 'read', ids, fields,
+                ctx)
         try:
-            res_ids = rpc.execute('object', 'execute',
-                    self.view['model'], 'read', ids, fields, ctx)
+            res_ids = rpc.execute(*args)
         except:
             res_ids = []
             for obj_id in ids:
@@ -321,9 +322,9 @@ class ViewTree(object):
 
     def reload(self):
         del self.model
-        self.model = ViewTreeModel(self.ids, self.view_info,
-                self.fields_order, self.fields, context=self.context,
-                pixbufs=self.pixbufs, treeview=self.view)
+        self.model = ViewTreeModel(self.ids, self.view_info, self.fields_order,
+                self.fields, context=self.context, pixbufs=self.pixbufs,
+                treeview=self.view)
         self.view.set_model(self.model)
 
     def widget_get(self):

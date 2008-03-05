@@ -9,7 +9,7 @@ import socket
 _SOCK = None
 _USER = 0
 _USERNAME = ''
-_PASSWORD = ''
+_SESSION = ''
 _DATABASE = ''
 CONTEXT = {}
 _VIEW_CACHE = {}
@@ -27,8 +27,7 @@ def db_list(host, port):
         _SOCK.send(('db', 'list'))
         res = _SOCK.receive()
         return res
-    except Exception, e:
-        print e
+    except:
         return None
 
 def db_exec(host, port, method, *args):
@@ -43,14 +42,10 @@ def db_exec(host, port, method, *args):
     return res
 
 def login(username, password, host, port, database):
-    global _SOCK, _USER, _USERNAME, _PASSWORD, _DATABASE, _VIEW_CACHE, SECURE
+    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
     if _SOCK:
         _SOCK.disconnect()
         _SOCK = None
-    _USER = 0
-    _USERNAME = ''
-    _PASSWORD = ''
-    _DATABASE = ''
     _VIEW_CACHE = {}
     SECURE = False
     try:
@@ -59,25 +54,33 @@ def login(username, password, host, port, database):
         _SOCK.send(('common', 'login', database, username, password))
         res = _SOCK.receive()
     except socket.error:
+        _USER = 0
+        _USERNAME = ''
+        _SESSION = ''
+        _DATABASE = ''
         return -1
     if not res:
+        _USER = 0
+        _USERNAME = ''
+        _SESSION = ''
+        _DATABASE = ''
         return -2
-    _USER = res
+    _USER = res[0]
     _USERNAME = username
-    _PASSWORD = password
+    _SESSION = res[1]
     _DATABASE = database
     SECURE = _SOCK.ssl
     context_reload()
     return 1
 
 def logout():
-    global _SOCK, _USER, _USERNAME, _PASSWORD, _DATABASE, _VIEW_CACHE
+    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE
     if _SOCK:
         _SOCK.disconnect()
         _SOCK = None
     _USER = 0
     _USERNAME = ''
-    _PASSWORD = ''
+    _SESSION = ''
     _DATABASE = ''
     _VIEW_CACHE = {}
 
@@ -107,7 +110,7 @@ def context_reload():
             TIMEZONE = execute('common', 'timezone_get')
 
 def execute(obj, method, *args):
-    global _SOCK
+    global _SOCK, _DATABASE, _USER, _SESSION
     if not _SOCK:
         raise Exception('Not logged!')
     logging.getLogger('rpc.request').info(str((obj, method, args)))
@@ -118,11 +121,11 @@ def execute(obj, method, *args):
             args = args[:]
             args = args + (_VIEW_CACHE[key][0],)
     try:
-        _SOCK.send((obj, method, _DATABASE, _USER, _PASSWORD) + args)
+        _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
         result = _SOCK.receive()
     except socket.error:
         _SOCK.reconnect()
-        _SOCK.send((obj, method, _DATABASE, _USER, _PASSWORD) + args)
+        _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
         result = _SOCK.receive()
     if key:
         if result is True and key in _VIEW_CACHE:
@@ -132,7 +135,22 @@ def execute(obj, method, *args):
     return result
 
 def process_exception(exception, parent, obj='', method='', *args):
-    global _USERNAME, _DATABASE
+    global _USERNAME, _DATABASE, _SOCK
+    if str(exception.args[0]) == 'NotLogged':
+        while True:
+            password = common.ask(_('Password:'), parent, visibility=False)
+            if password is None:
+                break
+            res = login(_USERNAME, password, _SOCK.host, _SOCK.port, _DATABASE)
+            if res < 0:
+                continue
+            if obj and method:
+                try:
+                    return execute(obj, method, *args)
+                except Exception, exception:
+                    return process_exception(exception, parent, obj,
+                            method, *args)
+            return
     type = 'error'
     data = str(exception.args[0])
     description = data

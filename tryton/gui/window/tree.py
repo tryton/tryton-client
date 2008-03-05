@@ -160,14 +160,15 @@ class Tree(SignalEvent):
     def menu_main_clicked(self, widget):
         if widget.get_active():
             obj_id = widget.get_data('id')
-
+            args = ('object', 'execute', self.model,
+                        'read', obj_id, [self.view['field_childs']])
             try:
-                ids = rpc.execute('object', 'execute', self.model,
-                        'read', obj_id, [self.view['field_childs']])\
-                                [self.view['field_childs']]
+                ids = rpc.execute(*args)[self.view['field_childs']]
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
-                return False
+                ids = rpc.process_exception(exception, self.window, *args)\
+                        [self.view['field_childs']]
+                if not ids:
+                    return False
 
             self.tree_res.ids = ids
             self.tree_res.reload()

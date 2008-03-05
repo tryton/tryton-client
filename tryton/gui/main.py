@@ -534,9 +534,9 @@ class Main(object):
         self.notebook.set_current_page(page - 1)
 
     def sig_user_preferences(self, widget):
-        win = Preference(rpc.session.user, self.window)
+        win = Preference(rpc._USER, self.window)
         if win.run():
-            rpc.session.context_reload()
+            rpc.context_reload()
         self.window.present()
         return True
 
@@ -545,28 +545,28 @@ class Main(object):
 
     def sig_request_new(self, widget):
         return Window.create(None, 'res.request', False,
-                [('act_from', '=', rpc.session.user)], 'form',
+                [('act_from', '=', rpc._USER)], 'form',
                 mode=['form', 'tree'], window=self.window,
                 context={'active_test': False})
 
     def sig_request_open(self, widget):
         ids = self.request_set()[0]
         return Window.create(False, 'res.request', ids,
-                [('act_to', '=', rpc.session.user), ('active', '=', True)],
+                [('act_to', '=', rpc._USER), ('active', '=', True)],
                 'form', mode=['tree', 'form'], window=self.window,
                 context={'active_test': False})
 
     def sig_request_wait(self, widget):
         ids = self.request_set()[0]
         return Window.create(False, 'res.request', ids,
-                [('act_from', '=', rpc.session.user),
+                [('act_from', '=', rpc._USER),
                     ('state', '=', 'waiting'), ('active', '=', True)],
                 'form', mode=['tree', 'form'], window=self.window,
                 context={'active_test': False})
 
     def request_set(self):
         try:
-            ids, ids2 = rpc.session.rpc_exec_auth_try('/object', 'execute',
+            ids, ids2 = rpc.execute('object', 'execute',
                     'res.request', 'request_get')
             if len(ids):
                 message = _('%s request(s)') % len(ids)

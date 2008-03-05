@@ -347,9 +347,10 @@ def ask(question, parent, visibility=True):
 
     response = win.run()
     parent.present()
+    res = entry.get_text()
     win.destroy()
     if response == gtk.RESPONSE_OK:
-        return entry.get_text()
+        return res
     else:
         return None
 
