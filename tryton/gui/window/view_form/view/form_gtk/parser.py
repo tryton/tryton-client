@@ -74,7 +74,7 @@ class Button(object):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, str):
+        if isinstance(state_changes, basestring):
             state_changes = eval(state_changes)
         if 'invisible' in state_changes:
             if eval(state_changes['invisible'], values):
@@ -99,7 +99,7 @@ class Label(gtk.Label):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, str):
+        if isinstance(state_changes, basestring):
             state_changes = eval(state_changes)
         if 'invisible' in state_changes:
             if eval(state_changes['invisible'], values):
@@ -118,7 +118,7 @@ class VBox(gtk.VBox):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, str):
+        if isinstance(state_changes, basestring):
             state_changes = eval(state_changes)
         if 'invisible' in state_changes:
             if eval(state_changes['invisible'], values):

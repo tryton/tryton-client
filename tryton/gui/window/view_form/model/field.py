@@ -91,7 +91,7 @@ class CharField(object):
         if values is None:
             values = {'state': 'draft'}
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, str):
+        if isinstance(state_changes, basestring):
             state_changes = eval(state_changes)
         for key in ('readonly', 'required', 'invisible'):
             if key in state_changes:
@@ -173,7 +173,7 @@ class M2OField(CharField):
         return False
 
     def set(self, model, value, test_state=False, modified=False):
-        if value and isinstance(value, (int, str, unicode, long)):
+        if value and isinstance(value, (int, basestring, long)):
             rpc2 = RPCProxy(self.attrs['relation'])
             try:
                 result = rpc2.name_get([value], rpc.CONTEXT)

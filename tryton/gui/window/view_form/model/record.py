@@ -240,6 +240,8 @@ class ModelRecord(SignalEvent):
 
     def on_change(self, field, attr):
         args = {}
+        if isinstance(attr, basestring):
+            attr = eval(attr)
         for arg in attr:
             args[arg] = self.expr_eval(arg)
         ids = self.id and [self.id] or []
