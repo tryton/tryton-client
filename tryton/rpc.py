@@ -97,18 +97,11 @@ def context_reload():
         value = context[i]
         if value:
             CONTEXT[i] = value
-        #TODO add direction to get_preferences
-        #if i == 'lang':
-        #    translate.setlang(value)
-        #    CONFIG['client.lang'] = value
-        #    ids = lang.search([('code', '=', value)])
-        #    if ids:
-        #        lang = lang.read(ids[0], ['direction'])
-        #        if lang and 'direction' in lang:
-        #            if lang['direction'] == 'rtl':
-        #                    gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
-        #                else:
-        #                    gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
+        if i == 'language_direction':
+            if value == 'rtl':
+                gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
+            else:
+                gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
         if i == 'timezone':
             TIMEZONE = execute('common', 'timezone_get')
 
