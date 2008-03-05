@@ -200,8 +200,14 @@ class Form(SignalEvent):
             ('write_date', _('Latest Modification Date')),
         ]
 
-        res = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                'read', [obj_id], [x[0] for x in fields])
+        args = ('object', 'execute', self.model, 'read', [obj_id],
+                [x[0] for x in fields])
+        try:
+            res = rpc.execute(*args)
+        except Exception, exception:
+            res = rpc.process_exception(exception, self.window, *args)
+            if not res:
+                return
         message_str = ''
         for line in res:
             for (key, val) in fields:
@@ -252,9 +258,12 @@ class Form(SignalEvent):
             return
         res_id = self._id_get()
         ctx = self.context.copy()
-        ctx.update(rpc.session.context)
-        new_id = rpc.session.rpc_exec_auth('/object', 'execute', self.model,
-                'copy', res_id, {}, ctx)
+        ctx.update(rpc.CONTEXT)
+        args = ('object', 'execute', self.model, 'copy', res_id, {}, ctx)
+        try:
+            new_id = rpc.execute(*args)
+        except Exception, exception:
+            new_id = rpc.process_exception(exception, self.window, *args)
         if new_id:
             self.screen.load([new_id])
             self.message_state(_('Working now on the duplicated document !'))
