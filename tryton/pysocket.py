@@ -4,7 +4,7 @@ import cStringIO
 
 DNS_CACHE = {}
 
-_ALLOWED_MODULES = {'datetime': ['datetime']}
+_ALLOWED_MODULES = {'datetime': ['datetime'], 'decimal': ['Decimal']}
 
 def checkfunction(module, klass):
     if module in _ALLOWED_MODULES and klass in _ALLOWED_MODULES[module]:
