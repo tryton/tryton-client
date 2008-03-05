@@ -89,7 +89,10 @@ def context_reload():
     CONTEXT = {}
     user = RPCProxy('res.user')
     lang = RPCProxy('ir.lang')
-    context = user.get_preferences(True, {})
+    try:
+        context = user.get_preferences(True, {})
+    except:
+        return
     for i in context:
         value = context[i]
         if value:

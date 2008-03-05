@@ -20,7 +20,7 @@ class Preference(object):
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
 
         self.win.set_default_response(gtk.RESPONSE_OK)
-        self.win.vbox.pack_start(gtk.Label(_('Edit ressource preferences')),
+        self.win.vbox.pack_start(gtk.Label(_('Edit User Preferences')),
                 expand=False, fill=True)
         self.win.vbox.pack_start(gtk.HSeparator())
         self.win.set_icon(TRYTON_ICON)
@@ -34,6 +34,7 @@ class Preference(object):
             res = user.get_preferences_fields_view(rpc.CONTEXT)
         except Exception, exception:
             rpc.process_exception(exception, parent)
+            self.win.destroy()
             raise
         arch = res['arch']
         fields = res['fields']
@@ -45,6 +46,7 @@ class Preference(object):
             preferences = user.get_preferences(False, rpc.CONTEXT)
         except Exception, exception:
             rpc.process_exception(exception, parent)
+            self.win.destroy()
             raise
         self.screen.current_model.set(preferences)
 
