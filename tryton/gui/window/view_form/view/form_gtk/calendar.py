@@ -76,7 +76,7 @@ class Calendar(WidgetInterface):
             self.entry.set_text('')
             return False
         super(Calendar, self).display(model, model_field)
-        value = model_field.get(model)
+        value = model_field.get_client(model)
         if not value:
             self.entry.set_text('')
         else:

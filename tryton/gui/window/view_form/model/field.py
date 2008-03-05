@@ -122,6 +122,13 @@ class DateTimeField(CharField):
         return value and str(value) or False
 
 
+class DateField(CharField):
+
+    def get_client(self, model):
+        value = super(DateField, self).get_client(model)
+        return value and str(value) or False
+
+
 class FloatField(CharField):
 
     def validate(self, model):
@@ -388,4 +395,5 @@ TYPES = {
     'selection': SelectionField,
     'boolean': IntegerField,
     'datetime': DateTimeField,
+    'date': DateField,
 }
