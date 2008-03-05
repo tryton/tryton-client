@@ -592,7 +592,7 @@ class Main(object):
         self.window.present()
         self.sig_logout(widget)
         log_response = rpc.login(*res)
-        if log_response == 1:
+        if log_response > 0:
             CONFIG.save()
             menu_id = self.sig_win_menu(quiet=False)
             if menu_id:
@@ -602,10 +602,10 @@ class Main(object):
             else:
                 self.secure_img.hide()
             self.request_set()
-        elif log_response==-1:
+        elif log_response == -1:
             common.message(_('Connection error !\n' \
                     'Unable to connect to the server !'), self.window)
-        elif log_response==-2:
+        elif log_response == -2:
             common.message(_('Connection error !\n' \
                     'Bad username or password !'), self.window)
         self.shortcut_set()
