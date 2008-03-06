@@ -45,6 +45,10 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         self.model_group.model_remove(self.models[idx])
         self.invalidate_iters()
 
+    def move(self, path, position):
+        idx = path[0]
+        self.model_group.model_move(self.models[idx], position)
+
     def sort(self, name):
         self.sort_asc = not (self.sort_asc and (self.last_sort == name))
         self.last_sort = name
@@ -153,6 +157,59 @@ class ViewList(ParserView):
         selection.set_mode(gtk.SELECTION_MULTIPLE)
         selection.connect('changed', self.__select_changed)
 
+        if self.widget_tree.sequence:
+            self.widget_tree.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
+                    [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
+                    gtk.gdk.ACTION_MOVE)
+            self.widget_tree.drag_source_set(gtk.gdk.BUTTON1_MASK | gtk.gdk.BUTTON3_MASK,
+                    [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
+                    gtk.gdk.ACTION_MOVE)
+            self.widget_tree.enable_model_drag_dest(
+                    [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
+                    gtk.gdk.ACTION_MOVE)
+
+            self.widget_tree.connect('drag-drop', self.drag_drop)
+            self.widget_tree.connect("drag-data-get", self.drag_data_get)
+            self.widget_tree.connect('drag-data-received', self.drag_data_received)
+            self.widget_tree.connect('drag-data-delete', self.drag_data_delete)
+
+    def drag_drop(self, treeview, context, x, y, time):
+        treeview.emit_stop_by_name('drag-drop')
+        treeview.drag_get_data(context, context.targets[-1], time)
+        return True
+
+    def drag_data_get(self, treeview, context, selection, target_id,
+            etime):
+        treeview.emit_stop_by_name('drag-data-get')
+        def _func_sel_get(store, path, iter, data):
+            data.append(path)
+        data = []
+        treeselection = treeview.get_selection()
+        treeselection.selected_foreach(_func_sel_get, data)
+        data = str(data[0])
+        selection.set(selection.target, 8, data)
+
+    def drag_data_received(self, treeview, context, x, y, selection,
+            info, etime):
+        treeview.emit_stop_by_name('drag-data-received')
+        model = treeview.get_model()
+        data = eval(selection.data)
+        drop_info = treeview.get_dest_row_at_pos(x, y)
+        if drop_info:
+            path, position = drop_info
+            idx = path[0]
+            if position in (gtk.TREE_VIEW_DROP_BEFORE,
+                    gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+                model.move(data, idx)
+            else:
+                model.move(data, idx + 1)
+        context.drop_finish(False, etime)
+        if treeview.sequence:
+            self.screen.models.set_sequence(field=treeview.sequence)
+
+    def drag_data_delete(self, treeview, context):
+        treeview.emit_stop_by_name('drag-data-delete')
+
     def __button_press(self, treeview, event):
         if event.button == 3:
             path = treeview.get_path_at_pos(int(event.x), int(event.y))
@@ -202,6 +259,7 @@ class ViewList(ParserView):
                     item.show()
                     menu.append(item)
                 menu.popup(None, None, None, event.button, event.time)
+        return False
 
     def click_and_relate(self, action, value, path):
         data = {}

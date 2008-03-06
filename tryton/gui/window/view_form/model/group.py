@@ -34,6 +34,17 @@ class ModelList(list):
                 self.__screen.signal('record-changed',
                         ('record-removed', len(self)))
 
+    def move(self, obj, pos):
+        idx = self.index(obj)
+        if self.__len__() > pos:
+            obj = self.pop(idx)
+            if pos > idx:
+                pos -= 1
+            super(ModelList, self).insert(pos, obj)
+        else:
+            obj = self.pop(idx)
+            super(ModelList, self).append(obj)
+
     def __setitem__(self, key, value):
         super(ModelList, self).__setitem__(key, value)
         if not self.lock_signal:
@@ -178,6 +189,20 @@ class ModelRecordGroup(SignalEvent):
         model.parent = self.parent
         model.signal_connect(self, 'record-changed', self._record_changed)
         return model
+
+    def model_move(self, model, position=0):
+        self.models.move(model, position)
+
+    def set_sequence(self, field='sequence'):
+        index = 0
+        for model in self.models:
+            if model[field]:
+                if index >= model[field].get(model):
+                    index += 1
+                    model[field].set(model, index, modified=True)
+                else:
+                    index = model[field].get(model)
+        self.save()
 
     def model_new(self, default=True, domain=None, context=None):
         newmod = ModelRecord(self.resource, None, self.window, group=self,
