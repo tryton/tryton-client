@@ -58,7 +58,8 @@ class Dialog(object):
 
         self.dia.show_all()
         self.screen = Screen(model_name, view_type=[], parent=parent,
-                window=self.dia)
+                window=self.dia,
+                exclude_field=attrs.get('relation_field', None))
         self.screen.models._context.update(model_ctx)
         if not model:
             model = self.screen.new(context=default_get_ctx)
@@ -74,7 +75,6 @@ class Dialog(object):
                     context=default_get_ctx)
         else:
             self.screen.add_view_id(False, 'form', display=True,
-                    exclude_field=attrs.get('relation_field', None),
                     context=default_get_ctx)
         viewport.add(self.screen.widget)
         width, height = self.screen.screen_container.size_get()
@@ -218,7 +218,8 @@ class One2Many(WidgetInterface):
                 parent=self.parent, views_preload=attrs.get('views', {}),
                 tree_saves=attrs.get('saves', False), create_new=True,
                 row_activate=self._on_activate,
-                default_get=attrs.get('default_get', {}), window=self._window)
+                default_get=attrs.get('default_get', {}), window=self._window,
+                exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
         menuitem_title.get_child().set_text(self.screen.current_view.title)
 

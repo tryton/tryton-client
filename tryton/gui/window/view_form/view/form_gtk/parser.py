@@ -200,6 +200,15 @@ class _container(object):
         wid_list.reverse()
         table.set_focus_chain(wid_list)
 
+    def empty_add(self, colspan=1):
+        (table, width, height) = self.cont[-1]
+        if colspan > self.col[-1]:
+            colspan = self.col[-1]
+        if colspan + width > self.col[-1]:
+            self.newline()
+            (table, width, height) = self.cont[-1]
+        self.cont[-1] = (table, width + colspan, height)
+
 
 class ParserForm(ParserInterface):
 
@@ -267,6 +276,9 @@ class ParserForm(ParserInterface):
                                 text += node.data
                             else:
                                 text += node.toxml()
+                if not text:
+                    container.empty_add(int(attrs.get('colspan', 1)))
+                    continue
                 label = Label(text, attrs)
                 button_list.append(label)
                 label.set_use_markup(True)
@@ -343,11 +355,13 @@ class ParserForm(ParserInterface):
                 name = str(attrs['name'])
                 del attrs['name']
                 if name not in fields:
+                    container.empty_add(int(attrs.get('colspan', 1)))
                     continue
                 ftype = attrs.get('widget', fields[name]['type'])
                 fields[name].update(attrs)
                 fields[name]['model'] = model
                 if not ftype in WIDGETS_TYPE:
+                    container.empty_add(int(attrs.get('colspan', 1)))
                     continue
 
                 fields[name]['name'] = name

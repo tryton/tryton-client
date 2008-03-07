@@ -16,7 +16,7 @@ class Screen(SignalEvent):
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
             default_get=None, show_search=False, window=None, limit=80,
-            readonly=False, form=None):
+            readonly=False, form=None, exclude_field=None):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -69,6 +69,7 @@ class Screen(SignalEvent):
         self.readonly = readonly
         self.form = form
         self.fields_view_tree = None
+        self.exclude_field = exclude_field
 
         if view_type:
             self.view_to_load = view_type[1:]
@@ -219,8 +220,7 @@ class Screen(SignalEvent):
     def add_view_custom(self, arch, fields, display=False, toolbar=None):
         return self.add_view(arch, fields, display, True, toolbar=toolbar)
 
-    def add_view_id(self, view_id, view_type, display=False,
-            exclude_field=None, context=None):
+    def add_view_id(self, view_id, view_type, display=False, context=None):
         if view_type in self.views_preload:
             return self.add_view(self.views_preload[view_type]['arch'],
                     self.views_preload[view_type]['fields'], display,
@@ -233,9 +233,9 @@ class Screen(SignalEvent):
             except Exception, exception:
                 rpc.process_exception(exception, self.window)
                 raise
-            if exclude_field:
-                if exclude_field in view['fields']:
-                    del view['fields'][exclude_field]
+            if self.exclude_field:
+                if self.exclude_field in view['fields']:
+                    del view['fields'][self.exclude_field]
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 
