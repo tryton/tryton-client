@@ -187,6 +187,7 @@ class ModelRecordGroup(SignalEvent):
             self.models.insert(position, model)
         self.current_idx = position
         model.parent = self.parent
+        model.window = self.window
         model.signal_connect(self, 'record-changed', self._record_changed)
         return model
 
