@@ -5,6 +5,7 @@ import gtk
 import logging
 import common
 import socket
+from threading import Semaphore
 
 _SOCK = None
 _USER = 0
@@ -15,6 +16,7 @@ CONTEXT = {}
 _VIEW_CACHE = {}
 TIMEZONE = 'utc'
 SECURE = False
+_SEMAPHORE = Semaphore()
 
 def db_list(host, port):
     global _SOCK
@@ -23,9 +25,13 @@ def db_list(host, port):
         _SOCK = None
     try:
         _SOCK = pysocket.PySocket()
-        _SOCK.connect(host, port)
-        _SOCK.send(('db', 'list'))
-        res = _SOCK.receive()
+        _SEMAPHORE.acquire()
+        try:
+            _SOCK.connect(host, port)
+            _SOCK.send(('db', 'list'))
+            res = _SOCK.receive()
+        finally:
+            _SEMAPHORE.release()
         return res
     except:
         return None
@@ -36,9 +42,13 @@ def db_exec(host, port, method, *args):
         _SOCK.disconnect()
         _SOCK = None
     _SOCK= pysocket.PySocket()
-    _SOCK.connect(host, port)
-    _SOCK.send(('db', method) + args)
-    res = _SOCK.receive()
+    _SEMAPHORE.acquire()
+    try:
+        _SOCK.connect(host, port)
+        _SOCK.send(('db', method) + args)
+        res = _SOCK.receive()
+    finally:
+        _SEMAPHORE.release()
     return res
 
 def login(username, password, host, port, database):
@@ -50,9 +60,13 @@ def login(username, password, host, port, database):
     SECURE = False
     try:
         _SOCK = pysocket.PySocket()
-        _SOCK.connect(host, port)
-        _SOCK.send(('common', 'login', database, username, password))
-        res = _SOCK.receive()
+        _SEMAPHORE.acquire()
+        try:
+            _SOCK.connect(host, port)
+            _SOCK.send(('common', 'login', database, username, password))
+            res = _SOCK.receive()
+        finally:
+            _SEMAPHORE.release()
     except socket.error:
         _USER = 0
         _USERNAME = ''
@@ -117,12 +131,20 @@ def execute(obj, method, *args):
             args = args[:]
             args = args + (_VIEW_CACHE[key][0],)
     try:
-        _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
-        result = _SOCK.receive()
+        _SEMAPHORE.acquire()
+        try:
+            _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
+            result = _SOCK.receive()
+        finally:
+            _SEMAPHORE.release()
     except socket.error:
-        _SOCK.reconnect()
-        _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
-        result = _SOCK.receive()
+        _SEMAPHORE.acquire()
+        try:
+            _SOCK.reconnect()
+            _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
+            result = _SOCK.receive()
+        finally:
+            _SEMAPHORE.release()
     if key:
         if result is True and key in _VIEW_CACHE:
             result = _VIEW_CACHE[key][1]
