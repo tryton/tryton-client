@@ -325,6 +325,8 @@ class Main(object):
         vbox = self.glade.get_widget('vbox_main')
         vbox.pack_start(self.notebook, expand=True, fill=True)
 
+        self.tooltips = gtk.Tooltips()
+
         self.shortcut_menu = self.glade.get_widget('shortcut')
 
         #
@@ -756,7 +758,13 @@ class Main(object):
     def win_add(self, page):
         self.pages.append(page)
         hbox = gtk.HBox()
-        label = gtk.Label(page.name)
+        if len(page.name) > 15:
+            name = page.name[:13] + '...'
+        else:
+            name = page.name
+        label = gtk.Label(name)
+        self.tooltips.set_tip(label, page.name)
+        self.tooltips.enable()
         label.set_alignment(0.0, 0.5)
         hbox.pack_start(label, expand=True, fill=True)
         button = gtk.Button()
