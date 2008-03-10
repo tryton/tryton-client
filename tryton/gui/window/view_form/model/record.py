@@ -4,6 +4,7 @@ from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
 import field
+import datetime
 
 
 class EvalEnvironment(object):
@@ -15,7 +16,7 @@ class EvalEnvironment(object):
         if item == 'parent' and self.parent.parent:
             return EvalEnvironment(self.parent.parent)
         if item == "current_date":
-            return time.strftime('%Y-%m-%d')
+            return datetime.datetime.today()
         if item == "time":
             return time
         return self.parent.get(includeid=True)[item]
@@ -38,6 +39,7 @@ class ModelRecord(SignalEvent):
         self.modified_fields = {}
         self.read_time = time.time()
         self.attachment_count = -1
+        self.next = None
         for key, val in self.mgroup.mfields.items():
             self.value[key] = val.create(self)
             if (new and val.attrs['type']=='one2many') \
@@ -229,7 +231,7 @@ class ModelRecord(SignalEvent):
         for name, mfield in self.mgroup.mfields.items():
             ctx[name] = mfield.get(self, check_load=check_load)
 
-        ctx['current_date'] = time.strftime('%Y-%m-%d')
+        ctx['current_date'] = datetime.datetime.today()
         ctx['time'] = time
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
