@@ -12,17 +12,30 @@ class ModelList(list):
         self.__screen = screen
 
     def insert(self, pos, obj):
+        if pos >= 1:
+            self.__getitem__(pos - 1).next = obj
+        if pos < self.__len__():
+            obj.next = self.__getitem__(pos)
+        else:
+            obj.next = None
         super(ModelList, self).insert(pos, obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-added', pos))
 
     def append(self, obj):
+        if self.__len__() >= 1:
+            self.__getitem__(self.__len__() - 1).next = obj
         super(ModelList, self).append(obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-added', -1))
 
     def remove(self, obj):
         idx = self.index(obj)
+        if idx >= 1:
+            if idx + 1 < self.__len__():
+                self.__getitem__(idx - 1).next = self.__getitem__(idx + 1)
+            else:
+                self.__getitem__(idx - 1).next = None
         super(ModelList, self).remove(obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-removed', idx))
@@ -35,15 +48,17 @@ class ModelList(list):
                         ('record-removed', len(self)))
 
     def move(self, obj, pos):
-        idx = self.index(obj)
+        self.lock_signal = True
         if self.__len__() > pos:
-            obj = self.pop(idx)
+            idx = self.index(obj)
+            self.remove(obj)
             if pos > idx:
                 pos -= 1
-            super(ModelList, self).insert(pos, obj)
+            self.insert(pos, obj)
         else:
-            obj = self.pop(idx)
-            super(ModelList, self).append(obj)
+            self.remove(obj)
+            self.append(obj)
+        self.lock_signal = False
 
     def __setitem__(self, key, value):
         super(ModelList, self).__setitem__(key, value)
@@ -126,15 +141,13 @@ class ModelRecordGroup(SignalEvent):
             self.signal('record-cleared')
         return True
 
-    def load_for(self, values):
+    def _load_for(self, values):
         if len(values)>10:
             self.models.lock_signal = True
         for value in values:
-            newmod = ModelRecord(self.resource, value['id'], self.window,
-                    parent=self.parent, group=self)
-            newmod.set(value)
-            self.models.append(newmod)
-            newmod.signal_connect(self, 'record-changed', self._record_changed)
+            for model in self.models:
+                if model.id == value['id']:
+                    model.set(value)
         if len(values)>10:
             self.models.lock_signal = False
             self.signal('record-cleared')
@@ -144,19 +157,29 @@ class ModelRecordGroup(SignalEvent):
             return True
         if not self.fields:
             return self.pre_load(ids, display)
+
+        self.models.lock_signal = True
+        for id in ids:
+            newmod = ModelRecord(self.resource, id, self.window,
+                    parent=self.parent, group=self)
+            self.models.append(newmod)
+            newmod.signal_connect(self, 'record-changed', self._record_changed)
+        self.models.lock_signal = False
+
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context)
         try:
-            values = self.rpc.read(ids, self.fields.keys(), ctx)
+            values = self.rpc.read(ids[:80], self.fields.keys(), ctx)
         except Exception, exception:
             rpc.process_exception(exception, self.window)
             return False
         if not values:
             return False
-        newmod = False
-        self.load_for(values)
-        if newmod and display:
-            self.signal('model-changed', newmod)
+        self._load_for(values)
+
+        #newmod = False
+        #if newmod and display:
+        #    self.signal('model-changed', newmod)
         self.current_idx = 0
         return True
 
@@ -284,7 +307,10 @@ class ModelRecordGroup(SignalEvent):
         new = []
         for model in models:
             if model.id:
-                old.append(model.id)
+                if model.is_modified():
+                    old.append(model.id)
+                else:
+                    model._loaded = False
             else:
                 new.append(model)
         ctx = context.copy()

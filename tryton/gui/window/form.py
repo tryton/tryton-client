@@ -25,7 +25,7 @@ class Form(SignalEvent):
     "Form"
 
     def __init__(self, model, res_id=False, domain=None, view_type=None,
-            view_ids=None, window=None, context=None, name=False, limit=80,
+            view_ids=None, window=None, context=None, name=False, limit=None,
             auto_refresh=False):
         super(Form, self).__init__()
         if not view_type:
@@ -375,8 +375,10 @@ class Form(SignalEvent):
             name2 = _('New document')
             if signal_data[3]:
                 name2 = _('Editing document (id: ')+str(signal_data[3])+')'
-            msg = _('Record: ') + name + ' / ' + str(signal_data[1]) + \
-                    _(' of ') + str(signal_data[2]) + ' - ' + name2
+            msg = _('Record: ') + name + ' / ' + str(signal_data[1])
+            if signal_data[1] < signal_data[2]:
+                msg += _(' of ') + str(signal_data[2])
+            msg += ' - ' + name2
         statusbar = self.glade.get_widget('stat_form')
         cid = statusbar.get_context_id('message')
         statusbar.push(cid, msg)

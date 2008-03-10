@@ -48,6 +48,32 @@ class ModelRecord(SignalEvent):
                 self.value[key].model_add(mod)
 
     def __getitem__(self, name):
+        if not self._loaded and self.id:
+            ids =  [self.id]
+            idx = self.mgroup.models.index(self)
+            length = len(self.mgroup.models)
+            n = 1
+            while len(ids) < 80 and (idx - n >= 0 or idx + n < length) and n < 100:
+                if idx - n >= 0:
+                    model = self.mgroup.models[idx - n]
+                    if not model._loaded:
+                        ids.append(model.id)
+                if idx + n < length:
+                    model = self.mgroup.models[idx + n]
+                    if not model._loaded:
+                        ids.append(model.id)
+                n += 1
+            ctx = rpc.CONTEXT.copy()
+            ctx.update(self.context_get())
+            try:
+                values = self.rpc.read(ids, self.mgroup.mfields.keys(), ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return self.mgroup.mfields.get(name, False)
+            for value in values:
+                for model in self.mgroup.models:
+                    if model.id == value['id']:
+                        model.set(value, signal=False)
         return self.mgroup.mfields.get(name, False)
 
     def __repr__(self):

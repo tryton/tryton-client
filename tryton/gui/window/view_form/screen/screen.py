@@ -9,6 +9,8 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 import gobject
 
+_LIMIT = 20000
+
 
 class Screen(SignalEvent):
     "Screen"
@@ -16,7 +18,7 @@ class Screen(SignalEvent):
     def __init__(self, model_name, view_ids=None, view_type=None,
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
-            default_get=None, show_search=False, window=None, limit=80,
+            default_get=None, show_search=False, window=None, limit=None,
             readonly=False, form=None, exclude_field=None):
         if view_ids is None:
             view_ids = []
@@ -96,7 +98,7 @@ class Screen(SignalEvent):
                         self.domain, (self, self.search_filter))
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear)
-                self.filter_widget.set_limit(self.limit)
+                self.filter_widget.set_limit(self.limit or _LIMIT)
             self.screen_container.show_filter()
         else:
             self.screen_container.hide_filter()
@@ -119,9 +121,12 @@ class Screen(SignalEvent):
                 values.append((key, operator, value))
         try:
             ids = rpc.execute('object', 'execute',
-                    self.name, 'search', values, offset,limit, 0, self.context)
-            self.search_count = rpc.execute('object', 'execute',
-                    self.name, 'search_count', values, self.context)
+                    self.name, 'search', values, offset, limit, 0, self.context)
+            if len(ids) == limit:
+                self.search_count = rpc.execute('object', 'execute',
+                        self.name, 'search_count', values, self.context)
+            else:
+                self.search_count = len(ids)
         except:
             ids = []
         self.clear()

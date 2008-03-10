@@ -105,9 +105,6 @@ class Action(object):
                     ):
                 datas[key] = action.get(key, datas.get(key, None))
 
-            if datas['limit'] is None or datas['limit'] == 0:
-                datas['limit'] = 80
-
             view_ids = False
             datas['view_mode'] = None
             if action.get('views', []):

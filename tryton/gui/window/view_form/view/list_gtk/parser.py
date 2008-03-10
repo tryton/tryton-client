@@ -110,10 +110,12 @@ class ParserTree(ParserInterface):
                 else:
                     width = twidth.get(fields[fname]['type'], 100)
                 col.set_min_width(width)
-                if not treeview.sequence:
-                    col.connect('clicked', sort_model, treeview)
+                col.set_expand(True)
+                #TODO implement with order on search
+                #if not treeview.sequence:
+                #    col.connect('clicked', sort_model, treeview)
                 col.set_resizable(True)
-                #col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+                col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 col.set_visible(not fields[fname].get('invisible', False))
                 i = treeview.append_column(col)
                 if 'sum' in fields[fname] and fields[fname]['type'] \
@@ -130,6 +132,7 @@ class ParserTree(ParserInterface):
                     label_sum.set_use_markup(True)
                     dict_widget[i] = (fname, label, label_sum,
                             fields.get('digits', (16,2))[1], label_bold)
+        treeview.set_fixed_height_mode(True)
         return treeview, dict_widget, [], on_write
 
 

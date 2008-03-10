@@ -98,7 +98,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 
     def on_iter_next(self, node):
         try:
-            return self.on_get_iter(self.on_get_path(node) + 1)
+            return node.next
         except IndexError:
             return None
 
