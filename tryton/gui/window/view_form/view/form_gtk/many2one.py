@@ -19,10 +19,6 @@ class Dialog(object):
             context=None, window=None):
         if attrs is None:
             attrs = {}
-        if domain is None:
-            domain = []
-        if context is None:
-            context = {}
 
         self.dia = gtk.Dialog(_('Tryton - Link'), window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
@@ -271,8 +267,9 @@ class Many2One(WidgetInterface):
     def sig_new(self, *args):
         self.focus_out = False
         domain = self._view.modelfield.domain_get(self._view.model)
+        context = self._view.modelfield.context_get(self._view.model)
         dia = Dialog(self.attrs['relation'], attrs=self.attrs,
-                window=self._window, domain=domain)
+                window=self._window, domain=domain, context=context)
         res, value = dia.run()
         if res:
             self._view.modelfield.set_client(self._view.model, value)
@@ -286,9 +283,11 @@ class Many2One(WidgetInterface):
         self.focus_out = False
         if value:
             domain = self._view.modelfield.domain_get(self._view.model)
+            context = self._view.modelfield.context_get(self._view.model)
             dia = Dialog(self.attrs['relation'],
                     self._view.modelfield.get(self._view.model),
-                    attrs=self.attrs, window=self._window, domain=domain)
+                    attrs=self.attrs, window=self._window, domain=domain,
+                    context=context)
             res, value = dia.run()
             if res:
                 self._view.modelfield.set_client(self._view.model, value,
