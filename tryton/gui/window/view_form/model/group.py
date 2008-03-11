@@ -128,7 +128,7 @@ class ModelRecordGroup(SignalEvent):
     def pre_load(self, ids, display=True):
         if not ids:
             return True
-        if len(ids)>10:
+        if len(ids) > 10:
             self.models.lock_signal = True
         for obj_id in ids:
             newmod = ModelRecord(self.resource, obj_id, self.window,
@@ -136,7 +136,7 @@ class ModelRecordGroup(SignalEvent):
             self.model_add(newmod)
             if display:
                 self.signal('model-changed', newmod)
-        if len(ids)>10:
+        if len(ids) > 10:
             self.models.lock_signal = False
             self.signal('record-cleared')
         return True
@@ -158,13 +158,16 @@ class ModelRecordGroup(SignalEvent):
         if not self.fields:
             return self.pre_load(ids, display)
 
-        self.models.lock_signal = True
+        if len(ids) > 10:
+            self.models.lock_signal = True
         for id in ids:
             newmod = ModelRecord(self.resource, id, self.window,
                     parent=self.parent, group=self)
             self.models.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
-        self.models.lock_signal = False
+        if len(ids) > 10:
+            self.models.lock_signal = False
+            self.signal('record-cleared')
 
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context)

@@ -49,19 +49,35 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         idx = path[0]
         self.model_group.model_move(self.models[idx], position)
 
-    def sort(self, name):
-        self.sort_asc = not (self.sort_asc and (self.last_sort == name))
-        self.last_sort = name
-        if self.sort_asc:
-            sort_fct = lambda x, y: cmp(x[name].get_client(x),
-                    y[name].get_client(y))
-        else:
-            sort_fct = lambda x, y: -1 * cmp(x[name].get_client(x),
-                    y[name].get_client(y))
-        self.models.sort(sort_fct)
-        for idx, row in enumerate(self.models):
-            iter = self.get_iter(idx)
-            self.row_changed(self.get_path(iter), iter)
+    def sort(self, ids):
+        ids2pos = {}
+        pos = 0
+        new_order = []
+        for model in self.models:
+            ids2pos[model.id] = pos
+            new_order.append(pos)
+            pos += 1
+        pos = 0
+        for obj_id in ids:
+            try:
+                old_pos = ids2pos[obj_id]
+                if old_pos != pos:
+                    new_order[old_pos] = pos
+                pos += 1
+            except KeyError:
+                if obj_id == 109216:
+                    print obj_id
+                continue
+        self.models.sort(lambda x, y: \
+                cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
+        prev = None
+        for model in self.models:
+            if prev:
+                prev.next = model
+            prev = model
+        if prev:
+            prev.next = None
+        self.rows_reordered(None, None, new_order)
 
     def saved(self, obj_id):
         return self.model_group.writen(obj_id)
@@ -109,6 +125,8 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         return None
 
     def on_iter_n_children(self, node):
+        if node is None:
+            return len(self.models)
         return 0
 
     def on_iter_nth_child(self, node, nth):

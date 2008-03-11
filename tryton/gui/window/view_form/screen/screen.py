@@ -19,7 +19,7 @@ class Screen(SignalEvent):
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
             default_get=None, show_search=False, window=None, limit=None,
-            readonly=False, form=None, exclude_field=None):
+            readonly=False, form=None, exclude_field=None, sort=''):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -73,6 +73,7 @@ class Screen(SignalEvent):
         self.form = form
         self.fields_view_tree = None
         self.exclude_field = exclude_field
+        self.sort = sort
 
         if view_type:
             self.view_to_load = view_type[1:]
@@ -107,7 +108,7 @@ class Screen(SignalEvent):
         self.filter_widget.clear()
         self.clear()
 
-    def search_filter(self, widget=None):
+    def search_filter(self, widget=None, only_ids=False):
         limit = self.filter_widget.get_limit()
         offset = self.filter_widget.get_offset()
         values = self.filter_widget.value
@@ -121,14 +122,17 @@ class Screen(SignalEvent):
                 values.append((key, operator, value))
         try:
             ids = rpc.execute('object', 'execute',
-                    self.name, 'search', values, offset, limit, 0, self.context)
-            if len(ids) == limit:
-                self.search_count = rpc.execute('object', 'execute',
-                        self.name, 'search_count', values, self.context)
-            else:
-                self.search_count = len(ids)
+                    self.name, 'search', values, offset, limit, self.sort, self.context)
+            if not only_ids:
+                if len(ids) == limit:
+                    self.search_count = rpc.execute('object', 'execute',
+                            self.name, 'search_count', values, self.context)
+                else:
+                    self.search_count = len(ids)
         except:
             ids = []
+        if only_ids:
+            return ids
         self.clear()
         self.load(ids)
         return True

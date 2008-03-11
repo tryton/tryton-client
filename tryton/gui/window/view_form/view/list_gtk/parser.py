@@ -29,9 +29,32 @@ def send_keys(renderer, editable, position, treeview):
     if isinstance(editable, gtk.ComboBoxEntry):
         editable.connect('changed', treeview.on_editing_done)
 
-def sort_model(column, treeview):
+def sort_model(column, treeview, screen):
+    if not screen.show_search:
+        return
+    for col in treeview.get_columns():
+        if col != column:
+            col.arrow_show = False
+            col.arrow.hide()
+    screen.sort = ''
+    if not column.arrow_show:
+        column.arrow_show = True
+        column.arrow.set(gtk.ARROW_DOWN, gtk.SHADOW_IN)
+        column.arrow.show()
+        screen.sort = column.name + ' ASC'
+    else:
+        if column.arrow.get_property('arrow-type') == gtk.ARROW_DOWN:
+            column.arrow.set(gtk.ARROW_UP, gtk.SHADOW_IN)
+            screen.sort = column.name + ' DESC'
+        else:
+            column.arrow_show = False
+            column.arrow.hide()
     model = treeview.get_model()
-    model.sort(column.name)
+    if screen.search_count == len(model):
+        ids = screen.search_filter(only_ids=True)
+        model.sort(ids)
+    else:
+        screen.search_filter()
 
 class ParserTree(ParserInterface):
 
@@ -90,6 +113,18 @@ class ParserTree(ParserInterface):
 
                 col = gtk.TreeViewColumn(fields[fname]['string'], renderer)
                 col.name = fname
+
+                hbox = gtk.HBox(False, 2)
+                label = gtk.Label(fields[fname]['string'])
+                label.show()
+                arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
+                col.arrow = arrow
+                col.arrow_show = False
+                hbox.pack_start(label, True, True, 0)
+                hbox.pack_start(arrow, False, False, 0)
+                hbox.show()
+                col.set_widget(hbox)
+
                 col._type = fields[fname]['type']
                 col.set_cell_data_func(renderer, cell.setter)
                 col.set_clickable(True)
@@ -110,10 +145,10 @@ class ParserTree(ParserInterface):
                 else:
                     width = twidth.get(fields[fname]['type'], 100)
                 col.set_min_width(width)
-                col.set_expand(True)
-                #TODO implement with order on search
-                #if not treeview.sequence:
-                #    col.connect('clicked', sort_model, treeview)
+                #XXX doesn't work well when resize columns
+                #col.set_expand(True)
+                if not treeview.sequence:
+                    col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 col.set_visible(not fields[fname].get('invisible', False))
