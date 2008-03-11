@@ -105,7 +105,7 @@ class Tree(SignalEvent):
     def sig_reload(self, widget=None):
         try:
             ids = rpc.execute('object', 'execute', self.model,
-                    'search', self.domain2)
+                    'search', self.domain2, 0, None, None, self.context)
         except Exception, exception:
             rpc.process_exception(exception, self.window)
             return
