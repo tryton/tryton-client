@@ -139,8 +139,8 @@ class ModelRecord(SignalEvent):
                 if not rpc.execute(*args):
                     return False
             except Exception, exception:
-                rpc.process_exception(exception, self.window, *args)
-                return False
+                if not rpc.process_exception(exception, self.window, *args):
+                    return False
         self._loaded = False
         if force_reload:
             self.reload()
