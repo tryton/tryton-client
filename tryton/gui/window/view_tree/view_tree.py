@@ -17,7 +17,7 @@ if not hasattr(locale, 'D_FMT'):
     locale.D_FMT = None
 
 FIELDS_LIST_TYPE = {
-    'checkbox': gobject.TYPE_BOOLEAN,
+    'boolean': gobject.TYPE_BOOLEAN,
     'integer': gobject.TYPE_INT,
 }
 
@@ -120,6 +120,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     if obj[field] < 0:
                         val = '-' + val
                     obj[field] = val
+            if self.fields_type[field]['type'] in ('boolean',):
+                for obj in res_ids:
+                    obj[field] = bool(obj[field])
         return res_ids
 
     def _node_process(self, ids):

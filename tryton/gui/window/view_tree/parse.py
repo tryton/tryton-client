@@ -25,7 +25,7 @@ class Parse(object):
                 self.toolbar = bool(attrs.get('toolbar'))
         elif name == 'field':
             field_type = self.fields[attrs['name']]['type']
-            if field_type != 'checkbox':
+            if field_type != 'boolean':
                 column = gtk.TreeViewColumn(
                         self.fields[attrs['name']]['string'])
                 if 'icon' in attrs:
@@ -45,8 +45,9 @@ class Parse(object):
             else:
                 cell = gtk.CellRendererToggle()
                 column = gtk.TreeViewColumn(
-                        self.fields[attrs['name']]['string'],
-                        cell, active=self.pos)
+                        self.fields[attrs['name']]['string'])
+                column.pack_start(cell, expand=False)
+                column.add_attribute(cell, 'active', self.pos)
             self.pos += 1
             column.set_resizable(1)
             self.fields_order.append(str(attrs['name']))
