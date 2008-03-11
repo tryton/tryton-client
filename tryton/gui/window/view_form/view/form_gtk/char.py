@@ -10,7 +10,7 @@ class Char(WidgetInterface):
         self.widget = gtk.HBox()
         self.entry = gtk.Entry()
         self.entry.set_property('activates_default', True)
-        self.entry.set_max_length(int(attrs.get('size', 16)))
+        self.entry.set_max_length(int(attrs.get('size', 0)))
         self.entry.set_width_chars(5)
 
         self.entry.connect('button_press_event', self._menu_open)
