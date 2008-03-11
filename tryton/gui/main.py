@@ -796,6 +796,12 @@ class Main(object):
         self.buttons['but_attach'].set_label(label)
 
     def _sig_remove_book(self, widget, page_widget):
+        for page in self.pages:
+            if page.widget == page_widget:
+                if 'but_close' in page.handlers:
+                    res = page.handlers['but_close']()
+                    if not res:
+                        return
         self._win_del(page_widget)
 
     def _win_del(self, page_widget=None):
