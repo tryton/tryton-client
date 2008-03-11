@@ -287,7 +287,8 @@ class ViewList(ParserView):
             message(_('You must select a record to use the relation!'))
             return False
         from tryton.gui.window.view_form.screen import Screen
-        screen = Screen(self.screen.fields[path[1].name]['relation'])
+        screen = Screen(self.screen.fields[path[1].name]['relation'],
+                self.window)
         screen.load([value])
         act['domain'] = screen.current_model.expr_eval(act['domain'],
                 check_load=False)

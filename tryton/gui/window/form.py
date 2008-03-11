@@ -24,8 +24,8 @@ _ = gettext.gettext
 class Form(SignalEvent):
     "Form"
 
-    def __init__(self, model, res_id=False, domain=None, view_type=None,
-            view_ids=None, window=None, context=None, name=False, limit=None,
+    def __init__(self, model, window, res_id=False, domain=None, view_type=None,
+            view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False):
         super(Form, self).__init__()
         if not view_type:
@@ -49,11 +49,10 @@ class Form(SignalEvent):
         self.domain = domain
         self.context = context
 
-        self.screen = Screen(self.model, view_type=view_type,
+        self.screen = Screen(self.model, self.window, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
                 hastoolbar=CONFIG['form.toolbar'], show_search=True,
-                window=self.window, limit=limit, readonly=bool(auto_refresh),
-                form=self)
+                limit=limit, readonly=bool(auto_refresh), form=self)
         self.screen.signal_connect(self, 'record-message', self._record_message)
         self.screen.signal_connect(self, 'attachment-count',
                 self._attachment_count)

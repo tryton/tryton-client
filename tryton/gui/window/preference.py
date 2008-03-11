@@ -38,7 +38,7 @@ class Preference(object):
             raise
         arch = res['arch']
         fields = res['fields']
-        self.screen = Screen('res.user', view_type=[], window=self.win)
+        self.screen = Screen('res.user', self.win, view_type=[])
         self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
 

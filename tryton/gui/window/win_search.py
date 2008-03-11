@@ -33,8 +33,8 @@ class WinSearch(object):
         scrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
-        self.screen = Screen(model, view_type=['tree'], context=context,
-                parent=self.win)
+        self.screen = Screen(model, self.win, view_type=['tree'],
+                context=context)
         self.view = self.screen.current_view
         self.view.unset_editable()
         sel = self.view.widget_tree.get_selection()

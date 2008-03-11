@@ -17,8 +17,8 @@ _ = gettext.gettext
 class Tree(SignalEvent):
     "Tree page"
 
-    def __init__(self, model, res_id=False, view_id=False, domain=None, context=None,
-            window=None, name=False):
+    def __init__(self, model, window, res_id=False, view_id=False, domain=None,
+            context=None, name=False):
         super(Tree, self).__init__()
         if domain is None:
             domain = {}

@@ -59,8 +59,8 @@ class Dialog(object):
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         scroll.add(viewport)
 
-        self.screen = Screen(model, domain=domain, context=context,
-                window=self.dia, view_type=['form'])
+        self.screen = Screen(model, self.dia, domain=domain, context=context,
+                view_type=['form'])
         if obj_id:
             self.screen.load([obj_id])
         else:
@@ -418,7 +418,7 @@ class Many2One(WidgetInterface):
         if not obj_id:
             common.message(_('You must select a record to use the relation !'))
             return False
-        screen = Screen(self.attrs['relation'])
+        screen = Screen(self.attrs['relation'], self._window)
         screen.load([obj_id])
         act['domain'] = screen.current_model.expr_eval(act['domain'],
                 check_load=False)

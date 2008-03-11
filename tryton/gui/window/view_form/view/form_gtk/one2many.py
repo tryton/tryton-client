@@ -57,8 +57,7 @@ class Dialog(object):
         scroll.add(viewport)
 
         self.dia.show_all()
-        self.screen = Screen(model_name, view_type=[], parent=parent,
-                window=self.dia,
+        self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
                 exclude_field=attrs.get('relation_field', None))
         self.screen.models._context.update(model_ctx)
         if not model:
@@ -213,12 +212,12 @@ class One2Many(WidgetInterface):
         tooltips.enable()
         self.widget.pack_start(hbox, expand=False, fill=True)
 
-        self.screen = Screen(attrs['relation'],
+        self.screen = Screen(attrs['relation'], self._window,
                 view_type=attrs.get('mode','tree,form').split(','),
                 parent=self.parent, views_preload=attrs.get('views', {}),
                 tree_saves=attrs.get('saves', False), create_new=True,
                 row_activate=self._on_activate,
-                default_get=attrs.get('default_get', {}), window=self._window,
+                default_get=attrs.get('default_get', {}),
                 exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
         menuitem_title.get_child().set_text(self.screen.current_view.title)

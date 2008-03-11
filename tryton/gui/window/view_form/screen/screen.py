@@ -15,10 +15,10 @@ _LIMIT = 20000
 class Screen(SignalEvent):
     "Screen"
 
-    def __init__(self, model_name, view_ids=None, view_type=None,
+    def __init__(self, model_name, window, view_ids=None, view_type=None,
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
-            default_get=None, show_search=False, window=None, limit=None,
+            default_get=None, show_search=False, limit=None,
             readonly=False, form=None, exclude_field=None, sort=''):
         if view_ids is None:
             view_ids = []

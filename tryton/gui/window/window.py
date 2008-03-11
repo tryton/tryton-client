@@ -15,15 +15,14 @@ class Window(object):
 
         if view_type == 'form':
             from form import Form
-            win = Form(model, res_id, domain, view_type=mode,
-                    view_ids = (view_ids or []), window=window,
-                    context=context, name=name, limit=limit,
-                    auto_refresh=auto_refresh)
+            win = Form(model, window, res_id, domain, view_type=mode,
+                    view_ids = (view_ids or []), context=context, name=name,
+                    limit=limit, auto_refresh=auto_refresh)
             Main.get_main().win_add(win)
         elif view_type == 'tree':
             from tree import Tree
-            win = Tree(model, res_id, view_ids and view_ids[0] or None, domain,
-                    context, window=window, name=name)
+            win = Tree(model, window, res_id, view_ids and view_ids[0] or None, domain,
+                    context, name=name)
             Main.get_main().win_add(win)
         else:
             import logging

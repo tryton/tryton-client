@@ -48,8 +48,8 @@ class Action(WidgetInterface):
                 view_id = [self.action['view_id'][0]]
             if self.action['view_type'] == 'form':
                 mode = (self.action['view_mode'] or 'form,tree').split(',')
-                self.screen = Screen(self.action['res_model'], view_type=mode,
-                        context=self.context, view_ids = view_id,
+                self.screen = Screen(self.action['res_model'], self._window,
+                        view_type=mode, context=self.context, view_ids=view_id,
                         domain=self.domain)
 #                self.win_gl = glade.XML(common.terp_path("terp.glade"),
 #                        'widget_paned', gettext.textdomain())
