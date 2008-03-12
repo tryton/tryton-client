@@ -22,8 +22,6 @@ class Dialog(object):
         self.dia = gtk.Dialog(_('Tryton - Link'), window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.window = window
-        if ('string' in attrs) and attrs['string']:
-            self.dia.set_title(self.dia.get_title() + ' - ' + attrs['string'])
         self.dia.set_property('default-width', 760)
         self.dia.set_property('default-height', 500)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
@@ -75,6 +73,13 @@ class Dialog(object):
         else:
             self.screen.add_view_id(False, 'form', display=True,
                     context=default_get_ctx)
+
+        name = attrs.get('string', '')
+        if name:
+            name += ' - '
+        name += self.screen.current_view.title
+        self.dia.set_title(self.dia.get_title() + ' - ' + name)
+
         viewport.add(self.screen.widget)
         width, height = self.screen.screen_container.size_get()
         viewport.set_size_request(width, height + 30)
@@ -220,7 +225,11 @@ class One2Many(WidgetInterface):
                 default_get=attrs.get('default_get', {}),
                 exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
-        menuitem_title.get_child().set_text(self.screen.current_view.title)
+        name = attrs.get('string', '')
+        if name:
+            name += ' - '
+        name += self.screen.current_view.title
+        menuitem_title.get_child().set_text(name)
 
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
