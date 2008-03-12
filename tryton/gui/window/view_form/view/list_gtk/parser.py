@@ -132,7 +132,7 @@ class ParserTree(ParserInterface):
                     'integer': 60,
                     'float': 80,
                     'float_time': 80,
-                    'date': 70,
+                    'date': 80,
                     'datetime': 120,
                     'selection': 90,
                     'char': 100,
