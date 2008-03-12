@@ -68,8 +68,7 @@ class ModelRecord(SignalEvent):
             try:
                 values = self.rpc.read(ids, self.mgroup.mfields.keys(), ctx)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
-                return self.mgroup.mfields.get(name, False)
+                values = [{'id': x} for x in ids]
             for value in values:
                 for model in self.mgroup.models:
                     if model.id == value['id']:
