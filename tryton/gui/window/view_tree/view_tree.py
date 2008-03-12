@@ -159,6 +159,8 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
     def on_get_column_type(self, index):
         if index in self.pixbufs:
             return gtk.gdk.Pixbuf
+        if index == 0:
+            return gobject.TYPE_INT
         return FIELDS_LIST_TYPE.get(
                 self.fields_type[self.fields[index-1]]['type'],
                 gobject.TYPE_STRING)
