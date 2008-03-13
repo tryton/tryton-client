@@ -1,5 +1,8 @@
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+import time
+import datetime
 
 class ModelField(object):
     '''
@@ -117,12 +120,27 @@ class SelectionField(CharField):
 
 class DateTimeField(CharField):
 
+    def set_client(self, model, value, test_state=True, force_change=False):
+        if value:
+            date = time.strptime(value, DHM_FORMAT)
+            value = datetime.datetime(date[0], date[1], date[2], date[3],
+                    date[4], date[5])
+        return super(DateTimeField, self).set_client(model, value,
+                test_state=test_state, force_change=force_change)
+
     def get_client(self, model):
         value = super(DateTimeField, self).get_client(model)
         return value and str(value) or False
 
 
 class DateField(CharField):
+
+    def set_client(self, model, value, test_state=True, force_change=False):
+        if value:
+            date = time.strptime(value, DT_FORMAT)
+            value = datetime.datetime(date[0], date[1], date[2])
+        return super(DateField, self).set_client(model, value,
+                test_state=test_state, force_change=force_change)
 
     def get_client(self, model):
         value = super(DateField, self).get_client(model)
