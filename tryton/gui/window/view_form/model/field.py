@@ -138,7 +138,7 @@ class DateField(CharField):
     def set_client(self, model, value, test_state=True, force_change=False):
         if value:
             date = time.strptime(value, DT_FORMAT)
-            value = datetime.datetime(date[0], date[1], date[2])
+            value = datetime.date(date[0], date[1], date[2])
         return super(DateField, self).set_client(model, value,
                 test_state=test_state, force_change=force_change)
 
