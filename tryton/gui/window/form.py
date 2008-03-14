@@ -147,7 +147,7 @@ class Form(SignalEvent):
         response = win.run()
         win.destroy()
         if response == gtk.RESPONSE_OK:
-            self.screen.load([locale.atoi(entry.get_text())])
+            self.screen.display(locale.atoi(entry.get_text()))
 
     def destroy(self):
         self.screen.signal_unconnect(self)
