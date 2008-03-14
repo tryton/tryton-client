@@ -309,7 +309,7 @@ class O2MField(CharField):
         model.value[self.name] = mod
         #self.internal.signal_connect(self.internal, 'model-changed',
         #       self._model_changed)
-        model.value[self.name].pre_load(value, display=False)
+        model.value[self.name].load(value, display=False)
         #self.internal.signal_connect(self.internal, 'model-changed',
         #       self._model_changed)
 
