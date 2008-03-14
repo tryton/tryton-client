@@ -125,22 +125,6 @@ class ModelRecordGroup(SignalEvent):
             self.model_add(newmod, new_index)
         return result
 
-    def pre_load(self, ids, display=True):
-        if not ids:
-            return True
-        if len(ids) > 10:
-            self.models.lock_signal = True
-        for obj_id in ids:
-            newmod = ModelRecord(self.resource, obj_id, self.window,
-                    parent=self.parent, group=self)
-            self.model_add(newmod)
-            if display:
-                self.signal('model-changed', newmod)
-        if len(ids) > 10:
-            self.models.lock_signal = False
-            self.signal('record-cleared')
-        return True
-
     def _load_for(self, values):
         if len(values)>10:
             self.models.lock_signal = True
@@ -155,11 +139,15 @@ class ModelRecordGroup(SignalEvent):
     def load(self, ids, display=True):
         if not ids:
             return True
-        if not self.fields:
-            return self.pre_load(ids, display)
+
+        old_ids = [x.id for x in self.models]
+        ids = [x for x in ids if x not in old_ids]
+        if not ids:
+            return True
 
         if len(ids) > 10:
             self.models.lock_signal = True
+        newmod = None
         for id in ids:
             newmod = ModelRecord(self.resource, id, self.window,
                     parent=self.parent, group=self)
@@ -171,18 +159,18 @@ class ModelRecordGroup(SignalEvent):
 
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context)
-        try:
-            values = self.rpc.read(ids[:80], self.fields.keys(), ctx)
-        except Exception, exception:
-            rpc.process_exception(exception, self.window)
-            return False
-        if not values:
-            return False
-        self._load_for(values)
+        if self.fields:
+            try:
+                values = self.rpc.read(ids[:80], self.fields.keys(), ctx)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                return False
+            if not values:
+                return False
+            self._load_for(values)
 
-        #newmod = False
-        #if newmod and display:
-        #    self.signal('model-changed', newmod)
+        if newmod and display:
+            self.signal('model-changed', newmod)
         self.current_idx = 0
         return True
 
