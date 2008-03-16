@@ -270,7 +270,10 @@ class ModelRecord(SignalEvent):
         if isinstance(attr, basestring):
             attr = eval(attr)
         for arg in attr:
-            args[arg] = self.expr_eval(arg)
+            try:
+                args[arg] = self.expr_eval(arg)
+            except:
+                args[arg] = False
         ids = self.id and [self.id] or []
         try:
             res = getattr(self.rpc, 'on_change_' + field)(ids, args,
