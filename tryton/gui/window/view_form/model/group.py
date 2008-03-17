@@ -99,31 +99,36 @@ class ModelRecordGroup(SignalEvent):
             self.writen(saved)
 
     def writen(self, edited_id):
-        if not self.on_write:
+        ids = self.on_write_ids([edited_id])
+        if not ids:
             return
-        try:
-            new_ids = getattr(self.rpc, self.on_write)(edited_id, self.context)
-        except Exception, exception:
-            rpc.process_exception(exception, self.window)
-            return
-        model_idx = self.models.index(self[edited_id])
-        result = False
-        for new_id in new_ids:
+        index = self.models.index(self[edited_id])
+        self.reload(ids, index)
+
+    def reload(self, ids, index):
+        for obj_id in ids:
             cont = False
             for model in self.models:
-                if model.id == new_id:
+                if model.id == obj_id:
                     cont = True
                     model.reload()
             if cont:
                 continue
-            newmod = ModelRecord(self.resource, new_id, self.window,
+            newmod = ModelRecord(self.resource, obj_id, self.window,
                     parent=self.parent, group=self)
             newmod.reload()
-            if not result:
-                result = newmod
-            new_index = min(model_idx, len(self.models)-1)
+            new_index = min(index, len(self.models)-1)
             self.model_add(newmod, new_index)
-        return result
+
+    def on_write_ids(self, ids):
+        if not self.on_write:
+            return False
+        try:
+            res = getattr(self.rpc, self.on_write)(ids, self.context)
+        except Exception, exception:
+            rpc.process_exception(exception, self.window)
+            return False
+        return res
 
     def _load_for(self, values):
         if len(values)>10:

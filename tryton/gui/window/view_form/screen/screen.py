@@ -417,6 +417,9 @@ class Screen(SignalEvent):
             obj_id = self.current_model.id
             if unlink and obj_id:
                 try:
+                    reload_ids = self.models.on_write_ids(obj_id)
+                    if reload_ids and obj_id in reload_ids:
+                        reload_ids.remove(obj_id)
                     if not self.rpc.unlink([obj_id]):
                         return False
                 except Exception, exception:
@@ -429,6 +432,8 @@ class Screen(SignalEvent):
                 self.current_model = self.models.models[idx]
             else:
                 self.current_model = None
+            if reload_ids:
+                self.models.reload(reload_ids, idx)
             self.display()
             self.current_view.set_cursor()
             res = obj_id
@@ -436,6 +441,11 @@ class Screen(SignalEvent):
             ids = self.current_view.sel_ids_get()
             if unlink and ids:
                 try:
+                    reload_ids = self.models.on_write_ids(ids)
+                    if reload_ids:
+                        for obj_id in ids:
+                            if obj_id in reload_ids:
+                                reload_ids.remove(obj_id)
                     if not self.rpc.unlink(ids):
                         return False
                 except Exception, exception:
@@ -444,6 +454,8 @@ class Screen(SignalEvent):
             for model in self.current_view.sel_models_get():
                 self.models.remove(model)
             self.current_model = None
+            if reload_ids:
+                self.models.reload(reload_ids, 0)
             self.display()
             self.current_view.set_cursor()
             res = ids
