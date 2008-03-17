@@ -424,8 +424,8 @@ class M2O(Char):
         rpc_relation = RPCProxy(relation)
 
         win = WinSearch(relation, sel_multi=False, ids=ids, context=context,
-                domain=domain)
-        found = win.go()
+                domain=domain, parent=self.window)
+        found = win.run()
         if found:
             try:
                 return rpc_relation.name_get([found[0]], context)[0]
