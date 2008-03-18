@@ -373,7 +373,6 @@ class Main(object):
             'on_opt_files_actions_activate': self.sig_files_actions,
             'on_help_tips_activate': self.sig_tips,
             'on_help_licence_activate': self.sig_licence,
-            'on_about_activate': self.sig_about,
             'on_shortcuts_activate' : self.sig_shortcuts,
             'on_db_new_activate': self.sig_db_new,
             'on_db_restore_activate': self.sig_db_restore,
@@ -653,19 +652,6 @@ class Main(object):
                 lambda obj: dialog.get_widget('win_licence').destroy())
 
         win = dialog.get_widget('win_licence')
-        win.set_transient_for(self.window)
-        win.show_all()
-
-    def sig_about(self, widget):
-        about = glade.XML(GLADE, "win_about", gettext.textdomain())
-        buf = about.get_widget('textview2').get_buffer()
-        about_txt = buf.get_text(buf.get_start_iter(),
-                buf.get_end_iter())
-        buf.set_text(about_txt % VERSION)
-        about.signal_connect("on_but_ok_pressed",
-                lambda obj: about.get_widget('win_about').destroy())
-
-        win = about.get_widget('win_about')
         win.set_transient_for(self.window)
         win.show_all()
 
