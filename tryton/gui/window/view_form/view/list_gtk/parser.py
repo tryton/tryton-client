@@ -131,6 +131,7 @@ class ParserTree(ParserInterface):
                 twidth = {
                     'integer': 60,
                     'float': 80,
+                    'numeric': 80,
                     'float_time': 80,
                     'date': 80,
                     'datetime': 120,
@@ -154,7 +155,7 @@ class ParserTree(ParserInterface):
                 col.set_visible(not fields[fname].get('tree_invisible', False))
                 i = treeview.append_column(col)
                 if 'sum' in fields[fname] and fields[fname]['type'] \
-                        in ('integer', 'float', 'float_time'):
+                        in ('integer', 'float', 'numeric', 'float_time'):
                     label = gtk.Label()
                     label.set_use_markup(True)
                     label_str = fields[fname]['sum'] + ': '
@@ -187,7 +188,7 @@ class Char(object):
         cell.set_property('text', text)
         color = self.get_color(model)
         cell.set_property('foreground', str(color))
-        if self.attrs['type'] in ('float', 'integer', 'boolean'):
+        if self.attrs['type'] in ('float', 'integer', 'boolean', 'numeric'):
             align = 1
         else:
             align = 0
