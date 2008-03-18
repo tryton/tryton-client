@@ -82,6 +82,7 @@ class ParserTree(ParserInterface):
         treeview.set_property('rules-hint', True)
         if not self.title:
             self.title = attrs.get('string', 'Unknown')
+        tooltips = gtk.Tooltips()
 
         for node in root_node.childNodes:
             node_attrs = node_attributes(node)
@@ -117,6 +118,11 @@ class ParserTree(ParserInterface):
                 hbox = gtk.HBox(False, 2)
                 label = gtk.Label(fields[fname]['string'])
                 label.show()
+                help = fields[fname]['string']
+                if fields[fname].get('help'):
+                    help += '\n' + fields[fname]['help']
+                tooltips.set_tip(label, help)
+                tooltips.enable()
                 arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
                 col.arrow = arrow
                 col.arrow_show = False
