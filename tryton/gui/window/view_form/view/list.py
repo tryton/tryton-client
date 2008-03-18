@@ -160,10 +160,12 @@ class ViewList(ParserView):
         if children:
             hbox = gtk.HBox()
             self.widget.pack_start(hbox, expand=False, fill=False, padding=2)
-            for child in children:
+            keys = children.keys()
+            keys.sort()
+            for i in keys:
                 hbox2 = gtk.HBox()
-                hbox2.pack_start(children[child][1], expand=True, fill=False)
-                hbox2.pack_start(children[child][2], expand=True, fill=False)
+                hbox2.pack_start(children[i][1], expand=True, fill=False)
+                hbox2.pack_start(children[i][2], expand=True, fill=False)
                 hbox.pack_start(hbox2, expand=False, fill=False, padding=12)
             hbox.show_all()
 
@@ -372,12 +374,23 @@ class ViewList(ParserView):
         ids = self.sel_ids_get()
         for child in self.children:
             value = 0.0
+            loaded = True
             for model in self.screen.models.models:
+                if not model.loaded:
+                    loaded = False
+                    break
                 if model.id in ids or not ids:
-                    value += model.fields_get()[self.children[child][0]]\
-                            .get(model, check_load=False)
-            label_str = locale.format('%.' + str(self.children[child][3]) + 'f',
-                    value, True)
+                    if not value:
+                        value = model.fields_get()[self.children[child][0]]\
+                                .get(model, check_load=False)
+                    else:
+                        value += model.fields_get()[self.children[child][0]]\
+                                .get(model, check_load=False)
+            if loaded:
+                label_str = locale.format('%.' + str(self.children[child][3]) + 'f',
+                        value, True)
+            else:
+                label_str = '-'
             if self.children[child][4]:
                 self.children[child][2].set_markup('<b>%s</b>' % label_str)
             else:

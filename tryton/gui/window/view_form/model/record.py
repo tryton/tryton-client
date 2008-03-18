@@ -90,6 +90,11 @@ class ModelRecord(SignalEvent):
             return True
         return False
 
+    def get_loaded(self):
+        return self._loaded
+
+    loaded = property(get_loaded)
+
     def get(self, get_readonly=True, includeid=False, check_load=True,
             get_modifiedonly=False):
         if check_load:
