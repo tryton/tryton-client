@@ -64,9 +64,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 if old_pos != pos:
                     new_order[old_pos] = pos
                 pos += 1
-            except KeyError:
-                if obj_id == 109216:
-                    print obj_id
+            except:
                 continue
         self.models.sort(lambda x, y: \
                 cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
@@ -304,14 +302,11 @@ class ViewList(ParserView):
             'id': value or False, 'ids': [value]})
 
     def signal_record_changed(self, signal, *args):
-        if not self.store:
-            return
-        if signal == 'record-added':
-            self.store.added(*args)
-        elif signal == 'record-removed':
-            self.store.removed(*args)
-        else:
-            pass
+        if self.store:
+            if signal == 'record-added':
+                self.store.added(*args)
+            elif signal == 'record-removed':
+                self.store.removed(*args)
         self.update_children()
 
     def cancel(self):

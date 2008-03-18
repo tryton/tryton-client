@@ -72,7 +72,7 @@ class ModelRecord(SignalEvent):
             for value in values:
                 for model in self.mgroup.models:
                     if model.id == value['id']:
-                        model.set(value, signal=False)
+                        model.set(value, signal=True)
         return self.mgroup.mfields.get(name, False)
 
     def __repr__(self):

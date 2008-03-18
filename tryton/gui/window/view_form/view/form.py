@@ -174,7 +174,10 @@ class ViewForm(ParserView):
             widget.reset(model)
 
     def signal_record_changed(self, *args):
-        pass
+        for widget in self.widgets.values():
+            if hasattr(widget.widget, 'screen'):
+                for view in widget.widget.screen.views:
+                    view.signal_record_changed(*args)
 
     def display(self):
         model = self.screen.current_model

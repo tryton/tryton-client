@@ -324,9 +324,7 @@ class One2Many(WidgetInterface):
             if (self.screen.current_view.view_type == 'tree') \
                     and self.screen.editable_get():
                 self.screen.current_model = None
-            self.screen.display()
-        else:
-            self.screen.display()
+        self.screen.display()
         return True
 
     def set_value(self, model, model_field):
