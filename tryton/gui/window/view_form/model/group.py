@@ -102,23 +102,15 @@ class ModelRecordGroup(SignalEvent):
         ids = self.on_write_ids([edited_id])
         if not ids:
             return
-        index = self.models.index(self[edited_id])
-        self.reload(ids, index)
+        self.reload(ids)
 
-    def reload(self, ids, index):
+    def reload(self, ids):
         for obj_id in ids:
             cont = False
             for model in self.models:
                 if model.id == obj_id:
                     cont = True
                     model.reload()
-            if cont:
-                continue
-            newmod = ModelRecord(self.resource, obj_id, self.window,
-                    parent=self.parent, group=self)
-            newmod.reload()
-            new_index = min(index, len(self.models)-1)
-            self.model_add(newmod, new_index)
 
     def on_write_ids(self, ids):
         if not self.on_write:

@@ -433,7 +433,7 @@ class Screen(SignalEvent):
             else:
                 self.current_model = None
             if reload_ids:
-                self.models.reload(reload_ids, idx)
+                self.models.reload(reload_ids)
             self.display()
             self.current_view.set_cursor()
             res = obj_id
@@ -455,7 +455,7 @@ class Screen(SignalEvent):
                 self.models.remove(model)
             self.current_model = None
             if reload_ids:
-                self.models.reload(reload_ids, 0)
+                self.models.reload(reload_ids)
             self.display()
             self.current_view.set_cursor()
             res = ids
