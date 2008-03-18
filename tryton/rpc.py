@@ -238,6 +238,6 @@ def concurrency(resource, obj_id, context, parent):
         return True
     if res == gtk.RESPONSE_APPLY:
         from gui.window import Window
-        Window.create(False, resource, obj_id, [], 'form', None, context,
-                'form,tree')
+        Window.create(False, resource, obj_id, [('id', '=', obj_id)], 'form',
+                parent, context, ['form', 'tree'])
     return False
