@@ -276,9 +276,10 @@ class O2MField(CharField):
         return mod
 
     def _model_changed(self, group, model):
-        model.parent.modified = True
-        model.parent.modified_fields.setdefault(self.name)
-        self.sig_changed(model.parent)
+        if model.modified:
+            model.parent.modified = True
+            model.parent.modified_fields.setdefault(self.name)
+            self.sig_changed(model.parent)
         self.parent.signal('record-changed', model)
 
     def get_client(self, model):
