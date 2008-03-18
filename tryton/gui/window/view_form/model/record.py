@@ -280,9 +280,11 @@ class ModelRecord(SignalEvent):
             except:
                 args[arg] = False
         ids = self.id and [self.id] or []
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(self.context_get())
         try:
             res = getattr(self.rpc, 'on_change_' + field)(ids, args,
-                    rpc.CONTEXT)
+                    ctx)
         except Exception, exception:
             rpc.process_exception(exception, self.window)
             return
