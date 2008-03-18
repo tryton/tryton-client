@@ -294,7 +294,8 @@ class O2MField(CharField):
                 continue
             if model2.id:
                 result.append((1, model2.id,
-                    model2.get(check_load=check_load, get_readonly=readonly)))
+                    model2.get(check_load=check_load, get_readonly=readonly,
+                        get_modifiedonly=modified)))
             else:
                 result.append((0, 0,
                     model2.get(check_load=check_load, get_readonly=readonly)))
