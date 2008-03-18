@@ -7,7 +7,7 @@ class Window(object):
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None,
             view_type='form', window=None, context=None, mode=None, name=False,
-            limit=80, auto_refresh=False):
+            limit=None, auto_refresh=False):
         from tryton.gui import Main
         if context is None:
             context = {}
