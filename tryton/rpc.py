@@ -1,11 +1,13 @@
 import pysocket
 import translate
-from config import CONFIG
+from config import CONFIG, GLADE, TRYTON_ICON
 import gtk
 import logging
 import common
 import socket
 from threading import Semaphore
+from gtk import glade
+import gettext
 
 _SOCK = None
 _USER = 0
