@@ -58,11 +58,19 @@ class Button(object):
                     except Exception, exception:
                         rpc.process_exception(exception, self.form.window)
                 elif button_type == 'action':
-                    Action.execute(int(self.attrs['name']), {
-                        'model': self.form.screen.name,
-                        'id': obj_id or False,
-                        'ids': obj_id and [obj_id] or [],
-                        })
+                    action_id = None
+                    try:
+                        action_id = rpc.execute('object', 'execute', 'ir.action',
+                                'get_action_id', int(self.attrs['name']),
+                                rpc.CONTEXT)
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.form.window)
+                    if action_id:
+                        Action.execute(action_id, {
+                            'model': self.form.screen.name,
+                            'id': obj_id or False,
+                            'ids': obj_id and [obj_id] or [],
+                            })
                 else:
                     raise Exception('Unallowed button type')
                 self.form.screen.reload()
