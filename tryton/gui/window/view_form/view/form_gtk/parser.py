@@ -402,24 +402,21 @@ class ParserForm(ParserInterface):
                         xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
-                frame = gtk.Frame(attrs.get('string', None))
-                frame.set_border_width(0)
-
-                container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
-                        expand=int(attrs.get('expand', 0)),
-                        rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
-                        fill=int(attrs.get('fill', 1)))
                 container.new(int(attrs.get('col', 4)))
-
                 widget, widgets, buttons, on_write = self.parse(model, node,
                         fields, tooltips=tooltips)
                 dict_widget.update(widgets)
                 button_list += buttons
-                frame.add(widget)
-                if not attrs.get('string', None):
-                    frame.set_shadow_type(gtk.SHADOW_NONE)
-                    container.get().set_border_width(0)
+                if attrs.get('string', None):
+                    frame = gtk.Frame(attrs['string'])
+                    frame.add(widget)
+                else:
+                    frame = widget
                 container.pop()
+                container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
+                        expand=int(attrs.get('expand', 0)),
+                        rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
+                        fill=int(attrs.get('fill', 1)))
             elif node.localName == 'hpaned':
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
