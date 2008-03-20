@@ -30,7 +30,7 @@ class TextBox(WidgetInterface):
         self.textview.set_editable(not value)
         self.textview.set_sensitive(not value)
 
-    def _color_scrolledwindow(self):
+    def _color_widget(self):
         return self.textview
 
     def set_value(self, model, model_field):
