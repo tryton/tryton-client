@@ -71,15 +71,11 @@ def login(username, password, host, port, database):
             _SEMAPHORE.release()
     except socket.error:
         _USER = 0
-        _USERNAME = ''
         _SESSION = ''
-        _DATABASE = ''
         return -1
     if not res:
         _USER = 0
-        _USERNAME = ''
         _SESSION = ''
-        _DATABASE = ''
         return -2
     _USER = res[0]
     _USERNAME = username
