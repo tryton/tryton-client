@@ -413,6 +413,7 @@ class Screen(SignalEvent):
 
     def remove(self, unlink=False):
         res = False
+        reload_ids = []
         if self.current_view.view_type == 'form' and self.current_model:
             obj_id = self.current_model.id
             if unlink and obj_id:
