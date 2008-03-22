@@ -457,6 +457,25 @@ class O2M(Char):
     def value_from_text(self, model, text):
         raise UnsettableColumn('Can not set column of type o2m')
 
+    def open_remote(self, model, create=True, changed=False, text=None):
+        if not create:
+            raise NotImplementedError
+        modelfield = model.mgroup.mfields[self.field_name]
+        relation = modelfield.attrs['relation']
+        context = modelfield.context_get(model)
+
+        dia = O2MDialog(relation, parent=model, attrs=modelfield.attrs,
+                default_get_ctx=context, window=self.window)
+        res = True
+        while res:
+            res, value = dia.run()
+            if res:
+                model.value[self.field_name].model_add(value)
+                value.signal('record-changed', value.parent)
+                dia.new()
+        dia.destroy()
+        return False, False
+
 
 class M2M(Char):
 
