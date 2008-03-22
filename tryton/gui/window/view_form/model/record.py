@@ -257,7 +257,7 @@ class ModelRecord(SignalEvent):
             return dom
         if check_load:
             self._check_load()
-        ctx = {}
+        ctx = rpc.CONTEXT.copy()
         for name, mfield in self.mgroup.mfields.items():
             ctx[name] = mfield.get(self, check_load=check_load)
 
