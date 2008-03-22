@@ -223,6 +223,9 @@ class Screen(SignalEvent):
         self.screen_container.set(self.current_view.widget)
         if self.current_model:
             self.current_model.validate_set()
+        else:
+            if self.current_view.view_type == 'form':
+                self.new()
         self.display()
         self.current_view.set_cursor()
         # TODO: set True or False accoring to the type
