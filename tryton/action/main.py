@@ -84,7 +84,7 @@ class Action(object):
     @staticmethod
     def _exec_action(action, datas=None, context=None):
         if context is None:
-            context = {}
+            context = rpc.CONTEXT.copy()
         if datas is None:
             datas = {}
         if 'type' not in action:
