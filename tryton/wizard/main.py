@@ -14,8 +14,9 @@ class Dialog(object):
     def __init__(self, arch, fields, state, obj_name, parent=None):
         self.states = []
         default = -1
-        self.dia = gtk.Dialog('Tryton', parent,
+        self.dia = gtk.Dialog(_('Tryton - Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.dia.set_deletable(False)
         for i in state:
             but = gtk.Button(i[1])
             but.show()
@@ -48,7 +49,7 @@ class Dialog(object):
         self.screen.widget.show()
 
         self.dia.vbox.pack_start(self.screen.widget)
-        self.dia.set_title(self.screen.current_view.title)
+        self.dia.set_title(self.dia.get_title() + ' - ' + self.screen.current_view.title)
         self.dia.show()
 
     def run(self, datas=None):
