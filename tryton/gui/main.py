@@ -231,8 +231,8 @@ class DBCreate(object):
                 common.warning(_('The database name must contain ' \
                         'only normal characters or "_".\n' \
                         'You must avoid all accents, space ' \
-                        'or special characters.'), _('Bad database name !'),
-                        parent=parent)
+                        'or special characters.'), parent,
+                        _('Bad database name !'))
 
             else:
                 break
