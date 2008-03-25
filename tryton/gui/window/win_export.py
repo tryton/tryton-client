@@ -185,7 +185,7 @@ class WinExport(object):
             iter = self.model2.iter_next(iter)
         try:
             new_id = ir_export.create({'name' : name, 'resource' : self.model,
-                'export_fields' : [(0, 0, {'name' : f}) for f in fields]})
+                'export_fields' : [('create', {'name' : f}) for f in fields]})
         except Exception, exception:
             rpc.process_exception(exception, self.win)
             return

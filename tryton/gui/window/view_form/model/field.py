@@ -235,7 +235,7 @@ class M2MField(CharField):
         return []
 
     def get(self, model, check_load=True, readonly=True, modified=False):
-        return [(6, 0, model.value[self.name] or [])]
+        return [('set', model.value[self.name] or [])]
 
     def get_client(self, model):
         return model.value[self.name] or []
@@ -293,14 +293,14 @@ class O2MField(CharField):
             if (modified and not model2.is_modified()):
                 continue
             if model2.id:
-                result.append((1, model2.id,
+                result.append(('write', model2.id,
                     model2.get(check_load=check_load, get_readonly=readonly,
                         get_modifiedonly=modified)))
             else:
-                result.append((0, 0,
+                result.append(('create',
                     model2.get(check_load=check_load, get_readonly=readonly)))
         for rm_id in model.value[self.name].model_removed:
-            result.append((2, rm_id, False))
+            result.append(('unlink', rm_id))
         return result
 
     def set(self, model, value, test_state=False, modified=False):
