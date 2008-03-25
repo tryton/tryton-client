@@ -3,6 +3,7 @@ import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
 import time
 import datetime
+from decimal import Decimal
 
 class ModelField(object):
     '''
@@ -84,6 +85,9 @@ class CharField(object):
             model.on_change(self.name, self.attrs['on_change'])
         return res
 
+    def set_on_change(self, model, value):
+        return self.set(model, value, modified=True)
+
     def get_default(self, model):
         return self.get(model)
 
@@ -163,6 +167,14 @@ class FloatField(CharField):
                 model.modified_fields.setdefault(self.name)
                 self.sig_changed(model)
                 model.signal('record-changed', model)
+
+
+class NumericField(FloatField):
+
+    def set_client(self, model, value, test_state=True, force_change=False):
+        value = Decimal(str(value))
+        return super(NumericField, self).set_client(model, value,
+                test_state=test_state, force_change=force_change)
 
 
 class IntegerField(CharField):
@@ -326,7 +338,12 @@ class O2MField(CharField):
             context = self.context_get(model)
             rpc2 = RPCProxy(self.attrs['relation'])
             try:
-                fields = rpc2.fields_get(value[0].keys(), context)
+                fields_name = []
+                for val in value:
+                    for fieldname in val.keys():
+                        if fieldname not in fields_name:
+                            fields_name.append(fieldname)
+                fields = rpc2.fields_get(fields_name, context)
             except:
                 return False
 
@@ -341,6 +358,44 @@ class O2MField(CharField):
             model.value[self.name].model_add(mod)
         model.value[self.name].current_model = mod
         #mod.signal('record-changed')
+        return True
+
+    def set_on_change(self, model, value):
+        from group import ModelRecordGroup
+
+        if value and value.get('add'):
+            context = self.context_get(model)
+            rpc2 = RPCProxy(self.attrs['relation'])
+            try:
+                fields_name = []
+                for val in value['add']:
+                    for fieldname in val.keys():
+                        if fieldname not in fields_name:
+                            fields_name.append(fieldname)
+                fields = rpc2.fields_get(fields_name, context)
+            except:
+                return False
+
+        to_remove = []
+        for mod in model.value[self.name]:
+            if not mod.id:
+                to_remove.append(mod)
+        if value and value.get('remove'):
+            for model_id in value['remove']:
+                mod = model.value[self.name].get_by_id(model_id)
+                if mod:
+                    to_remove.append(mod)
+        for mod in to_remove:
+            model.value[self.name].remove(mod)
+
+        mod = None
+        if value and value.get('add'):
+            model.value[self.name].add_fields(fields, model.value[self.name])
+            for record in (value['add'] or []):
+                mod = model.value[self.name].model_new(default=False)
+                model.value[self.name].model_add(mod)
+                mod.set(record, modified=True, signal=True)
+        model.value[self.name].current_model = mod
         return True
 
     def get_default(self, model):
@@ -407,7 +462,7 @@ TYPES = {
     'float_time': FloatField,
     'integer' : IntegerField,
     'float' : FloatField,
-    'numeric' : FloatField,
+    'numeric' : NumericField,
     'many2one' : M2OField,
     'many2many' : M2MField,
     'one2many' : O2MField,

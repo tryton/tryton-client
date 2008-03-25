@@ -148,6 +148,8 @@ class ModelRecord(SignalEvent):
         self._loaded = False
         if force_reload:
             self.reload()
+        if self.mgroup:
+            self.mgroup.writen(self.id)
         return self.id
 
     def default_get(self, domain=None, context=None):
@@ -270,7 +272,7 @@ class ModelRecord(SignalEvent):
         val = eval(dom, ctx)
         return val
 
-    def on_change(self, field, attr):
+    def on_change(self, fieldname, attr):
         args = {}
         if isinstance(attr, basestring):
             attr = eval(attr)
@@ -283,14 +285,23 @@ class ModelRecord(SignalEvent):
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
         try:
-            res = getattr(self.rpc, 'on_change_' + field)(ids, args,
+            res = getattr(self.rpc, 'on_change_' + fieldname)(ids, args,
                     ctx)
         except Exception, exception:
             rpc.process_exception(exception, self.window)
             return
         if res:
-            self.set(res, modified=True)
-        self.signal('record-changed')
+            later = {}
+            for fieldname, value in res.items():
+                if fieldname not in self.mgroup.mfields:
+                    continue
+                if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
+                    later[fieldname] = value
+                    continue
+                self.mgroup.mfields[fieldname].set_on_change(self, value)
+            for fieldname, value in later.items():
+                self.mgroup.mfields[fieldname].set_on_change(self, value)
+            self.signal('record-changed')
 
     def cond_default(self, field_name, value):
         ir_default = RPCProxy('ir.default')
