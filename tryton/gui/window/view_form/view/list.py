@@ -77,9 +77,6 @@ class AdaptModelGroup(gtk.GenericTreeModel):
             prev.next = None
         self.rows_reordered(None, None, new_order)
 
-    def saved(self, obj_id):
-        return self.model_group.writen(obj_id)
-
     def __len__(self):
         return len(self.models)
 

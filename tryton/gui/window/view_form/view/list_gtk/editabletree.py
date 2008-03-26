@@ -135,27 +135,21 @@ class EditableTreeView(gtk.TreeView):
             entry.editing_done_id = entry.connect('editing_done',
                     self.on_editing_done)
         if event.keyval in self.leaving_model_events:
-            if model.validate() and self.screen.tree_saves:
+            if self.screen.tree_saves:
+                if not model.validate():
+                    invalid_fields = model.invalid_fields
+                    col = None
+                    for col in self.get_columns():
+                        if col.name in invalid_fields:
+                            break
+                    self.set_cursor(path, col, True)
+                    self.screen.form.message_state(
+                            _('Warning; field "%s" is required !') % \
+                                    invalid_fields[col.name])
+                    return True
                 obj_id = model.save()
                 if not obj_id:
                     return True
-                else:
-                    res = store.saved(obj_id)
-                    if res:
-                        self.screen.display(res.id)
-
-            elif self.screen.tree_saves:
-                invalid_fields = model.invalid_fields
-                col = None
-                for col in self.get_columns():
-                    if col.name in invalid_fields:
-                        break
-                self.set_cursor(path, col, True)
-                self.screen.form.message_state(
-                        _('Warning; field "%s" is required !') % \
-                                invalid_fields[col.name])
-                return True
-
         if event.keyval == gtk.keysyms.Tab:
             new_col = self.__next_column(column)
             self.set_cursor(path, new_col, True)
@@ -214,6 +208,7 @@ class EditableTreeView(gtk.TreeView):
             self.on_create_line()
         new_path = (path[0] + 1) % len(store)
         self.set_cursor(new_path, column, True)
+        self.scroll_to_cell(new_path)
         return new_path
 
     def _key_up(self, path, store, column):
@@ -223,6 +218,7 @@ class EditableTreeView(gtk.TreeView):
         else:
             new_path = (path[0] - 1) % len(store)
         self.set_cursor(new_path, column, True)
+        self.scroll_to_cell(new_path)
         return new_path
 
     def on_editing_done(self, entry):
