@@ -149,7 +149,7 @@ class DBLogin(object):
                 i = liststore.iter_next(i)
 
         res = win.run()
-        url_m = re.match('^([\w.\-]+):(\d{1,5})$',
+        url_m = re.match('^([\w.:\-\d]+):(\d{1,5})$',
                 server_widget.get_text() or '')
         if url_m:
             CONFIG['login.server'] = url_m.group(1)
@@ -685,7 +685,7 @@ class Main(object):
         self.sb_username.push(sb_id, prefs['name'] or '')
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, '%s@%s:%d' % (rpc._USERNAME,
-            rpc._SOCK.host, rpc._SOCK.port))
+            rpc._SOCK.hostname, rpc._SOCK.port))
         if not prefs[menu_type]:
             if quiet:
                 return False
@@ -859,7 +859,7 @@ class Main(object):
         if not dbname:
             return
 
-        host, port = url.split(':')
+        host, port = url.rsplit(':', 1)
 
         try:
             rpc.db_exec(host, int(port), 'drop', passwd, dbname)
@@ -881,7 +881,7 @@ class Main(object):
             file_p = file(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
-            host, port = url.split(':')
+            host, port = url.rsplit(':' , 1)
             res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
                     data_b64)
             if res:
@@ -936,7 +936,7 @@ class Main(object):
                 preview=False)
 
         if filename:
-            host, port = url.split(':')
+            host, port = url.rsplit(':', 1)
             dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
             dump = base64.decodestring(dump_b64)
             file_ = file(filename, 'wb')

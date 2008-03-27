@@ -34,7 +34,8 @@ class PySocket:
     def connect(self, host, port=False):
         if not port:
             buf = host.split('//')[1]
-            host, port = buf.split(':')
+            host, port = buf.rsplit(':', 1)
+        hostname = host
         if host in DNS_CACHE:
             host = DNS_CACHE[host]
         if not self.sock:
@@ -48,7 +49,7 @@ class PySocket:
             self.sock = socket.socket(familly, socket.SOCK_STREAM)
             self.sock.settimeout(120)
         self.sock.connect((host, int(port)))
-        DNS_CACHE[host], port = self.sock.getpeername()[:2]
+        DNS_CACHE[hostname], port = self.sock.getpeername()[:2]
         try:
             familly = socket.AF_INET
             if socket.has_ipv6:
@@ -67,6 +68,7 @@ class PySocket:
         if self.ssl:
             self.ssl_sock = socket.ssl(self.sock)
         self.host = host
+        self.hostname = hostname
         self.port = port
 
     def disconnect(self):
