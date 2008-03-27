@@ -22,14 +22,15 @@ _SEMAPHORE = Semaphore()
 
 def db_list(host, port):
     global _SOCK
-    if _SOCK:
-        _SOCK.disconnect()
-        _SOCK = None
+    _SEMAPHORE.acquire()
     try:
-        _SOCK = pysocket.PySocket()
-        _SEMAPHORE.acquire()
         try:
-            _SOCK.connect(host, port)
+            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+                _SOCK.disconnect()
+                _SOCK = None
+            if _SOCK is None:
+                _SOCK = pysocket.PySocket()
+                _SOCK.connect(host, port)
             _SOCK.send(('db', 'list'))
             res = _SOCK.receive()
         finally:
@@ -40,13 +41,14 @@ def db_list(host, port):
 
 def db_exec(host, port, method, *args):
     global _SOCK
-    if _SOCK:
-        _SOCK.disconnect()
-        _SOCK = None
-    _SOCK= pysocket.PySocket()
     _SEMAPHORE.acquire()
     try:
-        _SOCK.connect(host, port)
+        if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+            _SOCK.disconnect()
+            _SOCK = None
+        if _SOCK is None:
+            _SOCK= pysocket.PySocket()
+            _SOCK.connect(host, port)
         _SOCK.send(('db', method) + args)
         res = _SOCK.receive()
     finally:
@@ -55,16 +57,17 @@ def db_exec(host, port, method, *args):
 
 def login(username, password, host, port, database):
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
-    if _SOCK:
-        _SOCK.disconnect()
-        _SOCK = None
     _VIEW_CACHE = {}
     SECURE = False
     try:
-        _SOCK = pysocket.PySocket()
         _SEMAPHORE.acquire()
         try:
-            _SOCK.connect(host, port)
+            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+                _SOCK.disconnect()
+                _SOCK = None
+            if _SOCK is None:
+                _SOCK = pysocket.PySocket()
+                _SOCK.connect(host, port)
             _SOCK.send(('common', 'login', database, username, password))
             res = _SOCK.receive()
         finally:
