@@ -591,7 +591,7 @@ class Main(object):
                     return False
                 raise
         self.window.present()
-        self.sig_logout(widget)
+        self.sig_logout(widget, disconnect=False)
         log_response = rpc.login(*res)
         if log_response > 0:
             CONFIG.save()
@@ -616,7 +616,7 @@ class Main(object):
         self.glade.get_widget('plugins').set_sensitive(True)
         return True
 
-    def sig_logout(self, widget):
+    def sig_logout(self, widget, disconnect=True):
         res = True
         while res:
             wid = self._wid_get()
@@ -640,7 +640,8 @@ class Main(object):
         self.glade.get_widget('user').set_sensitive(False)
         self.glade.get_widget('form').set_sensitive(False)
         self.glade.get_widget('plugins').set_sensitive(False)
-        rpc.logout()
+        if disconnect:
+            rpc.logout()
         return True
 
     def sig_tips(self, *args):
