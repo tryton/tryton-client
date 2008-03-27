@@ -455,7 +455,7 @@ class O2M(Char):
                 get_client(model).models)) + ' )'
 
     def value_from_text(self, model, text):
-        raise UnsettableColumn('Can not set column of type o2m')
+        pass
 
     def open_remote(self, model, create=True, changed=False, text=None):
         if not create:
