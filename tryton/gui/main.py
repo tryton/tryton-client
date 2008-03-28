@@ -685,8 +685,8 @@ class Main(object):
         sb_id = self.sb_username.get_context_id('message')
         self.sb_username.push(sb_id, prefs['name'] or '')
         sb_id = self.sb_servername.get_context_id('message')
-        self.sb_servername.push(sb_id, '%s@%s:%d' % (rpc._USERNAME,
-            rpc._SOCK.hostname, rpc._SOCK.port))
+        self.sb_servername.push(sb_id, '%s@%s:%d/%s' % (rpc._USERNAME,
+            rpc._SOCK.hostname, rpc._SOCK.port, rpc._DATABASE))
         if not prefs[menu_type]:
             if quiet:
                 return False
