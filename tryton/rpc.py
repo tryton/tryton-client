@@ -110,8 +110,7 @@ def context_reload():
         return
     for i in context:
         value = context[i]
-        if value:
-            CONTEXT[i] = value
+        CONTEXT[i] = value
         if i == 'language_direction':
             if value == 'rtl':
                 gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
