@@ -81,7 +81,7 @@ class EditableTreeView(gtk.TreeView):
             self.screen.form.message_state(_('Relation Field: F1: New F2: Open/Search'))
         elif focus_column and (focus_column._type in ('one2many')) \
                 and self.screen.form:
-            self.screen.form.message_state(_('Relation Field: F1: New'))
+            self.screen.form.message_state(_('Relation Field: F2: Open'))
         elif focus_column and (focus_column._type in ('boolean')):
             start_editing = False
         elif self.screen.form:

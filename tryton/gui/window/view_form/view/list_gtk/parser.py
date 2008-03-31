@@ -10,11 +10,13 @@ import time
 
 from tryton.gui.window.view_form.view.form_gtk.many2one import Dialog \
         as M2ODialog
+from tryton.gui.window.view_form.view.form_gtk.one2many import Dialog \
+        as O2MDialog
 from tryton.gui.window.win_search import WinSearch
 
 import tryton.rpc as rpc
 import datetime as DT
-from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes
+from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, TRYTON_ICON
 
 if not hasattr(locale, 'nl_langinfo'):
     locale.nl_langinfo = lambda *a: '%x'
@@ -458,21 +460,15 @@ class O2M(Char):
         pass
 
     def open_remote(self, model, create=True, changed=False, text=None):
-        if not create:
-            raise NotImplementedError
+        models = model.value[self.field_name]
         modelfield = model.mgroup.mfields[self.field_name]
         relation = modelfield.attrs['relation']
         context = modelfield.context_get(model)
 
-        dia = O2MDialog(relation, parent=model, attrs=modelfield.attrs,
-                default_get_ctx=context, window=self.window)
-        res = True
-        while res:
-            res, value = dia.run()
-            if res:
-                model.value[self.field_name].model_add(value)
-                value.signal('record-changed', value.parent)
-                dia.new()
+        dia = O2MDialog(relation, parent=model, model=models,
+                attrs=modelfield.attrs, default_get_ctx=context,
+                window=self.window)
+        res, value = dia.run()
         dia.destroy()
         return False, False
 
