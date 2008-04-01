@@ -188,6 +188,46 @@ class ViewList(ParserView):
             self.widget_tree.connect('drag-data-received', self.drag_data_received)
             self.widget_tree.connect('drag-data-delete', self.drag_data_delete)
 
+        self.widget_tree.connect('key_press_event', self.on_keypres)
+
+    def on_keypres(self, widget, event):
+        if event.keyval == gtk.keysyms.c and event.state & gtk.gdk.CONTROL_MASK:
+            self.on_copy()
+            return False
+
+    def on_copy(self):
+        clipboard = self.widget_tree.get_clipboard(gtk.gdk.SELECTION_CLIPBOARD)
+        targets = [
+            ('STRING', 0, 0),
+            ('TEXT', 0, 1),
+            ('COMPOUND_TEXT', 0, 2),
+            ('UTF8_STRING', 0, 3)
+        ]
+        clipboard.set_with_data(targets, self.copy_get_func,
+                self.copy_clear_func, self.widget_tree.get_selection())
+
+    def copy_foreach(self, treemodel, path,iter, data):
+        model = treemodel.get_value(iter, 0)
+        values = []
+        for col in self.widget_tree.get_columns():
+            if not col.get_visible():
+                continue
+            cell = self.widget_tree.cells[col.name]
+            values.append('"' + str(cell.get_textual_value(model)) + '"')
+        data.append('\t'.join(values))
+        return
+
+    def copy_get_func(self, clipboard, selectiondata, info, selection):
+        data = []
+        selection.selected_foreach(self.copy_foreach, data)
+        clipboard.set_text('\n'.join(data))
+        del data
+        return
+
+    def copy_clear_func(self, clipboard, selection):
+        del selection
+        return
+
     def drag_drop(self, treeview, context, x, y, time):
         treeview.emit_stop_by_name('drag-drop')
         treeview.drag_get_data(context, context.targets[-1], time)
