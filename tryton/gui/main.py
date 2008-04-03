@@ -320,8 +320,7 @@ class Main(object):
         self.notebook = gtk.Notebook()
         self.notebook.popup_enable()
         self.notebook.set_scrollable(True)
-        self.sig_id = self.notebook.connect_after('switch-page',
-                self._sig_page_changt)
+        self.notebook.connect_after('switch-page', self._sig_page_changt)
         vbox = self.glade.get_widget('vbox_main')
         vbox.pack_start(self.notebook, expand=True, fill=True)
 
@@ -798,7 +797,6 @@ class Main(object):
             page_id = int(self.notebook.get_current_page())
             page_widget = self.notebook.get_nth_page(page_id)
         if page_id != -1:
-            self.notebook.disconnect(self.sig_id)
             page = None
             for i in range(len(self.pages)):
                 if self.pages[i].widget == page_widget:
@@ -806,8 +804,6 @@ class Main(object):
                     page.signal_unconnect(self)
                     break
             self.notebook.remove_page(page_id)
-            self.sig_id = self.notebook.connect_after('switch-page',
-                    self._sig_page_changt)
             self.sb_set()
 
             if hasattr(page, 'destroy'):
