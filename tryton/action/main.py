@@ -120,7 +120,9 @@ class Action(object):
                     'active_ids': datas.get('ids',[]),
                     'user': rpc._USER,
                     }
-            ctx.update(eval(action.get('context','{}'), ctx.copy()))
+            eval_ctx = ctx.copy()
+            eval_ctx['datetime'] = datetime
+            ctx.update(eval(action.get('context','{}'), eval_ctx))
             ctx.update(context)
 
             domain_context = ctx.copy()
