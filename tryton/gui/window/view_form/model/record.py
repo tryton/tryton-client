@@ -324,7 +324,6 @@ class ModelRecord(SignalEvent):
                     ('res_model', '=', self.resource),
                     ('res_id', '=', self.id),
                     ])
-            except Exception, exception:
-                rpc.process_exception(exception, self.window)
+            except:
                 return 0
         return self.attachment_count
