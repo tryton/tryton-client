@@ -31,6 +31,8 @@ class Integer(Char):
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
         try:
+            if new_value == '-':
+                return
             locale.atoi(new_value)
         except:
             entry.stop_emission('insert-text')

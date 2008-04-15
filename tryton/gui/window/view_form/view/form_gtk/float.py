@@ -30,6 +30,8 @@ class Float(Integer):
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
         try:
+            if new_value == '-':
+                return
             if len(str(int(locale.atof(new_value)))) > self.digits[0]:
                 entry.stop_emission('insert-text')
         except:
