@@ -33,11 +33,15 @@ class ViewWidget(object):
 
     def reset(self, model):
         modelfield = None
+        values = rpc.CONTEXT.copy()
+        values['state'] = 'draft'
         if model:
             modelfield = model.mgroup.mfields.get(self.widget_name, None)
             if modelfield and 'valid' in modelfield.get_state_attrs(model):
                 modelfield.get_state_attrs(model)['valid'] = True
-        self.display(model, modelfield)
+            for field in model.mgroup.fields:
+                values[field] = model[field].get(model, check_load=False)
+        self.display(model, values)
 
     def set_value(self, model):
         if self.widget_name in model.mgroup.mfields:
