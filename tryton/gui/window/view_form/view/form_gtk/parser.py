@@ -259,7 +259,8 @@ class ParserForm(ParserInterface):
                 button_list.append(vbox)
                 if text:
                     label = gtk.Label(text)
-                    label.set_alignment(0.0, 0.5)
+                    label.set_use_markup(True)
+                    label.set_alignment(float(attrs.get('align', 0.0)), 0.5)
                     vbox.pack_start(label)
                 vbox.pack_start(gtk.HSeparator())
                 container.wid_add(vbox, colspan=int(attrs.get('colspan', 1)),
