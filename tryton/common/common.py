@@ -189,10 +189,13 @@ def file_selection(title, filename='', parent=None,
         win.destroy()
         return filenames
 
-def file_open(filename, type, parent):
+def file_open(filename, type, parent, print_p=False):
     cmd = ''
     if type in CONFIG['client.actions']:
-        cmd = CONFIG['client.actions'][type]
+        if print_p:
+            cmd = CONFIG['client.actions'][type][1]
+        else:
+            cmd = CONFIG['client.actions'][type][0]
     if not cmd:
         #TODO add dialog box
         pass
@@ -207,6 +210,11 @@ def file_open(filename, type, parent):
             file_p.close()
         return
     cmd = cmd % filename
+    if print_p:
+        prog, args = cmd.split(' ', 1)
+        args = [os.path.basename(prog)] + args.split(' ')
+        os.spawnv(os.P_WAIT, prog, args)
+        return
     pid = os.fork()
     if not pid:
         pid = os.fork()

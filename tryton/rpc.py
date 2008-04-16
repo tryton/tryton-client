@@ -37,23 +37,28 @@ def db_list(host, port):
             _SEMAPHORE.release()
         return res
     except:
+        _SOCK = None
         return None
 
 def db_exec(host, port, method, *args):
     global _SOCK
     _SEMAPHORE.acquire()
     try:
-        if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
-            _SOCK.disconnect()
-            _SOCK = None
-        if _SOCK is None:
-            _SOCK= pysocket.PySocket()
-            _SOCK.connect(host, port)
-        _SOCK.send(('db', method) + args)
-        res = _SOCK.receive()
-    finally:
-        _SEMAPHORE.release()
-    return res
+        try:
+            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+                _SOCK.disconnect()
+                _SOCK = None
+            if _SOCK is None:
+                _SOCK= pysocket.PySocket()
+                _SOCK.connect(host, port)
+            _SOCK.send(('db', method) + args)
+            res = _SOCK.receive()
+        finally:
+            _SEMAPHORE.release()
+        return res
+    except:
+        _SOCK = None
+        return None
 
 def login(username, password, host, port, database):
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
@@ -73,6 +78,7 @@ def login(username, password, host, port, database):
         finally:
             _SEMAPHORE.release()
     except socket.error:
+        _SOCK = None
         _USER = 0
         _SESSION = ''
         return -1

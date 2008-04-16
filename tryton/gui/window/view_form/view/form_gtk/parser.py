@@ -402,7 +402,6 @@ class ParserForm(ParserInterface):
                         xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
-                container.new(int(attrs.get('col', 4)))
                 widget, widgets, buttons, on_write = self.parse(model, node,
                         fields, tooltips=tooltips)
                 dict_widget.update(widgets)
@@ -412,7 +411,6 @@ class ParserForm(ParserInterface):
                     frame.add(widget)
                 else:
                     frame = widget
-                container.pop()
                 container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
                         expand=int(attrs.get('expand', 0)),
                         rowspan=int(attrs.get('rowspan', 1)), ypadding=0,

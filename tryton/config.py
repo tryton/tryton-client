@@ -38,7 +38,7 @@ def get_home_dir():
     else:
         return '.'
 
-def find_path(progs):
+def find_path(progs, args):
     #TODO check for win32
     paths = [x for x in os.environ['PATH'].split(':')
             if os.path.isdir(x)]
@@ -46,7 +46,7 @@ def find_path(progs):
         content = os.listdir(dir)
         for prog in progs:
             if prog in content:
-                return os.path.join(dir, prog) + ' %s'
+                return os.path.join(dir, prog) + ' ' + args
     return ''
 
 
@@ -55,7 +55,7 @@ class ConfigManager(object):
 
     def __init__(self):
         self.options = {
-            'login.login': 'demo',
+            'login.login': 'admin',
             'login.server': 'localhost',
             'login.port': '8070',
             'login.protocol': 'socket://',
@@ -73,10 +73,12 @@ class ConfigManager(object):
             'client.form_tab_orientation': 90,
             'client.lang': 'en_US',
             'client.actions': {
-                'odt': find_path(['ooffice', 'ooffice2']),
-                'txt': find_path(['ooffice', 'ooffice2']),
-                'pdf': find_path(['evince', 'xpdf', 'gpdf',
-                    'kpdf', 'epdfview', 'acroread'])
+                'odt': {0: find_path(['ooffice', 'ooffice2'], '%s'),
+                    1: find_path(['ooffice', 'ooffice2'], '-p %s')},
+                'txt': {0: find_path(['ooffice', 'ooffice2'], '%s'),
+                    1: find_path(['ooffice', 'ooffice2'], '-p %s')},
+                'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
+                    'kpdf', 'epdfview', 'acroread'], '%s'), 1: ''},
                 },
         }
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))

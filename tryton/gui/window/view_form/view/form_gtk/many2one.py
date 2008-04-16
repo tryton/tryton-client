@@ -55,6 +55,7 @@ class Dialog(object):
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         scroll.add(viewport)
 
+        self.dia.show()
         self.screen = Screen(model, self.dia, domain=domain, context=context,
                 view_type=['form'])
         if obj_id:

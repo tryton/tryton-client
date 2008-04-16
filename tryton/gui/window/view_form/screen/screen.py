@@ -256,7 +256,8 @@ class Screen(SignalEvent):
                         self.hastoolbar)
             except Exception, exception:
                 rpc.process_exception(exception, self.window)
-                raise
+                view = self.rpc.fields_view_get(view_id, view_type, self.context,
+                        self.hastoolbar)
             if self.exclude_field:
                 if self.exclude_field in view['fields']:
                     del view['fields'][self.exclude_field]

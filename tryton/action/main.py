@@ -41,12 +41,12 @@ class Action(object):
             return False
         if not res:
             return False
-        (type, data) = res
+        (type, data, print_p) = res
         (fileno, fp_name) = tempfile.mkstemp('.' + type, 'tryton_')
         file_d = os.fdopen(fileno, 'wb+')
         file_d.write(base64.decodestring(data))
         file_d.close()
-        file_open(fp_name, type, Main.get_main().window)
+        file_open(fp_name, type, Main.get_main().window, print_p=print_p)
         return True
 
     @staticmethod

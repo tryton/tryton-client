@@ -22,20 +22,36 @@ class FilesActions(object):
             _('Edit files actions')), expand=False, fill=True)
         self.win.vbox.pack_start(gtk.HSeparator())
         self.entries = {}
-        table = gtk.Table(len(CONFIG['client.actions']), 2)
+        table = gtk.Table(len(CONFIG['client.actions']) + 1, 3)
         table.set_col_spacings(3)
         table.set_row_spacings(3)
         table.set_border_width(1)
-        i = 0
-        for extension in CONFIG['client.actions']:
+        table.attach(gtk.Label(_('File Type')), 0, 1, 0, 1, yoptions=False,
+                xoptions=gtk.FILL)
+        table.attach(gtk.Label(_('Open')), 1, 2, 0, 1, yoptions=False,
+                xoptions=gtk.FILL)
+        table.attach(gtk.Label(_('Print')), 2, 3, 0, 1, yoptions=False,
+                xoptions=gtk.FILL)
+        i = 1
+        extensions = CONFIG['client.actions'].keys()
+        extensions.sort()
+        for extension in extensions:
             table.attach(gtk.Label(_('%s file: ') % extension.upper()),
-                    0, 1, i, i + 1, yoptions = False, xoptions=gtk.FILL)
-            self.entries[extension] = gtk.Entry()
-            self.entries[extension].set_property(
+                    0, 1, i, i + 1, yoptions=False, xoptions=gtk.FILL)
+            self.entries[extension] = {}
+            self.entries[extension][0] = gtk.Entry()
+            self.entries[extension][0].set_property(
                     'activates_default', True)
-            self.entries[extension].set_text(
-                    CONFIG['client.actions'][extension])
-            table.attach(self.entries[extension], 1, 2, i, i + 1,
+            self.entries[extension][0].set_text(
+                    CONFIG['client.actions'][extension][0])
+            table.attach(self.entries[extension][0], 1, 2, i, i + 1,
+                yoptions = False, xoptions=gtk.FILL)
+            self.entries[extension][1] = gtk.Entry()
+            self.entries[extension][1].set_property(
+                    'activates_default', True)
+            self.entries[extension][1].set_text(
+                    CONFIG['client.actions'][extension][1])
+            table.attach(self.entries[extension][1], 2, 3, i, i + 1,
                 yoptions = False, xoptions=gtk.FILL)
             i += 1
         self.win.vbox.pack_start(table, expand=True, fill=True)
@@ -46,8 +62,10 @@ class FilesActions(object):
         res = self.win.run()
         if res == gtk.RESPONSE_OK:
             for extension in self.entries:
-                CONFIG['client.actions'][extension] = \
-                        self.entries[extension].get_text()
+                CONFIG['client.actions'][extension][0] = \
+                        self.entries[extension][0].get_text()
+                CONFIG['client.actions'][extension][1] = \
+                        self.entries[extension][1].get_text()
             CONFIG.save()
         self.parent.present()
         self.win.destroy()
