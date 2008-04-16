@@ -165,7 +165,7 @@ class ModelRecord(SignalEvent):
                 if clause[0] in self.mgroup.fields:
                     if clause[1] == '=':
                         val[clause[0]] = clause[2]
-                    if clause[1] == 'in' and len(d[2]) == 1:
+                    if clause[1] == 'in' and len(clause[2]) == 1:
                         val[clause[0]] = clause[2][0]
             self.set_default(val)
 
