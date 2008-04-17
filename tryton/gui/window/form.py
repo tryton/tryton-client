@@ -344,7 +344,7 @@ class Form(SignalEvent):
                 self.previous_action = res
             self.sig_reload(test_modified=False)
         else:
-            self.message_state(_('No record selected!'), self.window)
+            self.message_state(_('No record selected!'))
 
     def sig_print(self):
         self.sig_action('form_print')
