@@ -447,14 +447,6 @@ class ParserForm(ParserInterface):
                 button_list += buttons
                 dict_widget.update(widgets)
                 paned.pack2(widget, resize=True, shrink=True)
-            elif node.localName == 'action':
-                from action import action
-                name = str(attrs['name'])
-                widget_act = action(self.window, self.parent, model, attrs)
-                dict_widget[name] = widget_act
-                container.wid_add(widget_act.widget,
-                        colspan=int(attrs.get('colspan', 3)),
-                        expand=True, fill=True)
         for (button, src, name, widget) in container.trans_box:
             button.connect('clicked', self.translate, model, name,
                     src, widget)

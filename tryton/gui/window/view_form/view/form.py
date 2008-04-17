@@ -2,7 +2,6 @@ import gtk
 import gettext
 from tryton.common import message, TRYTON_ICON
 import tryton.rpc as rpc
-from tryton.gui.window.view_form.view.form_gtk.action import Action
 from interface import ParserView
 from tryton.action import Action
 from tryton.config import CONFIG
