@@ -42,7 +42,7 @@ class Tree(SignalEvent):
         else:
             try:
                 view = rpc.execute('object', 'execute', model,
-                    'fields_view_get', False, view_type, context)
+                    'fields_view_get', False, 'tree', context)
             except Exception, exception:
                 rpc.process_exception(exception, window)
                 raise
