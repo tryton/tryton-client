@@ -68,7 +68,8 @@ class ModelList(list):
 
 class ModelRecordGroup(SignalEvent):
 
-    def __init__(self, resource, fields, window, ids=None, parent=None, context=None):
+    def __init__(self, resource, fields, window, ids=None, parent=None, context=None,
+            readonly=False):
         super(ModelRecordGroup, self).__init__()
         self.window = window
         self.parent = parent
@@ -84,6 +85,7 @@ class ModelRecordGroup(SignalEvent):
         self.load(ids)
         self.model_removed = []
         self.on_write = ''
+        self.readonly = readonly
 
     @staticmethod
     def mfields_load(fkeys, models):

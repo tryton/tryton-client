@@ -106,6 +106,8 @@ class CharField(object):
                         eval(state_changes[key], values)
             elif key in self.attrs:
                 self.get_state_attrs(model)[key] = self.attrs[key]
+        if model.mgroup.readonly:
+            self.get_state_attrs(model)['readonly'] = True
         if 'value' in state_changes:
             value = eval(state_changes['value'], values)
             if value:

@@ -60,7 +60,8 @@ class Screen(SignalEvent):
         self.parent = parent
         self.window = window
         models = ModelRecordGroup(model_name, self.fields, self.window,
-                parent=self.parent, context=self.context)
+                parent=self.parent, context=self.context,
+                readonly=readonly)
         self.models_set(models)
         self.current_model = None
         self.screen_container = ScreenContainer()
@@ -69,7 +70,6 @@ class Screen(SignalEvent):
         self.__current_view = 0
         self.tree_saves = tree_saves
         self.limit = limit
-        self.readonly = readonly
         self.form = form
         self.fields_view_tree = None
         self.exclude_field = exclude_field
@@ -274,8 +274,6 @@ class Screen(SignalEvent):
                     attrs = node_attributes(node)
                     if attrs.get('widget', False):
                         attrs['type'] = attrs['widget']
-                    if self.readonly:
-                        attrs['readonly'] = 1
                     try:
                         fields[str(attrs['name'])].update(attrs)
                     except:
