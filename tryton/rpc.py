@@ -58,7 +58,7 @@ def db_exec(host, port, method, *args):
         return res
     except:
         _SOCK = None
-        return None
+        raise
 
 def login(username, password, host, port, database):
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
