@@ -232,7 +232,6 @@ class ParserForm(ParserInterface):
         container.new(col=int(attrs.get('col', 4)))
 
         if not self.title:
-            attrs = common.node_attributes(root_node)
             self.title = attrs.get('string', 'Unknown')
 
         for node in root_node.childNodes:
