@@ -82,21 +82,25 @@ class Button(object):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            state_changes = eval(state_changes)
-        if 'invisible' in state_changes:
-            if eval(state_changes['invisible'], values):
-                self.widget.hide()
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if eval(state_changes['invisible'], values):
+                    self.widget.hide()
+                else:
+                    self.widget.show()
             else:
                 self.widget.show()
-        else:
-            self.widget.show()
-        if 'readonly' in state_changes:
-            if eval(state_changes['readonly'], values):
-                self.widget.set_sensitive(False)
+            if 'readonly' in state_changes:
+                if eval(state_changes['readonly'], values):
+                    self.widget.set_sensitive(False)
+                else:
+                    self.widget.set_sensitive(True)
             else:
                 self.widget.set_sensitive(True)
-        else:
+        except:
+            self.widget.show()
             self.widget.set_sensitive(True)
 
 class Label(gtk.Label):
@@ -107,14 +111,17 @@ class Label(gtk.Label):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            state_changes = eval(state_changes)
-        if 'invisible' in state_changes:
-            if eval(state_changes['invisible'], values):
-                self.hide()
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if eval(state_changes['invisible'], values):
+                    self.hide()
+                else:
+                    self.show()
             else:
                 self.show()
-        else:
+        except:
             self.show()
 
 
@@ -126,14 +133,17 @@ class VBox(gtk.VBox):
 
     def state_set(self, values):
         state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            state_changes = eval(state_changes)
-        if 'invisible' in state_changes:
-            if eval(state_changes['invisible'], values):
-                self.hide()
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if eval(state_changes['invisible'], values):
+                    self.hide()
+                else:
+                    self.show()
             else:
                 self.show()
-        else:
+        except:
             self.show()
 
 
