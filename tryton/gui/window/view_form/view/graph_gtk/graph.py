@@ -98,8 +98,8 @@ class Graph(gtk.DrawingArea):
         self.updateArea(cr)
         self.drawBackground(cr, *self.window.get_size())
         self.drawLines(cr, *self.window.get_size())
-        self.drawAxis(cr, *self.window.get_size())
         self.drawGraph(cr, *self.window.get_size())
+        self.drawAxis(cr, *self.window.get_size())
         self.drawLegend(cr, *self.window.get_size())
 
     def drawBackground(self, cr, width, height):
@@ -376,10 +376,7 @@ class Graph(gtk.DrawingArea):
                 self.attrs.get('color', 'blue'), keys + ['__highlight'])
 
     def _getDatasKeys(self):
-        if not self.datas.values():
-            return []
-        return list({}.fromkeys(
-            reduce(lambda x, y: list(x)+list(y), self.datas.values())))
+        return [x['name'] for x in self.yfields]
 
 class Area(object):
 
