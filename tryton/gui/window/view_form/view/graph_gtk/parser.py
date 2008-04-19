@@ -3,10 +3,12 @@ import tryton.common as common
 import gtk
 from graph import Graph
 from bar import VerticalBar, HorizontalBar
+from line import Line
 
 GRAPH_TYPE = {
     'vbar': VerticalBar,
     'hbar': HorizontalBar,
+    'line': Line,
 }
 
 
