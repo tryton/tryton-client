@@ -55,7 +55,7 @@ class Bar(Graph):
                     bar.highlight = True
                     label = locale.format('%.2f', bar.yval, True)
                     label += '\n'
-                    label += bar.xname
+                    label += str(self.labels[bar.xname])
                     self.popup.set_text(label)
                     self.queue_draw()
             else:
@@ -101,8 +101,7 @@ class VerticalBar(Bar):
                     h = abs(h)
                     y -= h
 
-                rect = Rect(x, y, w, h, xval, yval,
-                        str(self.labels[xfield]), yfield)
+                rect = Rect(x, y, w, h, xval, yval, xfield, yfield)
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
@@ -146,8 +145,7 @@ class HorizontalBar(Bar):
                     w = abs(w)
                     x -= w
 
-                rect = Rect(x, y, w, h, xval, yval,
-                        str(self.labels[xfield]), yfield)
+                rect = Rect(x, y, w, h, xval, yval, xfield, yfield)
                 if (0.0 <= rect.x <= 1.0) and (0.0 <= rect.y <= 1.0):
                     self.bars.append(rect)
 
