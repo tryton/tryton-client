@@ -1,0 +1,387 @@
+import gtk
+from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT
+import locale
+import math
+import datetime
+import mx.DateTime
+import time
+
+
+class Popup(object):
+
+    def __init__(self, widget):
+        self.win = gtk.Window(gtk.WINDOW_POPUP)
+        self.win.set_name('gtk-tooltips')
+        self.win.set_resizable(False)
+        self.win.set_border_width(1)
+        self.win.set_transient_for(widget.window)
+        self.label = gtk.Label()
+        self.win.add(self.label)
+        self.win.connect('enter-notify-event', self.enter)
+
+    def set_text(self, text):
+        self.label.set_text(text)
+
+    def set_position(self, widget, x, y):
+        widget_x, widget_y = widget.window.get_origin()
+        width, height = widget.window.get_size()
+        popup_width, popup_height = self.win.get_size()
+        if x < popup_width / 2:
+            x = popup_width / 2
+        if x > width - popup_width / 2:
+            x = width - popup_width / 2
+        pos_x = widget_x + x - popup_width / 2
+        if pos_x < 0:
+            pos_x = 0
+        if y < popup_height + 5:
+            y = popup_height + 5
+        if y > height:
+            y = height
+        pos_y = widget_y + y - popup_height - 5
+        if pos_y < 0:
+            pos_y = 0
+        self.win.move(int(pos_x), int(pos_y))
+
+    def show(self):
+        self.win.show_all()
+
+    def hide(self):
+        self.win.hide()
+
+    def destroy(self):
+        self.win.destroy()
+
+    def enter(self, widget, event):
+        self.win.hide()
+
+class Graph(gtk.DrawingArea):
+    'Graph'
+
+    __gsignals__ = { "expose-event": "override" }
+
+    def __init__(self, xfield, yfields, attrs):
+        super(Graph, self).__init__()
+        self.xfield = xfield
+        self.yfields = yfields
+        self.datas = {}
+        self.topPadding = 15
+        self.bottomPadding = 15
+        self.rightPadding = 30
+        self.leftPadding = 30
+        self.set_events(gtk.gdk.POINTER_MOTION_MASK)
+        self.connect('motion-notify-event', self.motion)
+        self.connect('leave-notify-event', self.leave)
+        self.popup = Popup(self)
+        self.attrs = attrs
+
+    def destroy(self):
+        self.popup.destroy()
+        super(Graph, self).destroy()
+
+    def motion(self, widget, event):
+        self.popup.set_position(self, event.x, event.y)
+
+    def leave(self, widget, event):
+        self.popup.hide()
+
+    # Handle the expose-event by drawing
+    def do_expose_event(self, event):
+
+        # Create the cairo context
+        cr = self.window.cairo_create()
+
+        # Restrict Cairo to the exposed area; avoid extra work
+        cr.rectangle(event.area.x, event.area.y,
+                event.area.width, event.area.height)
+        cr.clip()
+
+        self.updateArea(cr)
+        self.drawBackground(cr, *self.window.get_size())
+        self.drawLines(cr, *self.window.get_size())
+        self.drawAxis(cr, *self.window.get_size())
+        self.drawGraph(cr, *self.window.get_size())
+        self.drawLegend(cr, *self.window.get_size())
+
+    def drawBackground(self, cr, width, height):
+        # Fill the background with gray
+        cr.save()
+        cr.set_source_rgb(*hex2rgb(self.attrs.get('background', '#f5f5f5')))
+        cr.rectangle(0, 0, width, height)
+        cr.fill()
+        cr.stroke()
+        cr.restore()
+
+    def drawGraph(self, cr, width, height):
+        pass
+
+
+    def YLabels(self):
+        ylabels = []
+        if self.yrange == 0.0:
+            base = 1
+        else:
+            base = 10**int(math.log(self.yrange, 10))
+        for i in range(int(self.yrange / base) + 1):
+            val = int(self.minyval / base) * base + i * base
+            h = (val - self.minyval) * self.yscale
+            label = locale.format('%.2f', val, True)
+            ylabels.append((h, label))
+        return ylabels
+
+    def XLabels(self):
+        xlabels = []
+        i = 0.0
+        keys = self.datas.keys()
+        keys.sort()
+        for key in keys:
+            w = i / self.xrange
+            xlabels.append((w, str(self.labels[key])))
+            i += 1
+        return xlabels
+
+    def drawAxis(self, cr, width, height):
+        cr.set_source_rgb(*hex2rgb('#000000'))
+        cr.set_line_width(1.5)
+
+        # Y axis
+        def drawYLabel(h, label):
+            x = self.area.x
+            y = self.area.y + self.area.h - h * self.area.h
+
+            cr.new_path()
+            cr.move_to(x, y)
+            cr.line_to(x - 3.0, y)
+            cr.close_path()
+            cr.stroke()
+
+            extends = cr.text_extents(label)
+            labelWidth = extends[2]
+            labelHeight = extends[3]
+            if labelWidth <= self.area.x:
+                cr.move_to(x - 3.0 - labelWidth - 5, y + labelHeight / 2.0)
+                cr.show_text(label)
+
+        for h, label in self.YLabels():
+            drawYLabel(h, label)
+        cr.new_path()
+        cr.move_to(self.area.x, self.area.y)
+        cr.line_to(self.area.x, self.area.y + self.area.h)
+        cr.close_path()
+        cr.stroke()
+
+        # X axis
+        def drawXLabel(w, label):
+            x = self.area.x + w * self.area.w
+            y = self.area.y + self.area.h
+
+            cr.new_path()
+            cr.move_to(x, y)
+            cr.line_to(x, y + 3.0)
+            cr.close_path()
+            cr.stroke()
+
+            extends = cr.text_extents(label)
+            labelWidth = extends[2]
+            labelHeight = extends[3]
+            if labelWidth <= self.xscale * self.area.w:
+                cr.move_to(x - labelWidth / 2.0, y + labelHeight + 5)
+                cr.show_text(label)
+
+        for w, label in self.XLabels():
+            drawXLabel(w, label)
+        cr.new_path()
+        cr.move_to(self.area.x, self.area.y + self.area.h)
+        cr.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
+        cr.close_path()
+        cr.stroke()
+
+    def drawLines(self, cr, width, height):
+        for h, label in self.YLabels():
+            self.drawLine(cr, 0, h)
+
+    def drawLine(self, cr, x, y):
+        if x:
+            x1 = x2 = self.area.x + x * self.area.w
+            y1 = self.area.y
+            y2 = y1 + self.area.h
+        else:
+            y1 = y2 = self.area.y + self.area.h - y * self.area.h
+            x1 = self.area.x
+            x2 = x1 + self.area.w
+
+        cr.save()
+        cr.set_source_rgb(*hex2rgb('#000000'))
+        cr.set_line_width(1.5)
+        cr.new_path()
+        cr.move_to(x1, y1)
+        cr.line_to(x2, y2)
+        cr.close_path()
+        cr.stroke()
+        cr.restore()
+
+    def drawLegend(self, cr, width, height):
+        if not self.attrs.get('legend', True):
+            return
+
+        padding = 4
+        bullet = 15
+        width = 0
+        height = padding
+        keys = self._getDatasKeys()
+        if not keys:
+            return
+        keys2txt = {}
+        for yfield in self.yfields:
+            keys2txt[yfield['name']] = yfield['string']
+        for key in keys:
+            extents = cr.text_extents(keys2txt[key])
+            width = max(extents[2], width)
+            height += max(extents[3], bullet) + padding
+        width = padding + bullet + padding + width + padding
+
+        pos_x, pos_y = self._getLegendPosition(width, height)
+
+        cr.save()
+        cr.rectangle(pos_x, pos_y, width, height)
+        cr.set_source_rgba(1, 1, 1, 0.8)
+        cr.fill_preserve()
+        cr.set_line_width(2)
+        cr.set_source_rgb(*hex2rgb('#000000'))
+        cr.stroke()
+
+        def drawKey(key, x, y, text_height):
+            cr.rectangle(x, y, bullet, bullet)
+            cr.set_source_rgb(*self.colorScheme[key])
+            cr.fill_preserve()
+            cr.set_source_rgb(0, 0, 0)
+            cr.stroke()
+            cr.move_to(x + bullet + padding,
+                    y + bullet / 2.0 + text_height / 2.0)
+            cr.show_text(keys2txt[key])
+
+        cr.set_line_width(1)
+        x = pos_x + padding
+        y = pos_y + padding
+        for key in keys:
+            extents = cr.text_extents(keys2txt[key])
+            drawKey(key, x, y, extents[3])
+            y += max(extents[3], bullet) + padding
+
+        cr.restore()
+
+    def _getLegendPosition(self, width, height):
+        return self.area.x + self.area.w * 0.05, \
+                self.area.y + self.area.h * 0.05
+
+    def display(self, models):
+        self.updateDatas(models)
+        self.setColorScheme()
+        self.updateXY()
+        self.updateGraph()
+        self.queue_draw()
+
+    def updateDatas(self, models):
+        self.datas = {}
+        self.labels = {}
+        minx = None
+        maxx = None
+        for model in models:
+            x = model[self.xfield['name']].get(model)
+            if not minx:
+                minx = x
+            if not maxx:
+                maxx = x
+            minx = min(minx, x)
+            maxx = max(maxx, x)
+            self.labels[x] = model[self.xfield['name']].get_client(model)
+            self.datas.setdefault(x, {})
+            for yfield in self.yfields:
+                self.datas[x].setdefault(yfield['name'], 0.0)
+                if yfield['name'] == '#':
+                    self.datas[x][yfield['name']] += 1
+                else:
+                    self.datas[x][yfield['name']] += \
+                            float(model[yfield['name']].get(model))
+            #if self.datas[x][yfield['name']] < 1000:
+            #    self.datas[x][yfield['name']] = - abs(self.datas[x][yfield['name']])
+        if isinstance(minx, datetime.date):
+            date = mx.DateTime.strptime(str(minx), '%Y-%m-%d')
+            end_date = mx.DateTime.strptime(str(maxx), '%Y-%m-%d')
+            while date <= end_date:
+                key = datetime.date(date.year, date.month, date.day)
+                self.labels[key] = time.strftime(locale.nl_langinfo(
+                    locale.D_FMT).replace('%y', '%Y'),
+                    time.strptime(str(key), DT_FORMAT))
+                self.datas.setdefault(key, {})
+                for yfield in self.yfields:
+                    self.datas[key].setdefault(yfield['name'], 0.0)
+                date = date + mx.DateTime.RelativeDateTime(days=1)
+
+    def updateArea(self, cr):
+        maxylabel = ''
+        for value, label in self.YLabels():
+            if len(maxylabel) < len(label):
+                maxylabel = label
+        extends = cr.text_extents(maxylabel)
+        yLabelWidth = extends[2]
+
+        maxxlabel = ''
+        for value, label in self.XLabels():
+            if len(maxxlabel) < len(label):
+                maxxlabel = label
+        extends = cr.text_extents(maxxlabel)
+        xLabelHeight = extends[3]
+
+        width, height = self.window.get_size()
+
+        if yLabelWidth > width / 3.0:
+            yLabelWidth = 0
+        width = width - self.leftPadding - yLabelWidth - self.rightPadding
+        height = height - self.topPadding - self.bottomPadding - xLabelHeight
+        self.area = Area(self.leftPadding + yLabelWidth, self.topPadding, width, height)
+
+    def updateXY(self):
+        self.maxxval = len(self.datas)
+        self.minxval = 0.0
+
+        self.xrange = self.maxxval - self.minxval
+        if self.xrange == 0:
+            self.xscale = 1.0
+        else:
+            self.xscale = 1.0 / self.xrange
+
+        if not self.datas.values():
+            self.maxyval = 0.0
+            self.minyval = 0.0
+        else:
+            self.maxyval = max([reduce(lambda x, y: max(x, y), x.values()) \
+                    for x in self.datas.values()])
+            self.minyval = min([reduce(lambda x, y: min(x, y), x.values()) \
+                    for x in self.datas.values()])
+        if self.minyval > 0:
+            self.minyval = 0.0
+
+        self.yrange = self.maxyval - self.minyval
+        if self.yrange == 0:
+            self.yscale = 1.0
+        else:
+            self.yscale = 1.0 / self.yrange
+
+    def updateGraph(self):
+        pass
+
+    def setColorScheme(self):
+        keys = self._getDatasKeys()
+        self.colorScheme = generateColorscheme(
+                self.attrs.get('color', 'blue'), keys + ['__highlight'])
+
+    def _getDatasKeys(self):
+        if not self.datas.values():
+            return []
+        return list({}.fromkeys(
+            reduce(lambda x, y: list(x)+list(y), self.datas.values())))
+
+class Area(object):
+
+    def __init__(self, x, y, w, h):
+        self.x, self.y, self.w, self.h = x, y, w, h

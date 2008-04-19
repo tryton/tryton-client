@@ -1,24 +1,24 @@
 from interface import ParserInterface
 import form_gtk
 import list_gtk
-#import graph_gtk
+import graph_gtk
 #import calendar_gtk
 from form import ViewForm
 from list import ViewList
-#from graph import ViewGraph
+from graph import ViewGraph
 #from calendar import ViewCalendar
 
 PARSERS = {
     'form': form_gtk.ParserForm,
     'tree': list_gtk.ParserTree,
-#    'graph': graph_gtk.parser_graph,
+    'graph': graph_gtk.ParserGraph,
 #    'calendar': calendar_gtk.parser_calendar,
 }
 
 PARSERS2 = {
     'form': ViewForm,
     'tree': ViewList,
-#    'graph': ViewGraph,
+    'graph': ViewGraph,
 #    'calendar': ViewCalendar,
 }
 

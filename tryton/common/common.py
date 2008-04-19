@@ -374,6 +374,55 @@ def node_attributes(node):
             result[attrs.item(i).localName] = eval(attrs.item(i).nodeValue)
     return result
 
+def hex2rgb(hexstring, digits=2):
+    """
+    Converts a hexstring color to a rgb tuple.
+    Example: #ff0000 -> (1.0, 0.0, 0.0)
+    digits is an integer number telling how many characters should be
+    interpreted for each component in the hexstring.
+    """
+    if isinstance(hexstring, (tuple, list)):
+        return hexstring
+    top = float(int(digits * 'f', 16))
+    r = int(hexstring[1:digits+1], 16)
+    g = int(hexstring[digits+1:digits*2+1], 16)
+    b = int(hexstring[digits*2+1:digits*3+1], 16)
+    return r / top, g / top, b / top
+
+def clamp(minValue, maxValue, value):
+    """Make sure value is between minValue and maxValue"""
+    if value < minValue:
+                return minValue
+    if value > maxValue:
+                return maxValue
+    return value
+
+def lighten(r, g, b, amount):
+    """Return a lighter version of the color (r, g, b)"""
+    return (clamp(0.0, 1.0, r + amount),
+            clamp(0.0, 1.0, g + amount),
+            clamp(0.0, 1.0, b + amount))
+
+def generateColorscheme(masterColor, keys, light=0.098):
+    """
+    Generates a dictionary where the keys match the keys argument and
+    the values are colors derivated from the masterColor.
+    Each color is a lighter version of masterColor separated by a difference
+    given by the light argument.
+    The masterColor is given in a hex string format.
+    """
+    r, g, b = hex2rgb(_COLOR_SCHEMES.get(masterColor, masterColor))
+    return dict([(key, lighten(r, g, b, light * i))
+        for i, key in enumerate(keys)])
+
+_COLOR_SCHEMES = {
+    'red': '#6d1d1d',
+    'green': '#3c581a',
+    'blue': '#224565',
+    'grey': '#444444',
+    'black': '#000000',
+    'darkcyan': '#305755',
+}
 
 COLORS = {
     'invalid':'#ff6969',
