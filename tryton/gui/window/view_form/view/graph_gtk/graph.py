@@ -302,8 +302,6 @@ class Graph(gtk.DrawingArea):
                 else:
                     self.datas[x][yfield['name']] += \
                             float(model[yfield['name']].get(model))
-            #if self.datas[x][yfield['name']] < 1000:
-            #    self.datas[x][yfield['name']] = - abs(self.datas[x][yfield['name']])
         if isinstance(minx, datetime.date):
             date = mx.DateTime.strptime(str(minx), '%Y-%m-%d')
             end_date = mx.DateTime.strptime(str(maxx), '%Y-%m-%d')
