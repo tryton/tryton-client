@@ -403,7 +403,7 @@ def lighten(r, g, b, amount):
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
 
-def generateColorscheme(masterColor, keys, light=0.098):
+def generateColorscheme(masterColor, keys, light=0.06):
     """
     Generates a dictionary where the keys match the keys argument and
     the values are colors derivated from the masterColor.
