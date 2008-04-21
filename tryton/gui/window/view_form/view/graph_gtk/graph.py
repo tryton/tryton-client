@@ -1,5 +1,5 @@
 import gtk
-from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT
+from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, COLOR_SCHEMES
 import locale
 import math
 import datetime
@@ -374,6 +374,10 @@ class Graph(gtk.DrawingArea):
         keys = self._getDatasKeys()
         self.colorScheme = generateColorscheme(
                 self.attrs.get('color', 'blue'), keys + ['__highlight'])
+        for yfield in self.yfields:
+            if yfield.get('color'):
+                self.colorScheme[yfield['name']] = hex2rgb(
+                        COLOR_SCHEMES.get(yfield['color'], yfield['color']))
 
     def _getDatasKeys(self):
         return [x['name'] for x in self.yfields]

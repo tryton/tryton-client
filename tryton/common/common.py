@@ -411,11 +411,11 @@ def generateColorscheme(masterColor, keys, light=0.098):
     given by the light argument.
     The masterColor is given in a hex string format.
     """
-    r, g, b = hex2rgb(_COLOR_SCHEMES.get(masterColor, masterColor))
+    r, g, b = hex2rgb(COLOR_SCHEMES.get(masterColor, masterColor))
     return dict([(key, lighten(r, g, b, light * i))
         for i, key in enumerate(keys)])
 
-_COLOR_SCHEMES = {
+COLOR_SCHEMES = {
     'red': '#6d1d1d',
     'green': '#3c581a',
     'blue': '#224565',
