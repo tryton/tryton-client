@@ -29,7 +29,8 @@ class ParserGraph(ParserInterface):
                     if not child.nodeType == child.ELEMENT_NODE:
                         continue
                     xfield = common.node_attributes(child)
-                    xfield['string'] = fields[xfield['name']]['string']
+                    if not xfield.get('string'):
+                        xfield['string'] = fields[xfield['name']]['string']
                     break
             elif node.localName == 'y':
                 for child in node.childNodes:
