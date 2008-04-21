@@ -5,6 +5,7 @@ import math
 import datetime
 import mx.DateTime
 import time
+import tryton.rpc as rpc
 
 
 class Popup(object):
@@ -232,7 +233,7 @@ class Graph(gtk.DrawingArea):
             return
         keys2txt = {}
         for yfield in self.yfields:
-            keys2txt[yfield['name']] = yfield['string']
+            keys2txt[yfield.get('key', yfield['name'])] = yfield['string']
         for key in keys:
             extents = cr.text_extents(keys2txt[key])
             width = max(extents[2], width)
@@ -296,11 +297,20 @@ class Graph(gtk.DrawingArea):
             self.labels[x] = model[self.xfield['name']].get_client(model)
             self.datas.setdefault(x, {})
             for yfield in self.yfields:
-                self.datas[x].setdefault(yfield['name'], 0.0)
+                name = yfield['name']
+                key = yfield.get('key', yfield['name'])
+                self.datas[x].setdefault(key, 0.0)
+                if yfield.get('domain'):
+                    values = rpc.CONTEXT.copy()
+                    values['state'] = 'draft'
+                    for field in model.mgroup.fields:
+                        values[field] = model[field].get(model, check_load=False)
+                    if not eval(yfield['domain'], values):
+                        continue
                 if yfield['name'] == '#':
-                    self.datas[x][yfield['name']] += 1
+                    self.datas[x][key] += 1
                 else:
-                    self.datas[x][yfield['name']] += \
+                    self.datas[x][key] += \
                             float(model[yfield['name']].get(model))
         if isinstance(minx, datetime.date):
             date = mx.DateTime.strptime(str(minx), '%Y-%m-%d')
@@ -312,7 +322,8 @@ class Graph(gtk.DrawingArea):
                     time.strptime(str(key), DT_FORMAT))
                 self.datas.setdefault(key, {})
                 for yfield in self.yfields:
-                    self.datas[key].setdefault(yfield['name'], 0.0)
+                    self.datas[key].setdefault(
+                            yfield.get('key', yfield['name']), 0.0)
                 date = date + mx.DateTime.RelativeDateTime(days=1)
 
     def updateArea(self, cr):
@@ -374,11 +385,11 @@ class Graph(gtk.DrawingArea):
                 self.attrs.get('color', 'blue'), keys + ['__highlight'])
         for yfield in self.yfields:
             if yfield.get('color'):
-                self.colorScheme[yfield['name']] = hex2rgb(
+                self.colorScheme[yfield.get('key', yfield['name'])] = hex2rgb(
                         COLOR_SCHEMES.get(yfield['color'], yfield['color']))
 
     def _getDatasKeys(self):
-        return [x['name'] for x in self.yfields]
+        return [x.get('key', x['name']) for x in self.yfields]
 
 class Area(object):
 

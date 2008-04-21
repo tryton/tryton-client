@@ -31,7 +31,8 @@ class Line(Graph):
     def drawGraph(self, cr, width, height):
         key2fill = {}
         for yfield in self.yfields:
-            key2fill[yfield['name']] = bool(eval(yfield.get('fill', '0')))
+            key2fill[yfield.get('key', yfield['name'])] = \
+                    bool(eval(yfield.get('fill', '0')))
 
         def preparePath(key):
             cr.new_path()
