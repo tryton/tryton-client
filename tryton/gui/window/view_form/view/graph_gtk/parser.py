@@ -36,9 +36,7 @@ class ParserGraph(ParserInterface):
                     if not child.nodeType == child.ELEMENT_NODE:
                         continue
                     yattrs = common.node_attributes(child)
-                    if yattrs['name'] == '#':
-                        yattrs['string'] = '#'
-                    else:
+                    if not yattrs.get('string') and yattrs['name'] != '#':
                         yattrs['string'] = fields[yattrs['name']]['string']
                     yfields.append(yattrs)
 
