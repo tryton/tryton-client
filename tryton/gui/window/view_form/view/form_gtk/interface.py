@@ -36,10 +36,10 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
     if dependance:
         widget = gtk.RadioButton(widget, _('Always'))
         vbox.pack_start(widget)
-    for (fname, name, fvalue, value) in dependance:
+    for (fname, name, fvalue, dvalue) in dependance:
         if fvalue:
             addwidget = True
-            widget = gtk.RadioButton(widget, name+' = '+str(value))
+            widget = gtk.RadioButton(widget, name+' = '+str(dvalue))
             widgets[(fname, fvalue)] = widget
             vbox.pack_start(widget)
     if not len(dependance) or not addwidget:
