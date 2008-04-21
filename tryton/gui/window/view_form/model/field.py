@@ -81,8 +81,6 @@ class CharField(object):
 
     def set_default(self, model, value):
         res = self.set(model, value)
-        if self.attrs.get('on_change', False):
-            model.on_change(self.name, self.attrs['on_change'])
         return res
 
     def set_on_change(self, model, value):
