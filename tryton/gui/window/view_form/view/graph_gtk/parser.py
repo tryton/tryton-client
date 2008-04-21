@@ -4,11 +4,13 @@ import gtk
 from graph import Graph
 from bar import VerticalBar, HorizontalBar
 from line import Line
+from pie import Pie
 
 GRAPH_TYPE = {
     'vbar': VerticalBar,
     'hbar': HorizontalBar,
     'line': Line,
+    'pie': Pie,
 }
 
 
