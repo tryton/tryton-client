@@ -15,7 +15,7 @@ class Button(object):
     def __init__(self, attrs=None):
         super(Button, self).__init__()
         self.attrs = attrs or {}
-        self.widget = gtk.Button(label=attrs.get('string', _('unknown')))
+        self.widget = gtk.Button(label=attrs.get('string', _('Unknown')))
         if attrs.get('icon', False):
             try:
                 stock = attrs['icon']
@@ -349,7 +349,7 @@ class ParserForm(ParserInterface):
                         pos = gtk.POS_BOTTOM
                 notebook.set_tab_pos(pos)
                 notebook.set_border_width(3)
-                container.wid_add(notebook, colspan=attrs.get('colspan', 3),
+                container.wid_add(notebook, colspan=attrs.get('colspan', 4),
                         expand=True, fill=True)
                 widget, widgets, buttons, on_write = self.parse(model, node,
                         fields, notebook, tooltips=tooltips)
