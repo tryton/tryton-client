@@ -38,16 +38,16 @@ def sort_model(column, treeview, screen):
         if col != column:
             col.arrow_show = False
             col.arrow.hide()
-    screen.sort = ''
+    screen.sort = None
     if not column.arrow_show:
         column.arrow_show = True
         column.arrow.set(gtk.ARROW_DOWN, gtk.SHADOW_IN)
         column.arrow.show()
-        screen.sort = column.name + ' ASC'
+        screen.sort = [(column.name, 'ASC')]
     else:
         if column.arrow.get_property('arrow-type') == gtk.ARROW_DOWN:
             column.arrow.set(gtk.ARROW_UP, gtk.SHADOW_IN)
-            screen.sort = column.name + ' DESC'
+            screen.sort = [(column.name, 'DESC')]
         else:
             column.arrow_show = False
             column.arrow.hide()

@@ -19,7 +19,7 @@ class Screen(SignalEvent):
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
             default_get=None, show_search=False, limit=None,
-            readonly=False, form=None, exclude_field=None, sort=''):
+            readonly=False, form=None, exclude_field=None, sort=None):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -73,7 +73,7 @@ class Screen(SignalEvent):
         self.form = form
         self.fields_view_tree = None
         self.exclude_field = exclude_field
-        self.sort = sort
+        self.sort = sort or []
         self.view_to_load = []
 
         if view_type:
