@@ -94,6 +94,7 @@ class Line(Graph):
 
         dia = self.area.w ** 2 + self.area.h ** 2
 
+        highlight = False
         for point in self.points:
             if point == nearest[0] and nearest[1] < dia / 100:
                 if not point.highlight:
@@ -107,8 +108,6 @@ class Line(Graph):
                 if point.highlight:
                     point.highlight = False
                     self.queue_draw()
-        highlight = False
-        for point in self.points:
             if point.highlight:
                 self.popup.set_position(self,
                         point.x * self.area.w + self.area.x,

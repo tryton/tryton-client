@@ -49,6 +49,7 @@ class Bar(Graph):
                 return True
             return False
 
+        highlight = False
         for bar in self.bars:
             if intersect(bar, event):
                 if not bar.highlight:
@@ -62,8 +63,6 @@ class Bar(Graph):
                 if bar.highlight:
                     bar.highlight = False
                     self.queue_draw()
-        highlight = False
-        for bar in self.bars:
             if bar.highlight:
                 highlight = True
         if highlight:
