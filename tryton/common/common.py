@@ -171,6 +171,7 @@ def file_selection(title, filename='', parent=None,
             try:
                 CONFIG['client.default_path'] = \
                         os.path.dirname(filepath)
+                CONFIG.save()
             except:
                 pass
         parent.present()
