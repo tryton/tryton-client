@@ -6,6 +6,7 @@ import datetime
 import mx.DateTime
 import time
 import tryton.rpc as rpc
+import cairo
 
 
 class Popup(object):
@@ -102,6 +103,20 @@ class Graph(gtk.DrawingArea):
         self.drawGraph(cr, *self.window.get_size())
         self.drawAxis(cr, *self.window.get_size())
         self.drawLegend(cr, *self.window.get_size())
+
+    def export_png(self, filename, width, height):
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        cx = cairo.Context(surface)
+
+        self.updateArea(cx, width, height)
+        self.drawBackground(cx, width, height)
+        self.drawLines(cx, width, height)
+        self.drawGraph(cx, width, height)
+        self.drawAxis(cx, width, height)
+        self.drawLegend(cx, width, height)
+        surface.write_to_png(filename)
+
+        self.queue_draw()
 
     def drawBackground(self, cr, width, height):
         # Fill the background with gray
