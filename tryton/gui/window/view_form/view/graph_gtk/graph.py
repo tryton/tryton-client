@@ -96,7 +96,7 @@ class Graph(gtk.DrawingArea):
                 event.area.width, event.area.height)
         cr.clip()
 
-        self.updateArea(cr)
+        self.updateArea(cr, *self.window.get_size())
         self.drawBackground(cr, *self.window.get_size())
         self.drawLines(cr, *self.window.get_size())
         self.drawGraph(cr, *self.window.get_size())
@@ -326,7 +326,7 @@ class Graph(gtk.DrawingArea):
                             yfield.get('key', yfield['name']), 0.0)
                 date = date + mx.DateTime.RelativeDateTime(days=1)
 
-    def updateArea(self, cr):
+    def updateArea(self, cr, width, height):
         maxylabel = ''
         for value, label in self.YLabels():
             if len(maxylabel) < len(label):
@@ -340,8 +340,6 @@ class Graph(gtk.DrawingArea):
                 maxxlabel = label
         extends = cr.text_extents(maxxlabel)
         xLabelHeight = extends[3]
-
-        width, height = self.window.get_size()
 
         if yLabelWidth > width / 3.0:
             yLabelWidth = 0
