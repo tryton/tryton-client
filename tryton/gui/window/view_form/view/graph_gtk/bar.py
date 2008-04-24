@@ -50,6 +50,7 @@ class Bar(Graph):
             return False
 
         highlight = False
+        draw_bars = []
         for bar in self.bars:
             if intersect(bar, event):
                 if not bar.highlight:
@@ -58,13 +59,26 @@ class Bar(Graph):
                     label += '\n'
                     label += str(self.labels[bar.xname])
                     self.popup.set_text(label)
-                    self.queue_draw()
+                    draw_bars.append(bar)
             else:
                 if bar.highlight:
                     bar.highlight = False
-                    self.queue_draw()
+                    draw_bars.append(bar)
             if bar.highlight:
                 highlight = True
+        if draw_bars:
+            minx = self.area.w + self.area.x
+            miny = self.area.h + self.area.y
+            maxx = maxy = 0.0
+            for bar in draw_bars:
+                x = self.area.w * bar.x + self.area.x
+                y = self.area.h * bar.y + self.area.y
+                minx = min(x, minx)
+                miny = min(y, miny)
+                maxx = max(x + self.area.w * bar.w, maxx)
+                maxy = max(y + self.area.h * bar.h, maxy)
+            self.queue_draw_area(int(minx), int(miny),
+                    int(maxx - minx), int(maxy - miny))
         if highlight:
             self.popup.show()
         else:
