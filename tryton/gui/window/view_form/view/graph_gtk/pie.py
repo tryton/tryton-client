@@ -51,9 +51,7 @@ class Pie(Graph):
     def drawLines(self, cr, width, height):
         pass
 
-    def updateArea(self, cr):
-        width, height = self.window.get_size()
-
+    def updateArea(self, cr, width, height):
         width = width - self.leftPadding - self.rightPadding
         height = height - self.topPadding - self.bottomPadding
         self.area = Area(self.leftPadding, self.topPadding, width, height)
