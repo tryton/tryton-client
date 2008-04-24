@@ -100,7 +100,7 @@ class VerticalBar(Bar):
         for xfield in keys:
             j = 0
             barWidthForSet = barWidth / len(self.datas[xfield])
-            for yfield in self.datas[xfield]:
+            for yfield in self._getDatasKeys():
                 xval = i
                 yval = self.datas[xfield][yfield]
 
@@ -144,7 +144,7 @@ class HorizontalBar(Bar):
         for xfield in keys:
             j = 0
             barWidthForSet = barWidth / len(self.datas[xfield])
-            for yfield in self.datas[xfield]:
+            for yfield in self._getDatasKeys():
                 xval = i
                 yval = self.datas[xfield][yfield]
 
