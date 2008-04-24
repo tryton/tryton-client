@@ -321,10 +321,12 @@ class Screen(SignalEvent):
     def new(self, default=True, context=None):
         if context is None:
             context = {}
-        if self.current_view and self.current_view.view_type == 'tree' \
+        if self.current_view and ((self.current_view.view_type == 'tree' \
                 and not (hasattr(self.current_view.widget_tree, 'editable') \
-                    and self.current_view.widget_tree.editable):
-            self.switch_view()
+                    and self.current_view.widget_tree.editable)) \
+                or self.current_view.view_type == 'graph'):
+            while self.current_view.view_type != 'form':
+                self.switch_view()
         ctx = self.context.copy()
         ctx.update(context)
         model = self.models.model_new(default, self.domain, ctx)
