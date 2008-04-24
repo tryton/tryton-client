@@ -120,6 +120,11 @@ class Line(Graph):
                         point.x * self.area.w + self.area.x,
                         point.y * self.area.h + self.area.y)
                 highlight = True
+        if highlight:
+            self.popup.show()
+        else:
+            self.popup.hide()
+
         if draw_points:
             minx = self.area.w + self.area.x
             miny = self.area.h + self.area.y
@@ -131,12 +136,8 @@ class Line(Graph):
                 miny = min(y - 5, miny)
                 maxx = max(x + 5, maxx)
                 maxy = max(y + 5, maxy)
-            self.queue_draw_area(int(minx), int(miny),
-                    int(maxx - minx), int(maxy - miny))
-        if highlight:
-            self.popup.show()
-        else:
-            self.popup.hide()
+            self.queue_draw_area(int(minx - 1), int(miny - 1),
+                    int(maxx - minx + 1), int(maxy - miny + 1))
 
     def updateXY(self):
         super(Line, self).updateXY()

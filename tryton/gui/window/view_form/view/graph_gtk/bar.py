@@ -66,6 +66,12 @@ class Bar(Graph):
                     draw_bars.append(bar)
             if bar.highlight:
                 highlight = True
+
+        if highlight:
+            self.popup.show()
+        else:
+            self.popup.hide()
+
         if draw_bars:
             minx = self.area.w + self.area.x
             miny = self.area.h + self.area.y
@@ -77,12 +83,8 @@ class Bar(Graph):
                 miny = min(y, miny)
                 maxx = max(x + self.area.w * bar.w, maxx)
                 maxy = max(y + self.area.h * bar.h, maxy)
-            self.queue_draw_area(int(minx), int(miny),
-                    int(maxx - minx), int(maxy - miny))
-        if highlight:
-            self.popup.show()
-        else:
-            self.popup.hide()
+            self.queue_draw_area(int(minx - 1), int(miny - 1),
+                    int(maxx - minx + 1), int(maxy - miny + 1))
 
 
 class VerticalBar(Bar):
