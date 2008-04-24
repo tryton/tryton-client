@@ -79,8 +79,12 @@ def save(widget, graph, window):
             if width and height and filename:
                 if not filename.endswith('.png'):
                     filename = filename + '.png'
-                graph.export_png(filename, width, height)
-                break
+                try:
+                    graph.export_png(filename, width, height)
+                    break
+                except MemoryError:
+                    common.message(_('Image size to large!'), dia,
+                            gtk.MESSAGE_ERROR)
         else:
             break
     window.present()
