@@ -94,13 +94,19 @@ class Line(Graph):
 
         dia = self.area.w ** 2 + self.area.h ** 2
 
+        keys2txt = {}
+        for yfield in self.yfields:
+            keys2txt[yfield.get('key', yfield['name'])] = yfield['string']
+
         highlight = False
         draw_points = []
         for point in self.points:
             if point == nearest[0] and nearest[1] < dia / 100:
                 if not point.highlight:
                     point.highlight = True
-                    label = locale.format('%.2f', point.yval, True)
+                    label = keys2txt[point.yname]
+                    label += '\n'
+                    label += locale.format('%.2f', point.yval, True)
                     label += '\n'
                     label += str(self.labels[point.xname])
                     self.popup.set_text(label)
