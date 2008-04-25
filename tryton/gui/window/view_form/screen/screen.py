@@ -9,8 +9,6 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 import gobject
 
-_LIMIT = 20000
-
 
 class Screen(SignalEvent):
     "Screen"
@@ -100,7 +98,7 @@ class Screen(SignalEvent):
                         self.domain, (self, self.search_filter))
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear)
-                self.filter_widget.set_limit(self.limit or _LIMIT)
+                self.filter_widget.set_limit(self.limit)
             self.screen_container.show_filter()
         else:
             self.screen_container.hide_filter()

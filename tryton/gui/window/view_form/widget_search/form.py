@@ -3,6 +3,8 @@ from xml.parsers import expat
 import sys
 import gettext
 
+_LIMIT = 20000
+
 _ = gettext.gettext
 
 
@@ -126,7 +128,7 @@ class Parse(object):
         hb_param.pack_start(gtk.Label(_('Limit :')), expand=False, fill=False)
 
         self.spin_limit.set_numeric(False)
-        self.spin_limit.set_adjustment(gtk.Adjustment(value=80, lower=1,
+        self.spin_limit.set_adjustment(gtk.Adjustment(value=_LIMIT, lower=1,
             upper=sys.maxint, step_incr=10, page_incr=100, page_size=100))
         self.spin_limit.set_property('visible', True)
 
@@ -136,7 +138,7 @@ class Parse(object):
 
         self.spin_offset.set_numeric(False)
         self.spin_offset.set_adjustment(gtk.Adjustment(value=0, lower=0,
-            upper=sys.maxint, step_incr=80, page_incr=100, page_size=100))
+            upper=sys.maxint, step_incr=_LIMIT, page_incr=100, page_size=100))
 
         hb_param.pack_start(self.spin_offset, expand=False, fill=False)
 
@@ -251,6 +253,8 @@ class Form(object):
                 page=100)
 
     def set_limit(self, value):
+        if not value:
+            value = _LIMIT
         return self.spin_limit.set_value(value)
 
     def get_limit(self):

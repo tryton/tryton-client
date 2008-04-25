@@ -9,6 +9,7 @@ from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.action import Action
 from tryton.config import TRYTON_ICON
+from tryton.gui.window.view_form.widget_search.form import _LIMIT
 
 _ = gettext.gettext
 
@@ -303,7 +304,8 @@ class Many2One(WidgetInterface):
                 try:
                     ids = rpc.execute('object', 'execute',
                             self.attrs['relation'], 'name_search',
-                            self.wid_text.get_text(), domain, 'ilike', context)
+                            self.wid_text.get_text(), domain, 'ilike', context,
+                            _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
                     rpc.process_exception(exception, self._window)
