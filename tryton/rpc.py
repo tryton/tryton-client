@@ -31,7 +31,14 @@ def db_list(host, port):
             if _SOCK is None:
                 _SOCK = pysocket.PySocket()
                 _SOCK.connect(host, port)
-            _SOCK.send(('db', 'list'))
+            try:
+                _SOCK.send(('db', 'list'))
+            except Exception, exception:
+                if exception[0] == 32:
+                    _SOCK.reconnect()
+                    _SOCK.send(('db', 'list'))
+                else:
+                    raise
             res = _SOCK.receive()
         finally:
             _SEMAPHORE.release()
