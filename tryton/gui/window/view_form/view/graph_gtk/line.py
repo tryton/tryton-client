@@ -8,6 +8,10 @@ class Line(Graph):
 
     def updateGraph(self):
 
+        yfield2attrs = {}
+        for yfield in self.yfields:
+            yfield2attrs[yfield.get('key', yfield['name'])] = yfield
+
         self.points = []
         i = 0
         keys = self.datas.keys()
@@ -20,6 +24,13 @@ class Line(Graph):
 
                 x = (xval - self.minxval) * self.xscale
                 y = 1.0 - (yval - self.minyval) * self.yscale
+
+                if self.xrange == 0:
+                    x = 1.0
+
+                if not bool(eval(yfield2attrs[yfield].get('empty', '1'))) \
+                        and yval == 0:
+                    continue
 
                 point = Point(x, y, xval, yval, xfield, yfield)
                 if (0.0 <= point.x <= 1.0) and (0.0 <= point.y <= 1.0):
