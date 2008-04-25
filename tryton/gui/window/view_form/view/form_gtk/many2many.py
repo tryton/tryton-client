@@ -3,6 +3,7 @@ from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
+from tryton.gui.window.view_form.widget_search.form import _LIMIT
 
 
 class Many2Many(WidgetInterface):
@@ -60,7 +61,8 @@ class Many2Many(WidgetInterface):
         try:
             ids = rpc.execute('object', 'execute',
                     self.attrs['relation'], 'name_search',
-                    self.wid_text.get_text(), domain, 'ilike', context)
+                    self.wid_text.get_text(), domain, 'ilike', context,
+                    _LIMIT)
         except Exception, exception:
             rpc.process_exception(exception, self._window)
             return False

@@ -233,7 +233,8 @@ class Many2One(WidgetInterface):
                 try:
                     ids = rpc.execute('object', 'execute',
                             self.attrs['relation'], 'name_search',
-                            self.wid_text.get_text(), domain, 'ilike', context)
+                            self.wid_text.get_text(), domain, 'ilike', context,
+                            _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
                     rpc.process_exception(exception, self._window)
