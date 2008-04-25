@@ -150,7 +150,10 @@ class Graph(gtk.DrawingArea):
         keys = self.datas.keys()
         keys.sort()
         for key in keys:
-            w = i / self.xrange
+            if self.xrange == 0:
+                w = 1.0
+            else:
+                w = i / self.xrange
             xlabels.append((w, str(self.labels[key])))
             i += 1
         return xlabels
