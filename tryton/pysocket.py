@@ -73,17 +73,24 @@ class PySocket:
 
     def disconnect(self):
         try:
-            if self.secure:
-                if hasattr(socket, 'SHUT_RDWR'):
-                    self.socket.sock_shutdown(socket.SHUT_RDWR)
-                else:
-                    self.socket.sock_shutdown(2)
+            if self.ssl:
+                try:
+                    if hasattr(socket, 'SHUT_RDWR'):
+                        self.ssl_sock.sock_shutdown(socket.SHUT_RDWR)
+                    else:
+                        self.ssl_sock.sock_shutdown(2)
+                except:
+                    pass
+                self.ssl_sock.close()
             else:
-                if hasattr(socket, 'SHUT_RDWR'):
-                    self.socket.shutdown(socket.SHUT_RDWR)
-                else:
-                    self.socket.shutdown(2)
-            self.sock.close()
+                try:
+                    if hasattr(socket, 'SHUT_RDWR'):
+                        self.sock.shutdown(socket.SHUT_RDWR)
+                    else:
+                        self.sock.shutdown(2)
+                except:
+                    pass
+                self.sock.close()
         except:
             pass
 
