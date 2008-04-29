@@ -79,12 +79,12 @@ class Bar(Graph):
             for bar in draw_bars:
                 x = self.area.w * bar.x + self.area.x
                 y = self.area.h * bar.y + self.area.y
-                minx = min(x, minx)
-                miny = min(y, miny)
-                maxx = max(x + self.area.w * bar.w, maxx)
-                maxy = max(y + self.area.h * bar.h, maxy)
-            self.queue_draw_area(int(minx - 1), int(miny - 1),
-                    int(maxx - minx + 1), int(maxy - miny + 1))
+                minx = int(min(x, minx))
+                miny = int(min(y, miny))
+                maxx = int(max(x + self.area.w * bar.w, maxx))
+                maxy = int(max(y + self.area.h * bar.h, maxy))
+            self.queue_draw_area(minx - 1, miny - 1,
+                    maxx - minx + 2, maxy - miny + 2)
 
 
 class VerticalBar(Bar):
