@@ -62,11 +62,11 @@ class Pie(Graph):
 
     def updateGraph(self):
 
-        sum = 0.0
+        self.sum = 0.0
         for xkey in self.datas.keys():
             key = self.yfields[0].get('key', self.yfields[0]['name'])
             if self.datas[xkey][key] > 0:
-                sum += self.datas[xkey][key]
+                self.sum += self.datas[xkey][key]
 
         fraction = angle = 0.0
 
@@ -76,7 +76,7 @@ class Pie(Graph):
             value = self.datas[xkey][key]
             if value > 0:
                 angle += fraction
-                fraction = value / sum
+                fraction = value / self.sum
                 slice = Slice(xkey, fraction, value, angle)
                 self.slices.append(slice)
 
@@ -143,8 +143,10 @@ class Pie(Graph):
             if slice.startAngle <= angle <= slice.endAngle:
                 if not slice.highlight:
                     slice.highlight = True
-                    label = '%s (%s%%)' % (self.labels[slice.xname],
-                            locale.format('%.2f', slice.fraction * 100))
+                    label = '%s (%s%%)\n%s/%s' % (self.labels[slice.xname],
+                            locale.format('%.2f', slice.fraction * 100),
+                            locale.format('%.2f', slice.fraction * self.sum),
+                            locale.format('%.2f', self.sum))
                     self.popup.set_text(label)
                     self.queue_draw()
             else:
