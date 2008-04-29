@@ -23,11 +23,13 @@ class Action(object):
         del datas['ids']
         if not ids:
             try:
-                ids =  rpc.execute('object', 'execute', datas['model'],
+                ids = rpc.execute('object', 'execute', datas['model'],
                         'search', [])
             except Exception, exception:
-                rpc.process_exception(exception, Main.get_main().window)
-                return False
+                ids = rpc.process_exception(exception, Main.get_main().window,
+                        'object', 'execute', datas['model'], 'search', [])
+                if not ids:
+                    return False
             if ids == []:
                 message(_('Nothing to print!'), Main.get_main().window)
                 return False
@@ -37,8 +39,10 @@ class Action(object):
         try:
             res = rpc.execute('report', 'execute', name, ids, datas, ctx)
         except Exception, exception:
-            rpc.process_exception(exception, Main.get_main().window)
-            return False
+            res = rpc.process_exception(exception, Main.get_main().window,
+                    'report', 'execute', name, ids, datas, ctx)
+            if not res:
+                return False
         if not res:
             return False
         (type, data, print_p) = res
