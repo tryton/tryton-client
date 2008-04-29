@@ -41,30 +41,32 @@ class Button(object):
                     common.sur(self.attrs['confirm']):
                 button_type = self.attrs.get('type', 'workflow')
                 if button_type == 'workflow':
+                    args = ('object', 'exec_workflow', self.form.screen.name,
+                            self.attrs['name'], obj_id)
                     try:
-                        rpc.execute('object', 'exec_workflow',
-                                self.form.screen.name,
-                                self.attrs['name'], obj_id)
+                        rpc.execute(*args)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.form.window)
+                        rpc.process_exception(exception, self.form.window,
+                                *args)
                 elif button_type == 'object':
                     if not obj_id:
                         return
+                    args = ('object', 'execute', self.form.screen.name,
+                            self.attrs['name'], [obj_id], model.context_get())
                     try:
-                        rpc.execute('object', 'execute',
-                                self.form.screen.name,
-                                self.attrs['name'],
-                                [obj_id], model.context_get())
+                        rpc.execute(*args)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.form.window)
+                        rpc.process_exception(exception, self.form.window,
+                                *args)
                 elif button_type == 'action':
                     action_id = None
+                    args = ('object', 'execute', 'ir.action', 'get_action_id',
+                            int(self.attrs['name']), rpc.CONTEXT)
                     try:
-                        action_id = rpc.execute('object', 'execute', 'ir.action',
-                                'get_action_id', int(self.attrs['name']),
-                                rpc.CONTEXT)
+                        action_id = rpc.execute(*args)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.form.window)
+                        action_id = rpc.process_exception(exception, self.form.window,
+                                *args)
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.form.screen.name,
