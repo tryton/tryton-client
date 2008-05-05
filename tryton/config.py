@@ -79,6 +79,8 @@ class ConfigManager(object):
                     1: find_path(['ooffice', 'ooffice2'], '-p %s')},
                 'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
                     'kpdf', 'epdfview', 'acroread'], '%s'), 1: ''},
+                'png': {0: find_path(['display', 'qiv', 'eye', 'open'],
+                    '%s'), 1: ''},
                 },
         }
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
