@@ -148,6 +148,27 @@ class VBox(gtk.VBox):
         except:
             self.show()
 
+class Image(gtk.Image):
+
+    def __init__(self, attrs=None):
+        super(Image, self).__init__()
+        self.attrs = attrs or {}
+
+    def state_set(self, values):
+        state_changes = self.attrs.get('states', {})
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if eval(state_changes['invisible'], values):
+                    self.hide()
+                else:
+                    self.show()
+            else:
+                self.show()
+        except:
+            self.show()
+
 
 class _container(object):
     def __init__(self, tooltips):
@@ -251,7 +272,8 @@ class ParserForm(ParserInterface):
                 continue
             attrs = common.node_attributes(node)
             if node.localName == 'image':
-                icon = gtk.Image()
+                icon = Image(attrs)
+                button_list.append(icon)
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
                 container.wid_add(icon, colspan=int(attrs.get('colspan', 1)),
                         expand=int(attrs.get('expand',0)), ypadding=10,
@@ -656,7 +678,7 @@ from one2many import One2Many
 from many2many import Many2Many
 from many2one import Many2One
 from url import Email, URL, CallTo, SIP
-from image import Image
+from image import Image as Image2
 
 
 WIDGETS_TYPE = {
@@ -680,5 +702,5 @@ WIDGETS_TYPE = {
     'url' : (URL, 1, False, False),
     'callto' : (CallTo, 1, False, False),
     'sip' : (SIP, 1, False, False),
-    'image' : (Image, 1, False, False),
+    'image' : (Image2, 1, False, False),
 }
