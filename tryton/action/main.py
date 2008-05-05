@@ -149,7 +149,8 @@ class Action(object):
             Action.exec_report(action['report_name'], datas)
 
     @staticmethod
-    def exec_keyword(keyword, data=None, context=None, warning=True):
+    def exec_keyword(keyword, data=None, context=None, warning=True,
+            alwaysask=False):
         from tryton.gui import Main
         actions = []
         if 'id' in data:
@@ -168,7 +169,8 @@ class Action(object):
             keyact[action['name']] = action
 
         from tryton.gui import Main
-        res = selection(_('Select your action'), keyact, Main.get_main().window)
+        res = selection(_('Select your action'), keyact, Main.get_main().window,
+                alwaysask=alwaysask)
         if res:
             (name, action) = res
             Action._exec_action(action, data, context=context)

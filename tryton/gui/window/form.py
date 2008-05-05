@@ -339,7 +339,7 @@ class Form(SignalEvent):
                 'id': obj_id or False,
                 'ids': ids,
                 'window': self.window,
-                }, context=ctx)
+                }, context=ctx, alwaysask=True)
             if res:
                 self.previous_action = res
             self.sig_reload(test_modified=False)
