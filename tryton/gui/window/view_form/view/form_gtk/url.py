@@ -1,6 +1,7 @@
 import gettext
 import gtk
 from interface import WidgetInterface
+import webbrowser
 
 
 class URL(WidgetInterface):
@@ -49,8 +50,8 @@ class URL(WidgetInterface):
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
-#        if value:
-#            tools.launch_browser(value)
+        if value:
+            webbrowser.open(value, new=2)
 
     def _color_widget(self):
         return self.entry
@@ -60,21 +61,21 @@ class Email(URL):
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
-#        if value:
-#            tools.launch_browser('mailto:%s' % value)
+        if value:
+            webbrowser.open('mailto:%s' % value, new=2)
 
 class CallTo(URL):
     "call to"
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
-#        if value:
-#            tools.launch_browser('callto:%s' % value)
+        if value:
+            webbrowser.open('callto:%s' % value, new=2)
 
 class SIP(URL):
     "sip"
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
-#        if value:
-#            tools.launch_browser('sip:%s' % value)
+        if value:
+            webbrowser.open('sip:%s' % value, new=2)
