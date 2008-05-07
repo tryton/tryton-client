@@ -137,7 +137,7 @@ class DateTimeField(CharField):
 
     def get_client(self, model):
         value = super(DateTimeField, self).get_client(model)
-        return value and str(value) or False
+        return value and value.strftime(DHM_FORMAT) or False
 
 
 class DateField(CharField):
@@ -151,7 +151,7 @@ class DateField(CharField):
 
     def get_client(self, model):
         value = super(DateField, self).get_client(model)
-        return value and str(value) or False
+        return value and value.strftime(DT_FORMAT) or False
 
 
 class FloatField(CharField):
