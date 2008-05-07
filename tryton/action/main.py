@@ -120,10 +120,10 @@ class Action(object):
             if not action.get('domain', False):
                 action['domain'] = '[]'
             ctx = {
-                    'active_id': datas.get('id',False),
-                    'active_ids': datas.get('ids',[]),
-                    'user': rpc._USER,
-                    }
+                'active_id': datas.get('id',False),
+                'active_ids': datas.get('ids',[]),
+                'user': rpc._USER,
+            }
             eval_ctx = ctx.copy()
             eval_ctx['datetime'] = datetime
             ctx.update(eval(action.get('context','{}'), eval_ctx))
