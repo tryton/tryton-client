@@ -11,7 +11,8 @@ _ = gettext.gettext
 class Dialog(object):
     "Dialog for wizard"
 
-    def __init__(self, arch, fields, state, obj_name, parent=None):
+    def __init__(self, arch, fields, state, obj_name, parent=None,
+            context=None):
         self.states = []
         default = -1
         self.dia = gtk.Dialog(_('Tryton - Wizard'), parent,
@@ -37,7 +38,7 @@ class Dialog(object):
             if 'value' in fields[i]:
                 val[i] = fields[i]['value']
 
-        self.screen = Screen(obj_name, self.dia, view_type=[])
+        self.screen = Screen(obj_name, self.dia, view_type=[], context=context)
         self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
         self.screen.current_model.set(val)
@@ -88,8 +89,11 @@ class Wizard(object):
             return
         dia = None
         while state != 'end':
+            ctx = context.copy()
+            ctx['active_id'] = datas.get('id')
+            ctx['active_ids'] = datas.get('ids')
             wizardprogress = WizardProgress(wiz_id, state, datas,
-                    parent, context)
+                    parent, ctx)
             res = wizardprogress.run()
             if not res:
                 if dia:
@@ -106,7 +110,7 @@ class Wizard(object):
             if res['type'] == 'form':
                 if not dia:
                     dia = Dialog(res['arch'], res['fields'], res['state'],
-                            res['object'], parent)
+                            res['object'], parent, context=ctx)
                     dia.screen.current_model.set(datas['form'])
                 res2 = dia.run(datas['form'])
                 if not res2:
@@ -118,17 +122,17 @@ class Wizard(object):
                 datas['form'].update(new_data)
                 del new_data
             elif res['type'] == 'action':
-                Action._exec_action(res['action'], datas, context=context)
+                Action._exec_action(res['action'], datas, context=ctx)
                 state = res['state']
             elif res['type'] == 'print':
                 datas['report_id'] = res.get('report_id', False)
                 if res.get('get_id_from_action', False):
                     backup_ids = datas['ids']
                     datas['ids'] = datas['form']['ids']
-                    Action.exec_report(res['report'], datas, context=context)
+                    Action.exec_report(res['report'], datas, context=ctx)
                     datas['ids'] = backup_ids
                 else:
-                    Action.exec_report(res['report'], datas, context=context)
+                    Action.exec_report(res['report'], datas, context=ctx)
                 state = res['state']
             elif res['type'] == 'state':
                 state = res['state']
