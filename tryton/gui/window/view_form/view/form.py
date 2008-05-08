@@ -128,12 +128,14 @@ class ViewForm(ParserView):
                 message(_('You must select a record ' \
                         'to use the relate button !'))
                 return False
-            act['domain'] = \
-                    self.screen.current_model.expr_eval(
-                            act['domain'], check_load=False)
-            act['context'] = str(
-                    self.screen.current_model.expr_eval(
-                        act['context'], check_load=False))
+            if 'domain' in act:
+                act['domain'] = \
+                        self.screen.current_model.expr_eval(
+                                act['domain'], check_load=False)
+            if 'context' in act:
+                act['context'] = str(
+                        self.screen.current_model.expr_eval(
+                            act['context'], check_load=False))
         value = Action._exec_action(act, data, context)
         if atype in ('print', 'action'):
             self.screen.reload()

@@ -8,6 +8,7 @@ import gettext
 import tempfile
 import base64
 import os
+import webbrowser
 
 _ = gettext.gettext
 
@@ -147,6 +148,10 @@ class Action(object):
 
         elif action['type'] == 'ir.action.report':
             Action.exec_report(action['report_name'], datas)
+
+        elif action['type'] == 'ir.action.url':
+            if action['url']:
+                webbrowser.open(action['url'], new=2)
 
     @staticmethod
     def exec_keyword(keyword, data=None, context=None, warning=True,
