@@ -12,6 +12,8 @@ class WinSearch(object):
 
     def __init__(self, model, sel_multi=True, ids=None, context=None,
             domain=None, parent=None, views_preload=None):
+        if views_preload is None:
+            views_preload = {}
         self.domain = domain or []
         self.context = context or {}
         self.context.update(rpc.CONTEXT)
