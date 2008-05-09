@@ -69,7 +69,8 @@ class Many2Many(WidgetInterface):
         ids = [x[0] for x in ids]
         if len(ids) != 1:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                    context=context, domain=domain, parent=self._window)
+                    context=context, domain=domain, parent=self._window,
+                    views_preload=self.attrs.get('views', {}))
             ids = win.run()
 
         self.screen.load(ids)

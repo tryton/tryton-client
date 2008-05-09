@@ -11,7 +11,7 @@ _ = gettext.gettext
 class WinSearch(object):
 
     def __init__(self, model, sel_multi=True, ids=None, context=None,
-            domain=None, parent=None):
+            domain=None, parent=None, views_preload=None):
         self.domain = domain or []
         self.context = context or {}
         self.context.update(rpc.CONTEXT)
@@ -34,7 +34,7 @@ class WinSearch(object):
         self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
         self.screen = Screen(model, self.win, view_type=['tree'],
-                context=context)
+                context=context, views_preload=views_preload)
         self.view = self.screen.current_view
         self.view.unset_editable()
         sel = self.view.widget_tree.get_selection()
@@ -53,13 +53,15 @@ class WinSearch(object):
 
         self.model_name = model
 
-        try:
-            view_form = rpc.execute('object', 'execute',
-                    self.model_name, 'fields_view_get', False, 'tree',
-                    self.context)
-        except Exception, exception:
-            rpc.process_exception(exception, self.parent)
-            raise
+        if 'tree' in views_preload:
+            view_form = views_preload['tree']
+        else:
+            try:
+                args = ('object', 'execute', self.model_name, 'fields_view_get',
+                        False, 'tree', self.context)
+                view_form = rpc.execute(*args)
+            except Exception, exception:
+                view_form = rpc.process_exception(exception, self.parent, *args)
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
                 model, parent=self.win)
 
