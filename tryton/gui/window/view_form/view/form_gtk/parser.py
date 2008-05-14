@@ -38,7 +38,7 @@ class Button(object):
         if model.validate():
             obj_id = self.form.screen.save_current()
             if not self.attrs.get('confirm', False) or \
-                    common.sur(self.attrs['confirm']):
+                    common.sur(self.attrs['confirm'], self.form.window):
                 button_type = self.attrs.get('type', 'workflow')
                 if button_type == 'workflow':
                     args = ('object', 'exec_workflow', self.form.screen.name,
