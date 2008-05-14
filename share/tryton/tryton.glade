@@ -1075,18 +1075,25 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4244">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-index</property>
+                                <property name="stock">gtk-info</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkMenuItem" id="shortcuts">
+                          <widget class="GtkImageMenuItem" id="shortcuts">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">Keyboard Shortcuts</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_shortcuts_activate"/>
+                            <child internal-child="image">
+                              <widget class="GtkImage" id="image4231">
+                                <property name="visible">True</property>
+                                <property name="stock">gtk-help</property>
+                                <property name="icon_size">1</property>
+                              </widget>
+                            </child>
                           </widget>
                         </child>
                         <child>
@@ -1103,7 +1110,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4245">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-justify-center</property>
+                                <property name="stock">gtk-about</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
