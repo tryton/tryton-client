@@ -120,12 +120,24 @@ class Screen(SignalEvent):
                     and self.context.get('active_test', False)):
                 values.append((key, operator, value))
         try:
-            ids = rpc.execute('object', 'execute',
-                    self.name, 'search', values, offset, limit, self.sort, self.context)
+            try:
+                ids = rpc.execute('object', 'execute',
+                        self.name, 'search', values, offset, limit, self.sort,
+                        self.context)
+            except Exception, exception:
+                rpc.process_exception(exception, self.window)
+                ids = rpc.execute('object', 'execute',
+                        self.name, 'search', values, offset, limit, self.sort,
+                        self.context)
             if not only_ids:
                 if len(ids) == limit:
-                    self.search_count = rpc.execute('object', 'execute',
-                            self.name, 'search_count', values, self.context)
+                    try:
+                        self.search_count = rpc.execute('object', 'execute',
+                                self.name, 'search_count', values, self.context)
+                    except Exception, exception:
+                        rpc.process_exception(exception, self.window)
+                        self.search_count = rpc.execute('object', 'execute',
+                                self.name, 'search_count', values, self.context)
                 else:
                     self.search_count = len(ids)
         except:
