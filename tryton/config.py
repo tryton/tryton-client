@@ -82,6 +82,8 @@ class ConfigManager(object):
                 'png': {0: find_path(['display', 'qiv', 'eye', 'mspaint.exe'],
                     '%s'), 1: ''},
                 },
+            'roundup.url': 'http://bugs.tryton.org/',
+            'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }
         parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",

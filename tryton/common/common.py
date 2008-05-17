@@ -8,6 +8,9 @@ from tryton.config import CONFIG
 from tryton.config import GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import time
 import sys
+import xmlrpclib
+import md5
+import webbrowser
 
 _ = gettext.gettext
 
@@ -227,26 +230,151 @@ def file_open(filename, type, parent, print_p=False):
         sys.exit(0)
     os.waitpid(pid, 0)
 
-def error(title, msg, parent, details=''):
+def error(title, parent, details):
     log = logging.getLogger('common.message')
-    log.error('MSG %s: %s' % (str(msg), details))
+    log.error('%s' % details)
+    dialog = gtk.Dialog(_('Tryton - Error'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+    dialog.set_icon(TRYTON_ICON)
 
-    xml = glade.XML(GLADE, "win_error", gettext.textdomain())
-    win = xml.get_widget('win_error')
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
-    xml.get_widget('error_title').set_text(str(title))
-    xml.get_widget('error_info').set_text(str(msg))
+    but_send = gtk.Button(_('Report Bug'))
+    dialog.add_action_widget(but_send, gtk.RESPONSE_OK)
+    dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL)
+    dialog.set_default_response(gtk.RESPONSE_CANCEL)
+
+    vbox = gtk.VBox()
+    label_title = gtk.Label()
+    label_title.set_markup('<b>' + _('Application Error!') + '</b>')
+    label_title.set_padding(-1, 5)
+    vbox.pack_start(label_title, False, False)
+    vbox.pack_start(gtk.HSeparator(), False, False)
+
+    hbox = gtk.HBox()
+    image = gtk.Image()
+    image.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_DIALOG)
+    hbox.pack_start(image, False, False)
+
+    scrolledwindow = gtk.ScrolledWindow()
+    scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+
+    viewport = gtk.Viewport()
+    viewport.set_shadow_type(gtk.SHADOW_NONE)
+
+    box = gtk.VBox()
+    label_error = gtk.Label()
+    label_error.set_markup('<b>' + _('Error: ') + '</b>' + title)
+    label_error.set_alignment(0, 0.5)
+    label_error.set_padding(-1, 14)
+    box.pack_start(label_error, False, False)
+    textview = gtk.TextView()
     buf = gtk.TextBuffer()
     buf.set_text(unicode(details,'latin1').encode('utf-8'))
-    xml.get_widget('error_details').set_buffer(buf)
+    textview.set_buffer(buf)
+    box.pack_start(textview, False, False)
 
-    xml.signal_connect('on_closebutton_clicked', lambda x : win.destroy())
+    viewport.add(box)
+    scrolledwindow.add(viewport)
+    hbox.pack_start(scrolledwindow)
 
-    win.run()
+    vbox.pack_start(hbox)
+
+    button_roundup = gtk.Button()
+    button_roundup.set_relief(gtk.RELIEF_NONE)
+    label_roundup = gtk.Label()
+    label_roundup.set_markup(_('To report bug you must have a user on ') \
+            + '<u>' + CONFIG['roundup.url'] + '</u>')
+    label_roundup.set_alignment(1, 0.5)
+    label_roundup.set_padding(20, 5)
+
+    button_roundup.connect('clicked',
+            lambda widget: webbrowser.open(CONFIG['roundup.url'], new=2))
+    button_roundup.add(label_roundup)
+    vbox.pack_start(button_roundup, False, False)
+
+    dialog.vbox.pack_start(vbox)
+    dialog.set_size_request(600, 400)
+
+    dialog.show_all()
+    response = dialog.run()
     parent.present()
-    win.destroy()
+    dialog.destroy()
+    if response == gtk.RESPONSE_OK:
+        send_bugtracker(details, parent)
     return True
+
+def send_bugtracker(msg, parent):
+    from tryton import rpc
+    win = gtk.Dialog(_('Tryton - Bug Tracker'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                gtk.STOCK_OK, gtk.RESPONSE_OK))
+    win.set_icon(TRYTON_ICON)
+    win.set_default_response(gtk.RESPONSE_OK)
+
+    hbox = gtk.HBox()
+    image = gtk.Image()
+    image.set_from_stock(gtk.STOCK_DIALOG_QUESTION,
+            gtk.ICON_SIZE_DIALOG)
+    hbox.pack_start(image, False, False)
+
+    table = gtk.Table(2, 2)
+    table.set_col_spacings(3)
+    table.set_row_spacings(3)
+    table.set_border_width(1)
+    label_user = gtk.Label(_('User:'))
+    label_user.set_alignment(1.0, 0.5)
+    table.attach(label_user, 0, 1, 0, 1, yoptions=False,
+            xoptions=gtk.FILL)
+    entry_user = gtk.Entry()
+    entry_user.set_activates_default(True)
+    table.attach(entry_user, 1, 2, 0, 1, yoptions=False,
+            xoptions=gtk.FILL)
+    label_password = gtk.Label(_('Password:'))
+    label_password.set_alignment(1.0, 0.5)
+    table.attach(label_password, 0, 1, 1, 2, yoptions=False,
+            xoptions=gtk.FILL)
+    entry_password = gtk.Entry()
+    entry_password.set_activates_default(True)
+    entry_password.set_visibility(False)
+    table.attach(entry_password, 1, 2, 1, 2, yoptions=False,
+            xoptions=gtk.FILL)
+    hbox.pack_start(table)
+
+    win.vbox.pack_start(hbox)
+    win.show_all()
+    entry_password.grab_focus()
+    entry_user.set_text(rpc._USERNAME)
+
+    response = win.run()
+    parent.present()
+    user = entry_user.get_text()
+    password = entry_password.get_text()
+    win.destroy()
+    if response == gtk.RESPONSE_OK:
+        try:
+            server = xmlrpclib.Server(('https://%s:%s@' + CONFIG['roundup.xmlrpc'])
+                    % (user, password), allow_none=True)
+            msg_md5 = md5.new(msg).hexdigest()
+            title = '[no title]'
+            for line in msg.split('\n'):
+                if line:
+                    title = line
+            msg_ids = server.filter('msg', None, {'summary': msg_md5})
+            issue_id = None
+            if msg_ids:
+                issue_ids = server.filter('issue', None, {'messages': msg_ids})
+                if issue_ids:
+                    issue_id = issue_ids[0]
+                    server.set('issue' + str(issue_id), *['nosy=+'+user])
+            if not issue_id:
+                msg_id = server.create('msg', *['content='+msg,
+                    'author='+user, 'summary=' + msg_md5])
+                issue_id = server.create('issue', *['messages='+str(msg_id),
+                    'nosy='+user, 'title='+title])
+        except Exception, exception:
+            message(_('Exception:') + '\n' + str(exception), parent,
+                    msg_type=gtk.MESSAGE_ERROR)
 
 def message(msg, parent, msg_type=gtk.MESSAGE_INFO):
     dialog = gtk.MessageDialog(parent,
