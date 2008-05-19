@@ -366,12 +366,12 @@ def send_bugtracker(msg, parent):
                 issue_ids = server.filter('issue', None, {'messages': msg_ids})
                 if issue_ids:
                     issue_id = issue_ids[0]
-                    server.set('issue' + str(issue_id), *['nosy=+'+user])
+                    server.set('issue' + str(issue_id), *['nosy=+' + str(user)])
             if not issue_id:
-                msg_id = server.create('msg', *['content='+msg,
-                    'author='+user, 'summary=' + msg_md5])
-                issue_id = server.create('issue', *['messages='+str(msg_id),
-                    'nosy='+user, 'title='+title, 'priority=bug'])
+                msg_id = server.create('msg', *['content=' + str(msg),
+                    'author=' + str(user), 'summary=' + str(msg_md5)])
+                issue_id = server.create('issue', *['messages=' + str(msg_id),
+                    'nosy=' + str(user), 'title=' + str(title), 'priority=bug'])
         except Exception, exception:
             message(_('Exception:') + '\n' + str(exception), parent,
                     msg_type=gtk.MESSAGE_ERROR)
