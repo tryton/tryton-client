@@ -360,7 +360,7 @@ def send_bugtracker(msg, parent):
             for line in msg.split('\n'):
                 if line:
                     title = line
-            msg_ids = server.filter('msg', None, {'summary': msg_md5})
+            msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
             issue_id = None
             if msg_ids:
                 issue_ids = server.filter('issue', None, {'messages': msg_ids})
