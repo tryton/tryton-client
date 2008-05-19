@@ -11,6 +11,7 @@ import sys
 import xmlrpclib
 import md5
 import webbrowser
+import traceback
 
 _ = gettext.gettext
 
@@ -373,7 +374,10 @@ def send_bugtracker(msg, parent):
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + str(user), 'title=' + str(title), 'priority=bug'])
         except Exception, exception:
-            message(_('Exception:') + '\n' + str(exception), parent,
+            tb_s = reduce(lambda x, y: x + y,
+                    traceback.format_exception(sys.exc_type,
+                        sys.exc_value, sys.exc_traceback))
+            message(_('Exception:') + '\n' + tb_s, parent,
                     msg_type=gtk.MESSAGE_ERROR)
 
 def message(msg, parent, msg_type=gtk.MESSAGE_INFO):
