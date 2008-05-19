@@ -371,7 +371,7 @@ def send_bugtracker(msg, parent):
                 msg_id = server.create('msg', *['content='+msg,
                     'author='+user, 'summary=' + msg_md5])
                 issue_id = server.create('issue', *['messages='+str(msg_id),
-                    'nosy='+user, 'title='+title])
+                    'nosy='+user, 'title='+title, 'priority=bug'])
         except Exception, exception:
             message(_('Exception:') + '\n' + str(exception), parent,
                     msg_type=gtk.MESSAGE_ERROR)
