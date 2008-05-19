@@ -211,7 +211,7 @@ def process_exception(exception, parent, obj='', method='', *args):
         else:
             common.warning(details, parent, description)
     else:
-        common.error(type, description, parent, details)
+        common.error(type, parent, details)
 
 
 class RPCProxy(object):
