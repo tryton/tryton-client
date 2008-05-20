@@ -189,7 +189,7 @@ def process_exception(exception, parent, obj='', method='', *args):
         details = str(exception.args[1])
     else:
         details = data
-    if hasattr(data, 'split'):
+    if hasattr(data, 'split') and ' -- ' in data:
         lines = data.split('\n')
         type = lines[0].split(' -- ')[0]
         description = ''
