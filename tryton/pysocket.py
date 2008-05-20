@@ -18,9 +18,9 @@ class PySocketException(Exception):
 
     def __init__(self, code, string):
         Exception.__init__(self)
-        self.faultCode = code
-        self.faultString = string
-        self.args = (code, string)
+        self.faultCode = code.decode('utf8')
+        self.faultString = string.decode('utf8')
+        self.args = (self.faultCode, self.faultString)
 
 class PySocket:
 

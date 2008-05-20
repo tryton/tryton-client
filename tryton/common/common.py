@@ -270,7 +270,7 @@ def error(title, parent, details):
     box.pack_start(label_error, False, False)
     textview = gtk.TextView()
     buf = gtk.TextBuffer()
-    buf.set_text(unicode(details,'latin1').encode('utf-8'))
+    buf.set_text(details)
     textview.set_buffer(buf)
     box.pack_start(textview, False, False)
 
@@ -354,7 +354,8 @@ def send_bugtracker(msg, parent):
     win.destroy()
     if response == gtk.RESPONSE_OK:
         try:
-            server = xmlrpclib.Server(('https://%s:%s@' + CONFIG['roundup.xmlrpc'])
+            msg = msg.encode('ascii', 'replace')
+            server = xmlrpclib.Server(('http://%s:%s@' + CONFIG['roundup.xmlrpc'])
                     % (user, password), allow_none=True)
             msg_md5 = md5.new(msg).hexdigest()
             title = '[no title]'
