@@ -129,9 +129,9 @@ class ViewForm(ParserView):
                         'to use the relate button !'))
                 return False
             if 'domain' in act:
-                act['domain'] = \
+                act['domain'] = str(
                         self.screen.current_model.expr_eval(
-                                act['domain'], check_load=False)
+                                act['domain'], check_load=False))
             if 'context' in act:
                 act['context'] = str(
                         self.screen.current_model.expr_eval(
