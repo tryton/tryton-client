@@ -141,6 +141,8 @@ class Wizard(object):
             dia = None
         try:
             rpc.execute('wizard', 'delete', wiz_id)
+            #XXX to remove when company displayed in status bar
+            rpc.context_reload()
         except:
             pass
 
