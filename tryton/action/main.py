@@ -123,8 +123,8 @@ class Action(object):
             ctx = {
                 'active_id': datas.get('id',False),
                 'active_ids': datas.get('ids',[]),
-                'user': rpc._USER,
             }
+            ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
             eval_ctx['datetime'] = datetime
             ctx.update(eval(action.get('context','{}'), eval_ctx))
