@@ -130,7 +130,10 @@ def context_reload():
             else:
                 gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
         if i == 'timezone':
-            TIMEZONE = execute('common', 'timezone_get')
+            try:
+                TIMEZONE = execute('common', 'timezone_get')
+            except:
+                pass
 
 def execute(obj, method, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
