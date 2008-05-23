@@ -170,7 +170,9 @@ def execute(obj, method, *args):
 
 def process_exception(exception, parent, obj='', method='', *args):
     global _USERNAME, _DATABASE, _SOCK
+    type = 'error'
     if str(exception.args[0]) == 'NotLogged':
+        type = 'warning'
         while True:
             password = common.ask(_('Password:'), parent, visibility=False)
             if password is None:
@@ -185,7 +187,6 @@ def process_exception(exception, parent, obj='', method='', *args):
                     return process_exception(exception, parent, obj,
                             method, *args)
             return
-    type = 'error'
     data = str(exception.args[0])
     description = data
     if len(exception.args) > 1:
