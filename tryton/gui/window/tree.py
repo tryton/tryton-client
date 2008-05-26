@@ -172,6 +172,8 @@ class Tree(SignalEvent):
 
             self.tree_res.ids = ids
             self.tree_res.reload()
+
+            self.sig_action('tree_open', obj_id=obj_id, warning=False)
         return False
 
     def sig_print(self):
