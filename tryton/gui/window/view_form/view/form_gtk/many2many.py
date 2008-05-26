@@ -49,6 +49,9 @@ class Many2Many(WidgetInterface):
 
         self.old = None
 
+    def grab_focus(self):
+        return self.wid_text.grab_focus()
+
     def destroy(self):
         self.screen.destroy()
         self.widget.destroy()

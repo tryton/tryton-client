@@ -39,9 +39,7 @@ class Dialog(object):
                 val[i] = fields[i]['value']
 
         self.screen = Screen(obj_name, self.dia, view_type=[], context=context)
-        self.screen.new(default=False)
         self.screen.add_view_custom(arch, fields, display=True)
-        self.screen.current_model.set(val)
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
@@ -52,6 +50,9 @@ class Dialog(object):
         self.dia.vbox.pack_start(self.screen.widget)
         self.dia.set_title(self.dia.get_title() + ' - ' + self.screen.current_view.title)
         self.dia.show()
+        self.screen.new(default=False)
+        self.screen.current_model.set(val)
+        self.screen.current_view.set_cursor()
 
     def run(self, datas=None):
         if datas is None:

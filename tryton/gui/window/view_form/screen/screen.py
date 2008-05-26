@@ -237,8 +237,8 @@ class Screen(SignalEvent):
         else:
             if self.current_view.view_type == 'form':
                 self.new()
-        self.display()
         self.current_view.set_cursor()
+        self.display()
         # TODO: set True or False accoring to the type
 
     def load_view_to_load(self):
@@ -346,9 +346,9 @@ class Screen(SignalEvent):
             self.models.model_add(model, self.new_model_position())
         self.current_model = model
         self.current_model.validate_set()
-        self.display()
         if self.current_view:
             self.current_view.set_cursor(new=True)
+        self.display()
         return self.current_model
 
     def new_model_position(self):
@@ -376,8 +376,8 @@ class Screen(SignalEvent):
         if self.current_model.validate():
             obj_id = self.current_model.save(force_reload=True)
         else:
-            self.current_view.display()
             self.current_view.set_cursor()
+            self.current_view.display()
             return False
         if self.current_view.view_type == 'tree':
             for model in self.models.models:
@@ -386,11 +386,11 @@ class Screen(SignalEvent):
                         obj_id = model.save(force_reload=True)
                     else:
                         self.current_model = model
-                        self.display()
                         self.current_view.set_cursor()
+                        self.display()
                         return False
-            self.display()
             self.current_view.set_cursor()
+            self.display()
         if self.current_model not in self.models:
             self.models.model_add(self.current_model)
         return obj_id
@@ -450,8 +450,8 @@ class Screen(SignalEvent):
                 self.current_model = None
             if reload_ids:
                 self.models.reload(reload_ids)
-            self.display()
             self.current_view.set_cursor()
+            self.display()
             res = obj_id
         if self.current_view.view_type == 'tree':
             ids = self.current_view.sel_ids_get()
@@ -472,8 +472,8 @@ class Screen(SignalEvent):
             self.current_model = None
             if reload_ids:
                 self.models.reload(reload_ids)
-            self.display()
             self.current_view.set_cursor()
+            self.display()
             res = ids
         return res
 
@@ -513,8 +513,8 @@ class Screen(SignalEvent):
                     and self.models.models[0]
         if self.current_model:
             self.current_model.validate_set()
-        self.display()
         self.current_view.set_cursor()
+        self.display()
 
     def display_prev(self):
         self.current_view.set_value()
@@ -529,8 +529,8 @@ class Screen(SignalEvent):
 
         if self.current_model:
             self.current_model.validate_set()
-        self.display()
         self.current_view.set_cursor()
+        self.display()
 
     def sel_ids_get(self):
         return self.current_view.sel_ids_get()

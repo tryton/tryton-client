@@ -338,6 +338,9 @@ class One2Many(WidgetInterface):
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
 
+    def grab_focus(self):
+        return self.screen.widget.grab_focus()
+
     def on_keypress(self, widget, event):
         if (event.keyval == gtk.keysyms.N \
                     and event.state & gtk.gdk.CONTROL_MASK \

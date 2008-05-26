@@ -177,7 +177,7 @@ class ParserTree(ParserInterface):
                     dict_widget[i] = (fname, label, label_sum,
                             fields.get('digits', (16,2))[1], label_bold)
         treeview.set_fixed_height_mode(True)
-        return treeview, dict_widget, [], on_write
+        return treeview, dict_widget, [], on_write, [], None
 
 
 class Char(object):

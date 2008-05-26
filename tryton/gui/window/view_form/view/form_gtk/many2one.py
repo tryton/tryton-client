@@ -153,6 +153,9 @@ class Many2One(WidgetInterface):
             if ids:
                 self.load_completion(ids)
 
+    def grab_focus(self):
+        return self.wid_text.grab_focus()
+
     def _focus_out(self):
         return WidgetInterface._focus_out(self)
 

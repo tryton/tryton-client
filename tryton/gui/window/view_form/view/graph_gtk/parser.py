@@ -136,4 +136,4 @@ class ParserGraph(ParserInterface):
         event.add(widget)
         event.connect('button-press-event', button_press, widget, self.window)
 
-        return event, {'root': widget}, [], ''
+        return event, {'root': widget}, [], '', [], None

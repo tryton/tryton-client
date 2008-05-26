@@ -87,6 +87,9 @@ class Reference(WidgetInterface):
         self.last_key = (None, 0)
         self.key_catalog = {}
 
+    def grab_focus(self):
+        return self.widget_combo.grab_focus()
+
     def get_model(self):
         child = self.widget_combo.get_child()
         res = child.get_text()

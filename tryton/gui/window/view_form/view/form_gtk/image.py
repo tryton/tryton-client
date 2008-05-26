@@ -72,6 +72,9 @@ class Image(WidgetInterface):
 
         self.update_img()
 
+    def grab_focus(self):
+        return self.image.grab_focus()
+
     def sig_add(self, widget):
         filter_all = gtk.FileFilter()
         filter_all.set_name(_('All files'))

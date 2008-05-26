@@ -56,6 +56,9 @@ class Calendar(WidgetInterface):
         self.entry.set_sensitive(not value)
         self.but_open.set_sensitive(not value)
 
+    def grab_focus(self):
+        return self.entry.grab_focus()
+
     def get_value(self, model):
         value = self.entry.get_text()
         if value == '':
@@ -166,6 +169,9 @@ class DateTime(WidgetInterface):
         self.readonly = value
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
+
+    def grab_focus(self):
+        return self.entry.grab_focus()
 
     def get_value(self, model, timezone=True):
         value = self.entry.get_text()

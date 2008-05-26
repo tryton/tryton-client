@@ -123,6 +123,9 @@ class WidgetInterface(object):
     def _invisible_widget(self):
         return self.widget
 
+    def grab_focus(self):
+        return self.widget.grab_focus()
+
     def color_set(self, name):
         widget = self._color_widget()
         colormap = widget.get_colormap()

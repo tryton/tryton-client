@@ -33,11 +33,11 @@ class WidgetParse(ParserInterface):
             if node.localName in PARSERS:
                 widget = PARSERS[node.localName](self.window, self.parent,
                         self.attrs, screen)
-                wid, child, buttons, on_write = widget.parse(screen.resource,
-                        node, fields)
+                wid, child, buttons, on_write, notebooks, cursor_widget = \
+                        widget.parse(screen.resource, node, fields)
                 screen.set_on_write(on_write)
                 res = PARSERS2[node.localName](self.window, screen, wid, child,
-                        buttons, toolbar)
+                        buttons, toolbar, notebooks, cursor_widget)
                 res.title = widget.title
                 widget = res
                 break

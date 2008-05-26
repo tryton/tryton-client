@@ -44,6 +44,9 @@ class Selection(WidgetInterface):
         self.set_popdown(selection)
         self.last_key = (None, 0)
 
+    def grab_focus(self):
+        return self.entry.grab_focus()
+
     def set_popdown(self, selection):
         model = gtk.ListStore(gobject.TYPE_STRING)
         self._selection = {}

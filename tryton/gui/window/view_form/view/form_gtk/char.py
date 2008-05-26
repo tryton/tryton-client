@@ -22,6 +22,9 @@ class Char(WidgetInterface):
     def _color_widget(self):
         return self.entry
 
+    def grab_focus(self):
+        return self.entry.grab_focus()
+
     def set_value(self, model, model_field):
         return model_field.set_client(model, self.entry.get_text() or False)
 

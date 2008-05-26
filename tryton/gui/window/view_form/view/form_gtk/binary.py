@@ -60,6 +60,9 @@ class Binary(WidgetInterface):
             self.but_new.show()
             self.but_remove.show()
 
+    def grab_focus(self):
+        return self.wid_text.grab_focus()
+
     def sig_new(self, widget=None):
         try:
             filename = file_selection(_('Open...'),

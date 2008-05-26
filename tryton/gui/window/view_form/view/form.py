@@ -61,9 +61,9 @@ class ViewWidget(object):
 class ViewForm(ParserView):
 
     def __init__(self, window, screen, widget, children=None,
-            buttons=None, toolbar=None):
+            buttons=None, toolbar=None, notebooks=None, cursor_widget=''):
         super(ViewForm, self).__init__(window, screen, widget, children,
-                buttons, toolbar)
+                buttons, toolbar, notebooks, cursor_widget)
         self.view_type = 'form'
         self.model_add_new = False
 
@@ -198,4 +198,7 @@ class ViewForm(ParserView):
         return True
 
     def set_cursor(self, new=False):
-        pass
+        for notebook in self.notebooks:
+            notebook.set_current_page(0)
+        if self.cursor_widget in self.widgets:
+            self.widgets[self.cursor_widget].widget.grab_focus()

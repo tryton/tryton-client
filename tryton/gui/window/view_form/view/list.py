@@ -136,9 +136,9 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 class ViewList(ParserView):
 
     def __init__(self, window, screen, widget, children=None, buttons=None,
-            toolbar=None):
+            toolbar=None, notebooks=None, cursor_widget=None):
         super(ViewList, self).__init__(window, screen, widget, children,
-                buttons, toolbar)
+                buttons, toolbar, notebooks, cursor_widget)
         self.store = None
         self.view_type = 'tree'
         self.model_add_new = True
