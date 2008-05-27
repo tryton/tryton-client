@@ -24,14 +24,14 @@ class AdaptModelGroup(gtk.GenericTreeModel):
     def added(self, modellist, position):
         if modellist is self.models:
             model = self.models[position]
-            self.emit('row_inserted', self.on_get_path(model),
-                      self.get_iter(self.on_get_path(model)))
+            self.row_inserted(self.on_get_path(model),
+                    self.get_iter(self.on_get_path(model)))
 
     def cancel(self):
         pass
 
     def removed(self, lst, position):
-        self.emit('row_deleted', position)
+        self.row_deleted(position)
         self.invalidate_iters()
 
     def append(self, model):
@@ -71,10 +71,10 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         prev = None
         for model in self.models:
             if prev:
-                prev.next = model
+                prev.next[id(self.models)] = model
             prev = model
         if prev:
-            prev.next = None
+            prev.next[id(self.models)] = None
         self.rows_reordered(None, None, new_order)
 
     def __len__(self):
@@ -109,7 +109,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 
     def on_iter_next(self, node):
         try:
-            return node.next
+            return node.next[id(self.models)]
         except IndexError:
             return None
 

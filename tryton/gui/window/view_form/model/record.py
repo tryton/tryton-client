@@ -39,7 +39,7 @@ class ModelRecord(SignalEvent):
         self.modified_fields = {}
         self.read_time = time.time()
         self.attachment_count = -1
-        self.next = None
+        self.next = {}
         for key, val in self.mgroup.mfields.items():
             self.value[key] = val.create(self)
             if (new and val.attrs['type']=='one2many') \

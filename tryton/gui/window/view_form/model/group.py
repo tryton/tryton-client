@@ -13,18 +13,19 @@ class ModelList(list):
 
     def insert(self, pos, obj):
         if pos >= 1:
-            self.__getitem__(pos - 1).next = obj
+            self.__getitem__(pos - 1).next[id(self)] = obj
         if pos < self.__len__():
-            obj.next = self.__getitem__(pos)
+            obj.next[id(self)] = self.__getitem__(pos)
         else:
-            obj.next = None
+            obj.next[id(self)] = None
         super(ModelList, self).insert(pos, obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-added', pos))
 
     def append(self, obj):
         if self.__len__() >= 1:
-            self.__getitem__(self.__len__() - 1).next = obj
+            self.__getitem__(self.__len__() - 1).next[id(self)] = obj
+        obj.next[id(self)] = None
         super(ModelList, self).append(obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-added', -1))
@@ -33,9 +34,9 @@ class ModelList(list):
         idx = self.index(obj)
         if idx >= 1:
             if idx + 1 < self.__len__():
-                self.__getitem__(idx - 1).next = self.__getitem__(idx + 1)
+                self.__getitem__(idx - 1).next[id(self)] = self.__getitem__(idx + 1)
             else:
-                self.__getitem__(idx - 1).next = None
+                self.__getitem__(idx - 1).next[id(self)] = None
         super(ModelList, self).remove(obj)
         if not self.lock_signal:
             self.__screen.signal('record-changed', ('record-removed', idx))
