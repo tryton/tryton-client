@@ -358,22 +358,25 @@ def send_bugtracker(msg, parent):
             server = xmlrpclib.Server(('http://%s:%s@' + CONFIG['roundup.xmlrpc'])
                     % (user, password), allow_none=True)
             msg_md5 = md5.new(msg).hexdigest()
-            title = '[no title]'
-            for line in msg.split('\n'):
-                if line:
-                    title = line
-            msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
+            # use the last line of the message as title
+            title = (filter(None, msg.splitlines()) or ['[no title]'])[-1]
             issue_id = None
+            msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
             if msg_ids:
                 issue_ids = server.filter('issue', None, {'messages': msg_ids})
                 if issue_ids:
                     issue_id = issue_ids[0]
-                    server.set('issue' + str(issue_id), *['nosy=+' + str(user)])
-            if not issue_id:
-                msg_id = server.create('msg', *['content=' + str(msg),
-                    'author=' + str(user), 'summary=' + str(msg_md5)])
+            if issue_id:
+                # issue to same message already exists, add user to nosy-list
+                server.set('issue' + str(issue_id), *['nosy=+' + user])
+            else:
+                # create a new issue for this error-message
+                # first create message
+                msg_id = server.create('msg', *['content=' + msg,
+                    'author=' + user, 'summary=' + msg_md5])
+                # second create issue with this message
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
-                    'nosy=' + str(user), 'title=' + str(title), 'priority=bug'])
+                    'nosy=' + user, 'title=' + title, 'priority=bug'])
         except Exception, exception:
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
