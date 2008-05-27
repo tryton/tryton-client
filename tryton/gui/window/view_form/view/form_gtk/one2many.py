@@ -170,13 +170,13 @@ class Dialog(object):
         if not model:
             model = self.screen.new(context=default_get_ctx)
         if isinstance(model, ModelRecordGroup):
-            self.screen.models_set(model)
             self.screen.add_view_id(False, 'tree', display=True,
                     context=default_get_ctx)
             self.screen.add_view_id(False, 'form', display=False,
                     context=default_get_ctx)
             self.screen.signal_connect(self, 'record-message', self._sig_label)
             self.screen.widget.connect('key_press_event', self.on_keypress)
+            self.screen.models_set(model)
         else:
             self.screen.models.model_add(model)
             self.screen.current_model = model
@@ -205,6 +205,7 @@ class Dialog(object):
         viewport.set_size_request(width, height + 30)
         self.dia.show_all()
         self.screen.display()
+        self.screen.current_view.set_cursor()
 
     def on_keypress(self, widget, event):
         if (event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
@@ -293,6 +294,7 @@ class Dialog(object):
                     or (not self.screen.current_model \
                         or self.screen.current_model.validate())
             if not end:
+                self.screen.current_view.set_cursor()
                 self.screen.display()
             self.but_cancel.set_label(gtk.STOCK_CLOSE)
 

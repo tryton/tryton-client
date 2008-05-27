@@ -67,6 +67,7 @@ class Dialog(object):
         i, j = self.screen.screen_container.size_get()
         viewport.set_size_request(i, j + 30)
         self.dia.show_all()
+        self.screen.current_view.set_cursor()
         self.screen.display()
 
     def run(self):
