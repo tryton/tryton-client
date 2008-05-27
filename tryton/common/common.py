@@ -369,6 +369,9 @@ def send_bugtracker(msg, parent):
             if issue_id:
                 # issue to same message already exists, add user to nosy-list
                 server.set('issue' + str(issue_id), *['nosy=+' + user])
+                message(_('Bug was already reported, \n' \
+                        'we added you to the listeners list of ') + \
+                        'issue%s' % issue_id, parent)
             else:
                 # create a new issue for this error-message
                 # first create message
@@ -377,6 +380,8 @@ def send_bugtracker(msg, parent):
                 # second create issue with this message
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
+                message(_('Created new issue with ID ') + \
+                        'issue%s' % issue_id, parent)
         except Exception, exception:
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
