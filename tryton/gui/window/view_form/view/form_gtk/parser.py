@@ -523,7 +523,7 @@ class ParserForm(ParserInterface):
         obj_id = self.screen.current_model.id
         if not obj_id:
             common.message(
-                    _('You need to save resource before adding translations!'),
+                    _('You need to save the record before adding translations!'),
                     parent=self.window)
             return False
 

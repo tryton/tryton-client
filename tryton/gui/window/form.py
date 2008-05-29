@@ -174,7 +174,7 @@ class Form(SignalEvent):
             attachment_count = value.get_attachment_count(reload=True)
             self.signal('attachment-count', attachment_count)
         else:
-            self.message_state(_('No resource selected!'))
+            self.message_state(_('No record selected!'))
         return True
 
     def sig_switch(self, widget=None):
@@ -188,7 +188,7 @@ class Form(SignalEvent):
     def sig_logs(self, widget=None):
         obj_id = self._id_get()
         if not obj_id:
-            self.message_state(_('You have to select one resource!'))
+            self.message_state(_('You have to select one record!'))
             return False
 
         fields = [
@@ -224,9 +224,9 @@ class Form(SignalEvent):
             msg = _('Are you sure to remove those records?')
         if sur(msg, self.window):
             if not self.screen.remove(unlink=True):
-                self.message_state(_('Resources not removed!'))
+                self.message_state(_('Records not removed!'))
             else:
-                self.message_state(_('Resources removed!'))
+                self.message_state(_('Records removed!'))
 
     def sig_import(self, widget=None):
         fields = []

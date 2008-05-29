@@ -134,8 +134,8 @@ class Many2One(WidgetInterface):
         self.widget.pack_start(self.but_open, expand=False, fill=False)
 
         self.tooltips = gtk.Tooltips()
-        self.tooltips.set_tip(self.but_new, _('Create a new resource'))
-        self.tooltips.set_tip(self.but_open, _('Open a resource'))
+        self.tooltips.set_tip(self.but_new, _('Create a new record'))
+        self.tooltips.set_tip(self.but_open, _('Open a record'))
         self.tooltips.enable()
 
         self._readonly = False
@@ -382,11 +382,11 @@ class Many2One(WidgetInterface):
         if res:
             img.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
-            self.tooltips.set_tip(self.but_open, _('Open a resource'))
+            self.tooltips.set_tip(self.but_open, _('Open a record'))
         else:
             img.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
-            self.tooltips.set_tip(self.but_open, _('Search a resource'))
+            self.tooltips.set_tip(self.but_open, _('Search a record'))
         self.changed = True
 
     def _populate_popup(self, widget, menu):

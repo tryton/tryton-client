@@ -66,8 +66,8 @@ class Reference(WidgetInterface):
                 fill=False)
 
         tooltips = gtk.Tooltips()
-        tooltips.set_tip(self.but_new, _('Create a new resource'))
-        tooltips.set_tip(self.but_open, _('Search / Open a resource'))
+        tooltips.set_tip(self.but_new, _('Create a new record'))
+        tooltips.set_tip(self.but_open, _('Search / Open a record'))
         tooltips.enable()
 
         self._readonly = False

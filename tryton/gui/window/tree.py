@@ -196,7 +196,7 @@ class Tree(SignalEvent):
                 'window': self.window,
                 }, context=ctx, warning=warning)
         else:
-            common.message(_('No resource selected!'), self.window)
+            common.message(_('No record selected!'), self.window)
         return False
 
     def sig_activate(self, widget, iter, path):
@@ -229,7 +229,7 @@ class Tree(SignalEvent):
             Window.create(None, self.model, obj_ids, self.domain,
                     window=self.window, mode=['form', 'tree'])
         else:
-            common.message(_('No resource selected!'), self.window)
+            common.message(_('No record selected!'), self.window)
 
     def sc_del(self, widget):
         obj_id = self.tree_sc.sel_id_get()
