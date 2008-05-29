@@ -297,6 +297,8 @@ class Screen(SignalEvent):
                 field_dom = str(fields[dom[0]].setdefault('domain',[]))
                 fields[dom[0]]['domain'] = field_dom[:1] + \
                         str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
+                if dom[1] == '=':
+                    fields[dom[0]]['readonly'] = True
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
                 self.fields_view_tree = {'arch': arch, 'fields': fields}

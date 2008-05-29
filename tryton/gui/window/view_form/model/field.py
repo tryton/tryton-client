@@ -101,6 +101,8 @@ class CharField(object):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             for key in ('readonly', 'required', 'invisible'):
+                if 'readonly' in self.attrs and self.attrs['readonly']:
+                    continue
                 if key in state_changes:
                     self.get_state_attrs(model)[key] = \
                             eval(state_changes[key], values)

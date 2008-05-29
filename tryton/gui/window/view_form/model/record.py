@@ -120,7 +120,7 @@ class ModelRecord(SignalEvent):
     def save(self, force_reload=True):
         self._check_load()
         if not self.id:
-            value = self.get(get_readonly=False)
+            value = self.get(get_readonly=True)
             try:
                 self.id = self.rpc.create(value, self.context_get())
             except Exception, exception:
