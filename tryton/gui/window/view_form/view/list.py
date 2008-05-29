@@ -442,6 +442,7 @@ class ViewList(ParserView):
                     focus_column = column
                     break
             self.widget_tree.set_cursor(path, focus_column, new)
+        self.widget_tree.grab_focus()
 
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):

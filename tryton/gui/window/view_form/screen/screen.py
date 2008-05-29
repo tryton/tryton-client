@@ -480,6 +480,7 @@ class Screen(SignalEvent):
     def load(self, ids):
         self.models.load(ids, display=False)
         self.current_view.reset()
+        self.current_view.set_cursor()
         if ids:
             self.display(ids[0])
         else:
