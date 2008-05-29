@@ -613,6 +613,7 @@ class Main(object):
         self.glade.get_widget('user').set_sensitive(True)
         self.glade.get_widget('form').set_sensitive(True)
         self.glade.get_widget('plugins').set_sensitive(True)
+        self.notebook.grab_focus()
         return True
 
     def sig_logout(self, widget, disconnect=True):
