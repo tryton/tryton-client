@@ -26,7 +26,7 @@ class Attachment(object):
         self.win.set_icon(TRYTON_ICON)
         self.win.set_transient_for(parent)
         self.parent = parent
-        self.ressource = (model, obj_id)
+        self.resource = (model, obj_id)
 
         self.view = gtk.TreeView()
         viewport = self.glade.get_widget('vp_attach')
@@ -120,8 +120,8 @@ class Attachment(object):
                 args = ('object', 'execute',
                         'ir.attachment', 'create', {
                             'name': fname,
-                            'res_model': self.ressource[0],
-                            'res_id': self.ressource[1],
+                            'res_model': self.resource[0],
+                            'res_id': self.resource[1],
                             'link': filename,
                             })
                 try:
@@ -187,8 +187,8 @@ class Attachment(object):
                     'ir.attachment', 'create', {
                         'name': name,
                         'datas': base64.encodestring(value),
-                        'res_model': self.ressource[0],
-                        'res_id': self.ressource[1],
+                        'res_model': self.resource[0],
+                        'res_id': self.resource[1],
                         })
             try:
                 obj_id = rpc.execute(*args)
@@ -292,8 +292,8 @@ class Attachment(object):
         try:
             ids = rpc.execute('object', 'execute',
                     'ir.attachment', 'search', [
-                        ('res_model', '=', self.ressource[0]),
-                        ('res_id', '=', self.ressource[1]),
+                        ('res_model', '=', self.resource[0]),
+                        ('res_id', '=', self.resource[1]),
                         ])
         except Exception, exception:
             rpc.process_exception(exception, self.win)
