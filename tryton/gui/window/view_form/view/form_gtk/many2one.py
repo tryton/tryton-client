@@ -224,6 +224,8 @@ class Many2One(WidgetInterface):
     def sig_activate(self, widget, event=None):
         if not self.focus_out:
             return
+        if not self._view.modelfield:
+            return
         self.changed = False
         value = self._view.modelfield.get(self._view.model)
 
