@@ -168,7 +168,7 @@ class ConfigManager(object):
 
 CONFIG = ConfigManager()
 CURRENT_DIR = os.path.abspath(os.path.normpath(os.path.join(
-    os.path.dirname(sys.argv[0]))))
+    os.path.dirname(__file__), '..')))
 PREFIX = os.path.abspath(os.path.normpath(os.path.join(
     os.path.dirname(sys.argv[0]), '..')))
 PIXMAPS_DIR = os.path.join(CURRENT_DIR, 'share', 'pixmaps')
