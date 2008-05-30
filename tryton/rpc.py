@@ -1,13 +1,7 @@
 import pysocket
-import translate
-from config import CONFIG, GLADE, TRYTON_ICON
-import gtk
 import logging
-import common
 import socket
 from threading import Semaphore
-from gtk import glade
-import gettext
 
 _SOCK = None
 _USER = 0
@@ -124,11 +118,6 @@ def context_reload():
     for i in context:
         value = context[i]
         CONTEXT[i] = value
-        if i == 'language_direction':
-            if value == 'rtl':
-                gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
-            else:
-                gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
         if i == 'timezone':
             try:
                 TIMEZONE = execute('common', 'timezone_get')
@@ -168,56 +157,6 @@ def execute(obj, method, *args):
             _VIEW_CACHE[key] = (result['md5'], result)
     return result
 
-def process_exception(exception, parent, obj='', method='', *args):
-    global _USERNAME, _DATABASE, _SOCK
-    type = 'error'
-    if str(exception.args[0]) == 'NotLogged':
-        type = 'warning'
-        while True:
-            password = common.ask(_('Password:'), parent, visibility=False)
-            if password is None:
-                break
-            res = login(_USERNAME, password, _SOCK.host, _SOCK.port, _DATABASE)
-            if res < 0:
-                continue
-            if obj and method:
-                try:
-                    return execute(obj, method, *args)
-                except Exception, exception:
-                    return process_exception(exception, parent, obj,
-                            method, *args)
-            return
-    data = str(exception.args[0])
-    description = data
-    if len(exception.args) > 1:
-        details = str(exception.args[1])
-    else:
-        details = data
-    if hasattr(data, 'split') and ' -- ' in data:
-        lines = data.split('\n')
-        type = lines[0].split(' -- ')[0]
-        description = ''
-        if len(lines[0].split(' -- ')) > 1:
-            description = lines[0].split(' -- ')[1]
-        if len(lines) > 2:
-            details = '\n'.join(lines[2:])
-    if type == 'warning':
-        if description == 'ConcurrencyException' \
-                and len(args) > 4:
-            if concurrency(args[0], args[2][0], args[4], parent):
-                if 'read_delta' in args[4]:
-                    del args[4]['read_delta']
-                try:
-                    return execute(obj, method, *args)
-                except Exception, exception:
-                    return process_exception(exception, parent, obj,
-                            method, *args)
-        else:
-            common.warning(details, parent, description)
-    else:
-        common.error(type, parent, details)
-
-
 class RPCProxy(object):
 
     def __init__(self, name):
@@ -237,22 +176,3 @@ class RPCFunction(object):
 
     def __call__(self, *args):
         return execute('object', 'execute', self.name, self.func, *args)
-
-def concurrency(resource, obj_id, context, parent):
-    dia = glade.XML(GLADE, 'dialog_concurrency_exception', gettext.textdomain())
-    win = dia.get_widget('dialog_concurrency_exception')
-
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
-
-    res = win.run()
-    parent.present()
-    win.destroy()
-
-    if res == gtk.RESPONSE_OK:
-        return True
-    if res == gtk.RESPONSE_APPLY:
-        from gui.window import Window
-        Window.create(False, resource, obj_id, [('id', '=', obj_id)], 'form',
-                parent, context, ['form', 'tree'])
-    return False

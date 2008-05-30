@@ -9,6 +9,7 @@ from parse import Parse
 import datetime as DT
 import locale
 from tryton.common import DT_FORMAT, DHM_FORMAT
+import tryton.common as common
 
 if not hasattr(locale, 'nl_langinfo'):
     locale.nl_langinfo = lambda *a: '%x'
@@ -319,7 +320,7 @@ class ViewTree(object):
             self.fields = rpc.execute('object', 'execute',
                     view_info['model'], 'fields_get', False, self.context)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             raise
         parse = Parse(self.fields)
         parse.parse(view_info['arch'], self.view)

@@ -7,6 +7,7 @@ from interface import ParserView
 from tryton.action import Action
 from tryton.common import message
 import gettext
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -285,7 +286,7 @@ class ViewList(ParserView):
                             (self.screen.fields[path[1].name]['relation'], 0),
                             rpc.CONTEXT)
                 except Exception, exception:
-                    rpc.process_exception(exception, self.window)
+                    common.process_exception(exception, self.window)
                     return False
                 menu_entries = []
                 menu_entries.append((None, None, None))

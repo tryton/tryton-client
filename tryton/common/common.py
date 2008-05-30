@@ -504,6 +504,74 @@ def ask(question, parent, visibility=True):
     else:
         return None
 
+def concurrency(resource, obj_id, context, parent):
+    dia = glade.XML(GLADE, 'dialog_concurrency_exception', gettext.textdomain())
+    win = dia.get_widget('dialog_concurrency_exception')
+
+    win.set_transient_for(parent)
+    win.set_icon(TRYTON_ICON)
+
+    res = win.run()
+    parent.present()
+    win.destroy()
+
+    if res == gtk.RESPONSE_OK:
+        return True
+    if res == gtk.RESPONSE_APPLY:
+        from tryton.gui.window import Window
+        Window.create(False, resource, obj_id, [('id', '=', obj_id)], 'form',
+                parent, context, ['form', 'tree'])
+    return False
+
+def process_exception(exception, parent, obj='', method='', *args):
+    global _USERNAME, _DATABASE, _SOCK
+    type = 'error'
+    if str(exception.args[0]) == 'NotLogged':
+        type = 'warning'
+        while True:
+            password = ask(_('Password:'), parent, visibility=False)
+            if password is None:
+                break
+            res = login(_USERNAME, password, _SOCK.host, _SOCK.port, _DATABASE)
+            if res < 0:
+                continue
+            if obj and method:
+                try:
+                    return execute(obj, method, *args)
+                except Exception, exception:
+                    return process_exception(exception, parent, obj,
+                            method, *args)
+            return
+    data = str(exception.args[0])
+    description = data
+    if len(exception.args) > 1:
+        details = str(exception.args[1])
+    else:
+        details = data
+    if hasattr(data, 'split') and ' -- ' in data:
+        lines = data.split('\n')
+        type = lines[0].split(' -- ')[0]
+        description = ''
+        if len(lines[0].split(' -- ')) > 1:
+            description = lines[0].split(' -- ')[1]
+        if len(lines) > 2:
+            details = '\n'.join(lines[2:])
+    if type == 'warning':
+        if description == 'ConcurrencyException' \
+                and len(args) > 4:
+            if concurrency(args[0], args[2][0], args[4], parent):
+                if 'read_delta' in args[4]:
+                    del args[4]['read_delta']
+                try:
+                    return execute(obj, method, *args)
+                except Exception, exception:
+                    return process_exception(exception, parent, obj,
+                            method, *args)
+        else:
+            warning(details, parent, description)
+    else:
+        error(type, parent, details)
+
 def node_attributes(node):
     result = {}
     attrs = node.attributes

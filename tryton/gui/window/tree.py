@@ -30,21 +30,21 @@ class Tree(SignalEvent):
                         'ir.ui.view', 'read', view_id,
                         ['model', 'type'], context)
             except Exception, exception:
-                rpc.process_exception(exception, window)
+                common.process_exception(exception, window)
                 raise
             try:
                 view = rpc.execute('object', 'execute',
                         view_base['model'], 'fields_view_get', view_id,
                         view_base['type'],context)
             except Exception, exception:
-                rpc.process_exception(exception, window)
+                common.process_exception(exception, window)
                 raise
         else:
             try:
                 view = rpc.execute('object', 'execute', model,
                     'fields_view_get', False, 'tree', context)
             except Exception, exception:
-                rpc.process_exception(exception, window)
+                common.process_exception(exception, window)
                 raise
 
         self.glade = glade.XML(GLADE, 'win_tree_container',
@@ -107,7 +107,7 @@ class Tree(SignalEvent):
             ids = rpc.execute('object', 'execute', self.model,
                     'search', self.domain2, 0, None, None, self.context)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return
         if self.tree_res.toolbar:
 
@@ -121,7 +121,7 @@ class Tree(SignalEvent):
                 results = rpc.execute('object', 'execute',
                         self.view['model'], 'read', ids, ['name', icon_name], ctx)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return
             radiotb = None
             for res in results:
@@ -165,7 +165,7 @@ class Tree(SignalEvent):
             try:
                 ids = rpc.execute(*args)[self.view['field_childs']]
             except Exception, exception:
-                ids = rpc.process_exception(exception, self.window, *args)\
+                ids = common.process_exception(exception, self.window, *args)\
                         [self.view['field_childs']]
                 if not ids:
                     return False
@@ -239,7 +239,7 @@ class Tree(SignalEvent):
                 rpc.execute('object', 'execute', 'ir.ui.view_sc',
                         'unlink', [sc_id])
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
         self.tree_sc.update()
 
     def sc_add(self, widget):
@@ -258,7 +258,7 @@ class Tree(SignalEvent):
                                 'name': name,
                                 })
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
         self.tree_sc.update()
 
     def sc_go(self, widget=None, *args):

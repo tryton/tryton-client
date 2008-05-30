@@ -113,3 +113,9 @@ def setlang(lang=None):
         gettext.textdomain(PACKAGE)
         gettext.install(PACKAGE, unicode=1)
     gtk.glade.bindtextdomain(PACKAGE, locale_dir)
+
+def set_language_direction(direction):
+    if direction == 'rtl':
+        gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
+    else:
+        gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)

@@ -79,7 +79,7 @@ class WinExport(object):
                                 fields[field]['relation'], 'fields_get', False,
                                 rpc.CONTEXT)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.win)
+                        common.process_exception(exception, self.win)
                         continue
                     model_populate(fields2, prefix_node+field+'/', node,
                             st_name+'/', level-1)
@@ -155,13 +155,13 @@ class WinExport(object):
         try:
             export_ids = ir_export.search([('resource', '=', self.model)])
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return
         for export in ir_export.read(export_ids):
             try:
                 fields = ir_export_line.read(export['export_fields'])
             except Exception, exception:
-                rpc.process_exception(exception, self.win)
+                common.process_exception(exception, self.win)
                 continue
             self.predef_model.append((
                 export['id'],
@@ -187,7 +187,7 @@ class WinExport(object):
             new_id = ir_export.create({'name' : name, 'resource' : self.model,
                 'export_fields' : [('create', {'name' : f}) for f in fields]})
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return
         self.predef_model.append((
             new_id,
@@ -208,7 +208,7 @@ class WinExport(object):
         try:
             ir_export.unlink(export_id)
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
@@ -283,6 +283,6 @@ class WinExport(object):
             datas = rpc.execute('object', 'execute', model,
                     'export_data', ids, fields, ctx)
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return []
         return datas

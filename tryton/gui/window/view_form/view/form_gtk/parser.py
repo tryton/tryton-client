@@ -46,7 +46,7 @@ class Button(object):
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.form.window,
+                        common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'object':
                     if not obj_id:
@@ -56,7 +56,7 @@ class Button(object):
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.form.window,
+                        common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'action':
                     action_id = None
@@ -65,7 +65,7 @@ class Button(object):
                     try:
                         action_id = rpc.execute(*args)
                     except Exception, exception:
-                        action_id = rpc.process_exception(exception, self.form.window,
+                        action_id = common.process_exception(exception, self.form.window,
                                 *args)
                     if action_id:
                         Action.execute(action_id, {
@@ -532,7 +532,7 @@ class ParserForm(ParserInterface):
             lang_ids = rpc.execute('object', 'execute', 'ir.lang',
                     'search', [('translatable','=','1')])
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return False
 
         if not lang_ids:
@@ -543,7 +543,7 @@ class ParserForm(ParserInterface):
             langs = rpc.execute('object', 'execute', 'ir.lang',
                     'read', lang_ids, ['code', 'name'])
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return False
 
         code = rpc.CONTEXT.get('language', 'en_US')
@@ -634,7 +634,7 @@ class ParserForm(ParserInterface):
                 val = rpc.execute('/object', 'execute', model,
                         'read', [obj_id], [name], context)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False
             val = val[0]
             if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
@@ -687,7 +687,7 @@ class ParserForm(ParserInterface):
                 try:
                     rpc.execute(*args)
                 except Exception, exception:
-                    rpc.process_exception(exception, self.window, *args)
+                    common.process_exception(exception, self.window, *args)
         if response == gtk.RESPONSE_CANCEL:
             self.window.present()
             win.destroy()

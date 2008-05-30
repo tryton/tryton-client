@@ -40,7 +40,7 @@ class Attachment(object):
             view = rpc.execute('object', 'execute',
                     'ir.attachment', 'fields_view_get', False, 'tree')
         except Exception, exception:
-            rpc.process_exception(exception, parent)
+            common.process_exception(exception, parent)
             raise
 
         parse = Parse(view['fields'])
@@ -90,7 +90,7 @@ class Attachment(object):
             try:
                 rpc.execute(*args)
             except Exception, exception:
-                rpc.process_exception(exception, self.win, *args)
+                common.process_exception(exception, self.win, *args)
         else:
             common.warning(_('You must put a text comment to an attachement.'),
                     self.win, _('Text not saved!'))
@@ -107,7 +107,7 @@ class Attachment(object):
                     rpc.execute('object', 'execute',
                             'ir.attachment', 'unlink', [int(obj_id)])
                 except Exception, exception:
-                    rpc.process_exception(exception, self.win, *args)
+                    common.process_exception(exception, self.win, *args)
         self.reload()
 
     def _sig_link(self, widget):
@@ -127,7 +127,7 @@ class Attachment(object):
                 try:
                     obj_id = rpc.execute(*args)
                 except Exception, exception:
-                    obj_id = rpc.process_exception(exception, self.win, *args)
+                    obj_id = common.process_exception(exception, self.win, *args)
                     if not obj_id:
                         return
                 self.reload(preview=False)
@@ -145,7 +145,7 @@ class Attachment(object):
                 data = rpc.execute('object', 'execute',
                         'ir.attachment', 'read', int(obj_id))
             except Exception, exception:
-                rpc.process_exception(exception, self.win)
+                common.process_exception(exception, self.win)
                 return None
             if not data:
                 return None
@@ -193,7 +193,7 @@ class Attachment(object):
             try:
                 obj_id = rpc.execute(*args)
             except Exception, exception:
-                obj_id = rpc.process_exception(exception, self.win, *args)
+                obj_id = common.process_exception(exception, self.win, *args)
                 if not obj_id:
                     return
             self.reload(preview=False)
@@ -214,7 +214,7 @@ class Attachment(object):
                 data = rpc.execute('object', 'execute',
                         'ir.attachment', 'read', int(obj_id))
             except Exception, exception:
-                rpc.process_exception(exception, self.win)
+                common.process_exception(exception, self.win)
                 return None
             if not data:
                 return None
@@ -234,7 +234,7 @@ class Attachment(object):
             data = rpc.execute('object', 'execute',
                     'ir.attachment', 'read', obj_id)
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return None
         if not data:
             return None
@@ -296,14 +296,14 @@ class Attachment(object):
                         ('res_id', '=', self.resource[1]),
                         ])
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return
         try:
             res_ids = rpc.execute('object', 'execute',
                     'ir.attachment', 'read', ids,
                     self.fields_order + ['link'])
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return
         for res in res_ids:
             num = self.model.append()

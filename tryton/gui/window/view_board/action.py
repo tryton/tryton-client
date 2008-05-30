@@ -7,6 +7,7 @@ import datetime
 from tryton.gui.window.win_search import WinSearch
 from tryton.action import Action as Action2
 from tryton.gui.window.view_tree.view_tree import ViewTree
+import tryton.common as common
 
 
 class Action(object):
@@ -22,7 +23,7 @@ class Action(object):
                     'ir.action.act_window', 'read', self.act_id, False,
                     rpc.CONTEXT)
         except Exception, exception:
-            rpc.process_exception(exception, self._window)
+            common.process_exception(exception, self._window)
             raise
 
         if self.action.get('views', []):
@@ -142,14 +143,14 @@ class Action(object):
                         'ir.ui.view', 'read', view_ids[0],
                         ['model', 'type'], self.context)
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
                 raise
             try:
                 view = rpc.execute('object', 'execute',
                         view_base['model'], 'fields_view_get', view_ids[0],
                         view_base['type'], self.context)
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
                 raise
             self.tree = ViewTree(view, [], self._window, True,
                     context=self.context)
@@ -180,7 +181,7 @@ class Action(object):
                         'get_action_id', self.act_id,
                         rpc.CONTEXT)
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
             if action_id:
                 Action2.execute(action_id, {})
 
@@ -209,7 +210,7 @@ class Action(object):
                     self.action['res_model'], 'search', self.domain, 0,
                     self.action.get('limit', 80))
         except Exception, exception:
-            rpc.process_exception(exception, self._window)
+            common.process_exception(exception, self._window)
             return False
         if self.screen:
             self.screen.clear()

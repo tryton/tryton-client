@@ -5,6 +5,7 @@ import tryton.rpc as rpc
 from tryton.common import warning, COLORS
 from tryton.config import GLADE, TRYTON_ICON
 import gettext
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -64,7 +65,7 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
             ir_default.set_default(model, field, clause, value, user,
                     rpc.CONTEXT)
         except Exception, exception:
-            rpc.process_exception(exception, window)
+            common.process_exception(exception, window)
             return False
         return True
     return False

@@ -79,7 +79,7 @@ class WinImport(object):
                                     'execute', fields[field]['relation'],
                                     'fields_get', False, rpc.CONTEXT)
                         except Exception, exception:
-                            rpc.process_exception(exception, self.win)
+                            common.process_exception(exception, self.win)
                             continue
                         model_populate(fields2, prefix_node+field+'/', node,
                                 st_name+'/', level-1)
@@ -202,7 +202,7 @@ class WinImport(object):
             res = rpc.execute('object', 'execute',
                     model, 'import_data', fields, datas)
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return False
         if res[0] >= 0:
             common.message(_('Imported %d objects!') % (res[0],), self.parent)

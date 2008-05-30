@@ -17,6 +17,7 @@ from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
 from tryton.common import TRYTON_ICON, message, sur, sur_3b
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -204,7 +205,7 @@ class Form(SignalEvent):
         try:
             res = rpc.execute(*args)
         except Exception, exception:
-            res = rpc.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, self.window, *args)
             if not res:
                 return
         message_str = ''
@@ -262,7 +263,7 @@ class Form(SignalEvent):
         try:
             new_id = rpc.execute(*args)
         except Exception, exception:
-            new_id = rpc.process_exception(exception, self.window, *args)
+            new_id = common.process_exception(exception, self.window, *args)
         if new_id:
             self.screen.load([new_id])
             self.message_state(_('Working now on the duplicated document !'))

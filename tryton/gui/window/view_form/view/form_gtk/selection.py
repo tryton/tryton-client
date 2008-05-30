@@ -2,6 +2,7 @@ import gtk
 import gobject
 from interface import WidgetInterface
 import tryton.rpc as rpc
+import tryton.common as common
 
 
 class Selection(WidgetInterface):
@@ -29,7 +30,7 @@ class Selection(WidgetInterface):
                         attrs['relation'], 'name_search', '',
                         attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
                 selection = []
         else:
             if not isinstance(selection, (list, tuple)):
@@ -37,7 +38,7 @@ class Selection(WidgetInterface):
                     selection = rpc.execute('object', 'execute',
                             self.model, selection, rpc.CONTEXT)
                 except Exception, exception:
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection

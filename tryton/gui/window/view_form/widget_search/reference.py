@@ -2,6 +2,7 @@ import gtk
 import gettext
 from interface import Interface
 import tryton.rpc as rpc
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -22,7 +23,7 @@ class Reference(Interface):
                         attrs['relation'], 'name_search', '',
                         attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
-                rpc.process_exception(exception, parent)
+                common.process_exception(exception, parent)
                 selection = []
         else:
             if not isinstance(selection, (list, tuple)):
@@ -30,7 +31,7 @@ class Reference(Interface):
                     selection = rpc.execute('object', 'execute',
                             attrs['model'], selection, rpc.CONTEXT)
                 except Exception, exception:
-                    rpc.process_exception(exception, parent)
+                    common.process_exception(exception, parent)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection

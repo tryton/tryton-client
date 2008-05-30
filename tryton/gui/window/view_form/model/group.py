@@ -3,6 +3,7 @@ import tryton.rpc as rpc
 from record import ModelRecord
 import field
 from tryton.signal_event import SignalEvent
+import tryton.common as common
 
 
 class ModelList(list):
@@ -121,7 +122,7 @@ class ModelRecordGroup(SignalEvent):
         try:
             res = getattr(self.rpc, self.on_write)(ids, self.context)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return False
         return res
 
@@ -163,7 +164,7 @@ class ModelRecordGroup(SignalEvent):
             try:
                 values = self.rpc.read(ids[:80], self.fields.keys(), ctx)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False
             if not values:
                 return False
@@ -311,7 +312,7 @@ class ModelRecordGroup(SignalEvent):
             try:
                 values = self.rpc.read(old, to_add, ctx)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False
             if values:
                 for value in values:
@@ -324,7 +325,7 @@ class ModelRecordGroup(SignalEvent):
             try:
                 values = self.rpc.default_get(to_add, ctx)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False
             for field_to_add in to_add:
                 if field_to_add not in values:

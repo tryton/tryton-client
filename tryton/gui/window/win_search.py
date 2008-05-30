@@ -4,6 +4,7 @@ import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 import tryton.gui.window.view_form.widget_search as widget_search
 from tryton.config import TRYTON_ICON, GLADE
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -63,7 +64,7 @@ class WinSearch(object):
                         False, 'tree', self.context)
                 view_form = rpc.execute(*args)
             except Exception, exception:
-                view_form = rpc.process_exception(exception, self.parent, *args)
+                view_form = common.process_exception(exception, self.parent, *args)
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
                 model, parent=self.win)
 
@@ -117,7 +118,7 @@ class WinSearch(object):
                     self.model_name, 'search', value, offset, limit, 0,
                     rpc.CONTEXT)
         except Exception, exception:
-            rpc.process_exception(exception, self.win)
+            common.process_exception(exception, self.win)
             return False
         self.reload()
         self.old_search = self.form.value

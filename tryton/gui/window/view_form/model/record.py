@@ -5,6 +5,7 @@ import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
 import field
 import datetime
+import tryton.common as common
 
 
 class EvalEnvironment(object):
@@ -124,7 +125,7 @@ class ModelRecord(SignalEvent):
             try:
                 self.id = self.rpc.create(value, self.context_get())
             except Exception, exception:
-                self.id = rpc.process_exception(exception, self.window, 'object',
+                self.id = common.process_exception(exception, self.window, 'object',
                         'execute', self.resource, 'create', value,
                         self.context_get())
                 if not self.id:
@@ -143,7 +144,7 @@ class ModelRecord(SignalEvent):
                 if not rpc.execute(*args):
                     return False
             except Exception, exception:
-                if not rpc.process_exception(exception, self.window, *args):
+                if not common.process_exception(exception, self.window, *args):
                     return False
         self._loaded = False
         if force_reload:
@@ -159,7 +160,7 @@ class ModelRecord(SignalEvent):
             try:
                 val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return
             for clause in domain:
                 if clause[0] in self.mgroup.fields:
@@ -173,7 +174,7 @@ class ModelRecord(SignalEvent):
         try:
             name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return False
         return name
 
@@ -247,7 +248,7 @@ class ModelRecord(SignalEvent):
         try:
             res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return
         if res:
             value = res[0]
@@ -288,7 +289,7 @@ class ModelRecord(SignalEvent):
             res = getattr(self.rpc, 'on_change_' + fieldname)(ids, args,
                     ctx)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return
         if res:
             later = {}
@@ -311,7 +312,7 @@ class ModelRecord(SignalEvent):
             self.set_default(ir_default.get_default(self.resource,
                 field_name + '=' + str(value), ctx))
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return False
 
     def get_attachment_count(self, reload=False):

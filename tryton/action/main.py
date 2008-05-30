@@ -9,6 +9,7 @@ import tempfile
 import base64
 import os
 import webbrowser
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -27,7 +28,7 @@ class Action(object):
                 ids = rpc.execute('object', 'execute', datas['model'],
                         'search', [])
             except Exception, exception:
-                ids = rpc.process_exception(exception, Main.get_main().window,
+                ids = common.process_exception(exception, Main.get_main().window,
                         'object', 'execute', datas['model'], 'search', [])
                 if not ids:
                     return False
@@ -40,7 +41,7 @@ class Action(object):
         try:
             res = rpc.execute('report', 'execute', name, ids, datas, ctx)
         except Exception, exception:
-            res = rpc.process_exception(exception, Main.get_main().window,
+            res = common.process_exception(exception, Main.get_main().window,
                     'report', 'execute', name, ids, datas, ctx)
             if not res:
                 return False
@@ -67,7 +68,7 @@ class Action(object):
                 res = rpc.execute('object', 'execute', 'ir.action', 'read',
                         act_id, ['type'], ctx)
             except Exception, exception:
-                rpc.process_exception(exception, Main.get_main().window)
+                common.process_exception(exception, Main.get_main().window)
                 return
             if not res:
                 raise Exception, 'ActionNotFound'
@@ -76,13 +77,13 @@ class Action(object):
             act_id2 = rpc.execute('object', 'execute', action_type,
                 'search', [('action', '=', act_id)], 0, None, None, ctx)[0]
         except Exception, exception:
-            rpc.process_exception(exception, Main.get_main().window)
+            common.process_exception(exception, Main.get_main().window)
             return
         try:
             res = rpc.execute('object', 'execute', action_type,
                 'read', act_id2, False, ctx)
         except Exception, exception:
-            rpc.process_exception(exception, Main.get_main().window)
+            common.process_exception(exception, Main.get_main().window)
             return
         Action._exec_action(res, datas)
 
@@ -170,7 +171,7 @@ class Action(object):
                         (data['model'], model_id))
             except Exception, exception:
                 from tryton.gui import Main
-                rpc.process_exception(exception, Main.get_main().window)
+                common.process_exception(exception, Main.get_main().window)
                 return False
 
         keyact = {}

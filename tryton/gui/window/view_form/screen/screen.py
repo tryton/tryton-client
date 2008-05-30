@@ -8,6 +8,7 @@ from tryton.gui.window.view_form.widget_search import Form
 from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 import gobject
+import tryton.common as common
 
 
 class Screen(SignalEvent):
@@ -125,7 +126,7 @@ class Screen(SignalEvent):
                         self.name, 'search', values, offset, limit, self.sort,
                         self.context)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 ids = rpc.execute('object', 'execute',
                         self.name, 'search', values, offset, limit, self.sort,
                         self.context)
@@ -135,7 +136,7 @@ class Screen(SignalEvent):
                         self.search_count = rpc.execute('object', 'execute',
                                 self.name, 'search_count', values, self.context)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.window)
+                        common.process_exception(exception, self.window)
                         self.search_count = rpc.execute('object', 'execute',
                                 self.name, 'search_count', values, self.context)
                 else:
@@ -265,7 +266,7 @@ class Screen(SignalEvent):
                 view = self.rpc.fields_view_get(view_id, view_type, self.context,
                         self.hastoolbar)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 view = self.rpc.fields_view_get(view_id, view_type, self.context,
                         self.hastoolbar)
             if self.exclude_field:
@@ -441,7 +442,7 @@ class Screen(SignalEvent):
                     if not self.rpc.unlink([obj_id]):
                         return False
                 except Exception, exception:
-                    rpc.process_exception(exception, self.window)
+                    common.process_exception(exception, self.window)
                     return False
             idx = self.models.models.index(self.current_model)
             self.models.remove(self.current_model)
@@ -467,7 +468,7 @@ class Screen(SignalEvent):
                     if not self.rpc.unlink(ids):
                         return False
                 except Exception, exception:
-                    rpc.process_exception(exception, self.window)
+                    common.process_exception(exception, self.window)
                     return False
             for model in self.current_view.sel_models_get():
                 self.models.remove(model)

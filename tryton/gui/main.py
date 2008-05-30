@@ -14,6 +14,7 @@ from tryton.gui.window import Preference
 from tryton.gui.window import FilesActions
 import re
 import base64
+import tryton.translate as translate
 
 _ = gettext.gettext
 
@@ -537,6 +538,9 @@ class Main(object):
         win = Preference(rpc._USER, self.window)
         if win.run():
             rpc.context_reload()
+            if 'language_direction' in rpc.CONTEXT:
+                translate.set_language_direction(
+                        rpc.CONTEXT['language_direction'])
         self.window.present()
         return True
 

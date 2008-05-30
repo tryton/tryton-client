@@ -17,6 +17,7 @@ from tryton.gui.window.win_search import WinSearch
 import tryton.rpc as rpc
 import datetime as DT
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, TRYTON_ICON
+import tryton.common as common
 
 if not hasattr(locale, 'nl_langinfo'):
     locale.nl_langinfo = lambda *a: '%x'
@@ -388,7 +389,7 @@ class M2O(Char):
         try:
             names = rpc_relation.name_search(text, domain, 'ilike', context)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return '???'
         if len(names) != 1:
             return self.search_remote(relation, [x[0] for x in names],
@@ -411,7 +412,7 @@ class M2O(Char):
             try:
                 names = rpc_relation.name_search(text, domain, 'ilike', context)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False, False
             if len(names) == 1:
                 return True, names[0]
@@ -439,7 +440,7 @@ class M2O(Char):
             try:
                 return rpc_relation.name_get([found[0]], context)[0]
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False, None
         else:
             return False, None
@@ -494,7 +495,7 @@ class M2M(Char):
         try:
             names = rpc_relation.name_search(text, domain, 'ilike', context)
         except Exception, exception:
-            rpc.process_exception(exception, self.window)
+            common.process_exception(exception, self.window)
             return []
         ids = [x[0] for x in names]
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
@@ -515,7 +516,7 @@ class M2M(Char):
             try:
                 ids = rpc_relation.search(domain)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 return False, None
             if ids and len(ids)==1:
                 return True, ids
@@ -542,7 +543,7 @@ class Selection(Char):
                         self.attrs['relation'], 'name_search', '',
                         self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
-                rpc.process_exception(exception, self.window)
+                common.process_exception(exception, self.window)
                 selection = []
         else:
             if not isinstance(selection, (list, tuple)):
@@ -550,7 +551,7 @@ class Selection(Char):
                     selection = rpc.execute('object', 'execute',
                             self.model, selection, rpc.CONTEXT)
                 except Exception, exception:
-                    rpc.process_exception(exception, self.window)
+                    common.process_exception(exception, self.window)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.attrs['selection'] = selection

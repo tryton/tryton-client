@@ -86,7 +86,7 @@ class Wizard(object):
         try:
             wiz_id = rpc.execute('wizard', 'create', action)
         except Exception, exception:
-            rpc.process_exception(exception, parent)
+            common.process_exception(exception, parent)
             return
         dia = None
         while state != 'end':
@@ -219,5 +219,5 @@ class WizardProgress(object):
             win.destroy()
             gtk.main_iteration()
         if self.exception:
-            rpc.process_exception(self.exception, self.parent)
+            common.process_exception(self.exception, self.parent)
         return self.res

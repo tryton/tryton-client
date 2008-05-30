@@ -3,6 +3,7 @@ import gobject
 import gtk
 import gettext
 from tryton.gui import Main
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -32,7 +33,7 @@ class ViewTreeSC(object):
         try:
             view_sc = rpc.execute(*args)
         except Exception, exception:
-            view_sc = rpc.process_exception(exception, self.window, *args)
+            view_sc = common.process_exception(exception, self.window, *args)
             if not view_sc:
                 return
         for shortcut in view_sc:

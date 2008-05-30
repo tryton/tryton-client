@@ -149,7 +149,7 @@ class Many2One(WidgetInterface):
                         self.attrs['relation'], 'name_search', '', [],
                         'ilike', {})
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
                 ids = []
             if ids:
                 self.load_completion(ids)
@@ -192,7 +192,7 @@ class Many2One(WidgetInterface):
                     self.attrs['relation'], 'name_search', name, domain, 'ilike',
                     context)
         except Exception, exception:
-            rpc.process_exception(exception, self._window)
+            common.process_exception(exception, self._window)
             return False
         if len(ids)==1:
             self._view.modelfield.set_client(self._view.model, ids[0])
@@ -208,7 +208,7 @@ class Many2One(WidgetInterface):
                             self.attrs['relation'], 'name_get', [ids[0]],
                             rpc.CONTEXT)[0]
                 except Exception, exception:
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     return False
                 self._view.modelfield.set_client(self._view.model, name)
         return True
@@ -243,7 +243,7 @@ class Many2One(WidgetInterface):
                             _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     self.changed = True
                     return False
                 if len(ids)==1:
@@ -264,7 +264,7 @@ class Many2One(WidgetInterface):
                                 rpc.CONTEXT)[0]
                     except Exception, exception:
                         self.focus_out = True
-                        rpc.process_exception(exception, self._window)
+                        common.process_exception(exception, self._window)
                         self.changed = True
                         return False
                     self._view.modelfield.set_client(self._view.model, name,
@@ -315,7 +315,7 @@ class Many2One(WidgetInterface):
                             _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     self.changed = True
                     return False
                 if ids and len(ids)==1:
@@ -336,7 +336,7 @@ class Many2One(WidgetInterface):
                                 rpc.CONTEXT)[0]
                     except Exception, exception:
                         self.focus_out = True
-                        rpc.process_exception(exception, self._window)
+                        common.process_exception(exception, self._window)
                         self.changed = True
                         return False
                     self._view.modelfield.set_client(self._view.model, name,

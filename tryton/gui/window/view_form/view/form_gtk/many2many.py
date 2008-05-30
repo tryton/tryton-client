@@ -4,6 +4,7 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
+import tryton.common as common
 
 
 class Many2Many(WidgetInterface):
@@ -67,7 +68,7 @@ class Many2Many(WidgetInterface):
                     self.wid_text.get_text(), domain, 'ilike', context,
                     _LIMIT)
         except Exception, exception:
-            rpc.process_exception(exception, self._window)
+            common.process_exception(exception, self._window)
             return False
         ids = [x[0] for x in ids]
         if len(ids) != 1:

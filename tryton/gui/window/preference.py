@@ -6,6 +6,7 @@ import tryton.rpc as rpc
 import copy
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -33,7 +34,7 @@ class Preference(object):
         try:
             res = user.get_preferences_fields_view(rpc.CONTEXT)
         except Exception, exception:
-            rpc.process_exception(exception, parent)
+            common.process_exception(exception, parent)
             self.win.destroy()
             raise
         arch = res['arch']
@@ -45,7 +46,7 @@ class Preference(object):
         try:
             preferences = user.get_preferences(False, rpc.CONTEXT)
         except Exception, exception:
-            rpc.process_exception(exception, parent)
+            common.process_exception(exception, parent)
             self.win.destroy()
             raise
         self.screen.current_model.set(preferences)
@@ -70,7 +71,7 @@ class Preference(object):
                     try:
                         user.set_preferences(val, rpc.CONTEXT)
                     except Exception, exception:
-                        rpc.process_exception(exception, self.win)
+                        common.process_exception(exception, self.win)
                         break
                     res = True
                     break

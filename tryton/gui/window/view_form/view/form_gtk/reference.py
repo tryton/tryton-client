@@ -6,6 +6,7 @@ from many2one import Dialog
 from tryton.gui.window.win_search import WinSearch
 import tryton.rpc as rpc
 from tryton.rpc import RPCProxy
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -79,7 +80,7 @@ class Reference(WidgetInterface):
                 selection = rpc.execute('object', 'execute',
                         self.model, selection, rpc.CONTEXT)
             except Exception, exception:
-                rpc.process_exception(exception, self._window)
+                common.process_exception(exception, self._window)
                 selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.set_popdown(selection)
@@ -162,7 +163,7 @@ class Reference(WidgetInterface):
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     return False
                 if ids and len(ids) == 1:
                     obj_id, name = ids[0]
@@ -185,7 +186,7 @@ class Reference(WidgetInterface):
                     except Exception, exception:
                         self.focus_out = True
                         self.changed = True
-                        rpc.process_exception(exception, self._window)
+                        common.process_exception(exception, self._window)
                         return False
                     self._view.modelfield.set_client(self._view.model,
                             (model, [obj_id, name]))
@@ -255,7 +256,7 @@ class Reference(WidgetInterface):
                     obj_id, name = RPCProxy(model).name_get(obj_id,
                             rpc.CONTEXT)[0]
                 except Exception, exception:
-                    rpc.process_exception(exception, self._window)
+                    common.process_exception(exception, self._window)
                     name = '???'
             self.wid_text.set_text(name)
             img.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
