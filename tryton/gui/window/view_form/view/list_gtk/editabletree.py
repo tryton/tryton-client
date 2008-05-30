@@ -165,7 +165,16 @@ class EditableTreeView(gtk.TreeView):
                 new_path = self._key_up(path, store, column)
             else:
                 new_path = self._key_down(path, store, column)
-            col = self.get_columns()[0]
+            col = None
+            for column in self.get_columns():
+                renderer = column.get_cell_renderers()[0]
+                if isinstance(renderer, gtk.CellRendererToggle):
+                    editable = renderer.get_property('activatable')
+                else:
+                    editable = renderer.get_property('editable')
+                if column.get_visible() and editable:
+                    col = column
+                    break
             self.set_cursor(new_path, col, True)
         elif event.keyval == gtk.keysyms.Escape:
             if model.id is None:
