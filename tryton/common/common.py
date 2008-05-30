@@ -12,6 +12,7 @@ import xmlrpclib
 import md5
 import webbrowser
 import traceback
+import tryton.rpc as rpc
 
 _ = gettext.gettext
 
@@ -532,12 +533,13 @@ def process_exception(exception, parent, obj='', method='', *args):
             password = ask(_('Password:'), parent, visibility=False)
             if password is None:
                 break
-            res = login(_USERNAME, password, _SOCK.host, _SOCK.port, _DATABASE)
+            res = rpc.login(rpc._USERNAME, password, rpc._SOCK.host,
+                    rpc._SOCK.port, rpc._DATABASE)
             if res < 0:
                 continue
             if obj and method:
                 try:
-                    return execute(obj, method, *args)
+                    return rpc.execute(obj, method, *args)
                 except Exception, exception:
                     return process_exception(exception, parent, obj,
                             method, *args)
@@ -563,7 +565,7 @@ def process_exception(exception, parent, obj='', method='', *args):
                 if 'read_delta' in args[4]:
                     del args[4]['read_delta']
                 try:
-                    return execute(obj, method, *args)
+                    return rpc.execute(obj, method, *args)
                 except Exception, exception:
                     return process_exception(exception, parent, obj,
                             method, *args)
