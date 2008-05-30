@@ -253,6 +253,11 @@ class _container(object):
 
 class ParserForm(ParserInterface):
 
+    def __init__(self, window, parent=None, attrs=None, screen=None):
+        super(ParserForm, self).__init__(window, parent=parent, attrs=attrs,
+                screen=screen)
+        self.widget_id = 0
+
     def parse(self, model, root_node, fields, notebook=None, paned=None,
             tooltips=None):
         dict_widget = {}
@@ -424,6 +429,8 @@ class ParserForm(ParserInterface):
                     fields[name]['saves'] = attrs['saves']
                 widget_act = WIDGETS_TYPE[ftype][0](self.window, self.parent,
                         model, fields[name])
+                self.widget_id += 1
+                widget_act.position = self.widget_id
                 dict_widget[name] = widget_act
                 size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
                 expand = WIDGETS_TYPE[ftype][2]

@@ -91,6 +91,7 @@ class WidgetInterface(object):
                 lambda x: self._menu_sig_default_set(), 1),
         ]
         self.widget = None
+        self.position = 0
 
     def destroy(self):
         pass

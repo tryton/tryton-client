@@ -202,3 +202,22 @@ class ViewForm(ParserView):
             notebook.set_current_page(0)
         if self.cursor_widget in self.widgets:
             self.widgets[self.cursor_widget].widget.grab_focus()
+        model = self.screen.current_model
+        position = len(self.widgets)
+        focus_widget = None
+        for widget in self.widgets.values():
+            modelfield = model.mgroup.mfields.get(widget.widget_name, None)
+            if not modelfield:
+                continue
+            if not modelfield.get_state_attrs(model).get('valid', True):
+                if widget.widget.position >= position:
+                    continue
+                position = widget.widget.position
+                focus_widget = widget
+        if focus_widget:
+            for notebook in self.notebooks:
+                for i in range(notebook.get_n_pages()):
+                    child = notebook.get_nth_page(i)
+                    if focus_widget.widget.widget.is_ancestor(child):
+                        notebook.set_current_page(i)
+            focus_widget.widget.grab_focus()
