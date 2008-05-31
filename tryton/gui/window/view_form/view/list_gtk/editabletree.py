@@ -94,7 +94,7 @@ class EditableTreeView(gtk.TreeView):
     def set_cursor(self, path, focus_column=None, start_editing=False):
         if focus_column and (focus_column._type in ('many2one','many2many')) \
                 and self.screen.form:
-            self.screen.form.message_state(_('Relation Field: F1: New F2: Open/Search'))
+            self.screen.form.message_state(_('Relation Field: F3: New F2: Open/Search'))
         elif focus_column and (focus_column._type in ('one2many')) \
                 and self.screen.form:
             self.screen.form.message_state(_('Relation Field: F2: Open'))
@@ -200,14 +200,14 @@ class EditableTreeView(gtk.TreeView):
                 self.screen.current_model = False
             self.screen.display()
             self.set_cursor(path, column, False)
-        elif event.keyval in (gtk.keysyms.F1, gtk.keysyms.F2):
+        elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
             if isinstance(entry, gtk.Entry):
                 value = entry.get_text()
             else:
                 value = entry.get_active_text()
             entry.disconnect(entry.editing_done_id)
             newval = self.on_open_remote(model, column.name,
-                                create=(event.keyval==gtk.keysyms.F1),
+                                create=(event.keyval==gtk.keysyms.F3),
                                 value=value)
             if isinstance(entry, gtk.Entry):
                 entry.set_text(newval)

@@ -346,7 +346,7 @@ class Many2One(WidgetInterface):
         self.changed = True
 
     def sig_key_press(self, widget, event, *args):
-        if event.keyval == gtk.keysyms.F1:
+        if event.keyval == gtk.keysyms.F3:
             self.sig_new(widget, event)
         elif event.keyval==gtk.keysyms.F2:
             self.sig_edit(widget)

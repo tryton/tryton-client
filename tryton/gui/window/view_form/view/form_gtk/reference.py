@@ -204,7 +204,7 @@ class Reference(WidgetInterface):
         dia.destroy()
 
     def sig_key_press(self, widget, event):
-        if event.keyval == gtk.keysyms.F1:
+        if event.keyval == gtk.keysyms.F3:
             self.sig_new(widget, event)
         elif event.keyval == gtk.keysyms.F2:
             self.sig_focus_out(widget, event)

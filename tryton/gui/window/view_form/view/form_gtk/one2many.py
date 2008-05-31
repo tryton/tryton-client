@@ -210,7 +210,7 @@ class Dialog(object):
     def on_keypress(self, widget, event):
         if (event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
                 and event.state & gtk.gdk.CONTROL_MASK) \
-                or event.keyval == gtk.keysyms.F1:
+                or event.keyval == gtk.keysyms.F3:
             self._sig_new(widget, event)
             return False
         if event.keyval == gtk.keysyms.F2:
@@ -347,7 +347,7 @@ class One2Many(WidgetInterface):
         if (event.keyval == gtk.keysyms.N \
                     and event.state & gtk.gdk.CONTROL_MASK \
                     and event.state & gtk.gdk.SHIFT_MASK) \
-                or event.keyval == gtk.keysyms.F1:
+                or event.keyval == gtk.keysyms.F3:
             self._sig_new(widget, event)
             return False
         if event.keyval == gtk.keysyms.F2:

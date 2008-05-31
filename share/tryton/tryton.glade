@@ -3974,7 +3974,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                   <widget class="GtkLabel" id="label46565">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">F1</property>
+                    <property name="label" translatable="yes">F3</property>
                   </widget>
                   <packing>
                     <property name="top_attach">8</property>
