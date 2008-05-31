@@ -7,9 +7,9 @@ _ = gettext.gettext
 
 class EditableTreeView(gtk.TreeView):
     leaving_model_events = (gtk.keysyms.Up, gtk.keysyms.Down,
-                            gtk.keysyms.Return, gtk.keysyms.KP_Enter)
+            gtk.keysyms.Return)
     leaving_events = leaving_model_events + (gtk.keysyms.Tab,
-                                             gtk.keysyms.ISO_Left_Tab) 
+            gtk.keysyms.ISO_Left_Tab, gtk.keysyms.KP_Enter)
 
     def __init__(self, position):
         super(EditableTreeView, self).__init__()
@@ -66,13 +66,29 @@ class EditableTreeView(gtk.TreeView):
     def __next_column(self, col):
         cols = self.get_columns()
         current = cols.index(col)
-        idx = (current + 1) % len(cols)
+        for i in range(len(cols)):
+            idx = (current + i + 1) % len(cols)
+            renderer = cols[idx].get_cell_renderers()[0]
+            if isinstance(renderer, gtk.CellRendererToggle):
+                editable = renderer.get_property('activatable')
+            else:
+                editable = renderer.get_property('editable')
+            if cols[idx].get_visible() and editable:
+                break
         return cols[idx]
 
     def __prev_column(self, col):
         cols = self.get_columns()
         current = cols.index(col)
-        idx = (current - 1) % len(cols)
+        for i in range(len(cols)):
+            idx = (current - (i + 1)) % len(cols)
+            renderer = cols[idx].get_cell_renderers()[0]
+            if isinstance(renderer, gtk.CellRendererToggle):
+                editable = renderer.get_property('activatable')
+            else:
+                editable = renderer.get_property('editable')
+            if cols[idx].get_visible() and editable:
+                break
         return cols[idx]
 
     def set_cursor(self, path, focus_column=None, start_editing=False):
@@ -150,7 +166,7 @@ class EditableTreeView(gtk.TreeView):
                 obj_id = model.save()
                 if not obj_id:
                     return True
-        if event.keyval == gtk.keysyms.Tab:
+        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter):
             new_col = self.__next_column(column)
             self.set_cursor(path, new_col, True)
         elif event.keyval == gtk.keysyms.ISO_Left_Tab:
@@ -160,7 +176,7 @@ class EditableTreeView(gtk.TreeView):
             self._key_up(path, store, column)
         elif event.keyval == gtk.keysyms.Down:
             self._key_down(path, store, column)
-        elif event.keyval in (gtk.keysyms.Return, gtk.keysyms.KP_Enter):
+        elif event.keyval in (gtk.keysyms.Return,):
             if self.editable == 'top':
                 new_path = self._key_up(path, store, column)
             else:
