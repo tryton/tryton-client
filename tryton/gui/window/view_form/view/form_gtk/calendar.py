@@ -25,6 +25,7 @@ class Calendar(WidgetInterface):
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.Entry()
         self.entry.set_property('activates_default', True)
+        self.entry.connect('key_press_event', self.sig_key_press)
         self.entry.connect('button_press_event', self._menu_open)
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
@@ -55,6 +56,10 @@ class Calendar(WidgetInterface):
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
         self.but_open.set_sensitive(not value)
+
+    def sig_key_press(self, widget, event):
+        if event.keyval == gtk.keysyms.F2:
+            self.cal_open(widget)
 
     def grab_focus(self):
         return self.entry.grab_focus()
@@ -141,6 +146,7 @@ class DateTime(WidgetInterface):
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.Entry()
         self.entry.set_property('activates_default', True)
+        self.entry.connect('key_press_event', self.sig_key_press)
         self.entry.connect('button_press_event', self._menu_open)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
@@ -169,6 +175,10 @@ class DateTime(WidgetInterface):
         self.readonly = value
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
+
+    def sig_key_press(self, widget, event):
+        if event.keyval == gtk.keysyms.F2:
+            self.cal_open(widget)
 
     def grab_focus(self):
         return self.entry.grab_focus()
