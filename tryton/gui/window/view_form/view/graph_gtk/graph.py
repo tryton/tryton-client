@@ -302,6 +302,7 @@ class Graph(gtk.DrawingArea):
     def updateDatas(self, models):
         self.datas = {}
         self.labels = {}
+        self.ids = {}
         minx = None
         maxx = None
         for model in models:
@@ -313,6 +314,8 @@ class Graph(gtk.DrawingArea):
             minx = min(minx, x)
             maxx = max(maxx, x)
             self.labels[x] = model[self.xfield['name']].get_client(model)
+            self.ids.setdefault(x, [])
+            self.ids[x].append(model.id)
             self.datas.setdefault(x, {})
             for yfield in self.yfields:
                 name = yfield['name']
