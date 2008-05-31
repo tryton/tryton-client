@@ -102,6 +102,12 @@ class Tree(SignalEvent):
         for signal in signals:
             self.glade.signal_connect(signal, signals[signal])
 
+        self.tree_res.view.grab_focus()
+        if self.tree_res.view.get_model().get_iter_root():
+            self.tree_res.view.grab_focus()
+            selection = self.tree_res.view.get_selection()
+            selection.select_path((0))
+
     def sig_reload(self, widget=None):
         try:
             ids = rpc.execute('object', 'execute', self.model,
@@ -226,6 +232,7 @@ class Tree(SignalEvent):
                         for child in wid.get_children():
                             if child.get_active():
                                 child.child.grab_focus()
+                                break
             for path in paths:
                 self.tree_res.view.collapse_row(path)
         elif event.keyval == gtk.keysyms.Right:
