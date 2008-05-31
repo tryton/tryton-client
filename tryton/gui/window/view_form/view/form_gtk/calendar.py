@@ -110,9 +110,10 @@ class Calendar(WidgetInterface):
         win.set_icon(TRYTON_ICON)
 
         cal = gtk.Calendar()
-        cal.display_options(gtk.CALENDAR_SHOW_HEADING | \
+        cal.set_display_options(gtk.CALENDAR_SHOW_HEADING | \
                 gtk.CALENDAR_SHOW_DAY_NAMES | \
-                gtk.CALENDAR_SHOW_WEEK_NUMBERS)
+                gtk.CALENDAR_SHOW_WEEK_NUMBERS | \
+                gtk.CALENDAR_WEEK_START_MONDAY)
         cal.connect('day-selected-double-click',
                 lambda *x: win.response(gtk.RESPONSE_OK))
         win.vbox.pack_start(cal, expand=True, fill=True)
@@ -261,9 +262,10 @@ class DateTime(WidgetInterface):
         win.vbox.pack_start(hbox, expand=False, fill=True)
 
         cal = gtk.Calendar()
-        cal.display_options(gtk.CALENDAR_SHOW_HEADING | \
+        cal.set_display_options(gtk.CALENDAR_SHOW_HEADING | \
                 gtk.CALENDAR_SHOW_DAY_NAMES | \
-                gtk.CALENDAR_SHOW_WEEK_NUMBERS)
+                gtk.CALENDAR_SHOW_WEEK_NUMBERS | \
+                gtk.CALENDAR_WEEK_START_MONDAY)
         cal.connect('day-selected-double-click',
                 lambda *x: win.response(gtk.RESPONSE_OK))
         win.vbox.pack_start(cal, expand=True, fill=True)
