@@ -175,9 +175,10 @@ class Tree(SignalEvent):
 
             self.sig_action('tree_open', obj_id=obj_id, warning=False)
             if focus:
-                self.tree_res.view.grab_focus()
-                selection = self.tree_res.view.get_selection()
-                selection.select_path((0))
+                if self.tree_res.view.get_model().get_iter_root():
+                    self.tree_res.view.grab_focus()
+                    selection = self.tree_res.view.get_selection()
+                    selection.select_path((0))
         return False
 
     def sig_print(self):
@@ -220,6 +221,11 @@ class Tree(SignalEvent):
                         new_path = paths[0][:-1]
                         selection.select_path(new_path)
                         self.tree_res.view.collapse_row(new_path)
+                    elif self.tree_res.toolbar:
+                        wid = self.glade.get_widget('tree_toolbar')
+                        for child in wid.get_children():
+                            if child.get_active():
+                                child.child.grab_focus()
             for path in paths:
                 self.tree_res.view.collapse_row(path)
         elif event.keyval == gtk.keysyms.Right:
