@@ -15,6 +15,7 @@ from tryton.gui.window import FilesActions
 import re
 import base64
 import tryton.translate as translate
+import tryton.plugin
 
 _ = gettext.gettext
 
@@ -718,7 +719,6 @@ class Main(object):
                 except_id=except_id)
 
     def sig_plugin_execute(self, widget):
-        import tryton.plugin
         page = self.notebook.get_current_page()
         datas = {
                 'model': self.pages[page].model,
