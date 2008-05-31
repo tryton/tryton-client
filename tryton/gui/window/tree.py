@@ -73,11 +73,11 @@ class Tree(SignalEvent):
             self.name = name
         self.scrollwindow = self.glade.get_widget('main_tree_sw')
 
-        wid = self.glade.get_widget('widget_vbox')
+        self.toolbar = self.glade.get_widget('widget_vbox')
         if CONFIG['client.modepda'] and not self.tree_res.toolbar:
-            wid.hide()
+            self.toolbar.hide()
         else:
-            wid.show()
+            self.toolbar.show()
 
         widget_sc = self.glade.get_widget('win_tree_sc')
 
@@ -147,7 +147,7 @@ class Tree(SignalEvent):
                 radiotb.show_all()
                 radiotb.set_data('id', res['id'])
                 radiotb.connect('clicked', self.menu_main_clicked)
-                self.menu_main_clicked(radiotb)
+                self.menu_main_clicked(radiotb, focus=False)
                 wid.insert(radiotb, -1)
         else:
             self.tree_res.ids = ids
@@ -157,7 +157,7 @@ class Tree(SignalEvent):
             wid = self.glade.get_widget('tree_vpaned')
             wid.set_position(-1)
 
-    def menu_main_clicked(self, widget):
+    def menu_main_clicked(self, widget, focus=True):
         if widget.get_active():
             obj_id = widget.get_data('id')
             args = ('object', 'execute', self.model,
@@ -174,6 +174,10 @@ class Tree(SignalEvent):
             self.tree_res.reload()
 
             self.sig_action('tree_open', obj_id=obj_id, warning=False)
+            if focus:
+                self.tree_res.view.grab_focus()
+                selection = self.tree_res.view.get_selection()
+                selection.select_path((0))
         return False
 
     def sig_print(self):
@@ -208,8 +212,14 @@ class Tree(SignalEvent):
 
     def sig_key_press(self, widget, event):
         if event.keyval == gtk.keysyms.Left:
-            model, paths = self.tree_res.view.get_selection()\
-                    .get_selected_rows()
+            selection = self.tree_res.view.get_selection()
+            model, paths = selection.get_selected_rows()
+            if len(paths) == 1:
+                if not self.tree_res.view.row_expanded(paths[0]):
+                    if len(paths[0]) > 1:
+                        new_path = paths[0][:-1]
+                        selection.select_path(new_path)
+                        self.tree_res.view.collapse_row(new_path)
             for path in paths:
                 self.tree_res.view.collapse_row(path)
         elif event.keyval == gtk.keysyms.Right:
