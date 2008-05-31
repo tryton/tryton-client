@@ -159,10 +159,6 @@ class DateField(CharField):
 
 class FloatField(CharField):
 
-    def validate(self, model):
-        self.get_state_attrs(model)['valid'] = True
-        return True
-
     def set_client(self, model, value, test_state=True, force_change=False):
         internal = model.value[self.name]
         self.set(model, value, test_state)
@@ -190,10 +186,6 @@ class IntegerField(CharField):
 
     def get_client(self, model):
         return model.value[self.name] or 0
-
-    def validate(self, model):
-        self.get_state_attrs(model)['valid'] = True
-        return True
 
 
 class M2OField(CharField):
