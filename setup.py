@@ -37,7 +37,7 @@ setup(name=PACKAGE,
             ]),
         ('share/tryton', ['share/tryton/tryton.glade']),
     ],
-    scripts=['tryton.py'],
+    scripts=['bin/tryton'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: GTK',
