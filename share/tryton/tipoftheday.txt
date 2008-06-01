@@ -1,0 +1,8 @@
+<b>Welcome to Tryton</b>
+
+
+---
+<b>Export list records</b>
+
+You can copy records from any list with Ctrl + C
+and paste in any application with Ctrl + V

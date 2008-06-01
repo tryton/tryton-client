@@ -84,8 +84,7 @@ class TrytonClient(object):
         main = Main()
         if CONFIG['tip.autostart']:
             main.sig_tips()
-        else:
-            main.sig_login()
+        main.sig_login()
         gtk.main()
 
 if __name__ == "__main__":

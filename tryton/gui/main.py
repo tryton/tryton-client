@@ -5,7 +5,7 @@ import gobject
 import gtk
 from gtk import glade
 import tryton.rpc as rpc
-from tryton.config import CONFIG, GLADE, TRYTON_ICON, PIXMAPS_DIR
+from tryton.config import CONFIG, GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import tryton.common as common
 from tryton.version import VERSION
 from tryton.action import Action
@@ -293,6 +293,79 @@ class DBCreate(object):
 
                 self.sig_login(dbname=dbname)
             return True
+
+
+class Tips(object):
+
+    def __init__(self, parent):
+        self.win = gtk.Dialog(_('Tryton - Tips'), parent,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.win.set_icon(TRYTON_ICON)
+
+        self.win.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+
+        vbox = gtk.VBox()
+        img = gtk.Image()
+        img.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
+        vbox.pack_start(img, False, False)
+        self.label = gtk.Label()
+        self.label.set_alignment(0, 0)
+        vbox.pack_start(self.label, True, True)
+        separator = gtk.HSeparator()
+        vbox.pack_start(separator, False, False)
+
+        hbox = gtk.HBox()
+        self.check = gtk.CheckButton(_('_Display a new tip next time'), True)
+        self.check.set_active(True)
+        hbox.pack_start(self.check)
+        but_back = gtk.Button(stock=gtk.STOCK_GO_BACK)
+        but_back.set_relief(gtk.RELIEF_NONE)
+        but_back.connect('clicked', self.tip_back)
+        hbox.pack_start(but_back)
+        but_forward = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+        but_forward.set_relief(gtk.RELIEF_NONE)
+        but_forward.connect('clicked', self.tip_forward)
+        hbox.pack_start(but_forward)
+        vbox.pack_start(hbox, False, False)
+        self.win.vbox.pack_start(vbox)
+        self.win.show_all()
+
+        try:
+            self.number = int(CONFIG['tip.position'])
+        except:
+            self.number = 0
+
+        self.tip_set()
+
+        self.win.run()
+        CONFIG['tip.autostart'] = self.check.get_active()
+        CONFIG['tip.position'] = self.number + 1
+        CONFIG.save()
+        parent.present()
+        self.win.destroy()
+
+    def tip_set(self):
+        lang = CONFIG['client.lang']
+        tip_file = False
+        if lang:
+            tip_file = os.path.join(DATA_DIR, 'tipoftheday.'+lang+'.txt')
+        if not os.path.isfile(tip_file):
+            tip_file = os.path.join(DATA_DIR, 'tipoftheday.txt')
+        if not os.path.isfile(tip_file):
+            return
+        tips = file(tip_file).read().split('---')
+        tip = tips[self.number % len(tips)].lstrip()
+        del tips
+        self.label.set_text(tip)
+        self.label.set_use_markup(True)
+
+    def tip_forward(self, widget):
+        self.number += 1
+        self.tip_set()
+
+    def tip_back(self, widget):
+        self.number -= 1
+        self.tip_set()
 
 _MAIN = []
 
@@ -650,7 +723,7 @@ class Main(object):
         return True
 
     def sig_tips(self, *args):
-        common.tipoftheday(self.window)
+        Tips(self.window)
 
     def sig_licence(self, widget):
         dialog = glade.XML(GLADE, "win_licence", gettext.textdomain())
