@@ -128,7 +128,7 @@ class Action(object):
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
             eval_ctx['datetime'] = datetime
-            ctx.update(eval(action.get('context','{}'), eval_ctx))
+            ctx.update(eval(action.get('context') or '{}', eval_ctx))
             ctx.update(context)
 
             domain_context = ctx.copy()
