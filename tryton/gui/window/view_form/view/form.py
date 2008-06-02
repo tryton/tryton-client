@@ -205,15 +205,16 @@ class ViewForm(ParserView):
         model = self.screen.current_model
         position = len(self.widgets)
         focus_widget = None
-        for widget in self.widgets.values():
-            modelfield = model.mgroup.mfields.get(widget.widget_name, None)
-            if not modelfield:
-                continue
-            if not modelfield.get_state_attrs(model).get('valid', True):
-                if widget.widget.position >= position:
+        if model:
+            for widget in self.widgets.values():
+                modelfield = model.mgroup.mfields.get(widget.widget_name, None)
+                if not modelfield:
                     continue
-                position = widget.widget.position
-                focus_widget = widget
+                if not modelfield.get_state_attrs(model).get('valid', True):
+                    if widget.widget.position >= position:
+                        continue
+                    position = widget.widget.position
+                    focus_widget = widget
         if focus_widget:
             for notebook in self.notebooks:
                 for i in range(notebook.get_n_pages()):
