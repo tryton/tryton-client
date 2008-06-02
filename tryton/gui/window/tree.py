@@ -155,6 +155,7 @@ class Tree(SignalEvent):
                 radiotb.connect('clicked', self.menu_main_clicked)
                 self.menu_main_clicked(radiotb, focus=False)
                 wid.insert(radiotb, -1)
+                radiotb.child.connect('key_press_event', self.menu_main_key_press)
         else:
             self.tree_res.ids = ids
             self.tree_res.reload()
@@ -186,6 +187,13 @@ class Tree(SignalEvent):
                     selection = self.tree_res.view.get_selection()
                     selection.select_path((0))
         return False
+
+    def menu_main_key_press(self, widget, event):
+        if event.keyval == gtk.keysyms.Right:
+            if self.tree_res.view.get_model().get_iter_root():
+                self.tree_res.view.grab_focus()
+                selection = self.tree_res.view.get_selection()
+                selection.select_path((0))
 
     def sig_print(self):
         self.sig_action('form_print')
