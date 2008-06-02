@@ -163,6 +163,11 @@ class Tree(SignalEvent):
             wid.hide()
             wid = self.glade.get_widget('tree_vpaned')
             wid.set_position(-1)
+        self.tree_res.view.grab_focus()
+        if self.tree_res.view.get_model().get_iter_root():
+            self.tree_res.view.grab_focus()
+            selection = self.tree_res.view.get_selection()
+            selection.select_path((0))
 
     def menu_main_clicked(self, widget, focus=True):
         if widget.get_active():
