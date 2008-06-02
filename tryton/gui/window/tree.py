@@ -185,7 +185,9 @@ class Tree(SignalEvent):
                 if self.tree_res.view.get_model().get_iter_root():
                     self.tree_res.view.grab_focus()
                     selection = self.tree_res.view.get_selection()
+                    selection.unselect_all()
                     selection.select_path((0))
+                    self.tree_res.view.set_cursor((0))
         return False
 
     def menu_main_key_press(self, widget, event):
@@ -193,7 +195,9 @@ class Tree(SignalEvent):
             if self.tree_res.view.get_model().get_iter_root():
                 self.tree_res.view.grab_focus()
                 selection = self.tree_res.view.get_selection()
+                selection.unselect_all()
                 selection.select_path((0))
+                self.tree_res.view.set_cursor((0))
 
     def sig_print(self):
         self.sig_action('form_print')
