@@ -35,7 +35,7 @@ setup(name=PACKAGE,
             'share/pixmaps/tryton-icon.png',
             'share/pixmaps/tryton-noimage.png',
             ]),
-        ('share/tryton', ['share/tryton/tryton.glade']),
+        ('share/tryton', ['share/tryton/tryton.glade', 'share/tryton/tipoftheday.txt']),
     ],
     scripts=['bin/tryton'],
     classifiers=[
