@@ -49,8 +49,9 @@ class Parse(object):
                 column.pack_start(cell, expand=False)
                 column.add_attribute(cell, 'active', self.pos)
             self.pos += 1
-            column.set_resizable(1)
             self.fields_order.append(str(attrs['name']))
+            column.set_resizable(True)
+            column.set_visible(not attrs.get('tree_invisible', False))
             self.tree.append_column(column)
         else:
             import logging
