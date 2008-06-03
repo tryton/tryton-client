@@ -110,11 +110,13 @@ class Tree(SignalEvent):
 
     def sig_reload(self, widget=None):
         try:
-            ids = rpc.execute('object', 'execute', self.model,
+            args = ('object', 'execute', self.model,
                     'search', self.domain2, 0, None, None, self.context)
+            ids = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            return
+            ids = common.process_exception(exception, self.window, *args)
+            if not ids:
+                return
         if self.tree_res.toolbar:
 
             icon_name = 'icon'
