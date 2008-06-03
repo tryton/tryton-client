@@ -12,6 +12,7 @@ class Parse(object):
         self.fields = fields
         self.pixbufs = {}
         self.fields_order = []
+        self.fields_attrs = {}
         self.title = _('Tree')
         self.toolbar = False
         self.tree = None
@@ -50,6 +51,7 @@ class Parse(object):
                 column.add_attribute(cell, 'active', self.pos)
             self.pos += 1
             self.fields_order.append(str(attrs['name']))
+            self.fields_attrs[attrs['name']] = attrs
             column.set_resizable(True)
             column.set_visible(not attrs.get('tree_invisible', False))
             self.tree.append_column(column)

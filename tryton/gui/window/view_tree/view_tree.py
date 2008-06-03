@@ -38,11 +38,12 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
     Node struct: [list of (pos, list) ]
     """
 
-    def __init__(self, ids, view, fields, fields_type, context=None,
-            pixbufs=None, treeview=None):
+    def __init__(self, ids, view, fields, fields_type, fields_attrs,
+            context=None, pixbufs=None, treeview=None):
         gtk.GenericTreeModel.__init__(self)
         self.fields = fields
         self.fields_type = fields_type
+        self.fields_attrs = fields_attrs
         self.view = view
         self.roots = ids
         self.context = context or {}
@@ -70,14 +71,18 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                         val[field] = ''
                 res_ids.append(val)
         for field in self.fields:
-            if self.fields_type[field]['type'] in ('date',):
+            field_type = self.fields_type[field]['type']
+            if field in self.fields_attrs \
+                    and 'widget' in self.fields_attrs[field]:
+                field_type = self.fields_attrs[field]['widget']
+            if field_type in ('date',):
                 display_format = locale.nl_langinfo(locale.D_FMT).replace('%y',
                         '%Y')
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DT_FORMAT)
                         obj[field] = time.strftime(display_format, date)
-            if self.fields_type[field]['type'] in ('datetime',):
+            elif field_type in ('datetime',):
                 display_format = locale.nl_langinfo(locale.D_FMT).replace('%y',
                         '%Y') + ' %H:%M:%S'
                 for obj in res_ids:
@@ -97,11 +102,11 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                             except:
                                 pass
                         obj[field] = time.strftime(display_format, date)
-            if self.fields_type[field]['type'] in ('one2one','many2one'):
+            elif field_type in ('one2one','many2one'):
                 for obj in res_ids:
                     if obj[field]:
                         obj[field] = obj[field][1]
-            if self.fields_type[field]['type'] in ('selection'):
+            elif field_type in ('selection'):
                 for obj in res_ids:
                     if obj[field]:
                         selection = self.fields_type[field]['selection']
@@ -127,22 +132,22 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                         self.fields_type[field]['selection'] = selection
                         obj[field] = dict(self.fields_type[field]['selection']
                                 ).get(obj[field],'')
-            if self.fields_type[field]['type'] in ('float', 'numeric'):
+            elif field_type in ('float', 'numeric'):
                 digit = self.fields_type[field].get('digits', (16, 2))[1]
                 for obj in res_ids:
                     obj[field] = locale.format('%.' + str(digit) + 'f',
                             obj[field] or 0.0, True)
-            if self.fields_type[field]['type'] in ('interger',):
+            elif field_type in ('interger',):
                 for obj in res_ids:
                     obj[field] = locale.format('%d', obj[field] or 0, True)
-            if self.fields_type[field]['type'] in ('float_time',):
+            elif field_type in ('float_time',):
                 for obj in res_ids:
                     val = '%02d:%02d' % (math.floor(abs(obj[field])),
                             round(abs(obj[field]) % 1 + 0.01, 2) * 60)
                     if obj[field] < 0:
                         val = '-' + val
                     obj[field] = val
-            if self.fields_type[field]['type'] in ('boolean',):
+            elif field_type in ('boolean',):
                 for obj in res_ids:
                     obj[field] = bool(obj[field])
         return res_ids
@@ -150,7 +155,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
     def _node_process(self, ids):
         tree = []
         if self.view.get('field_childs', False):
-            res = self._read(ids, self.fields+[self.view['field_childs']])
+            res = self._read(ids, self.fields + [self.view['field_childs']])
             for obj in res:
                 tree.append([obj['id'], None, [],
                     obj[self.view['field_childs']]])
@@ -340,6 +345,7 @@ class ViewTree(object):
         self.ids = ids
         self.view_info = view_info
         self.fields_order = parse.fields_order
+        self.fields_attrs = parse.fields_attrs
         self.model = None
         self.reload()
 
@@ -350,8 +356,8 @@ class ViewTree(object):
     def reload(self):
         del self.model
         self.model = ViewTreeModel(self.ids, self.view_info, self.fields_order,
-                self.fields, context=self.context, pixbufs=self.pixbufs,
-                treeview=self.view)
+                self.fields, self.fields_attrs, context=self.context,
+                pixbufs=self.pixbufs, treeview=self.view)
         self.view.set_model(self.model)
 
     def widget_get(self):
