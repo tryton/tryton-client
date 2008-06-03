@@ -7,6 +7,7 @@ import mx.DateTime
 import time
 import tryton.rpc as rpc
 import cairo
+from tryton.action import Action
 
 
 class Popup(object):
@@ -61,7 +62,7 @@ class Graph(gtk.DrawingArea):
 
     __gsignals__ = { "expose-event": "override" }
 
-    def __init__(self, xfield, yfields, attrs):
+    def __init__(self, xfield, yfields, attrs, model):
         super(Graph, self).__init__()
         self.xfield = xfield
         self.yfields = yfields
@@ -75,6 +76,7 @@ class Graph(gtk.DrawingArea):
         self.connect('leave-notify-event', self.leave)
         self.popup = Popup(self)
         self.attrs = attrs
+        self.model = model
 
     def destroy(self):
         self.popup.destroy()
@@ -117,6 +119,24 @@ class Graph(gtk.DrawingArea):
         surface.write_to_png(filename)
 
         self.queue_draw()
+
+    def action(self, window):
+        self.popup.hide()
+
+    def action_keyword(self, ids, window):
+        if not ids:
+            return
+        ctx = self.models.context.copy()
+        if 'active_ids' in ctx:
+            del ctx['active_ids']
+        if 'active_id' in ctx:
+            del ctx['active_id']
+        return Action.exec_keyword('graph_open', {
+            'model': self.model,
+            'id': ids[0],
+            'ids': ids,
+            'window': window,
+            }, context=ctx, warning=False)
 
     def drawBackground(self, cr, width, height):
         # Fill the background with gray
@@ -303,6 +323,7 @@ class Graph(gtk.DrawingArea):
         self.datas = {}
         self.labels = {}
         self.ids = {}
+        self.models = models
         minx = None
         maxx = None
         for model in models:

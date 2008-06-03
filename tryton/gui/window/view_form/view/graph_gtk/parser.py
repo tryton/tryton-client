@@ -100,6 +100,8 @@ def button_press(widget, event, graph, window):
         menu.append(item)
         menu.popup(None, None, None, event.button, event.time)
         return True
+    elif event.button == 1:
+        graph.action(window)
 
 
 class ParserGraph(ParserInterface):
@@ -131,7 +133,7 @@ class ParserGraph(ParserInterface):
                         yattrs['string'] = fields[yattrs['name']]['string']
                     yfields.append(yattrs)
 
-        widget = GRAPH_TYPE[attrs.get('type', 'vbar')](xfield, yfields, attrs)
+        widget = GRAPH_TYPE[attrs.get('type', 'vbar')](xfield, yfields, attrs, model)
         event = gtk.EventBox()
         event.add(widget)
         event.connect('button-press-event', button_press, widget, self.window)

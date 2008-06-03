@@ -163,6 +163,13 @@ class Line(Graph):
         super(Line, self).drawAxis(cr, width, height)
         self.drawLine(cr, 1.0, 0)
 
+    def action(self, window):
+        super(Line, self).action(window)
+        for point in self.points:
+            if point.highlight:
+                ids = self.ids[point.xname]
+                self.action_keyword(ids, window)
+
 
 class Point(object):
 
