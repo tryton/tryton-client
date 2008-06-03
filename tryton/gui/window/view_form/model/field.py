@@ -187,6 +187,24 @@ class IntegerField(CharField):
     def get_client(self, model):
         return model.value[self.name] or 0
 
+class BooleanField(CharField):
+
+    def set_client(self, model, value, test_state=True, force_change=False):
+        value = bool(value)
+        internal = bool(model.value.get(self.name, False))
+        self.set(model, value, test_state)
+        if internal != bool(model.value.get(self.name, False)):
+            model.modified = True
+            model.modified_fields.setdefault(self.name)
+            self.sig_changed(model)
+            model.signal('record-changed', model)
+
+    def get(self, model, check_load=True, readonly=True, modified=False):
+        return bool(model.value.get(self.name, False))
+
+    def get_client(self, model):
+        return bool(model.value[self.name])
+
 
 class M2OField(CharField):
     '''
@@ -466,7 +484,7 @@ TYPES = {
     'one2many' : O2MField,
     'reference' : ReferenceField,
     'selection': SelectionField,
-    'boolean': IntegerField,
+    'boolean': BooleanField,
     'datetime': DateTimeField,
     'date': DateField,
 }
