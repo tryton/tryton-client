@@ -185,7 +185,7 @@ class ModelRecordGroup(SignalEvent):
         return ctx
     context = property(_get_context)
 
-    def model_add(self, model, position=-1):
+    def model_add(self, model, position=-1, modified=True):
         #TODO To be checked
         if not model.mgroup is self:
             fields = {}
@@ -203,7 +203,8 @@ class ModelRecordGroup(SignalEvent):
         self.current_idx = position
         model.parent = self.parent
         model.window = self.window
-        model.modified = True
+        if modified:
+            model.modified = True
         model.signal_connect(self, 'record-changed', self._record_changed)
         return model
 

@@ -395,7 +395,7 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             self.display()
         if self.current_model not in self.models:
-            self.models.model_add(self.current_model)
+            self.models.model_add(self.current_model, modified=False)
         return obj_id
 
     def _get_current_view(self):
