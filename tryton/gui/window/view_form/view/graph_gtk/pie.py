@@ -143,10 +143,22 @@ class Pie(Graph):
             if slice.startAngle <= angle <= slice.endAngle:
                 if not slice.highlight:
                     slice.highlight = True
+                    if self.yfields[0].get('widget') == 'float_time':
+                        val = slice.fraction * self.sum
+                        value = '%02d:%02d' % (math.floor(abs(val)),
+                                round(abs(val) % 1 + 0.01, 2) * 60)
+                        if val < 0:
+                            value = '-' + value
+                        sum = '%02d:%02d' % (math.floor(abs(self.sum)),
+                                round(abs(self.sum) % 1 + 0.01, 2) * 60)
+                        if self.sum < 0:
+                            sum = '-' + sum
+                    else:
+                        value = locale.format('%.2f', slice.fraction * self.sum)
+                        sum = locale.format('%.2f', self.sum)
                     label = '%s (%s%%)\n%s/%s' % (self.labels[slice.xname],
                             locale.format('%.2f', slice.fraction * 100),
-                            locale.format('%.2f', slice.fraction * self.sum),
-                            locale.format('%.2f', self.sum))
+                            value, sum)
                     self.popup.set_text(label)
                     self.queue_draw()
             else:

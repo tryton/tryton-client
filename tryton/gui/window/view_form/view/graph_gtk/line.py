@@ -111,13 +111,22 @@ class Line(Graph):
 
         highlight = False
         draw_points = []
+        yfields_float_time = [x.get('key', x['name']) for x in self.yfields
+                if x.get('widget')]
         for point in self.points:
             if point == nearest[0] and nearest[1] < dia / 100:
                 if not point.highlight:
                     point.highlight = True
                     label = keys2txt[point.yname]
                     label += '\n'
-                    label += locale.format('%.2f', point.yval, True)
+                    if point.yname in yfields_float_time:
+                        val = '%02d:%02d' % (math.floor(abs(point.yval)),
+                                round(abs(point.yval) % 1 + 0.01, 2) * 60)
+                        if point.yval < 0:
+                            val = '-' + val
+                        label += val
+                    else:
+                        label += locale.format('%.2f', point.yval, True)
                     label += '\n'
                     label += str(self.labels[point.xname])
                     self.popup.set_text(label)
@@ -169,6 +178,21 @@ class Line(Graph):
             if point.highlight:
                 ids = self.ids[point.xname]
                 self.action_keyword(ids, window)
+
+    def YLabels(self):
+        ylabels = super(Line, self).YLabels()
+        if len([x.get('key', x['name']) for x in self.yfields
+            if x.get('widget')]) == len(self.yfields):
+
+            def format(val):
+                val = eval(val)
+                res = '%02d:%02d' % (math.floor(abs(val)),
+                        round(abs(val) % 1 + 0.01, 2) * 60)
+                if val < 0:
+                    res = '-' + res
+                return res
+            return [(x[0], format(x[1])) for x in ylabels]
+        return ylabels
 
 
 class Point(object):

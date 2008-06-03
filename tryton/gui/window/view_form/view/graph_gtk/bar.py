@@ -1,6 +1,7 @@
 from graph import Graph
 from tryton.common import hex2rgb, lighten
 import locale
+import math
 
 
 class Bar(Graph):
@@ -51,11 +52,19 @@ class Bar(Graph):
 
         highlight = False
         draw_bars = []
+        yfields_float_time = [x.get('key', x['name']) for x in self.yfields
+                if x.get('widget')]
         for bar in self.bars:
             if intersect(bar, event):
                 if not bar.highlight:
                     bar.highlight = True
-                    label = locale.format('%.2f', bar.yval, True)
+                    if bar.yname in yfields_float_time:
+                        label = '%02d:%02d' % (math.floor(abs(bar.yval)),
+                                round(abs(bar.yval) % 1 + 0.01, 2) * 60)
+                        if bar.yval < 0:
+                            label = '-' + label
+                    else:
+                        label = locale.format('%.2f', bar.yval, True)
                     label += '\n'
                     label += str(self.labels[bar.xname])
                     self.popup.set_text(label)
@@ -134,6 +143,21 @@ class VerticalBar(Bar):
         xlabels = super(VerticalBar, self).XLabels()
         return [(x[0] + (self.xscale / 2), x[1]) for x in xlabels]
 
+    def YLabels(self):
+        ylabels = super(VerticalBar, self).YLabels()
+        if len([x.get('key', x['name']) for x in self.yfields
+            if x.get('widget')]) == len(self.yfields):
+
+            def format(val):
+                val = eval(val)
+                res = '%02d:%02d' % (math.floor(abs(val)),
+                        round(abs(val) % 1 + 0.01, 2) * 60)
+                if val < 0:
+                    res = '-' + res
+                return res
+            return [(x[0], format(x[1])) for x in ylabels]
+        return ylabels
+
     def _getShadowRectangle(self, x, y, w, h):
         return (x-2, y-2, w+4, h+2)
 
@@ -180,6 +204,17 @@ class HorizontalBar(Bar):
 
     def XLabels(self):
         ylabels = super(HorizontalBar, self).YLabels()
+        if len([x.get('key', x['name']) for x in self.yfields
+            if x.get('widget')]) == len(self.yfields):
+
+            def format(val):
+                val = eval(val)
+                res = '%02d:%02d' % (math.floor(abs(val)),
+                        round(abs(val) % 1 + 0.01, 2) * 60)
+                if val < 0:
+                    res = '-' + res
+                return res
+            return [(x[0], format(x[1])) for x in ylabels]
         return [(x[0], x[1]) for x in ylabels]
 
     def _getShadowRectangle(self, x, y, w, h):
