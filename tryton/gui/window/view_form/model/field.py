@@ -125,7 +125,12 @@ class CharField(object):
 
 
 class SelectionField(CharField):
-    pass
+
+    def set(self, model, value, test_state=True, modified=False):
+        if isinstance(value, (list, tuple)):
+            value = value[0]
+        return super(SelectionField, self).set(model, value,
+                test_state=test_state,modified=modified)
 
 
 class DateTimeField(CharField):
