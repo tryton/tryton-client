@@ -638,7 +638,7 @@ class ParserForm(ParserInterface):
             context = copy.copy(rpc.CONTEXT)
             context['language'] = adapt_context(lang['code'])
             try:
-                val = rpc.execute('/object', 'execute', model,
+                val = rpc.execute('object', 'execute', model,
                         'read', [obj_id], [name], context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
