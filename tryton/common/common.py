@@ -291,7 +291,7 @@ def send_bugtracker(msg, parent):
     if response == gtk.RESPONSE_OK:
         try:
             msg = msg.encode('ascii', 'replace')
-            server = xmlrpclib.Server(('http://%s:%s@' + CONFIG['roundup.xmlrpc'])
+            server = xmlrpclib.Server(('https://%s:%s@' + CONFIG['roundup.xmlrpc'])
                     % (user, password), allow_none=True)
             msg_md5 = md5.new(msg).hexdigest()
             # use the last line of the message as title
