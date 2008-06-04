@@ -404,11 +404,14 @@ class Screen(SignalEvent):
         return self.views[self.__current_view]
     current_view = property(_get_current_view)
 
-    def get(self):
+    def get(self, get_readonly=True, includeid=False, check_load=True,
+            get_modifiedonly=False):
         if not self.current_model:
             return None
         self.current_view.set_value()
-        return self.current_model.get()
+        return self.current_model.get(get_readonly=get_readonly,
+                includeid=includeid, check_load=check_load,
+                get_modifiedonly=get_modifiedonly)
 
     def is_modified(self):
         if not self.current_model:

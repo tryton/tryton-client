@@ -66,7 +66,7 @@ class Preference(object):
         while True:
             if self.win.run() == gtk.RESPONSE_OK:
                 if self.screen.current_model.validate():
-                    val = copy.copy(self.screen.get())
+                    val = copy.copy(self.screen.get(get_modifiedonly=True))
                     user = RPCProxy('res.user')
                     try:
                         user.set_preferences(val, rpc.CONTEXT)
