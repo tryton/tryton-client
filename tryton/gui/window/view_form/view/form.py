@@ -116,11 +116,6 @@ class ViewForm(ParserView):
                         'to use the relate button!'))
                 return False
             self.screen.display()
-            data = {
-                'model': self.screen.name,
-                'id': obj_id,
-                'ids': [obj_id],
-            }
         if atype == 'relate':
             obj_id = self.screen.current_model \
                     and self.screen.current_model.id
@@ -136,6 +131,11 @@ class ViewForm(ParserView):
                 act['context'] = str(
                         self.screen.current_model.expr_eval(
                             act['context'], check_load=False))
+        data = {
+            'model': self.screen.name,
+            'id': obj_id,
+            'ids': [obj_id],
+        }
         value = Action._exec_action(act, data, context)
         if atype in ('print', 'action'):
             self.screen.reload()
