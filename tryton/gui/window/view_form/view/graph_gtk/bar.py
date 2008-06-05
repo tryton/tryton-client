@@ -149,7 +149,7 @@ class VerticalBar(Bar):
             if x.get('widget')]) == len(self.yfields):
 
             def format(val):
-                val = eval(val)
+                val = locale.atof(val)
                 res = '%02d:%02d' % (math.floor(abs(val)),
                         round(abs(val) % 1 + 0.01, 2) * 60)
                 if val < 0:
@@ -208,7 +208,7 @@ class HorizontalBar(Bar):
             if x.get('widget')]) == len(self.yfields):
 
             def format(val):
-                val = eval(val)
+                val = locale.atof(val)
                 res = '%02d:%02d' % (math.floor(abs(val)),
                         round(abs(val) % 1 + 0.01, 2) * 60)
                 if val < 0:
