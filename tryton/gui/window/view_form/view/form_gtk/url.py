@@ -49,6 +49,10 @@ class URL(WidgetInterface):
     def _readonly_set(self, value):
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
+        if value:
+            self.entry.hide()
+        else:
+            self.entry.show()
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
