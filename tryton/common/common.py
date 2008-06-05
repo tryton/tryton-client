@@ -291,37 +291,8 @@ def send_bugtracker(msg, parent):
     if response == gtk.RESPONSE_OK:
         try:
             msg = msg.encode('ascii', 'replace')
-            if os.environ.has_key("http_proxy"):
-
-
-                class ProxiedSafeTransport(xmlrpclib.SafeTransport):
-
-                    def set_proxy(self, proxy):
-                        self.proxy = proxy
-
-                    def make_connection(self, host):
-                        self.realhost = host
-                        host, extra_headers, x509 = self.get_host_info(self.proxy)
-                        return httplib.HTTP(host)
-
-                    def send_request(self, connection, handler, request_body):
-                        connection.putrequest("POST", 'https://%s%s' % \
-                                (self.realhost, handler))
-
-                    def send_host(self, connection, host):
-                        host, extra_headers, x509 = self.get_host_info(self.realhost)
-                        connection.putheader("Host", host)
-                        if extra_headers:
-                            if isinstance(extra_headers, DictType):
-                                extra_headers = extra_headers.items()
-                            for key, value in extra_headers:
-                                connection.putheader(key, value)
-
-                transport = ProxiedSafeTransport()
-            else:
-                transport = xmlrpclib.SafeTransport()
             server = xmlrpclib.Server(('https://%s:%s@' + CONFIG['roundup.xmlrpc'])
-                    % (user, password), allow_none=True, transport=transport)
+                    % (user, password), allow_none=True)
             msg_md5 = md5.new(msg).hexdigest()
             # use the last line of the message as title
             title = (filter(None, msg.splitlines()) or ['[no title]'])[-1]
