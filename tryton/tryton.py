@@ -30,14 +30,14 @@
 import os
 import sys
 
-import config
-from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
-
 import pygtk
 pygtk.require('2.0')
 import gtk
 import logging
+
 import version
+import config
+from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
 import translate
 from gui import Main
 
