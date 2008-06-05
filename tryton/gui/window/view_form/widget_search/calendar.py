@@ -87,7 +87,7 @@ class Calendar(Interface):
             _('The content of the widget or ValueError if not valid'))
 
     def cal_open(self, widget, event, dest, parent=None):
-        win = gtk.Dialog(_('Tryton - Date selection'), parent,
+        win = gtk.Dialog(_('Date selection'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))

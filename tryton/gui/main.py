@@ -298,7 +298,7 @@ class DBCreate(object):
 class Tips(object):
 
     def __init__(self, parent):
-        self.win = gtk.Dialog(_('Tryton - Tips'), parent,
+        self.win = gtk.Dialog(_('Tips'), parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_icon(TRYTON_ICON)
 

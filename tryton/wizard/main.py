@@ -15,7 +15,7 @@ class Dialog(object):
             context=None):
         self.states = []
         default = -1
-        self.dia = gtk.Dialog(_('Tryton - Wizard'), parent,
+        self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dia.set_deletable(False)
         for i in state:
@@ -48,7 +48,7 @@ class Dialog(object):
         self.screen.widget.show()
 
         self.dia.vbox.pack_start(self.screen.widget)
-        self.dia.set_title(self.dia.get_title() + ' - ' + self.screen.current_view.title)
+        self.dia.set_title(self.screen.current_view.title)
         self.dia.show()
         self.screen.new(default=False)
         self.screen.current_model.set(val)

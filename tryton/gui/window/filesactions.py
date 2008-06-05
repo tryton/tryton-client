@@ -10,7 +10,7 @@ class FilesActions(object):
     "Files actions window"
 
     def __init__(self, parent):
-        self.win = gtk.Dialog(_('Tryton - Files Actions'), parent,
+        self.win = gtk.Dialog(_('Files Actions'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))

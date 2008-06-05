@@ -15,7 +15,7 @@ class Preference(object):
     "Preference window"
 
     def __init__(self, user, parent):
-        self.win = gtk.Dialog(_('Tryton - Preferences'), parent,
+        self.win = gtk.Dialog(_('Preferences'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))

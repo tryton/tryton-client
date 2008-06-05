@@ -21,11 +21,11 @@ class Dialog(object):
         if attrs is None:
             attrs = {}
 
-        self.dia = gtk.Dialog(_('Tryton - Link'), window,
+        self.dia = gtk.Dialog(_('Link'), window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.window = window
         if ('string' in attrs) and attrs['string']:
-            self.dia.set_title(self.dia.get_title() + ' - ' + attrs['string'])
+            self.dia.set_title(attrs['string'])
         self.dia.set_property('default-width', 760)
         self.dia.set_property('default-height', 500)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)

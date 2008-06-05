@@ -123,7 +123,7 @@ class Dialog(object):
         self.model_ctx = model_ctx
         self.default_get_ctx = default_get_ctx
 
-        self.dia = gtk.Dialog(_('Tryton - Link'), window,
+        self.dia = gtk.Dialog(_('Link'), window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.window = window
         self.dia.set_property('default-width', 760)
@@ -196,7 +196,7 @@ class Dialog(object):
         if name:
             name += ' - '
         name += self.screen.current_view.title
-        self.dia.set_title(self.dia.get_title() + ' - ' + name)
+        self.dia.set_title(name)
         if menuitem_title:
             menuitem_title.get_child().set_text(name)
 

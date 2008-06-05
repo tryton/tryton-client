@@ -21,7 +21,7 @@ class WinSearch(object):
         self.sel_multi = sel_multi
         self.parent = parent
 
-        self.win = gtk.Dialog(_('Tryton - Search'), self.parent,
+        self.win = gtk.Dialog(_('Search'), self.parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_FIND, gtk.RESPONSE_APPLY,
                 gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -68,8 +68,8 @@ class WinSearch(object):
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
                 model, parent=self.win)
 
-        self.title = _('Tryton Search: %s') % self.form.name
-        self.title_results = _('Tryton Search: %s (%%d result(s))') % \
+        self.title = _('Search: %s') % self.form.name
+        self.title_results = _('Search: %s (%%d result(s))') % \
                 self.form.name
         self.win.set_title(self.title)
 

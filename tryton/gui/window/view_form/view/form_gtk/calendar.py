@@ -103,7 +103,7 @@ class Calendar(WidgetInterface):
             message(_('This widget is readonly!'), self._window)
             return True
 
-        win = gtk.Dialog(_('Tryton - Date selection'), self._window,
+        win = gtk.Dialog(_('Date Selection'), self._window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -246,7 +246,7 @@ class DateTime(WidgetInterface):
             message(_('This widget is readonly!'), self._window)
             return True
 
-        win = gtk.Dialog(_('Tryton - Date selection'), self._window,
+        win = gtk.Dialog(_('Date Time Selection'), self._window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))

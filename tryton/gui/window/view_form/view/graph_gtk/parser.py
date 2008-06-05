@@ -16,7 +16,7 @@ GRAPH_TYPE = {
 }
 
 def save(widget, graph, window):
-    dia = gtk.Dialog(_('Tryton - Save As'), window,
+    dia = gtk.Dialog(_('Save As'), window,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
