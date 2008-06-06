@@ -19,7 +19,7 @@ def db_list(host, port):
     _SEMAPHORE.acquire()
     try:
         try:
-            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
                 _SOCK = None
             if _SOCK is None:
@@ -46,7 +46,7 @@ def db_exec(host, port, method, *args):
     _SEMAPHORE.acquire()
     try:
         try:
-            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
                 _SOCK = None
             if _SOCK is None:
@@ -68,7 +68,7 @@ def login(username, password, host, port, database):
     try:
         _SEMAPHORE.acquire()
         try:
-            if _SOCK and _SOCK.hostname != host and _SOCK.port != port:
+            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
                 _SOCK = None
             if _SOCK is None:
