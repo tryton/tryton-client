@@ -31,9 +31,7 @@ setup(name=PACKAGE,
     ],
     data_files=[
         ('share/pixmaps', [
-            'share/pixmaps/tryton.png',
-            'share/pixmaps/tryton-icon.png',
-            'share/pixmaps/tryton-noimage.png',
+            'share/pixmaps/*.png',
             ]),
         ('share/tryton', ['share/tryton/tryton.glade', 'share/tryton/tipoftheday.txt']),
     ],
