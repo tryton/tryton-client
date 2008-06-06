@@ -108,7 +108,7 @@ def _create_menu(self):
 class Dialog(object):
 
     def __init__(self, model_name, parent, model=None, attrs=None,
-            model_ctx=None, window=None, default_get_ctx=None):
+            model_ctx=None, window=None, default_get_ctx=None, readonly=False):
 
         if attrs is None:
             attrs = {}
@@ -165,7 +165,7 @@ class Dialog(object):
 
         self.dia.show_all()
         self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
-                exclude_field=attrs.get('relation_field', None))
+                exclude_field=attrs.get('relation_field', None), readonly=readonly)
         self.screen.models._context.update(model_ctx)
         if not model:
             model = self.screen.new(context=default_get_ctx)
@@ -377,10 +377,17 @@ class One2Many(WidgetInterface):
                 self.screen.new(context=ctx)
                 self.screen.current_view.widget.set_sensitive(True)
             else:
+                readonly = False
+                if self._view.modelfield and self._view.model:
+                    modelfield = self._view.modelfield
+                    model = self._view.model
+                    readonly = modelfield.get_state_attrs(model
+                            ).get('readonly', False)
                 dia = Dialog(self.attrs['relation'], parent=self._view.model,
                         attrs=self.attrs,
                         model_ctx=self.screen.models._context,
-                        default_get_ctx=ctx, window=self._window)
+                        default_get_ctx=ctx, window=self._window,
+                        readonly=readonly)
                 res = True
                 while res:
                     res, value = dia.run()
@@ -393,9 +400,15 @@ class One2Many(WidgetInterface):
 
     def _sig_edit(self, widget=None, event=None):
         if self.screen.current_model:
+            readonly = False
+            if self._view.modelfield and self._view.model:
+                modelfield = self._view.modelfield
+                model = self._view.model
+                readonly = modelfield.get_state_attrs(model
+                        ).get('readonly', False)
             dia = Dialog(self.attrs['relation'], parent=self._view.model,
                     model=self.screen.current_model, attrs=self.attrs,
-                    window=self._window)
+                    window=self._window, readonly=readonly)
             res, value = dia.run()
             dia.destroy()
 

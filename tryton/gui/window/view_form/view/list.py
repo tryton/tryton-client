@@ -248,6 +248,11 @@ class ViewList(ParserView):
     def drag_data_received(self, treeview, context, x, y, selection,
             info, etime):
         treeview.emit_stop_by_name('drag-data-received')
+        if treeview.sequence:
+            for model in self.screen.models.models:
+                if model[treeview.sequence].get_state_attrs(
+                        model).get('readonly', False):
+                    return
         model = treeview.get_model()
         data = eval(selection.data)
         drop_info = treeview.get_dest_row_at_pos(x, y)
@@ -401,7 +406,20 @@ class ViewList(ParserView):
             #self.widget.set_cursor(None,None,False)
             if self.store:
                 self.widget_tree.set_model(self.store)
+        self.set_state()
         self.update_children()
+
+    def set_state(self):
+        model = self.screen.current_model
+        values = rpc.CONTEXT.copy()
+        values['state'] = 'draft'
+        if model:
+            for field in model.mgroup.fields:
+                values[field] = model[field].get(model, check_load=False)
+            for field in model.mgroup.fields:
+                modelfield = model.mgroup.mfields.get(field, None)
+                if modelfield:
+                    modelfield.state_set(model, values)
 
     def update_children(self):
         ids = self.sel_ids_get()

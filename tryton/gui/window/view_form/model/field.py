@@ -121,6 +121,8 @@ class CharField(object):
     def get_state_attrs(self, model):
         if self.name not in model.state_attrs:
             model.state_attrs[self.name] = self.attrs.copy()
+        if model.mgroup.readonly:
+            model.state_attrs[self.name]['readonly'] = True
         return model.state_attrs[self.name]
 
 
@@ -435,6 +437,11 @@ class O2MField(CharField):
             res = False
         self.get_state_attrs(model)['valid'] = res
         return res
+
+    def state_set(self, model, values=None):
+        super(O2MField, self).state_set(model, values=values)
+        if self.get_state_attrs(model).get('readonly', False):
+            model.value[self.name].readonly = True
 
 
 class ReferenceField(CharField):
