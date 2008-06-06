@@ -843,7 +843,8 @@ class Main(object):
         label_menu = gtk.Label(page.name)
         label_menu.set_alignment(0.0, 0.5)
         self.notebook.append_page_menu(page.widget, hbox, label_menu)
-        self.notebook.set_tab_reorderable(page.widget, True)
+        if hasattr(self.notebook, 'set_tab_reorderable'):
+            self.notebook.set_tab_reorderable(page.widget, True)
         self.notebook.set_current_page(-1)
         page.signal_connect(self, 'attachment-count', self._attachment_count)
 
