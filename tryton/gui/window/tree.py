@@ -137,16 +137,11 @@ class Tree(SignalEvent):
                 radiotb.set_label_widget(gtk.Label(res['name']))
 
                 icon = gtk.Image()
-                if hasattr(res[icon_name], 'startswith') \
-                        and res[icon_name].startswith('STOCK_'):
-                    icon.set_from_stock(getattr(gtk, res[icon_name]),
+                try:
+                    icon.set_from_stock(res[icon_name],
                             gtk.ICON_SIZE_BUTTON)
-                else:
-                    try:
-                        icon.set_from_stock(res[icon_name],
-                                gtk.ICON_SIZE_BUTTON)
-                    except:
-                        pass
+                except:
+                    pass
 
                 hbox = gtk.HBox(spacing=6)
                 hbox.pack_start(icon)

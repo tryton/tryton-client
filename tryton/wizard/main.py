@@ -194,7 +194,7 @@ class WizardProgress(object):
                     hbox = gtk.HBox(False, 13)
                     hbox.set_border_width(10)
                     img = gtk.Image()
-                    img.set_from_stock('gtk-dialog-info', gtk.ICON_SIZE_DIALOG)
+                    img.set_from_stock('tryton-dialog-information', gtk.ICON_SIZE_DIALOG)
                     hbox.pack_start(img, expand=True, fill=False)
                     vbox2 = gtk.VBox(False, 0)
                     label = gtk.Label()

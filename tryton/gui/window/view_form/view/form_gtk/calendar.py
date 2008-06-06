@@ -34,7 +34,7 @@ class Calendar(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)
@@ -155,7 +155,7 @@ class DateTime(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)

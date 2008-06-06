@@ -40,7 +40,7 @@ class Image(WidgetInterface):
         self.hbox = gtk.HBox(spacing=3)
         self.but_add = gtk.Button()
         img_add = gtk.Image()
-        img_add.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
+        img_add.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
         self.but_add.set_image(img_add)
         self.but_add.set_relief(gtk.RELIEF_NONE)
         self.but_add.connect('clicked', self.sig_add)
@@ -49,7 +49,7 @@ class Image(WidgetInterface):
 
         self.but_save_as = gtk.Button()
         img_save_as = gtk.Image()
-        img_save_as.set_from_stock('gtk-save', gtk.ICON_SIZE_BUTTON)
+        img_save_as.set_from_stock('tryton-save', gtk.ICON_SIZE_BUTTON)
         self.but_save_as.set_image(img_save_as)
         self.but_save_as.set_relief(gtk.RELIEF_NONE)
         self.but_save_as.connect('clicked', self.sig_save_as)
@@ -58,7 +58,7 @@ class Image(WidgetInterface):
 
         self.but_remove = gtk.Button()
         img_remove = gtk.Image()
-        img_remove.set_from_stock('gtk-clear', gtk.ICON_SIZE_BUTTON)
+        img_remove.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
         self.but_remove.set_image(img_remove)
         self.but_remove.set_relief(gtk.RELIEF_NONE)
         self.but_remove.connect('clicked', self.sig_remove)

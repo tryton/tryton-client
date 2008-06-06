@@ -124,7 +124,7 @@ class Form(SignalEvent):
         table = gtk.Table(2, 2)
         table.attach(gtk.Label(_('Go to ID:')), 1, 2, 0, 1, gtk.FILL)
         img = gtk.Image()
-        img.set_from_stock('gtk-index', gtk.ICON_SIZE_DIALOG)
+        img.set_from_stock('tryton-go-jump', gtk.ICON_SIZE_DIALOG)
         table.attach(img, 0, 1, 0, 2, gtk.FILL)
 
         entry = gtk.Entry()
@@ -266,11 +266,11 @@ class Form(SignalEvent):
             new_id = common.process_exception(exception, self.window, *args)
         if new_id:
             self.screen.load([new_id])
-            self.message_state(_('Working now on the duplicated document !'))
+            self.message_state(_('Working now on the duplicated record!'))
 
     def sig_save(self, widget=None):
         if self.screen.save_current():
-            self.message_state(_('Document saved!'))
+            self.message_state(_('Record saved!'))
             return True
         else:
             self.message_state(_('Invalid form!'))
@@ -367,14 +367,14 @@ class Form(SignalEvent):
 
     def _record_message(self, screen, signal_data):
         if not signal_data[3]:
-            msg = _('No record selected!')
+            msg = _('No Record Selected!')
         else:
             name = '_'
             if signal_data[0] >= 0:
                 name = str(signal_data[0]+1)
-            name2 = _('New document')
+            name2 = _('New Record')
             if signal_data[3]:
-                name2 = _('Editing document (id: ')+str(signal_data[3])+')'
+                name2 = _('Editing Record (id: ')+str(signal_data[3])+')'
             msg = _('Record: ') + name + ' / ' + str(signal_data[1])
             if signal_data[1] < signal_data[2]:
                 msg += _(' of ') + str(signal_data[2])

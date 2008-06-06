@@ -35,7 +35,7 @@ class Calendar(Interface):
         self.eb1.connect('button_press_event', self.cal_open, self.entry1,
                 parent)
         img = gtk.Image()
-        img.set_from_stock('gtk-zoom-in', gtk.ICON_SIZE_MENU)
+        img.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
         img.set_alignment(0.5, 0.5)
         self.eb1.add(img)
         self.widget.pack_start(self.eb1, expand=False, fill=False)
@@ -54,7 +54,7 @@ class Calendar(Interface):
         self.eb2.connect('button_press_event', self.cal_open, self.entry2,
                 parent)
         img = gtk.Image()
-        img.set_from_stock('gtk-zoom-in', gtk.ICON_SIZE_MENU)
+        img.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
         img.set_alignment(0.5, 0.5)
         self.eb2.add(img)
         self.widget.pack_start(self.eb2, expand=False, fill=False)

@@ -94,7 +94,7 @@ def save(widget, graph, window):
 def button_press(widget, event, graph, window):
     if event.button == 3:
         menu = gtk.Menu()
-        item = gtk.ImageMenuItem('gtk-save-as')
+        item = gtk.ImageMenuItem('tryton-save-as')
         item.connect('activate', save, graph, window)
         item.show()
         menu.append(item)

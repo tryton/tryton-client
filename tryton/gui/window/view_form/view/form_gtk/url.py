@@ -25,7 +25,7 @@ class URL(WidgetInterface):
 
         self.button = gtk.Button()
         img = gtk.Image()
-        img.set_from_stock('gtk-jump-to', gtk.ICON_SIZE_BUTTON)
+        img.set_from_stock('tryton-web-browser', gtk.ICON_SIZE_BUTTON)
         self.button.set_image(img)
         self.button.set_relief(gtk.RELIEF_NONE)
         self.button.connect('clicked', self.button_clicked)

@@ -318,14 +318,28 @@ class Tips(object):
         self.check = gtk.CheckButton(_('_Display a new tip next time'), True)
         self.check.set_active(True)
         hbox.pack_start(self.check)
-        but_back = gtk.Button(stock=gtk.STOCK_GO_BACK)
-        but_back.set_relief(gtk.RELIEF_NONE)
-        but_back.connect('clicked', self.tip_back)
-        hbox.pack_start(but_back)
-        but_forward = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
-        but_forward.set_relief(gtk.RELIEF_NONE)
-        but_forward.connect('clicked', self.tip_forward)
-        hbox.pack_start(but_forward)
+        but_previous = gtk.Button()
+        hbox_previous = gtk.HBox()
+        img_previous = gtk.Image()
+        img_previous.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_BUTTON)
+        hbox_previous.pack_start(img_previous)
+        label_previous = gtk.Label(_('Previous'))
+        hbox_previous.pack_start(label_previous)
+        but_previous.add(hbox_previous)
+        but_previous.set_relief(gtk.RELIEF_NONE)
+        but_previous.connect('clicked', self.tip_previous)
+        hbox.pack_start(but_previous)
+        hbox_next = gtk.HBox()
+        label_next = gtk.Label(_('Next'))
+        hbox_next.pack_start(label_next)
+        but_next = gtk.Button()
+        img_next = gtk.Image()
+        img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_BUTTON)
+        hbox_next.pack_start(img_next)
+        but_next.add(hbox_next)
+        but_next.set_relief(gtk.RELIEF_NONE)
+        but_next.connect('clicked', self.tip_next)
+        hbox.pack_start(but_next)
         vbox.pack_start(hbox, False, False)
         self.win.vbox.pack_start(vbox)
         self.win.show_all()
@@ -359,11 +373,11 @@ class Tips(object):
         self.label.set_text(tip)
         self.label.set_use_markup(True)
 
-    def tip_forward(self, widget):
+    def tip_next(self, widget):
         self.number += 1
         self.tip_set()
 
-    def tip_back(self, widget):
+    def tip_previous(self, widget):
         self.number -= 1
         self.tip_set()
 
@@ -488,7 +502,6 @@ class Main(object):
             'form_save': 'but_save',
             'goto_id': 'but_goto_id',
             'form_print': 'but_print',
-            'form_print_html': 'but_print_html',
             'form_save_as': 'but_save_as',
             'form_import': 'but_import',
             'form_filter': 'but_filter',
@@ -691,6 +704,8 @@ class Main(object):
         self.glade.get_widget('user').set_sensitive(True)
         self.glade.get_widget('form').set_sensitive(True)
         self.glade.get_widget('plugins').set_sensitive(True)
+        self.glade.get_widget('request_new_but').set_sensitive(True)
+        self.glade.get_widget('req_search_but').set_sensitive(True)
         self.notebook.grab_focus()
         return True
 
@@ -718,6 +733,8 @@ class Main(object):
         self.glade.get_widget('user').set_sensitive(False)
         self.glade.get_widget('form').set_sensitive(False)
         self.glade.get_widget('plugins').set_sensitive(False)
+        self.glade.get_widget('request_new_but').set_sensitive(False)
+        self.glade.get_widget('req_search_but').set_sensitive(False)
         if disconnect:
             rpc.logout()
         return True
@@ -833,7 +850,7 @@ class Main(object):
         hbox.pack_start(label, expand=True, fill=True)
         button = gtk.Button()
         img = gtk.Image()
-        img.set_from_stock('gtk-close', gtk.ICON_SIZE_MENU)
+        img.set_from_stock('tryton-close', gtk.ICON_SIZE_SMALL_TOOLBAR)
         button.set_relief(gtk.RELIEF_NONE)
         button.add(img)
         hbox.pack_start(button, expand=False, fill=False)

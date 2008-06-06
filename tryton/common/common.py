@@ -188,7 +188,7 @@ def error(title, parent, details):
 
     hbox = gtk.HBox()
     image = gtk.Image()
-    image.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_DIALOG)
+    image.set_from_stock('tryton-dialog-error', gtk.ICON_SIZE_DIALOG)
     hbox.pack_start(image, False, False)
 
     scrolledwindow = gtk.ScrolledWindow()
@@ -251,7 +251,7 @@ def send_bugtracker(msg, parent):
 
     hbox = gtk.HBox()
     image = gtk.Image()
-    image.set_from_stock(gtk.STOCK_DIALOG_QUESTION,
+    image.set_from_stock('tryton-dialog-information',
             gtk.ICON_SIZE_DIALOG)
     hbox.pack_start(image, False, False)
 
@@ -418,7 +418,7 @@ def ask(question, parent, visibility=True):
 
     hbox = gtk.HBox()
     image = gtk.Image()
-    image.set_from_stock(gtk.STOCK_DIALOG_QUESTION,
+    image.set_from_stock('tryton-dialog-information',
             gtk.ICON_SIZE_DIALOG)
     hbox.pack_start(image)
     vbox = gtk.VBox()

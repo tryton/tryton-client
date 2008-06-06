@@ -22,7 +22,7 @@
                 <property name="width_request">500</property>
                 <property name="height_request">129</property>
                 <property name="visible">True</property>
-                <property name="stock">gtk-missing-image</property>
+                <property name="stock">tryton-image-missing</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -270,7 +270,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4209">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-connect</property>
+                                <property name="stock">tryton-connect</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -285,7 +285,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4210">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-disconnect</property>
+                                <property name="stock">tryton-disconnect</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -312,7 +312,7 @@
                                     <child internal-child="image">
                                       <widget class="GtkImage" id="image4212">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-new</property>
+                                        <property name="stock">tryton-folder-new</property>
                                         <property name="icon_size">1</property>
                                       </widget>
                                     </child>
@@ -327,7 +327,7 @@
                                     <child internal-child="image">
                                       <widget class="GtkImage" id="image4213">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-open</property>
+                                        <property name="stock">tryton-folder-saved-search</property>
                                         <property name="icon_size">1</property>
                                       </widget>
                                     </child>
@@ -342,7 +342,7 @@
                                     <child internal-child="image">
                                       <widget class="GtkImage" id="image4214">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-save-as</property>
+                                        <property name="stock">tryton-save-as</property>
                                         <property name="icon_size">1</property>
                                       </widget>
                                     </child>
@@ -357,7 +357,7 @@
                                     <child internal-child="image">
                                       <widget class="GtkImage" id="image4215">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-delete</property>
+                                        <property name="stock">tryton-delete</property>
                                         <property name="icon_size">1</property>
                                       </widget>
                                     </child>
@@ -377,7 +377,7 @@
                                     <child internal-child="image">
                                       <widget class="GtkImage" id="image4216">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-dialog-question</property>
+                                        <property name="stock">tryton-users</property>
                                         <property name="icon_size">1</property>
                                       </widget>
                                     </child>
@@ -388,7 +388,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4211">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
+                                <property name="stock">tryton-system-file-manager</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -402,10 +402,17 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="quitter1">
                             <property name="visible">True</property>
-                            <property name="label">gtk-quit</property>
+                            <property name="label" translatable="yes">Quit</property>
                             <property name="use_underline">True</property>
-                            <property name="use_stock">True</property>
                             <signal name="activate" handler="on_quit_activate"/>
+                            <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                            <child internal-child="image">
+                              <widget class="GtkImage" id="imagelogout">
+                                <property name="visible">True</property>
+                                <property name="stock">tryton-log-out</property>
+                                <property name="icon_size">1</property>
+                              </widget>
+                            </child>
                           </widget>
                         </child>
                       </widget>
@@ -430,7 +437,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4217">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-preferences</property>
+                                <property name="stock">tryton-preferences-system-session</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -450,7 +457,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4218">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-new</property>
+                                <property name="stock">tryton-mail-message-new</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -465,7 +472,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4219">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-find</property>
+                                <property name="stock">tryton-find</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -507,7 +514,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4220">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-new</property>
+                                <property name="stock">tryton-new</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -523,7 +530,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4221">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-save</property>
+                                <property name="stock">tryton-save</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -532,7 +539,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="copy">
                             <property name="visible">True</property>
-                            <property name="tooltip" translatable="yes">Copy this resource</property>
+                            <property name="tooltip" translatable="yes">Copy this record</property>
                             <property name="label" translatable="yes">_Duplicate</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_copy_activate"/>
@@ -540,7 +547,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4222">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-copy</property>
+                                <property name="stock">tryton-copy</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -556,7 +563,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4223">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-delete</property>
+                                <property name="stock">tryton-delete</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -577,7 +584,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4224">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-find</property>
+                                <property name="stock">tryton-find</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -593,7 +600,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4225">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-go-forward</property>
+                                <property name="stock">tryton-go-next</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -609,7 +616,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4226">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-go-back</property>
+                                <property name="stock">tryton-go-previous</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -625,7 +632,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4227">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-justify-fill</property>
+                                <property name="stock">tryton-fullscreen</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -634,14 +641,14 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="win_new">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Menu</property>
+                            <property name="label" translatable="yes">Menu</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_win_new_activate"/>
                             <accelerator key="T" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4228">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-index</property>
+                                <property name="stock">tryton-start-here</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -662,7 +669,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4229">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-home</property>
+                                <property name="stock">tryton-go-home</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -678,7 +685,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4230">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-close</property>
+                                <property name="stock">tryton-close</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -718,7 +725,7 @@
                         <child>
                           <widget class="GtkMenuItem" id="goto_id">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Go to resource ID...</property>
+                            <property name="label" translatable="yes">_Go to record ID...</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_goto_id_activate"/>
                             <accelerator key="G" modifiers="GDK_CONTROL_MASK" signal="activate"/>
@@ -739,7 +746,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4232">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-redo</property>
+                                <property name="stock">tryton-refresh</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -753,29 +760,14 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="form_print">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Preview in PDF</property>
+                            <property name="label" translatable="yes">_Print</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_print_activate"/>
                             <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4233">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-print-preview</property>
-                                <property name="icon_size">1</property>
-                              </widget>
-                            </child>
-                          </widget>
-                        </child>
-                        <child>
-                          <widget class="GtkImageMenuItem" id="form_print_html">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Previe_w in editor</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_form_print_html_activate"/>
-                            <child internal-child="image">
-                              <widget class="GtkImage" id="image4234">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-print-preview</property>
+                                <property name="stock">tryton-print</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -795,7 +787,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4235">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-save-as</property>
+                                <property name="stock">tryton-save-as</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -883,13 +875,6 @@
                                     <signal name="activate" handler="on_mode_pda_activate"/>
                                   </widget>
                                 </child>
-                              </widget>
-                            </child>
-                            <child internal-child="image">
-                              <widget class="GtkImage" id="image4236">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-print-preview</property>
-                                <property name="icon_size">1</property>
                               </widget>
                             </child>
                           </widget>
@@ -1012,7 +997,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4239">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-save</property>
+                                <property name="stock">tryton-save</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -1040,7 +1025,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4240">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
+                                <property name="stock">tryton-executable</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -1075,7 +1060,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4244">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-info</property>
+                                <property name="stock">tryton-information</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -1090,7 +1075,7 @@
                             <child internal-child="image">
                               <widget class="GtkImage" id="image4231">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-help</property>
+                                <property name="stock">tryton-help</property>
                                 <property name="icon_size">1</property>
                               </widget>
                             </child>
@@ -1107,13 +1092,6 @@
                             <property name="label" translatable="yes">_License</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_help_licence_activate"/>
-                            <child internal-child="image">
-                              <widget class="GtkImage" id="image4245">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-about</property>
-                                <property name="icon_size">1</property>
-                              </widget>
-                            </child>
                           </widget>
                         </child>
                       </widget>
@@ -1135,8 +1113,10 @@
             <child>
               <widget class="GtkToolButton" id="but_new">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Create a new resource</property>
-                <property name="stock_id">gtk-new</property>
+                <property name="tooltip" translatable="yes">Create a new record</property>
+                <property name="stock_id">tryton-new</property>
+                <property name="label" translatable="yes">_New</property>
+                <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_but_new_clicked"/>
               </widget>
               <packing>
@@ -1146,8 +1126,10 @@
             <child>
               <widget class="GtkToolButton" id="but_save">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Edit / Save this resource</property>
-                <property name="stock_id">gtk-save</property>
+                <property name="tooltip" translatable="yes">Save this record</property>
+                <property name="stock_id">tryton-save</property>
+                <property name="label" translatable="yes">_Save</property>
+                <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_but_save_clicked"/>
               </widget>
               <packing>
@@ -1166,8 +1148,10 @@
             <child>
               <widget class="GtkToolButton" id="but_remove">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Delete this resource</property>
-                <property name="stock_id">gtk-delete</property>
+                <property name="tooltip" translatable="yes">Delete this record</property>
+                <property name="stock_id">tryton-delete</property>
+                <property name="label" translatable="yes">_Delete</property>
+                <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_but_remove_clicked"/>
               </widget>
               <packing>
@@ -1186,8 +1170,10 @@
             <child>
               <widget class="GtkToolButton" id="but_search">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Find a resource</property>
-                <property name="stock_id">gtk-find</property>
+                <property name="tooltip" translatable="yes">Find a record</property>
+                <property name="stock_id">tryton-find</property>
+                <property name="label" translatable="yes">_Find</property>
+                <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_but_search_clicked"/>
               </widget>
               <packing>
@@ -1198,7 +1184,8 @@
               <widget class="GtkToolButton" id="but_previous">
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Go to previous matched search</property>
-                <property name="stock_id">gtk-go-back</property>
+                <property name="stock_id">tryton-go-previous</property>
+                <property name="label" translatable="yes">Previous</property>
                 <signal name="clicked" handler="on_but_previous_clicked"/>
               </widget>
               <packing>
@@ -1208,8 +1195,9 @@
             <child>
               <widget class="GtkToolButton" id="but_next">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Go to next matched resource</property>
-                <property name="stock_id">gtk-go-forward</property>
+                <property name="tooltip" translatable="yes">Go to next matched record</property>
+                <property name="stock_id">tryton-go-next</property>
+                <property name="label" translatable="yes">Next</property>
                 <signal name="clicked" handler="on_but_next_clicked"/>
               </widget>
               <packing>
@@ -1222,7 +1210,8 @@
                 <property name="tooltip" translatable="yes">Switch current view: form / list / graph</property>
                 <property name="label" translatable="yes">View</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-justify-left</property>
+                <property name="stock_id">tryton-fullscreen</property>
+                <property name="label" translatable="yes">Switch</property>
                 <signal name="clicked" handler="on_but_switch_clicked"/>
               </widget>
               <packing>
@@ -1232,10 +1221,10 @@
             <child>
               <widget class="GtkToolButton" id="but_reload">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Reload / Undo Form</property>
-                <property name="label" translatable="yes">Reload</property>
+                <property name="tooltip" translatable="yes">Reload</property>
+                <property name="label" translatable="yes">_Reload</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-redo</property>
+                <property name="stock_id">tryton-refresh</property>
                 <signal name="clicked" handler="on_form_reload_activate"/>
               </widget>
               <packing>
@@ -1249,7 +1238,7 @@
                 <property name="tooltip" translatable="yes">Menu</property>
                 <property name="label" translatable="yes">Menu</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-index</property>
+                <property name="stock_id">tryton-start-here</property>
                 <signal name="clicked" handler="on_but_menu_clicked"/>
               </widget>
               <packing>
@@ -1268,10 +1257,10 @@
             <child>
               <widget class="GtkToolButton" id="but_action">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Launch actions about this resource</property>
+                <property name="tooltip" translatable="yes">Launch actions about this record</property>
                 <property name="label" translatable="yes">Action</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-execute</property>
+                <property name="stock_id">tryton-executable</property>
                 <signal name="clicked" handler="on_but_action_clicked"/>
               </widget>
               <packing>
@@ -1281,8 +1270,9 @@
             <child>
               <widget class="GtkToolButton" id="but_print">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Print documents</property>
-                <property name="stock_id">gtk-print</property>
+                <property name="tooltip" translatable="yes">Print records</property>
+                <property name="stock_id">tryton-print</property>
+                <property name="label" translatable="yes">Print</property>
                 <signal name="clicked" handler="on_but_print_clicked"/>
               </widget>
               <packing>
@@ -1301,10 +1291,10 @@
             <child>
               <widget class="GtkToolButton" id="but_attach">
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Add an attachment to this resource</property>
+                <property name="tooltip" translatable="yes">Add an attachment to this record</property>
                 <property name="label" translatable="yes">Attachment(0)</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-paste</property>
+                <property name="stock_id">tryton-attachment</property>
                 <signal name="clicked" handler="on_but_attach_clicked"/>
               </widget>
               <packing>
@@ -1324,7 +1314,7 @@
               <widget class="GtkToolButton" id="but_close">
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Close this window</property>
-                <property name="stock_id">gtk-close</property>
+                <property name="stock_id">tryton-close</property>
                 <signal name="clicked" handler="on_but_close_clicked"/>
               </widget>
               <packing>
@@ -1389,6 +1379,7 @@
             <child>
               <widget class="GtkButton" id="request_new_but">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="tooltip" translatable="yes">Send a new request</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="response_id">0</property>
@@ -1396,7 +1387,7 @@
                 <child>
                   <widget class="GtkImage" id="image377">
                     <property name="visible">True</property>
-                    <property name="stock">gtk-new</property>
+                    <property name="stock">tryton-mail-message-new</property>
                   </widget>
                 </child>
               </widget>
@@ -1409,6 +1400,7 @@
             <child>
               <widget class="GtkButton" id="req_search_but">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="tooltip" translatable="yes">Read my Requests</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="response_id">0</property>
@@ -1416,7 +1408,7 @@
                 <child>
                   <widget class="GtkImage" id="image376">
                     <property name="visible">True</property>
-                    <property name="stock">gtk-find</property>
+                    <property name="stock">tryton-find</property>
                   </widget>
                 </child>
               </widget>
@@ -1501,7 +1493,7 @@
                                     <child>
                                       <widget class="GtkToolButton" id="button57">
                                         <property name="visible">True</property>
-                                        <property name="stock_id">gtk-add</property>
+                                        <property name="stock_id">tryton-list-add</property>
                                         <signal name="clicked" handler="on_but_sc_add_clicked"/>
                                       </widget>
                                       <packing>
@@ -1511,7 +1503,7 @@
                                     <child>
                                       <widget class="GtkToolButton" id="button58">
                                         <property name="visible">True</property>
-                                        <property name="stock_id">gtk-jump-to</property>
+                                        <property name="stock_id">tryton-go-jump</property>
                                         <signal name="clicked" handler="on_but_sc_go_clicked"/>
                                       </widget>
                                       <packing>
@@ -1521,7 +1513,7 @@
                                     <child>
                                       <widget class="GtkToolButton" id="button59">
                                         <property name="visible">True</property>
-                                        <property name="stock_id">gtk-remove</property>
+                                        <property name="stock_id">tryton-list-remove</property>
                                         <signal name="clicked" handler="on_but_sc_del_clicked"/>
                                       </widget>
                                       <packing>
@@ -1672,7 +1664,7 @@
                 <property name="visible">True</property>
                 <property name="xpad">15</property>
                 <property name="ypad">15</property>
-                <property name="stock">gtk-dialog-question</property>
+                <property name="stock">tryton-dialog-information</property>
                 <property name="icon_size">6</property>
               </widget>
               <packing>
@@ -2193,7 +2185,7 @@
                                 <child>
                                   <widget class="GtkImage" id="image353">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-go-forward</property>
+                                    <property name="stock">tryton-list-add</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2240,7 +2232,7 @@
                                 <child>
                                   <widget class="GtkImage" id="image354">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-go-back</property>
+                                    <property name="stock">tryton-list-remove</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2288,7 +2280,7 @@
                                 <child>
                                   <widget class="GtkImage" id="image355">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-goto-first</property>
+                                    <property name="stock">tryton-clear</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2298,7 +2290,7 @@
                                 <child>
                                   <widget class="GtkLabel" id="label113">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">_Nothing</property>
+                                    <property name="label" translatable="yes">Clear</property>
                                     <property name="use_underline">True</property>
                                   </widget>
                                   <packing>
@@ -2345,7 +2337,7 @@
                                 <child>
                                   <widget class="GtkImage" id="image2906">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-add</property>
+                                    <property name="stock">tryton-save</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2355,7 +2347,7 @@
                                 <child>
                                   <widget class="GtkLabel" id="label264">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Save List</property>
+                                    <property name="label" translatable="yes">Save Export</property>
                                     <property name="use_underline">True</property>
                                     <property name="justify">GTK_JUSTIFY_CENTER</property>
                                   </widget>
@@ -2394,7 +2386,7 @@
                                 <child>
                                   <widget class="GtkImage" id="image2">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-remove</property>
+                                    <property name="stock">tryton-delete</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2404,7 +2396,7 @@
                                 <child>
                                   <widget class="GtkLabel" id="label3">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Remove List</property>
+                                    <property name="label" translatable="yes">Delete Export</property>
                                     <property name="use_underline">True</property>
                                     <property name="justify">GTK_JUSTIFY_CENTER</property>
                                   </widget>
@@ -2694,7 +2686,7 @@ Save as CSV</property>
                                 <child>
                                   <widget class="GtkImage" id="image3409">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-floppy</property>
+                                    <property name="stock">tryton-save</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2748,11 +2740,45 @@ Save as CSV</property>
                       <widget class="GtkButton" id="attach_but_add">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label">gtk-add</property>
-                        <property name="use_stock">True</property>
                         <property name="focus_on_click">False</property>
                         <property name="response_id">0</property>
                         <signal name="clicked" handler="on_attach_but_add_activate"/>
+                        <child>
+                          <widget class="GtkAlignment" id="alignment_attach_but_add">
+                            <property name="width_request">78</property>
+                            <property name="visible">True</property>
+                            <property name="xscale">0</property>
+                            <property name="yscale">0</property>
+                            <child>
+                              <widget class="GtkHBox" id="hbox_attach_but_add">
+                                <property name="visible">True</property>
+                                <property name="spacing">2</property>
+                                <child>
+                                  <widget class="GtkImage" id="image_attach_but_add">
+                                    <property name="visible">True</property>
+                                    <property name="stock">tryton-list-add</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label_attach_but_add">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">Add</property>
+                                    <property name="use_underline">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -2778,7 +2804,7 @@ Save as CSV</property>
                                 <child>
                                   <widget class="GtkImage" id="image1649">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-add</property>
+                                    <property name="stock">tryton-list-add</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2812,10 +2838,44 @@ Save as CSV</property>
                       <widget class="GtkButton" id="attach_but_save">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label">gtk-save-as</property>
-                        <property name="use_stock">True</property>
                         <property name="response_id">0</property>
                         <signal name="clicked" handler="on_attach_but_save_activate"/>
+                        <child>
+                          <widget class="GtkAlignment" id="alignment_attach_but_save">
+                            <property name="width_request">78</property>
+                            <property name="visible">True</property>
+                            <property name="xscale">0</property>
+                            <property name="yscale">0</property>
+                            <child>
+                              <widget class="GtkHBox" id="hbox_attach_but_save">
+                                <property name="visible">True</property>
+                                <property name="spacing">2</property>
+                                <child>
+                                  <widget class="GtkImage" id="image_attach_but_save">
+                                    <property name="visible">True</property>
+                                    <property name="stock">tryton-save-as</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label_attach_but_save">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">Save As</property>
+                                    <property name="use_underline">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -2827,10 +2887,45 @@ Save as CSV</property>
                       <widget class="GtkButton" id="attach_but_del">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label">gtk-delete</property>
                         <property name="use_stock">True</property>
                         <property name="response_id">0</property>
                         <signal name="clicked" handler="on_attach_but_del_activate"/>
+                        <child>
+                          <widget class="GtkAlignment" id="alignment_attach_but_del">
+                            <property name="width_request">78</property>
+                            <property name="visible">True</property>
+                            <property name="xscale">0</property>
+                            <property name="yscale">0</property>
+                            <child>
+                              <widget class="GtkHBox" id="hbox_attach_but_del">
+                                <property name="visible">True</property>
+                                <property name="spacing">2</property>
+                                <child>
+                                  <widget class="GtkImage" id="image_attach_but_del">
+                                    <property name="visible">True</property>
+                                    <property name="stock">tryton-delete</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label_attach_but_del">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">Delete</property>
+                                    <property name="use_underline">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -3106,7 +3201,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                 <property name="visible">True</property>
                 <property name="xpad">15</property>
                 <property name="ypad">15</property>
-                <property name="stock">gtk-dialog-question</property>
+                <property name="stock">tryton-dialog-information</property>
                 <property name="icon_size">6</property>
               </widget>
               <packing>
@@ -3246,7 +3341,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="ypad">10</property>
-                    <property name="label" translatable="yes">&lt;i&gt;When editing a resource in a popup window&lt;/i&gt;</property>
+                    <property name="label" translatable="yes">&lt;i&gt;When editing a record in a popup window&lt;/i&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="justify">GTK_JUSTIFY_CENTER</property>
                   </widget>
@@ -3894,7 +3989,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="label">gtk-close</property>
+                <property name="label">tryton-close</property>
                 <property name="use_stock">True</property>
                 <property name="response_id">-7</property>
                 <signal name="clicked" handler="on_but_ok_pressed"/>
@@ -3987,7 +4082,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                                 <child>
                                   <widget class="GtkImage" id="image2901">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-go-forward</property>
+                                    <property name="stock">tryton-list-add</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -4034,7 +4129,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                                 <child>
                                   <widget class="GtkImage" id="image2902">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-go-back</property>
+                                    <property name="stock">tryton-list-remove</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -4082,7 +4177,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                                 <child>
                                   <widget class="GtkImage" id="image2904">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-goto-first</property>
+                                    <property name="stock">tryton-clear</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -4092,7 +4187,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                                 <child>
                                   <widget class="GtkLabel" id="label231">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">N_othing</property>
+                                    <property name="label" translatable="yes">Clear</property>
                                     <property name="use_underline">True</property>
                                   </widget>
                                   <packing>
@@ -4141,7 +4236,7 @@ Each version is given a distinguishing version number.  If the Program specifies
                                 <child>
                                   <widget class="GtkImage" id="image2905">
                                     <property name="visible">True</property>
-                                    <property name="stock">gtk-zoom-fit</property>
+                                    <property name="stock">tryton-find</property>
                                   </widget>
                                   <packing>
                                     <property name="expand">False</property>
@@ -4747,45 +4842,10 @@ Latin1</property>
                   <widget class="GtkButton" id="but_server_select">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">Change</property>
                     <property name="response_id">0</property>
                     <signal name="activate" handler="on_but_server_activate"/>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment50">
-                        <property name="visible">True</property>
-                        <property name="xscale">0</property>
-                        <property name="yscale">0</property>
-                        <child>
-                          <widget class="GtkHBox" id="hbox74">
-                            <property name="visible">True</property>
-                            <property name="spacing">2</property>
-                            <child>
-                              <widget class="GtkImage" id="image3411">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
-                                <property name="icon_size">2</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label292">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Change</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
-                  </widget>
+                 </widget>
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
@@ -4992,44 +5052,9 @@ Latin1</property>
                   <widget class="GtkButton" id="but_server_change">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">Change</property>
                     <property name="response_id">0</property>
                     <signal name="activate" handler="on_but_server_activate"/>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment51">
-                        <property name="visible">True</property>
-                        <property name="xscale">0</property>
-                        <property name="yscale">0</property>
-                        <child>
-                          <widget class="GtkHBox" id="hbox75">
-                            <property name="visible">True</property>
-                            <property name="spacing">2</property>
-                            <child>
-                              <widget class="GtkImage" id="image3412">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
-                                <property name="icon_size">2</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label293">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Change</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
@@ -5329,43 +5354,8 @@ Latin1</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="response_id">0</property>
+                    <property name="label" translatable="yes">Change</property>
                     <signal name="activate" handler="on_but_server_activate"/>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment49">
-                        <property name="visible">True</property>
-                        <property name="xscale">0</property>
-                        <property name="yscale">0</property>
-                        <child>
-                          <widget class="GtkHBox" id="hbox73">
-                            <property name="visible">True</property>
-                            <property name="spacing">2</property>
-                            <child>
-                              <widget class="GtkImage" id="image3410">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
-                                <property name="icon_size">2</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label291">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Change</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
@@ -5541,43 +5531,8 @@ Latin1</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="response_id">0</property>
+                    <property name="label" translatable="yes">Change</property>
                     <signal name="activate" handler="on_but_server_activate"/>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment53">
-                        <property name="visible">True</property>
-                        <property name="xscale">0</property>
-                        <property name="yscale">0</property>
-                        <child>
-                          <widget class="GtkHBox" id="hbox76">
-                            <property name="visible">True</property>
-                            <property name="spacing">2</property>
-                            <child>
-                              <widget class="GtkImage" id="image3484">
-                                <property name="visible">True</property>
-                                <property name="stock">gtk-network</property>
-                                <property name="icon_size">2</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label46546">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">Change</property>
-                                <property name="use_underline">True</property>
-                              </widget>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </widget>
-                        </child>
-                      </widget>
-                    </child>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
@@ -5766,7 +5721,7 @@ Latin1</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
-                <property name="label">gtk-close</property>
+                <property name="label">tryton-close</property>
                 <property name="use_stock">True</property>
                 <property name="response_id">-7</property>
               </widget>
@@ -5801,7 +5756,7 @@ Latin1</property>
                 <property name="yalign">0</property>
                 <property name="xpad">10</property>
                 <property name="ypad">16</property>
-                <property name="stock">gtk-dialog-info</property>
+                <property name="stock">tryton-dialog-information</property>
                 <property name="icon_size">6</property>
               </widget>
               <packing>
@@ -5891,7 +5846,7 @@ Latin1</property>
                         <child>
                           <widget class="GtkImage" id="image4164">
                             <property name="visible">True</property>
-                            <property name="stock">gtk-close</property>
+                            <property name="stock">tryton-close</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -5935,7 +5890,7 @@ Latin1</property>
                         <child>
                           <widget class="GtkImage" id="image4163">
                             <property name="visible">True</property>
-                            <property name="stock">gtk-go-forward</property>
+                            <property name="stock">tryton-go-next</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -5986,7 +5941,7 @@ Latin1</property>
               <widget class="GtkImage" id="image4169">
                 <property name="width_request">33</property>
                 <property name="visible">True</property>
-                <property name="stock">gtk-dialog-info</property>
+                <property name="stock">tryton-dialog-information</property>
                 <property name="icon_size">6</property>
               </widget>
             </child>
@@ -6001,7 +5956,7 @@ Latin1</property>
                 <property name="label" translatable="yes">&lt;b&gt;
 Write concurrency warning:
 &lt;/b&gt;
-This document has been modified while you were editing it.
+This record has been modified while you were editing it.
   Choose:
    - "Cancel" to cancel saving.
    - "Compare" to see the modified version.
@@ -6051,7 +6006,7 @@ This document has been modified while you were editing it.
                         <child>
                           <widget class="GtkImage" id="image4171">
                             <property name="visible">True</property>
-                            <property name="stock">gtk-find-and-replace</property>
+                            <property name="stock">tryton-find-and-replace</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -6097,7 +6052,7 @@ This document has been modified while you were editing it.
                         <child>
                           <widget class="GtkImage" id="image4170">
                             <property name="visible">True</property>
-                            <property name="stock">gtk-floppy</property>
+                            <property name="stock">tryton-save</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>

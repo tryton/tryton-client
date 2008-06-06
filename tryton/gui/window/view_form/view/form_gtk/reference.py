@@ -45,7 +45,7 @@ class Reference(WidgetInterface):
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
-        img_new.set_from_stock('gtk-new', gtk.ICON_SIZE_BUTTON)
+        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
@@ -55,9 +55,9 @@ class Reference(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         img_open = gtk.Image()
-        img_open.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
+        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_activate)
@@ -259,11 +259,11 @@ class Reference(WidgetInterface):
                     common.process_exception(exception, self._window)
                     name = '???'
             self.wid_text.set_text(name)
-            img.set_from_stock('gtk-open', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
         else:
             self.wid_text.set_text('')
-            img.set_from_stock('gtk-find', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
             self.but_open.set_image(img)
         self.changed = True
 

@@ -163,7 +163,7 @@ class Parse(object):
         self.add_widget_end = []
 
         img = gtk.Image()
-        img.set_from_stock('gtk-add', gtk.ICON_SIZE_BUTTON)
+        img.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
         self.button_param.set_image(img)
         self.button_param.set_relief(gtk.RELIEF_NONE)
         self.button_param.set_alignment(0.5, 0.5)
@@ -241,11 +241,11 @@ class Form(object):
         img = gtk.Image()
         if self._hide:
             self.show()
-            img.set_from_stock('gtk-remove', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
             widget.set_image(img)
         else:
             self.hide()
-            img.set_from_stock('gtk-add', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
             widget.set_image(img)
 
     def limit_changed(self, widget):

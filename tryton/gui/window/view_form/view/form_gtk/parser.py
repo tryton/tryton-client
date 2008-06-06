@@ -226,7 +226,7 @@ class _container(object):
         if translate and hasattr(widget, 'pack_start'):
             button = gtk.Button()
             img = gtk.Image()
-            img.set_from_stock('gtk-preferences', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-locale', gtk.ICON_SIZE_BUTTON)
             button.set_image(img)
             button.set_relief(gtk.RELIEF_NONE)
             self.trans_box.append((button, name, fname, widget.get_children()[0]))
