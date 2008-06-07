@@ -116,7 +116,7 @@ class PySocket:
                 self.ssl_sock = socket.ssl(self.sock)
 
     def send(self, msg, exception=False, traceback=None):
-        msg = cPickle.dumps([msg, traceback])
+        msg = cPickle.dumps([msg, traceback], protocol=2)
         size = len(msg)
         if self.ssl:
             self.ssl_sock.write('%8d' % size)
