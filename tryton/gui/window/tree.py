@@ -89,6 +89,7 @@ class Tree(SignalEvent):
             'but_action': self.sig_action,
             'but_print': self.sig_print,
             'but_save_as': self.sig_save_as,
+            'but_close': self.sig_close,
         }
         signals = {
             'on_but_sc_go_clicked': self.sc_go,
@@ -316,3 +317,6 @@ class Tree(SignalEvent):
                 self.tree_res.fields, [], parent=self.window,
                 context=self.context)
         win.run()
+
+    def sig_close(self):
+        return True

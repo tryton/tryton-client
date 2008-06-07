@@ -44,8 +44,12 @@ class Board(SignalEvent):
 
         self.handlers = {
             'but_reload': self.sig_reload,
+            'but_close': self.sig_close,
         }
 
     def sig_reload(self, test_modified=True):
         self.board.reload()
+        return True
+
+    def sig_close(self):
         return True
