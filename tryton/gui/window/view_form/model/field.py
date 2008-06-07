@@ -453,8 +453,12 @@ class ReferenceField(CharField):
 
     def get(self, model, check_load=True, readonly=True, modified=False):
         if model.value[self.name]:
-            return '%s,%d' % (model.value[self.name][0],
-                    model.value[self.name][1][0])
+            if isinstance(model.value[self.name][1], (list, tuple)):
+                return '%s,%s' % (model.value[self.name][0],
+                        str(model.value[self.name][1][0]))
+            else:
+                return '%s,%s' % (model.value[self.name][0],
+                        str(model.value[self.name][1]))
         return False
 
     def set_client(self, model, value, test_state=False, force_change=False):
@@ -471,8 +475,11 @@ class ReferenceField(CharField):
             model.value[self.name] = False
             return
         ref_model, ref_id = value.split(',', 1)
-        ref_id = eval(ref_id)
-        if isinstance(ref_id, (int, basestring, long)):
+        try:
+            ref_id = eval(ref_id)
+        except:
+            pass
+        if isinstance(ref_id, (int, basestring, long)) and ref_model:
             rpc2 = RPCProxy(ref_model)
             try:
                 result = rpc2.name_get([ref_id], rpc.CONTEXT)

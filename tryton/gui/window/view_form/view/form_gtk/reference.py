@@ -248,7 +248,9 @@ class Reference(WidgetInterface):
         if not value:
             model, (obj_id, name) = '', (0, '')
         else:
-            model, (obj_id, name) = value
+            model, obj_id = value
+            if isinstance(obj_id, (list, tuple)):
+                obj_id, name = obj_id
         if model:
             child.set_text(self._selection2[model])
             if not name and obj_id:
