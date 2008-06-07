@@ -470,16 +470,20 @@ class ReferenceField(CharField):
         if not value:
             model.value[self.name] = False
             return
-        ref_model, ref_id = value.split(',')
-        rpc2 = RPCProxy(ref_model)
-        try:
-            result = rpc2.name_get([ref_id], rpc.CONTEXT)
-        except:
-            return
-        if result:
-            model.value[self.name] = ref_model, result[0]
+        ref_model, ref_id = value.split(',', 1)
+        ref_id = eval(ref_id)
+        if isinstance(ref_id, (int, basestring, long)):
+            rpc2 = RPCProxy(ref_model)
+            try:
+                result = rpc2.name_get([ref_id], rpc.CONTEXT)
+            except:
+                return
+            if result:
+                model.value[self.name] = ref_model, result[0]
+            else:
+                model.value[self.name] = ref_model, (0, '')
         else:
-            model.value[self.name] = ref_model, (0, '')
+            model.value[self.name] = ref_model, ref_id
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
