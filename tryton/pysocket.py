@@ -1,6 +1,9 @@
 import socket
 import cPickle
-import cStringIO
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 DNS_CACHE = {}
 
@@ -161,7 +164,7 @@ class PySocket:
             if chunk == '':
                 raise RuntimeError, "socket connection broken"
             msg = msg + chunk
-        msgio = cStringIO.StringIO(msg)
+        msgio = StringIO.StringIO(msg)
         unpickler = cPickle.Unpickler(msgio)
         unpickler.find_global = checkfunction
         res = unpickler.load()
