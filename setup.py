@@ -32,6 +32,7 @@ setup(name=PACKAGE,
     data_files=[
         ('share/pixmaps', [
             'share/pixmaps/*.png',
+            'share/pixmaps/*.svg',
             ]),
         ('share/tryton', ['share/tryton/tryton.glade', 'share/tryton/tipoftheday.txt']),
     ],
