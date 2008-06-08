@@ -198,6 +198,9 @@ class EditableTreeView(gtk.TreeView):
                 self.screen.current_model = False
             if not path[0]:
                 self.screen.current_model = False
+            if path[0] == len(self.screen.models.models) \
+                    and path[0]:
+                path = (path[0] - 1,)
             self.screen.display()
             self.set_cursor(path, column, False)
         elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
