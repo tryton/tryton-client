@@ -348,8 +348,10 @@ class Many2One(WidgetInterface):
     def sig_key_press(self, widget, event, *args):
         if event.keyval == gtk.keysyms.F3:
             self.sig_new(widget, event)
+            return True
         elif event.keyval==gtk.keysyms.F2:
             self.sig_edit(widget)
+            return True
         elif event.keyval  == gtk.keysyms.Tab:
             if self._view.modelfield.get(self._view.model) or \
                     not self.wid_text.get_text():
