@@ -11,12 +11,10 @@ class FloatTime(WidgetInterface):
                 attrs=attrs)
 
         self.widget = gtk.Entry()
-        self.widget.set_max_length(11)
-        self.widget.set_visibility(not attrs.get('invisible', False))
-        self.widget.set_width_chars(5)
+        self.widget.set_alignment(1.0)
         self.widget.set_property('activates_default', True)
 
-        self.widget.connect('button_press_event', self._menu_open)
+        self.widget.connect('populate-popup', self._populate_popup)
         self.widget.connect('activate', self.sig_activate)
         self.widget.connect('focus-in-event', lambda x, y: self._focus_in())
         self.widget.connect('focus-out-event', lambda x, y: self._focus_out())

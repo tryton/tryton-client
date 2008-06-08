@@ -175,6 +175,22 @@ class WidgetInterface(object):
             menu.popup(None, None, None, event.button, event.time)
             return True
 
+    def _populate_popup(self, widget, menu):
+        menu_entries = []
+        menu_entries.append((None, None, None))
+        menu_entries += self._menu_entries
+        for stock_id, callback, sensitivity in menu_entries:
+            if stock_id:
+                item = gtk.ImageMenuItem(stock_id)
+                if callback:
+                    item.connect("activate", callback)
+                item.set_sensitive(sensitivity)
+            else:
+                item = gtk.SeparatorMenuItem()
+            item.show()
+            menu.append(item)
+        return True
+
     def _focus_in(self):
         pass
 

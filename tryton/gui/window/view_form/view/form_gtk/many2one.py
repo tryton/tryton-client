@@ -398,6 +398,8 @@ class Many2One(WidgetInterface):
                 (self.model_type, 0), rpc.CONTEXT)
         menu_entries = []
         menu_entries.append((None, None, None))
+        menu_entries += self._menu_entries
+        menu_entries.append((None, None, None))
         menu_entries.append((_('Actions'),
             lambda x: self.click_and_action('form_action'),0))
         menu_entries.append((_('Reports'),
