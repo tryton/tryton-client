@@ -39,7 +39,7 @@ class Parse(object):
 
                 cell = gtk.CellRendererText()
                 cell.set_fixed_height_from_font(1)
-                if field_type in ('float', 'numeric', 'integer'):
+                if field_type in ('float', 'numeric', 'integer', 'float_time'):
                     cell.set_property('xalign', 1.0)
                 column.pack_start(cell, expand=False)
                 column.add_attribute(cell, 'text', self.pos)
