@@ -197,7 +197,8 @@ class Char(object):
         cell.set_property('text', text)
         color = self.get_color(model)
         cell.set_property('foreground', str(color))
-        if self.attrs['type'] in ('float', 'integer', 'boolean', 'numeric'):
+        if self.attrs['type'] in ('float', 'integer', 'boolean', 'numeric',
+                'float_time'):
             align = 1
         else:
             align = 0
