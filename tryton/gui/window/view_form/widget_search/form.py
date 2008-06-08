@@ -79,13 +79,11 @@ class Parse(object):
         self.focusable = None
         self.add_widget_end = []
         self.container = None
-        self.button_param = gtk.Button()
         self.spin_limit = gtk.SpinButton(climb_rate=1, digits=0)
         self.spin_offset = gtk.SpinButton(climb_rate=1, digits=0)
         self.title = 'Form'
         self.notebooks = []
         self.dict_widget = {}
-        self.hb_param = None
 
     def _psr_start(self, name, attrs):
 
@@ -111,7 +109,7 @@ class Parse(object):
         widget_act = WIDGETS_TYPE[ftype][0](str(attrs['name']), self.parent,
                 self.fields[attrs['name']])
         if 'string' in self.fields[str(attrs['name'])]:
-            label = self.fields[str(attrs['name'])]['string']+' :'
+            label = self.fields[str(attrs['name'])]['string'] + _(':')
         else:
             label = None
         size = WIDGETS_TYPE[ftype][1]
@@ -158,24 +156,27 @@ class Parse(object):
         self.container = _container(max_width)
 
         psr.Parse(xml_data)
+
+        vbox = gtk.VBox()
+        vbox.pack_start(self.container.pop())
+
+        expander = gtk.Expander(_('Advanced Search'))
+        vbox2 = gtk.VBox()
+
+        self.container = _container(max_width)
+        self.container.new(self.col)
         for i in self.add_widget_end:
             self.add_widget(*i)
         self.add_widget_end = []
 
-        img = gtk.Image()
-        img.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
-        self.button_param.set_image(img)
-        self.button_param.set_relief(gtk.RELIEF_NONE)
-        self.button_param.set_alignment(0.5, 0.5)
-        table = self.container.get()
-        table.attach(self.button_param, 0, 1, 0, 1,
-                yoptions=gtk.FILL, xoptions=gtk.FILL, ypadding=2, xpadding=0)
+        vbox2.pack_start(self.container.pop())
 
-        self.hb_param = self.container.wid_add(self.add_parameters(), length=8,
-                name=_('Parameters :'))
+        vbox2.pack_start(self.add_parameters())
+        vbox2.show_all()
+        expander.add(vbox2)
+        vbox.pack_start(expander)
 
-
-        return (self.dict_widget, self.container.pop())
+        return (self.dict_widget, vbox)
 
 
 class Form(object):
@@ -196,9 +197,6 @@ class Form(object):
             width = self.parent.size_request()[0]
         (self.widgets, self.widget) = parser.parse(xml, width)
         self.widget.show_all()
-        self.hb_param = parser.hb_param
-        self.button_param = parser.button_param
-        self.button_param.connect('clicked', self.toggle)
         self.spin_limit = parser.spin_limit
         self.spin_limit.connect('value-changed', self.limit_changed)
         self.spin_limit.set_activates_default(True)
@@ -207,8 +205,6 @@ class Form(object):
         self.focusable = parser.focusable
         self.id = 0
         self.name = parser.title
-        self._hide = True
-        self.hide()
         for i in domain:
             if i[0] in self.widgets:
                 if i[1] == '=':
@@ -222,31 +218,6 @@ class Form(object):
         self.id = 0
         for i in self.widgets.values():
             i[0].clear()
-
-    def show(self):
-        for i, widget, value in  self.widgets.values():
-            if value >= 2:
-                widget.show()
-        self.hb_param.show()
-        self._hide = False
-
-    def hide(self):
-        for i, widget, value in  self.widgets.values():
-            if value >= 2:
-                widget.hide()
-        self.hb_param.hide()
-        self._hide = True
-
-    def toggle(self, widget):
-        img = gtk.Image()
-        if self._hide:
-            self.show()
-            img.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
-            widget.set_image(img)
-        else:
-            self.hide()
-            img.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
-            widget.set_image(img)
 
     def limit_changed(self, widget):
         self.spin_offset.set_increments(step=self.spin_limit.get_value(),
