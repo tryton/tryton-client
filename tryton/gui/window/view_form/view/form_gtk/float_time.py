@@ -22,9 +22,13 @@ class FloatTime(WidgetInterface):
     def text_to_float(self, text):
         try:
             if text and ':' in text:
-                return round(int(text.split(':')[0]) + \
-                        int(text.split(':')[1]) / 60.0,2)
+                # assume <hours>:<minutes>
+                h, m = text.split(':')
+                h = h or 0
+                m = m or 0
+                return round(int(h) + int(m)/60.0, 2)
             else:
+                # try float in locale notion
                 return locale.atof(text)
         except:
             return 0.0
