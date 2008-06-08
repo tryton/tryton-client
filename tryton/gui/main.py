@@ -256,9 +256,10 @@ class DBCreate(object):
             try:
                 users = rpc.db_exec(host, int(port), 'create', passwd, dbname,
                             langreal)
-            except:
+            except Exception, exception:
                 common.warning(_('The server crashed during installation.\n' \
-                        'We suggest you to drop this database.'), parent,
+                        'We suggest you to drop this database.\n' \
+                        'Error message:\n') + str(exception[0]), parent,
                         _("Error during database creation!"))
                 return False
             dialog = glade.XML(GLADE, "dia_dbcreate_ok", gettext.textdomain())
