@@ -382,6 +382,7 @@ class Form(SignalEvent):
         statusbar = self.glade.get_widget('stat_form')
         cid = statusbar.get_context_id('message')
         statusbar.push(cid, msg)
+        self.message_state('')
 
     def _attachment_count(self, screen, signal_data):
         self.signal('attachment-count', signal_data)

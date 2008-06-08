@@ -174,6 +174,10 @@ class Screen(SignalEvent):
                     signal[1], *args)
 
     def _model_changed(self, model_group, model):
+        if self.form:
+            self.form.message_state('')
+        if self.parent:
+            self.parent.signal('record-changed', self.parent)
         if (not model) or (model == self.current_model):
             self.display()
 
