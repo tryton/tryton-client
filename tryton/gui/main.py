@@ -764,7 +764,8 @@ class Main(object):
     def sig_win_menu(self, widget=None, quiet=True):
         for page in range(len(self.pages)):
             if self.pages[page].model == 'ir.ui.menu':
-                self.notebook.set_current_page(page)
+                page_num = self.notebook.page_num(self.pages[page].widget)
+                self.notebook.set_current_page(page_num)
                 return True
         res = self.sig_win_new(widget, menu_type='menu', quiet=quiet)
         if not res:
