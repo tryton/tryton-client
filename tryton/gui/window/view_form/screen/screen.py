@@ -342,8 +342,12 @@ class Screen(SignalEvent):
                 and not (hasattr(self.current_view.widget_tree, 'editable') \
                     and self.current_view.widget_tree.editable)) \
                 or self.current_view.view_type == 'graph'):
-            while self.current_view.view_type != 'form':
+            for i in range(len(self.views)):
                 self.switch_view()
+                if self.current_view.view_type == 'form':
+                    break
+            if self.current_view.view_type != 'form':
+                return None
         ctx = self.context.copy()
         ctx.update(context)
         model = self.models.model_new(default, self.domain, ctx)
