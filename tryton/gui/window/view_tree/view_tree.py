@@ -217,7 +217,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         res = value or ''
         if (column in self.pixbufs) and res:
             return self.treeview.render_icon(stock_id=res,
-                    size=gtk.ICON_SIZE_MENU, detail=None)
+                    size=gtk.ICON_SIZE_BUTTON, detail=None)
         return res
 
     def on_iter_next(self, node):
