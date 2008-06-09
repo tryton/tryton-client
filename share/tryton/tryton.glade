@@ -1422,7 +1422,7 @@
               <widget class="GtkImage" id="secure_img">
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">SSL connection</property>
-                <property name="stock">gtk-dialog-authentication</property>
+                <property name="stock">tryton-lock</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
