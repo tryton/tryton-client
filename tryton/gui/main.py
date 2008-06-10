@@ -443,6 +443,7 @@ class Main(object):
             'on_send_request_activate': self.sig_request_new,
             'on_request_wait_activate': self.sig_request_wait,
             'on_opt_save_activate': lambda x: CONFIG.save(),
+            'on_menubar_default_activate': lambda x: self.sig_menubar('default'),
             'on_menubar_icons_activate': lambda x: self.sig_menubar('icons'),
             'on_menubar_text_activate': lambda x: self.sig_menubar('text'),
             'on_menubar_both_activate': lambda x: self.sig_menubar('both'),
@@ -524,7 +525,7 @@ class Main(object):
         }
         self.glade.get_widget('menubar_'+(CONFIG['client.toolbar'] or \
                 'both')).set_active(True)
-        self.sig_menubar(CONFIG['client.toolbar'] or 'both')
+        self.sig_menubar(CONFIG['client.toolbar'] or 'default')
         self.glade.get_widget('opt_form_tab_' + (CONFIG['client.form_tab'] or \
                 'left')).set_active(True)
         Main.sig_form_tab(CONFIG['client.form_tab'] or 'left')
@@ -594,7 +595,9 @@ class Main(object):
 
     def sig_menubar(self, option):
         CONFIG['client.toolbar'] = option
-        if option == 'both':
+        if option == 'default':
+            self.toolbar.set_style(False)
+        elif option == 'both':
             self.toolbar.set_style(gtk.TOOLBAR_BOTH)
         elif option == 'text':
             self.toolbar.set_style(gtk.TOOLBAR_TEXT)

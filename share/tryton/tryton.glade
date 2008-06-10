@@ -821,10 +821,19 @@
                             <child>
                               <widget class="GtkMenu" id="menubar_menu">
                                 <child>
+                                  <widget class="GtkRadioMenuItem" id="menubar_default">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">_Default</property>
+                                    <property name="use_underline">True</property>
+                                    <signal name="activate" handler="on_menubar_default_activate"/>
+                                  </widget>
+                                </child>
+                                <child>
                                   <widget class="GtkRadioMenuItem" id="menubar_both">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">Text _and Icons</property>
                                     <property name="use_underline">True</property>
+                                    <property name="group">menubar_default</property>
                                     <signal name="activate" handler="on_menubar_both_activate"/>
                                   </widget>
                                 </child>
@@ -833,7 +842,7 @@
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">_Icons only</property>
                                     <property name="use_underline">True</property>
-                                    <property name="group">menubar_both</property>
+                                    <property name="group">menubar_default</property>
                                     <signal name="activate" handler="on_menubar_icons_activate"/>
                                   </widget>
                                 </child>
@@ -842,7 +851,7 @@
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">_Text only</property>
                                     <property name="use_underline">True</property>
-                                    <property name="group">menubar_both</property>
+                                    <property name="group">menubar_default</property>
                                     <signal name="activate" handler="on_menubar_text_activate"/>
                                   </widget>
                                 </child>
