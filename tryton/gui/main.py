@@ -26,6 +26,7 @@ def _refresh_dblist(db_widget, host, port, dbtoload=None):
     liststore = db_widget.get_model()
     liststore.clear()
     result = rpc.db_list(host, port)
+    Main.get_main().refresh_ssl()
     if result is None:
         return None
     for db_num, dbname in enumerate(result):
@@ -39,6 +40,7 @@ def _refresh_langlist(lang_widget, host, port):
     liststore = lang_widget.get_model()
     liststore.clear()
     lang_list = rpc.db_exec(host, port, 'list_lang')
+    Main.get_main().refresh_ssl()
     for key, val in lang_list:
         liststore.insert(0, (val, key))
     lang_widget.set_active(0)
@@ -167,6 +169,8 @@ class DBLogin(object):
         if res != gtk.RESPONSE_OK:
             parent.present()
             win.destroy()
+            rpc.logout()
+            Main.get_main().refresh_ssl()
             raise Exception('QueryCanceled')
         parent.present()
         win.destroy()
@@ -256,6 +260,7 @@ class DBCreate(object):
             try:
                 users = rpc.db_exec(host, int(port), 'create', passwd, dbname,
                             langreal)
+                Main.get_main().refresh_ssl()
             except Exception, exception:
                 common.warning(_('The server crashed during installation.\n' \
                         'We suggest you to drop this database.\n' \
@@ -294,6 +299,9 @@ class DBCreate(object):
 
                 self.sig_login(dbname=dbname)
             return True
+        else:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
 
 
 class Tips(object):
@@ -399,7 +407,6 @@ class Main(object):
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
         self.secure_img = self.glade.get_widget('secure_img')
-        self.secure_img.hide()
 
         window = self.glade.get_widget('win_main')
         window.connect("destroy", Main.sig_quit)
@@ -687,15 +694,12 @@ class Main(object):
         self.window.present()
         self.sig_logout(widget, disconnect=False)
         log_response = rpc.login(*res)
+        self.refresh_ssl()
         if log_response > 0:
             CONFIG.save()
             menu_id = self.sig_win_menu(quiet=False)
             if menu_id:
                 self.sig_home_new(quiet=True, except_id=menu_id)
-            if rpc.SECURE:
-                self.secure_img.show()
-            else:
-                self.secure_img.hide()
             self.request_set()
         elif log_response == -1:
             common.message(_('Connection error !\n' \
@@ -731,7 +735,6 @@ class Main(object):
         self.sb_username.push(sb_id, _('Not logged !'))
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
-        self.secure_img.hide()
         self.shortcut_unset()
         self.glade.get_widget('but_menu').set_sensitive(False)
         self.glade.get_widget('user').set_sensitive(False)
@@ -741,7 +744,14 @@ class Main(object):
         self.glade.get_widget('req_search_but').set_sensitive(False)
         if disconnect:
             rpc.logout()
+        self.refresh_ssl()
         return True
+
+    def refresh_ssl(self):
+        if rpc.SECURE:
+            self.secure_img.show()
+        else:
+            self.secure_img.hide()
 
     def sig_tips(self, *args):
         Tips(self.window)
@@ -795,6 +805,7 @@ class Main(object):
                     'you have an action defined for your user.'),
                     'Access Denied!', self.window)
             rpc.logout()
+            self.refresh_ssl()
             return False
         act_id = prefs[menu_type]
         if except_id and act_id == except_id:
@@ -955,12 +966,15 @@ class Main(object):
             return False
         url, dbname, passwd = self._choose_db_select(_('Delete a database'))
         if not dbname:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
             return
 
         host, port = url.rsplit(':', 1)
 
         try:
             rpc.db_exec(host, int(port), 'drop', passwd, dbname)
+            self.refresh_ssl()
         except:
             common.message(_('Unable to drop the database!'),
                     parent=self.window)
@@ -972,6 +986,8 @@ class Main(object):
         filename = common.file_selection(_('Open...'), parent=self.window,
                 preview=False)
         if not filename:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
             return
 
         url, dbname, passwd = self._choose_db_ent()
@@ -982,12 +998,16 @@ class Main(object):
             host, port = url.rsplit(':' , 1)
             res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
                     data_b64)
+            self.refresh_ssl()
             if res:
                 common.message(_("Database restored successfully!"),
                         parent=self.window)
             else:
                 common.message(_('Database restore failed!'),
                         parent=self.window)
+        else:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
 
     def sig_db_password(self, widget):
         dialog = glade.XML(GLADE, "dia_passwd_change",
@@ -1022,12 +1042,18 @@ class Main(object):
             else:
                 rpc.db_exec(host, port, 'change_admin_password',
                         old_passwd, new_passwd)
+                self.refresh_ssl()
+        else:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
         self.window.present()
         win.destroy()
 
     def sig_db_dump(self, widget):
         url, dbname, passwd = self._choose_db_select(_('Backup a database'))
         if not dbname:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
             return
         filename = common.file_selection(_('Save As...'),
                 action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window,
@@ -1036,12 +1062,16 @@ class Main(object):
         if filename:
             host, port = url.rsplit(':', 1)
             dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
+            self.refresh_ssl()
             dump = base64.decodestring(dump_b64)
             file_ = file(filename, 'wb')
             file_.write(dump)
             file_.close()
             common.message(_("Database backuped successfully !"),
                     parent=self.window)
+        else:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
 
     def _choose_db_select(self, title=_("Backup a database")):
         def refreshlist(widget, db_widget, label, host, port):

@@ -15,7 +15,7 @@ SECURE = False
 _SEMAPHORE = Semaphore()
 
 def db_list(host, port):
-    global _SOCK
+    global _SOCK, SECURE
     _SEMAPHORE.acquire()
     try:
         try:
@@ -34,6 +34,7 @@ def db_list(host, port):
                 else:
                     raise
             res = _SOCK.receive()
+            SECURE = _SOCK.ssl
         finally:
             _SEMAPHORE.release()
         return res
@@ -42,7 +43,7 @@ def db_list(host, port):
         return None
 
 def db_exec(host, port, method, *args):
-    global _SOCK
+    global _SOCK, SECURE
     _SEMAPHORE.acquire()
     try:
         try:
@@ -54,6 +55,7 @@ def db_exec(host, port, method, *args):
                 _SOCK.connect(host, port)
             _SOCK.send(('db', method) + args)
             res = _SOCK.receive()
+            SECURE = _SOCK.ssl
         finally:
             _SEMAPHORE.release()
         return res
@@ -96,7 +98,7 @@ def login(username, password, host, port, database):
     return 1
 
 def logout():
-    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE
+    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
     if _SOCK:
         _SOCK.disconnect()
         _SOCK = None
@@ -105,6 +107,7 @@ def logout():
     _SESSION = ''
     _DATABASE = ''
     _VIEW_CACHE = {}
+    SECURE = False
 
 def context_reload():
     global CONTEXT, TIMEZONE
