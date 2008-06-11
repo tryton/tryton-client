@@ -198,7 +198,7 @@ class WinExport(object):
 
     def remove_predef(self, widget):
         sel = self.pref_export.get_selection().get_selected()
-        if sel == None:
+        if sel is None:
             return None
         (model, i) = sel
         if not i:

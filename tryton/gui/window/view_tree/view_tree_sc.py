@@ -46,7 +46,7 @@ class ViewTreeSC(object):
 
     def value_get(self, col):
         sel = self.tree.get_selection().get_selected()
-        if sel == None:
+        if sel is None:
             return None
         (model, i) = sel
         if not i:
@@ -55,6 +55,6 @@ class ViewTreeSC(object):
 
     def sel_id_get(self):
         res = self.value_get(0)
-        if res != None:
+        if res is not None:
             return int(res)
         return None

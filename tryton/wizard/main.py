@@ -118,7 +118,7 @@ class Wizard(object):
                     break
                 (state, new_data) = res2
                 for data in new_data:
-                    if new_data[data] == None:
+                    if new_data[data] is None:
                         del new_data[data]
                 datas['form'].update(new_data)
                 del new_data

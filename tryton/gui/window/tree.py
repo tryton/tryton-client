@@ -271,7 +271,7 @@ class Tree(SignalEvent):
 
     def sc_del(self, widget):
         obj_id = self.tree_sc.sel_id_get()
-        if obj_id != None:
+        if obj_id is not None:
             sc_id = int(self.tree_sc.value_get(2))
             try:
                 rpc.execute('object', 'execute', 'ir.ui.view_sc',
@@ -301,7 +301,7 @@ class Tree(SignalEvent):
 
     def sc_go(self, widget=None, *args):
         obj_id = self.tree_sc.sel_id_get()
-        if obj_id != None:
+        if obj_id is not None:
             self.sig_action(keyword='tree_open', obj_id=obj_id)
 
     def ids_get(self):

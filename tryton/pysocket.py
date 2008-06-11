@@ -1,4 +1,5 @@
 import socket
+# can't use/fall-back pickle due to different interface :-(
 import cPickle
 try:
     import cStringIO as StringIO
@@ -166,6 +167,7 @@ class PySocket:
             msg = msg + chunk
         msgio = StringIO.StringIO(msg)
         unpickler = cPickle.Unpickler(msgio)
+        # cPickle mechanism to import instances (pickle differs here)
         unpickler.find_global = checkfunction
         res = unpickler.load()
         if exception:

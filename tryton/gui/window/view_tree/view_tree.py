@@ -231,11 +231,11 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def on_iter_children(self, node):
         '''returns the first child of this node'''
-        if node == None:
+        if node is None:
             return [(0, self.tree)]
         node = node[:]
         (i, values) = node[-1]
-        if values[i][2] == None:
+        if values[i][2] is None:
             self._node_expand(values[i])
         if values[i][2] == []:
             return None
@@ -249,22 +249,22 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def on_iter_n_children(self, node):
         '''returns the number of children of this node'''
-        if node == None:
+        if node is None:
             return len(self.tree)
         (i, values) = node[-1]
-        if values[i][2] == None:
+        if values[i][2] is None:
             self._node_expand(values[i])
         return len(values[i][2])
 
     def on_iter_nth_child(self, node, child):
         '''returns the nth child of this node'''
-        if node == None:
+        if node is None:
             if child < len(self.tree):
                 return [(child, self.tree)]
             return None
         node = node[:]
         (i, values) = node[-1]
-        if values[i][2] == None:
+        if values[i][2] is None:
             self._node_expand(values[i])
         if child < len(values[i][2]):
             node.append((child, values[i][2]))
@@ -273,7 +273,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def on_iter_parent(self, node):
         '''returns the parent of this node'''
-        if node == None:
+        if node is None:
             return None
         return node[:-1]
 
@@ -300,7 +300,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     if node[0] == val:
                         break
                     path[-1] += 1
-                if (node[2] == None) and (ids != []):
+                if (node[2] is None) and (ids != []):
                     return None
                 tree = node[2]
             return (tuple(path), node)
@@ -379,7 +379,7 @@ class ViewTree(object):
 
     def value_get(self, col):
         sel = self.view.get_selection().get_selected_rows()
-        if sel == None:
+        if sel is None:
             return None
         (model, i) = sel
         if not i:
