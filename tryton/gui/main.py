@@ -639,6 +639,10 @@ class Main(object):
             if 'language_direction' in rpc.CONTEXT:
                 translate.set_language_direction(
                         rpc.CONTEXT['language_direction'])
+            prefs = rpc.execute('object', 'execute', 'res.user',
+                    'get_preferences', False, rpc.CONTEXT)
+            sb_id = self.sb_username.get_context_id('message')
+            self.sb_username.push(sb_id, prefs['status_bar'] or '')
         self.window.present()
         return True
 
@@ -793,7 +797,7 @@ class Main(object):
         except:
             return False
         sb_id = self.sb_username.get_context_id('message')
-        self.sb_username.push(sb_id, prefs['name'] or '')
+        self.sb_username.push(sb_id, prefs['status_bar'] or '')
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, '%s@%s:%d/%s' % (rpc._USERNAME,
             rpc._SOCK.hostname, rpc._SOCK.port, rpc._DATABASE))
