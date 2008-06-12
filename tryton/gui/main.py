@@ -711,6 +711,7 @@ class Main(object):
         elif log_response == -2:
             common.message(_('Connection error !\n' \
                     'Bad username or password !'), self.window)
+            return self.sig_login()
         self.shortcut_set()
         self.glade.get_widget('but_menu').set_sensitive(True)
         self.glade.get_widget('user').set_sensitive(True)
