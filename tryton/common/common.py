@@ -482,7 +482,7 @@ def process_exception(exception, parent, obj='', method='', *args):
                 except Exception, exception:
                     return process_exception(exception, parent, obj,
                             method, *args)
-            return
+            return True
     data = str(exception.args[0])
     description = data
     if len(exception.args) > 1:
@@ -512,6 +512,7 @@ def process_exception(exception, parent, obj='', method='', *args):
             warning(details, parent, description)
     else:
         error(type, parent, details)
+    return False
 
 def node_attributes(node):
     result = {}
