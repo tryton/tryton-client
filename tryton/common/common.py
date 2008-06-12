@@ -295,7 +295,11 @@ def send_bugtracker(msg, parent):
                     % (user, password), allow_none=True)
             msg_md5 = md5.new(msg).hexdigest()
             # use the last line of the message as title
-            title = (filter(None, msg.splitlines()) or ['[no title]'])[-1]
+            title = '[no title]'
+            for line in msg.splitline():
+                #don't use empty line nor ^ from sql error
+                if line and '^' != line.strip():
+                    title = line
             issue_id = None
             msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
             if msg_ids:
