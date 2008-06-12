@@ -151,18 +151,19 @@ class EditableTreeView(gtk.TreeView):
             entry.editing_done_id = entry.connect('editing_done',
                     self.on_editing_done)
         if event.keyval in self.leaving_model_events:
-            if self.screen.tree_saves:
-                if not model.validate():
-                    invalid_fields = model.invalid_fields
-                    col = None
-                    for col in self.get_columns():
-                        if col.name in invalid_fields:
-                            break
-                    self.set_cursor(path, col, True)
+            if not model.validate():
+                invalid_fields = model.invalid_fields
+                col = None
+                for col in self.get_columns():
+                    if col.name in invalid_fields:
+                        break
+                self.set_cursor(path, col, True)
+                if self.screen.form:
                     self.screen.form.message_state(
                             _('Warning; field "%s" is required !') % \
                                     invalid_fields[col.name])
-                    return True
+                return True
+            if self.screen.tree_saves:
                 obj_id = model.save()
                 if not obj_id:
                     return True
