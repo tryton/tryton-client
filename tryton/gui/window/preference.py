@@ -34,9 +34,15 @@ class Preference(object):
         try:
             res = user.get_preferences_fields_view(rpc.CONTEXT)
         except Exception, exception:
-            common.process_exception(exception, parent)
-            self.win.destroy()
-            raise
+            if not common.process_exception(exception, parent):
+                self.win.destroy()
+                raise
+            try:
+                res = user.get_preferences_fields_view(rpc.CONTEXT)
+            except Exception, exception:
+                common.process_exception(exception, parent)
+                self.win.destroy()
+                raise
         arch = res['arch']
         fields = res['fields']
         self.screen = Screen('res.user', self.win, view_type=[])
