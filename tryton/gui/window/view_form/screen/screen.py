@@ -297,13 +297,6 @@ class Screen(SignalEvent):
                 _parse_fields(node2, fields)
         xml_dom = xml.dom.minidom.parseString(arch)
         _parse_fields(xml_dom, fields)
-        for dom in self.domain:
-            if dom[0] in fields:
-                field_dom = str(fields[dom[0]].setdefault('domain',[]))
-                fields[dom[0]]['domain'] = field_dom[:1] + \
-                        str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
-                if dom[1] == '=':
-                    fields[dom[0]]['readonly'] = True
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
                 self.fields_view_tree = {'arch': arch, 'fields': fields}
@@ -316,6 +309,8 @@ class Screen(SignalEvent):
             self.models.add_fields_custom(fields, self.models)
         else:
             self.models.add_fields(fields, self.models, context=context)
+
+        self.set_domain()
         self.fields = self.models.fields
 
         parser = WidgetParse(parent=self.parent, window=self.window)
@@ -328,6 +323,16 @@ class Screen(SignalEvent):
             self.current_view.display()
             self.screen_container.set(view.widget)
         return view
+
+    def set_domain(self):
+        fields = self.models.fields
+        for dom in self.domain:
+            if dom[0] in fields:
+                field_dom = str(fields[dom[0]].setdefault('domain',[]))
+                fields[dom[0]]['domain'] = field_dom[:1] + \
+                        str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
+                if dom[1] == '=':
+                    fields[dom[0]]['readonly'] = True
 
     def editable_get(self):
         if hasattr(self.current_view, 'widget_tree'):

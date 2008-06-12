@@ -108,7 +108,8 @@ def _create_menu(self):
 class Dialog(object):
 
     def __init__(self, model_name, parent, model=None, attrs=None,
-            model_ctx=None, window=None, default_get_ctx=None, readonly=False):
+            model_ctx=None, window=None, default_get_ctx=None, readonly=False,
+            domain=None):
 
         if attrs is None:
             attrs = {}
@@ -165,7 +166,8 @@ class Dialog(object):
 
         self.dia.show_all()
         self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
-                exclude_field=attrs.get('relation_field', None), readonly=readonly)
+                exclude_field=attrs.get('relation_field', None), readonly=readonly,
+                domain=domain)
         self.screen.models._context.update(model_ctx)
         if not model:
             model = self.screen.new(context=default_get_ctx)
@@ -378,16 +380,18 @@ class One2Many(WidgetInterface):
                 self.screen.current_view.widget.set_sensitive(True)
             else:
                 readonly = False
+                domain = []
                 if self._view.modelfield and self._view.model:
                     modelfield = self._view.modelfield
                     model = self._view.model
                     readonly = modelfield.get_state_attrs(model
                             ).get('readonly', False)
+                    domain = modelfield.domain_get(self._view.model)
                 dia = Dialog(self.attrs['relation'], parent=self._view.model,
                         attrs=self.attrs,
                         model_ctx=self.screen.models._context,
                         default_get_ctx=ctx, window=self._window,
-                        readonly=readonly)
+                        readonly=readonly, domain=domain)
                 res = True
                 while res:
                     res, value = dia.run()
@@ -401,14 +405,16 @@ class One2Many(WidgetInterface):
     def _sig_edit(self, widget=None, event=None):
         if self.screen.current_model:
             readonly = False
+            domain = []
             if self._view.modelfield and self._view.model:
                 modelfield = self._view.modelfield
                 model = self._view.model
                 readonly = modelfield.get_state_attrs(model
                         ).get('readonly', False)
+                domain = modelfield.domain_get(self._view.model)
             dia = Dialog(self.attrs['relation'], parent=self._view.model,
                     model=self.screen.current_model, attrs=self.attrs,
-                    window=self._window, readonly=readonly)
+                    window=self._window, readonly=readonly, domain=domain)
             res, value = dia.run()
             dia.destroy()
 
@@ -445,6 +451,18 @@ class One2Many(WidgetInterface):
             if (self.screen.current_view.view_type == 'tree') \
                     and self.screen.editable_get():
                 self.screen.current_model = None
+            readonly = False
+            domain = []
+            if self._view.modelfield and self._view.model:
+                modelfield = self._view.modelfield
+                model = self._view.model
+                readonly = modelfield.get_state_attrs(model
+                        ).get('readonly', False)
+                domain = modelfield.domain_get(self._view.model)
+            if self.screen.domain != domain:
+                self.screen.domain = domain
+                self.screen.set_domain()
+            self.screen.models.readonly = readonly
         self.screen.display()
         return True
 
