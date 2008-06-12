@@ -177,9 +177,9 @@ class _container(object):
     def new(self, col=4):
         table = gtk.Table(1, col)
         table.set_homogeneous(False)
-        table.set_col_spacings(3)
+        table.set_col_spacings(0)
         table.set_row_spacings(0)
-        table.set_border_width(1)
+        table.set_border_width(0)
         self.cont.append( (table, 0, 0) )
         self.col.append( col )
 
@@ -199,7 +199,7 @@ class _container(object):
 
     def wid_add(self, widget, name='', expand=False, ypadding=2, rowspan=1,
             colspan=1, translate=False, fname=None, help_tip=False, fill=False,
-            xexpand=True, xfill=True):
+            xexpand=True, xfill=True, xpadding=3):
         (table, width, height) = self.cont[-1]
         if colspan > self.col[-1]:
             colspan = self.col[-1]
@@ -216,7 +216,6 @@ class _container(object):
             xopt = xopt | gtk.EXPAND
         if xfill:
             xopt = xopt | gtk.FILL
-        widget = widget
         if help_tip:
             self.tooltips.set_tip(widget, help_tip)
             self.tooltips.enable()
@@ -232,7 +231,7 @@ class _container(object):
         table.attach(widget, width, width + colspan,
                 height, height + rowspan,
                 yoptions=yopt, ypadding=ypadding,
-                xoptions=xopt, xpadding=0)
+                xoptions=xopt, xpadding=xpadding)
         self.cont[-1] = (table, width + colspan, height)
         wid_list = table.get_children()
         wid_list.reverse()
@@ -468,7 +467,7 @@ class ParserForm(ParserInterface):
                 container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
                         expand=int(attrs.get('expand', 0)),
                         rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
-                        fill=int(attrs.get('fill', 1)))
+                        fill=int(attrs.get('fill', 1)), xpadding=0)
             elif node.localName == 'hpaned':
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
@@ -656,9 +655,9 @@ class ParserForm(ParserInterface):
 
             entries_list.append((val['id'], lang['code'], entry))
             table.attach(label, 0, 1, i, i+1, yoptions=False, xoptions=gtk.FILL,
-                    ypadding=2, xpadding=5)
+                    ypadding=2, xpadding=3)
             table.attach(entry, 1, 2, i, i+1, yoptions=yoptions,
-                    ypadding=2, xpadding=5)
+                    ypadding=2, xpadding=3)
             i += 1
 
         vbox.pack_start(table)
