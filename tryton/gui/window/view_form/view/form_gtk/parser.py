@@ -34,9 +34,8 @@ class Button(object):
         if not self.form:
             return
         model = self.form.screen.current_model
-        self.form.set_value()
-        if model.validate():
-            obj_id = self.form.screen.save_current()
+        obj_id = self.form.screen.save_current()
+        if obj_id:
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm'], self.form.window):
                 button_type = self.attrs.get('type', 'workflow')
@@ -49,8 +48,6 @@ class Button(object):
                         common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'object':
-                    if not obj_id:
-                        return
                     args = ('object', 'execute', self.form.screen.name,
                             self.attrs['name'], [obj_id], model.context_get())
                     try:
@@ -70,8 +67,8 @@ class Button(object):
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.form.screen.name,
-                            'id': obj_id or False,
-                            'ids': obj_id and [obj_id] or [],
+                            'id': obj_id,
+                            'ids': [obj_id],
                             })
                 else:
                     raise Exception('Unallowed button type')
