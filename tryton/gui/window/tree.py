@@ -3,7 +3,7 @@ import gtk
 from gtk import glade
 import gettext
 import tryton.common as common
-from view_tree import ViewTree, ViewTreeSC
+from tryton.gui.window.view_tree import ViewTree, ViewTreeSC
 import tryton.rpc as rpc
 from tryton.config import CONFIG
 from tryton.gui.window.win_export import WinExport

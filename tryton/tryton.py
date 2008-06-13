@@ -40,7 +40,7 @@ import version
 import config
 from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
 import translate
-from gui import Main
+import gui
 
 
 class TrytonClient(object):
@@ -87,7 +87,7 @@ class TrytonClient(object):
             factory.add('gtk-' + name[7:], icon_set)
 
     def run(self):
-        main = Main()
+        main = gui.Main()
         if CONFIG['tip.autostart']:
             main.sig_tips()
         main.sig_login()

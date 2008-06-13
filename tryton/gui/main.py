@@ -10,7 +10,7 @@ import tryton.common as common
 from tryton.version import VERSION
 from tryton.action import Action
 from tryton.gui.window import Window
-from tryton.gui.window import Preference
+from tryton.gui.window.preference import Preference
 from tryton.gui.window import FilesActions
 import re
 import base64
