@@ -390,6 +390,35 @@ class Tips(object):
         self.number -= 1
         self.tip_set()
 
+
+class Credits(object):
+
+    def __init__(self, parent):
+        self.win = gtk.Dialog(_('Credits'), parent,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.win.set_icon(TRYTON_ICON)
+
+        self.win.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+
+        vbox = gtk.VBox()
+        img = gtk.Image()
+        img.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
+        vbox.pack_start(img, False, False)
+        self.label = gtk.Label()
+        self.label.set_alignment(0.5, 0)
+        contributors_file = os.path.join(DATA_DIR, 'contributors.txt')
+        contributors = '\n' + _('<b>Contributors:</b>') + '\n\n'
+        contributors += file(contributors_file).read()
+        self.label.set_text(contributors)
+        self.label.set_use_markup(True)
+        vbox.pack_start(self.label, True, True)
+        self.win.vbox.pack_start(vbox)
+        self.win.show_all()
+
+        self.win.run()
+        parent.present()
+        self.win.destroy()
+
 _MAIN = []
 
 class Main(object):
@@ -469,7 +498,8 @@ class Main(object):
                     Main.sig_form_tab_orientation(90),
             'on_opt_files_actions_activate': self.sig_files_actions,
             'on_help_tips_activate': self.sig_tips,
-            'on_help_licence_activate': self.sig_licence,
+            'on_help_license_activate': self.sig_license,
+            'on_help_credits_activate': self.sig_credits,
             'on_shortcuts_activate' : self.sig_shortcuts,
             'on_db_new_activate': self.sig_db_new,
             'on_db_restore_activate': self.sig_db_restore,
@@ -761,14 +791,17 @@ class Main(object):
     def sig_tips(self, *args):
         Tips(self.window)
 
-    def sig_licence(self, widget):
-        dialog = glade.XML(GLADE, "win_licence", gettext.textdomain())
+    def sig_license(self, widget):
+        dialog = glade.XML(GLADE, "win_license", gettext.textdomain())
         dialog.signal_connect("on_but_ok_pressed",
-                lambda obj: dialog.get_widget('win_licence').destroy())
+                lambda obj: dialog.get_widget('win_license').destroy())
 
-        win = dialog.get_widget('win_licence')
+        win = dialog.get_widget('win_license')
         win.set_transient_for(self.window)
         win.show_all()
+
+    def sig_credits(self, widget):
+        Credits(self.window)
 
     def sig_shortcuts(self, widget):
         shortcuts_win = glade.XML(GLADE, 'shortcuts_dia', gettext.textdomain())

@@ -71,7 +71,8 @@ setup(name=PACKAGE,
         ('share/pixmaps', glob.glob('share/pixmaps/*.png') + \
                 glob.glob('share/pixmaps/*.svg')),
         ('share/tryton', glob.glob('share/tryton/tryton.glade') + \
-                glob.glob('share/tryton/tipoftheday.txt')),
+                glob.glob('share/tryton/tipoftheday.txt') + \
+                glob.glob('share/tryton/contributors.txt')),
     ],
     scripts=['bin/tryton'],
     classifiers=[

@@ -1096,11 +1096,19 @@
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkImageMenuItem" id="help_licence">
+                          <widget class="GtkImageMenuItem" id="help_license">
                             <property name="visible">True</property>
                             <property name="label" translatable="yes">_License</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_help_licence_activate"/>
+                            <signal name="activate" handler="on_help_license_activate"/>
+                          </widget>
+                        </child>
+                        <child>
+                          <widget class="GtkImageMenuItem" id="help_credits">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">_Credits</property>
+                            <property name="use_underline">True</property>
+                            <signal name="activate" handler="on_help_credits_activate"/>
                           </widget>
                         </child>
                       </widget>
@@ -3007,7 +3015,7 @@ Save as CSV</property>
       </widget>
     </child>
   </widget>
-  <widget class="GtkDialog" id="win_licence">
+  <widget class="GtkDialog" id="win_license">
     <property name="width_request">484</property>
     <property name="height_request">358</property>
     <property name="title" translatable="yes">License</property>
