@@ -174,6 +174,10 @@ PREFIX = os.path.abspath(os.path.normpath(os.path.join(
 PIXMAPS_DIR = os.path.join(CURRENT_DIR, 'share', 'pixmaps')
 if not os.path.isdir(PIXMAPS_DIR):
     PIXMAPS_DIR = os.path.join(PREFIX, 'share', 'pixmaps')
+    if not os.path.isdir(PIXMAPS_DIR):
+        PREFIX = os.path.abspath(os.path.normpath(
+            os.path.dirname(sys.argv[0])))
+        PIXMAPS_DIR = os.path.join(PREFIX, 'share', 'pixmaps')
 
 if os.name == 'nt':
     sys.path.insert(0, os.path.join(CURRENT_DIR, 'GTK\\bin'))
