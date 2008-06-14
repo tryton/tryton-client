@@ -114,7 +114,7 @@ class ViewForm(ParserView):
                     and self.screen.current_model.id
             if not (obj_id):
                 message(_('You must save this record ' \
-                        'to use the relate button!'))
+                        'to use the relate button!'), self.window)
                 return False
             self.screen.display()
         if atype == 'relate':
@@ -122,7 +122,7 @@ class ViewForm(ParserView):
                     and self.screen.current_model.id
             if not (obj_id):
                 message(_('You must select a record ' \
-                        'to use the relate button !'))
+                        'to use the relate button !'), self.window)
                 return False
             if 'domain' in act:
                 act['domain'] = str(
