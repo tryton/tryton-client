@@ -41,7 +41,6 @@ class Form(SignalEvent):
         fields = {}
         self.model = model
         self.window = window
-        self.previous_action = None
         self.glade = glade.XML(GLADE, 'win_form_container',
                 gettext.textdomain())
         self.widget = self.glade.get_widget('win_form_container')
@@ -341,8 +340,6 @@ class Form(SignalEvent):
                 'ids': ids,
                 'window': self.window,
                 }, context=ctx, alwaysask=True)
-            if res:
-                self.previous_action = res
             self.sig_reload(test_modified=False)
         else:
             self.message_state(_('No record selected!'))
