@@ -14,7 +14,7 @@ if os.name == 'nt':
     args['options'] = {
         'py2exe': {
             'optimize': 0,
-            'bundle_files': 3,
+            'bundle_files': 3, #don't bundle because gtk doesn't support it
             'packages': [
                 'encodings',
                 'gtk',
