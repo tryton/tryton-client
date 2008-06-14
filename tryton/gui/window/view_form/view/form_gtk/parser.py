@@ -15,7 +15,9 @@ class Button(object):
     def __init__(self, attrs=None):
         super(Button, self).__init__()
         self.attrs = attrs or {}
-        self.widget = gtk.Button(label=attrs.get('string', _('Unknown')))
+        self.widget = gtk.Button()
+        self.widget.set_use_underline(True)
+        self.widget.set_label(attrs.get('string', _('Unknown')))
         if attrs.get('icon', False):
             try:
                 stock = attrs['icon']
