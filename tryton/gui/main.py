@@ -540,6 +540,7 @@ class Main(object):
             'form_next': 'but_next',
             'form_save': 'but_save',
             'goto_id': 'but_goto_id',
+            'form_actions': 'but_action',
             'form_print': 'but_print',
             'form_save_as': 'but_save_as',
             'form_import': 'but_import',
