@@ -92,13 +92,14 @@ class ViewForm(ParserView):
 
                 for tool in toolbar[icontype]:
                     iconstock = {
-                        'print': gtk.STOCK_PRINT,
-                        'action': gtk.STOCK_EXECUTE,
-                        'relate': gtk.STOCK_JUMP_TO,
-                    }.get(icontype, gtk.STOCK_ABOUT)
+                        'print': 'tryton-print',
+                        'action': 'tryton-executable',
+                        'relate': 'tryton-go-jump',
+                    }.get(icontype)
 
                     tbutton = gtk.ToolButton(iconstock)
-                    tbutton.set_label_widget(gtk.Label(tool['name']))
+                    tbutton.set_use_underline(True)
+                    tbutton.set_label(tool['name'])
                     gtktoolbar.insert(tbutton, -1)
 
                     tbutton.connect('clicked', self._action, tool, icontype)
