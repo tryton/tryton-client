@@ -296,7 +296,7 @@ def send_bugtracker(msg, parent):
             msg_md5 = md5.new(msg).hexdigest()
             # use the last line of the message as title
             title = '[no title]'
-            for line in msg.splitline():
+            for line in msg.splitlines():
                 #don't use empty line nor ^ from sql error
                 if line and '^' != line.strip():
                     title = line
