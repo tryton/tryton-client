@@ -23,6 +23,7 @@ class URL(WidgetInterface):
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry, expand=True, fill=True)
 
+        self.tooltips = gtk.Tooltips()
         self.button = gtk.Button()
         img = gtk.Image()
         img.set_from_stock('tryton-web-browser', gtk.ICON_SIZE_BUTTON)
@@ -45,6 +46,15 @@ class URL(WidgetInterface):
             return False
         super(URL, self).display(model, model_field)
         self.entry.set_text(model_field.get(model) or '')
+        self.set_tooltips()
+
+    def set_tooltips(self):
+        value = self.entry.get_text()
+        if value:
+            self.tooltips.enable()
+            self.tooltips.set_tip(self.button, value)
+        else:
+            self.tooltips.disable()
 
     def _readonly_set(self, value):
         self.entry.set_editable(not value)
@@ -70,6 +80,15 @@ class Email(URL):
         if value:
             webbrowser.open('mailto:%s' % value, new=2)
 
+    def set_tooltips(self):
+        value = self.entry.get_text()
+        if value:
+            self.tooltips.enable()
+            self.tooltips.set_tip(self.button, 'mailto:%s' % value)
+        else:
+            self.tooltips.disable()
+
+
 class CallTo(URL):
     "call to"
 
@@ -78,6 +97,15 @@ class CallTo(URL):
         if value:
             webbrowser.open('callto:%s' % value, new=2)
 
+    def set_tooltips(self):
+        value = self.entry.get_text()
+        if value:
+            self.tooltips.enable()
+            self.tooltips.set_tip(self.button, 'callto:%s' % value)
+        else:
+            self.tooltips.disable()
+
+
 class SIP(URL):
     "sip"
 
@@ -85,3 +113,12 @@ class SIP(URL):
         value = self.entry.get_text()
         if value:
             webbrowser.open('sip:%s' % value, new=2)
+
+    def set_tooltips(self):
+        value = self.entry.get_text()
+        if value:
+            self.tooltips.enable()
+            self.tooltips.set_tip(self.button, 'sip:%s' % value)
+        else:
+            self.tooltips.disable()
+
