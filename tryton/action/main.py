@@ -176,7 +176,7 @@ class Action(object):
 
         keyact = {}
         for action in actions:
-            keyact[action['name']] = action
+            keyact[action['name'].replace('_', '')] = action
 
         from tryton.gui import Main
         res = selection(_('Select your action'), keyact, Main.get_main().window,
