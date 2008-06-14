@@ -147,6 +147,8 @@ class Dialog(object):
         self.but_ok.add_accelerator('clicked', self.accel_group,
                 gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 
+        self.dia.set_default_response(gtk.RESPONSE_OK)
+
         self.default_get_ctx = default_get_ctx
 
         menuitem_title = None
