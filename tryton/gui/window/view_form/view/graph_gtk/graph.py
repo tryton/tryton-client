@@ -355,8 +355,8 @@ class Graph(gtk.DrawingArea):
                     self.datas[x][key] += \
                             float(model[yfield['name']].get(model))
         if isinstance(minx, datetime.date):
-            date = mx.DateTime.strptime(str(minx), '%Y-%m-%d')
-            end_date = mx.DateTime.strptime(str(maxx), '%Y-%m-%d')
+            date = mx.DateTime.mktime(time.strptime(str(minx), '%Y-%m-%d'))
+            end_date = mx.DateTime.mktime(time.strptime(str(maxx), '%Y-%m-%d'))
             while date <= end_date:
                 key = datetime.date(date.year, date.month, date.day)
                 self.labels[key] = time.strftime(locale.nl_langinfo(
