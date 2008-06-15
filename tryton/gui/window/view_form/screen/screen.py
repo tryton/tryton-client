@@ -363,6 +363,7 @@ class Screen(SignalEvent):
         self.current_model = model
         self.current_model.validate_set()
         if self.current_view:
+            self.current_view.set_value()
             self.current_view.set_cursor(new=True)
         self.display()
         return self.current_model
