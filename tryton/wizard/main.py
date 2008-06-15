@@ -18,6 +18,10 @@ class Dialog(object):
         self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dia.set_deletable(False)
+
+        self.accel_group = gtk.AccelGroup()
+        self.dia.add_accel_group(self.accel_group)
+
         for i in state:
             but = gtk.Button(i[1])
             but.show()
@@ -27,11 +31,14 @@ class Dialog(object):
                 but.set_image(icon)
             self.dia.add_action_widget(but, len(self.states))
             if len(i) >= 4 and i[3]:
-                but.set_flags(gtk.CAN_DEFAULT)
-                default = len(self.states)
+                if default < 0:
+                    default = len(self.states)
+                    but.set_flags(gtk.CAN_DEFAULT)
+                    but.add_accelerator('clicked', self.accel_group,
+                            gtk.keysyms.Return, gtk.gdk.CONTROL_MASK,
+                            gtk.ACCEL_VISIBLE)
+                    self.dia.set_default_response(default)
             self.states.append(i[0])
-        if default >= 0:
-            self.dia.set_default_response(default)
 
         val = {}
         for i in fields:
