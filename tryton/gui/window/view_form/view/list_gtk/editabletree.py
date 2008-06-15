@@ -92,6 +92,7 @@ class EditableTreeView(gtk.TreeView):
         return cols[idx]
 
     def set_cursor(self, path, focus_column=None, start_editing=False):
+        self.grab_focus()
         if focus_column and (focus_column._type in ('many2one','many2many')) \
                 and self.screen.form:
             self.screen.form.message_state(_('Relation Field: F3: New F2: Open/Search'))
