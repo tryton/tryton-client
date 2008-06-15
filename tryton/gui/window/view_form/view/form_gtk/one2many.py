@@ -287,13 +287,13 @@ class Dialog(object):
     def new(self):
         model = self.screen.new(context=self.default_get_ctx)
         self.screen.models.model_add(model)
-        self.screen.current_model = model
         return True
 
     def run(self):
         end = False
         while not end:
             res = self.dia.run()
+            self.screen.current_view.set_value()
             end = (res != gtk.RESPONSE_OK) \
                     or (not self.screen.current_model \
                         or self.screen.current_model.validate())
@@ -303,7 +303,6 @@ class Dialog(object):
             self.but_cancel.set_label(gtk.STOCK_CLOSE)
 
         if res == gtk.RESPONSE_OK:
-            self.screen.current_view.set_value()
             model = self.screen.current_model
             return (True, model)
         return (False, None)
