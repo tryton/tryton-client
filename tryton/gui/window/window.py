@@ -21,12 +21,13 @@ class Window(object):
             Main.get_main().win_add(win)
         elif view_type == 'tree':
             from tree import Tree
-            win = Tree(model, window, res_id, view_ids and view_ids[0] or None, domain,
-                    context, name=name)
+            win = Tree(model, window, res_id, view_ids and view_ids[0] or None,
+                    domain, context, name=name)
             Main.get_main().win_add(win)
         elif view_type == 'board':
             from board import Board
-            win = Board(window, view_ids[0], context=context, name=name, auto_refresh=auto_refresh)
+            win = Board(window, view_ids[0], context=context, name=name,
+                    auto_refresh=auto_refresh)
             Main.get_main().win_add(win)
         else:
             import logging

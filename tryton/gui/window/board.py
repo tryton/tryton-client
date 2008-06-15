@@ -9,7 +9,8 @@ import tryton.common as common
 class Board(SignalEvent):
     'Board'
 
-    def __init__(self, window, view_id, context=None, name=False, auto_refresh=False):
+    def __init__(self, window, view_id, context=None, name=False,
+            auto_refresh=False):
         super(Board, self).__init__()
 
         try:
