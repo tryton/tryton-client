@@ -617,8 +617,7 @@ class ParserForm(ParserInterface):
         win.add_accel_group(accel_group)
 
         but_cancel = win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        but_cancel.add_accelerator('clicked', accel_group, gtk.keysyms.Escape,
-                gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+
         but_ok = win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         but_ok.add_accelerator('clicked', accel_group, gtk.keysyms.Return,
                 gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)

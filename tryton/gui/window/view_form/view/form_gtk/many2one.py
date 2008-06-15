@@ -39,8 +39,6 @@ class Dialog(object):
             icon_cancel = gtk.STOCK_CANCEL
         self.but_cancel = self.dia.add_button(icon_cancel,
                 gtk.RESPONSE_CANCEL)
-        self.but_cancel.add_accelerator('clicked', self.accel_group,
-                gtk.keysyms.Escape, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 
         self.but_ok = self.dia.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.but_ok.add_accelerator('clicked', self.accel_group,
