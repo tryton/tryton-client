@@ -299,7 +299,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="Databases">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Databases</property>
+                            <property name="label" translatable="yes">Data_bases</property>
                             <property name="use_underline">True</property>
                             <child>
                               <widget class="GtkMenu" id="Databases_menu">
@@ -402,7 +402,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="quitter1">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Quit</property>
+                            <property name="label" translatable="yes">_Quit</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_quit_activate"/>
                             <accelerator key="Q" modifiers="GDK_CONTROL_MASK" signal="activate"/>
