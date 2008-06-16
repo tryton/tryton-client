@@ -61,7 +61,7 @@ class ConfigManager(object):
             'login.protocol': 'socket://',
             'login.db': False,
             'client.modepda': False,
-            'client.toolbar': 'both',
+            'client.toolbar': 'default',
             'tip.autostart': False,
             'tip.position': 0,
             'logging.logger': '',
