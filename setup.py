@@ -86,7 +86,6 @@ setup(name=PACKAGE,
     ],
     license=LICENSE,
     #requires=[
-    #    'xml',
     #    'pygtk (>2.0)',
     #],
     **args
