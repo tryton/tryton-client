@@ -105,7 +105,7 @@ class ConfigManager(object):
         opt = parser.parse_args()[0]
 
 
-        self.rcfile = opt.config or os.path.join(get_home_dir(), '.trytonrc')
+        self.rcfile = opt.config or os.path.join(get_home_dir(), '.tryton')
         self.load()
 
         if opt.verbose:
