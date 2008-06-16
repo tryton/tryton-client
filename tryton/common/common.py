@@ -322,6 +322,7 @@ def send_bugtracker(msg, parent):
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
                 message(_('Created new issue with ID ') + \
                         'issue%s' % issue_id, parent)
+            webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
         except Exception, exception:
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
