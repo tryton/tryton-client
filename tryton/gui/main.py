@@ -16,6 +16,7 @@ import re
 import base64
 import tryton.translate as translate
 import tryton.plugin
+import locale
 
 _ = gettext.gettext
 
@@ -41,9 +42,17 @@ def _refresh_langlist(lang_widget, host, port):
     liststore.clear()
     lang_list = rpc.db_exec(host, port, 'list_lang')
     Main.get_main().refresh_ssl()
+    index = -1
+    i = 0
+    lang = locale.getdefaultlocale()[0]
     for key, val in lang_list:
-        liststore.insert(0, (val, key))
-    lang_widget.set_active(0)
+        liststore.insert(i, (val, key))
+        if key == lang:
+            index = i
+        if key == 'en_US' and index < 0 :
+            index = i
+        i += 1
+    lang_widget.set_active(index)
     return lang_list
 
 def _server_ask(server_widget, parent):
