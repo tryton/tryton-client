@@ -362,10 +362,9 @@ class Screen(SignalEvent):
             self.models.model_add(model, self.new_model_position())
         self.current_model = model
         self.current_model.validate_set()
-        if self.current_view:
-            self.current_view.set_value()
-            self.current_view.set_cursor(new=True)
         self.display()
+        if self.current_view:
+            self.current_view.set_cursor(new=True)
         return self.current_model
 
     def new_model_position(self):
