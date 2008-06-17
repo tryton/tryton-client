@@ -231,7 +231,9 @@ class Many2One(WidgetInterface):
 
         self.focus_out = False
         if not value:
-            if not self._readonly and self.wid_text.get_text():
+            if not self._readonly and (self.wid_text.get_text() or \
+                    self._view.modelfield.get_state_attrs(
+                        self._view.model)['required']):
                 domain = self._view.modelfield.domain_get(self._view.model)
                 context = self._view.modelfield.context_get(self._view.model)
                 self.wid_text.grab_focus()
