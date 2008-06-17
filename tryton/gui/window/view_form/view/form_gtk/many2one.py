@@ -221,7 +221,7 @@ class Many2One(WidgetInterface):
     def _color_widget(self):
         return self.wid_text
 
-    def sig_activate(self, widget, event=None):
+    def sig_activate(self, widget, event=None, key_press=False):
         if not self.focus_out:
             return
         if not self._view.modelfield:
@@ -232,8 +232,8 @@ class Many2One(WidgetInterface):
         self.focus_out = False
         if not value:
             if not self._readonly and (self.wid_text.get_text() or \
-                    self._view.modelfield.get_state_attrs(
-                        self._view.model)['required']):
+                    (self._view.modelfield.get_state_attrs(
+                        self._view.model)['required']) and key_press):
                 domain = self._view.modelfield.domain_get(self._view.model)
                 context = self._view.modelfield.context_get(self._view.model)
                 self.wid_text.grab_focus()
@@ -271,9 +271,17 @@ class Many2One(WidgetInterface):
                         return False
                     self._view.modelfield.set_client(self._view.model, name,
                             force_change=True)
+                    self.focus_out = True
+                    self.display(self._view.model, self._view.modelfield)
+                    return True
+                else:
+                    self.focus_out = True
+                    self.display(self._view.model, self._view.modelfield)
+                    return False
         self.focus_out = True
         self.display(self._view.model, self._view.modelfield)
         self.changed = True
+        return True
 
     def sig_new(self, *args):
         self.focus_out = False
@@ -351,15 +359,11 @@ class Many2One(WidgetInterface):
         if event.keyval == gtk.keysyms.F3:
             self.sig_new(widget, event)
             return True
-        elif event.keyval==gtk.keysyms.F2:
+        elif event.keyval == gtk.keysyms.F2:
             self.sig_edit(widget)
             return True
-        elif event.keyval  == gtk.keysyms.Tab:
-            if self._view.modelfield.get(self._view.model) or \
-                    not self.wid_text.get_text():
-                return False
-            self.sig_activate(widget, event)
-            return True
+        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return):
+            return not self.sig_activate(widget, event, key_press=True)
         return False
 
     def sig_changed(self, *args):
