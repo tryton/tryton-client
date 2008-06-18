@@ -568,11 +568,11 @@ class ParserForm(ParserInterface):
                 return None
 
         def value_set(widget, value):
+            if value == False:
+                value = ''
             if type(widget) == type(gtk.Entry()):
                 widget.set_text(value)
             elif type(widget.child) == type(gtk.TextView()):
-                if value == False:
-                    value = ''
                 buf = widget.child.get_buffer()
                 buf.delete(buf.get_start_iter(), buf.get_end_iter())
                 iter_start = buf.get_start_iter()
