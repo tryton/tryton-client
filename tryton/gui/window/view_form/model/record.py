@@ -161,7 +161,7 @@ class ModelRecord(SignalEvent):
                 val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
-                return
+                val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             for clause in domain:
                 if clause[0] in self.mgroup.fields:
                     if clause[1] == '=':
@@ -175,7 +175,7 @@ class ModelRecord(SignalEvent):
             name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
         except Exception, exception:
             common.process_exception(exception, self.window)
-            return False
+            name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
         return name
 
     def validate_set(self):
@@ -249,7 +249,7 @@ class ModelRecord(SignalEvent):
             res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
         except Exception, exception:
             common.process_exception(exception, self.window)
-            return
+            res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
         if res:
             value = res[0]
             self.read_time = time.time()
@@ -290,7 +290,8 @@ class ModelRecord(SignalEvent):
                     ctx)
         except Exception, exception:
             common.process_exception(exception, self.window)
-            return
+            res = getattr(self.rpc, 'on_change_' + fieldname)(ids, args,
+                    ctx)
         if res:
             later = {}
             for fieldname, value in res.items():
@@ -313,7 +314,8 @@ class ModelRecord(SignalEvent):
                 field_name + '=' + str(value), ctx))
         except Exception, exception:
             common.process_exception(exception, self.window)
-            return False
+            self.set_default(ir_default.get_default(self.resource,
+                field_name + '=' + str(value), ctx))
 
     def get_attachment_count(self, reload=False):
         if not self.id:
