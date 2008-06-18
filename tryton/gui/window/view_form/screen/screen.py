@@ -205,8 +205,8 @@ class Screen(SignalEvent):
         if value and value.attachment_count > 0:
             attachment_count = value.attachment_count
         self.signal('attachment-count', attachment_count)
-        # update attachment-count after 5 seconds
-        gobject.timeout_add(5 * 1000, self.update_attachment, value)
+        # update attachment-count after 1 second
+        gobject.timeout_add(1000, self.update_attachment, value)
         return True
     current_model = property(_get_current_model, _set_current_model)
 
