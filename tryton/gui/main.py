@@ -940,10 +940,15 @@ class Main(object):
             if self.buttons[i]:
                 self.buttons[i].set_sensitive(
                         bool(view and (i in view.handlers)))
+        self.buttons['but_attach'].set_stock_id('tryton-attachment')
 
     def _attachment_count(self, widget, signal_data):
         label = _('Attachment(%d)') % signal_data
         self.buttons['but_attach'].set_label(label)
+        if signal_data:
+            self.buttons['but_attach'].set_stock_id('tryton-attachment-hi')
+        else:
+            self.buttons['but_attach'].set_stock_id('tryton-attachment')
 
     def _sig_remove_book(self, widget, page_widget):
         for page in self.pages:
