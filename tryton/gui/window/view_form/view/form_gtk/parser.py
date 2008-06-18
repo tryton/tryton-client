@@ -535,7 +535,7 @@ class ParserForm(ParserInterface):
         obj_id = self.screen.current_model.save(force_reload=False)
         try:
             lang_ids = rpc.execute('object', 'execute', 'ir.lang',
-                    'search', [('translatable','=','1')])
+                    'search', [('translatable', '=', '1')])
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False
@@ -545,6 +545,8 @@ class ParserForm(ParserInterface):
                     parent=self.window)
             return False
         try:
+            lang_ids += rpc.execute('object', 'execute', 'ir.lang',
+                    'search', [('code', '=', 'en_US')])
             langs = rpc.execute('object', 'execute', 'ir.lang',
                     'read', lang_ids, ['code', 'name'])
         except Exception, exception:
@@ -552,13 +554,6 @@ class ParserForm(ParserInterface):
             return False
 
         code = rpc.CONTEXT.get('language', 'en_US')
-
-        #change 'en' to false for context
-        def adapt_context(val):
-            if val == 'en_US':
-                return False
-            else:
-                return val
 
         #widget accessor functions
         def value_get(widget):
@@ -633,7 +628,7 @@ class ParserForm(ParserInterface):
         i = 0
         for lang in langs:
             context = copy.copy(rpc.CONTEXT)
-            context['language'] = adapt_context(lang['code'])
+            context['language'] = lang['code']
             try:
                 val = rpc.execute('object', 'execute', model,
                         'read', [obj_id], [name], context)
@@ -685,7 +680,7 @@ class ParserForm(ParserInterface):
                 if new_val['code'] == code:
                     value_set(widget_entry, new_val['value'])
                 context = copy.copy(rpc.CONTEXT)
-                context['language'] = adapt_context(new_val['code'])
+                context['language'] = new_val['code']
                 args = ('object', 'execute', model, 'write', [obj_id],
                         {str(name):  new_val['value']}, context)
                 try:
