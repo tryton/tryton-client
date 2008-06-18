@@ -267,6 +267,10 @@ class DBCreate(object):
 
         if res == gtk.RESPONSE_OK:
             try:
+                if rpc.db_exec(host, int(port), 'db_exist', dbname):
+                    common.warning(_('Try with an other name.'), parent,
+                            _('The Database already exists!'))
+                    return False
                 users = rpc.db_exec(host, int(port), 'create', passwd, dbname,
                             langreal)
                 Main.get_main().refresh_ssl()
