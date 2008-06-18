@@ -763,7 +763,7 @@
                             <property name="label" translatable="yes">_Actions</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_actions_activate"/>
-                            <accelerator key="A" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                            <accelerator key="E" modifiers="GDK_CONTROL_MASK" signal="activate"/>
                             <child internal-child="image">
                               <widget class="GtkImage" id="image_form_actions">
                                 <property name="visible">True</property>
