@@ -92,7 +92,6 @@ class Tree(SignalEvent):
             'but_close': self.sig_close,
         }
         signals = {
-            'on_but_sc_go_clicked': self.sc_go,
             'on_but_sc_add_clicked': self.sc_add,
             'on_but_sc_del_clicked': self.sc_del,
         }

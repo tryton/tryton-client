@@ -1524,36 +1524,6 @@
                                     <property name="visible">True</property>
                                     <property name="toolbar_style">GTK_TOOLBAR_ICONS</property>
                                     <child>
-                                      <widget class="GtkToolButton" id="button57">
-                                        <property name="visible">True</property>
-                                        <property name="stock_id">tryton-list-add</property>
-                                        <signal name="clicked" handler="on_but_sc_add_clicked"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkToolButton" id="button58">
-                                        <property name="visible">True</property>
-                                        <property name="stock_id">tryton-go-jump</property>
-                                        <signal name="clicked" handler="on_but_sc_go_clicked"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkToolButton" id="button59">
-                                        <property name="visible">True</property>
-                                        <property name="stock_id">tryton-list-remove</property>
-                                        <signal name="clicked" handler="on_but_sc_del_clicked"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                      </packing>
-                                    </child>
-                                    <child>
                                       <widget class="GtkToolItem" id="toolitem1">
                                         <property name="visible">True</property>
                                         <child>
@@ -1567,6 +1537,26 @@
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="homogeneous">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkToolButton" id="button57">
+                                        <property name="visible">True</property>
+                                        <property name="stock_id">tryton-list-add</property>
+                                        <signal name="clicked" handler="on_but_sc_add_clicked"/>
+                                      </widget>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkToolButton" id="button59">
+                                        <property name="visible">True</property>
+                                        <property name="stock_id">tryton-list-remove</property>
+                                        <signal name="clicked" handler="on_but_sc_del_clicked"/>
+                                      </widget>
+                                      <packing>
+                                        <property name="expand">False</property>
                                       </packing>
                                     </child>
                                   </widget>
