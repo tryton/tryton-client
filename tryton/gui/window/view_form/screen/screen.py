@@ -407,6 +407,7 @@ class Screen(SignalEvent):
                     if model.validate():
                         obj_id = model.save(force_reload=True)
                     else:
+                        self.current_view.set_cursor()
                         self.current_model = model
                         self.current_view.set_cursor()
                         self.display()
@@ -466,6 +467,7 @@ class Screen(SignalEvent):
                 except Exception, exception:
                     common.process_exception(exception, self.window)
                     return False
+            self.current_view.set_cursor()
             idx = self.models.models.index(self.current_model)
             self.models.remove(self.current_model)
             if self.models.models:
@@ -475,7 +477,6 @@ class Screen(SignalEvent):
                 self.current_model = None
             if reload_ids:
                 self.models.reload(reload_ids)
-            self.current_view.set_cursor()
             self.display()
             res = obj_id
         if self.current_view.view_type == 'tree':
@@ -536,6 +537,7 @@ class Screen(SignalEvent):
 
     def display_next(self):
         self.current_view.set_value()
+        self.current_view.set_cursor()
         if self.current_model in self.models.models:
             idx = self.models.models.index(self.current_model)
             idx = (idx+1) % len(self.models.models)
@@ -543,13 +545,14 @@ class Screen(SignalEvent):
         else:
             self.current_model = len(self.models.models) \
                     and self.models.models[0]
+        self.current_view.set_cursor()
         if self.current_model:
             self.current_model.validate_set()
-        self.current_view.set_cursor()
         self.display()
 
     def display_prev(self):
         self.current_view.set_value()
+        self.current_view.set_cursor()
         if self.current_model in self.models.models:
             idx = self.models.models.index(self.current_model)-1
             if idx < 0:
@@ -558,10 +561,9 @@ class Screen(SignalEvent):
         else:
             self.current_model = len(self.models.models) \
                     and self.models.models[-1]
-
+        self.current_view.set_cursor()
         if self.current_model:
             self.current_model.validate_set()
-        self.current_view.set_cursor()
         self.display()
 
     def sel_ids_get(self):
