@@ -1,3 +1,4 @@
+#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 'Parser'
 import gtk
 from tryton.gui.window.view_form.view.form_gtk.parser import _container

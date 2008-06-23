@@ -1,3 +1,4 @@
+#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, COLOR_SCHEMES
 import locale

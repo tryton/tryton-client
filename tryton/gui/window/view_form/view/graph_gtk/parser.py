@@ -1,3 +1,4 @@
+#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
 import gtk
