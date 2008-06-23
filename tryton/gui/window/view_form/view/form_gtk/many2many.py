@@ -91,8 +91,11 @@ class Many2Many(WidgetInterface):
                     views_preload=self.attrs.get('views', {}))
             ids = win.run()
 
+        res_id = None
+        if ids:
+            res_id = ids[0]
         self.screen.load(ids)
-        self.screen.display(res_id=ids[0])
+        self.screen.display(res_id=res_id)
         if self.screen.current_view:
             self.screen.current_view.set_cursor()
         self.wid_text.set_text('')
