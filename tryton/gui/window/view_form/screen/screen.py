@@ -109,9 +109,15 @@ class Screen(SignalEvent):
         self.clear()
 
     def search_filter(self, widget=None, only_ids=False):
-        limit = self.filter_widget.get_limit()
-        offset = self.filter_widget.get_offset()
-        values = self.filter_widget.value
+        limit = None
+        offset = 0
+        values = []
+        if self.filter_widget:
+            limit = self.filter_widget.get_limit()
+            offset = self.filter_widget.get_offset()
+            values = self.filter_widget.value
+        else:
+            values = [('id', 'in', [x.id for x in self.models])]
         filter_keys = []
         for key, operator, value in values:
             filter_keys.append(key)

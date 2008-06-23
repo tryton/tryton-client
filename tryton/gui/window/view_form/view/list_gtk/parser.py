@@ -33,8 +33,6 @@ def send_keys(renderer, editable, position, treeview):
         editable.connect('changed', treeview.on_editing_done)
 
 def sort_model(column, treeview, screen):
-    if not screen.show_search:
-        return
     for col in treeview.get_columns():
         if col != column:
             col.arrow_show = False
