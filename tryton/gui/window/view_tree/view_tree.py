@@ -102,7 +102,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                             except:
                                 pass
                         obj[field] = time.strftime(display_format, date)
-            elif field_type in ('one2one','many2one'):
+            elif field_type in ('many2one',):
                 for obj in res_ids:
                     if obj[field]:
                         obj[field] = obj[field][1]
