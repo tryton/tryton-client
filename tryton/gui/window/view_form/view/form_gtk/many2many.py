@@ -92,7 +92,9 @@ class Many2Many(WidgetInterface):
             ids = win.run()
 
         self.screen.load(ids)
-        self.screen.display()
+        self.screen.display(res_id=ids[0])
+        if self.screen.current_view:
+            self.screen.current_view.set_cursor()
         self.wid_text.set_text('')
 
     def _sig_remove(self, *args):
@@ -101,6 +103,7 @@ class Many2Many(WidgetInterface):
 
     def _sig_activate(self, *args):
         self._sig_add()
+        self.wid_text.grab_focus()
 
     def _readonly_set(self, value):
         super(Many2Many, self)._readonly_set(value)
