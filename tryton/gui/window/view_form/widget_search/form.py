@@ -93,10 +93,12 @@ class Parse(object):
             self.container.new(self.col)
         elif name == 'field':
             if attrs['name'] in self.fields:
-                val  = attrs.get('select', False) \
-                        or self.fields[attrs['name']].get('select', False)
+                val  = attrs.get('select', None)
+                if val is None:
+                    val = self.fields[attrs['name']].get('select', 0)
+                val = int(val)
                 if val:
-                    if int(val) <= 1:
+                    if val <= 1:
                         self.add_widget(attrs, val)
                     else:
                         self.add_widget_end.append((attrs, val))
