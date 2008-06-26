@@ -758,7 +758,8 @@ class Main(object):
             common.message(_('Connection error !\n' \
                     'Bad username or password !'), self.window)
             return self.sig_login()
-        self.shortcut_set()
+        if not self.shortcut_menu.get_property('sensitive'):
+            self.shortcut_set()
         self.glade.get_widget('but_menu').set_sensitive(True)
         self.glade.get_widget('user').set_sensitive(True)
         self.glade.get_widget('form').set_sensitive(True)
