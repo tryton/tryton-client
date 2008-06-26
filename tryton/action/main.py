@@ -75,14 +75,8 @@ class Action(object):
                 raise Exception, 'ActionNotFound'
             action_type = res['type']
         try:
-            act_id2 = rpc.execute('object', 'execute', action_type,
-                'search', [('action', '=', act_id)], 0, None, None, ctx)[0]
-        except Exception, exception:
-            common.process_exception(exception, Main.get_main().window)
-            return
-        try:
-            res = rpc.execute('object', 'execute', action_type,
-                'read', act_id2, False, ctx)
+            res = rpc.execute('object', 'execute', action_type, 'search_read',
+                    [('action', '=', act_id)], 0, 1, None, ctx, None)
         except Exception, exception:
             common.process_exception(exception, Main.get_main().window)
             return
