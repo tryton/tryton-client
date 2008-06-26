@@ -747,9 +747,14 @@ class Main(object):
         self.refresh_ssl()
         if log_response > 0:
             CONFIG.save()
-            menu_id = self.sig_win_menu(quiet=False)
+            try:
+                prefs = rpc.execute('object', 'execute',
+                        'res.user', 'get_preferences', False, rpc.CONTEXT)
+            except:
+                prefs = None
+            menu_id = self.sig_win_menu(quiet=False, prefs=prefs)
             if menu_id:
-                self.sig_home_new(quiet=True, except_id=menu_id)
+                self.sig_home_new(quiet=True, except_id=menu_id, prefs=prefs)
             self.request_set()
         elif log_response == -1:
             common.message(_('Connection error !\n' \
@@ -829,24 +834,24 @@ class Main(object):
         win.set_transient_for(self.window)
         win.show_all()
 
-    def sig_win_menu(self, widget=None, quiet=True):
+    def sig_win_menu(self, widget=None, quiet=True, prefs=None):
         for page in range(len(self.pages)):
             if self.pages[page].model == 'ir.ui.menu':
                 page_num = self.notebook.page_num(self.pages[page].widget)
                 self.notebook.set_current_page(page_num)
                 return True
-        res = self.sig_win_new(widget, menu_type='menu', quiet=quiet)
-        if not res:
-            return self.sig_win_new(widget, menu_type='action', quiet=quiet)
+        res = self.sig_win_new(widget, menu_type='menu', quiet=quiet,
+                prefs=prefs)
         return res
 
     def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
-            except_id=False):
-        try:
-            prefs = rpc.execute('object', 'execute',
-                    'res.user', 'get_preferences', False, rpc.CONTEXT)
-        except:
-            return False
+            except_id=False, prefs=None):
+        if not prefs:
+            try:
+                prefs = rpc.execute('object', 'execute',
+                        'res.user', 'get_preferences', False, rpc.CONTEXT)
+            except:
+                return False
         sb_id = self.sb_username.get_context_id('message')
         self.sb_username.push(sb_id, prefs['status_bar'] or '')
         sb_id = self.sb_servername.get_context_id('message')
@@ -868,9 +873,10 @@ class Main(object):
         Action.execute(act_id, {'window': self.window})
         return act_id
 
-    def sig_home_new(self, widget=None, quiet=True, except_id=False):
+    def sig_home_new(self, widget=None, quiet=True, except_id=False,
+            prefs=None):
         return self.sig_win_new(widget, menu_type='action', quiet=quiet,
-                except_id=except_id)
+                except_id=except_id, prefs=prefs)
 
     def sig_plugin_execute(self, widget):
         page = self.notebook.get_current_page()
