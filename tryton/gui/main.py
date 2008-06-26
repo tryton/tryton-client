@@ -574,6 +574,8 @@ class Main(object):
         signals = {
             'on_opt_form_toolbar_activate': (fnc_menuitem, 'form.toolbar',
                 'opt_form_toolbar'),
+            'on_opt_tree_width_activate': (fnc_menuitem, 'client.tree_width',
+                'opt_tree_width'),
         }
         self.glade.get_widget('menubar_'+(CONFIG['client.toolbar'] or \
                 'both')).set_active(True)

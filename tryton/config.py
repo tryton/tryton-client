@@ -72,6 +72,7 @@ class ConfigManager(object):
             'form.toolbar': True,
             'client.form_tab': 'left',
             'client.form_tab_orientation': 90,
+            'client.tree_width': True,
             'client.lang': 'en_US',
             'client.actions': {
                 'odt': {0: find_path(['ooffice', 'ooffice2'], '%s'),

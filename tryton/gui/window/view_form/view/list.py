@@ -9,6 +9,7 @@ from tryton.action import Action
 from tryton.common import message
 import gettext
 import tryton.common as common
+from tryton.config import CONFIG
 
 _ = gettext.gettext
 
@@ -363,6 +364,25 @@ class ViewList(ParserView):
         return None
 
     def destroy(self):
+        if CONFIG['client.tree_width']:
+            fields = {}
+            last_col = None
+            for col in self.widget_tree.get_columns():
+                if col.get_width() != col.width and col.get_visible():
+                    fields[col.name] = col.get_width()
+                if col.get_visible():
+                    last_col = col
+            #Don't set width for last visible columns
+            #as it depends of the screen size
+            if last_col and last_col.name in fields:
+                del fields[last_col.name]
+
+            if fields:
+                try:
+                    rpc.execute('object', 'execute', 'ir.ui.view_tree_width',
+                            'set_width', self.screen.name, fields, rpc.CONTEXT)
+                except:
+                    pass
         self.widget_tree.destroy()
         del self.screen
         del self.widget_tree

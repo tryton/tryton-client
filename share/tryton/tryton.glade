@@ -915,9 +915,17 @@
                                 <child>
                                   <widget class="GtkCheckMenuItem" id="opt_form_toolbar">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Right Toolbar</property>
+                                    <property name="label" translatable="yes">Toolbar</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_opt_form_toolbar_activate"/>
+                                  </widget>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckMenuItem" id="opt_tree_width">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">Save columns width</property>
+                                    <property name="use_underline">True</property>
+                                    <signal name="activate" handler="on_opt_tree_width_activate"/>
                                   </widget>
                                 </child>
                                 <child>

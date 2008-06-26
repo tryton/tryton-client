@@ -153,7 +153,9 @@ class ParserTree(ParserInterface):
                     width = int(fields[fname]['width'])
                 else:
                     width = twidth.get(fields[fname]['type'], 100)
-                col.set_min_width(width)
+                col.width = width
+                if width > 0:
+                    col.set_fixed_width(width)
                 #XXX doesn't work well when resize columns
                 #col.set_expand(True)
                 if not treeview.sequence:
