@@ -43,7 +43,7 @@ class ViewTreeSC(object):
                     2, shortcut['id'])
         self.tree.set_model(store)
         if self.model == 'ir.ui.menu':
-            Main.get_main().shortcut_set()
+            Main.get_main().shortcut_set(shortcuts=view_sc)
 
     def value_get(self, col):
         sel = self.tree.get_selection().get_selected()

@@ -605,19 +605,20 @@ class Main(object):
     def get_main():
         return _MAIN[0]
 
-    def shortcut_set(self):
+    def shortcut_set(self, shortcuts=None):
         def _action_shortcut(widget, action):
             ctx = rpc.CONTEXT.copy()
             Action.exec_keyword('tree_open', {'model': 'ir.ui.menu',
                 'id': action, 'ids': [action],
                 'window': self.window}, context=ctx)
-        user = rpc._USER
-        try:
-            shortcuts = rpc.execute('object', 'execute',
-                    'ir.ui.view_sc', 'get_sc', user, 'ir.ui.menu',
-                    rpc.CONTEXT)
-        except:
-            shortcuts = []
+        if shortcuts is None:
+            user = rpc._USER
+            try:
+                shortcuts = rpc.execute('object', 'execute',
+                        'ir.ui.view_sc', 'get_sc', user, 'ir.ui.menu',
+                        rpc.CONTEXT)
+            except:
+                shortcuts = []
         menu = gtk.Menu()
         for shortcut in shortcuts:
             menuitem = gtk.MenuItem(shortcut['name'])
