@@ -56,21 +56,22 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
-        args = ('object', 'execute', self.view['model'], 'read', ids, fields,
-                ctx)
-        try:
-            res_ids = rpc.execute(*args)
-        except:
-            res_ids = []
-            for obj_id in ids:
-                val = {'id': obj_id}
-                for field in fields:
-                    if self.fields_type[field]['type'] \
-                            in ('one2many', 'many2many'):
-                        val[field] = []
-                    else:
-                        val[field] = ''
-                res_ids.append(val)
+        res_ids = []
+        if ids:
+            args = ('object', 'execute', self.view['model'], 'read', ids, fields,
+                    ctx)
+            try:
+                res_ids = rpc.execute(*args)
+            except:
+                for obj_id in ids:
+                    val = {'id': obj_id}
+                    for field in fields:
+                        if self.fields_type[field]['type'] \
+                                in ('one2many', 'many2many'):
+                            val[field] = []
+                        else:
+                            val[field] = ''
+                    res_ids.append(val)
         for field in self.fields:
             field_type = self.fields_type[field]['type']
             if field in self.fields_attrs \
