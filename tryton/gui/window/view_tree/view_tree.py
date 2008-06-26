@@ -320,12 +320,7 @@ class ViewTree(object):
         self.context.update(rpc.CONTEXT)
         if context:
             self.context.update(context)
-        try:
-            self.fields = rpc.execute('object', 'execute',
-                    view_info['model'], 'fields_get', False, self.context)
-        except Exception, exception:
-            common.process_exception(exception, self.window)
-            raise
+        self.fields = view_info['fields']
         parse = Parse(self.fields)
         parse.parse(view_info['arch'], self.view)
         self.toolbar = parse.toolbar
