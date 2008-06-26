@@ -865,13 +865,6 @@ class Main(object):
         if except_id and act_id == except_id:
             return act_id
         Action.execute(act_id, {'window': self.window})
-        try:
-            prefs = rpc.execute('object', 'execute',
-                    'res.user', 'get_preferences', False, rpc.CONTEXT)
-            if prefs[menu_type]:
-                act_id = prefs[menu_type]
-        except:
-            pass
         return act_id
 
     def sig_home_new(self, widget=None, quiet=True, except_id=False):
