@@ -18,6 +18,7 @@ class Parse(object):
         self.toolbar = False
         self.tree = None
         self.pos = 1
+        self.fill = 0
 
     def _psr_start(self, name, attrs):
         if name == 'tree':
@@ -25,6 +26,8 @@ class Parse(object):
                 self.title = attrs['string']
             if 'toolbar' in attrs:
                 self.toolbar = bool(attrs.get('toolbar'))
+            if 'fill' in attrs:
+                self.fill = bool(int(attrs.get('fill')))
         elif name == 'field':
             field_type = self.fields[attrs['name']]['type']
             if field_type != 'boolean':
@@ -83,4 +86,7 @@ class Parse(object):
         psr.EndElementHandler = self._psr_end
         psr.CharacterDataHandler = self._psr_char
         psr.Parse(xml_data)
+        if not self.fill:
+            column = gtk.TreeViewColumn()
+            tree.append_column(column)
         return self.pos
