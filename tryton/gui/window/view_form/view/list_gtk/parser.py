@@ -178,6 +178,14 @@ class ParserTree(ParserInterface):
                     label_sum.set_use_markup(True)
                     dict_widget[i] = (fname, label, label_sum,
                             fields.get('digits', (16,2))[1], label_bold)
+        if not bool(int(attrs.get('fill', '0'))):
+            col = gtk.TreeViewColumn()
+            col.name = None
+            arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
+            col.arrow = arrow
+            col.arrow_show = False
+            col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+            treeview.append_column(col)
         treeview.set_fixed_height_mode(True)
         return treeview, dict_widget, [], on_write, [], None
 

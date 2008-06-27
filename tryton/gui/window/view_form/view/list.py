@@ -368,10 +368,12 @@ class ViewList(ParserView):
             fields = {}
             last_col = None
             for col in self.widget_tree.get_columns():
-                if col.get_width() != col.width and col.get_visible():
-                    fields[col.name] = col.get_width()
                 if col.get_visible():
                     last_col = col
+                if not hasattr(col, 'name') or not hasattr(col, 'width'):
+                    continue
+                if col.get_width() != col.width and col.get_visible():
+                    fields[col.name] = col.get_width()
             #Don't set width for last visible columns
             #as it depends of the screen size
             if last_col and last_col.name in fields:
