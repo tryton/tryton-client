@@ -101,7 +101,7 @@ def setlang(lang=None):
         except:
             logging.getLogger('translate').warn(
                     _('Unable to set locale %s') % lang + '.' + encoding)
-        lang = gettext.translation(PACKAGE, locale_dir, languages=lang,
+        lang = gettext.translation(PACKAGE, locale_dir, languages=[lang],
                 fallback=True)
         lang.install(unicode=1)
     else:
