@@ -55,14 +55,18 @@ class Integer(Interface):
         return res
 
     def _value_set(self, value):
-        self.entry1.set_text(locale.format('%d', value or 0, True))
-        self.entry2.set_text(locale.format('%d', value or 0, True))
+        if value == False:
+            text = ''
+        else:
+            text = locale.format('%d', value or 0, True)
+        self.entry1.set_text(text)
+        self.entry2.set_text(text)
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))
 
     def clear(self):
-        self.value = 0
+        self.value = False
 
     def sig_activate(self, fct):
         self.entry1.connect_after('activate', fct)

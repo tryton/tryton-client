@@ -27,7 +27,13 @@ class CheckBox(Interface):
         return []
 
     def _value_set(self, value):
-        pass
+        if value == '':
+            self.widget.child.set_text('')
+            return
+        if value:
+            self.widget.child.set_text(_('Yes'))
+        else:
+            self.widget.child.set_text(_('No'))
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))

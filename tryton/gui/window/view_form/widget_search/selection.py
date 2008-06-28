@@ -62,13 +62,15 @@ class Selection(Interface):
 
     def _value_set(self, value):
         if value == False:
-            value = ''
-        for sel in self._selection:
-            if self._selection[sel] == value:
-                self.widget.child.set_text(sel)
+            self.widget.child.set_text('')
+            return
+        for long_text, sel_value in self._selection.items():
+            if sel_value == value:
+                self.widget.child.set_text(long_text)
+                break
 
     def clear(self):
-        self.value = ''
+        self.value = False
 
     value = property(_value_get, _value_set, None,
       'The content of the widget or ValueError if not valid')
