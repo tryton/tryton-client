@@ -132,8 +132,6 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 except:
                                     selection = []
                         self.fields_type[field]['selection'] = selection
-                        obj[field] = dict(self.fields_type[field]['selection']
-                                ).get(obj[field],'')
             elif field_type in ('float', 'numeric'):
                 digit = self.fields_type[field].get('digits', (16, 2))[1]
                 for obj in res_ids:
@@ -212,7 +210,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
     def on_get_value(self, node, column):
         (i, values) = node[-1]
         if column:
-            value = values[i][1][column-1]
+            value = values[i][1][column - 1]
         else:
             value = values[i][0]
 
@@ -220,6 +218,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         if (column in self.pixbufs) and res:
             return self.treeview.render_icon(stock_id=res,
                     size=gtk.ICON_SIZE_BUTTON, detail=None)
+        field = self.fields[column - 1]
+        if hasattr(self.fields_type[field], 'selection'):
+            res = dict(self.fields_type[field]['selection']).get(res, '')
         return res
 
     def on_iter_next(self, node):
