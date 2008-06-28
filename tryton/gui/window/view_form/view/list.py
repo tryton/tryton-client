@@ -476,7 +476,10 @@ class ViewList(ParserView):
             path = self.store.on_get_path(self.screen.current_model)
             focus_column = None
             for column in self.widget_tree.get_columns():
-                renderer = column.get_cell_renderers()[0]
+                renderers = column.get_cell_renderers()
+                if not renderers:
+                    continue
+                renderer = renderers[0]
                 if isinstance(renderer, gtk.CellRendererToggle):
                     editable = renderer.get_property('activatable')
                 else:
