@@ -18,7 +18,8 @@ class Dialog(object):
         default = -1
         self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.dia.set_deletable(False)
+        if hasattr(self.dia, 'set_deletable'):
+            self.dia.set_deletable(False)
 
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
