@@ -12,8 +12,9 @@ _ = gettext.gettext
 class Dialog(object):
     "Dialog for wizard"
 
-    def __init__(self, arch, fields, state, obj_name, parent=None,
+    def __init__(self, arch, fields, state, obj_name, parent,
             context=None):
+        self.parent = parent
         self.states = []
         default = -1
         self.dia = gtk.Dialog(_('Wizard'), parent,
@@ -76,9 +77,11 @@ class Dialog(object):
         if res < len(self.states) and res >= 0:
             datas.update(self.screen.get())
             self.dia.hide()
+            self.parent.present()
             return (self.states[res], datas)
         else:
             self.dia.hide()
+            self.parent.present()
             return False
 
     def destroy(self):
