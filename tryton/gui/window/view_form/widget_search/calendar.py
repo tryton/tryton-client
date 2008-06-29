@@ -6,14 +6,9 @@ import gettext
 import locale
 from interface import Interface
 from tryton.common import DT_FORMAT
+from _strptime import LocaleTime
 
 _ = gettext.gettext
-
-if not hasattr(locale, 'nl_langinfo'):
-    locale.nl_langinfo = lambda *a: '%x'
-
-if not hasattr(locale, 'D_FMT'):
-    locale.D_FMT = None
 
 
 class Calendar(Interface):
@@ -65,7 +60,7 @@ class Calendar(Interface):
     def _date_get(self, value):
         try:
             date = time.strptime(value,
-                    locale.nl_langinfo(locale.D_FMT).replace('%y', '%Y'))
+                    LocaleTime().LC_date.replace('%y', '%Y'))
         except:
             return False
         return time.strftime(DT_FORMAT, date)
@@ -115,7 +110,7 @@ class Calendar(Interface):
             year, month, day = cal.get_date()
             date = DT.date(year, month+1, day)
             dest.set_text(date.strftime(
-                locale.nl_langinfo(locale.D_FMT).replace('%y', '%Y')))
+                LocaleTime().LC_date.replace('%y', '%Y')))
         win.destroy()
 
     def clear(self):

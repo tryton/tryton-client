@@ -11,12 +11,7 @@ import datetime as DT
 import locale
 from tryton.common import DT_FORMAT, DHM_FORMAT
 import tryton.common as common
-
-if not hasattr(locale, 'nl_langinfo'):
-    locale.nl_langinfo = lambda *a: '%x'
-
-if not hasattr(locale, 'D_FMT'):
-    locale.D_FMT = None
+from _strptime import LocaleTime
 
 FIELDS_LIST_TYPE = {
     'boolean': gobject.TYPE_BOOLEAN,
@@ -78,15 +73,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     and 'widget' in self.fields_attrs[field]:
                 field_type = self.fields_attrs[field]['widget']
             if field_type in ('date',):
-                display_format = locale.nl_langinfo(locale.D_FMT).replace('%y',
-                        '%Y')
+                display_format = LocaleTime().LC_date.replace('%y', '%Y')
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DT_FORMAT)
                         obj[field] = time.strftime(display_format, date)
             elif field_type in ('datetime',):
-                display_format = locale.nl_langinfo(locale.D_FMT).replace('%y',
-                        '%Y') + ' %H:%M:%S'
+                display_format = LocaleTime().LC_date.replace('%y', '%Y') \
+                        + ' %H:%M:%S'
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DHM_FORMAT)

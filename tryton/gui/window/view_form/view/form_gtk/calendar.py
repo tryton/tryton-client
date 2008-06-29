@@ -7,14 +7,9 @@ import locale
 from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, TRYTON_ICON
+from _strptime import LocaleTime
 
 _ = gettext.gettext
-
-if not hasattr(locale, 'nl_langinfo'):
-    locale.nl_langinfo = lambda *a: '%x'
-
-if not hasattr(locale, 'D_FMT'):
-    locale.D_FMT = None
 
 
 class Calendar(WidgetInterface):
@@ -71,8 +66,8 @@ class Calendar(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value, locale.nl_langinfo(
-                locale.D_FMT).replace('%y', '%Y'))
+            date = time.strptime(value,
+                    LocaleTime().LC_date.replace('%y', '%Y'))
         except:
             return False
         return time.strftime(DT_FORMAT, date)
@@ -93,8 +88,8 @@ class Calendar(WidgetInterface):
             if len(value)>10:
                 value = value[:10]
             date = time.strptime(value, DT_FORMAT)
-            value = time.strftime(locale.nl_langinfo(
-                locale.D_FMT).replace('%y', '%Y'), date)
+            value = time.strftime(LocaleTime().LC_date.replace('%y', '%Y'),
+                    date)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -134,7 +129,7 @@ class Calendar(WidgetInterface):
             year, month, day = cal.get_date()
             date = DT.date(year, month+1, day)
             self.entry.set_text(date.strftime(
-                locale.nl_langinfo(locale.D_FMT).replace('%y', '%Y')))
+                LocaleTime().LC_date.replace('%y', '%Y')))
         self._focus_out()
         self._window.present()
         win.destroy()
@@ -192,8 +187,8 @@ class DateTime(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value, locale.nl_langinfo(
-                locale.D_FMT).replace('%y', '%Y') + ' ' + HM_FORMAT)
+            date = time.strptime(value,
+                    LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT)
         except:
             return False
         if 'timezone' in rpc.CONTEXT and timezone:
@@ -237,8 +232,9 @@ class DateTime(WidgetInterface):
                     date = ldt.timetuple()
                 except:
                     pass
-            value = time.strftime(locale.nl_langinfo(
-                locale.D_FMT).replace('%y', '%Y') + ' ' + HM_FORMAT, date)
+            value = time.strftime(
+                    LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT,
+                    date)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)

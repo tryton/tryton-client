@@ -19,12 +19,7 @@ import tryton.rpc as rpc
 import datetime as DT
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, TRYTON_ICON
 import tryton.common as common
-
-if not hasattr(locale, 'nl_langinfo'):
-    locale.nl_langinfo = lambda *a: '%x'
-
-if not hasattr(locale, 'D_FMT'):
-    locale.D_FMT = None
+from _strptime import LocaleTime
 
 def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
@@ -276,7 +271,7 @@ class Boolean(Int):
 
 class Date(Char):
     server_format = DT_FORMAT
-    display_format = locale.nl_langinfo(locale.D_FMT).replace('%y', '%Y')
+    display_format = LocaleTime().LC_date.replace('%y', '%Y')
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)
@@ -302,7 +297,7 @@ class Date(Char):
 
 class Datetime(Date):
     server_format = DHM_FORMAT
-    display_format = locale.nl_langinfo(locale.D_FMT).replace('%y', '%Y') + \
+    display_format = LocaleTime().LC_date.replace('%y', '%Y') + \
             ' %H:%M:%S'
 
     def get_textual_value(self, model):

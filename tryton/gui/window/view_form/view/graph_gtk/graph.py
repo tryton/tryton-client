@@ -9,6 +9,7 @@ import time
 import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
+from _strptime import LocaleTime
 
 
 class Popup(object):
@@ -360,8 +361,8 @@ class Graph(gtk.DrawingArea):
             end_date = mx.DateTime.mktime(time.strptime(str(maxx), '%Y-%m-%d'))
             while date <= end_date:
                 key = datetime.date(date.year, date.month, date.day)
-                self.labels[key] = time.strftime(locale.nl_langinfo(
-                    locale.D_FMT).replace('%y', '%Y'),
+                self.labels[key] = time.strftime(
+                        LocaleTime().LC_date.replace('%y', '%Y'),
                     time.strptime(str(key), DT_FORMAT))
                 self.datas.setdefault(key, {})
                 for yfield in self.yfields:
