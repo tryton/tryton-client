@@ -85,17 +85,6 @@ class Pie(Graph):
         cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
         cr.save()
-        cr.set_source_rgba(0, 0, 0, 0.15)
-        cr.new_path()
-        cr.move_to(self.centerx, self.centery)
-        cr.arc(self.centerx + 1, self.centery + 2, self.radius + 1, 0,
-                2 * math.pi)
-        cr.line_to(self.centerx, self.centery)
-        cr.close_path()
-        cr.fill()
-        cr.restore()
-
-        cr.save()
         for slice in self.slices:
             if slice.isBigEnough():
                 if bool(eval(self.yfields[0].get('fill', '1'))):

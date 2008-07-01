@@ -141,9 +141,13 @@ class Graph(gtk.DrawingArea):
             }, context=ctx, warning=False)
 
     def drawBackground(self, cr, width, height):
-        # Fill the background with gray
+        # Fill the background
         cr.save()
-        cr.set_source_rgb(*hex2rgb(self.attrs.get('background', '#f5f5f5')))
+        r, g, b = hex2rgb(self.attrs.get('background', '#d5d5d5'))
+        linear = cairo.LinearGradient(width / 2, 0, width / 2, height)
+        linear.add_color_stop_rgb(0, 1, 1, 1)
+        linear.add_color_stop_rgb(1, r, g, b)
+        cr.set_source(linear)
         cr.rectangle(0, 0, width, height)
         cr.fill()
         cr.stroke()

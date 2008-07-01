@@ -3,6 +3,7 @@ from graph import Graph
 from tryton.common import hex2rgb, lighten
 import locale
 import math
+import cairo
 
 
 class Bar(Graph):
@@ -26,10 +27,10 @@ class Bar(Graph):
             cr.fill()
 
             self.drawRectangle(cr, x, y, w, h)
-            color = self.colorScheme[bar.yname]
+            r, g, b = self.colorScheme[bar.yname]
             if bar.highlight:
-                color = self.colorScheme['__highlight']
-            cr.set_source_rgb(*color)
+                r, g, b = self.colorScheme['__highlight']
+            cr.set_source(self.sourceRectangle(x, y, w, h, r, g, b))
             cr.fill_preserve()
             cr.stroke()
 
@@ -45,6 +46,12 @@ class Bar(Graph):
         cr.arc(x + 5, y + h - 5, 5, 0, 2 * math.pi)
         cr.rectangle(x + 5, y, w - 10, h)
         cr.rectangle(x, y + 5, w, h - 10)
+
+    def sourceRectangle(self, x, y, w, h, r, g, b):
+        linear = cairo.LinearGradient((x + w) / 2, y, (x + w) / 2, y + h)
+        linear.add_color_stop_rgb(0, 3.5 * r / 5.0, 3.5 * g / 5.0, 3.5 * b / 5.0)
+        linear.add_color_stop_rgb(1, r, g, b)
+        return linear
 
     def motion(self, widget, event):
         super(Bar, self).motion(widget, event)

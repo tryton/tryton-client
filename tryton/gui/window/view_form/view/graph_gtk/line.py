@@ -3,6 +3,7 @@ from graph import Graph
 from tryton.common import hex2rgb
 import locale
 import math
+import cairo
 
 
 class Line(Graph):
@@ -73,11 +74,31 @@ class Line(Graph):
                 cr.fill()
                 cr.restore()
 
-                cr.set_source_rgb(*self.colorScheme[key])
+                r, g, b = self.colorScheme[key]
+                linear = cairo.LinearGradient(width / 2, 0, width / 2, height)
+                linear.add_color_stop_rgb(0,
+                        3.5 * r / 5.0, 3.5 * g / 5.0, 3.5 * b / 5.0)
+                linear.add_color_stop_rgb(1, r, g, b)
+                cr.set_source(linear)
                 preparePath(key)
                 cr.fill()
             else:
                 preparePath(key)
+
+        for point in self.points:
+            if key2fill[point.yname]:
+                continue
+            cr.set_source_rgb(*self.colorScheme[point.yname])
+            cr.arc(point.x * self.area.w + self.area.x,
+                    point.y * self.area.h + self.area.y,
+                    3, 0, 2 * math.pi)
+            cr.fill()
+
+        cr.restore()
+
+    def drawLegend(self, cr, widht, height):
+        super(Line, self).drawLegend(cr, widht, height)
+        cr.save()
         for point in self.points:
             if point.highlight:
                 cr.set_line_width(2)
