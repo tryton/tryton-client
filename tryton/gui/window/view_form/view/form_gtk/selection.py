@@ -15,6 +15,9 @@ class Selection(WidgetInterface):
         self.entry = gtk.ComboBoxEntry()
         child = self.entry.get_child()
         child.set_property('activates_default', True)
+        child.set_max_length(int(attrs.get('size', 0)))
+        child.set_width_chars(5)
+
         child.connect('changed', self.sig_changed)
         self.changed = True
         child.connect('button_press_event', self._menu_open)
