@@ -22,10 +22,10 @@ class Bar(Graph):
 
             cr.set_source_rgba(0, 0, 0, 0.15)
             rectangle = self._getShadowRectangle(x, y, w, h)
-            cr.rectangle(*rectangle)
+            self.drawRectangle(cr, *rectangle)
             cr.fill()
 
-            cr.rectangle(x, y, w, h)
+            self.drawRectangle(cr, x, y, w, h)
             color = self.colorScheme[bar.yname]
             if bar.highlight:
                 color = self.colorScheme['__highlight']
@@ -37,6 +37,14 @@ class Bar(Graph):
         for bar in self.bars:
             drawBar(bar)
         cr.restore()
+
+    def drawRectangle(self, cr, x, y, w, h):
+        cr.arc(x + 5, y + 5, 5, 0, 2 * math.pi)
+        cr.arc(x + w - 5, y + 5, 5, 0, 2 * math.pi)
+        cr.arc(x + w - 5, y + h - 5, 5, 0, 2 * math.pi)
+        cr.arc(x + 5, y + h - 5, 5, 0, 2 * math.pi)
+        cr.rectangle(x + 5, y, w - 10, h)
+        cr.rectangle(x, y + 5, w, h - 10)
 
     def motion(self, widget, event):
         super(Bar, self).motion(widget, event)
