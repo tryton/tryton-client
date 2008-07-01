@@ -690,7 +690,11 @@ class Main(object):
             prefs = rpc.execute('object', 'execute', 'res.user',
                     'get_preferences', False, rpc.CONTEXT)
             sb_id = self.sb_username.get_context_id('message')
-            self.sb_username.push(sb_id, prefs['status_bar'] or '')
+            self.sb_username.push(sb_id, prefs.get('status_bar', ''))
+            if prefs and 'language' in prefs:
+                translate.setlang(prefs['language'])
+                CONFIG['client.lang'] = prefs['language']
+                CONFIG.save()
         self.window.present()
         return True
 
@@ -748,7 +752,6 @@ class Main(object):
         log_response = rpc.login(*res)
         self.refresh_ssl()
         if log_response > 0:
-            CONFIG.save()
             try:
                 prefs = rpc.execute('object', 'execute',
                         'res.user', 'get_preferences', False, rpc.CONTEXT)
@@ -758,6 +761,10 @@ class Main(object):
             if menu_id:
                 self.sig_home_new(quiet=True, except_id=menu_id, prefs=prefs)
             self.request_set()
+            if prefs and 'language' in prefs:
+                translate.setlang(prefs['language'])
+                CONFIG['client.lang'] = prefs['language']
+            CONFIG.save()
         elif log_response == -1:
             common.message(_('Connection error !\n' \
                     'Unable to connect to the server !'), self.window)
