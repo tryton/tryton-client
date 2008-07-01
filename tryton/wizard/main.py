@@ -5,6 +5,7 @@ import tryton.rpc as rpc
 import tryton.common as common
 import thread, time
 from tryton.gui.window.view_form.screen import Screen
+import os
 
 _ = gettext.gettext
 
@@ -19,7 +20,7 @@ class Dialog(object):
         default = -1
         self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        if hasattr(self.dia, 'set_deletable'):
+        if hasattr(self.dia, 'set_deletable') and os.name != 'nt':
             self.dia.set_deletable(False)
 
         self.accel_group = gtk.AccelGroup()
