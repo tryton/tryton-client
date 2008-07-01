@@ -255,7 +255,7 @@ class Graph(gtk.DrawingArea):
             x2 = x1 + self.area.w
 
         cr.save()
-        cr.set_source_rgb(*hex2rgb('#000000'))
+        cr.set_source_rgb(*hex2rgb('#808080'))
         cr.set_line_width(1.5)
         cr.new_path()
         cr.move_to(x1, y1)
