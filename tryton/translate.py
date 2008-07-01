@@ -83,9 +83,6 @@ def setlang(lang=None):
     locale_dir = os.path.join(CURRENT_DIR, 'share/locale')
     if not os.path.isdir(locale_dir):
         locale_dir = os.path.join(PREFIX, 'share/locale')
-    if not os.path.isdir(locale_dir):
-        gettext.install(PACKAGE, unicode=1)
-        return False
     if lang:
         encoding = locale.getdefaultlocale()[1]
         if encoding == 'utf':
@@ -101,19 +98,24 @@ def setlang(lang=None):
         except:
             logging.getLogger('translate').warn(
                     _('Unable to set locale %s') % lang + '.' + encoding)
-        lang = gettext.translation(PACKAGE, locale_dir, languages=[lang],
-                fallback=True)
-        lang.install(unicode=1)
+        if not os.path.isdir(locale_dir):
+            gettext.install(PACKAGE, unicode=1)
+        else:
+            lang = gettext.translation(PACKAGE, locale_dir, languages=[lang],
+                    fallback=True)
+            lang.install(unicode=1)
     else:
         try:
             locale.setlocale(locale.LC_ALL, '')
         except:
             logging.getLogger('translate').warn(
                     _('Unable to unset locale'))
-        gettext.bindtextdomain(PACKAGE, locale_dir)
+        if os.path.isdir(locale_dir):
+            gettext.bindtextdomain(PACKAGE, locale_dir)
         gettext.textdomain(PACKAGE)
         gettext.install(PACKAGE, unicode=1)
-    gtk.glade.bindtextdomain(PACKAGE, locale_dir)
+    if os.path.isdir(locale_dir):
+        gtk.glade.bindtextdomain(PACKAGE, locale_dir)
 
 def set_language_direction(direction):
     if direction == 'rtl':
