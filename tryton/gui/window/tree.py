@@ -166,6 +166,7 @@ class Tree(SignalEvent):
             self.tree_res.view.grab_focus()
             selection = self.tree_res.view.get_selection()
             selection.select_path((0))
+        self.tree_sc.update()
 
     def menu_main_clicked(self, widget, focus=True):
         if widget.get_active():
