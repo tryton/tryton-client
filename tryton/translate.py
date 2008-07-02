@@ -90,14 +90,13 @@ def setlang(lang=None):
         if encoding == 'cp1252':
             encoding = '1252'
         try:
+            lang2 = lang
             if os.name == 'nt':
-                locale.setlocale(locale.LC_ALL,
-                        _LOCALE2WIN32.get(lang, lang) + '.' + encoding)
-            else:
-                locale.setlocale(locale.LC_ALL, lang + '.' + encoding)
+                lang2 = _LOCALE2WIN32.get(lang, lang)
+            locale.setlocale(locale.LC_ALL, lang2 + '.' + encoding)
         except:
             logging.getLogger('translate').warn(
-                    _('Unable to set locale %s') % lang + '.' + encoding)
+                    _('Unable to set locale %s') % lang2 + '.' + encoding)
         if not os.path.isdir(locale_dir):
             gettext.install(PACKAGE, unicode=1)
         else:
