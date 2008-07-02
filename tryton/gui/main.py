@@ -599,6 +599,10 @@ class Main(object):
             self.glade.get_widget(signals[signal][2]).set_active(
                     int(bool(CONFIG[signals[signal][1]])))
 
+        if os.name == 'nt':
+            # Disable actions, on win32 we use os.startfile
+            self.glade.get_widget('actions').set_sensitive(False)
+
         # Adding a timer the check to requests
         gobject.timeout_add(5 * 60 * 1000, self.request_set)
         _MAIN.append(self)

@@ -132,6 +132,16 @@ def file_selection(title, filename='', parent=None,
         return filenames
 
 def file_open(filename, type, parent, print_p=False):
+    if os.name == 'nt':
+        operation = 'open'
+        if print_p:
+            operation = 'print'
+        try:
+            os.startfile(os.path.normpath(filename), operation)
+        except:
+            # Try without operation, it is not supported on version < 2.5
+            os.startfile(os.path.normpath(filename))
+        return
     cmd = ''
     if type in CONFIG['client.actions']:
         if print_p:
