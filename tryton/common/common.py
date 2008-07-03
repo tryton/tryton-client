@@ -425,7 +425,7 @@ def sur_3b(msg, parent):
         return 'cancel'
 
 def ask(question, parent, visibility=True):
-    win = gtk.Dialog(_('Tryton'), parent,
+    win = gtk.Dialog('Tryton', parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))

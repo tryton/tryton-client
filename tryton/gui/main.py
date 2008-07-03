@@ -94,14 +94,14 @@ class DBLogin(object):
     def refreshlist(widget, db_widget, label, host, port, butconnect=None):
         res = _refresh_dblist(db_widget, host, port)
         if res is None:
-            label.set_label('<b>'+_('Could not connect to server !')+'</b>')
+            label.set_label('<b>'+_('Could not connect to server!')+'</b>')
             db_widget.hide()
             label.show()
             if butconnect:
                 butconnect.set_sensitive(False)
         elif res==0:
             label.set_label('<b>' + \
-                    _('No database found, you must create one !') + '</b>')
+                    _('No database found, you must create one!') + '</b>')
             db_widget.hide()
             label.show()
             if butconnect:
@@ -190,12 +190,12 @@ class DBCreate(object):
     def set_sensitive(self, sensitive):
         if sensitive:
             label = self.dialog.get_widget('db_label_info')
-            label.set_text(_('Do not use special characters !'))
+            label.set_text(_('Do not use special characters!'))
             self.dialog.get_widget('button_db_ok').set_sensitive(True)
         else:
             label = self.dialog.get_widget('db_label_info')
             label.set_markup('<b>' + \
-                    _('Can not connect to server, please change it !') + '</b>')
+                    _('Can not connect to server!') + '</b>')
             self.dialog.get_widget('button_db_ok').set_sensitive(False)
         return sensitive
 
@@ -248,7 +248,7 @@ class DBCreate(object):
                         'only normal characters or "_".\n' \
                         'You must avoid all accents, space ' \
                         'or special characters.'), parent,
-                        _('Bad database name !'))
+                        _('Bad database name!'))
 
             else:
                 break

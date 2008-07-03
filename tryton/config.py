@@ -87,7 +87,7 @@ class ConfigManager(object):
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }
-        parser = optparse.OptionParser(version=_("Tryton %s" % VERSION))
+        parser = optparse.OptionParser(version=("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
         parser.add_option("-v", "--verbose", action="store_true",
