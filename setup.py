@@ -7,6 +7,26 @@ import glob
 import sys
 
 args = {}
+
+try:
+    from babel.messages import frontend as babel
+
+    args['cmdclass'] = {
+            'compile_catalog': babel.compile_catalog,
+            'extract_messages': babel.extract_messages,
+            'init_catalog': babel.init_catalog,
+            'update_catalog': babel.update_catalog,
+        }
+
+    args['message_extractors'] = {
+            'tryton': [
+                ('**.py', 'python', None),
+            ],
+        }
+
+except ImportError:
+        pass
+
 if os.name == 'nt':
     import py2exe
     args['windows'] = [{
@@ -74,6 +94,7 @@ setup(name=PACKAGE,
         ('share/tryton', glob.glob('share/tryton/tryton.glade') + \
                 glob.glob('share/tryton/tipoftheday.txt') + \
                 glob.glob('share/tryton/contributors.txt')),
+        ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],
     classifiers=[
