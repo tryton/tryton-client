@@ -1,7 +1,7 @@
 # French (France) translations for tryton.
 # Copyright (C) 2008 B2CK
 # This file is distributed under the same license as the tryton project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+# FIRST AUTHOR <cedric.krier@b2ck.com>, 2008.
 #
 msgid ""
 msgstr ""
@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:25+0200\n"
 "PO-Revision-Date: 2008-07-03 23:51+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Cédric Krier <cedric.krier@b2ck.com>\n"
 "Language-Team: fr_FR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
