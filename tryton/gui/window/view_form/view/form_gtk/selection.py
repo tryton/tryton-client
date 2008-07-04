@@ -21,10 +21,12 @@ class Selection(WidgetInterface):
         child.connect('changed', self.sig_changed)
         self.changed = True
         child.connect('button_press_event', self._menu_open)
+        child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
         self.entry.set_size_request(int(attrs.get('widget_size', -1)), -1)
         self.widget.pack_start(self.entry, expand=True, fill=True)
+        self.widget.set_focus_chain([child])
 
         self._selection = {}
         selection = attrs.get('selection', [])
@@ -77,6 +79,12 @@ class Selection(WidgetInterface):
         child = self.entry.get_child()
         res = child.get_text()
         return self._selection.get(res, False)
+
+    def sig_key_press(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS \
+                and event.state & gtk.gdk.CONTROL_MASK \
+                and event.keyval == gtk.keysyms.space:
+            self.entry.popup()
 
     def sig_activate(self, widget, event=None):
         text = self.entry.child.get_text()
