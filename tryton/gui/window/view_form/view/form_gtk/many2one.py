@@ -85,6 +85,7 @@ class Dialog(object):
 
     def destroy(self):
         self.window.present()
+        self.screen.destroy()
         self.dia.destroy()
 
 class Many2One(WidgetInterface):
