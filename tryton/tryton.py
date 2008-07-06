@@ -15,6 +15,7 @@ import config
 from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
 import translate
 import gui
+import traceback
 
 
 class TrytonClient(object):
@@ -62,6 +63,17 @@ class TrytonClient(object):
 
     def run(self):
         main = gui.Main()
+
+        def excepthook(exctyp, value, tb):
+            import common
+            tb_s = reduce(lambda x, y: x+y,
+                    traceback.format_exception(exctyp, value, tb))
+            for path in sys.path:
+                tb_s = tb_s.replace(path, '')
+            common.error(str(value), main.window, tb_s)
+
+        sys.excepthook = excepthook
+
         if CONFIG['tip.autostart']:
             main.sig_tips()
         main.sig_login()
