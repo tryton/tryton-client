@@ -176,8 +176,10 @@ class Tree(SignalEvent):
             try:
                 ids = rpc.execute(*args)[self.view['field_childs']]
             except Exception, exception:
-                ids = common.process_exception(exception, self.window, *args)\
-                        [self.view['field_childs']]
+                res = common.process_exception(exception, self.window, *args)
+                if not res:
+                    return False
+                ids = res[self.view['field_childs']]
                 if not ids:
                     return False
 

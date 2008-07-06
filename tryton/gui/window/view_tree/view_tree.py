@@ -61,8 +61,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 for obj_id in ids:
                     val = {'id': obj_id}
                     for field in fields:
-                        if self.fields_type[field]['type'] \
-                                in ('one2many', 'many2many'):
+                        if field in self.fields_type \
+                                and self.fields_type[field]['type'] \
+                                    in ('one2many', 'many2many'):
                             val[field] = []
                         else:
                             val[field] = ''
