@@ -1046,11 +1046,13 @@ class Main(object):
 
         try:
             rpc.db_exec(host, int(port), 'drop', passwd, dbname)
+        except Exception, exception:
             self.refresh_ssl()
-        except:
-            common.message(_('Unable to drop the database!'),
-                    parent=self.window)
+            common.warning(_('Database drop failed with '\
+                    'error message:\n') + str(exception[0]), self.window,
+                    _('Database drop failed!'))
             return
+        self.refresh_ssl()
         common.message(_("Database dropped successfully!"),
                 parent=self.window)
 
@@ -1068,8 +1070,15 @@ class Main(object):
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
             host, port = url.rsplit(':' , 1)
-            res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
-                    data_b64)
+            try:
+                res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
+                        data_b64)
+            except Exception, exception:
+                self.refresh_ssl()
+                common.warning(_('Database restore failed with ' \
+                        'error message:\n') + str(exception[0]), self.window,
+                        _('Database restore failed!'))
+                return
             self.refresh_ssl()
             if res:
                 common.message(_("Database restored successfully!"),
@@ -1112,8 +1121,14 @@ class Main(object):
                         "new password, operation cancelled!"),
                         _("Validation Error."), parent=win)
             else:
-                rpc.db_exec(host, port, 'change_admin_password',
-                        old_passwd, new_passwd)
+                try:
+                    rpc.db_exec(host, port, 'change_admin_password',
+                            old_passwd, new_passwd)
+                except Exception, exception:
+                    rpc.logout()
+                    common.warning(_('Change Admin password failed with ' \
+                            'error message:\n') + str(exception[0]),
+                            self.window, _('Change Admin password failed!'))
                 self.refresh_ssl()
         else:
             rpc.logout()
@@ -1127,15 +1142,24 @@ class Main(object):
             rpc.logout()
             Main.get_main().refresh_ssl()
             return
+
+        host, port = url.rsplit(':', 1)
+        try:
+            dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
+        except Exception, exception:
+            rpc.logout()
+            Main.get_main().refresh_ssl()
+            common.warning(_('Database dump failed with error message:\n') + \
+                    str(exception[0]), self.window, _('Database dump failed!'))
+            return
+        self.refresh_ssl()
+        dump = base64.decodestring(dump_b64)
+
         filename = common.file_selection(_('Save As...'),
                 action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window,
                 preview=False)
 
         if filename:
-            host, port = url.rsplit(':', 1)
-            dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
-            self.refresh_ssl()
-            dump = base64.decodestring(dump_b64)
             file_ = file(filename, 'wb')
             file_.write(dump)
             file_.close()
