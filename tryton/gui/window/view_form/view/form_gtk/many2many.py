@@ -123,7 +123,7 @@ class Many2Many(WidgetInterface):
             ids = model_field.get_client(model)
         if ids != self.old:
             self.screen.clear()
-            self.screen.load(ids)
+            self.screen.load(ids, set_cursor=False)
             self.old = ids
         self.screen.display()
         return True
