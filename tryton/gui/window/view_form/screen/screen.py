@@ -453,7 +453,7 @@ class Screen(SignalEvent):
             self.parent.reload()
         self.display()
 
-    def remove(self, unlink=False):
+    def remove(self, unlink=False, remove=False):
         res = False
         reload_ids = []
         if self.current_view.view_type == 'form' and self.current_model:
@@ -470,7 +470,7 @@ class Screen(SignalEvent):
                     return False
             self.current_view.set_cursor()
             idx = self.models.models.index(self.current_model)
-            self.models.remove(self.current_model)
+            self.models.remove(self.current_model, remove=remove)
             if self.models.models:
                 idx = min(idx, len(self.models.models)-1)
                 self.current_model = self.models.models[idx]
@@ -497,7 +497,7 @@ class Screen(SignalEvent):
             idx = self.models.models.index(
                     self.current_view.sel_models_get()[0])
             for model in self.current_view.sel_models_get():
-                self.models.remove(model)
+                self.models.remove(model, remove=remove)
             if self.models.models:
                 idx = min(idx, len(self.models.models)-1)
                 self.current_model = self.models.models[idx]
@@ -510,8 +510,8 @@ class Screen(SignalEvent):
             res = ids
         return res
 
-    def load(self, ids, set_cursor=True):
-        self.models.load(ids, display=False)
+    def load(self, ids, set_cursor=True, modified=False):
+        self.models.load(ids, display=False, modified=modified)
         self.current_view.reset()
         if set_cursor:
             self.current_view.set_cursor()

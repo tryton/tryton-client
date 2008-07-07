@@ -5,10 +5,14 @@ from tryton.common import TRYTON_ICON
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.view_form.model.group import ModelRecordGroup
+from tryton.gui.window.win_search import WinSearch
+from tryton.gui.window.view_form.widget_search.form import _LIMIT
+import tryton.common as common
+import tryton.rpc as rpc
 
 _ = gettext.gettext
 
-def _create_menu(self):
+def _create_menu(self, attrs):
     hbox = gtk.HBox(homogeneous=False, spacing=5)
     menubar = gtk.MenuBar()
     if hasattr(menubar, 'set_pack_direction') and \
@@ -34,6 +38,35 @@ def _create_menu(self):
 
     tooltips = gtk.Tooltips()
 
+    if attrs.get('add_remove'):
+
+        self.wid_text = gtk.Entry()
+        self.wid_text.set_property('width_chars', 13)
+        self.wid_text.connect('activate', self._sig_activate)
+        hbox.pack_start(self.wid_text, expand=True, fill=True)
+
+        self.eb_add = gtk.EventBox()
+        tooltips.set_tip(self.eb_add, _('Add'))
+        self.eb_add.set_events(gtk.gdk.BUTTON_PRESS)
+        self.eb_add.connect('button_press_event', self._sig_add)
+        img_add = gtk.Image()
+        img_add.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
+        img_add.set_alignment(0.5, 0.5)
+        self.eb_add.add(img_add)
+        hbox.pack_start(self.eb_add, expand=False, fill=False)
+
+        self.eb_remove = gtk.EventBox()
+        tooltips.set_tip(self.eb_remove, _('Remove'))
+        self.eb_remove.set_events(gtk.gdk.BUTTON_PRESS)
+        self.eb_remove.connect('button_press_event', self._sig_remove, True)
+        img_remove = gtk.Image()
+        img_remove.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
+        img_remove.set_alignment(0.5, 0.5)
+        self.eb_remove.add(img_remove)
+        hbox.pack_start(self.eb_remove, expand=False, fill=False)
+
+        hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
+
     self.eb_new = gtk.EventBox()
     tooltips.set_tip(self.eb_new, _('Create a new entry'))
     self.eb_new.set_events(gtk.gdk.BUTTON_PRESS)
@@ -45,7 +78,7 @@ def _create_menu(self):
     hbox.pack_start(self.eb_new, expand=False, fill=False)
 
     self.eb_open = gtk.EventBox()
-    tooltips.set_tip(self.eb_open, _('Edit this entry'))
+    tooltips.set_tip(self.eb_open, _('Edit selected entry'))
     self.eb_open.set_events(gtk.gdk.BUTTON_PRESS)
     self.eb_open.connect('button_press_event', self._sig_edit)
     img_open = gtk.Image()
@@ -55,7 +88,7 @@ def _create_menu(self):
     hbox.pack_start(self.eb_open, expand=False, fill=False)
 
     self.eb_del = gtk.EventBox()
-    tooltips.set_tip(self.eb_del, _('Remove this entry'))
+    tooltips.set_tip(self.eb_del, _('Delete selected entry'))
     self.eb_del.set_events(gtk.gdk.BUTTON_PRESS)
     self.eb_del.connect('button_press_event', self._sig_remove)
     img_del = gtk.Image()
@@ -152,7 +185,7 @@ class Dialog(object):
 
         menuitem_title = None
         if isinstance(model, ModelRecordGroup):
-            hbox, menuitem_title = _create_menu(self)
+            hbox, menuitem_title = _create_menu(self, attrs)
             self.dia.vbox.pack_start(hbox, expand=False, fill=True)
 
         scroll = gtk.ScrolledWindow()
@@ -211,6 +244,10 @@ class Dialog(object):
         self.screen.current_view.set_cursor()
 
     def on_keypress(self, widget, event):
+        if self.attrs.get('add_remove') \
+                and event.keyval == gtk.keysyms.F3:
+            self._sig_add()
+            return False
         if (event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
                 and event.state & gtk.gdk.CONTROL_MASK) \
                 or event.keyval == gtk.keysyms.F3:
@@ -264,11 +301,41 @@ class Dialog(object):
         if event.type == gtk.gdk.BUTTON_PRESS:
             self.screen.display_prev()
 
-    def _sig_remove(self, widget, event):
+    def _sig_remove(self, widget, event, remove=False):
         if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.remove()
+            self.screen.remove(remove=remove)
             if not self.screen.models.models:
                 self.screen.current_view.widget.set_sensitive(False)
+
+    def _sig_activate(self, *args):
+        self._sig_add()
+        self.wid_text.grab_focus()
+
+    def _sig_add(self, *args):
+        domain = []
+
+        try:
+            ids = rpc.execute('object', 'execute', self.attrs['relation'],
+                    'name_search', self.wid_text.get_text(), domain, 'ilike',
+                    context, _LIMIT)
+        except Exception, exception:
+            common.process_exception(exception, self._window)
+            return False
+        ids = [x[0] for x in ids]
+        if len(ids) != 1:
+            win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
+                    context=context, domain=domain, parent=self._window,
+                    views_preload=self.attrs.get('views', {}))
+            ids = win.run()
+
+        res_id = None
+        if ids:
+            res_id = ids[0]
+        self.screen.load(ids, modified=True)
+        self.screen.display(res_id=res_id)
+        if self.screen.current_view:
+            self.screen.current_view.set_cursor()
+        self.wid_text.set_text('')
 
     def _sig_label(self, screen, signal_data):
         name = '_'
@@ -320,7 +387,7 @@ class One2Many(WidgetInterface):
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
 
-        hbox, menuitem_title = _create_menu(self)
+        hbox, menuitem_title = _create_menu(self, attrs)
 
         self.widget.pack_start(hbox, expand=False, fill=True)
 
@@ -346,6 +413,10 @@ class One2Many(WidgetInterface):
         return self.screen.widget.grab_focus()
 
     def on_keypress(self, widget, event):
+        if self.attrs.get('add_remove') \
+                and event.keyval == gtk.keysyms.F3:
+            self._sig_add()
+            return False
         if (event.keyval == gtk.keysyms.N \
                     and event.state & gtk.gdk.CONTROL_MASK \
                     and event.state & gtk.gdk.SHIFT_MASK) \
@@ -368,6 +439,10 @@ class One2Many(WidgetInterface):
     def _readonly_set(self, value):
         self.eb_new.set_sensitive(not value)
         self.eb_del.set_sensitive(not value)
+        if self.attrs.get('add_remove'):
+            self.wid_text.set_sensitive(not value)
+            self.eb_add.set_sensitive(not value)
+            self.eb_remove.set_sensitive(not value)
 
     def _sig_new(self, widget, event):
         ctx = self._view.model.expr_eval(self.screen.default_get)
@@ -426,11 +501,45 @@ class One2Many(WidgetInterface):
         if event.type == gtk.gdk.BUTTON_PRESS:
             self.screen.display_prev()
 
-    def _sig_remove(self, widget, event):
+    def _sig_remove(self, widget, event, remove=False):
         if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.remove()
+            self.screen.remove(remove=remove)
             if not self.screen.models.models:
                 self.screen.current_view.widget.set_sensitive(False)
+
+    def _sig_activate(self, *args):
+        self._sig_add()
+        self.wid_text.grab_focus()
+
+    def _sig_add(self, *args):
+        domain = self._view.modelfield.domain_get(self._view.model)
+        context = self._view.modelfield.context_get(self._view.model)
+        domain = domain[:]
+        domain.extend(self._view.model.expr_eval(self.attrs.get('add_remove'),
+            context))
+
+        try:
+            ids = rpc.execute('object', 'execute', self.attrs['relation'],
+                    'name_search', self.wid_text.get_text(), domain, 'ilike',
+                    context, _LIMIT)
+        except Exception, exception:
+            common.process_exception(exception, self._window)
+            return False
+        ids = [x[0] for x in ids]
+        if len(ids) != 1:
+            win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
+                    context=context, domain=domain, parent=self._window,
+                    views_preload=self.attrs.get('views', {}))
+            ids = win.run()
+
+        res_id = None
+        if ids:
+            res_id = ids[0]
+        self.screen.load(ids, modified=True)
+        self.screen.display(res_id=res_id)
+        if self.screen.current_view:
+            self.screen.current_view.set_cursor()
+        self.wid_text.set_text('')
 
     def _sig_label(self, screen, signal_data):
         name = '_'

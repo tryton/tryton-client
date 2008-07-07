@@ -87,6 +87,7 @@ class ModelRecordGroup(SignalEvent):
         self.current_idx = None
         self.load(ids)
         self.model_removed = []
+        self.model_unlinked = []
         self.on_write = ''
         self.readonly = readonly
 
@@ -138,7 +139,7 @@ class ModelRecordGroup(SignalEvent):
             self.models.lock_signal = False
             self.signal('record-cleared')
 
-    def load(self, ids, display=True):
+    def load(self, ids, display=True, modified=False):
         if not ids:
             return True
 
@@ -150,11 +151,17 @@ class ModelRecordGroup(SignalEvent):
         if len(ids) > 10:
             self.models.lock_signal = True
         newmod = None
+        newmods = []
         for id in ids:
             newmod = ModelRecord(self.resource, id, self.window,
                     parent=self.parent, group=self)
             self.models.append(newmod)
+            newmods.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
+            if id in self.model_removed:
+                del self.model_removed[id]
+            if id in self.model_unlinked:
+                del self.model_unlinked[id]
         if len(ids) > 10:
             self.models.lock_signal = False
             self.signal('record-cleared')
@@ -173,12 +180,20 @@ class ModelRecordGroup(SignalEvent):
 
         if newmod and display:
             self.signal('model-changed', newmod)
+
+        if modified:
+            for newmod in newmods:
+                newmod.modified = True
+                if newmod.parent:
+                    newmod.signal('record-changed', newmod.parent)
+
         self.current_idx = 0
         return True
 
     def clear(self):
         self.models.clear()
         self.model_removed = []
+        self.model_unlinked = []
 
     def _get_context(self):
         ctx = {}
@@ -267,10 +282,13 @@ class ModelRecordGroup(SignalEvent):
             return None
         return self.models[self.current_idx]
 
-    def remove(self, model):
+    def remove(self, model, remove=False):
         idx = self.models.index(model)
         if self.models[idx].id:
-            self.model_removed.append(self.models[idx].id)
+            if remove:
+                self.model_removed.append(self.models[idx].id)
+            else:
+                self.model_unlinked.append(self.models[idx].id)
         if model.parent:
             model.parent.modified = True
         self.models.remove(self.models[idx])

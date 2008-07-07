@@ -336,6 +336,8 @@ class O2MField(CharField):
                 result.append(('create',
                     model2.get(check_load=check_load, get_readonly=readonly)))
         for rm_id in model.value[self.name].model_removed:
+            result.append(('remove', rm_id))
+        for rm_id in model.value[self.name].model_unlinked:
             result.append(('unlink', rm_id))
         return result
 
