@@ -196,7 +196,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         node = []
         tree = self.tree
         for i in path:
-            if not tree:
+            if not tree or i >= len(tree):
                 return None
             node.append((i, tree))
             tree = tree[i][2]
