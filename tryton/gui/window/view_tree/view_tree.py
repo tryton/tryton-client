@@ -195,9 +195,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         '''returns the node corresponding to the given path.'''
         node = []
         tree = self.tree
-        if self.tree == []:
-            return None
         for i in path:
+            if not tree:
+                return None
             node.append((i, tree))
             tree = tree[i][2]
         return node
