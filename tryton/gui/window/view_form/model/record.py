@@ -37,7 +37,7 @@ class ModelRecord(SignalEvent):
         self.mgroup = group
         self.value = {}
         self.state_attrs = {}
-        self.modified = False
+        self.__modified = False
         self.modified_fields = {}
         self.read_time = time.time()
         self.attachment_count = -1
@@ -79,6 +79,14 @@ class ModelRecord(SignalEvent):
 
     def __repr__(self):
         return '<ModelRecord %s@%s>' % (self.id, self.resource)
+
+    def get_modified(self):
+        return self.__modified
+
+    def set_modified(self, value):
+        self.__modified = value
+
+    modified = property(get_modified, set_modified)
 
     def is_modified(self):
         return self.modified
