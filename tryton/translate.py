@@ -166,7 +166,7 @@ def setlang(lang=None):
                 lang2 = _LOCALE2WIN32.get(lang, lang)
             locale.setlocale(locale.LC_ALL, lang2 + '.' + encoding)
         except:
-            logging.getLogger('translate').warn(
+            logging.getLogger('translate').info(
                     _('Unable to set locale %s') % lang2 + '.' + encoding)
         if not os.path.isdir(locale_dir):
             gettext.install(PACKAGE, unicode=1)
