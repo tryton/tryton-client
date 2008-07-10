@@ -394,15 +394,27 @@ class ViewList(ParserView):
         self.screen.row_activate()
 
     def __select_changed(self, tree_sel):
+        previous_model = self.screen.current_model
+
         if tree_sel.get_mode() == gtk.SELECTION_SINGLE:
             model, iter = tree_sel.get_selected()
             if iter:
                 path = model.get_path(iter)[0]
                 self.screen.current_model = model.models[path]
+
         elif tree_sel.get_mode() == gtk.SELECTION_MULTIPLE:
             model, paths = tree_sel.get_selected_rows()
             if paths:
                 self.screen.current_model = model.models[paths[0][0]]
+
+        if hasattr(self.widget_tree, 'editable') \
+                and self.widget_tree.editable \
+                and self.screen.tree_saves \
+                and previous_model != self.screen.current_model:
+            if not previous_model.save():
+                self.screen.current_model = previous_model
+                self.set_cursor()
+                return True
         self.update_children()
 
 
