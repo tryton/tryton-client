@@ -213,7 +213,7 @@ class ViewList(ParserView):
         model = treemodel.get_value(iter, 0)
         values = []
         for col in self.widget_tree.get_columns():
-            if not col.get_visible():
+            if not col.get_visible() or not col.name:
                 continue
             cell = self.widget_tree.cells[col.name]
             values.append('"' + str(cell.get_textual_value(model)) + '"')
