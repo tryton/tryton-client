@@ -19,7 +19,8 @@ class Screen(SignalEvent):
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
             default_get=None, show_search=False, limit=None,
-            readonly=False, form=None, exclude_field=None, sort=None):
+            readonly=False, form=None, exclude_field=None, sort=None,
+            search_value=None):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -70,6 +71,7 @@ class Screen(SignalEvent):
         self.__current_view = 0
         self.tree_saves = tree_saves
         self.limit = limit
+        self.search_value = search_value
         self.form = form
         self.fields_view_tree = None
         self.exclude_field = exclude_field
@@ -101,6 +103,7 @@ class Screen(SignalEvent):
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear)
                 self.filter_widget.set_limit(self.limit)
+                self.filter_widget.value = self.search_value
             self.screen_container.show_filter()
         else:
             self.screen_container.hide_filter()

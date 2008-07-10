@@ -8,7 +8,7 @@ class Window(object):
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None,
             view_type='form', window=None, context=None, mode=None, name=False,
-            limit=None, auto_refresh=False):
+            limit=None, auto_refresh=False, search_value=None):
         from tryton.gui import Main
         if context is None:
             context = {}
@@ -18,7 +18,8 @@ class Window(object):
             from form import Form
             win = Form(model, window, res_id, domain, view_type=mode,
                     view_ids = (view_ids or []), context=context, name=name,
-                    limit=limit, auto_refresh=auto_refresh)
+                    limit=limit, auto_refresh=auto_refresh,
+                    search_value=search_value)
             Main.get_main().win_add(win)
         elif view_type == 'tree':
             from tree import Tree

@@ -26,7 +26,7 @@ class Char(Interface):
             return []
 
     def _value_set(self, value):
-        self.widget.set_text(value)
+        self.widget.set_text(value or '')
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))

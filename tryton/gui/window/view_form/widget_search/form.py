@@ -249,6 +249,8 @@ class Form(object):
         return res
 
     def _value_set(self, value):
+        if not value:
+            return
         for i in value:
             if i in self.widgets:
                 self.widgets[i][0].value = value[i]

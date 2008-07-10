@@ -103,6 +103,7 @@ class Action(object):
                     'view_type',
                     'limit',
                     'auto_refresh',
+                    'search_value',
                     ):
                 datas[key] = action.get(key, datas.get(key, None))
 
@@ -134,6 +135,11 @@ class Action(object):
             if datas.get('domain', False):
                 domain.append(datas['domain'])
 
+            search_context = ctx.copy()
+            search_context['time'] = time
+            search_context['datetime'] = datetime
+            search_value = eval(action['search_value'] or '{}', search_context)
+
             name = False
             if action.get('window_name', True):
                 name = action.get('name', False)
@@ -141,7 +147,8 @@ class Action(object):
             Window.create(view_ids, datas['res_model'], datas['res_id'], domain,
                     action['view_type'], win, ctx,
                     datas['view_mode'], name=name,
-                    limit=datas['limit'], auto_refresh=datas['auto_refresh'])
+                    limit=datas['limit'], auto_refresh=datas['auto_refresh'],
+                    search_value=search_value)
         elif action['type'] == 'ir.action.wizard':
             Wizard.execute(action['wiz_name'], datas, win,
                     context=context)

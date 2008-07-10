@@ -28,7 +28,7 @@ class Form(SignalEvent):
 
     def __init__(self, model, window, res_id=False, domain=None, view_type=None,
             view_ids=None, context=None, name=False, limit=None,
-            auto_refresh=False):
+            auto_refresh=False, search_value=None):
         super(Form, self).__init__()
         if not view_type:
             view_type = ['tree', 'form']
@@ -53,7 +53,8 @@ class Form(SignalEvent):
         self.screen = Screen(self.model, self.window, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
                 hastoolbar=CONFIG['form.toolbar'], show_search=True,
-                limit=limit, readonly=bool(auto_refresh), form=self)
+                limit=limit, readonly=bool(auto_refresh), form=self,
+                search_value=search_value)
         self.screen.signal_connect(self, 'record-message', self._record_message)
         self.screen.signal_connect(self, 'attachment-count',
                 self._attachment_count)

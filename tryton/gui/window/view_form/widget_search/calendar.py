@@ -76,8 +76,16 @@ class Calendar(Interface):
         return res
 
     def _value_set(self, value):
-        self.entry1.set_text(value)
-        self.entry2.set_text(value)
+        def conv(value):
+            if not value:
+                return ''
+            try:
+                return value.strftime(LocaleTime().LC_date.replace('%y', '%Y'))
+            except:
+                return ''
+
+        self.entry1.set_text(conv(value[0]))
+        self.entry2.set_text(conv(value[1]))
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))

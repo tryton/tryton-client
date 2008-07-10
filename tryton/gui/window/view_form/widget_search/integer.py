@@ -55,12 +55,13 @@ class Integer(Interface):
         return res
 
     def _value_set(self, value):
-        if value == False:
-            text = ''
-        else:
-            text = locale.format('%d', value or 0, True)
-        self.entry1.set_text(text)
-        self.entry2.set_text(text)
+        def conv(value):
+            if value == False:
+                return ''
+            else:
+                return locale.format('%d', value or 0, True)
+        self.entry1.set_text(conv(value[0]))
+        self.entry2.set_text(conv(value[1]))
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))
