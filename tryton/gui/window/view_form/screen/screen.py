@@ -18,8 +18,9 @@ class Screen(SignalEvent):
     def __init__(self, model_name, window, view_ids=None, view_type=None,
             parent=None, context=None, views_preload=None, tree_saves=True,
             domain=None, create_new=False, row_activate=None, hastoolbar=False,
-            default_get=None, limit=None, readonly=False, form=None,
-            exclude_field=None, sort=None, search_value=None):
+            default_get=None, show_search=False, limit=None,
+            readonly=False, form=None, exclude_field=None, sort=None,
+            search_value=None):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -36,6 +37,7 @@ class Screen(SignalEvent):
         super(Screen, self).__init__()
 
         self.__current_model = None
+        self.show_search = show_search
         self.search_count = 0
         self.hastoolbar = hastoolbar
         self.default_get = default_get
@@ -86,7 +88,7 @@ class Screen(SignalEvent):
         self.display()
 
     def search_active(self, active=True):
-        if active:
+        if active and self.show_search:
             if not self.filter_widget:
                 if not self.fields_view_tree:
                     try:
