@@ -52,8 +52,8 @@ class Form(SignalEvent):
 
         self.screen = Screen(self.model, self.window, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
-                hastoolbar=CONFIG['form.toolbar'], limit=limit,
-                readonly=bool(auto_refresh), form=self,
+                hastoolbar=CONFIG['form.toolbar'], show_search=True,
+                limit=limit, readonly=bool(auto_refresh), form=self,
                 search_value=search_value)
         self.screen.signal_connect(self, 'record-message', self._record_message)
         self.screen.signal_connect(self, 'attachment-count',
