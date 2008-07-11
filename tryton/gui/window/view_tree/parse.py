@@ -29,6 +29,8 @@ class Parse(object):
             if 'fill' in attrs:
                 self.fill = bool(int(attrs.get('fill')))
         elif name == 'field':
+            if not attrs['name'] in self.fields:
+                return
             field_type = self.fields[attrs['name']]['type']
             if field_type != 'boolean':
                 column = gtk.TreeViewColumn(
