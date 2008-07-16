@@ -12,18 +12,32 @@ class CheckBox(Interface):
         super(CheckBox, self).__init__(name, parent, attrs)
 
         self.widget = gtk.combo_box_entry_new_text()
+        self.widget.child.set_editable(True)
+        self.widget.child.set_property('activates_default', True)
+        self.widget.child.connect('key_press_event', self.sig_key_press)
+        self.widget.set_focus_chain([self.widget.child])
+
         self.widget.append_text('')
         self.widget.append_text(_('Yes'))
         self.widget.append_text(_('No'))
 
-        self.entry = self.widget.child
-        self.entry.set_property('activates_default', True)
-        self.entry.set_editable(False)
+        completion = gtk.EntryCompletion()
+        completion.set_inline_selection(True)
+        completion.set_model(self.widget.get_model())
+        self.widget.child.set_completion(completion)
+        completion.set_text_column(0)
+
+    def sig_key_press(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS \
+                and event.state & gtk.gdk.CONTROL_MASK \
+                and event.keyval == gtk.keysyms.space:
+            self.widget.popup()
 
     def _value_get(self):
-        val = self.entry.get_text()
+        val = self.widget.child.get_text()
         if val:
             return [(self.name, '=', int(val == _('Yes')))]
+        self.widget.child.set_text('')
         return []
 
     def _value_set(self, value):
@@ -37,3 +51,6 @@ class CheckBox(Interface):
 
     value = property(_value_get, _value_set, None,
             _('The content of the widget or ValueError if not valid'))
+
+    def sig_activate(self, fct):
+        self.widget.child.connect_after('activate', fct)

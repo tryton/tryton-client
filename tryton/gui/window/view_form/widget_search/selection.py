@@ -12,7 +12,10 @@ class Selection(Interface):
         super(Selection, self).__init__(name, parent, attrs)
 
         self.widget = gtk.combo_box_entry_new_text()
-        self.widget.child.set_editable(False)
+        self.widget.child.set_editable(True)
+        self.widget.child.set_property('activates_default', True)
+        self.widget.child.connect('key_press_event', self.sig_key_press)
+        self.widget.set_focus_chain([self.widget.child])
         self._selection = {}
         selection = attrs.get('selection', [])
         if 'relation' in attrs:
@@ -49,15 +52,24 @@ class Selection(Interface):
         self.widget.append_text('')
         for name in lst:
             self.widget.append_text(name)
+        completion = gtk.EntryCompletion()
+        completion.set_inline_selection(True)
+        completion.set_model(model)
+        self.widget.child.set_completion(completion)
+        completion.set_text_column(0)
         return lst
 
+    def sig_key_press(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS \
+                and event.state & gtk.gdk.CONTROL_MASK \
+                and event.keyval == gtk.keysyms.space:
+            self.widget.popup()
+
     def _value_get(self):
-        model = self.widget.get_model()
-        index = self.widget.get_active()
-        if index >= 0:
-            res = self._selection.get(model[index][0], False)
-            if res:
-                return [(self.name, '=', res)]
+        res = self._selection.get(self.widget.child.get_text(), False)
+        if res:
+            return [(self.name, '=', res)]
+        self.widget.child.set_text('')
         return []
 
     def _value_set(self, value):
@@ -77,3 +89,6 @@ class Selection(Interface):
 
     def _readonly_set(self, value):
         self.widget.set_sensitive(not value)
+
+    def sig_activate(self, fct):
+        self.widget.child.connect_after('activate', fct)

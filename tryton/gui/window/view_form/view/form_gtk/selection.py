@@ -66,6 +66,11 @@ class Selection(WidgetInterface):
             model.set(i, 0, name)
         self.entry.set_model(model)
         self.entry.set_text_column(0)
+        completion = gtk.EntryCompletion()
+        completion.set_inline_selection(True)
+        completion.set_model(model)
+        self.entry.get_child().set_completion(completion)
+        completion.set_text_column(0)
         return lst
 
     def _readonly_set(self, value):
