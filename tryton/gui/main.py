@@ -101,7 +101,6 @@ def _request_server(server_widget, parent):
     dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
     dialog.add_button("gtk-ok", gtk.RESPONSE_OK)
     dialog.vbox.pack_start(vbox)
-    dialog.set_transient_for(parent)
     dialog.set_icon(TRYTON_ICON)
     dialog.show_all()
     dialog.set_default_response(gtk.RESPONSE_OK)
@@ -125,20 +124,19 @@ def _request_server(server_widget, parent):
 
 
 class DBLogin(object):
-    def __init__(self, parent=None):
-        self.dialog = gtk.Dialog(
-            title =  _('Login'),
-            parent = parent,
-            flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,)
+    def __init__(self, parent):
+        self.dialog = gtk.Dialog(title=_('Login'), parent=parent,
+            flags=gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dialog.set_size_request(500, 301)
-        self.dialog.set_title (_("Login"))
         self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(False)
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL)
         self.button_connect = gtk.Button(_('C_onnect'))
-        self.button_connect.set_flags(gtk.CAN_FOCUS|gtk.CAN_DEFAULT
-            |gtk.HAS_DEFAULT)
+        img_connect = gtk.Image()
+        img_connect.set_from_stock('tryton-connect', gtk.ICON_SIZE_BUTTON)
+        self.button_connect.set_image(img_connect)
+        self.button_connect.set_flags(gtk.CAN_DEFAULT)
         self.dialog.add_action_widget(self.button_connect, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         dialog_vbox = gtk.VBox()
@@ -157,58 +155,48 @@ class DBLogin(object):
         self.combo_database = gtk.ComboBox()
         self.combo_label = gtk.Label()
         self.combo_label.set_use_markup(True)
-        self.combo_label.set_alignment(0.01, 1)
+        self.combo_label.set_alignment(0, 1)
         vbox_combo.pack_start(self.combo_database, True, True, 0)
         vbox_combo.pack_start(self.combo_label, False, False, 0)
-        table_main.attach(vbox_combo, 1, 3, 1, 2, yoptions=False, 
-            xoptions=gtk.FILL)
+        table_main.attach(vbox_combo, 1, 3, 1, 2)
         self.entry_password = gtk.Entry()
         self.entry_password.set_visibility(False)
         self.entry_password.set_activates_default(True)
-        table_main.attach(self.entry_password, 1, 3, 3, 4, yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(self.entry_password, 1, 3, 3, 4)
         self.entry_login = gtk.Entry()
         self.entry_login.set_text("admin")
         self.entry_login.set_activates_default(True)
-        table_main.attach(self.entry_login, 1, 3, 2, 3, yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(self.entry_login, 1, 3, 2, 3)
         label_server = gtk.Label()
         label_server.set_text(_("Server:"))
-        label_server.set_size_request(117, -1)
         label_server.set_alignment(1, 0.5)
         label_server.set_padding(3, 3)
-        table_main.attach(label_server, 0, 1, 0, 1, yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(label_server, 0, 1, 0, 1, xoptions=gtk.FILL)
         label_database = gtk.Label()
         label_database.set_text(_("Database:"))
         label_database.set_alignment(1, 0.5)
         label_database.set_padding(3, 3)
-        table_main.attach(label_database, 0, 1, 1, 2,yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(label_database, 0, 1, 1, 2, xoptions=gtk.FILL)
         self.entry_server = gtk.Entry()
-        table_main.attach(self.entry_server, 1, 2, 0, 1, yoptions=False, 
-            xoptions=gtk.FILL)
+        table_main.attach(self.entry_server, 1, 2, 0, 1)
         self.entry_server.set_sensitive(False)
         self.entry_server.unset_flags(gtk.CAN_FOCUS)
         self.entry_server.set_editable(False)
         self.entry_server.set_text("localhost")
         self.entry_server.set_activates_default(True)
         self.entry_server.set_width_chars(16)
-        self.button_server = gtk.Button(label=_("C_hange"), stock=None, 
+        self.button_server = gtk.Button(label=_("C_hange"), stock=None,
             use_underline=True)
-        table_main.attach(self.button_server, 2, 3, 0, 1, yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(self.button_server, 2, 3, 0, 1, xoptions=gtk.FILL)
         label_password = gtk.Label(str = _("Password:"))
         label_password.set_justify(gtk.JUSTIFY_RIGHT)
         label_password.set_alignment(1, 0.5)
         label_password.set_padding(3, 3)
-        table_main.attach(label_password, 0, 1, 3, 4, yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(label_password, 0, 1, 3, 4, xoptions=gtk.FILL)
         label_username = gtk.Label(str = _("User name:"))
         label_username.set_alignment(1, 0.5)
         label_username.set_padding(3, 3)
-        table_main.attach(label_username, 0, 1, 2, 3,yoptions=False,
-            xoptions=gtk.FILL)
+        table_main.attach(label_username, 0, 1, 2, 3, xoptions=gtk.FILL)
         self.entry_password.grab_focus()
         self.dialog.vbox.pack_start(dialog_vbox)
 
@@ -243,7 +231,6 @@ class DBLogin(object):
                 butconnect)
 
     def run(self, dbname, parent):
-        self.dialog.set_transient_for(parent)
         self.dialog.show_all()
         self.combo_label.hide()
 
@@ -859,7 +846,7 @@ class Main(object):
     def sig_login(self, widget=None, dbname=False, res=None):
         if not res:
             try:
-                dblogin = DBLogin()
+                dblogin = DBLogin(self.window)
                 res = dblogin.run(dbname, self.window)
             except Exception, exception:
                 if exception.args == ('QueryCanceled',):
