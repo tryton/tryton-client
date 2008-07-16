@@ -4,6 +4,7 @@ from gtk import glade
 import gobject
 import gettext
 import os
+import re
 import logging
 from tryton.config import CONFIG
 from tryton.config import GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
@@ -14,8 +15,112 @@ import md5
 import webbrowser
 import traceback
 import tryton.rpc as rpc
+import locale
 
 _ = gettext.gettext
+
+def refresh_dblist(db_widget, host, port, dbtoload=None):
+    if not dbtoload:
+        dbtoload = CONFIG['login.db']
+    index = 0
+    liststore = db_widget.get_model()
+    liststore.clear()
+    result = rpc.db_list(host, port)
+    from tryton.gui.main import Main
+    Main.get_main().refresh_ssl()
+    if result is None:
+        return None
+    for db_num, dbname in enumerate(result):
+        liststore.append([dbname])
+        if dbname == dbtoload:
+            index = db_num
+    db_widget.set_active(index)
+    return len(liststore)
+
+def refresh_langlist(lang_widget, host, port):
+    liststore = lang_widget.get_model()
+    liststore.clear()
+    lang_list = rpc.db_exec(host, port, 'list_lang')
+    from tryton.gui.main import Main
+    Main.get_main().refresh_ssl()
+    index = -1
+    i = 0
+    lang = locale.getdefaultlocale()[0]
+    for key, val in lang_list:
+        liststore.insert(i, (val, key))
+        if key == lang:
+            index = i
+        if key == 'en_US' and index < 0 :
+            index = i
+        i += 1
+    lang_widget.set_active(index)
+    return lang_list
+
+def request_server(server_widget, parent):
+    result = False
+    dialog = gtk.Dialog(
+        title =  _('Server'),
+        parent = parent,
+        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT | 
+            gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
+    vbox = gtk.VBox()
+    label_connect = gtk.Label(_("<b>Connect to a Tryton server</b>"))
+    label_connect.set_use_markup(True)
+    label_connect.set_alignment(0, 0.5)
+    vbox.pack_start(label_connect, False, False, 0)
+    hseparator = gtk.HSeparator()
+    vbox.pack_start(hseparator, False, True, 0)
+    table = gtk.Table(2, 2, False)
+    table.set_border_width(12)
+    table.set_row_spacings(6)
+    vbox.pack_start(table, False, True, 0)
+    label_server = gtk.Label(_("Server:"))
+    label_server.set_alignment(1, 0)
+    label_server.set_padding(3, 0)
+    table.attach(label_server, 0, 1, 0, 1, yoptions=False,
+        xoptions=gtk.FILL)
+    entry_port = gtk.Entry()
+    entry_port.set_max_length(5)
+    entry_port.set_text("8069")
+    entry_port.set_activates_default(True)
+    entry_port.set_width_chars(16)
+    table.attach(entry_port, 1, 2, 1, 2, yoptions=False,
+        xoptions=gtk.FILL)
+    entry_server = gtk.Entry()
+    entry_server.set_text("localhost")
+    entry_server.set_activates_default(True)
+    entry_server.set_width_chars(16)
+    table.attach(entry_server, 1, 2, 0, 1,yoptions=False,
+        xoptions=gtk.FILL | gtk.EXPAND)
+    label_port = gtk.Label(_("Port:"))
+    label_port.set_alignment(1, 0.5)
+    label_port.set_padding(3, 3)
+    table.attach(label_port, 0, 1, 1, 2, yoptions=False,
+        xoptions=False)
+    dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
+    dialog.add_button("gtk-ok", gtk.RESPONSE_OK)
+    dialog.vbox.pack_start(vbox)
+    dialog.set_icon(TRYTON_ICON)
+    dialog.show_all()
+    dialog.set_default_response(gtk.RESPONSE_OK)
+
+    url_m = re.match('^([\w.-]+):(\d{1,5})$',
+        server_widget.get_text())
+    if url_m:
+        entry_server.set_text(url_m.group(1))
+        entry_port.set_text(url_m.group(2))
+
+    res = dialog.run()
+    if res == gtk.RESPONSE_OK:
+        host = entry_server.get_text()
+        port = int(entry_port.get_text())
+        url = '%s:%d' % (host, port)
+        server_widget.set_text(url)
+        result = (host, port)
+    parent.present()
+    dialog.destroy()
+    return result
 
 
 def selection(title, values, parent, alwaysask=False):
