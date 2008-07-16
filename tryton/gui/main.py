@@ -56,39 +56,161 @@ def _refresh_langlist(lang_widget, host, port):
     lang_widget.set_active(index)
     return lang_list
 
-def _server_ask(server_widget, parent):
+def _request_server(server_widget, parent):
     result = False
-    win_gl = glade.XML(GLADE, "win_server", gettext.textdomain())
-    win = win_gl.get_widget('win_server')
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
-    win.show_all()
-    win.set_default_response(gtk.RESPONSE_OK)
-    host_widget = win_gl.get_widget('ent_host')
-    port_widget = win_gl.get_widget('ent_port')
+    dialog = gtk.Dialog(
+        title =  _('Server'),
+        parent = parent,
+        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT | 
+            gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
+    vbox = gtk.VBox()
+    label_connect = gtk.Label(_("<b>Connect to a Tryton server</b>"))
+    label_connect.set_use_markup(True)
+    label_connect.set_alignment(0, 0.5)
+    vbox.pack_start(label_connect, False, False, 0)
+    hseparator = gtk.HSeparator()
+    vbox.pack_start(hseparator, False, True, 0)
+    table = gtk.Table(2, 2, False)
+    table.set_border_width(12)
+    table.set_row_spacings(6)
+    vbox.pack_start(table, False, True, 0)
+    label_server = gtk.Label(_("Server:"))
+    label_server.set_alignment(1, 0)
+    label_server.set_padding(3, 0)
+    table.attach(label_server, 0, 1, 0, 1, yoptions=False,
+        xoptions=gtk.FILL)
+    entry_port = gtk.Entry()
+    entry_port.set_max_length(5)
+    entry_port.set_text("8069")
+    entry_port.set_activates_default(True)
+    entry_port.set_width_chars(16)
+    table.attach(entry_port, 1, 2, 1, 2, yoptions=False,
+        xoptions=gtk.FILL)
+    entry_server = gtk.Entry()
+    entry_server.set_text("localhost")
+    entry_server.set_activates_default(True)
+    entry_server.set_width_chars(16)
+    table.attach(entry_server, 1, 2, 0, 1,yoptions=False,
+        xoptions=gtk.FILL | gtk.EXPAND)
+    label_port = gtk.Label(_("Port:"))
+    label_port.set_alignment(1, 0.5)
+    label_port.set_padding(3, 3)
+    table.attach(label_port, 0, 1, 1, 2, yoptions=False,
+        xoptions=False)
+    dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
+    dialog.add_button("gtk-ok", gtk.RESPONSE_OK)
+    dialog.vbox.pack_start(vbox)
+    dialog.set_transient_for(parent)
+    dialog.set_icon(TRYTON_ICON)
+    dialog.show_all()
+    dialog.set_default_response(gtk.RESPONSE_OK)
 
     url_m = re.match('^([\w.-]+):(\d{1,5})$',
-            server_widget.get_text())
+        server_widget.get_text())
     if url_m:
-        host_widget.set_text(url_m.group(1))
-        port_widget.set_text(url_m.group(2))
+        entry_server.set_text(url_m.group(1))
+        entry_port.set_text(url_m.group(2))
 
-    res = win.run()
+    res = dialog.run()
     if res == gtk.RESPONSE_OK:
-        host = host_widget.get_text()
-        port = int(port_widget.get_text())
+        host = entry_server.get_text()
+        port = int(entry_port.get_text())
         url = '%s:%d' % (host, port)
         server_widget.set_text(url)
         result = (host, port)
     parent.present()
-    win.destroy()
+    dialog.destroy()
     return result
 
 
 class DBLogin(object):
-
-    def __init__(self):
-        self.win_gl = glade.XML(GLADE, "win_login", gettext.textdomain())
+    def __init__(self, parent=None):
+        self.dialog = gtk.Dialog(
+            title =  _('Login'),
+            parent = parent,
+            flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,)
+        self.dialog.set_size_request(500, 301)
+        self.dialog.set_title (_("Login"))
+        self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.dialog.set_has_separator(False)
+        self.dialog.set_icon(TRYTON_ICON)
+        self.dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL)
+        self.button_connect = gtk.Button(_('C_onnect'))
+        self.button_connect.set_flags(gtk.CAN_FOCUS|gtk.CAN_DEFAULT
+            |gtk.HAS_DEFAULT)
+        self.dialog.add_action_widget(self.button_connect, gtk.RESPONSE_OK)
+        self.dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog_vbox = gtk.VBox()
+        vbox_image = gtk.VBox()
+        image = gtk.Image()
+        image.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
+        image.set_size_request(500, 129)
+        vbox_image.pack_start(image)
+        dialog_vbox.pack_start(vbox_image)
+        table_main = gtk.Table(4, 3, False)
+        table_main.set_border_width(10)
+        table_main.set_row_spacings(3)
+        table_main.set_col_spacings(3)
+        vbox_image.pack_start(table_main, True, True, 0)
+        vbox_combo = gtk.VBox()
+        self.combo_database = gtk.ComboBox()
+        self.combo_label = gtk.Label()
+        self.combo_label.set_use_markup(True)
+        self.combo_label.set_alignment(0.01, 1)
+        vbox_combo.pack_start(self.combo_database, True, True, 0)
+        vbox_combo.pack_start(self.combo_label, False, False, 0)
+        table_main.attach(vbox_combo, 1, 3, 1, 2, yoptions=False, 
+            xoptions=gtk.FILL)
+        self.entry_password = gtk.Entry()
+        self.entry_password.set_visibility(False)
+        self.entry_password.set_activates_default(True)
+        table_main.attach(self.entry_password, 1, 3, 3, 4, yoptions=False,
+            xoptions=gtk.FILL)
+        self.entry_login = gtk.Entry()
+        self.entry_login.set_text("admin")
+        self.entry_login.set_activates_default(True)
+        table_main.attach(self.entry_login, 1, 3, 2, 3, yoptions=False,
+            xoptions=gtk.FILL)
+        label_server = gtk.Label()
+        label_server.set_text(_("Server:"))
+        label_server.set_size_request(117, -1)
+        label_server.set_alignment(1, 0.5)
+        label_server.set_padding(3, 3)
+        table_main.attach(label_server, 0, 1, 0, 1, yoptions=False,
+            xoptions=gtk.FILL)
+        label_database = gtk.Label()
+        label_database.set_text(_("Database:"))
+        label_database.set_alignment(1, 0.5)
+        label_database.set_padding(3, 3)
+        table_main.attach(label_database, 0, 1, 1, 2,yoptions=False,
+            xoptions=gtk.FILL)
+        self.entry_server = gtk.Entry()
+        table_main.attach(self.entry_server, 1, 2, 0, 1, yoptions=False, 
+            xoptions=gtk.FILL)
+        self.entry_server.set_sensitive(False)
+        self.entry_server.unset_flags(gtk.CAN_FOCUS)
+        self.entry_server.set_editable(False)
+        self.entry_server.set_text("localhost")
+        self.entry_server.set_activates_default(True)
+        self.entry_server.set_width_chars(16)
+        self.button_server = gtk.Button(label=_("C_hange"), stock=None, 
+            use_underline=True)
+        table_main.attach(self.button_server, 2, 3, 0, 1, yoptions=False,
+            xoptions=gtk.FILL)
+        label_password = gtk.Label(str = _("Password:"))
+        label_password.set_justify(gtk.JUSTIFY_RIGHT)
+        label_password.set_alignment(1, 0.5)
+        label_password.set_padding(3, 3)
+        table_main.attach(label_password, 0, 1, 3, 4, yoptions=False,
+            xoptions=gtk.FILL)
+        label_username = gtk.Label(str = _("User name:"))
+        label_username.set_alignment(1, 0.5)
+        label_username.set_padding(3, 3)
+        table_main.attach(label_username, 0, 1, 2, 3,yoptions=False,
+            xoptions=gtk.FILL)
+        self.entry_password.grab_focus()
+        self.dialog.vbox.pack_start(dialog_vbox)
 
     @staticmethod
     def refreshlist(widget, db_widget, label, host, port, butconnect=None):
@@ -116,74 +238,66 @@ class DBLogin(object):
     @staticmethod
     def refreshlist_ask(widget, server_widget, db_widget, label,
             butconnect=False, host=False, port=0, parent=None):
-        host, port = _server_ask(server_widget, parent) or (host, port)
+        host, port = _request_server(server_widget, parent) or (host, port)
         return DBLogin.refreshlist(widget, db_widget, label, host, port,
                 butconnect)
 
     def run(self, dbname, parent):
-        win = self.win_gl.get_widget('win_login')
-        win.set_transient_for(parent)
-        win.set_icon(TRYTON_ICON)
-        win.show_all()
-        img = self.win_gl.get_widget('image_tryton')
-        img.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
-        login = self.win_gl.get_widget('ent_login')
-        passwd = self.win_gl.get_widget('ent_passwd')
-        server_widget = self.win_gl.get_widget('ent_server')
-        but_connect = self.win_gl.get_widget('button_connect')
-        db_widget = self.win_gl.get_widget('combo_db')
-        change_button = self.win_gl.get_widget('but_server')
-        label = self.win_gl.get_widget('combo_label')
-        label.hide()
+        self.dialog.set_transient_for(parent)
+        self.dialog.show_all()
+        self.combo_label.hide()
 
         host = CONFIG['login.server']
         port = int(CONFIG['login.port'])
 
         url = '%s:%d' % (host, port)
-        server_widget.set_text(url)
-        login.set_text(CONFIG['login.login'])
+        self.entry_server.set_text(url)
+        self.entry_login.set_text(CONFIG['login.login'])
 
         # construct the list of available db and select the last one used
         liststore = gtk.ListStore(str)
-        db_widget.set_model(liststore)
+        self.combo_database.set_model(liststore)
         cell = gtk.CellRendererText()
-        db_widget.pack_start(cell, True)
-        db_widget.add_attribute(cell, 'text', 0)
+        self.combo_database.pack_start(cell, True)
+        self.combo_database.add_attribute(cell, 'text', 0)
 
-        res = self.refreshlist(None, db_widget, label, host, port, but_connect)
-        change_button.connect_after('clicked', DBLogin.refreshlist_ask,
-                server_widget, db_widget, label, but_connect, host, port, win)
-
+        res = self.refreshlist(None, self.combo_database, self.combo_label, 
+            host, port, self.button_connect)
+        
+        self.button_server.connect_after('clicked', DBLogin.refreshlist_ask,
+            self.entry_server, self.combo_database, self.combo_label, 
+            self.button_connect, host, port, self.dialog)
         if dbname:
             i = liststore.get_iter_root()
             while i:
                 if liststore.get_value(i, 0)==dbname:
-                    db_widget.set_active_iter(i)
+                    self.combo_database.set_active_iter(i)
                     break
                 i = liststore.iter_next(i)
 
-        res = win.run()
+        res = self.dialog.run()
         url_m = re.match('^([\w.:\-\d]+):(\d{1,5})$',
-                server_widget.get_text() or '')
+                self.entry_server.get_text() or '')
         if url_m:
             CONFIG['login.server'] = url_m.group(1)
-            CONFIG['login.login'] = login.get_text()
+            CONFIG['login.login'] = self.entry_login.get_text()
             CONFIG['login.port'] = url_m.group(2)
-            CONFIG['login.db'] = db_widget.get_active_text()
-            result = (login.get_text(), passwd.get_text(), url_m.group(1),
-                    int(url_m.group(2)), db_widget.get_active_text())
+            CONFIG['login.db'] = self.combo_database.get_active_text()
+            result = (self.entry_login.get_text(), 
+                self.entry_password.get_text(), url_m.group(1), 
+                int(url_m.group(2)), self.combo_database.get_active_text())
         else:
             parent.present()
-            win.destroy()
+            self.dialog.destroy()
             raise Exception('QueryCanceled')
         if res != gtk.RESPONSE_OK:
             parent.present()
-            win.destroy()
+            self.dialog.destroy()
             rpc.logout()
             Main.get_main().refresh_ssl()
             raise Exception('QueryCanceled')
         parent.present()
-        win.destroy()
+        self.dialog.destroy()
         return result
 
 class DBCreate(object):
@@ -200,7 +314,7 @@ class DBCreate(object):
         return sensitive
 
     def server_change(self, widget, parent):
-        host, port = _server_ask(self.server_widget, parent)
+        host, port = _request_server(self.server_widget, parent)
         try:
             if self.lang_widget and host and port:
                 _refresh_langlist(self.lang_widget, host, port)
@@ -1103,7 +1217,7 @@ class Main(object):
         new_pass2_widget = dialog.get_widget('new_passwd2')
         change_button = dialog.get_widget('but_server_change')
         change_button.connect_after('clicked', \
-                lambda a,b: _server_ask(b, win), server_widget)
+                lambda a,b: _request_server(b, win), server_widget)
 
         host = CONFIG['login.server']
         port = int(CONFIG['login.port'])
@@ -1189,7 +1303,7 @@ class Main(object):
 
         def refreshlist_ask(widget, server_widget, db_widget, label,
                 parent=None):
-            host, port = _server_ask(server_widget, parent)
+            host, port = _request_server(server_widget, parent)
             if not url:
                 return None
             refreshlist(widget, db_widget, label, host, port)
@@ -1257,7 +1371,7 @@ class Main(object):
         widget_url.set_text(url)
 
         change_button = dialog.get_widget('but_server_change')
-        change_button.connect_after('clicked', lambda a, b: _server_ask(b, win),
+        change_button.connect_after('clicked', lambda a, b: _request_server(b, win),
                 widget_url)
 
         res = win.run()
