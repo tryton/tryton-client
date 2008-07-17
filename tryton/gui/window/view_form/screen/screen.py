@@ -466,7 +466,7 @@ class Screen(SignalEvent):
                     reload_ids = self.models.on_write_ids(obj_id)
                     if reload_ids and obj_id in reload_ids:
                         reload_ids.remove(obj_id)
-                    if not self.rpc.unlink([obj_id]):
+                    if not self.rpc.unlink([obj_id], rpc.CONTEXT):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)
@@ -492,7 +492,7 @@ class Screen(SignalEvent):
                         for obj_id in ids:
                             if obj_id in reload_ids:
                                 reload_ids.remove(obj_id)
-                    if not self.rpc.unlink(ids):
+                    if not self.rpc.unlink(ids, rpc.CONTEXT):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)
