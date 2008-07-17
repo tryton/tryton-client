@@ -53,7 +53,9 @@ class Selection(Interface):
         for name in lst:
             self.widget.append_text(name)
         completion = gtk.EntryCompletion()
-        completion.set_inline_selection(True)
+        #Only available in PyGTK 2.6 and above.
+        if hasattr(completion, 'set_inline_selection'):
+            completion.set_inline_selection(True)
         completion.set_model(model)
         self.widget.child.set_completion(completion)
         completion.set_text_column(0)
