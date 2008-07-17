@@ -484,7 +484,12 @@ def warning(msg, parent, title=''):
     dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, gtk.BUTTONS_OK)
     dialog.set_icon(TRYTON_ICON)
-    dialog.set_markup('<b>%s</b>\n\n%s' % (to_xml(title), to_xml(msg)))
+    # format_secondary_markup available in PyGTK 2.6 and above.
+    if hasattr(dialog, 'format_secondary_markup'):
+        dialog.set_markup('<b>%s</b>' % (to_xml(title)))
+        dialog.format_secondary_markup(to_xml(msg))
+    else:
+        dialog.set_markup('<b>%s</b>\n%s' % (to_xml(title), to_xml(msg)))
     dialog.show_all()
     dialog.run()
     parent.present()
@@ -582,9 +587,7 @@ def concurrency(resource, obj_id, context, parent):
 
 def process_exception(exception, parent, obj='', method='', *args):
     global _USERNAME, _DATABASE, _SOCK
-    type = 'error'
     if str(exception.args[0]) == 'NotLogged':
-        type = 'warning'
         while True:
             password = ask(_('Password:'), parent, visibility=False)
             if password is None:
@@ -600,35 +603,26 @@ def process_exception(exception, parent, obj='', method='', *args):
                     return process_exception(exception, parent, obj,
                             method, *args)
             return True
-    data = str(exception.args[0])
-    description = data
-    if len(exception.args) > 1:
-        details = str(exception.args[1])
-    else:
-        details = data
-    if hasattr(data, 'split') and ' -- ' in data:
-        lines = data.split('\n')
-        type = lines[0].split(' -- ')[0]
-        description = ''
-        if len(lines[0].split(' -- ')) > 1:
-            description = lines[0].split(' -- ')[1]
-        if len(lines) > 2:
-            details = '\n'.join(lines[2:])
-    if type == 'warning':
-        if description == 'ConcurrencyException' \
-                and len(args) > 4:
-            if concurrency(args[0], args[2][0], args[4], parent):
-                if 'read_delta' in args[4]:
-                    del args[4]['read_delta']
-                try:
-                    return rpc.execute(obj, method, *args)
-                except Exception, exception:
-                    return process_exception(exception, parent, obj,
-                            method, *args)
-        else:
-            warning(details, parent, description)
-    else:
-        error(type, parent, details)
+
+    if exception.args[0] == 'ConcurrencyException' \
+            and len(args) > 4:
+        if concurrency(args[0], args[2][0], args[4], parent):
+            if 'read_delta' in args[4]:
+                del args[4]['read_delta']
+            try:
+                return rpc.execute(obj, method, *args)
+            except Exception, exception:
+                return process_exception(exception, parent, obj,
+                        method, *args)
+
+    if exception.args[0] == 'UserError':
+        msg = ''
+        if len(exception.args) > 3:
+            msg = exception.args[2]
+        warning(str(msg), parent, str(exception.args[1]))
+        return False
+
+    error(str(exception.args[0]), parent, str(exception.args[-1]))
     return False
 
 def node_attributes(node):

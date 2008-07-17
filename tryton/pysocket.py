@@ -19,14 +19,6 @@ def checkfunction(module, klass):
     raise ValueError('Not supported: %s/%s' % (module, klass))
 
 
-class PySocketException(Exception):
-
-    def __init__(self, code, string):
-        Exception.__init__(self)
-        self.faultCode = code.decode('utf8')
-        self.faultString = string.decode('utf8')
-        self.args = (self.faultCode, self.faultString)
-
 class PySocket:
 
     def __init__(self, sock=None):
@@ -172,6 +164,6 @@ class PySocket:
         unpickler.find_global = checkfunction
         res = unpickler.load()
         if exception:
-            raise PySocketException(str(res[0]), str(res[1]))
+            raise Exception(*(list(res[0]) + [res[1]]))
         else:
             return res[0]
