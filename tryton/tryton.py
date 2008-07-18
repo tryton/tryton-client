@@ -66,6 +66,10 @@ class TrytonClient(object):
 
         def excepthook(exctyp, value, tb):
             import common
+
+            if str(value) == 'NotLogged':
+                return
+
             tb_s = reduce(lambda x, y: x+y,
                     traceback.format_exception(exctyp, value, tb))
             for path in sys.path:

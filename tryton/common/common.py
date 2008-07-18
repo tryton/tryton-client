@@ -591,7 +591,7 @@ def process_exception(exception, parent, obj='', method='', *args):
         while True:
             password = ask(_('Password:'), parent, visibility=False)
             if password is None:
-                break
+                raise Exception('NotLogged')
             res = rpc.login(rpc._USERNAME, password, rpc._SOCK.host,
                     rpc._SOCK.port, rpc._DATABASE)
             if res < 0:
