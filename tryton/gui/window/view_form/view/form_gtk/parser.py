@@ -170,6 +170,28 @@ class Image(gtk.Image):
             self.show()
 
 
+class Frame(gtk.Frame):
+
+    def __init__(self, label=None, attrs=None):
+        super(Frame, self).__init__(label=label)
+        self.attrs = attrs or {}
+
+    def state_set(self, values):
+        state_changes = self.attrs.get('states', {})
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if eval(state_changes['invisible'], values):
+                    self.hide()
+                else:
+                    self.show()
+            else:
+                self.show()
+        except:
+            self.show()
+
+
 class _container(object):
     def __init__(self, tooltips):
         self.cont = []
@@ -462,9 +484,18 @@ class ParserForm(ParserInterface):
                 notebook_list.extend(notebook_list2)
                 dict_widget.update(widgets)
                 button_list += buttons
-                if attrs.get('string', None):
-                    frame = gtk.Frame(attrs['string'])
+                text = ''
+                if 'name' in attrs and attrs['name'] in fields:
+                    if 'states' in fields[attrs['name']]:
+                        attrs['states'] = fields[attrs['name']]['states']
+                    text = fields[attrs['name']]['string']
+                if attrs.get('string'):
+                    text = attrs['string']
+
+                if text:
+                    frame = Frame(text, attrs)
                     frame.add(widget)
+                    button_list.append(frame)
                 else:
                     frame = widget
                 container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
