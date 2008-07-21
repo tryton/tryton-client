@@ -588,12 +588,13 @@ def concurrency(resource, obj_id, context, parent):
 def process_exception(exception, parent, obj='', method='', *args):
     global _USERNAME, _DATABASE, _SOCK
     if str(exception.args[0]) == 'NotLogged':
+        host = rpc._SOCK.host
+        port = rpc._SOCK.port
         while True:
             password = ask(_('Password:'), parent, visibility=False)
             if password is None:
                 raise Exception('NotLogged')
-            res = rpc.login(rpc._USERNAME, password, rpc._SOCK.host,
-                    rpc._SOCK.port, rpc._DATABASE)
+            res = rpc.login(rpc._USERNAME, password, host, port, rpc._DATABASE)
             if res < 0:
                 continue
             if obj and method:
