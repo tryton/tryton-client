@@ -43,6 +43,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         self.view = view
         self.roots = ids
         self.context = context or {}
+        self.to_reload = []
         self.tree = self._node_process(self.roots)
         self.pixbufs = pixbufs or {}
         self.treeview = treeview
@@ -57,7 +58,10 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     ctx)
             try:
                 res_ids = rpc.execute(*args)
-            except:
+                for obj_id in ids:
+                    if obj_id in self.to_reload:
+                        self.to_reload.remove(obj_id)
+            except Exception, exception:
                 for obj_id in ids:
                     val = {'id': obj_id}
                     for field in fields:
@@ -68,6 +72,8 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                         else:
                             val[field] = ''
                     res_ids.append(val)
+                    if obj_id not in self.to_reload:
+                        self.to_reload.append(obj_id)
         for field in self.fields:
             field_type = self.fields_type[field]['type']
             if field in self.fields_attrs \
@@ -165,7 +171,6 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def _node_expand(self, node):
         node[2] = self._node_process(node[3])
-        del node[3]
 
     #Mandatory GenericTreeModel method
     def on_get_path(self, node):
@@ -233,7 +238,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
             return [(0, self.tree)]
         node = node[:]
         (i, values) = node[-1]
-        if values[i][2] is None:
+
+        to_reload = False
+        if len(values[i]) >= 4:
+            for obj_id in values[i][3]:
+                if obj_id in self.to_reload:
+                    to_reload = True
+
+        if values[i][2] is None or to_reload:
             self._node_expand(values[i])
         if values[i][2] == []:
             return None
@@ -250,7 +262,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         if node is None:
             return len(self.tree)
         (i, values) = node[-1]
-        if values[i][2] is None:
+
+        to_reload = False
+        if len(values[i]) >= 4:
+            for obj_id in values[i][3]:
+                if obj_id in self.to_reload:
+                    to_reload = True
+
+        if values[i][2] is None or to_reload:
             self._node_expand(values[i])
         return len(values[i][2])
 
@@ -262,7 +281,14 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
             return None
         node = node[:]
         (i, values) = node[-1]
-        if values[i][2] is None:
+
+        to_reload = False
+        if len(values[i]) >= 4:
+            for obj_id in values[i][3]:
+                if obj_id in self.to_reload:
+                    to_reload = True
+
+        if values[i][2] is None or to_reload:
             self._node_expand(values[i])
         if child < len(values[i][2]):
             node.append((child, values[i][2]))

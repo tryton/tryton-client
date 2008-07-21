@@ -67,6 +67,8 @@ class Tree(SignalEvent):
                 context=context)
         self.tree_res.view.connect('row-activated', self.sig_activate)
         self.tree_res.view.connect('key_press_event', self.sig_key_press)
+        self.tree_res.view.connect_after('test-expand-row',
+                self.sig_test_expand_row)
 
         if not name:
             self.name = self.tree_res.name
@@ -258,6 +260,24 @@ class Tree(SignalEvent):
                     .get_selected_rows()
             for path in paths:
                 self.tree_res.view.expand_row(path, False)
+
+    def sig_test_expand_row(self, widget, iter, path):
+        model = self.tree_res.view.get_model()
+        iter_children = model.iter_children(iter)
+        if iter_children and model.get(iter_children, 0)[0] in model.to_reload:
+            host = rpc._SOCK.host
+            port = rpc._SOCK.port
+            while True:
+                password = common.ask(_('Password:'), self.window,
+                        visibility=False)
+                if password is None:
+                    return True
+                res = rpc.login(rpc._USERNAME, password, host, port,
+                        rpc._DATABASE)
+                if res < 0:
+                    continue
+                return False
+        return False
 
     def sig_edit(self):
         obj_ids = self.ids_get()
