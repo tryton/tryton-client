@@ -153,7 +153,7 @@ class ParserTree(ParserInterface):
                     col.set_fixed_width(width)
                 #XXX doesn't work well when resize columns
                 #col.set_expand(True)
-                if not treeview.sequence:
+                if not treeview.sequence and node_attrs.get('sortable', True):
                     col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
