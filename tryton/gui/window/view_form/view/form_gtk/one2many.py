@@ -445,6 +445,7 @@ class One2Many(WidgetInterface):
             self.eb_remove.set_sensitive(not value)
 
     def _sig_new(self, widget, event):
+        self._view.view_form.set_value()
         ctx = self._view.model.expr_eval(self.screen.default_get)
         ctx.update(self._view.model.expr_eval('dict(%s)' % \
                 self.attrs.get('context', '')))
@@ -478,6 +479,7 @@ class One2Many(WidgetInterface):
                 dia.destroy()
 
     def _sig_edit(self, widget=None, event=None):
+        self._view.view_form.set_value()
         if self.screen.current_model:
             readonly = False
             domain = []
@@ -512,6 +514,7 @@ class One2Many(WidgetInterface):
         self.wid_text.grab_focus()
 
     def _sig_add(self, *args):
+        self._view.view_form.set_value()
         domain = self._view.modelfield.domain_get(self._view.model)
         context = self._view.modelfield.context_get(self._view.model)
         domain = domain[:]
