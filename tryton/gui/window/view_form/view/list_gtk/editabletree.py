@@ -69,6 +69,8 @@ class EditableTreeView(gtk.TreeView):
         current = cols.index(col)
         for i in range(len(cols)):
             idx = (current + i + 1) % len(cols)
+            if not cols[idx].get_cell_renderers():
+                continue
             renderer = cols[idx].get_cell_renderers()[0]
             if isinstance(renderer, gtk.CellRendererToggle):
                 editable = renderer.get_property('activatable')
