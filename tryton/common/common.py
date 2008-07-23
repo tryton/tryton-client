@@ -92,8 +92,8 @@ def request_server(server_widget, parent):
     label_port.set_padding(3, 3)
     table.attach(label_port, 0, 1, 1, 2, yoptions=False,
         xoptions=False)
-    dialog.add_button(_("gtk-cancel"), gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
-    dialog.add_button(_("gtk-ok"), gtk.RESPONSE_OK)
+    dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
+    dialog.add_button("gtk-ok", gtk.RESPONSE_OK)
     dialog.vbox.pack_start(vbox)
     dialog.set_icon(TRYTON_ICON)
     dialog.show_all()
