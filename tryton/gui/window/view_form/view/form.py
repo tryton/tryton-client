@@ -114,8 +114,12 @@ class ViewForm(ParserView):
             obj_id = self.screen.current_model \
                     and self.screen.current_model.id
             if not (obj_id):
-                message(_('You must save this record ' \
-                        'to use the relate button!'), self.window)
+                if atype in ('print'):
+                    message(_('You must save this record ' \
+                        'to use the print button!'), self.window)
+                if atype in ('action'):
+                    message(_('You must save this record ' \
+                        'to use the action button!'), self.window)
                 return False
             self.screen.display()
         if atype == 'relate':
