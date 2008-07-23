@@ -59,18 +59,12 @@ def refresh_langlist(lang_widget, host, port):
 def request_server(server_widget, parent):
     result = False
     dialog = gtk.Dialog(
-        title =  _('Server'),
+        title =  _('Tryton connect'),
         parent = parent,
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
             gtk.WIN_POS_CENTER_ON_PARENT | 
             gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
     vbox = gtk.VBox()
-    label_connect = gtk.Label(_("<b>Connect to a Tryton server</b>"))
-    label_connect.set_use_markup(True)
-    label_connect.set_alignment(0, 0.5)
-    vbox.pack_start(label_connect, False, False, 0)
-    hseparator = gtk.HSeparator()
-    vbox.pack_start(hseparator, False, True, 0)
     table = gtk.Table(2, 2, False)
     table.set_border_width(12)
     table.set_row_spacings(6)
@@ -98,8 +92,8 @@ def request_server(server_widget, parent):
     label_port.set_padding(3, 3)
     table.attach(label_port, 0, 1, 1, 2, yoptions=False,
         xoptions=False)
-    dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
-    dialog.add_button("gtk-ok", gtk.RESPONSE_OK)
+    dialog.add_button(_("gtk-cancel"), gtk.RESPONSE_CANCEL | gtk.CAN_DEFAULT)
+    dialog.add_button(_("gtk-ok"), gtk.RESPONSE_OK)
     dialog.vbox.pack_start(vbox)
     dialog.set_icon(TRYTON_ICON)
     dialog.show_all()
@@ -292,7 +286,7 @@ def error(title, parent, details):
 
     but_send = gtk.Button(_('Report Bug'))
     dialog.add_action_widget(but_send, gtk.RESPONSE_OK)
-    dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL)
+    dialog.add_button(_("gtk-close"), gtk.RESPONSE_CANCEL)
     dialog.set_default_response(gtk.RESPONSE_CANCEL)
 
     vbox = gtk.VBox()
@@ -316,7 +310,7 @@ def error(title, parent, details):
 
     box = gtk.VBox()
     label_error = gtk.Label()
-    label_error.set_markup('<b>' + _('Error: ') + '</b>' + title)
+    label_error.set_markup('<b>' + _('Error:') + '</b> ' + title)
     label_error.set_alignment(0, 0.5)
     label_error.set_padding(-1, 14)
     box.pack_start(label_error, False, False)
@@ -335,7 +329,7 @@ def error(title, parent, details):
     button_roundup = gtk.Button()
     button_roundup.set_relief(gtk.RELIEF_NONE)
     label_roundup = gtk.Label()
-    label_roundup.set_markup(_('To report bug you must have a user on ') \
+    label_roundup.set_markup(_('To report bugs you must have an account on ') \
             + '<u>' + CONFIG['roundup.url'] + '</u>')
     label_roundup.set_alignment(1, 0.5)
     label_roundup.set_padding(20, 5)
@@ -425,9 +419,9 @@ def send_bugtracker(msg, parent):
             if issue_id:
                 # issue to same message already exists, add user to nosy-list
                 server.set('issue' + str(issue_id), *['nosy=+' + user])
-                message(_('Bug was already reported, \n' \
-                        'we added you to the listeners list of ') + \
-                        'issue%s' % issue_id, parent)
+                message(_('The same bug was already reported by another user.\n' \
+                        'To keep you informed your username is added to the nosy-list of this issue') + \
+                        '%s' % issue_id, parent)
             else:
                 # create a new issue for this error-message
                 # first create message
@@ -436,8 +430,8 @@ def send_bugtracker(msg, parent):
                 # second create issue with this message
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
-                message(_('Created new issue with ID ') + \
-                        'issue%s' % issue_id, parent)
+                message(_('Created new bug with ID issue') + \
+                        '%s' % issue_id, parent)
             webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
         except Exception, exception:
             tb_s = reduce(lambda x, y: x + y,
@@ -535,7 +529,7 @@ def sur_3b(msg, parent):
         return 'cancel'
 
 def ask(question, parent, visibility=True):
-    win = gtk.Dialog('Tryton', parent,
+    win = gtk.Dialog(_('Tryton'), parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
