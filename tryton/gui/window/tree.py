@@ -207,6 +207,7 @@ class Tree(SignalEvent):
                 selection.unselect_all()
                 selection.select_path((0))
                 self.tree_res.view.set_cursor((0))
+                return True
 
     def sig_print(self):
         self.sig_action('form_print')
@@ -256,11 +257,13 @@ class Tree(SignalEvent):
                                 break
             for path in paths:
                 self.tree_res.view.collapse_row(path)
+            return True
         elif event.keyval == gtk.keysyms.Right:
             model, paths = self.tree_res.view.get_selection()\
                     .get_selected_rows()
             for path in paths:
                 self.tree_res.view.expand_row(path, False)
+            return True
 
     def sig_test_expand_row(self, widget, iter, path):
         model = self.tree_res.view.get_model()
