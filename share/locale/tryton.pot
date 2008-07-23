@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-07-21 19:53+0200\n"
+"POT-Creation-Date: 2008-07-23 17:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,73 +85,85 @@ msgid "No action defined!"
 msgstr ""
 
 #: tryton/common/common.py:62
-msgid "Server"
+msgid "Tryton connect"
 msgstr ""
 
-#: tryton/common/common.py:68
-msgid "<b>Connect to a Tryton server</b>"
-msgstr ""
-
-#: tryton/common/common.py:78 tryton/gui/window/dblogin.py:58
+#: tryton/common/common.py:72 tryton/gui/window/dblogin.py:66
 msgid "Server:"
 msgstr ""
 
-#: tryton/common/common.py:96
+#: tryton/common/common.py:90
 msgid "Port:"
 msgstr ""
 
-#: tryton/common/common.py:260 tryton/gui/main.py:750
+#: tryton/common/common.py:95
+msgid "gtk-cancel"
+msgstr ""
+
+#: tryton/common/common.py:96
+msgid "gtk-ok"
+msgstr ""
+
+#: tryton/common/common.py:254 tryton/gui/main.py:750
 #: tryton/gui/window/attachment.py:153 tryton/gui/window/win_export.py:244
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:83
 #: tryton/gui/window/view_form/view/form_gtk/image.py:98
 msgid "Save As..."
 msgstr ""
 
-#: tryton/common/common.py:289
+#: tryton/common/common.py:283
 msgid "Error"
 msgstr ""
 
-#: tryton/common/common.py:293
+#: tryton/common/common.py:287
 msgid "Report Bug"
 msgstr ""
 
-#: tryton/common/common.py:300
+#: tryton/common/common.py:289
+msgid "gtk-close"
+msgstr ""
+
+#: tryton/common/common.py:294
 msgid "Application Error!"
 msgstr ""
 
-#: tryton/common/common.py:319
-msgid "Error: "
+#: tryton/common/common.py:313
+msgid "Error:"
 msgstr ""
 
-#: tryton/common/common.py:338
-msgid "To report bug you must have a user on "
+#: tryton/common/common.py:332
+msgid "To report bugs you must have an account on "
 msgstr ""
 
-#: tryton/common/common.py:361
+#: tryton/common/common.py:355
 msgid "Bug Tracker"
 msgstr ""
 
-#: tryton/common/common.py:378
+#: tryton/common/common.py:372
 msgid "User:"
 msgstr ""
 
-#: tryton/common/common.py:386 tryton/common/common.py:592
-#: tryton/gui/window/dblogin.py:78
+#: tryton/common/common.py:380 tryton/common/common.py:586
+#: tryton/gui/window/dblogin.py:87
 msgid "Password:"
 msgstr ""
 
-#: tryton/common/common.py:428
+#: tryton/common/common.py:422
 msgid ""
-"Bug was already reported, \n"
-"we added you to the listeners list of "
+"The same bug was already reported by another user.\n"
+"To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 
-#: tryton/common/common.py:439
-msgid "Created new issue with ID "
+#: tryton/common/common.py:433
+msgid "Created new bug with ID issue"
 msgstr ""
 
-#: tryton/common/common.py:446
+#: tryton/common/common.py:440
 msgid "Exception:"
+msgstr ""
+
+#: tryton/common/common.py:532 tryton/gui/main.py:612
+msgid "Tryton"
 msgstr ""
 
 #: tryton/gui/main.py:43 tryton/gui/main.py:399
@@ -202,10 +214,6 @@ msgstr ""
 #: tryton/gui/main.py:553
 #, python-format
 msgid "Attachment(%d)"
-msgstr ""
-
-#: tryton/gui/main.py:612
-msgid "Tryton"
 msgstr ""
 
 #: tryton/gui/main.py:631
@@ -377,27 +385,43 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:22
+#: tryton/gui/window/dblogin.py:23
+msgid "_Cancel"
+msgstr ""
+
+#: tryton/gui/window/dblogin.py:27
+msgid "Cancel connection or reconnection to the Tryton server"
+msgstr ""
+
+#: tryton/gui/window/dblogin.py:29
 msgid "C_onnect"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:63
+#: tryton/gui/window/dblogin.py:34
+msgid "Connect or reconnect the Tryton server"
+msgstr ""
+
+#: tryton/gui/window/dblogin.py:71
 msgid "Database:"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:75
+#: tryton/gui/window/dblogin.py:83
 msgid "C_hange"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:83
+#: tryton/gui/window/dblogin.py:85
+msgid "Configure the Tryton server connection preferences"
+msgstr ""
+
+#: tryton/gui/window/dblogin.py:92
 msgid "User name:"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:94
+#: tryton/gui/window/dblogin.py:103
 msgid "Could not connect to server!"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:101
+#: tryton/gui/window/dblogin.py:110
 msgid "No database found, you must create one!"
 msgstr ""
 
@@ -631,11 +655,15 @@ msgstr ""
 msgid ":"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form.py:117
-msgid "You must save this record to use the relate button!"
+#: tryton/gui/window/view_form/view/form.py:118
+msgid "You must save this record to use the print button!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form.py:125
+#: tryton/gui/window/view_form/view/form.py:121
+msgid "You must save this record to use the action button!"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form.py:129
 msgid "You must select a record to use the relate button !"
 msgstr ""
 
