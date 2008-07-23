@@ -415,7 +415,10 @@ def send_bugtracker(msg, parent):
             for line in msg.splitlines():
                 #don't use empty line nor ^ from sql error
                 if line and '^' != line.strip():
-                    title = line
+                    if len(line) > 128:
+                        title = line[:128] + '...'
+                    else:
+                        title = line
             issue_id = None
             msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
             if msg_ids:
