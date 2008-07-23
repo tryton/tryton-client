@@ -87,6 +87,7 @@ class Tree(SignalEvent):
         widget_sc.connect('row-activated', self.sc_go)
         self.tree_sc = ViewTreeSC(widget_sc, self.model, self.window)
         self.handlers = {
+            'but_new': self.sig_new,
             'but_reload': self.sig_reload,
             'but_switch': self.sig_edit,
             'but_action': self.sig_action,
@@ -279,6 +280,10 @@ class Tree(SignalEvent):
                 return False
         return False
 
+    def sig_new(self):
+        Window.create(None, self.model, domain=self.domain, window=self.window,
+                context=self.context, mode=['form', 'tree'])
+
     def sig_edit(self):
         obj_ids = self.ids_get()
         if self.tree_res.toolbar:
@@ -288,7 +293,8 @@ class Tree(SignalEvent):
                     obj_ids.append(child.get_data('id'))
         if obj_ids:
             Window.create(None, self.model, obj_ids, self.domain,
-                    window=self.window, mode=['form', 'tree'])
+                    window=self.window, context=self.context,
+                    mode=['form', 'tree'])
         else:
             common.message(_('No record selected!'), self.window)
 
