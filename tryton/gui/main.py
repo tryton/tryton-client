@@ -781,9 +781,10 @@ class Main(object):
 
         def refreshlist_ask(widget, server_widget, db_widget, label,
                 parent=None):
-            host, port = common.request_server(server_widget, parent)
-            if not url:
+            res = common.request_server(server_widget, parent)
+            if not res:
                 return None
+            host, port = res
             refreshlist(widget, db_widget, label, host, port)
             return (host, port)
 

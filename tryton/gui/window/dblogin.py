@@ -122,7 +122,10 @@ class DBLogin(object):
     @staticmethod
     def refreshlist_ask(widget, server_widget, db_widget, label,
             butconnect=False, host=False, port=0, parent=None):
-        host, port = common.request_server(server_widget, parent) or (host, port)
+        res = common.request_server(server_widget, parent) or (host, port)
+        if not res:
+            return False
+        host, port = res
         return DBLogin.refreshlist(widget, db_widget, label, host, port,
                 butconnect)
 

@@ -24,7 +24,10 @@ class DBCreate(object):
         return sensitive
 
     def server_change(self, widget, parent):
-        host, port = common.request_server(self.server_widget, parent)
+        res = common.request_server(self.server_widget, parent)
+        if not res:
+            return False
+        host, port = res
         try:
             if self.lang_widget and host and port:
                 common.refresh_langlist(self.lang_widget, host, port)
@@ -32,7 +35,7 @@ class DBCreate(object):
         except:
             self.set_sensitive(False)
             return False
-        return url
+        return True
 
     def __init__(self, sig_login):
         self.dialog = glade.XML(GLADE, "win_createdb", gettext.textdomain())
