@@ -342,7 +342,8 @@ class Form(SignalEvent):
                 'ids': ids,
                 'window': self.window,
                 }, context=ctx, alwaysask=True)
-            self.sig_reload(test_modified=False)
+            if res:
+                self.sig_reload(test_modified=False)
         else:
             self.message_state(_('No record selected!'))
 
