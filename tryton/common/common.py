@@ -286,7 +286,7 @@ def error(title, parent, details):
 
     but_send = gtk.Button(_('Report Bug'))
     dialog.add_action_widget(but_send, gtk.RESPONSE_OK)
-    dialog.add_button(_("gtk-close"), gtk.RESPONSE_CANCEL)
+    dialog.add_button("gtk-close", gtk.RESPONSE_CANCEL)
     dialog.set_default_response(gtk.RESPONSE_CANCEL)
 
     vbox = gtk.VBox()
