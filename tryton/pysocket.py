@@ -36,26 +36,29 @@ class PySocket:
         if host in DNS_CACHE:
             host = DNS_CACHE[host]
         if not self.sock:
-            familly = socket.AF_INET
+            self.sock = None
             if socket.has_ipv6:
                 try:
                     socket.getaddrinfo(host, int(port), socket.AF_INET6)
-                    familly = socket.AF_INET6
+                    self.sock = socket.socket(socket.AF_INET6,
+                            socket.SOCK_STREAM)
                 except:
                     pass
-            self.sock = socket.socket(familly, socket.SOCK_STREAM)
+            if self.sock is None:
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.settimeout(120)
         self.sock.connect((host, int(port)))
         DNS_CACHE[hostname], port = self.sock.getpeername()[:2]
         try:
-            familly = socket.AF_INET
+            sock = None
             if socket.has_ipv6:
                 try:
                     socket.getaddrinfo(host, int(port), socket.AF_INET6)
-                    familly = socket.AF_INET6
+                    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
                 except:
                     pass
-            sock = socket.socket(familly, socket.SOCK_STREAM)
+            if sock is None:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(120)
             sock.connect((host, int(port)))
             ssl_sock = socket.ssl(sock)
@@ -94,16 +97,17 @@ class PySocket:
     def reconnect(self):
         if self.host and self.port:
             self.disconnect()
-            familly = socket.AF_INET
+            self.sock = None
             if socket.has_ipv6:
                 try:
                     socket.getaddrinfo(self.host, int(self.port),
                             socket.AF_INET6)
-                    familly = socket.AF_INET6
+                    self.sock = socket.socket(socket.AF_INET6,
+                            socket.SOCK_STREAM)
                 except:
                     pass
-            self.sock = socket.socket(
-                familly, socket.SOCK_STREAM)
+            if self.sock is None:
+                self.sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
             self.sock.settimeout(120)
             self.sock.connect((self.host, int(self.port)))
             if self.ssl:
