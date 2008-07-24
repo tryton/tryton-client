@@ -81,6 +81,13 @@ class TrytonClient(object):
         if CONFIG['tip.autostart']:
             main.sig_tips()
         main.sig_login()
+
+        try:
+            import psyco
+            psyco.full()
+        except ImportError:
+            pass
+
         gtk.main()
 
 if __name__ == "__main__":
