@@ -181,6 +181,8 @@ class Attachment(object):
         filenames = common.file_selection(_('Open...'), preview=True,
                 multi=True, parent=self.win,
                 filters=[filter_all, filter_image])
+        if not filenames:
+            return
         for filename in filenames:
             value = file(filename, 'rb').read()
             name = os.path.basename(filename)
