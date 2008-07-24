@@ -160,6 +160,8 @@ def setlang(lang=None):
             encoding = 'UTF-8'
         if encoding == 'cp1252':
             encoding = '1252'
+        if not encoding:
+            encoding = 'UTF-8'
         try:
             lang2 = lang
             if os.name == 'nt':
