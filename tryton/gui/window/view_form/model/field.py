@@ -337,8 +337,8 @@ class O2MField(CharField):
                     model2.get(check_load=check_load, get_readonly=readonly)))
         if model.value[self.name].model_removed:
             result.append(('remove', model.value[self.name].model_removed))
-        if model.value[self.name].model_unlinked:
-            result.append(('unlink', model.value[self.name].model_unlinked))
+        if model.value[self.name].model_deleted:
+            result.append(('delete', model.value[self.name].model_deleted))
         return result
 
     def set(self, model, value, test_state=False, modified=False):

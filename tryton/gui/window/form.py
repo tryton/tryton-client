@@ -225,7 +225,7 @@ class Form(SignalEvent):
         else:
             msg = _('Are you sure to remove those records?')
         if sur(msg, self.window):
-            if not self.screen.remove(unlink=True):
+            if not self.screen.remove(delete=True):
                 self.message_state(_('Records not removed!'))
             else:
                 self.message_state(_('Records removed!'))

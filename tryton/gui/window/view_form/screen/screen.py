@@ -456,17 +456,17 @@ class Screen(SignalEvent):
             self.parent.reload()
         self.display()
 
-    def remove(self, unlink=False, remove=False):
+    def remove(self, delete=False, remove=False):
         res = False
         reload_ids = []
         if self.current_view.view_type == 'form' and self.current_model:
             obj_id = self.current_model.id
-            if unlink and obj_id:
+            if delete and obj_id:
                 try:
                     reload_ids = self.models.on_write_ids(obj_id)
                     if reload_ids and obj_id in reload_ids:
                         reload_ids.remove(obj_id)
-                    if not self.rpc.unlink([obj_id], rpc.CONTEXT):
+                    if not self.rpc.delete([obj_id], rpc.CONTEXT):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)
@@ -485,14 +485,14 @@ class Screen(SignalEvent):
             res = obj_id
         if self.current_view.view_type == 'tree':
             ids = self.current_view.sel_ids_get()
-            if unlink and ids:
+            if delete and ids:
                 try:
                     reload_ids = self.models.on_write_ids(ids)
                     if reload_ids:
                         for obj_id in ids:
                             if obj_id in reload_ids:
                                 reload_ids.remove(obj_id)
-                    if not self.rpc.unlink(ids, rpc.CONTEXT):
+                    if not self.rpc.delete(ids, rpc.CONTEXT):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)

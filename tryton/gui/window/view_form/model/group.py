@@ -87,7 +87,7 @@ class ModelRecordGroup(SignalEvent):
         self.current_idx = None
         self.load(ids)
         self.model_removed = []
-        self.model_unlinked = []
+        self.model_deleted = []
         self.on_write = ''
         self.readonly = readonly
 
@@ -160,8 +160,8 @@ class ModelRecordGroup(SignalEvent):
             newmod.signal_connect(self, 'record-changed', self._record_changed)
             if id in self.model_removed:
                 self.model_removed.remove(id)
-            if id in self.model_unlinked:
-                self.model_unlinked.remove(id)
+            if id in self.model_deleted:
+                self.model_deleted.remove(id)
         if len(ids) > 10:
             self.models.lock_signal = False
             self.signal('record-cleared')
@@ -193,7 +193,7 @@ class ModelRecordGroup(SignalEvent):
     def clear(self):
         self.models.clear()
         self.model_removed = []
-        self.model_unlinked = []
+        self.model_deleted = []
 
     def _get_context(self):
         ctx = {}
@@ -288,7 +288,7 @@ class ModelRecordGroup(SignalEvent):
             if remove:
                 self.model_removed.append(self.models[idx].id)
             else:
-                self.model_unlinked.append(self.models[idx].id)
+                self.model_deleted.append(self.models[idx].id)
         if model.parent:
             model.parent.modified = True
         self.models.remove(self.models[idx])

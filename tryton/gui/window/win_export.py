@@ -207,7 +207,7 @@ class WinExport(object):
         ir_export = rpc.RPCProxy('ir.export')
         export_id = model.get_value(i, 0)
         try:
-            ir_export.unlink(export_id)
+            ir_export.delete(export_id)
         except Exception, exception:
             common.process_exception(exception, self.win)
             return

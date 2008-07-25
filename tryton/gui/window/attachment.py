@@ -106,7 +106,7 @@ class Attachment(object):
                     self.win):
                 try:
                     rpc.execute('object', 'execute',
-                            'ir.attachment', 'unlink', [int(obj_id)])
+                            'ir.attachment', 'delete', [int(obj_id)])
                 except Exception, exception:
                     common.process_exception(exception, self.win, *args)
         self.reload()

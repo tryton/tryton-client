@@ -307,7 +307,7 @@ class Tree(SignalEvent):
             sc_id = int(self.tree_sc.value_get(2))
             try:
                 rpc.execute('object', 'execute', 'ir.ui.view_sc',
-                        'unlink', [sc_id])
+                        'delete', sc_id, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
         self.tree_sc.update()
