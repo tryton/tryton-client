@@ -497,9 +497,11 @@ class Screen(SignalEvent):
                 except Exception, exception:
                     common.process_exception(exception, self.window)
                     return False
-            idx = self.models.models.index(
-                    self.current_view.sel_models_get()[0])
-            for model in self.current_view.sel_models_get():
+            sel_models = self.current_view.sel_models_get()
+            if not sel_models:
+                return True
+            idx = self.models.models.index(sel_models[0])
+            for model in sel_models:
                 self.models.remove(model, remove=remove)
             if self.models.models:
                 idx = min(idx, len(self.models.models)-1)
