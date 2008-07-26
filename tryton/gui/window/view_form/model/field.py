@@ -445,6 +445,8 @@ class O2MField(CharField):
         super(O2MField, self).state_set(model, values=values)
         if self.get_state_attrs(model).get('readonly', False):
             model.value[self.name].readonly = True
+        else:
+            model.value[self.name].readonly = False
 
 
 class ReferenceField(CharField):
