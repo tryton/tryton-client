@@ -35,6 +35,7 @@ class CharField(object):
             model.on_change(self.name, self.attrs['on_change'])
         if self.attrs.get('change_default', False):
             model.cond_default(self.attrs['name'], self.get(model))
+        model.on_change_with(self.name)
 
     def domain_get(self, model):
         dom = self.attrs.get('domain', '[]')

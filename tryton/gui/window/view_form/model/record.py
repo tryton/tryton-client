@@ -314,6 +314,30 @@ class ModelRecord(SignalEvent):
                 self.mgroup.mfields[fieldname].set_on_change(self, value)
             self.signal('record-changed')
 
+    def on_change_with(self, fieldname):
+        for fieldname in self.mgroup.mfields:
+            on_change_with = self.mgroup.mfields[fieldname].attrs.get(
+                    'on_change_with')
+            if not on_change_with:
+                continue
+            args = {}
+            for arg in on_change_with:
+                try:
+                    args[arg] = self.expr_eval(arg)
+                except:
+                    args[arg] = False
+            ids = self.id and [self.id] or []
+            ctx = rpc.CONTEXT.copy()
+            ctx.update(self.context_get())
+            try:
+                res = getattr(self.rpc, 'on_change_with_' + fieldname)(ids,
+                        args, ctx)
+            except Exception, exception:
+                common.process_exception(exception, self.window)
+                res = getattr(self.rpc, 'on_change_with_' + fieldname)(ids,
+                        args, ctx)
+            self.mgroup.mfields[fieldname].set_on_change(self, res)
+
     def cond_default(self, field_name, value):
         ir_default = RPCProxy('ir.default')
         ctx = rpc.CONTEXT.copy()
