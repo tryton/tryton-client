@@ -310,7 +310,7 @@ def error(title, parent, details):
 
     box = gtk.VBox()
     label_error = gtk.Label()
-    label_error.set_markup('<b>' + _('Error: ') + '</b> ' + title)
+    label_error.set_markup('<b>' + _('Error: ') + '</b>' + title)
     label_error.set_alignment(0, 0.5)
     label_error.set_padding(-1, 14)
     box.pack_start(label_error, False, False)
