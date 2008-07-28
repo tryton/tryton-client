@@ -51,6 +51,8 @@ class DBCreate(object):
         win.show_all()
         pass_widget = self.dialog.get_widget('ent_password_new')
         change_button = self.dialog.get_widget('but_server_new')
+        admin_passwd = self.dialog.get_widget('ent_password_admin')
+        admin_passwd2 = self.dialog.get_widget('ent_re_password_admin')
 
         change_button.connect_after('clicked', self.server_change, win)
         host = CONFIG['login.server']
@@ -68,22 +70,28 @@ class DBCreate(object):
         while True:
             res = win.run()
             dbname = self.db_widget.get_text()
-            if (res==gtk.RESPONSE_OK) \
-                    and ((not dbname) \
-                        or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname))):
-                common.warning(_('The database name must contain ' \
-                        'only normal characters or "_".\n' \
-                        'You must avoid all accents, space ' \
-                        'or special characters.'), parent,
-                        _('Bad database name!'))
+            if res == gtk.RESPONSE_OK:
+                if (not dbname) \
+                        or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname)):
+                    common.warning(_('The database name must contain ' \
+                            'only normal characters or "_".\n' \
+                            'You must avoid all accents, space ' \
+                            'or special characters.'), parent,
+                            _('Bad database name!'))
+                    continue
+                elif admin_passwd.get_text() != admin_passwd2.get_text():
+                    common.warning(_('Admin password confirmation ' \
+                            'do not match password!'), parent,
+                            _('Wrong passwords!'))
+                    continue
 
-            else:
-                break
+            break
 
         langidx = self.lang_widget.get_active_iter()
         langreal = langidx \
                 and self.lang_widget.get_model().get_value(langidx, 1)
         passwd = pass_widget.get_text()
+        admin_passwd = admin_passwd.get_text()
         url = self.server_widget.get_text()
         url_m = re.match('^([\w.\-]+):(\d{1,5})$',
                 url or '')
@@ -99,47 +107,20 @@ class DBCreate(object):
                     common.warning(_('Try with an other name.'), parent,
                             _('The Database already exists!'))
                     return False
-                users = rpc.db_exec(host, int(port), 'create', passwd, dbname,
-                            langreal)
+                rpc.db_exec(host, int(port), 'create', passwd, dbname,
+                            langreal, admin_passwd)
                 from tryton.gui.main import Main
                 Main.get_main().refresh_ssl()
             except Exception, exception:
-                common.warning(_('The server crashed during installation.\n' \
+                common.warning(_('The database creation failed ' \
+                        'during installation.\n' \
                         'We suggest you to drop this database.\n' \
                         'Error message:\n') + str(exception[0]), parent,
                         _("Error during database creation!"))
                 return False
-            dialog = glade.XML(GLADE, "dia_dbcreate_ok", gettext.textdomain())
-            win = dialog.get_widget('dia_dbcreate_ok')
-            win.set_transient_for(parent)
-            win.show_all()
-            buf = dialog.get_widget('dia_tv').get_buffer()
-
-            buf.delete(buf.get_start_iter(), buf.get_end_iter())
-            iter_start = buf.get_start_iter()
-
-            pwdlst = '\n'.join(['    - %s: %s / %s' % \
-                    (x['name'], x['login'], x['password']) for x in users])
-
-            buf.insert(iter_start, _('The following users have been ' \
-                    'installed on your database:') + '\n\n' + pwdlst + \
-                    '\n\n' + _('You can now connect to the database ' \
-                    'as an administrator.'))
-            res = win.run()
-            parent.present()
-            win.destroy()
-
-            if res == gtk.RESPONSE_OK:
-                url_m = re.match('^(http[s]?://|socket://)([\w.]+):(\d{1,5})$',
-                        url)
-                res = ['admin', 'admin']
-                if url_m:
-                    res.append(url_m.group(2))
-                    res.append(url_m.group(3))
-                    res.append(url_m.group(1))
-                    res.append(dbname)
-
-                self.sig_login(dbname=dbname)
+            common.message(_('You can now connect to the new database\n' \
+                    'with the user: admin.'), parent)
+            self.sig_login(dbname=dbname)
             return True
         else:
             rpc.logout()
