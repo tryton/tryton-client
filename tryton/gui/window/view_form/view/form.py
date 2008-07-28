@@ -18,30 +18,24 @@ class ViewWidget(object):
         self.widget._view = self
         self.widget_name = widget_name
 
-    def display(self, model, values=None):
-        if values is None:
-            values = {'state': 'draft'}
+    def display(self, model):
         if not model:
             self.widget.display(model, False)
             return False
         modelfield = model.mgroup.mfields.get(self.widget_name, None)
         if modelfield:
-            modelfield.state_set(model, values)
+            modelfield.state_set(model)
             self.widget.display(model, modelfield)
         elif isinstance(self.widget, Action):
             self.widget.display(model, False)
 
     def reset(self, model):
         modelfield = None
-        values = rpc.CONTEXT.copy()
-        values['state'] = 'draft'
         if model:
             modelfield = model.mgroup.mfields.get(self.widget_name, None)
             if modelfield and 'valid' in modelfield.get_state_attrs(model):
                 modelfield.get_state_attrs(model)['valid'] = True
-            for field in model.mgroup.fields:
-                values[field] = model[field].get(model, check_load=False)
-        self.display(model, values)
+        self.display(model)
 
     def set_value(self, model):
         if self.widget_name in model.mgroup.mfields:
@@ -192,15 +186,10 @@ class ViewForm(ParserView):
 
     def display(self):
         model = self.screen.current_model
-        values = rpc.CONTEXT.copy()
-        values['state'] = 'draft'
-        if model:
-            for field in model.mgroup.fields:
-                values[field] = model[field].get(model, check_load=False)
         for widget in self.widgets.values():
-            widget.display(model, values)
+            widget.display(model)
         for button in self.buttons:
-            button.state_set(values)
+            button.state_set(model)
         return True
 
     def set_cursor(self, new=False):

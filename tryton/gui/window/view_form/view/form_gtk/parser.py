@@ -82,20 +82,22 @@ class Button(object):
                         _('Invalid Form, correct red fields!'))
             self.form.screen.display()
 
-    def state_set(self, values):
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if eval(state_changes['invisible'], values):
+                if model.expr_eval(state_changes['invisible'],
+                        check_load=False):
                     self.widget.hide()
                 else:
                     self.widget.show()
             else:
                 self.widget.show()
             if 'readonly' in state_changes:
-                if eval(state_changes['readonly'], values):
+                if model.expr_eval(state_changes['readonly'],
+                        check_load=False):
                     self.widget.set_sensitive(False)
                 else:
                     self.widget.set_sensitive(True)
@@ -111,13 +113,14 @@ class Label(gtk.Label):
         super(Label, self).__init__(str=str)
         self.attrs = attrs or {}
 
-    def state_set(self, values):
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if eval(state_changes['invisible'], values):
+                if model.expr_eval(state_changes['invisible'],
+                        check_load=False):
                     self.hide()
                 else:
                     self.show()
@@ -133,13 +136,14 @@ class VBox(gtk.VBox):
         super(VBox, self).__init__(homogeneous, spacing)
         self.attrs = attrs or {}
 
-    def state_set(self, values):
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if eval(state_changes['invisible'], values):
+                if model.expr_eval(state_changes['invisible'],
+                        check_load=False):
                     self.hide()
                 else:
                     self.show()
@@ -154,13 +158,14 @@ class Image(gtk.Image):
         super(Image, self).__init__()
         self.attrs = attrs or {}
 
-    def state_set(self, values):
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if eval(state_changes['invisible'], values):
+                if mode.expr_eval(state_changes['invisible'],
+                        check_load=False):
                     self.hide()
                 else:
                     self.show()
@@ -176,13 +181,14 @@ class Frame(gtk.Frame):
         super(Frame, self).__init__(label=label)
         self.attrs = attrs or {}
 
-    def state_set(self, values):
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if eval(state_changes['invisible'], values):
+                if model.expr_eval(state_changes['invisible'],
+                        check_load=False):
                     self.hide()
                 else:
                     self.show()

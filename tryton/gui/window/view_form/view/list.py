@@ -449,15 +449,11 @@ class ViewList(ParserView):
 
     def set_state(self):
         model = self.screen.current_model
-        values = rpc.CONTEXT.copy()
-        values['state'] = 'draft'
         if model:
-            for field in model.mgroup.fields:
-                values[field] = model[field].get(model, check_load=False)
             for field in model.mgroup.fields:
                 modelfield = model.mgroup.mfields.get(field, None)
                 if modelfield:
-                    modelfield.state_set(model, values)
+                    modelfield.state_set(model)
 
     def update_children(self):
         ids = self.sel_ids_get()

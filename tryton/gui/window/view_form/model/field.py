@@ -95,9 +95,7 @@ class CharField(object):
     def create(self, model):
         return False
 
-    def state_set(self, model, values=None):
-        if values is None:
-            values = {'state': 'draft'}
+    def state_set(self, model):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
@@ -107,13 +105,15 @@ class CharField(object):
                     continue
                 if key in state_changes:
                     self.get_state_attrs(model)[key] = \
-                            eval(state_changes[key], values)
+                            model.expr_eval(state_changes[key],
+                                    check_load=False)
                 elif key in self.attrs:
                     self.get_state_attrs(model)[key] = self.attrs[key]
             if model.mgroup.readonly:
                 self.get_state_attrs(model)['readonly'] = True
             if 'value' in state_changes:
-                value = eval(state_changes['value'], values)
+                value = model.expr_eval(state_changes['value'],
+                        check_load=False)
                 if value:
                     self.set(model, value, test_state=False,
                             modified=True)
@@ -446,8 +446,8 @@ class O2MField(CharField):
         self.get_state_attrs(model)['valid'] = res
         return res
 
-    def state_set(self, model, values=None):
-        super(O2MField, self).state_set(model, values=values)
+    def state_set(self, model):
+        super(O2MField, self).state_set(model)
         if self.get_state_attrs(model).get('readonly', False):
             model.value[self.name].readonly = True
         else:
