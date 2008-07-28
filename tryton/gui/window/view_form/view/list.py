@@ -171,6 +171,8 @@ class ViewList(ParserView):
 
         self.widget_tree.connect('button-press-event', self.__button_press)
         self.widget_tree.connect_after('row-activated', self.__sig_switch)
+        if hasattr(self.widget_tree, 'set_rubber_banding'):
+            self.widget_tree.set_rubber_banding(True)
         selection = self.widget_tree.get_selection()
         selection.set_mode(gtk.SELECTION_MULTIPLE)
         selection.connect('changed', self.__select_changed)
