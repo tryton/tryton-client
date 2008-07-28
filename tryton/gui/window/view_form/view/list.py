@@ -463,20 +463,31 @@ class ViewList(ParserView):
         ids = self.sel_ids_get()
         for child in self.children:
             value = 0.0
+            value_selected = 0.0
             loaded = True
             for model in self.screen.models.models:
                 if not model.loaded:
                     loaded = False
                     break
                 if model.id in ids or not ids:
-                    if not value:
-                        value = model.fields_get()[self.children[child][0]]\
+                    if not value_selected:
+                        value_selected = model.fields_get()[self.children[child][0]]\
                                 .get(model, check_load=False)
                     else:
-                        value += model.fields_get()[self.children[child][0]]\
+                        value_selected += model.fields_get()[self.children[child][0]]\
                                 .get(model, check_load=False)
+                if not value:
+                    value = model.fields_get()[self.children[child][0]]\
+                            .get(model, check_load=False)
+                else:
+                    value += model.fields_get()[self.children[child][0]]\
+                            .get(model, check_load=False)
+
             if loaded:
                 label_str = locale.format('%.' + str(self.children[child][3]) + 'f',
+                        value_selected, True)
+                label_str += ' / '
+                label_str += locale.format('%.' + str(self.children[child][3]) + 'f',
                         value, True)
             else:
                 label_str = '-'
