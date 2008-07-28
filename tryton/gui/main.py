@@ -710,8 +710,8 @@ class Main(object):
             new_passwd2 = new_pass2_widget.get_text()
             if new_passwd != new_passwd2:
                 common.warning(_("Confirmation password do not match " \
-                        "new password, operation cancelled!"),
-                        _("Validation Error."), parent=win)
+                        "new password, operation cancelled!"), win,
+                        _("Validation Error."))
             else:
                 try:
                     rpc.db_exec(host, port, 'change_admin_password',
