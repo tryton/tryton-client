@@ -171,8 +171,12 @@ class ParserTree(ParserInterface):
                         label.set_markup(label_str)
                     label_sum = gtk.Label()
                     label_sum.set_use_markup(True)
-                    dict_widget[i] = (fname, label, label_sum,
-                            fields.get('digits', (16,2))[1], label_bold)
+                    if isinstance(fields.get('digits'), str):
+                        digits = 2
+                    else:
+                        digits = fields.get('digits', (16, 2))[1]
+                    dict_widget[i] = (fname, label, label_sum, digits,
+                            label_bold)
         if not bool(int(attrs.get('fill', '0'))):
             col = gtk.TreeViewColumn()
             col.name = None
@@ -347,7 +351,10 @@ class Datetime(Date):
 
 class Float(Char):
     def get_textual_value(self, model):
-        digit = self.attrs.get('digits', (16, 2))[1]
+        if isinstance(self.attrs.get('digits'), str):
+            digit = model.expr_eval(self.attrs['digits'])[1]
+        else:
+            digit = self.attrs.get('digits', (16, 2))[1]
         return locale.format('%.'+str(digit)+'f',
                 model[self.field_name].get_client(model) or 0.0, True)
 

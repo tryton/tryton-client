@@ -23,7 +23,11 @@ class Float(Integer):
         if not model_field:
             self.entry.set_text('')
             return False
-        self.entry.set_text(locale.format('%.' + str(self.digits[1]) + 'f',
+        if isinstance(self.digits, str):
+            digits = self._view.model.expr_eval(self.digits)
+        else:
+            digits = self.digits
+        self.entry.set_text(locale.format('%.' + str(digits[1]) + 'f',
             model_field.get(model) or 0.0, True))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):

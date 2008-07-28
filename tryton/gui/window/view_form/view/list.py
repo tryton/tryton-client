@@ -441,6 +441,7 @@ class ViewList(ParserView):
             #self.widget.set_cursor(None,None,False)
             if self.store:
                 self.widget_tree.set_model(self.store)
+        self.widget_tree.queue_draw()
         self.set_state()
         self.update_children()
 
