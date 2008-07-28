@@ -122,7 +122,7 @@ class Calendar(Interface):
         win.destroy()
 
     def clear(self):
-        self.value = ''
+        self.value = ('', '')
 
     def sig_activate(self, fct):
         self.entry1.connect_after('activate', fct)
