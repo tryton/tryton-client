@@ -91,6 +91,9 @@ class ModelRecordGroup(SignalEvent):
         self.on_write = ''
         self.readonly = readonly
 
+    def __repr__(self):
+        return '<ModelRecordGroup %s>' % (self.resource,)
+
     @staticmethod
     def mfields_load(fkeys, models):
         for fname in fkeys:
