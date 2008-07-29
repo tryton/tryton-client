@@ -135,9 +135,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                         self.fields_type[field]['selection'] = selection
             elif field_type in ('float', 'numeric'):
                 digits = self.fields_type[field].get('digits', (16, 2))
-                if isinstance(digits, str):
-                    digits = eval(digits, obj)
                 for obj in res_ids:
+                    if isinstance(digits, str):
+                        digits = eval(digits, obj)
                     obj[field] = locale.format('%.' + str(digits[1]) + 'f',
                             obj[field] or 0.0, True)
             elif field_type in ('interger',):
