@@ -134,7 +134,7 @@ def execute(obj, method, *args):
         raise Exception('Not logged!')
     logging.getLogger('rpc.request').info(str((obj, method, args)))
     key = False
-    if len(args) >= 7 and args[3] == 'fields_view_get':
+    if len(args) >= 6 and args[1] == 'fields_view_get':
         key = str(args)
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
             args = args[:]
