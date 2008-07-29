@@ -84,6 +84,10 @@ class DBCreate(object):
                             'do not match password!'), parent,
                             _('Wrong passwords!'))
                     continue
+                elif not admin_passwd.get_text():
+                    common.warning(_('Admin password is required!'),
+                            parent, _('Admin password!'))
+                    continue
 
             break
 
