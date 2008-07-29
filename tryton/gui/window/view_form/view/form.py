@@ -186,6 +186,10 @@ class ViewForm(ParserView):
 
     def display(self):
         model = self.screen.current_model
+        if model:
+            # Force to set mfields in model
+            for field in model.mgroup.fields:
+                model[field].get(model, check_load=False)
         for widget in self.widgets.values():
             widget.display(model)
         for button in self.buttons:
