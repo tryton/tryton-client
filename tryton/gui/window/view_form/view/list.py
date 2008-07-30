@@ -346,7 +346,7 @@ class ViewList(ParserView):
     def click_and_action(self, atype, value, path):
         return Action.exec_keyword(atype, {
             'model': self.screen.fields[path[1].name]['relation'],
-            'id': value or False, 'ids': [value]})
+            'id': value or False, 'ids': [value]}, alwaysask=True)
 
     def signal_record_changed(self, signal, *args):
         if self.store:
