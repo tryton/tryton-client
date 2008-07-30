@@ -287,7 +287,7 @@ class ViewList(ParserView):
                 return False
             model = model.models[path[0][0]]
 
-            if path[1]._type == 'many2one':
+            if hasattr(path[1], '_type') and path[1]._type == 'many2one':
                 value = model[path[1].name].get(model)
                 ir_action_keyword = RPCProxy('ir.action.keyword')
                 try:
