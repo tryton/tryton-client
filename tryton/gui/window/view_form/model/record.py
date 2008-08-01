@@ -123,6 +123,15 @@ class ModelRecord(SignalEvent):
             value['id'] = self.id
         return value
 
+    def get_eval(self, check_load=True):
+        if check_load:
+            self._check_load()
+        value = {}
+        for name, mfield in self.mgroup.mfields.items():
+            value[name] = mfield.get_eval(self, check_load=check_load)
+        value['id'] = self.id
+        return value
+
     def cancel(self):
         self._loaded = False
         self.reload()
@@ -271,7 +280,7 @@ class ModelRecord(SignalEvent):
             self._check_load()
         ctx = rpc.CONTEXT.copy()
         for name, mfield in self.mgroup.mfields.items():
-            ctx[name] = mfield.get(self, check_load=check_load)
+            ctx[name] = mfield.get_eval(self, check_load=check_load)
 
         ctx['current_date'] = datetime.datetime.today()
         ctx['time'] = time
