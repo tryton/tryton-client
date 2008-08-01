@@ -287,7 +287,7 @@ class ViewList(ParserView):
                 return False
             model = model.models[path[0][0]]
 
-            if path[1]._type == 'many2one':
+            if hasattr(path[1], '_type') and path[1]._type == 'many2one':
                 value = model[path[1].name].get(model)
                 ir_action_keyword = RPCProxy('ir.action.keyword')
                 try:
@@ -346,7 +346,7 @@ class ViewList(ParserView):
     def click_and_action(self, atype, value, path):
         return Action.exec_keyword(atype, {
             'model': self.screen.fields[path[1].name]['relation'],
-            'id': value or False, 'ids': [value]})
+            'id': value or False, 'ids': [value]}, alwaysask=True)
 
     def signal_record_changed(self, signal, *args):
         if self.store:

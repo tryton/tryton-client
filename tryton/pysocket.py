@@ -8,6 +8,8 @@ except ImportError:
     import StringIO
 
 DNS_CACHE = {}
+MAX_SIZE = 999999999
+MAX_LENGHT = len(str(MAX_SIZE))
 
 _ALLOWED_MODULES = {'datetime': ['datetime', 'date'], 'decimal': ['Decimal']}
 
@@ -117,9 +119,9 @@ class PySocket:
         msg = cPickle.dumps([msg, traceback], protocol=2)
         size = len(msg)
         if self.ssl:
-            self.ssl_sock.write('%8d' % size)
+            self.ssl_sock.write(str(size) + ' ')
         else:
-            self.sock.send('%8d' % size)
+            self.sock.send(str(size) + ' ')
         if self.ssl:
             self.ssl_sock.write(exception and "1" or "0")
         else:
@@ -136,29 +138,35 @@ class PySocket:
 
     def receive(self):
         buf = ''
-        while len(buf) < 8:
+        while len(buf) < MAX_LENGHT:
             if self.ssl:
-                chunk = self.ssl_sock.read(8 - len(buf))
+                chunk = self.ssl_sock.read(MAX_LENGHT - len(buf))
             else:
-                chunk = self.sock.recv(8 - len(buf))
+                chunk = self.sock.recv(MAX_LENGHT - len(buf))
             if chunk == '':
                 raise RuntimeError, "socket connection broken"
             buf += chunk
-        size = int(buf)
-        if self.ssl:
-            buf = self.ssl_sock.read(1)
-        else:
-            buf = self.sock.recv(1)
-        if buf != "0":
+            if ' ' in buf:
+                break
+        size, msg = buf.split(' ', 1)
+        size = int(size)
+        if msg == '':
+            if self.ssl:
+                msg = self.ssl_sock.read(1)
+            else:
+                msg = self.sock.recv(1)
+            if msg == '':
+                raise RuntimeError, "socket connection broken"
+        if msg[0] != "0":
             exception = buf
         else:
             exception = False
-        msg = ''
+        msg = msg[1:]
         while len(msg) < size:
             if self.ssl:
-                chunk = self.ssl_sock.read(size-len(msg))
+                chunk = self.ssl_sock.read(size - len(msg))
             else:
-                chunk = self.sock.recv(size-len(msg))
+                chunk = self.sock.recv(size - len(msg))
             if chunk == '':
                 raise RuntimeError, "socket connection broken"
             msg = msg + chunk

@@ -121,6 +121,8 @@ class Wizard(object):
 
             if 'datas' in res:
                 datas['form'] = res['datas']
+            elif res['type'] == 'form':
+                datas['form'] = {}
             if res['type'] == 'form':
                 if not dia:
                     dia = Dialog(res['arch'], res['fields'], res['state'],

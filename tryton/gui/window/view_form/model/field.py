@@ -70,6 +70,10 @@ class CharField(object):
     def get(self, model, check_load=True, readonly=True, modified=False):
         return model.value.get(self.name, False) or False
 
+    def get_eval(self, model, check_load=True):
+        return self.get(model, check_load=check_load, readonly=True,
+                modified=False)
+
     def set_client(self, model, value, test_state=True, force_change=False):
         internal = model.value.get(self.name, False)
         self.set(model, value, test_state)
@@ -278,6 +282,10 @@ class M2MField(CharField):
     def get(self, model, check_load=True, readonly=True, modified=False):
         return [('set', model.value[self.name] or [])]
 
+    def get_eval(self, model, check_load=True):
+        return self.get(model, check_load=check_load, readonly=True,
+                modified=False)[0][1]
+
     def get_client(self, model):
         return model.value[self.name] or []
 
@@ -344,6 +352,14 @@ class O2MField(CharField):
             result.append(('remove', model.value[self.name].model_removed))
         if model.value[self.name].model_deleted:
             result.append(('delete', model.value[self.name].model_deleted))
+        return result
+
+    def get_eval(self, model, check_load=True):
+        result = []
+        if not model.value[self.name]:
+            return []
+        for model2 in model.value[self.name].models:
+            result.append(model2.get_eval(check_load=check_load))
         return result
 
     def set(self, model, value, test_state=False, modified=False):

@@ -285,7 +285,7 @@ class ModelRecordGroup(SignalEvent):
             return None
         return self.models[self.current_idx]
 
-    def remove(self, model, remove=False):
+    def remove(self, model, remove=False, modified=True):
         idx = self.models.index(model)
         if self.models[idx].id:
             if remove:
@@ -294,7 +294,10 @@ class ModelRecordGroup(SignalEvent):
                 self.model_deleted.append(self.models[idx].id)
         if model.parent:
             model.parent.modified = True
+        if modified:
+            model.modified = True
         self.models.remove(self.models[idx])
+        model.signal('record-changed', model.parent)
 
     def add_fields_custom(self, fields, models):
         to_add = []
@@ -325,7 +328,7 @@ class ModelRecordGroup(SignalEvent):
             if model.id:
                 if model.is_modified():
                     old.append(model.id)
-                else:
+                elif to_add:
                     model._loaded = False
             else:
                 new.append(model)

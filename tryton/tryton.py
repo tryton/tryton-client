@@ -82,11 +82,12 @@ class TrytonClient(object):
             main.sig_tips()
         main.sig_login()
 
-        try:
-            import psyco
-            psyco.full()
-        except ImportError:
-            pass
+        #XXX psyco breaks report printing
+        #try:
+        #    import psyco
+        #    psyco.full()
+        #except ImportError:
+        #    pass
 
         gtk.main()
 
