@@ -11,17 +11,14 @@ import tryton.common as common
 
 class EvalEnvironment(object):
 
-    def __init__(self, parent):
+    def __init__(self, parent, check_load):
         self.parent = parent
+        self.check_load = check_load
 
     def __getattr__(self, item):
         if item == 'parent' and self.parent.parent:
             return EvalEnvironment(self.parent.parent)
-        if item == "current_date":
-            return datetime.datetime.today()
-        if item == "time":
-            return time
-        return self.parent.get(includeid=True)[item]
+        return self.parent.get_eval(check_load=self.check_load)[item]
 
 
 class ModelRecord(SignalEvent):
@@ -273,7 +270,7 @@ class ModelRecord(SignalEvent):
             self.read_time = time.time()
             self.set(value)
 
-    def expr_eval(self, dom, check_load=True):
+    def expr_eval(self, dom, check_load=False):
         if not isinstance(dom, basestring):
             return dom
         if check_load:
@@ -287,7 +284,7 @@ class ModelRecord(SignalEvent):
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
         if self.parent:
-            ctx['parent'] = EvalEnvironment(self.parent)
+            ctx['parent'] = EvalEnvironment(self.parent, check_load)
         val = eval(dom, ctx)
         return val
 
