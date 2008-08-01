@@ -328,7 +328,7 @@ class ModelRecordGroup(SignalEvent):
             if model.id:
                 if model.is_modified():
                     old.append(model.id)
-                else:
+                elif to_add:
                     model._loaded = False
             else:
                 new.append(model)
