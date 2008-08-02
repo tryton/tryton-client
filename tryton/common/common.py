@@ -76,7 +76,7 @@ def request_server(server_widget, parent):
         xoptions=gtk.FILL)
     entry_port = gtk.Entry()
     entry_port.set_max_length(5)
-    entry_port.set_text("8069")
+    entry_port.set_text("8070")
     entry_port.set_activates_default(True)
     entry_port.set_width_chars(16)
     table.attach(entry_port, 1, 2, 1, 2, yoptions=False,
@@ -99,7 +99,7 @@ def request_server(server_widget, parent):
     dialog.show_all()
     dialog.set_default_response(gtk.RESPONSE_OK)
 
-    url_m = re.match('^([\w.-]+):(\d{1,5})$',
+    url_m = re.match('^([\w.-]+):(\d{1,5})',
         server_widget.get_text())
     if url_m:
         entry_server.set_text(url_m.group(1))
