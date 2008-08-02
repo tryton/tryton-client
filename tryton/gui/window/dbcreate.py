@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
-#from gtk import glade  
 import gobject
 import gettext
 import re
@@ -10,49 +9,34 @@ import tryton.rpc as rpc
 
 _ = gettext.gettext
 
-# Some Postgres restrictions for the DB_Name
-def move_cursor(entry, pos):
-    entry.set_position(pos)
-    return False
-
-def entry_insert_text(entry, new_text, new_text_length, position):
-    if (new_text.isalnum() or new_text == '_' ):
-#        _string = entry.get_chars(0, -1) + new_text
-        _hid = entry.get_data('handlerid')
-        entry.handler_block(_hid)
-        _pos = entry.get_position()
-#        _val = _string
-        if _pos == 0 and not new_text.isalpha():
-            new_text = ""
- 
-        _pos = entry.insert_text(new_text, _pos)
-        entry.handler_unblock(_hid)
-        gobject.idle_add(move_cursor, entry, _pos)
-
-    entry.stop_emission("insert-text")
-
 class DBCreate(object):
-    def server_connection_state(self, sensitive):
-        if sensitive:
-            self.entry_server.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("#000000"))
-#            self.button_db_ok.set_flags(gtk.CAN_FOCUS)
-#            self.button_db_ok.grab_focus()
-            self.button_db_ok.set_sensitive(True)
-            self.button_db_ok.set_flags(gtk.CAN_DEFAULT)
-            self.button_db_ok.unset_flags(gtk.HAS_DEFAULT)
-            self.button_db_ok.grab_default()
-            self.button_db_ok.set_flags(gtk.RECEIVES_DEFAULT)
+    def server_connection_state(self, state):
+        """Method to set the server connection information depending on the 
+        connection state. If state is True, the connection string will shown.
+        Otherwise the wrong connection string will be shown plus an additional
+        errormessage, colored in red."""
+        if state:
+            self.entry_server.modify_text(gtk.STATE_INSENSITIVE, \
+                gtk.gdk.color_parse("#000000"))
+            #self.button_db_ok.set_sensitive(True)
+            
+            #self.button_db_ok.set_flags(gtk.RECEIVES_DEFAULT)
         else:
             self.entry_server.set_editable(False)
             self.entry_server.set_sensitive(False)
-            self.entry_server.set_text(self.entry_server.get_text() + " " + _('Can not connect to server!'))
-            self.entry_server.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("#ff0000"))
+            self.entry_server.set_text(self.entry_server.get_text() + " " \
+                + _('Can not connect to server!'))
+            self.entry_server.modify_text(gtk.STATE_INSENSITIVE, \
+                gtk.gdk.color_parse("#ff0000"))
             self.button_db_ok.set_sensitive(False)
-            self.button_db_ok.unset_flags(gtk.CAN_DEFAULT)
-            self.button_db_ok.unset_flags(gtk.HAS_DEFAULT)
+            #self.button_db_ok.unset_flags(gtk.CAN_DEFAULT)
+            #self.button_db_ok.unset_flags(gtk.HAS_DEFAULT)
         return sensitive
 
     def server_change(self, widget, parent):
+        """This method checks the server connection via host and port. If the 
+        connection is successfull, it query the language list and pass true
+        state to the GUI. Otherwise it pass false state to the GUI."""
         res = common.request_server(self.entry_server, parent)
         if not res:
             return False
@@ -66,11 +50,17 @@ class DBCreate(object):
             return False
         return True
 
-    def event_passwd_clear( self, widget, event, data=None ):
+    def event_passwd_clear(self, widget, event, data=None):
+        """This event method clear the text in a widget if CTRL-u 
+        is pressed."""
         if  event.keyval == gtk.keysyms.u:
             widget.set_text("")
 
-    def event_show_button_create( self, widget, event, data=None ):
+    def event_show_button_create(self, widget, event, data=None):
+        """This event method decide by rules if the Create button will be 
+        sensitive or insensitive. The general rule is, all given fields 
+        must be filled, then the Create button is set to sensitive. This
+        event method doesn't check the valid of single entrys."""
         if  self.entry_server.get_text() !=  _("") \
             and self.entry_password_new.get_text() != "" \
             and self.entry_new_db.get_text() != "" \
@@ -78,13 +68,41 @@ class DBCreate(object):
             and self.ent_password_admin.get_text() != "" \
             and self.ent_re_password_admin.get_text() != "":
             self.button_db_ok.set_sensitive(True)
+
+            self.button_db_ok.grab_default()
         else:
             self.button_db_ok.set_sensitive(False)
-            
-    def __init__(self, sig_login):
+            self.button_db_ok.unset_flags(gtk.CAN_DEFAULT)
+            self.button_db_ok.unset_flags(gtk.HAS_DEFAULT)
 
+    # Some Postgres restrictions for the DB_Name
+
+
+    def entry_insert_text(self, entry, new_text, new_text_length, position):
+        """This event method checks each text input for the PostgreSQL
+        database name. It allows the following rules: 
+        - Allowed characters are alpha-nummeric [A-Za-z0-9] and underscore (_)
+        - First character must be a letter"""
+        def move_cursor(entry, pos):
+            entry.set_position(pos)
+            return False
+
+        if (new_text.isalnum() or new_text == '_' ):
+            _hid = entry.get_data('handlerid')
+            entry.handler_block(_hid)
+            _pos = entry.get_position()
+            if _pos == 0 and not new_text.isalpha():
+                new_text = ""
+            _pos = entry.insert_text(new_text, _pos)
+            entry.handler_unblock(_hid)
+            gobject.idle_add(move_cursor, entry, _pos)
+        entry.stop_emission("insert-text")
+
+
+    def __init__(self, sig_login):
+        """This method defines the complete GUI."""
         self.dialog = gtk.Dialog(
-            title =  _("Create New Database"),
+            title =  _("Create new database"),
             parent = None,
             flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
             | gtk.WIN_POS_CENTER_ON_PARENT,
@@ -129,7 +147,8 @@ class DBCreate(object):
         self.entry_server.set_width_chars(16)
         table_main.attach(self.entry_server, 1, 2, 1, 2)
         tooltips.set_tip(self.entry_server, _("This is the URL of the Tryton " \
-            "server. Use 'localhost' if the server is installed on this " \
+            "server. Use server 'localhost' and port '8070' if the server " \
+            "is installed on this " \
             "computer. Click on 'Change' to change the address."), None)
 
         self.but_server_new = gtk.Button(_("C_hange"), stock=None, 
@@ -142,7 +161,7 @@ class DBCreate(object):
         tooltips.set_tip(self.but_server_new, _("Setup the Tryton server " \
             "connection..."), None)
 
-        label_server_password = gtk.Label(_("Server Password:"))
+        label_server_password = gtk.Label(_("Server password:"))
         label_server_password.set_justify(gtk.JUSTIFY_RIGHT)
         label_server_password.set_alignment(1, 0.5)
         label_server_password.set_padding( 3, 3)
@@ -156,11 +175,12 @@ class DBCreate(object):
         self.entry_password_new.set_width_chars(16)
         table_main.attach(self.entry_password_new, 1, 3, 2, 3, yoptions=False,
             xoptions=gtk.EXPAND | gtk.FILL)
-        tooltips.set_tip(self.entry_password_new, _("This is the Password " \
+        tooltips.set_tip(self.entry_password_new, _("This is the " \
             "password for Tryton administration. It doesn't belong to a " \
             "Tryton user. This password is usually defined in the trytond" \
             "configuration."), None)
-        self.entry_password_new.connect("key-press-event", self.event_passwd_clear)
+        self.entry_password_new.connect("key-press-event", \
+            self.event_passwd_clear)
 
         hseparator = gtk.HSeparator()
         table_main.attach(hseparator, 0, 3, 3, 4, yoptions=False,
@@ -187,14 +207,16 @@ class DBCreate(object):
         self.entry_new_db.set_width_chars(63)
         table_main.attach(self.entry_new_db, 1, 3, 5, 6, yoptions=False,
                     xoptions=gtk.EXPAND | gtk.FILL)
-        tooltips.set_tip(self.entry_new_db, _("Choose the name of the new database.\n" \
+        tooltips.set_tip(self.entry_new_db, _("Choose the name of the new " \
+            "database.\n" \
             "Allowed characters are alphanumerical or _ (underscore)\n" \
             "You need to avoid all accents, space or special characters! " \
             "Example: tryton"), None)
-        handlerid = self.entry_new_db.connect("insert-text", entry_insert_text)
+        handlerid = self.entry_new_db.connect("insert-text", \
+            self.entry_insert_text)
         self.entry_new_db.set_data('handlerid', handlerid)
 
-        label_default_lang = gtk.Label(_("Default Language:"))
+        label_default_lang = gtk.Label(_("Default language:"))
         label_default_lang.set_justify(gtk.JUSTIFY_RIGHT)
         label_default_lang.set_alignment(1, 0.5)
         label_default_lang.set_padding( 3, 3)
@@ -205,12 +227,12 @@ class DBCreate(object):
         eventbox_default_lang.add(self.combo_default_lang)
         table_main.attach(eventbox_default_lang, 1, 3, 6, 7, \
             xoptions=gtk.EXPAND | gtk.FILL)
-        tooltips.set_tip(eventbox_default_lang, _("Choose the default language that " \
-            "will be installed for this database. You will be able to " \
-            "install new languages after installation through the " \
-            "administration menu."), None)
+        tooltips.set_tip(eventbox_default_lang, _("Choose the default " \
+            "language that will be installed for this database. You will " \
+            "be able to install new languages after installation through " \
+            "the administration menu."), None)
 
-        label_admin_password = gtk.Label(_("Admin Password:"))
+        label_admin_password = gtk.Label(_("Admin password:"))
         label_admin_password.set_justify(gtk.JUSTIFY_RIGHT)
         label_admin_password.set_padding( 3, 3)
         label_admin_password.set_alignment(1, 0.5)
@@ -221,29 +243,28 @@ class DBCreate(object):
         tooltips.set_tip(self.ent_password_admin, _("Choose a password for " \
             "the admin user of the new database. With these credentials you " \
             "are later able to login into the database:\n" \
-            "login: admin\n" \
-            "password: <The password you set here>"), None)
+            "User name: admin\n" \
+            "Password: <The password you set here>"), None)
         table_main.attach(self.ent_password_admin, 1, 3, 7, 8, \
             xoptions=gtk.EXPAND | gtk.FILL)
-        self.ent_password_admin.connect("key-press-event", self.event_passwd_clear)
+        self.ent_password_admin.connect("key-press-event", \
+            self.event_passwd_clear)
 
-        label_admin_re_password = gtk.Label(_("Confirm Admin Password:"))
+        label_admin_re_password = gtk.Label(_("Confirm admin password:"))
         label_admin_re_password.set_justify(gtk.JUSTIFY_RIGHT)
         label_admin_re_password.set_padding( 3, 3)
         label_admin_re_password.set_alignment(1, 0.5)
-        table_main.attach(label_admin_re_password, 0, 1, 8, 9, xoptions=gtk.FILL)
+        table_main.attach(label_admin_re_password, 0, 1, 8, 9, \
+            xoptions=gtk.FILL)
 
         self.ent_re_password_admin = gtk.Entry()
         self.ent_re_password_admin.set_visibility(False)
-        tooltips.set_tip(self.ent_re_password_admin, _("Type the Admin Password again"), None)
+        tooltips.set_tip(self.ent_re_password_admin, _("Type the Admin " \
+            "password again"), None)
         table_main.attach(self.ent_re_password_admin, 1, 3, 8, 9, \
             xoptions=gtk.EXPAND | gtk.FILL)
-        #self.ent_re_password_admin.connect("key-press-event", self.event_passwd_clear)
-
-#        self.label_connection_info = gtk.Label()
-#        table_main.attach(self.label_connection_info, 1, 3, 9, 10)
-#        self.label_connection_info.set_use_markup(True)
-#        self.label_connection_info.set_alignment(0, 0.5)
+        self.ent_re_password_admin.connect("key-press-event", \
+            self.event_passwd_clear)
 
         self.dialog.add_button("gtk-cancel", \
             gtk.RESPONSE_CANCEL)
@@ -254,9 +275,8 @@ class DBCreate(object):
         img_connect.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
         self.button_db_ok.set_image(img_connect)
         self.button_db_ok.set_flags(gtk.CAN_DEFAULT)
-        #self.button_db_ok.set_flags(gtk.HAS_DEFAULT)
-        #self.button_db_ok.grab_default()
-        tooltips.set_tip(self.button_db_ok, _('Create the new Tryton database.'))
+        tooltips.set_tip(self.button_db_ok, _('Create the new Tryton ' \
+            'database.'))
         self.dialog.add_action_widget(self.button_db_ok, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
 
@@ -280,7 +300,6 @@ class DBCreate(object):
         port = int(CONFIG['login.port'])
         url = '%s:%d' % (host, port)
         self.entry_server.set_text(url)
-        #print "URL: ",url
 
         liststore = gtk.ListStore(str, str)
         self.combo_default_lang.set_model(liststore)
@@ -293,19 +312,20 @@ class DBCreate(object):
             res = self.dialog.run()
             dbname = self.entry_new_db.get_text()
             url = self.entry_server.get_text()
-
-            url_m = re.match('^([\w.\-]+):(\d{1,5})$', \
-                    url or '')
+            url_m = re.match('^([\w.\-]+):(\d{1,5})', \
+                url or '')
 
             langidx = self.combo_default_lang.get_active_iter()
             langreal = langidx \
-                    and self.combo_default_lang.get_model().get_value(langidx, 1)
+                and self.combo_default_lang.get_model().get_value(langidx, 1)
             passwd = pass_widget.get_text()
             if res == gtk.RESPONSE_OK:
                 if (not dbname) \
-                        or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname)):
+                    or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname)):
                     common.warning(_('The database name is restricted to' \
-                        'alphanumerical characters and "_" (underscore).\n' \
+                        'alpha-nummerical characters and "_" (underscore).' \
+                        'It must begin with a letter and max. sized to 63 ' \
+                        'characters at all.\n' \
                         'Try to avoid all accents, space ' \
                         'and any other special characters.'), parent, \
                         _('Wrong characters in database name!'))
@@ -314,7 +334,7 @@ class DBCreate(object):
                     common.warning(_("The new admin password " \
                         "doesn't match to the retyped password.\n" \
                         "Try to type the same passwords in the " \
-                        "Admin Password and the Confirm Admin Password " \
+                        "admin password and the confirm admin password " \
                         "fields again."), parent, \
                         _("Passwords doesn't match!"))
                     continue
@@ -323,12 +343,19 @@ class DBCreate(object):
                         "required to create a new Tryton database\n"), \
                         parent, _('Missing admin password!'))
                     continue
-                elif url_m.group(1) and int(url_m.group(2)) and dbname and langreal and passwd \
+                elif url_m.group(1) \
+                    and int(url_m.group(2)) \
+                    and dbname \
+                    and langreal \
+                    and passwd \
                     and admin_passwd.get_text():
                     try:
-                        if rpc.db_exec( url_m.group(1), int(url_m.group(2)), 'db_exist', dbname):
-                            common.warning(_('Try another database name.'), parent, \
-                            _('The Database already exists!'))
+                        if rpc.db_exec( url_m.group(1), int(url_m.group(2)), \
+                                'db_exist', dbname):
+                            common.warning(_("Database with the same name " \
+                                "already exists.\n"
+                                "Try another database name."), parent, \
+                                _("Databasename already exist!"))
                             self.entry_new_db.set_text("")
                             self.entry_new_db.grab_focus()
                             continue
@@ -336,30 +363,35 @@ class DBCreate(object):
                             if url_m:
                                 CONFIG['login.server'] = host = url_m.group(1)
                                 CONFIG['login.port'] = port = url_m.group(2)
-                            rpc.db_exec(host, int(port), 'create', passwd, dbname, \
-                            langreal, admin_passwd.get_text())
+                            rpc.db_exec(host, int(port), 'create', passwd, \
+                                dbname, langreal, admin_passwd.get_text())
                             from tryton.gui.main import Main
                             Main.get_main().refresh_ssl()
-                            common.message(_('You can now connect to the new database\n' \
-                                'with the user: admin.'), parent)
+                            common.message(_('You can now connect to the ' \
+                                'new database, with the following login:\n' 
+                                'User name: admin\n' \
+                                'Password:<The password you set before>'), 
+                                parent, _("Database created successful!"))
                             self.sig_login(dbname=dbname)
                             return True
                             break
                     except Exception, exception:
                         if str(exception[0]) == "AccessDenied":
-                            common.warning(_("The Tryton server password " \
-                                "is wrong. Please type again.") \
+                            common.warning(_("Sorry, the Tryton server "
+                                "password seems wrong. Please type again.") \
                                 , parent, _("Access denied!"))
                             self.entry_password_new.set_text("")
                             self.entry_password_new.grab_focus()
                             continue
                         else: # Unclassified error
-                            common.warning(_("Can't request if a database with " \
-                                "the given name already exists.\n" \
-                                "The connection to the PostgreSQL server seems " \
-                                "refused. \n" \
-                                "Error message:\n") + str(exception[0]), parent, \
-                                _("Error request database!"))
+                            common.warning(_("Can't request the Tryton " \ 
+                                "server, caused by an unknown reason.\n" \
+                                "If there is a database created, it could " \
+                                "be broken. Please drop this database!" \
+                                "Please check the error message for " \ 
+                                "possible informations.\n" \
+                                "Error message:\n") + str(exception[0]), \
+                                parent, _("Error requesting Tryton server!"))
                         parent.present()
                         self.dialog.destroy()
                         rpc.logout()
