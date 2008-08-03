@@ -14,19 +14,28 @@ class DBCreate(object):
         """Method to set the server connection information depending on the 
         connection state. If state is True, the connection string will shown.
         Otherwise the wrong connection string will be shown plus an additional
-        errormessage, colored in red."""
+        errormessage, colored in red. In this case, all entryboxes set 
+        insensitive"""
         if state:
+            self.entry_serverpasswd.set_sensitive(True)
+            self.entry_dbname.set_sensitive(True)
+            self.entry_adminpasswd.set_sensitive(True)
+            self.entry_adminpasswd2.set_sensitive(True)
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
                 gtk.gdk.color_parse("#000000"))
         else:
+            self.entry_serverpasswd.set_sensitive(False)
+            self.entry_dbname.set_sensitive(False)
+            self.entry_adminpasswd.set_sensitive(False)
+            self.entry_adminpasswd2.set_sensitive(False)
             self.entry_server_connection.set_editable(False)
             self.entry_server_connection.set_sensitive(False)
             self.entry_server_connection.set_text( \
-                self.entry_server_connection.get_text() + " " \
+                self.entry_server_connection.get_text() + "  " \
                 + _('Can not connect to server!'))
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
                 gtk.gdk.color_parse("#ff0000"))
-        return sensitive
+        return state
 
     def server_change(self, widget, parent):
         """This method checks the server connection via host and port. If the 
@@ -72,19 +81,15 @@ class DBCreate(object):
 
         else:
             self.button_create.set_sensitive(False)
-            #self.button_create.unset_flags(gtk.CAN_DEFAULT)
-            #self.button_create.unset_flags(gtk.HAS_DEFAULT)
-
-
-    # Some Postgres restrictions for the DB_Name
-
 
     def entry_insert_text(self, entry, new_text, new_text_length, position):
         """This event method checks each text input for the PostgreSQL
         database name. It allows the following rules: 
         - Allowed characters are alpha-nummeric [A-Za-z0-9] and underscore (_)
         - First character must be a letter"""
-        def move_cursor(entry, pos):
+        def _move_cursor(entry, pos):
+            """Helper function for entry_insert_text. It is used to position 
+            the cursor for right and wron inputs correctly."""
             entry.set_position(pos)
             return False
 
@@ -96,7 +101,7 @@ class DBCreate(object):
                 new_text = ""
             _pos = entry.insert_text(new_text, _pos)
             entry.handler_unblock(_hid)
-            gobject.idle_add(move_cursor, entry, _pos)
+            gobject.idle_add(_move_cursor, entry, _pos)
         entry.stop_emission("insert-text")
 
 
@@ -108,23 +113,17 @@ class DBCreate(object):
             flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
             | gtk.WIN_POS_CENTER_ON_PARENT,
         )
+        # This event is needed for controlling the button_create
         self.dialog.connect("key-press-event", self.event_show_button_create)
-        self.dialog.connect("focus-in-event", self.event_show_button_create)
-        self.dialog.connect("focus-out-event", self.event_show_button_create)
-
         tooltips = gtk.Tooltips()
-        
         self.dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
         self.dialog.set_has_separator(False)
-
         dialog_vbox = gtk.VBox()
-
         table = gtk.Table(9, 3, False)
-        table.set_border_width(10)
+        table.set_border_width(3)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
         dialog_vbox.pack_start(table)
-
         label_server_setup = gtk.Label()
         label_server_setup.set_markup("<b>"+ _("Tryton Server Setup:")+ "</b>")
         label_server_setup.set_justify(gtk.JUSTIFY_LEFT)
@@ -187,7 +186,7 @@ class DBCreate(object):
             xoptions=gtk.EXPAND | gtk.FILL)
 
         label_dbname = gtk.Label()
-        label_dbname.set_markup("<b>" + _("New database setup")  + "</b>")
+        label_dbname.set_markup("<b>" + _("New database setup:")  + "</b>")
         label_dbname.set_justify(gtk.JUSTIFY_LEFT)
         label_dbname.set_alignment(0, 1)
         label_dbname.set_padding( 9, 5)
@@ -357,7 +356,7 @@ class DBCreate(object):
                         if rpc.db_exec( url_m.group(1), int(url_m.group(2)), \
                                 'db_exist', dbname):
                             common.warning(_("Database with the same name " \
-                                "already exists.\n"
+                                "already exists.\n" \
                                 "Try another database name."), parent, \
                                 _("Databasename already exist!"))
                             self.entry_dbname.set_text("")
@@ -371,17 +370,18 @@ class DBCreate(object):
                                 dbname, langreal, admin_passwd.get_text())
                             from tryton.gui.main import Main
                             Main.get_main().refresh_ssl()
-                            common.message(_('You can now connect to the ' \
-                                'new database, with the following login:\n' 
-                                'User name: admin\n' \
-                                'Password:<The password you set before>'), 
-                                parent, _("Database created successful!"))
+                            common.message( _("You can now connect to the " \
+                                "new database, with the following login:\n" \
+                                "User name: admin\n" \
+                                "Password:<Admin Password>"), \
+                                parent)
+                            parent.present()
+                            self.dialog.destroy()
                             self.sig_login(dbname=dbname)
-                            return True
                             break
                     except Exception, exception:
                         if str(exception[0]) == "AccessDenied":
-                            common.warning(_("Sorry, the Tryton server "
+                            common.warning(_("Sorry, the Tryton server " \
                                 "password seems wrong. Please type again.") \
                                 , parent, _("Access denied!"))
                             self.entry_serverpasswd.set_text("")
@@ -391,7 +391,7 @@ class DBCreate(object):
                             common.warning(_("Can't request the Tryton " \
                                 "server, caused by an unknown reason.\n" \
                                 "If there is a database created, it could " \
-                                "be broken. Please drop this database!" \
+                                "be broken. Maybe drop this database!" \
                                 "Please check the error message for " \
                                 "possible informations.\n" \
                                 "Error message:\n") + str(exception[0]), \
@@ -406,7 +406,4 @@ class DBCreate(object):
 
         parent.present()
         self.dialog.destroy()
-
-
-
 
