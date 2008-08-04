@@ -320,11 +320,13 @@ class ModelRecord(SignalEvent):
                 self.mgroup.mfields[fieldname].set_on_change(self, value)
             self.signal('record-changed')
 
-    def on_change_with(self, fieldname):
+    def on_change_with(self, field_name):
         for fieldname in self.mgroup.mfields:
             on_change_with = self.mgroup.mfields[fieldname].attrs.get(
                     'on_change_with')
             if not on_change_with:
+                continue
+            if field_name not in on_change_with:
                 continue
             args = {}
             for arg in on_change_with:
