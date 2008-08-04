@@ -192,8 +192,19 @@ class NumericField(FloatField):
 
     def set_client(self, model, value, test_state=True, force_change=False):
         value = Decimal(str(value))
-        return super(NumericField, self).set_client(model, value,
-                test_state=test_state, force_change=force_change)
+        internal = model.value[self.name]
+        self.set(model, value, test_state)
+        if isinstance(self.attrs.get('digits'), str):
+            digits = model.expr_eval(self.attrs['digits'])
+        else:
+            digits = self.attrs.get('digits', (12, 2))
+        if abs((internal or Decimal('0.0')) - (model.value[self.name] or Decimal('0.0'))) \
+                >= Decimal(str(10.0**(-int(digits[1])))):
+            if not self.get_state_attrs(model).get('readonly', False):
+                model.modified = True
+                model.modified_fields.setdefault(self.name)
+                self.sig_changed(model)
+                model.signal('record-changed', model)
 
 
 class IntegerField(CharField):
