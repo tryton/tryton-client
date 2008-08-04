@@ -287,7 +287,7 @@ class ModelRecordGroup(SignalEvent):
 
     def remove(self, model, remove=False, modified=True):
         idx = self.models.index(model)
-        if self.models[idx].id:
+        if self.models[idx].id > 0:
             if remove:
                 self.model_removed.append(self.models[idx].id)
             else:
@@ -325,7 +325,7 @@ class ModelRecordGroup(SignalEvent):
         old = []
         new = []
         for model in models:
-            if model.id:
+            if model.id > 0:
                 if model.is_modified():
                     old.append(model.id)
                 elif to_add:

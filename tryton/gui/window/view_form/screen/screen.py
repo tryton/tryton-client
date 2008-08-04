@@ -461,7 +461,7 @@ class Screen(SignalEvent):
         reload_ids = []
         if self.current_view.view_type == 'form' and self.current_model:
             obj_id = self.current_model.id
-            if delete and obj_id:
+            if delete and obj_id > 0:
                 try:
                     reload_ids = self.models.on_write_ids(obj_id)
                     if reload_ids and obj_id in reload_ids:

@@ -352,7 +352,7 @@ class O2MField(CharField):
         for model2 in model.value[self.name].models:
             if (modified and not model2.is_modified()):
                 continue
-            if model2.id:
+            if model2.id > 0:
                 result.append(('write', model2.id,
                     model2.get(check_load=check_load, get_readonly=readonly,
                         get_modifiedonly=modified)))
@@ -419,14 +419,12 @@ class O2MField(CharField):
         return True
 
     def set_on_change(self, model, value):
-        from group import ModelRecordGroup
-
-        if value and value.get('add'):
+        if value and (value.get('add') or value.get('update')):
             context = self.context_get(model)
             rpc2 = RPCProxy(self.attrs['relation'])
             try:
                 fields_name = []
-                for val in value['add']:
+                for val in (value.get('add', []) + value.get('update', [])):
                     for fieldname in val.keys():
                         if fieldname not in fields_name:
                             fields_name.append(fieldname)
@@ -447,12 +445,19 @@ class O2MField(CharField):
             model.value[self.name].remove(mod)
 
         mod = None
-        if value and value.get('add'):
+        if value and value.get('add') or value.get('update', []):
             model.value[self.name].add_fields(fields, model.value[self.name])
-            for record in (value['add'] or []):
+            for record in value.get('add', []):
                 mod = model.value[self.name].model_new(default=False)
                 model.value[self.name].model_add(mod)
-                mod.set(record, modified=True, signal=True)
+                mod.set(record, modified=True, signal=False)
+
+            for record in value.get('update', []):
+                if 'id' not in record:
+                    continue
+                mod = model.value[self.name].get_by_id(record['id'])
+                if mod:
+                    mod.set(record, modified=True, signal=False)
         model.value[self.name].current_model = mod
         return True
 
