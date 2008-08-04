@@ -43,7 +43,7 @@ class DBCreate(object):
                 "Can not connect to the Tryton server!\n" \
                 "1. Try to check if the Tryton server is running.\n" \
                 "2. Find out on which address and port it is listen.\n" \
-                "3. If there is a firewall between the server and this" \
+                "3. If there is a firewall between the server and this " \
                 "client, make shure that the Tryton server address and port " \
                 "(usually 8070) are not blocked.\n" \
                 "Click on 'Change' to change the address."), None)
@@ -77,7 +77,7 @@ class DBCreate(object):
         sensitive or insensitive. The general rule is, all given fields 
         must be filled, then the Create button is set to sensitive. This
         event method doesn't check the valid of single entrys."""
-        if  self.entry_server_connection.get_text() !=  _("") \
+        if  self.entry_server_connection.get_text() !=  "" \
             and self.entry_serverpasswd.get_text() != "" \
             and self.entry_dbname.get_text() != "" \
             and self.combo_language.get_active() != -1 \
@@ -195,7 +195,7 @@ class DBCreate(object):
         table.attach(self.entry_serverpasswd, 1, 3, 2, 3)
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
             "password for Tryton administration. It doesn't belong to a " \
-            "Tryton user. This password is usually defined in the trytond" \
+            "Tryton user. This password is usually defined in the trytond " \
             "configuration."), None)
         self.entry_serverpasswd.connect("key-press-event", \
             self.event_passwd_clear)
@@ -310,8 +310,8 @@ class DBCreate(object):
             if res == gtk.RESPONSE_OK:
                 if (not dbname) \
                     or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname)):
-                    common.warning(_('The database name is restricted to' \
-                        'alpha-nummerical characters and "_" (underscore).' \
+                    common.warning(_('The database name is restricted to ' \
+                        'alpha-nummerical characters and "_" (underscore). ' \
                         'It must begin with a letter and max. sized to 63 ' \
                         'characters at all.\n' \
                         'Try to avoid all accents, space ' \
@@ -328,7 +328,7 @@ class DBCreate(object):
                     continue
                 elif not admin_passwd.get_text():
                     common.warning(_("Admin password and confirmation are " \
-                        "required to create a new Tryton database\n"), \
+                        "required to create a new Tryton database."), \
                         parent, _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
@@ -376,7 +376,7 @@ class DBCreate(object):
                             common.warning(_("Can't request the Tryton " \
                                 "server, caused by an unknown reason.\n" \
                                 "If there is a database created, it could " \
-                                "be broken. Maybe drop this database!" \
+                                "be broken. Maybe drop this database! " \
                                 "Please check the error message for " \
                                 "possible informations.\n" \
                                 "Error message:\n") + str(exception[0]), \
