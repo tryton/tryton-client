@@ -160,6 +160,7 @@ class Dialog(object):
 
         self.dia = gtk.Dialog(_('Link'), window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.dia.connect('close', self._sig_close)
         self.window = window
         self.dia.set_property('default-width', 760)
         self.dia.set_property('default-height', 500)
@@ -169,11 +170,11 @@ class Dialog(object):
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
 
-        icon_cancel = gtk.STOCK_CLOSE
+        self.but_cancel = None
         if not model:
             icon_cancel = gtk.STOCK_CANCEL
-        self.but_cancel = self.dia.add_button(icon_cancel,
-                gtk.RESPONSE_CANCEL)
+            self.but_cancel = self.dia.add_button(icon_cancel,
+                    gtk.RESPONSE_CANCEL)
 
         self.but_ok = self.dia.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.but_ok.add_accelerator('clicked', self.accel_group,
@@ -366,12 +367,22 @@ class Dialog(object):
             if not end:
                 self.screen.current_view.set_cursor()
                 self.screen.display()
-            self.but_cancel.set_label(gtk.STOCK_CLOSE)
+            if self.but_cancel:
+                self.but_cancel.set_label(gtk.STOCK_CLOSE)
 
         if res == gtk.RESPONSE_OK:
             model = self.screen.current_model
             return (True, model)
         return (False, None)
+
+    def _sig_close(self, widget):
+        self.screen.current_view.set_value()
+        if not self.but_cancel \
+                and self.screen.current_model \
+                and not self.screen.current_model.validate():
+            self.screen.current_view.set_cursor()
+            self.screen.display()
+            widget.emit_stop_by_name('close')
 
     def destroy(self):
         self.screen.signal_unconnect(self)
