@@ -11,17 +11,14 @@ import tryton.common as common
 
 class EvalEnvironment(object):
 
-    def __init__(self, parent):
+    def __init__(self, parent, check_load):
         self.parent = parent
+        self.check_load = check_load
 
     def __getattr__(self, item):
         if item == 'parent' and self.parent.parent:
             return EvalEnvironment(self.parent.parent)
-        if item == "current_date":
-            return datetime.datetime.today()
-        if item == "time":
-            return time
-        return self.parent.get(includeid=True)[item]
+        return self.parent.get_eval(check_load=self.check_load)[item]
 
 
 class ModelRecord(SignalEvent):
@@ -121,6 +118,15 @@ class ModelRecord(SignalEvent):
         value = dict(value)
         if includeid:
             value['id'] = self.id
+        return value
+
+    def get_eval(self, check_load=True):
+        if check_load:
+            self._check_load()
+        value = {}
+        for name, mfield in self.mgroup.mfields.items():
+            value[name] = mfield.get_eval(self, check_load=check_load)
+        value['id'] = self.id
         return value
 
     def cancel(self):
@@ -264,21 +270,21 @@ class ModelRecord(SignalEvent):
             self.read_time = time.time()
             self.set(value)
 
-    def expr_eval(self, dom, check_load=True):
+    def expr_eval(self, dom, check_load=False):
         if not isinstance(dom, basestring):
             return dom
         if check_load:
             self._check_load()
         ctx = rpc.CONTEXT.copy()
         for name, mfield in self.mgroup.mfields.items():
-            ctx[name] = mfield.get(self, check_load=check_load)
+            ctx[name] = mfield.get_eval(self, check_load=check_load)
 
         ctx['current_date'] = datetime.datetime.today()
         ctx['time'] = time
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
         if self.parent:
-            ctx['parent'] = EvalEnvironment(self.parent)
+            ctx['parent'] = EvalEnvironment(self.parent, check_load)
         val = eval(dom, ctx)
         return val
 
