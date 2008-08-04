@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-08-04 16:37+0100\n"
+"PO-Revision-Date: 2008-08-04 17:07+0100\n"
 "Last-Translator: Udo Spallek <udono@gmx.net>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -367,7 +367,7 @@ msgstr ""
 "1. Stellen Sie fest, ob der Tryton-Server läuft.\n"
 "2. Finden Sie heraus auf welcher Adresse und unter welchem Port der Server erreichbar ist.\n"
 "3. Wenn sich eine Firewall zwischen dem Tryton-Server und diesem Client befindet, stellen Sie sicher, das die Tryton-Serveradresse und der Port nicht durch die Firewall blockiert werden.\n"
-"Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Trytonservers anzupassen."
+"Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Tryton- Servers anzupassen."
 
 #: tryton/gui/window/dbcreate.py:122
 msgid "Create new database"
@@ -408,7 +408,7 @@ msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. D
 
 #: tryton/gui/window/dbcreate.py:207
 msgid "New database setup:"
-msgstr "Einstellungen der neuen Datenbank:"
+msgstr "Datenbank Einstellungen:"
 
 #: tryton/gui/window/dbcreate.py:212
 msgid "Name:"
@@ -510,7 +510,7 @@ msgstr ""
 
 #: tryton/gui/window/dbcreate.py:369
 msgid "Sorry, the Tryton server password seems wrong. Please type again."
-msgstr "Entschuldigung, das Tryton Server-Passwort scheint falsch zu sein. Bitte geben Sie es noch einmal ein."
+msgstr "Das Tryton Server-Passwort ist falsch! Bitte geben Sie es noch einmal ein."
 
 #: tryton/gui/window/dbcreate.py:371
 msgid "Access denied!"
