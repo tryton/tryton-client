@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-07-23 17:23+0100\n"
+"PO-Revision-Date: 2008-08-04 16:37+0100\n"
 "Last-Translator: Udo Spallek <udono@gmx.net>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -63,12 +63,12 @@ msgstr "Kein Plug-In für diese Ressource vorhanden!"
 msgid "Choose a Plugin"
 msgstr "Plug-In auswählen"
 
-#: tryton/translate.py:170
+#: tryton/translate.py:172
 #, python-format
 msgid "Unable to set locale %s"
 msgstr "Kann locale %s nicht setzen"
 
-#: tryton/translate.py:182
+#: tryton/translate.py:184
 msgid "Unable to unset locale"
 msgstr "Kann locale nicht zurücksetzen"
 
@@ -89,6 +89,7 @@ msgid "Tryton connect"
 msgstr "Verbindung"
 
 #: tryton/common/common.py:72
+#: tryton/gui/window/dbcreate.py:160
 #: tryton/gui/window/dblogin.py:66
 msgid "Server:"
 msgstr "Server:"
@@ -96,14 +97,6 @@ msgstr "Server:"
 #: tryton/common/common.py:90
 msgid "Port:"
 msgstr "Port:"
-
-#: tryton/common/common.py:95
-msgid "gtk-cancel"
-msgstr "Abbrechen"
-
-#: tryton/common/common.py:96
-msgid "gtk-ok"
-msgstr "Ok"
 
 #: tryton/common/common.py:254
 #: tryton/gui/main.py:750
@@ -122,16 +115,12 @@ msgstr "Fehler"
 msgid "Report Bug"
 msgstr "Fehler berichten"
 
-#: tryton/common/common.py:289
-msgid "gtk-close"
-msgstr "Schließen"
-
 #: tryton/common/common.py:294
 msgid "Application Error!"
 msgstr "Anwendungsfehler"
 
 #: tryton/common/common.py:313
-msgid "Error:"
+msgid "Error: "
 msgstr "Fehler:"
 
 #: tryton/common/common.py:332
@@ -147,12 +136,13 @@ msgid "User:"
 msgstr "Benutzername:"
 
 #: tryton/common/common.py:380
-#: tryton/common/common.py:586
-#: tryton/gui/window/dblogin.py:87
+#: tryton/common/common.py:591
+#: tryton/gui/window/dblogin.py:88
+#: tryton/gui/window/tree.py:275
 msgid "Password:"
 msgstr "Passwort:"
 
-#: tryton/common/common.py:422
+#: tryton/common/common.py:425
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
@@ -160,15 +150,15 @@ msgstr ""
 "Die selbe Fehlermeldung wurde bereits von einem anderen Benutzer berichtet.\n"
 "Zu Ihrer information haben wurden Ihr Benutzername auf der entsprechenden Interessentenliste hinterlegt. Issue"
 
-#: tryton/common/common.py:433
+#: tryton/common/common.py:436
 msgid "Created new bug with ID issue"
 msgstr "Neue Fehlermeldung angelegt, mit Id Issue"
 
-#: tryton/common/common.py:440
+#: tryton/common/common.py:443
 msgid "Exception:"
 msgstr "Ausnahme: "
 
-#: tryton/common/common.py:532
+#: tryton/common/common.py:535
 #: tryton/gui/main.py:612
 msgid "Tryton"
 msgstr "Tryton"
@@ -344,7 +334,7 @@ msgstr "Alle Dateien"
 msgid "Images"
 msgstr "Bilder"
 
-#: tryton/gui/window/attachment.py:315
+#: tryton/gui/window/attachment.py:317
 msgid "link: "
 msgstr "Verknüpfung: "
 
@@ -356,55 +346,189 @@ msgstr "Danksagungen"
 msgid "<b>Contributors:</b>"
 msgstr "<b>Helfer:</b>"
 
-#: tryton/gui/window/dbcreate.py:17
-msgid "Do not use special characters!"
-msgstr "Bitte nur zulässige Zeichen benutzen!"
+#: tryton/gui/window/dbcreate.py:26
+#: tryton/gui/window/dbcreate.py:172
+msgid "This is the URL of the Tryton server. Use server 'localhost' and port '8070' if the server is installed on this computer. Click on 'Change' to change the address."
+msgstr "Hier wird die Adresse des Tryton-Servers angezeigt. Ist der Server lokal auf diesem Computer installiert, dann wird meistens \"localhost\" als Adresse eingetragen. Klicken Sie auf \"Bearbeiten\" um diese Adresse zu ändern."
 
-#: tryton/gui/window/dbcreate.py:22
-msgid "Can not connect to server!"
-msgstr "Kann nicht zum Server verbinden!"
+#: tryton/gui/window/dbcreate.py:39
+msgid "No connection!"
+msgstr "Keine Verbindung!"
 
-#: tryton/gui/window/dbcreate.py:71
+#: tryton/gui/window/dbcreate.py:42
 msgid ""
-"The database name must contain only normal characters or \"_\".\n"
-"You must avoid all accents, space or special characters."
+"Can not connect to the Tryton server!\n"
+"1. Try to check if the Tryton server is running.\n"
+"2. Find out on which address and port it is listen.\n"
+"3. If there is a firewall between the server and this client, make shure that the Tryton server address and port (usually 8070) are not blocked.\n"
+"Click on 'Change' to change the address."
 msgstr ""
-"Der Datenbank Name darf nur Buchstaben, Zahlen, oder _ (Unterstrich) beinhalten.\n"
-" Akzente, Umlaute, ß und Leerzeichen andere Sonderzeichen sollten vermieden werden."
+"Kann nicht mit dem Tryton-Server verbinden!\n"
+"1. Stellen Sie fest, ob der Tryton-Server läuft.\n"
+"2. Finden Sie heraus auf welcher Adresse und unter welchem Port der Server erreichbar ist.\n"
+"3. Wenn sich eine Firewall zwischen dem Tryton-Server und diesem Client befindet, stellen Sie sicher, das die Tryton-Serveradresse und der Port nicht durch die Firewall blockiert werden.\n"
+"Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Trytonservers anzupassen."
 
-#: tryton/gui/window/dbcreate.py:75
-msgid "Bad database name!"
-msgstr "Fehler im Datenbank Namen"
+#: tryton/gui/window/dbcreate.py:122
+msgid "Create new database"
+msgstr "Neue Datenbank erstellen"
 
-#: tryton/gui/window/dbcreate.py:96
-msgid "Try with an other name."
-msgstr "Versuchen Sie einen anderen Namen."
+#: tryton/gui/window/dbcreate.py:135
+msgid "C_reate"
+msgstr "_Erstellen"
 
-#: tryton/gui/window/dbcreate.py:97
-msgid "The Database already exists!"
+#: tryton/gui/window/dbcreate.py:142
+msgid "Create the new Tryton database."
+msgstr "Die neue Tryton-Datenbank erstellen."
+
+#: tryton/gui/window/dbcreate.py:155
+msgid "Tryton Server Setup:"
+msgstr "Tryton Server Einstellungen:"
+
+#: tryton/gui/window/dbcreate.py:169
+msgid "http://localhost:8070"
+msgstr "http://localhost:8070"
+
+#: tryton/gui/window/dbcreate.py:176
+#: tryton/gui/window/dblogin.py:83
+msgid "C_hange"
+msgstr "_Bearbeiten"
+
+#: tryton/gui/window/dbcreate.py:183
+msgid "Setup the Tryton server connection..."
+msgstr "Tryton-Serververbindung konfigurieren..."
+
+#: tryton/gui/window/dbcreate.py:185
+msgid "Server password:"
+msgstr "Server Passwort:"
+
+#: tryton/gui/window/dbcreate.py:196
+msgid "This is the password for Tryton administration. It doesn't belong to a Tryton user. This password is usually defined in the trytond configuration."
+msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort gehört nicht zu einem Tryton Benutzer. Das Paswort wird normalerweise in der Tryton Konfiguration angegeben."
+
+#: tryton/gui/window/dbcreate.py:207
+msgid "New database setup:"
+msgstr "Einstellungen der neuen Datenbank:"
+
+#: tryton/gui/window/dbcreate.py:212
+msgid "Name:"
+msgstr "Benutzername:"
+
+#: tryton/gui/window/dbcreate.py:222
+msgid ""
+"Choose the name of the new database.\n"
+"Allowed characters are alphanumerical or _ (underscore)\n"
+"You need to avoid all accents, space or special characters! Example: tryton"
+msgstr ""
+"Geben Sie hier den Namen der neuen Datenbank ein.\n"
+"Erlaubt sind alle Buchstaben, Zahlen und _ (Unterstrich).\n"
+"Nicht erlaubt sind Umlaute, Akzente, Leezeichen oder 'ß'! Beispielname: tryton"
+
+#: tryton/gui/window/dbcreate.py:230
+msgid "Default language:"
+msgstr "Standard Sprache:"
+
+#: tryton/gui/window/dbcreate.py:239
+msgid "Choose the default language that will be installed for this database. You will be able to install new languages after installation through the administration menu."
+msgstr "Wählen Sie die Standardsprache für die neue Datenbank. Nach der Installation ist es im Administrationsmenü möglich eine neue Sprache einzustellen."
+
+#: tryton/gui/window/dbcreate.py:243
+msgid "Admin password:"
+msgstr "Admin- Passwort:"
+
+#: tryton/gui/window/dbcreate.py:251
+msgid ""
+"Choose a password for the admin user of the new database. With these credentials you are later able to login into the database:\n"
+"User name: admin\n"
+"Password: <The password you set here>"
+msgstr ""
+"Wählen Sie hier das Passwort des Benutzers mit Administrationsrechten für die neue Datenbank aus. Mit diesem Passwort werden sie sich folgendermaßen in der neuen Datenbank authentifizieren können:\n"
+"Benutzername: admin\n"
+"Passwort: <Das hier vergebene Passwort>"
+
+#: tryton/gui/window/dbcreate.py:259
+msgid "Confirm admin password:"
+msgstr "Admin-Passwort Wiederholung:"
+
+#: tryton/gui/window/dbcreate.py:268
+msgid "Type the Admin password again"
+msgstr "Wiederholen Sie die Eingabe des Admin Passworts um sicher zu gehen, dass Sie sich beim ersten Mal nicht vertippt haben."
+
+#: tryton/gui/window/dbcreate.py:313
+msgid ""
+"The database name is restricted to alpha-nummerical characters and \"_\" (underscore). It must begin with a letter and max. sized to 63 characters at all.\n"
+"Try to avoid all accents, space and any other special characters."
+msgstr ""
+"Die erlaubten Zeichen des Datenbanknames sind auf Buchstaben, Zahlen und \"_\" (Unterstrich) beschränkt. Der Datenbankname muss mit einem Buchstaben beginnen und darf maximal 63 Zeichen lang sein.\n"
+"Umlaute, Akzente und 'ß'  sind ebenfalls verboten."
+
+#: tryton/gui/window/dbcreate.py:319
+msgid "Wrong characters in database name!"
+msgstr "Unerlaubte Zeichen im Datenbank Namen!"
+
+#: tryton/gui/window/dbcreate.py:322
+msgid ""
+"The new admin password doesn't match to the retyped password.\n"
+"Try to type the same passwords in the admin password and the confirm admin password fields again."
+msgstr ""
+"Das neue Admin-Passwort und dessen Wiederholung sind unterschiedlich.\n"
+"Versuchen Sie noch einmal das selbe Passwort in die Felder Admin-Passwort und Admin-Passwort (Wiederholung) einzutragen."
+
+#: tryton/gui/window/dbcreate.py:327
+msgid "Passwords doesn't match!"
+msgstr "Passwörter sind nicht identisch!"
+
+#: tryton/gui/window/dbcreate.py:330
+msgid "Admin password and confirmation are required to create a new Tryton database."
+msgstr "Das Admin-Passwort und dessen Wiederholung sind notwendig um eine neue Tryton-Datenbank anlegen zu können."
+
+#: tryton/gui/window/dbcreate.py:332
+msgid "Missing admin password!"
+msgstr "Admin-Passwort fehlt!"
+
+#: tryton/gui/window/dbcreate.py:343
+msgid ""
+"Database with the same name already exists.\n"
+"Try another database name."
+msgstr ""
+"Eine Datenbank mit demselben Namen existiert bereits.\n"
+"Versuchen Sie einen anderein Datenbanknamen."
+
+#: tryton/gui/window/dbcreate.py:346
+msgid "Databasename already exist!"
 msgstr "Eine Datenbank mit diesem Namen existiert bereits!"
 
-#: tryton/gui/window/dbcreate.py:104
+#: tryton/gui/window/dbcreate.py:358
 msgid ""
-"The server crashed during installation.\n"
-"We suggest you to drop this database.\n"
+"You can now connect to the new database, with the following login:\n"
+"User name: admin\n"
+"Password:<Admin Password>"
+msgstr ""
+"Sie können nun mit der neuen Datenbank verbinden. Benutzen Sie dazu die folgenden Angaben:\n"
+"Benutzername: admin\n"
+"Passwort:<Admin-Passwort-das-sie-gerade-angegeben-haben>"
+
+#: tryton/gui/window/dbcreate.py:369
+msgid "Sorry, the Tryton server password seems wrong. Please type again."
+msgstr "Entschuldigung, das Tryton Server-Passwort scheint falsch zu sein. Bitte geben Sie es noch einmal ein."
+
+#: tryton/gui/window/dbcreate.py:371
+msgid "Access denied!"
+msgstr "Zugang verweigert!"
+
+#: tryton/gui/window/dbcreate.py:376
+msgid ""
+"Can't request the Tryton server, caused by an unknown reason.\n"
+"If there is a database created, it could be broken. Maybe drop this database! Please check the error message for possible informations.\n"
 "Error message:\n"
 msgstr ""
-"Der Server verursachte Fehler während der Installation.\n"
-"Es wird empfohlen, die soeben erstellte Datenbank zu löschen.\n"
+"Kann nicht mit dem Tryton-Server verbinden, wegen eines unbekannten Problems.\n"
+"Wenn eine Datenbank erstellt wurde, könnte diese unvollständig oder defekt sein. Es wird empfohlen die soeben erstellte Datenbank zu löschen! Bitte beachten Sie die folgende Fehlermeldung für weitere Informationen zu diesem Fehler.\n"
 "Fehlermeldung:\n"
 
-#: tryton/gui/window/dbcreate.py:107
-msgid "Error during database creation!"
-msgstr "Fehler beim Erstellen der Datenbank!"
-
-#: tryton/gui/window/dbcreate.py:121
-msgid "The following users have been installed on your database:"
-msgstr "Die folgenden Benutzernamen wurden ihrer Datenbank hinzugefügt:"
-
-#: tryton/gui/window/dbcreate.py:123
-msgid "You can now connect to the database as an administrator."
-msgstr "Sie können sich nun als Administrator mit der Datenbank verbinden."
+#: tryton/gui/window/dbcreate.py:383
+msgid "Error requesting Tryton server!"
+msgstr "Fehler bei der Abfrage des Tryton-Servers!"
 
 #: tryton/gui/window/dblogin.py:15
 msgid "Login"
@@ -415,7 +539,7 @@ msgid "_Cancel"
 msgstr "_Abbrechen"
 
 #: tryton/gui/window/dblogin.py:27
-msgid "Cancel connection or reconnection to the Tryton server"
+msgid "Cancel connection to the Tryton server"
 msgstr "Abbrechen"
 
 #: tryton/gui/window/dblogin.py:29
@@ -423,32 +547,28 @@ msgid "C_onnect"
 msgstr "_Verbinden"
 
 #: tryton/gui/window/dblogin.py:34
-msgid "Connect or reconnect the Tryton server"
+msgid "Connect the Tryton server"
 msgstr "Verbindung zum Tryton-Server herstellen"
 
 #: tryton/gui/window/dblogin.py:71
 msgid "Database:"
 msgstr "Datenbank:"
 
-#: tryton/gui/window/dblogin.py:83
-msgid "C_hange"
-msgstr "_Bearbeiten"
+#: tryton/gui/window/dblogin.py:86
+msgid "Configure the Tryton server connection"
+msgstr "Tryton-Serververbindung konfigurieren..."
 
-#: tryton/gui/window/dblogin.py:85
-msgid "Configure the Tryton server connection preferences"
-msgstr "Tryton Server-Verbindung konfigurieren..."
-
-#: tryton/gui/window/dblogin.py:92
+#: tryton/gui/window/dblogin.py:93
 msgid "User name:"
 msgstr "Benutzername:"
 
-#: tryton/gui/window/dblogin.py:103
+#: tryton/gui/window/dblogin.py:104
 msgid "Could not connect to server!"
 msgstr "Kann nicht zum Server verbinden!"
 
-#: tryton/gui/window/dblogin.py:110
+#: tryton/gui/window/dblogin.py:111
 msgid "No database found, you must create one!"
-msgstr "Keine Datenbank gefunden! Bitte eine neue Datenbank erstellen. (Tipp: Datei > Datenbank > Neue Datenbank)"
+msgstr "Keine Datenbank gefunden! Bitte eine neue Datenbank erstellen."
 
 #: tryton/gui/window/filesactions.py:14
 msgid "Files Actions"
@@ -485,9 +605,9 @@ msgid "Go to ID:"
 msgstr "Gehe zu Id:"
 
 #: tryton/gui/window/form.py:179
-#: tryton/gui/window/form.py:347
-#: tryton/gui/window/tree.py:228
-#: tryton/gui/window/tree.py:273
+#: tryton/gui/window/form.py:348
+#: tryton/gui/window/tree.py:232
+#: tryton/gui/window/tree.py:302
 msgid "No record selected!"
 msgstr "Kein Datensatz ausgewählt!"
 
@@ -545,7 +665,7 @@ msgid "Invalid form!"
 msgstr "Ungültiges Formular!"
 
 #: tryton/gui/window/form.py:296
-#: tryton/gui/window/form.py:392
+#: tryton/gui/window/form.py:393
 msgid ""
 "This record has been modified\n"
 "do you want to save it ?"
@@ -553,23 +673,23 @@ msgstr ""
 "Dieser Datensatz wurde verändert.\n"
 "Veränderten Datensatz speichern? "
 
-#: tryton/gui/window/form.py:369
+#: tryton/gui/window/form.py:370
 msgid "No Record Selected!"
 msgstr "Kein Datensatz ausgewählt!"
 
-#: tryton/gui/window/form.py:374
+#: tryton/gui/window/form.py:375
 msgid "New Record"
 msgstr "Neuer Datensatz"
 
-#: tryton/gui/window/form.py:376
+#: tryton/gui/window/form.py:377
 msgid "Editing Record (id: "
 msgstr "Datensatz bearbeiten (id: "
 
-#: tryton/gui/window/form.py:377
+#: tryton/gui/window/form.py:378
 msgid "Record: "
 msgstr "Datensatz: "
 
-#: tryton/gui/window/form.py:379
+#: tryton/gui/window/form.py:380
 msgid " of "
 msgstr " von "
 
@@ -692,37 +812,37 @@ msgstr "Ansicht wechseln"
 
 #: tryton/gui/window/view_board/parser.py:67
 #: tryton/gui/window/view_board/parser.py:69
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:340
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:342
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:672
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:674
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:346
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:348
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:678
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:680
 #: tryton/gui/window/view_form/widget_search/form.py:115
 msgid ":"
 msgstr ":"
 
-#: tryton/gui/window/view_form/view/form.py:118
+#: tryton/gui/window/view_form/view/form.py:112
 msgid "You must save this record to use the print button!"
 msgstr "Nur ausgewählte gültige Datensätze können gedruckt werden! Korrigieren Sie die rot markierten Felder und wählen SIe einen oder mehrere Datensätze aus. Wiederholen sie nach den letzten Vorgang."
 
-#: tryton/gui/window/view_form/view/form.py:121
+#: tryton/gui/window/view_form/view/form.py:115
 msgid "You must save this record to use the action button!"
 msgstr "Für diese Aktion müssen Sie zuerst einen Datensatz auswählen!"
 
-#: tryton/gui/window/view_form/view/form.py:129
+#: tryton/gui/window/view_form/view/form.py:123
 msgid "You must select a record to use the relate button !"
 msgstr "Für diese Verknüpfung muss ein Datensatz ausgewählt sein!"
 
-#: tryton/gui/window/view_form/view/list.py:300
+#: tryton/gui/window/view_form/view/list.py:302
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:411
 msgid "Actions"
 msgstr "Aktionen"
 
-#: tryton/gui/window/view_form/view/list.py:303
+#: tryton/gui/window/view_form/view/list.py:305
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:413
 msgid "Reports"
 msgstr "Berichte"
 
-#: tryton/gui/window/view_form/view/list.py:332
+#: tryton/gui/window/view_form/view/list.py:334
 msgid "You must select a record to use the relation!"
 msgstr "Für diese Verknüpfung müssen Sie zuerst einen Datensatz auswählen!"
 
@@ -876,15 +996,15 @@ msgstr "Falsches Icon für diesen Knopf!"
 msgid "Invalid Form, correct red fields!"
 msgstr "Fehlerhaftes Formular! Rote Felder bitte überarbeiten!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:563
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:569
 msgid "You need to save the record before adding translations!"
 msgstr "Datensatz speichern, bevor eine Übersetzung hinzugefügt werden kann!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:576
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:582
 msgid "No other language available!"
 msgstr "Keine anderen Sprachen vorhanden!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:635
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:641
 msgid "Add Translation"
 msgstr "Übersetzung hinzufügen"
 
@@ -912,15 +1032,15 @@ msgstr "PNG Bild (*.png)"
 msgid "Image size to large!"
 msgstr "Bild ist zu groß!"
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:99
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:101
 msgid "Relation Field: F3: New F2: Open/Search"
 msgstr "Verknüpfungsfeld: F3: Neu F2: Öffne/Suche"
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:102
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:104
 msgid "Relation Field: F2: Open"
 msgstr "Verknüpfungsfeld: F2: öffnen"
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:165
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:167
 #, python-format
 msgid "Warning; field \"%s\" is required !"
 msgstr "Warnung! Feld \"%s\" ist erforderlich!"
@@ -936,7 +1056,7 @@ msgstr "bis Datum"
 #: tryton/gui/window/view_form/widget_search/calendar.py:91
 #: tryton/gui/window/view_form/widget_search/char.py:32
 #: tryton/gui/window/view_form/widget_search/checkbox.py:55
-#: tryton/gui/window/view_form/widget_search/float.py:36
+#: tryton/gui/window/view_form/widget_search/float.py:39
 #: tryton/gui/window/view_form/widget_search/integer.py:67
 #: tryton/gui/window/view_form/widget_search/reference.py:75
 msgid "The content of the widget or ValueError if not valid"
@@ -1001,11 +1121,11 @@ msgstr "Erweiterten Workflow drucken"
 msgid "Wizard"
 msgstr "Wizard"
 
-#: tryton/wizard/main.py:214
+#: tryton/wizard/main.py:216
 msgid "Operation in progress"
 msgstr "Vorgang wird ausgeführt"
 
-#: tryton/wizard/main.py:218
+#: tryton/wizard/main.py:220
 msgid ""
 "Please wait,\n"
 "this operation may take a while..."

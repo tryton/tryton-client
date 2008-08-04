@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-07-23 17:20+0200\n"
+"POT-Creation-Date: 2008-08-04 16:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,12 +63,12 @@ msgstr ""
 msgid "Choose a Plugin"
 msgstr ""
 
-#: tryton/translate.py:170
+#: tryton/translate.py:172
 #, python-format
 msgid "Unable to set locale %s"
 msgstr ""
 
-#: tryton/translate.py:182
+#: tryton/translate.py:184
 msgid "Unable to unset locale"
 msgstr ""
 
@@ -88,20 +88,13 @@ msgstr ""
 msgid "Tryton connect"
 msgstr ""
 
-#: tryton/common/common.py:72 tryton/gui/window/dblogin.py:66
+#: tryton/common/common.py:72 tryton/gui/window/dbcreate.py:160
+#: tryton/gui/window/dblogin.py:66
 msgid "Server:"
 msgstr ""
 
 #: tryton/common/common.py:90
 msgid "Port:"
-msgstr ""
-
-#: tryton/common/common.py:95
-msgid "gtk-cancel"
-msgstr ""
-
-#: tryton/common/common.py:96
-msgid "gtk-ok"
 msgstr ""
 
 #: tryton/common/common.py:254 tryton/gui/main.py:750
@@ -119,16 +112,12 @@ msgstr ""
 msgid "Report Bug"
 msgstr ""
 
-#: tryton/common/common.py:289
-msgid "gtk-close"
-msgstr ""
-
 #: tryton/common/common.py:294
 msgid "Application Error!"
 msgstr ""
 
 #: tryton/common/common.py:313
-msgid "Error:"
+msgid "Error: "
 msgstr ""
 
 #: tryton/common/common.py:332
@@ -143,26 +132,26 @@ msgstr ""
 msgid "User:"
 msgstr ""
 
-#: tryton/common/common.py:380 tryton/common/common.py:586
-#: tryton/gui/window/dblogin.py:87
+#: tryton/common/common.py:380 tryton/common/common.py:591
+#: tryton/gui/window/dblogin.py:88 tryton/gui/window/tree.py:275
 msgid "Password:"
 msgstr ""
 
-#: tryton/common/common.py:422
+#: tryton/common/common.py:425
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 
-#: tryton/common/common.py:433
+#: tryton/common/common.py:436
 msgid "Created new bug with ID issue"
 msgstr ""
 
-#: tryton/common/common.py:440
+#: tryton/common/common.py:443
 msgid "Exception:"
 msgstr ""
 
-#: tryton/common/common.py:532 tryton/gui/main.py:612
+#: tryton/common/common.py:535 tryton/gui/main.py:612
 msgid "Tryton"
 msgstr ""
 
@@ -324,7 +313,7 @@ msgstr ""
 msgid "Images"
 msgstr ""
 
-#: tryton/gui/window/attachment.py:315
+#: tryton/gui/window/attachment.py:317
 msgid "link: "
 msgstr ""
 
@@ -336,49 +325,181 @@ msgstr ""
 msgid "<b>Contributors:</b>"
 msgstr ""
 
-#: tryton/gui/window/dbcreate.py:17
-msgid "Do not use special characters!"
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:22
-msgid "Can not connect to server!"
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:71
+#: tryton/gui/window/dbcreate.py:26 tryton/gui/window/dbcreate.py:172
 msgid ""
-"The database name must contain only normal characters or \"_\".\n"
-"You must avoid all accents, space or special characters."
+"This is the URL of the Tryton server. Use server 'localhost' and port "
+"'8070' if the server is installed on this computer. Click on 'Change' to "
+"change the address."
 msgstr ""
 
-#: tryton/gui/window/dbcreate.py:75
-msgid "Bad database name!"
+#: tryton/gui/window/dbcreate.py:39
+msgid "No connection!"
 msgstr ""
 
-#: tryton/gui/window/dbcreate.py:96
-msgid "Try with an other name."
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:97
-msgid "The Database already exists!"
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:104
+#: tryton/gui/window/dbcreate.py:42
 msgid ""
-"The server crashed during installation.\n"
-"We suggest you to drop this database.\n"
+"Can not connect to the Tryton server!\n"
+"1. Try to check if the Tryton server is running.\n"
+"2. Find out on which address and port it is listen.\n"
+"3. If there is a firewall between the server and this client, make shure "
+"that the Tryton server address and port (usually 8070) are not blocked.\n"
+"Click on 'Change' to change the address."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:122
+msgid "Create new database"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:135
+msgid "C_reate"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:142
+msgid "Create the new Tryton database."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:155
+msgid "Tryton Server Setup:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:169
+msgid "http://localhost:8070"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:176 tryton/gui/window/dblogin.py:83
+msgid "C_hange"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:183
+msgid "Setup the Tryton server connection..."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:185
+msgid "Server password:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:196
+msgid ""
+"This is the password for Tryton administration. It doesn't belong to a "
+"Tryton user. This password is usually defined in the trytond "
+"configuration."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:207
+msgid "New database setup:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:212
+msgid "Name:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:222
+msgid ""
+"Choose the name of the new database.\n"
+"Allowed characters are alphanumerical or _ (underscore)\n"
+"You need to avoid all accents, space or special characters! Example: "
+"tryton"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:230
+msgid "Default language:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:239
+msgid ""
+"Choose the default language that will be installed for this database. You"
+" will be able to install new languages after installation through the "
+"administration menu."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:243
+msgid "Admin password:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:251
+msgid ""
+"Choose a password for the admin user of the new database. With these "
+"credentials you are later able to login into the database:\n"
+"User name: admin\n"
+"Password: <The password you set here>"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:259
+msgid "Confirm admin password:"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:268
+msgid "Type the Admin password again"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:313
+msgid ""
+"The database name is restricted to alpha-nummerical characters and \"_\" "
+"(underscore). It must begin with a letter and max. sized to 63 characters"
+" at all.\n"
+"Try to avoid all accents, space and any other special characters."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:319
+msgid "Wrong characters in database name!"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:322
+msgid ""
+"The new admin password doesn't match to the retyped password.\n"
+"Try to type the same passwords in the admin password and the confirm "
+"admin password fields again."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:327
+msgid "Passwords doesn't match!"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:330
+msgid ""
+"Admin password and confirmation are required to create a new Tryton "
+"database."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:332
+msgid "Missing admin password!"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:343
+msgid ""
+"Database with the same name already exists.\n"
+"Try another database name."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:346
+msgid "Databasename already exist!"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:358
+msgid ""
+"You can now connect to the new database, with the following login:\n"
+"User name: admin\n"
+"Password:<Admin Password>"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:369
+msgid "Sorry, the Tryton server password seems wrong. Please type again."
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:371
+msgid "Access denied!"
+msgstr ""
+
+#: tryton/gui/window/dbcreate.py:376
+msgid ""
+"Can't request the Tryton server, caused by an unknown reason.\n"
+"If there is a database created, it could be broken. Maybe drop this "
+"database! Please check the error message for possible informations.\n"
 "Error message:\n"
 msgstr ""
 
-#: tryton/gui/window/dbcreate.py:107
-msgid "Error during database creation!"
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:121
-msgid "The following users have been installed on your database:"
-msgstr ""
-
-#: tryton/gui/window/dbcreate.py:123
-msgid "You can now connect to the database as an administrator."
+#: tryton/gui/window/dbcreate.py:383
+msgid "Error requesting Tryton server!"
 msgstr ""
 
 #: tryton/gui/window/dblogin.py:15
@@ -390,7 +511,7 @@ msgid "_Cancel"
 msgstr ""
 
 #: tryton/gui/window/dblogin.py:27
-msgid "Cancel connection or reconnection to the Tryton server"
+msgid "Cancel connection to the Tryton server"
 msgstr ""
 
 #: tryton/gui/window/dblogin.py:29
@@ -398,30 +519,26 @@ msgid "C_onnect"
 msgstr ""
 
 #: tryton/gui/window/dblogin.py:34
-msgid "Connect or reconnect the Tryton server"
+msgid "Connect the Tryton server"
 msgstr ""
 
 #: tryton/gui/window/dblogin.py:71
 msgid "Database:"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:83
-msgid "C_hange"
+#: tryton/gui/window/dblogin.py:86
+msgid "Configure the Tryton server connection"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:85
-msgid "Configure the Tryton server connection preferences"
-msgstr ""
-
-#: tryton/gui/window/dblogin.py:92
+#: tryton/gui/window/dblogin.py:93
 msgid "User name:"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:103
+#: tryton/gui/window/dblogin.py:104
 msgid "Could not connect to server!"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:110
+#: tryton/gui/window/dblogin.py:111
 msgid "No database found, you must create one!"
 msgstr ""
 
@@ -459,8 +576,8 @@ msgstr ""
 msgid "Go to ID:"
 msgstr ""
 
-#: tryton/gui/window/form.py:179 tryton/gui/window/form.py:347
-#: tryton/gui/window/tree.py:228 tryton/gui/window/tree.py:273
+#: tryton/gui/window/form.py:179 tryton/gui/window/form.py:348
+#: tryton/gui/window/tree.py:232 tryton/gui/window/tree.py:302
 msgid "No record selected!"
 msgstr ""
 
@@ -516,29 +633,29 @@ msgstr ""
 msgid "Invalid form!"
 msgstr ""
 
-#: tryton/gui/window/form.py:296 tryton/gui/window/form.py:392
+#: tryton/gui/window/form.py:296 tryton/gui/window/form.py:393
 msgid ""
 "This record has been modified\n"
 "do you want to save it ?"
 msgstr ""
 
-#: tryton/gui/window/form.py:369
+#: tryton/gui/window/form.py:370
 msgid "No Record Selected!"
 msgstr ""
 
-#: tryton/gui/window/form.py:374
+#: tryton/gui/window/form.py:375
 msgid "New Record"
 msgstr ""
 
-#: tryton/gui/window/form.py:376
+#: tryton/gui/window/form.py:377
 msgid "Editing Record (id: "
 msgstr ""
 
-#: tryton/gui/window/form.py:377
+#: tryton/gui/window/form.py:378
 msgid "Record: "
 msgstr ""
 
-#: tryton/gui/window/form.py:379
+#: tryton/gui/window/form.py:380
 msgid " of "
 msgstr ""
 
@@ -647,37 +764,37 @@ msgstr ""
 
 #: tryton/gui/window/view_board/parser.py:67
 #: tryton/gui/window/view_board/parser.py:69
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:340
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:342
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:672
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:674
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:346
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:348
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:678
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:680
 #: tryton/gui/window/view_form/widget_search/form.py:115
 msgid ":"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form.py:118
+#: tryton/gui/window/view_form/view/form.py:112
 msgid "You must save this record to use the print button!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form.py:121
+#: tryton/gui/window/view_form/view/form.py:115
 msgid "You must save this record to use the action button!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form.py:129
+#: tryton/gui/window/view_form/view/form.py:123
 msgid "You must select a record to use the relate button !"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list.py:300
+#: tryton/gui/window/view_form/view/list.py:302
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:411
 msgid "Actions"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list.py:303
+#: tryton/gui/window/view_form/view/list.py:305
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:413
 msgid "Reports"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list.py:332
+#: tryton/gui/window/view_form/view/list.py:334
 msgid "You must select a record to use the relation!"
 msgstr ""
 
@@ -831,15 +948,15 @@ msgstr ""
 msgid "Invalid Form, correct red fields!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:563
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:569
 msgid "You need to save the record before adding translations!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:576
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:582
 msgid "No other language available!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:635
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:641
 msgid "Add Translation"
 msgstr ""
 
@@ -867,15 +984,15 @@ msgstr ""
 msgid "Image size to large!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:99
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:101
 msgid "Relation Field: F3: New F2: Open/Search"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:102
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:104
 msgid "Relation Field: F2: Open"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:165
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:167
 #, python-format
 msgid "Warning; field \"%s\" is required !"
 msgstr ""
@@ -891,7 +1008,7 @@ msgstr ""
 #: tryton/gui/window/view_form/widget_search/calendar.py:91
 #: tryton/gui/window/view_form/widget_search/char.py:32
 #: tryton/gui/window/view_form/widget_search/checkbox.py:55
-#: tryton/gui/window/view_form/widget_search/float.py:36
+#: tryton/gui/window/view_form/widget_search/float.py:39
 #: tryton/gui/window/view_form/widget_search/integer.py:67
 #: tryton/gui/window/view_form/widget_search/reference.py:75
 msgid "The content of the widget or ValueError if not valid"
@@ -956,11 +1073,11 @@ msgstr ""
 msgid "Wizard"
 msgstr ""
 
-#: tryton/wizard/main.py:214
+#: tryton/wizard/main.py:216
 msgid "Operation in progress"
 msgstr ""
 
-#: tryton/wizard/main.py:218
+#: tryton/wizard/main.py:220
 msgid ""
 "Please wait,\n"
 "this operation may take a while..."
