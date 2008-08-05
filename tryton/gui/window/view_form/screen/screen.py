@@ -502,6 +502,9 @@ class Screen(SignalEvent):
                 return True
             idx = self.models.models.index(sel_models[0])
             for model in sel_models:
+                # set current model to None to prevent __select_changed
+                # to save the previous_model as it can be already deleted.
+                self.current_model = None
                 self.models.remove(model, remove=remove)
             if self.models.models:
                 idx = min(idx, len(self.models.models)-1)
