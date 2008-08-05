@@ -13,10 +13,10 @@ _ = gettext.gettext
 class DBCreate(object):
     def server_connection_state(self, state):
         """
-        Method to set the server connection information depending on the 
+        Method to set the server connection information depending on the
         connection state. If state is True, the connection string will shown.
         Otherwise the wrong connection string will be shown plus an additional
-        errormessage, colored in red. In this case, all entryboxes set 
+        errormessage, colored in red. In this case, all entryboxes set
         insensitive
         """
         if state:
@@ -54,7 +54,7 @@ class DBCreate(object):
 
     def server_change(self, widget, parent):
         """
-        This method checks the server connection via host and port. If the 
+        This method checks the server connection via host and port. If the
         connection is successfull, it query the language list and pass true
         state to the GUI. Otherwise it pass false state to the GUI.
         """
@@ -73,7 +73,7 @@ class DBCreate(object):
 
     def event_passwd_clear(self, widget, event, data=None):
         """
-        This event method clear the text in a widget if CTRL-u 
+        This event method clear the text in a widget if CTRL-u
         is pressed.
         """
         if  (event.keyval == gtk.keysyms.u) \
@@ -82,8 +82,8 @@ class DBCreate(object):
 
     def event_show_button_create(self, widget, event, data=None):
         """
-        This event method decide by rules if the Create button will be 
-        sensitive or insensitive. The general rule is, all given fields 
+        This event method decide by rules if the Create button will be
+        sensitive or insensitive. The general rule is, all given fields
         must be filled, then the Create button is set to sensitive. This
         event method doesn't check the valid of single entrys.
         """
@@ -113,7 +113,7 @@ class DBCreate(object):
         """
         def _move_cursor(entry, pos):
             """
-            Helper function for entry_insert_text. It is used to position 
+            Helper function for entry_insert_text. It is used to position
             the cursor for right and wron inputs correctly.
             """
             entry.set_position(pos)
@@ -186,7 +186,7 @@ class DBCreate(object):
             "the Tryton server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
             "change the address."), None)
-        self.button_server_change = gtk.Button(_("C_hange"), stock=None, 
+        self.button_server_change = gtk.Button(_("C_hange"), stock=None,
              use_underline=True)
         img_button_server_change = gtk.Image()
         img_button_server_change.set_from_stock('tryton-preferences-system', \
@@ -289,7 +289,7 @@ class DBCreate(object):
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
-        
+
         pass_widget = self.entry_serverpasswd
         change_button = self.button_server_change
         admin_passwd = self.entry_adminpasswd
