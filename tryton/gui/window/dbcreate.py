@@ -76,7 +76,8 @@ class DBCreate(object):
         This event method clear the text in a widget if CTRL-u 
         is pressed.
         """
-        if  event.keyval == gtk.keysyms.u:
+        if  (event.keyval == gtk.keysyms.u) \
+            and (event.state & gtk.gdk.CONTROL_MASK) == gtk.gdk.CONTROL_MASK:
             widget.set_text("")
 
     def event_show_button_create(self, widget, event, data=None):
