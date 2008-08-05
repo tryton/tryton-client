@@ -22,7 +22,7 @@ class DBCreate(object):
             self.entry_adminpasswd.set_sensitive(True)
             self.entry_adminpasswd2.set_sensitive(True)
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
-                gtk.gdk.color_parse("#000000"))
+                gtk.gdk.color_parse(common.COLOR_SCHEMES["black"]))
             self.tooltips.set_tip(self.entry_server_connection,_("This is the URL of " \
             "the Tryton server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
@@ -38,7 +38,7 @@ class DBCreate(object):
                 self.entry_server_connection.get_text()
                 + "  " + _("No connection!"))
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
-                gtk.gdk.color_parse("#ff0000"))
+                gtk.gdk.color_parse(common.COLORS["invalid"]))
             self.tooltips.set_tip(self.entry_server_connection, _( \
                 "Can not connect to the Tryton server!\n" \
                 "1. Try to check if the Tryton server is running.\n" \
