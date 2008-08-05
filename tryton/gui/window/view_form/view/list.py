@@ -413,7 +413,7 @@ class ViewList(ParserView):
                 and self.widget_tree.editable \
                 and self.screen.tree_saves \
                 and previous_model != self.screen.current_model:
-            if not previous_model.save():
+            if previous_model and not previous_model.save():
                 self.screen.current_model = previous_model
                 self.set_cursor()
                 return True
@@ -514,7 +514,7 @@ class ViewList(ParserView):
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
             model = store.on_get_iter(path)
-            if model.id:
+            if model and model.id > 0:
                 ids.append(model.id)
         ids = []
         sel = self.widget_tree.get_selection()
