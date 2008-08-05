@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-08-04 17:07+0100\n"
+"PO-Revision-Date: 2008-08-05 10:41+0100\n"
 "Last-Translator: Udo Spallek <udono@gmx.net>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -27,11 +27,11 @@ msgstr "Debug-Modus aktiv"
 
 #: tryton/config.py:97
 msgid "specify channels to log"
-msgstr "Log-channel angeben"
+msgstr "Log-Channel angeben"
 
 #: tryton/config.py:99
 msgid "specify the log level: INFO, DEBUG, WARNING, ERROR, CRITICAL"
-msgstr "Log level angeben: INFO, DEBUG, WARNING, ERROR, CRITICAL"
+msgstr "Log-Level angeben: INFO, DEBUG, WARNING, ERROR, CRITICAL"
 
 #: tryton/config.py:102
 msgid "specify the login user"
@@ -74,15 +74,15 @@ msgstr "Kann locale nicht zurücksetzen"
 
 #: tryton/action/main.py:37
 msgid "Nothing to print!"
-msgstr " Nichts zu drucken!"
+msgstr "Nichts zu drucken!"
 
 #: tryton/action/main.py:184
 msgid "Select your action"
-msgstr "Action wählen"
+msgstr "Aktion wählen"
 
 #: tryton/action/main.py:191
 msgid "No action defined!"
-msgstr "Keine action angegeben!"
+msgstr "Keine Aktion angegeben!"
 
 #: tryton/common/common.py:62
 msgid "Tryton connect"
@@ -117,7 +117,7 @@ msgstr "Fehler berichten"
 
 #: tryton/common/common.py:294
 msgid "Application Error!"
-msgstr "Anwendungsfehler"
+msgstr "Anwendungsfehler!"
 
 #: tryton/common/common.py:313
 msgid "Error: "
@@ -148,11 +148,11 @@ msgid ""
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 "Die selbe Fehlermeldung wurde bereits von einem anderen Benutzer berichtet.\n"
-"Zu Ihrer information haben wurden Ihr Benutzername auf der entsprechenden Interessentenliste hinterlegt. Issue"
+"Zu Ihrer information:Ihr Benutzername wurde auf der Interessentenliste hinterlegt, für Issue"
 
 #: tryton/common/common.py:436
 msgid "Created new bug with ID issue"
-msgstr "Neue Fehlermeldung angelegt, mit Id Issue"
+msgstr "Neue Fehlermeldung angelegt: Issue"
 
 #: tryton/common/common.py:443
 msgid "Exception:"
@@ -263,11 +263,11 @@ msgstr "Die Passwörter stimmen nicht überein!"
 
 #: tryton/gui/main.py:714
 msgid "Validation Error."
-msgstr "Prüffehler."
+msgstr "Gültigkeitsfehler."
 
 #: tryton/gui/main.py:721
 msgid "Change Admin password failed with error message:\n"
-msgstr "Die Änderung des Admin Passworts ist fehlgeschlagen mit der folgenden Fehlermeldung:\n"
+msgstr "Die Änderung des Admin Passworts ist mit der folgenden Fehlermeldung fehlgeschlagen:\n"
 
 #: tryton/gui/main.py:723
 msgid "Change Admin password failed!"
@@ -296,7 +296,7 @@ msgstr "Kann nicht mit Tryton Server verbinden!"
 
 #: tryton/gui/main.py:774
 msgid "No database found, you must create one !"
-msgstr "Keine Datenbank gefunden. Bitte neue Datenbank anlegen!"
+msgstr "Keine Datenbank gefunden. Bitte eine neue Datenbank anlegen!"
 
 #: tryton/gui/window/attachment.py:83
 #: tryton/gui/window/attachment.py:96
