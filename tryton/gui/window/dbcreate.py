@@ -165,7 +165,6 @@ class DBCreate(object):
         table.set_border_width(10)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
-        dialog_vbox.pack_start(table)
 
         label_server_setup = gtk.Label()
         label_server_setup.set_markup("<b>"+ _("Tryton Server Setup:")+ "</b>")
