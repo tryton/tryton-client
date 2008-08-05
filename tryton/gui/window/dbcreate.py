@@ -165,9 +165,9 @@ class DBCreate(object):
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
-        self.entry_server_connection.set_width_chars(26)
+        #self.entry_server_connection.set_width_chars(26)
         self.entry_server_connection.set_text(_("http://localhost:8070"))
-        self.entry_server_connection.set_width_chars(16)
+        #self.entry_server_connection.set_width_chars(16)
         table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
             "the Tryton server. Use server 'localhost' and port '8070' if " \
@@ -188,10 +188,10 @@ class DBCreate(object):
         label_serverpasswd.set_padding( 3, 3)
         table.attach(label_serverpasswd, 0, 1, 2, 3, xoptions=gtk.FILL)
         self.entry_serverpasswd = gtk.Entry()
-        self.entry_serverpasswd.set_max_length(16)
+        #self.entry_serverpasswd.set_max_length(16)
         self.entry_serverpasswd.set_visibility(False)
         self.entry_serverpasswd.set_activates_default(True)
-        self.entry_serverpasswd.set_width_chars(16)
+        #self.entry_serverpasswd.set_width_chars(16)
         table.attach(self.entry_serverpasswd, 1, 3, 2, 3)
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
             "password for Tryton administration. It doesn't belong to a " \
@@ -264,7 +264,7 @@ class DBCreate(object):
         self.entry_adminpasswd2 = gtk.Entry()
         self.entry_adminpasswd2.set_visibility(False)
         self.entry_adminpasswd2.set_activates_default(True)
-        self.entry_adminpasswd2.set_width_chars(16)
+        #self.entry_adminpasswd2.set_width_chars(16)
         self.tooltips.set_tip(self.entry_adminpasswd2, _("Type the Admin " \
             "password again"), None)
         table.attach(self.entry_adminpasswd2, 1, 3, 8, 9)
