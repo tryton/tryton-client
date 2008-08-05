@@ -271,6 +271,7 @@ class DBCreate(object):
         self.entry_adminpasswd2.connect("key-press-event", \
             self.event_passwd_clear)
         self.entry_serverpasswd.grab_focus()
+        dialog_vbox.pack_start(table)
         self.dialog.vbox.pack_start(dialog_vbox)
         self.sig_login = sig_login
 
