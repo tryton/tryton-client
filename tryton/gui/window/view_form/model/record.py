@@ -23,12 +23,18 @@ class EvalEnvironment(object):
 
 class ModelRecord(SignalEvent):
 
+    id = -1
+
+
     def __init__(self, resource, obj_id, window, group=None, parent=None, new=False ):
+        global ID_COUNT
         super(ModelRecord, self).__init__()
         self.window = window
         self.resource = resource
         self.rpc = RPCProxy(self.resource)
-        self.id = obj_id
+        self.id = obj_id or ModelRecord.id
+        if self.id < 0:
+            ModelRecord.id -= 1
         self._loaded = False
         self.parent = parent
         self.mgroup = group
@@ -47,7 +53,7 @@ class ModelRecord(SignalEvent):
                 self.value[key].model_add(mod)
 
     def __getitem__(self, name):
-        if not self._loaded and self.id:
+        if not self._loaded and self.id > 0:
             ids =  [self.id]
             idx = self.mgroup.models.index(self)
             length = len(self.mgroup.models)
@@ -135,7 +141,7 @@ class ModelRecord(SignalEvent):
 
     def save(self, force_reload=True):
         self._check_load()
-        if not self.id:
+        if self.id < 0:
             value = self.get(get_readonly=True)
             try:
                 self.id = self.rpc.create(value, self.context_get())
@@ -143,7 +149,7 @@ class ModelRecord(SignalEvent):
                 self.id = common.process_exception(exception, self.window, 'object',
                         'execute', self.resource, 'create', value,
                         self.context_get())
-                if not self.id:
+                if not self.id or self.id < 0:
                     return False
         else:
             if not self.is_modified():
@@ -256,7 +262,7 @@ class ModelRecord(SignalEvent):
             self.signal('record-changed')
 
     def reload(self):
-        if not self.id:
+        if self.id < 0:
             return
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
@@ -297,7 +303,7 @@ class ModelRecord(SignalEvent):
                 args[arg] = self.expr_eval(arg)
             except:
                 args[arg] = False
-        ids = self.id and [self.id] or []
+        ids = [self.id]
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
         try:
@@ -320,11 +326,13 @@ class ModelRecord(SignalEvent):
                 self.mgroup.mfields[fieldname].set_on_change(self, value)
             self.signal('record-changed')
 
-    def on_change_with(self, fieldname):
+    def on_change_with(self, field_name):
         for fieldname in self.mgroup.mfields:
             on_change_with = self.mgroup.mfields[fieldname].attrs.get(
                     'on_change_with')
             if not on_change_with:
+                continue
+            if field_name not in on_change_with:
                 continue
             args = {}
             for arg in on_change_with:
@@ -332,7 +340,7 @@ class ModelRecord(SignalEvent):
                     args[arg] = self.expr_eval(arg)
                 except:
                     args[arg] = False
-            ids = self.id and [self.id] or []
+            ids = [self.id]
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
             try:
@@ -357,7 +365,7 @@ class ModelRecord(SignalEvent):
                 field_name + '=' + str(value), ctx))
 
     def get_attachment_count(self, reload=False):
-        if not self.id:
+        if self.id < 0:
             return 0
         if self.attachment_count < 0 or reload:
             ir_attachment = RPCProxy('ir.attachment')
