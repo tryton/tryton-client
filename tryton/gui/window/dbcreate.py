@@ -221,7 +221,7 @@ class DBCreate(object):
         label_dbname.set_alignment(0, 1)
         label_dbname.set_padding( 9, 5)
         table.attach(label_dbname, 0, 3, 4, 5, xoptions=gtk.FILL)
-        label_dbname = gtk.Label(_("Name:"))
+        label_dbname = gtk.Label(_("Database name:"))
         label_dbname.set_justify(gtk.JUSTIFY_RIGHT)
         label_dbname.set_padding( 3, 3)
         label_dbname.set_alignment(1, 0.5)
