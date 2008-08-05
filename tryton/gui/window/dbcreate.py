@@ -9,13 +9,16 @@ import tryton.rpc as rpc
 
 _ = gettext.gettext
 
+
 class DBCreate(object):
     def server_connection_state(self, state):
-        """Method to set the server connection information depending on the 
+        """
+        Method to set the server connection information depending on the 
         connection state. If state is True, the connection string will shown.
         Otherwise the wrong connection string will be shown plus an additional
         errormessage, colored in red. In this case, all entryboxes set 
-        insensitive"""
+        insensitive
+        """
         if state:
             self.entry_serverpasswd.set_sensitive(True)
             self.entry_dbname.set_sensitive(True)
@@ -50,9 +53,11 @@ class DBCreate(object):
         return state
 
     def server_change(self, widget, parent):
-        """This method checks the server connection via host and port. If the 
+        """
+        This method checks the server connection via host and port. If the 
         connection is successfull, it query the language list and pass true
-        state to the GUI. Otherwise it pass false state to the GUI."""
+        state to the GUI. Otherwise it pass false state to the GUI.
+        """
         res = common.request_server(self.entry_server_connection, parent)
         if not res:
             return False
@@ -67,16 +72,20 @@ class DBCreate(object):
         return True
 
     def event_passwd_clear(self, widget, event, data=None):
-        """This event method clear the text in a widget if CTRL-u 
-        is pressed."""
+        """
+        This event method clear the text in a widget if CTRL-u 
+        is pressed.
+        """
         if  event.keyval == gtk.keysyms.u:
             widget.set_text("")
 
     def event_show_button_create(self, widget, event, data=None):
-        """This event method decide by rules if the Create button will be 
+        """
+        This event method decide by rules if the Create button will be 
         sensitive or insensitive. The general rule is, all given fields 
         must be filled, then the Create button is set to sensitive. This
-        event method doesn't check the valid of single entrys."""
+        event method doesn't check the valid of single entrys.
+        """
         if  self.entry_server_connection.get_text() !=  "" \
             and self.entry_serverpasswd.get_text() != "" \
             and self.entry_dbname.get_text() != "" \
@@ -95,13 +104,17 @@ class DBCreate(object):
             self.button_create.set_sensitive(False)
 
     def entry_insert_text(self, entry, new_text, new_text_length, position):
-        """This event method checks each text input for the PostgreSQL
+        """
+        This event method checks each text input for the PostgreSQL
         database name. It allows the following rules: 
         - Allowed characters are alpha-nummeric [A-Za-z0-9] and underscore (_)
-        - First character must be a letter"""
+        - First character must be a letter
+        """
         def _move_cursor(entry, pos):
-            """Helper function for entry_insert_text. It is used to position 
-            the cursor for right and wron inputs correctly."""
+            """
+            Helper function for entry_insert_text. It is used to position 
+            the cursor for right and wron inputs correctly.
+            """
             entry.set_position(pos)
             return False
 
@@ -117,7 +130,9 @@ class DBCreate(object):
         entry.stop_emission("insert-text")
 
     def __init__(self, sig_login):
-        """This method defines the complete GUI."""
+        """
+        This method defines the complete GUI.
+        """
         self.dialog = gtk.Dialog(
             title =  _("Create new database"),
             parent = None,
@@ -389,7 +404,6 @@ class DBCreate(object):
                         Main.get_main().refresh_ssl()
                     break
             break
-
         parent.present()
         self.dialog.destroy()
 
