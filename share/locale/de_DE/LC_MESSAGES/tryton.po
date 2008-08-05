@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-08-05 10:41+0100\n"
+"PO-Revision-Date: 2008-08-05 14:41+0100\n"
 "Last-Translator: Udo Spallek <udono@gmx.net>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -89,7 +89,6 @@ msgid "Tryton connect"
 msgstr "Verbindung"
 
 #: tryton/common/common.py:72
-#: tryton/gui/window/dbcreate.py:160
 #: tryton/gui/window/dblogin.py:66
 msgid "Server:"
 msgstr "Server:"
@@ -346,16 +345,16 @@ msgstr "Danksagungen"
 msgid "<b>Contributors:</b>"
 msgstr "<b>Helfer:</b>"
 
-#: tryton/gui/window/dbcreate.py:26
-#: tryton/gui/window/dbcreate.py:172
+#: tryton/gui/window/dbcreate.py:29
+#: tryton/gui/window/dbcreate.py:186
 msgid "This is the URL of the Tryton server. Use server 'localhost' and port '8070' if the server is installed on this computer. Click on 'Change' to change the address."
 msgstr "Hier wird die Adresse des Tryton-Servers angezeigt. Ist der Server lokal auf diesem Computer installiert, dann wird meistens \"localhost\" als Adresse eingetragen. Klicken Sie auf \"Bearbeiten\" um diese Adresse zu ändern."
 
-#: tryton/gui/window/dbcreate.py:39
+#: tryton/gui/window/dbcreate.py:42
 msgid "No connection!"
 msgstr "Keine Verbindung!"
 
-#: tryton/gui/window/dbcreate.py:42
+#: tryton/gui/window/dbcreate.py:45
 msgid ""
 "Can not connect to the Tryton server!\n"
 "1. Try to check if the Tryton server is running.\n"
@@ -369,52 +368,56 @@ msgstr ""
 "3. Wenn sich eine Firewall zwischen dem Tryton-Server und diesem Client befindet, stellen Sie sicher, das die Tryton-Serveradresse und der Port nicht durch die Firewall blockiert werden.\n"
 "Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Tryton- Servers anzupassen."
 
-#: tryton/gui/window/dbcreate.py:122
+#: tryton/gui/window/dbcreate.py:138
 msgid "Create new database"
 msgstr "Neue Datenbank erstellen"
 
-#: tryton/gui/window/dbcreate.py:135
+#: tryton/gui/window/dbcreate.py:151
 msgid "C_reate"
 msgstr "_Erstellen"
 
-#: tryton/gui/window/dbcreate.py:142
+#: tryton/gui/window/dbcreate.py:158
 msgid "Create the new Tryton database."
 msgstr "Die neue Tryton-Datenbank erstellen."
 
-#: tryton/gui/window/dbcreate.py:155
+#: tryton/gui/window/dbcreate.py:171
 msgid "Tryton Server Setup:"
 msgstr "Tryton Server Einstellungen:"
 
-#: tryton/gui/window/dbcreate.py:169
+#: tryton/gui/window/dbcreate.py:176
+msgid "Server connection:"
+msgstr "Server Verbindung:"
+
+#: tryton/gui/window/dbcreate.py:184
 msgid "http://localhost:8070"
 msgstr "http://localhost:8070"
 
-#: tryton/gui/window/dbcreate.py:176
+#: tryton/gui/window/dbcreate.py:190
 #: tryton/gui/window/dblogin.py:83
 msgid "C_hange"
 msgstr "_Bearbeiten"
 
-#: tryton/gui/window/dbcreate.py:183
+#: tryton/gui/window/dbcreate.py:197
 msgid "Setup the Tryton server connection..."
 msgstr "Tryton-Serververbindung konfigurieren..."
 
-#: tryton/gui/window/dbcreate.py:185
+#: tryton/gui/window/dbcreate.py:199
 msgid "Server password:"
 msgstr "Server Passwort:"
 
-#: tryton/gui/window/dbcreate.py:196
+#: tryton/gui/window/dbcreate.py:208
 msgid "This is the password for Tryton administration. It doesn't belong to a Tryton user. This password is usually defined in the trytond configuration."
 msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort gehört nicht zu einem Tryton Benutzer. Das Paswort wird normalerweise in der Tryton Konfiguration angegeben."
 
-#: tryton/gui/window/dbcreate.py:207
+#: tryton/gui/window/dbcreate.py:219
 msgid "New database setup:"
 msgstr "Datenbank Einstellungen:"
 
-#: tryton/gui/window/dbcreate.py:212
-msgid "Name:"
-msgstr "Benutzername:"
+#: tryton/gui/window/dbcreate.py:224
+msgid "Database name:"
+msgstr "Name:"
 
-#: tryton/gui/window/dbcreate.py:222
+#: tryton/gui/window/dbcreate.py:234
 msgid ""
 "Choose the name of the new database.\n"
 "Allowed characters are alphanumerical or _ (underscore)\n"
@@ -424,19 +427,19 @@ msgstr ""
 "Erlaubt sind alle Buchstaben, Zahlen und _ (Unterstrich).\n"
 "Nicht erlaubt sind Umlaute, Akzente, Leezeichen oder 'ß'! Beispielname: tryton"
 
-#: tryton/gui/window/dbcreate.py:230
+#: tryton/gui/window/dbcreate.py:242
 msgid "Default language:"
 msgstr "Standard Sprache:"
 
-#: tryton/gui/window/dbcreate.py:239
+#: tryton/gui/window/dbcreate.py:251
 msgid "Choose the default language that will be installed for this database. You will be able to install new languages after installation through the administration menu."
 msgstr "Wählen Sie die Standardsprache für die neue Datenbank. Nach der Installation ist es im Administrationsmenü möglich eine neue Sprache einzustellen."
 
-#: tryton/gui/window/dbcreate.py:243
+#: tryton/gui/window/dbcreate.py:255
 msgid "Admin password:"
 msgstr "Admin- Passwort:"
 
-#: tryton/gui/window/dbcreate.py:251
+#: tryton/gui/window/dbcreate.py:263
 msgid ""
 "Choose a password for the admin user of the new database. With these credentials you are later able to login into the database:\n"
 "User name: admin\n"
@@ -446,15 +449,15 @@ msgstr ""
 "Benutzername: admin\n"
 "Passwort: <Das hier vergebene Passwort>"
 
-#: tryton/gui/window/dbcreate.py:259
+#: tryton/gui/window/dbcreate.py:271
 msgid "Confirm admin password:"
 msgstr "Admin-Passwort Wiederholung:"
 
-#: tryton/gui/window/dbcreate.py:268
+#: tryton/gui/window/dbcreate.py:279
 msgid "Type the Admin password again"
 msgstr "Wiederholen Sie die Eingabe des Admin Passworts um sicher zu gehen, dass Sie sich beim ersten Mal nicht vertippt haben."
 
-#: tryton/gui/window/dbcreate.py:313
+#: tryton/gui/window/dbcreate.py:325
 msgid ""
 "The database name is restricted to alpha-nummerical characters and \"_\" (underscore). It must begin with a letter and max. sized to 63 characters at all.\n"
 "Try to avoid all accents, space and any other special characters."
@@ -462,11 +465,11 @@ msgstr ""
 "Die erlaubten Zeichen des Datenbanknames sind auf Buchstaben, Zahlen und \"_\" (Unterstrich) beschränkt. Der Datenbankname muss mit einem Buchstaben beginnen und darf maximal 63 Zeichen lang sein.\n"
 "Umlaute, Akzente und 'ß'  sind ebenfalls verboten."
 
-#: tryton/gui/window/dbcreate.py:319
+#: tryton/gui/window/dbcreate.py:331
 msgid "Wrong characters in database name!"
 msgstr "Unerlaubte Zeichen im Datenbank Namen!"
 
-#: tryton/gui/window/dbcreate.py:322
+#: tryton/gui/window/dbcreate.py:334
 msgid ""
 "The new admin password doesn't match to the retyped password.\n"
 "Try to type the same passwords in the admin password and the confirm admin password fields again."
@@ -474,19 +477,19 @@ msgstr ""
 "Das neue Admin-Passwort und dessen Wiederholung sind unterschiedlich.\n"
 "Versuchen Sie noch einmal das selbe Passwort in die Felder Admin-Passwort und Admin-Passwort (Wiederholung) einzutragen."
 
-#: tryton/gui/window/dbcreate.py:327
+#: tryton/gui/window/dbcreate.py:339
 msgid "Passwords doesn't match!"
 msgstr "Passwörter sind nicht identisch!"
 
-#: tryton/gui/window/dbcreate.py:330
+#: tryton/gui/window/dbcreate.py:342
 msgid "Admin password and confirmation are required to create a new Tryton database."
 msgstr "Das Admin-Passwort und dessen Wiederholung sind notwendig um eine neue Tryton-Datenbank anlegen zu können."
 
-#: tryton/gui/window/dbcreate.py:332
+#: tryton/gui/window/dbcreate.py:344
 msgid "Missing admin password!"
 msgstr "Admin-Passwort fehlt!"
 
-#: tryton/gui/window/dbcreate.py:343
+#: tryton/gui/window/dbcreate.py:355
 msgid ""
 "Database with the same name already exists.\n"
 "Try another database name."
@@ -494,11 +497,11 @@ msgstr ""
 "Eine Datenbank mit demselben Namen existiert bereits.\n"
 "Versuchen Sie einen anderein Datenbanknamen."
 
-#: tryton/gui/window/dbcreate.py:346
+#: tryton/gui/window/dbcreate.py:358
 msgid "Databasename already exist!"
 msgstr "Eine Datenbank mit diesem Namen existiert bereits!"
 
-#: tryton/gui/window/dbcreate.py:358
+#: tryton/gui/window/dbcreate.py:370
 msgid ""
 "You can now connect to the new database, with the following login:\n"
 "User name: admin\n"
@@ -508,15 +511,15 @@ msgstr ""
 "Benutzername: admin\n"
 "Passwort:<Admin-Passwort-das-sie-gerade-angegeben-haben>"
 
-#: tryton/gui/window/dbcreate.py:369
+#: tryton/gui/window/dbcreate.py:381
 msgid "Sorry, the Tryton server password seems wrong. Please type again."
 msgstr "Das Tryton Server-Passwort ist falsch! Bitte geben Sie es noch einmal ein."
 
-#: tryton/gui/window/dbcreate.py:371
+#: tryton/gui/window/dbcreate.py:383
 msgid "Access denied!"
 msgstr "Zugang verweigert!"
 
-#: tryton/gui/window/dbcreate.py:376
+#: tryton/gui/window/dbcreate.py:388
 msgid ""
 "Can't request the Tryton server, caused by an unknown reason.\n"
 "If there is a database created, it could be broken. Maybe drop this database! Please check the error message for possible informations.\n"
@@ -526,7 +529,7 @@ msgstr ""
 "Wenn eine Datenbank erstellt wurde, könnte diese unvollständig oder defekt sein. Es wird empfohlen die soeben erstellte Datenbank zu löschen! Bitte beachten Sie die folgende Fehlermeldung für weitere Informationen zu diesem Fehler.\n"
 "Fehlermeldung:\n"
 
-#: tryton/gui/window/dbcreate.py:383
+#: tryton/gui/window/dbcreate.py:395
 msgid "Error requesting Tryton server!"
 msgstr "Fehler bei der Abfrage des Tryton-Servers!"
 
@@ -1132,4 +1135,7 @@ msgid ""
 msgstr ""
 "Bitte warten,\n"
 "dieser Vorgang benötigt etwas Zeit..."
+
+#~ msgid "Name:"
+#~ msgstr "Benutzername:"
 
