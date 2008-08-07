@@ -43,11 +43,11 @@ class DBCreate(object):
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
                 gtk.gdk.color_parse(common.COLORS["invalid"]))
             self.tooltips.set_tip(self.entry_server_connection, _( \
-                "Can not connect to the Tryton server!\n" \
-                "1. Try to check if the Tryton server is running.\n" \
+                "Can not connect to the server!\n" \
+                "1. Try to check if the server is running.\n" \
                 "2. Find out on which address and port it is listen.\n" \
                 "3. If there is a firewall between the server and this " \
-                "client, make shure that the Tryton server address and port " \
+                "client, make shure that the server address and port " \
                 "(usually 8070) are not blocked.\n" \
                 "Click on 'Change' to change the address."), None)
         return state
@@ -155,8 +155,7 @@ class DBCreate(object):
         img_connect = gtk.Image()
         img_connect.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
         self.button_create.set_image(img_connect)
-        self.tooltips.set_tip(self.button_create, _('Create the new Tryton ' \
-            'database.'))
+        self.tooltips.set_tip(self.button_create, _('Create the new database.'))
         self.dialog.add_action_widget(self.button_create, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
 
@@ -167,7 +166,7 @@ class DBCreate(object):
         table.set_col_spacings(3)
 
         label_server_setup = gtk.Label()
-        label_server_setup.set_markup("<b>"+ _("Tryton Server Setup:")+ "</b>")
+        label_server_setup.set_markup("<b>"+ _("Server Setup:")+ "</b>")
         label_server_setup.set_justify(gtk.JUSTIFY_LEFT)
         label_server_setup.set_alignment(0, 1)
         label_server_setup.set_padding( 9, 5)
@@ -183,7 +182,7 @@ class DBCreate(object):
         self.entry_server_connection.set_text("http://localhost:8070")
         table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
-            "the Tryton server. Use server 'localhost' and port '8070' if " \
+            "the server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
             "change the address."), None)
         self.button_server_change = gtk.Button(_("C_hange"), stock=None,
@@ -193,9 +192,9 @@ class DBCreate(object):
             gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
         table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
-        self.tooltips.set_tip(self.button_server_change, _("Setup the Tryton " \
+        self.tooltips.set_tip(self.button_server_change, _("Setup the " \
             "server connection..."), None)
-        label_serverpasswd = gtk.Label(_("Server password:"))
+        label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_serverpasswd.set_alignment(1, 0.5)
         label_serverpasswd.set_padding( 3, 3)
@@ -205,8 +204,8 @@ class DBCreate(object):
         self.entry_serverpasswd.set_activates_default(True)
         table.attach(self.entry_serverpasswd, 1, 3, 2, 3)
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
-            "password for Tryton administration. It doesn't belong to a " \
-            "Tryton user. This password is usually defined in the trytond " \
+            "password of the Tryton server. It doesn't belong to a " \
+            "real user. This password is usually defined in the trytond " \
             "configuration."), None)
         self.entry_serverpasswd.connect("key-press-event", \
             self.event_passwd_clear)
@@ -339,7 +338,7 @@ class DBCreate(object):
                     continue
                 elif not admin_passwd.get_text():
                     common.warning(_("Admin password and confirmation are " \
-                        "required to create a new Tryton database."), \
+                        "required to create a new database."), \
                         parent, _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
@@ -384,14 +383,14 @@ class DBCreate(object):
                             self.entry_serverpasswd.grab_focus()
                             continue
                         else: # Unclassified error
-                            common.warning(_("Can't create the Tryton " \
+                            common.warning(_("Can't create the " \
                                 "database, caused by an unknown reason.\n" \
                                 "If there is a database created, it could " \
                                 "be broken. Maybe drop this database! " \
                                 "Please check the error message for " \
                                 "possible informations.\n" \
                                 "Error message:\n") + str(exception[0]), \
-                                parent, _("Error creating Tryton database!"))
+                                parent, _("Error creating database!"))
                         parent.present()
                         self.dialog.destroy()
                         rpc.logout()
