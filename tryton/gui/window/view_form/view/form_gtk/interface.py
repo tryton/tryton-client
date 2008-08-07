@@ -101,7 +101,7 @@ class WidgetInterface(object):
                 .get('readonly', False):
             return False
         model = self._view.modelfield.parent.resource
-        try
+        try:
             res = rpc.execute('object', 'execute', model,
                     'default_get', [self.attrs['name']])
         except Exception, exception:
