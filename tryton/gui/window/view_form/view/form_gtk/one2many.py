@@ -68,7 +68,7 @@ def _create_menu(self, attrs):
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
     self.eb_new = gtk.EventBox()
-    tooltips.set_tip(self.eb_new, _('Create a new entry'))
+    tooltips.set_tip(self.eb_new, _('Create a new record'))
     self.eb_new.set_events(gtk.gdk.BUTTON_PRESS)
     self.eb_new.connect('button_press_event', self._sig_new)
     img_new = gtk.Image()
@@ -78,7 +78,7 @@ def _create_menu(self, attrs):
     hbox.pack_start(self.eb_new, expand=False, fill=False)
 
     self.eb_open = gtk.EventBox()
-    tooltips.set_tip(self.eb_open, _('Edit selected entry'))
+    tooltips.set_tip(self.eb_open, _('Edit selected record'))
     self.eb_open.set_events(gtk.gdk.BUTTON_PRESS)
     self.eb_open.connect('button_press_event', self._sig_edit)
     img_open = gtk.Image()
@@ -88,7 +88,7 @@ def _create_menu(self, attrs):
     hbox.pack_start(self.eb_open, expand=False, fill=False)
 
     self.eb_del = gtk.EventBox()
-    tooltips.set_tip(self.eb_del, _('Delete selected entry'))
+    tooltips.set_tip(self.eb_del, _('Delete selected record'))
     self.eb_del.set_events(gtk.gdk.BUTTON_PRESS)
     self.eb_del.connect('button_press_event', self._sig_remove)
     img_del = gtk.Image()
