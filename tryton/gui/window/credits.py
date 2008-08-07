@@ -23,7 +23,7 @@ class Credits(object):
         self.label = gtk.Label()
         self.label.set_alignment(0.5, 0)
         contributors_file = os.path.join(DATA_DIR, 'contributors.txt')
-        contributors = '\n' + _('<b>Contributors:</b>') + '\n\n'
+        contributors = '\n<b>' + _('Contributors:') + '</b>\n\n'
         contributors += file(contributors_file).read()
         self.label.set_text(contributors)
         self.label.set_use_markup(True)
