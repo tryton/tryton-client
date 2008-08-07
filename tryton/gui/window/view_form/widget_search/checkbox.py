@@ -51,8 +51,7 @@ class CheckBox(Interface):
         else:
             self.widget.child.set_text(_('No'))
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the widget or ValueError if not valid'))
+    value = property(_value_get, _value_set)
 
     def sig_activate(self, fct):
         self.widget.child.connect_after('activate', fct)

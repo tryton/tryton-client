@@ -26,7 +26,7 @@ class Calendar(Interface):
         self.widget.pack_start(self.entry1, expand=False, fill=True)
 
         self.eb1 = gtk.EventBox()
-        tooltips.set_tip(self.eb1, _('Open the calendar widget'))
+        tooltips.set_tip(self.eb1, _('Open the calendar'))
         self.eb1.set_events(gtk.gdk.BUTTON_PRESS)
         self.eb1.connect('button_press_event', self.cal_open, self.entry1,
                 parent)
@@ -45,7 +45,7 @@ class Calendar(Interface):
         self.widget.pack_start(self.entry2, expand=False, fill=True)
 
         self.eb2 = gtk.EventBox()
-        tooltips.set_tip(self.eb2, _('Open the calendar widget'))
+        tooltips.set_tip(self.eb2, _('Open the calendar'))
         self.eb2.set_events(gtk.gdk.BUTTON_PRESS)
         self.eb2.connect('button_press_event', self.cal_open, self.entry2,
                 parent)
@@ -87,8 +87,7 @@ class Calendar(Interface):
         self.entry1.set_text(conv(value[0]))
         self.entry2.set_text(conv(value[1]))
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the widget or ValueError if not valid'))
+    value = property(_value_get, _value_set)
 
     def cal_open(self, widget, event, dest, parent=None):
         win = gtk.Dialog(_('Date selection'), parent,

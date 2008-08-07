@@ -255,8 +255,7 @@ class Form(object):
             if i in self.widgets:
                 self.widgets[i][0].value = value[i]
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the form or excpetion if not valid'))
+    value = property(_value_get, _value_set)
 
 import calendar
 import float

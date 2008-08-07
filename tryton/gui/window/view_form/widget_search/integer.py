@@ -63,8 +63,7 @@ class Integer(Interface):
         self.entry1.set_text(conv(value[0]))
         self.entry2.set_text(conv(value[1]))
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the widget or ValueError if not valid'))
+    value = property(_value_get, _value_set)
 
     def clear(self):
         self.value = False

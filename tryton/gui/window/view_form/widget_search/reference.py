@@ -71,8 +71,7 @@ class Reference(Interface):
                 self.widget.child.set_text(sel)
 
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the widget or ValueError if not valid'))
+    value = property(_value_get, _value_set)
 
     def clear(self):
         self.value = ''

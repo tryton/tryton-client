@@ -35,8 +35,7 @@ class Float(Integer):
         self.entry1.set_text(text)
         self.entry2.set_text(text)
 
-    value = property(_value_get, _value_set, None,
-            _('The content of the widget or ValueError if not valid'))
+    value = property(_value_get, _value_set)
 
     def clear(self):
         self.value = False
