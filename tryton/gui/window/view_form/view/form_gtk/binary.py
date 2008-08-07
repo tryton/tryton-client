@@ -3,7 +3,7 @@ import base64
 import gtk
 import gettext
 import os
-from tryton.common import file_selection, message
+from tryton.common import file_selection, message, warning
 from interface import WidgetInterface
 
 _ = gettext.gettext
@@ -28,7 +28,7 @@ class Binary(WidgetInterface):
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
-        self.tooltips.set_tip(self.but_new, _('Set File'))
+        self.tooltips.set_tip(self.but_new, _('Select a File'))
         self.widget.pack_start(self.but_new, expand=False, fill=False)
 
         self.but_save_as = gtk.Button()
@@ -37,7 +37,7 @@ class Binary(WidgetInterface):
         self.but_save_as.set_image(img_save_as)
         self.but_save_as.set_relief(gtk.RELIEF_NONE)
         self.but_save_as.connect('clicked', self.sig_save_as)
-        self.tooltips.set_tip(self.but_save_as, _('Save As'))
+        self.tooltips.set_tip(self.but_save_as, _('Save As...'))
         self.widget.pack_start(self.but_save_as, expand=False, fill=False)
 
         self.but_remove = gtk.Button()
@@ -75,8 +75,9 @@ class Binary(WidgetInterface):
                 if fname:
                     self.parent.value = {fname:os.path.basename(filename)}
                 self.display(self._view.model, self.model_field)
-        except:
-            message(_('Error reading the file'), self._window)
+        except Exception, exception:
+            warning(_('Error reading the file.\nError message:\n%s') \
+                    % str(exception), self._window, _('Error'))
 
     def sig_save_as(self, widget=None):
         try:
@@ -87,8 +88,9 @@ class Binary(WidgetInterface):
                 file_p.write(base64.decodestring(
                     self.model_field.get(self._view.model)))
                 file_p.close()
-        except:
-            message(_('Error writing the file!'), self._window)
+        except Exception, exception:
+            warning(_('Error writing the file.\nError message:\n%s') \
+                    % str(exception), self._window, _('Error'))
 
     def sig_remove(self, widget=None):
         if self.model_field:
