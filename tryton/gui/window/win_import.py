@@ -115,7 +115,7 @@ class WinImport(object):
             data = csv.reader(file(fname), quotechar=csvdel, delimiter=csvsep)
         except:
             common.warning(_('Error opening CSV file'), self.parent,
-                    _('Input Error'))
+                    _('Error'))
             return True
         self.sig_unsel_all()
         word = ''
@@ -126,10 +126,10 @@ class WinImport(object):
                     num = self.model2.append()
                     self.model2.set(num, 0, word, 1, self.fields_invert[word])
                 break
-        except:
-            common.warning(_('Error processing your first line of the file.\n' \
-                    'Field %s is unknown!') % (word,), self.parent,
-                    _('Import Error'))
+        except Exception, exception:
+            common.warning(_('Error processing the file at field %s.\n' \
+                    'Error message:\n%s') % (word, str(exception)), self.parent,
+                    _('Error'))
         return True
 
     def sig_sel_all(self, widget=None):
@@ -206,7 +206,10 @@ class WinImport(object):
             common.process_exception(exception, self.win)
             return False
         if res[0] >= 0:
-            common.message(_('Imported %d objects!') % (res[0],), self.parent)
+            if res[0] == 1:
+                common.message(_('%d record imported!') % (res[0],), self.parent)
+            else:
+                common.message(_('%d records imported!') % (res[0],), self.parent)
         else:
             buf = ''
             for key, val in res[1].items():
