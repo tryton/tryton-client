@@ -384,14 +384,14 @@ class DBCreate(object):
                             self.entry_serverpasswd.grab_focus()
                             continue
                         else: # Unclassified error
-                            common.warning(_("Can't request the Tryton " \
-                                "server, caused by an unknown reason.\n" \
+                            common.warning(_("Can't create the Tryton " \
+                                "database, caused by an unknown reason.\n" \
                                 "If there is a database created, it could " \
                                 "be broken. Maybe drop this database! " \
                                 "Please check the error message for " \
                                 "possible informations.\n" \
                                 "Error message:\n") + str(exception[0]), \
-                                parent, _("Error requesting Tryton server!"))
+                                parent, _("Error creating Tryton database!"))
                         parent.present()
                         self.dialog.destroy()
                         rpc.logout()
