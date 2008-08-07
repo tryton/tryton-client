@@ -164,7 +164,7 @@ class EditableTreeView(gtk.TreeView):
                 self.set_cursor(path, col, True)
                 if self.screen.form:
                     self.screen.form.message_state(
-                            _('Warning; field "%s" is required !') % \
+                            _('Warning; field "%s" is required!') % \
                                     invalid_fields[col.name])
                 return True
             if self.screen.tree_saves:
