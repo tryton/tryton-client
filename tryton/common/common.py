@@ -59,7 +59,7 @@ def refresh_langlist(lang_widget, host, port):
 def request_server(server_widget, parent):
     result = False
     dialog = gtk.Dialog(
-        title =  _('Tryton connect'),
+        title =  _('Tryton Connection'),
         parent = parent,
         flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
             gtk.WIN_POS_CENTER_ON_PARENT | 
@@ -433,8 +433,8 @@ def send_bugtracker(msg, parent):
                 # second create issue with this message
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
-                message(_('Created new bug with ID issue') + \
-                        '%s' % issue_id, parent)
+                message(_('Created new bug with ID ') + \
+                        'issue%s' % issue_id, parent)
             webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
         except Exception, exception:
             tb_s = reduce(lambda x, y: x + y,
@@ -532,7 +532,7 @@ def sur_3b(msg, parent):
         return 'cancel'
 
 def ask(question, parent, visibility=True):
-    win = gtk.Dialog(_('Tryton'), parent,
+    win = gtk.Dialog('Tryton', parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
