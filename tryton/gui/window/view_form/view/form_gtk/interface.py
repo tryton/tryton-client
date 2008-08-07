@@ -3,10 +3,9 @@ import gtk
 from gtk import glade
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
-from tryton.common import warning, COLORS
+from tryton.common import COLORS, process_exception
 from tryton.config import GLADE, TRYTON_ICON
 import gettext
-import tryton.common as common
 
 _ = gettext.gettext
 
@@ -45,7 +44,7 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
             widgets[(fname, fvalue)] = widget
             vbox.pack_start(widget)
     if not len(dependance) or not addwidget:
-        vbox.pack_start(gtk.Label(_('Always applicable !')))
+        vbox.pack_start(gtk.Label(_('Always applicable!')))
     vbox.show_all()
 
     res = win.run()
@@ -66,7 +65,7 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
             ir_default.set_default(model, field, clause, value, user,
                     rpc.CONTEXT)
         except Exception, exception:
-            common.process_exception(exception, window)
+            process_exception(exception, window)
             return False
         return True
     return False
@@ -98,20 +97,18 @@ class WidgetInterface(object):
         pass
 
     def _menu_sig_default_get(self):
-        try:
-            if self._view.modelfield.get_state_attrs(self._view.model)\
-                    .get('readonly', False):
-                return False
-            model = self._view.modelfield.parent.resource
+        if self._view.modelfield.get_state_attrs(self._view.model)\
+                .get('readonly', False):
+            return False
+        model = self._view.modelfield.parent.resource
+        try
             res = rpc.execute('object', 'execute', model,
                     'default_get', [self.attrs['name']])
-            self._view.modelfield.set(self._view.model,
-                    res.get(self.attrs['name'], False))
-            self.display(self._view.model, self._view.modelfield)
-        except:
-            warning(_('You can not set to the default value here!'),
-                    _('Operation not permited'))
-            return False
+        except Exception, exception:
+            process_exception(exception, self._window)
+        self._view.modelfield.set(self._view.model,
+                res.get(self.attrs['name'], False))
+        self.display(self._view.model, self._view.modelfield)
 
     def sig_activate(self, widget=None):
         # emulate a focus_out so that the onchange is called if needed
