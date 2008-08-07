@@ -267,12 +267,16 @@ class WinExport(object):
                         row.append(val)
                 writer.writerow(row)
             file_p.close()
-            common.message(str(len(result)) + _(' record(s) saved !'),
-                    self.parent)
+            if len(result) == 1:
+                common.message(_('%d record saved!') % len(result),
+                        self.parent)
+            else:
+                common.message(_('%d records saved!') % len(result),
+                        self.parent)
             return True
-        except IOError, exception:
-            common.message(_("Operation failed !\nI/O error") + \
-                    "(%s)" % (exception[0],), self.parent)
+        except Exception, exception:
+            common.warning(_("Operation failed!\nError message:\n%s") \
+                     % (exception[0],), self.parent, _('Error'))
             return False
 
     def datas_read(self, ids, model, fields, context=None):
