@@ -437,7 +437,8 @@ class Many2One(WidgetInterface):
         act = action.copy()
         obj_id = self._view.modelfield.get(self._view.model)
         if not obj_id:
-            common.message(_('You must select a record to use the relation !'))
+            common.message(_('You must select a record to use the relation!'),
+                    self._window)
             return False
         screen = Screen(self.attrs['relation'], self._window)
         screen.load([obj_id])
