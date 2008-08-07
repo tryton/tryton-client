@@ -323,11 +323,17 @@ class Main(object):
             ids, ids2 = rpc.execute('object', 'execute',
                     'res.request', 'request_get')
             if len(ids):
-                message = _('%s request(s)') % len(ids)
+                if len(ids) == 1:
+                    message = _('%s request') % len(ids)
+                else:
+                    message = _('%s requests') % len(ids)
             else:
                 message = _('No request')
             if len(ids2):
-                message += _(' - %s request(s) sended') % len(ids2)
+                if len(ids2) == 1:
+                    message += _(' - %s request sended') % len(ids2)
+                else:
+                    message += _(' - %s requests sended') % len(ids2)
             sb_id = self.sb_requests.get_context_id('message')
             self.sb_requests.push(sb_id, message)
             return (ids, ids2)
@@ -362,11 +368,11 @@ class Main(object):
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
-            common.message(_('Connection error !\n' \
-                    'Unable to connect to the server !'), self.window)
+            common.message(_('Connection error!\n' \
+                    'Unable to connect to the server!'), self.window)
         elif log_response == -2:
-            common.message(_('Connection error !\n' \
-                    'Bad username or password !'), self.window)
+            common.message(_('Connection error!\n' \
+                    'Bad username or password!'), self.window)
             return self.sig_login()
         if not self.shortcut_menu.get_property('sensitive'):
             self.shortcut_set()
@@ -394,7 +400,7 @@ class Main(object):
         sb_id = self.sb_requests.get_context_id('message')
         self.sb_requests.push(sb_id, '')
         sb_id = self.sb_username.get_context_id('message')
-        self.sb_username.push(sb_id, _('Not logged !'))
+        self.sb_username.push(sb_id, _('Not logged!'))
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
         self.shortcut_unset()
@@ -465,9 +471,8 @@ class Main(object):
         if not prefs[menu_type]:
             if quiet:
                 return False
-            common.warning(_('You can not log into the system !\n' \
-                    'Ask the administrator to verify\n' \
-                    'you have an action defined for your user.'),
+            common.warning(_('You can not log into the system!\n' \
+                    'Verify if you have an menu defined on your user.'),
                     'Access Denied!', self.window)
             rpc.logout()
             self.refresh_ssl()
@@ -498,14 +503,14 @@ class Main(object):
         gtk.main_quit()
 
     def sig_close(self, widget):
-        if common.sur(_("Do you really want to quit ?"), parent=self.window):
+        if common.sur(_("Do you really want to quit?"), parent=self.window):
             if not self.sig_logout(widget):
                 return False
             CONFIG.save()
             gtk.main_quit()
 
     def sig_delete(self, widget, event):
-        if common.sur(_("Do you really want to quit ?"), parent=self.window):
+        if common.sur(_("Do you really want to quit?"), parent=self.window):
             if not self.sig_logout(widget):
                 return True
             return False
@@ -609,7 +614,7 @@ class Main(object):
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
-        title = _('Tryton')
+        title = 'Tryton'
         page = self._wid_get()
         if page:
             title += ' - ' + page.name
@@ -755,7 +760,7 @@ class Main(object):
             file_ = file(filename, 'wb')
             file_.write(dump)
             file_.close()
-            common.message(_("Database backuped successfully !"),
+            common.message(_("Database backuped successfully!"),
                     parent=self.window)
         else:
             rpc.logout()
@@ -766,12 +771,12 @@ class Main(object):
             res = common.refresh_dblist(db_widget, host, port)
             if res == -1:
                 label.set_label('<b>' + \
-                        _('Could not connect to server !') + '</b>')
+                        _('Could not connect to server!') + '</b>')
                 db_widget.hide()
                 label.show()
             elif res==0:
                 label.set_label('<b>' + \
-                        _('No database found, you must create one !') + '</b>')
+                        _('No database found, you must create one!') + '</b>')
                 db_widget.hide()
                 label.show()
             else:
