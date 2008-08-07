@@ -39,16 +39,13 @@ class Calendar(WidgetInterface):
         self.widget.pack_start(self.but_open, expand=False, fill=False)
 
         tooltips = gtk.Tooltips()
-        tooltips.set_tip(self.but_open, _('Open the calendar widget'))
+        tooltips.set_tip(self.but_open, _('Open the calendar'))
         tooltips.enable()
-
-        self.readonly = False
 
     def _color_widget(self):
         return self.entry
 
     def _readonly_set(self, value):
-        super(Calendar, self)._readonly_set(value)
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
         self.but_open.set_sensitive(not value)
@@ -96,10 +93,6 @@ class Calendar(WidgetInterface):
         return True
 
     def cal_open(self, widget):
-        if self.readonly:
-            message(_('This widget is readonly!'), self._window)
-            return True
-
         win = gtk.Dialog(_('Date Selection'), self._window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -161,18 +154,16 @@ class DateTime(WidgetInterface):
         self.widget.pack_start(self.but_open, expand=False, fill=False)
 
         tooltips = gtk.Tooltips()
-        tooltips.set_tip(self.but_open, _('Open the calendar widget'))
+        tooltips.set_tip(self.but_open, _('Open the calendar'))
         tooltips.enable()
-
-        self.readonly = False
 
     def _color_widget(self):
         return self.entry
 
     def _readonly_set(self, value):
-        self.readonly = value
         self.entry.set_editable(not value)
         self.entry.set_sensitive(not value)
+        self.but_open.set_sensitive(not value)
 
     def sig_key_press(self, widget, event):
         if event.keyval == gtk.keysyms.F2:
@@ -241,10 +232,6 @@ class DateTime(WidgetInterface):
         return True
 
     def cal_open(self, widget):
-        if self.readonly:
-            message(_('This widget is readonly!'), self._window)
-            return True
-
         win = gtk.Dialog(_('Date Time Selection'), self._window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
