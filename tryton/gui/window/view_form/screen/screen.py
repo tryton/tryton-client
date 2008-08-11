@@ -337,6 +337,9 @@ class Screen(SignalEvent):
     def set_domain(self):
         fields = self.models.fields
         for dom in self.domain:
+            #XXX to improve for new domain structure
+            if not isinstance(dom, tuple):
+                continue
             if dom[0] in fields:
                 field_dom = str(fields[dom[0]].setdefault('domain',[]))
                 fields[dom[0]]['domain'] = field_dom[:1] + \
