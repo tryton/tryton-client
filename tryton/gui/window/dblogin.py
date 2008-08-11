@@ -59,7 +59,6 @@ class DBLogin(object):
         self.entry_password.set_activates_default(True)
         table_main.attach(self.entry_password, 1, 3, 3, 4)
         self.entry_login = gtk.Entry()
-        self.entry_login.set_text("admin")
         self.entry_login.set_activates_default(True)
         table_main.attach(self.entry_login, 1, 3, 2, 3)
         label_server = gtk.Label()
