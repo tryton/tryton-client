@@ -361,15 +361,11 @@ class DBCreate(object):
                             if url_m:
                                 CONFIG['login.server'] = host = url_m.group(1)
                                 CONFIG['login.port'] = port = url_m.group(2)
+                            CONFIG["login.login"] = "admin"
                             rpc.db_exec(host, int(port), 'create', passwd, \
                                 dbname, langreal, admin_passwd.get_text())
                             from tryton.gui.main import Main
                             Main.get_main().refresh_ssl()
-                            common.message( _("You can now connect to the " \
-                                "new database, with the following login:\n" \
-                                "User name: admin\n" \
-                                "Password:<Admin Password>"), \
-                                parent)
                             parent.present()
                             self.dialog.destroy()
                             self.sig_login(dbname=dbname)
