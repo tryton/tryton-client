@@ -244,12 +244,20 @@ class M2OField(CharField):
 
     def get(self, model, check_load=True, readonly=True, modified=False):
         if model.value[self.name]:
+            if isinstance(model.value[self.name], (int, basestring, long)):
+                self.set(model, model.value[self.name])
+            if isinstance(model.value[self.name], (int, basestring, long)):
+                return model.value[self.name]
             return model.value[self.name][0] or False
         return False
 
     def get_client(self, model):
         #model._check_load()
         if model.value[self.name]:
+            if isinstance(model.value[self.name], (int, basestring, long)):
+                self.set(model, model.value[self.name])
+            if isinstance(model.value[self.name], (int, basestring, long)):
+                return model.value[self.name]
             return model.value[self.name][1]
         return False
 
