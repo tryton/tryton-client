@@ -181,8 +181,7 @@ def setlang(lang=None):
         try:
             if os.name == 'nt':
                 os.environ['LANG'] = ''
-            else:
-                locale.setlocale(locale.LC_ALL, '')
+            locale.setlocale(locale.LC_ALL, '')
         except:
             logging.getLogger('translate').warn(
                     _('Unable to unset locale'))
