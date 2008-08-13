@@ -158,7 +158,7 @@ def selection(title, values, parent, alwaysask=False):
             (model, i) = sel
             if i:
                 value = model.get_value(i, 0)
-                res = (res, values[value])
+                res = (value, values[value])
     parent.present()
     win.destroy()
     return res
