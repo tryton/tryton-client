@@ -166,6 +166,7 @@ def setlang(lang=None):
             lang2 = lang
             if os.name == 'nt':
                 lang2 = _LOCALE2WIN32.get(lang, lang)
+                os.environ['LANG'] = lang
             locale.setlocale(locale.LC_ALL, str(lang2 + '.' + encoding))
         except:
             logging.getLogger('translate').info(
@@ -178,6 +179,8 @@ def setlang(lang=None):
             lang.install(unicode=1)
     else:
         try:
+            if os.name == 'nt':
+                os.environ['LANG'] = None
             locale.setlocale(locale.LC_ALL, '')
         except:
             logging.getLogger('translate').warn(
