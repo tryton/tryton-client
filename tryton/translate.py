@@ -167,6 +167,8 @@ def setlang(lang=None):
             if os.name == 'nt':
                 lang2 = _LOCALE2WIN32.get(lang, lang)
                 os.environ['LANG'] = lang
+            elif os.name == 'mac':
+                encoding = 'UTF-8'
             locale.setlocale(locale.LC_ALL, str(lang2 + '.' + encoding))
         except:
             logging.getLogger('translate').info(
