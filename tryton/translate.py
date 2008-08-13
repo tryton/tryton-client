@@ -180,7 +180,7 @@ def setlang(lang=None):
     else:
         try:
             if os.name == 'nt':
-                os.environ['LANG'] = None
+                os.environ['LANG'] = ''
             locale.setlocale(locale.LC_ALL, '')
         except:
             logging.getLogger('translate').warn(
