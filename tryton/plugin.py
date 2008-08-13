@@ -21,6 +21,8 @@ def execute(datas, parent):
     for module in MODULES:
         try:
             for name, func in module.get_plugins(datas['model']):
+                # Use str as key to use in the ListStore of common.selection
+                name = name.encode('utf-8')
                 result[name] = func
         except Exception, exception:
             continue
