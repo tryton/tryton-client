@@ -100,7 +100,12 @@ class Tree(SignalEvent):
             'on_but_sc_del_clicked': self.sc_del,
         }
 
-        self.scrollwindow.add(self.tree_res.widget_get())
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        viewport.add(self.tree_res.widget_get())
+        viewport.show()
+
+        self.scrollwindow.add(viewport)
         self.sig_reload()
 
         for signal in signals:
