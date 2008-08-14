@@ -29,6 +29,7 @@ class PySocket:
         self.port = None
         self.ssl = False
         self.ssl_sock = None
+        self.connected = False
 
     def connect(self, host, port=False):
         if not port:
@@ -37,18 +38,17 @@ class PySocket:
         hostname = host
         if host in DNS_CACHE:
             host = DNS_CACHE[host]
-        if not self.sock:
-            self.sock = None
-            if socket.has_ipv6:
-                try:
-                    socket.getaddrinfo(host, int(port), socket.AF_INET6)
-                    self.sock = socket.socket(socket.AF_INET6,
-                            socket.SOCK_STREAM)
-                except:
-                    pass
-            if self.sock is None:
-                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.settimeout(120)
+        self.sock = None
+        if socket.has_ipv6:
+            try:
+                socket.getaddrinfo(host, int(port), socket.AF_INET6)
+                self.sock = socket.socket(socket.AF_INET6,
+                        socket.SOCK_STREAM)
+            except:
+                pass
+        if self.sock is None:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(120)
         self.sock.connect((host, int(port)))
         DNS_CACHE[hostname], port = self.sock.getpeername()[:2]
         try:
@@ -72,6 +72,7 @@ class PySocket:
         self.host = host
         self.hostname = hostname
         self.port = port
+        self.connected = True
 
     def disconnect(self):
         try:
@@ -95,6 +96,8 @@ class PySocket:
                 self.sock.close()
         except:
             pass
+        self.sock = None
+        self.connected = False
 
     def reconnect(self):
         if self.host and self.port:

@@ -22,9 +22,9 @@ def db_list(host, port):
         try:
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
-                _SOCK = None
             if _SOCK is None:
                 _SOCK = pysocket.PySocket()
+            if not _SOCK.connected:
                 _SOCK.connect(host, port)
             try:
                 _SOCK.send(('db', 'list'))
@@ -40,7 +40,6 @@ def db_list(host, port):
             _SEMAPHORE.release()
         return res
     except:
-        _SOCK = None
         return None
 
 def db_exec(host, port, method, *args):
@@ -50,9 +49,9 @@ def db_exec(host, port, method, *args):
         try:
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
-                _SOCK = None
             if _SOCK is None:
                 _SOCK= pysocket.PySocket()
+            if not _SOCK.connected:
                 _SOCK.connect(host, port)
             _SOCK.send(('db', method) + args)
             res = _SOCK.receive()
@@ -61,7 +60,6 @@ def db_exec(host, port, method, *args):
             _SEMAPHORE.release()
         return res
     except:
-        _SOCK = None
         raise
 
 def login(username, password, host, port, database):
@@ -73,9 +71,9 @@ def login(username, password, host, port, database):
         try:
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
-                _SOCK = None
             if _SOCK is None:
                 _SOCK = pysocket.PySocket()
+            if not _SOCK.connected:
                 _SOCK.connect(host, port)
             _SOCK.send(('common', 'login', database, username, password))
             res = _SOCK.receive()
