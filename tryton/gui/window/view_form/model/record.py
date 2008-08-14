@@ -146,11 +146,12 @@ class ModelRecord(SignalEvent):
             try:
                 self.id = self.rpc.create(value, self.context_get())
             except Exception, exception:
-                self.id = common.process_exception(exception, self.window, 'object',
+                res = common.process_exception(exception, self.window, 'object',
                         'execute', self.resource, 'create', value,
                         self.context_get())
-                if not self.id or self.id < 0:
+                if not res:
                     return False
+                self.id = res
         else:
             if not self.is_modified():
                 return self.id
