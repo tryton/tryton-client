@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 from interface import WidgetInterface
+import tryton.rpc as rpc
 
 
 class TextBox(WidgetInterface):
@@ -22,6 +23,12 @@ class TextBox(WidgetInterface):
         self.textview.set_accepts_tab(False)
         self.textview.connect('focus-in-event', lambda x, y: self._focus_in())
         self.textview.connect('focus-out-event', lambda x, y: self._focus_out())
+        try:
+            import gtkspell
+            gtkspell.Spell(self.textview).set_language(
+                    rpc.CONTEXT.get('language', 'en_US'))
+        except:
+            pass
         self.scrolledwindow.add(self.textview)
         self.scrolledwindow.show_all()
 
