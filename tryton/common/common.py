@@ -593,6 +593,10 @@ def process_exception(exception, parent, obj='', method='', *args):
             if password is None:
                 raise Exception('NotLogged')
             res = rpc.login(rpc._USERNAME, password, host, port, rpc._DATABASE)
+            if res == -1:
+                message(_('Connection error!\n' \
+                        'Unable to connect to the server!'), parent)
+                return False
             if res < 0:
                 continue
             if obj and method:

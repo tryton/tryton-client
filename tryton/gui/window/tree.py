@@ -278,6 +278,10 @@ class Tree(SignalEvent):
                     return True
                 res = rpc.login(rpc._USERNAME, password, host, port,
                         rpc._DATABASE)
+                if res == -1:
+                    common.message(_('Connection error!\n' \
+                            'Unable to connect to the server!'), self.window)
+                    return True
                 if res < 0:
                     continue
                 return False
