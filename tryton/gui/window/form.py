@@ -371,10 +371,10 @@ class Form(SignalEvent):
         else:
             name = '_'
             if signal_data[0] >= 0:
-                name = str(signal_data[0]+1)
+                name = str(signal_data[0] + 1)
             name2 = _('New Record')
-            if signal_data[3]:
-                name2 = _('Editing Record (id: ')+str(signal_data[3])+')'
+            if signal_data[3] and signal_data[3] > 0:
+                name2 = _('Editing Record (id: ') + str(signal_data[3]) + ')'
             msg = _('Record: ') + name + ' / ' + str(signal_data[1])
             if signal_data[1] < signal_data[2]:
                 msg += _(' of ') + str(signal_data[2])
