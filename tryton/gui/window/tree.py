@@ -130,11 +130,13 @@ class Tree(SignalEvent):
             ctx = {}
             ctx.update(rpc.CONTEXT)
             try:
-                results = rpc.execute('object', 'execute',
+                args = ('object', 'execute',
                         self.view['model'], 'read', ids, ['name', icon_name], ctx)
+                results = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                return
+                results = common.process_exception(exception, self.window, *args)
+                if not results:
+                    return
             radiotb = None
             for res in results:
                 radiotb = gtk.RadioToolButton(group=radiotb)
