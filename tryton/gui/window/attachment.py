@@ -52,7 +52,6 @@ class Attachment(object):
         types = [gobject.TYPE_STRING]
         for i in self.fields_order:
             types.append(gobject.TYPE_STRING)
-        self.view_name = view['name']
         self.model_name = model
         self.model = gtk.ListStore(*types)
 
