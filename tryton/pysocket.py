@@ -102,21 +102,7 @@ class PySocket:
     def reconnect(self):
         if self.host and self.port:
             self.disconnect()
-            self.sock = None
-            if socket.has_ipv6:
-                try:
-                    socket.getaddrinfo(self.host, int(self.port),
-                            socket.AF_INET6)
-                    self.sock = socket.socket(socket.AF_INET6,
-                            socket.SOCK_STREAM)
-                except:
-                    pass
-            if self.sock is None:
-                self.sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            self.sock.settimeout(120)
-            self.sock.connect((self.host, int(self.port)))
-            if self.ssl:
-                self.ssl_sock = socket.ssl(self.sock)
+            self.connect(self.host, self.port)
 
     def send(self, msg, exception=False, traceback=None):
         msg = cPickle.dumps([msg, traceback], protocol=2)
