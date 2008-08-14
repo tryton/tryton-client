@@ -285,7 +285,10 @@ class Screen(SignalEvent):
                         self.hastoolbar)
             if self.exclude_field:
                 if self.exclude_field in view['fields']:
-                    del view['fields'][self.exclude_field]
+                    view['fields'][self.exclude_field]['states'] = {'invisible': True}
+                    view['fields'][self.exclude_field]['readonly'] = True
+                    view['fields'][self.exclude_field]['invisible'] = True
+                    view['fields'][self.exclude_field]['tree_invisible'] = True
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 
