@@ -127,8 +127,8 @@ def context_reload():
 
 def execute(obj, method, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
-    if not _SOCK:
-        raise Exception('Not logged!')
+    if not _SOCK or not _SOCK.connected:
+        raise Exception('NotLogged')
     logging.getLogger('rpc.request').info(str((obj, method, args)))
     key = False
     if len(args) >= 6 and args[1] == 'fields_view_get':
