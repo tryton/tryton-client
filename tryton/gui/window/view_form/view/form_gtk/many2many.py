@@ -13,7 +13,7 @@ class Many2Many(WidgetInterface):
     def __init__(self, window, parent, model, attrs=None):
         super(Many2Many, self).__init__(window, parent, model, attrs)
 
-        self.widget = gtk.VBox(homogeneous=False, spacing=1)
+        self.widget = gtk.VBox(homogeneous=False, spacing=5)
 
         hbox = gtk.HBox(homogeneous=False, spacing=3)
         self.wid_text = gtk.Entry()
@@ -51,17 +51,15 @@ class Many2Many(WidgetInterface):
         hbox.pack_start(self.wid_but_remove, expand=False, fill=False)
 
         self.widget.pack_start(hbox, expand=False, fill=False)
-        self.widget.pack_start(gtk.HSeparator(), expand=False, fill=True)
-
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_placement(gtk.CORNER_TOP_LEFT)
-        scroll.set_shadow_type(gtk.SHADOW_NONE)
 
         self.screen = Screen(attrs['relation'], self._window,
                 view_type=['tree'], views_preload=attrs.get('views', {}))
-        scroll.add_with_viewport(self.screen.widget)
-        self.widget.pack_start(scroll, expand=True, fill=True)
+
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        viewport.add(self.screen.widget)
+        viewport.show()
+        self.widget.pack_start(viewport, expand=True, fill=True)
 
         self.old = None
 
