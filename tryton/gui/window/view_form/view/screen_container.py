@@ -14,7 +14,7 @@ class ScreenContainer(object):
                 gtk.POLICY_AUTOMATIC)
         self.viewport = gtk.Viewport()
         self.viewport.set_shadow_type(gtk.SHADOW_NONE)
-        self.vbox = gtk.VBox()
+        self.vbox = gtk.VBox(spacing=3)
         self.vbox.pack_end(self.scrolledwindow)
         self.filter_vbox = None
         self.button = None
@@ -59,18 +59,17 @@ class ScreenContainer(object):
         hbuttonbox.pack_start(self.button, expand=False, fill=False)
         hbuttonbox.show_all()
         self.filter_vbox.pack_start(hbuttonbox, expand=False, fill=False)
-        hseparator = gtk.HSeparator()
-        hseparator.show()
-        self.filter_vbox.pack_start(hseparator, expand=True, fill=False)
         self.vbox.pack_start(self.filter_vbox, expand=False, fill=True)
 
     def show_filter(self):
         if self.filter_vbox:
             self.filter_vbox.show()
+        self.viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 
     def hide_filter(self):
         if self.filter_vbox:
             self.filter_vbox.hide()
+        self.viewport.set_shadow_type(gtk.SHADOW_NONE)
 
     def set(self, widget):
         if self.viewport.get_child():
