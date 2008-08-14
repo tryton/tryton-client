@@ -443,6 +443,9 @@ class ParserForm(ParserInterface):
                 del attrs['name']
                 if name not in fields:
                     container.empty_add(int(attrs.get('colspan', 1)))
+                    import logging
+                    log = logging.getLogger('view')
+                    log.error('Unknow field "%s"' % str(name))
                     continue
                 ftype = attrs.get('widget', fields[name]['type'])
                 fields[name].update(attrs)
