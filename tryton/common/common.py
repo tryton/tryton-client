@@ -16,6 +16,7 @@ import webbrowser
 import traceback
 import tryton.rpc as rpc
 import locale
+import socket
 
 _ = gettext.gettext
 
@@ -618,6 +619,10 @@ def process_exception(exception, parent, obj='', method='', *args):
         if len(exception.args) > 3:
             msg = exception.args[2]
         warning(str(msg), parent, str(exception.args[1]))
+        return False
+
+    if isinstance(exception, socket.error):
+        warning(exception.args[1], parent, _('Network Error!'))
         return False
 
     error(str(exception.args[0]), parent, str(exception.args[-1]))
