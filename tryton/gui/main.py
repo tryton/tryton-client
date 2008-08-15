@@ -191,8 +191,9 @@ class Main(object):
             self.glade.get_widget(signals[signal][2]).set_active(
                     int(bool(CONFIG[signals[signal][1]])))
 
-        if os.name == 'nt':
+        if os.name in ('nt', 'mac'):
             # Disable actions, on win32 we use os.startfile
+            # and on mac we use /usr/bin/open
             self.glade.get_widget('actions').set_sensitive(False)
 
         # Adding a timer the check to requests

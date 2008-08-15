@@ -242,6 +242,16 @@ def file_open(filename, type, parent, print_p=False):
             # Try without operation, it is not supported on version < 2.5
             os.startfile(os.path.normpath(filename))
         return
+    elif os.name == 'mac':
+        pid = os.fork()
+        if not pid:
+            pid = os.fork()
+            if not pid:
+                os.execv('/usr/bin/open', ['/usr/bin/open', filename])
+            time.sleep(0.1)
+            sys.exit(0)
+        os.waitpid(pid, 0)
+        return
     cmd = ''
     if type in CONFIG['client.actions']:
         if print_p:
