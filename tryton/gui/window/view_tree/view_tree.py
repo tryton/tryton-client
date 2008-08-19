@@ -50,8 +50,8 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def _read(self, ids, fields):
         ctx = {}
-        ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
+        ctx.update(rpc.CONTEXT)
         res_ids = []
         if ids:
             args = ('object', 'execute', self.view['model'], 'read', ids, fields,

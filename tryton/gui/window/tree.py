@@ -25,25 +25,28 @@ class Tree(SignalEvent):
             domain = {}
         if context is None:
             context = {}
+        ctx = {}
+        ctx.update(context)
+        ctx.update(rpc.CONTEXT)
         if view_id:
             try:
                 view_base =  rpc.execute('object', 'execute',
                         'ir.ui.view', 'read', view_id,
-                        ['model', 'type'], context)
+                        ['model', 'type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
             try:
                 view = rpc.execute('object', 'execute',
                         view_base['model'], 'fields_view_get', view_id,
-                        view_base['type'],context)
+                        view_base['type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
         else:
             try:
                 view = rpc.execute('object', 'execute', model,
-                    'fields_view_get', False, 'tree', context)
+                    'fields_view_get', False, 'tree', ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
@@ -119,8 +122,11 @@ class Tree(SignalEvent):
 
     def sig_reload(self, widget=None):
         try:
+            ctx = {}
+            ctx.update(self.context)
+            ctx.update(rpc.CONTEXT)
             args = ('object', 'execute', self.model,
-                    'search', self.domain2, 0, None, None, self.context)
+                    'search', self.domain2, 0, None, None, ctx)
             ids = rpc.execute(*args)
         except Exception, exception:
             ids = common.process_exception(exception, self.window, *args)
@@ -182,7 +188,7 @@ class Tree(SignalEvent):
         if widget.get_active():
             obj_id = widget.get_data('id')
             args = ('object', 'execute', self.model,
-                        'read', obj_id, [self.view['field_childs']])
+                        'read', obj_id, [self.view['field_childs']], rpc.CONTEXT)
             try:
                 ids = rpc.execute(*args)[self.view['field_childs']]
             except Exception, exception:
@@ -337,7 +343,7 @@ class Tree(SignalEvent):
                                 'user_id': user,
                                 'res_id': obj_id,
                                 'name': name,
-                                })
+                                }, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
         self.tree_sc.update()
