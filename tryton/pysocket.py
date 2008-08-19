@@ -63,8 +63,9 @@ class PySocket:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(120)
             sock.connect((host, int(port)))
-            ssl_sock = socket.ssl(sock)
-            self.ssl = True
+            if hasattr(socket, 'ssl'):
+                ssl_sock = socket.ssl(sock)
+                self.ssl = True
         except:
             pass
         if self.ssl:
