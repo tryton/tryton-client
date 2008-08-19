@@ -418,8 +418,11 @@ class Main(object):
 
     def refresh_ssl(self):
         if rpc.SECURE:
+            self.tooltips.set_tip(self.secure_img, _('SSL connection') + \
+                    '\n' + str(rpc._SOCK.ssl_sock.server()))
             self.secure_img.show()
         else:
+            self.tooltips.set_tip(self.secure_img, '')
             self.secure_img.hide()
 
     def sig_tips(self, *args):
