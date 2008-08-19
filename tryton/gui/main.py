@@ -191,7 +191,7 @@ class Main(object):
             self.glade.get_widget(signals[signal][2]).set_active(
                     int(bool(CONFIG[signals[signal][1]])))
 
-        if os.name in ('nt', 'mac'):
+        if os.name in ('nt', 'mac') or os.uname()[0] == 'Darwin':
             # Disable actions, on win32 we use os.startfile
             # and on mac we use /usr/bin/open
             self.glade.get_widget('actions').set_sensitive(False)

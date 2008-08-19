@@ -242,7 +242,7 @@ def file_open(filename, type, parent, print_p=False):
             # Try without operation, it is not supported on version < 2.5
             os.startfile(os.path.normpath(filename))
         return
-    elif os.name == 'mac':
+    elif os.name == 'mac' or os.uname()[0] == 'Darwin':
         pid = os.fork()
         if not pid:
             pid = os.fork()
