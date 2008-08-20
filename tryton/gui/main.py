@@ -8,7 +8,6 @@ from gtk import glade
 import tryton.rpc as rpc
 from tryton.config import CONFIG, GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import tryton.common as common
-from tryton.version import VERSION
 from tryton.action import Action
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
@@ -773,12 +772,16 @@ class Main(object):
     def _choose_db_select(self, title=_("Backup a database")):
         def refreshlist(widget, db_widget, label, host, port):
             res = common.refresh_dblist(db_widget, host, port)
-            if res == -1:
-                label.set_label('<b>' + \
-                        _('Could not connect to server!') + '</b>')
+            if res is None or res == -1:
+                if res is None:
+                    label.set_label('<b>' + _('Could not connect to server!') +\
+                            '</b>')
+                else:
+                    label.set_label('<b>' + \
+                            _('Incompatible version of the server!') + '</b>')
                 db_widget.hide()
                 label.show()
-            elif res==0:
+            elif res == 0:
                 label.set_label('<b>' + \
                         _('No database found, you must create one!') + '</b>')
                 db_widget.hide()

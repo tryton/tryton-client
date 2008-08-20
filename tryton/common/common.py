@@ -17,10 +17,20 @@ import traceback
 import tryton.rpc as rpc
 import locale
 import socket
+from tryton.version import VERSION
 
 _ = gettext.gettext
 
 def refresh_dblist(db_widget, host, port, dbtoload=None):
+    '''
+    Return the number of database available
+        or None if it is impossible to connect
+        or -1 if the server version doesn't macth the client version
+    '''
+    version = rpc.server_version(host, port)
+    if version:
+        if version.split('.')[:2] != VERSION.split('.')[:2]:
+            return -1
     if not dbtoload:
         dbtoload = CONFIG['login.db']
     index = 0

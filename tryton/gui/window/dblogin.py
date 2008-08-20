@@ -99,13 +99,18 @@ class DBLogin(object):
     @staticmethod
     def refreshlist(widget, db_widget, label, host, port, butconnect=None):
         res = common.refresh_dblist(db_widget, host, port)
-        if res is None:
-            label.set_label('<b>'+_('Could not connect to server!')+'</b>')
+        if res is None or res == -1:
+            if res is None:
+                label.set_label('<b>' + _('Could not connect to server!') + \
+                        '</b>')
+            else:
+                label.set_label('<b>' + \
+                        _('Incompatible version of the server!') + '</b>')
             db_widget.hide()
             label.show()
             if butconnect:
                 butconnect.set_sensitive(False)
-        elif res==0:
+        elif res == 0:
             label.set_label('<b>' + \
                     _('No database found, you must create one!') + '</b>')
             db_widget.hide()

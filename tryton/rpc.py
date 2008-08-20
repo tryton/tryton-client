@@ -62,6 +62,33 @@ def db_exec(host, port, method, *args):
     except:
         raise
 
+def server_version(host, port):
+    global _SOCK, SECURE
+    _SEMAPHORE.acquire()
+    try:
+        try:
+            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
+                _SOCK.disconnect()
+            if _SOCK is None:
+                _SOCK = pysocket.PySocket()
+            if not _SOCK.connected:
+                _SOCK.connect(host, port)
+            try:
+                _SOCK.send(('common', 'version'))
+            except Exception, exception:
+                if exception[0] == 32:
+                    _SOCK.reconnect()
+                    _SOCK.send(('db', 'list'))
+                else:
+                    raise
+            res = _SOCK.receive()
+            SECURE = _SOCK.ssl
+        finally:
+            _SEMAPHORE.release()
+        return res
+    except:
+        return None
+
 def login(username, password, host, port, database):
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
     _VIEW_CACHE = {}
