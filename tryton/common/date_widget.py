@@ -111,8 +111,11 @@ class DateEntry(gtk.Entry):
         self.stop_emission('delete-text')
         return
 
-    def _focus_out(self, args, args2):
+    def _focus_out(self, editable, event):
         self.date_get()
+        if self.mode_cmd:
+            self.mode_cmd = False
+            if self.callback_process: self.callback_process(False, self, event)
 
     def set_text(self, text):
         self._interactive_input = False
@@ -213,7 +216,7 @@ class ComplexEntry(gtk.HBox):
             self._date_cb(event)
         else:
             data = self.widget.get_text()
-            if not event.keyval == gtk.keysyms.Escape:
+            if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
                 lst = {
                     '^=(\d+)w$': lambda dt,r: dt+RelativeDateTime(day=0, month=0, weeks = int(r.group(1))),
                     '^=(\d+)d$': lambda dt,r: dt+RelativeDateTime(day=int(r.group(1))),
