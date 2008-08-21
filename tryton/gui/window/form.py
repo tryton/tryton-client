@@ -60,6 +60,8 @@ class Form(SignalEvent):
                 self._attachment_count)
         self.screen.widget.show()
 
+        self.screen.widget.connect('key_press_event', self._sig_key_press)
+
         if not name:
             self.name = self.screen.current_view.title
         else:
@@ -364,6 +366,9 @@ class Form(SignalEvent):
         statusbar = self.glade.get_widget('stat_state')
         cid = statusbar.get_context_id(context)
         statusbar.push(cid, message)
+
+    def _sig_key_press(self, widget, event):
+        self.message_state('')
 
     def _record_message(self, screen, signal_data):
         if not signal_data[3]:
