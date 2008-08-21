@@ -7,6 +7,7 @@ import locale
 from interface import Interface
 from tryton.common import DT_FORMAT
 from _strptime import LocaleTime
+from tryton.common import date_widget
 
 _ = gettext.gettext
 
@@ -19,11 +20,14 @@ class Calendar(Interface):
         tooltips = gtk.Tooltips()
         self.widget = gtk.HBox(spacing=3)
 
-        self.entry1 = gtk.Entry()
+        self.format = LocaleTime().LC_date.replace('%y', '%Y')
+
+        self.widget1 = date_widget.ComplexEntry(self.format, spacing=3)
+        self.entry1 = self.widget1.widget
         self.entry1.set_property('width-chars', 10)
         self.entry1.set_property('activates_default', True)
         tooltips.set_tip(self.entry1, _('Start date'))
-        self.widget.pack_start(self.entry1, expand=False, fill=True)
+        self.widget.pack_start(self.widget1, expand=False, fill=True)
 
         self.eb1 = gtk.EventBox()
         tooltips.set_tip(self.eb1, _('Open the calendar'))
@@ -38,11 +42,12 @@ class Calendar(Interface):
 
         self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
 
-        self.entry2 = gtk.Entry()
+        self.widget2 = date_widget.ComplexEntry(self.format, spacing=3)
+        self.entry2 = self.widget2.widget
         self.entry2.set_property('width-chars', 10)
         self.entry2.set_property('activates_default', True)
         tooltips.set_tip(self.entry2, _('End date'))
-        self.widget.pack_start(self.entry2, expand=False, fill=True)
+        self.widget.pack_start(self.widget2, expand=False, fill=True)
 
         self.eb2 = gtk.EventBox()
         tooltips.set_tip(self.eb2, _('Open the calendar'))
@@ -59,20 +64,19 @@ class Calendar(Interface):
 
     def _date_get(self, value):
         try:
-            date = time.strptime(value,
-                    LocaleTime().LC_date.replace('%y', '%Y'))
+            date = time.strptime(value, self.format)
         except:
             return False
         return time.strftime(DT_FORMAT, date)
 
     def _value_get(self):
         res = []
-        val = self.entry1.get_text()
+        val = self._date_get(self.entry1.get_text())
         if val:
-            res.append((self.name, '>=', self._date_get(val)))
-        val = self.entry2.get_text()
+            res.append((self.name, '>=', val))
+        val = self._date_get(self.entry2.get_text())
         if val:
-            res.append((self.name, '<=', self._date_get(val)))
+            res.append((self.name, '<=', val))
         return res
 
     def _value_set(self, value):
@@ -80,12 +84,20 @@ class Calendar(Interface):
             if not value:
                 return ''
             try:
-                return value.strftime(LocaleTime().LC_date.replace('%y', '%Y'))
+                return value.strftime(self.format)
             except:
                 return ''
 
-        self.entry1.set_text(conv(value[0]))
-        self.entry2.set_text(conv(value[1]))
+        val = conv(value[0])
+        if val:
+            self.entry1.set_text()
+        else:
+            self.entry1.clear()
+        val = conv(value[1])
+        if val:
+            self.entry2.set_text()
+        else:
+            self.entry2.clear()
 
     value = property(_value_get, _value_set)
 
@@ -116,8 +128,7 @@ class Calendar(Interface):
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
             date = DT.date(year, month+1, day)
-            dest.set_text(date.strftime(
-                LocaleTime().LC_date.replace('%y', '%Y')))
+            dest.set_text(date.strftime(self.format))
         win.destroy()
 
     def clear(self):

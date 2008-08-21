@@ -8,6 +8,7 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, TRYTON_ICON
 from _strptime import LocaleTime
+from tryton.common import date_widget
 
 _ = gettext.gettext
 
@@ -18,15 +19,15 @@ class Calendar(WidgetInterface):
     def __init__(self, window, parent=None, model=None, attrs=None):
         super(Calendar, self).__init__(window, parent, model=model, attrs=attrs)
 
-        self.widget = gtk.HBox(spacing=3)
-        self.entry = gtk.Entry()
+        self.format = LocaleTime().LC_date.replace('%y', '%Y')
+        self.widget = date_widget.ComplexEntry(self.format, spacing=3)
+        self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
         self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
-        self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
@@ -63,8 +64,7 @@ class Calendar(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value,
-                    LocaleTime().LC_date.replace('%y', '%Y'))
+            date = time.strptime(value, self.format)
         except:
             return False
         return time.strftime(DT_FORMAT, date)
@@ -75,18 +75,17 @@ class Calendar(WidgetInterface):
 
     def display(self, model, model_field):
         if not model_field:
-            self.entry.set_text('')
+            self.entry.clear()
             return False
         super(Calendar, self).display(model, model_field)
         value = model_field.get_client(model)
         if not value:
-            self.entry.set_text('')
+            self.entry.clear()
         else:
             if len(value)>10:
                 value = value[:10]
             date = time.strptime(value, DT_FORMAT)
-            value = time.strftime(LocaleTime().LC_date.replace('%y', '%Y'),
-                    date)
+            value = time.strftime(self.format, date)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -121,8 +120,7 @@ class Calendar(WidgetInterface):
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
             date = DT.date(year, month+1, day)
-            self.entry.set_text(date.strftime(
-                LocaleTime().LC_date.replace('%y', '%Y')))
+            self.entry.set_text(date.strftime(self.format))
         self._focus_out()
         self._window.present()
         win.destroy()
@@ -134,14 +132,14 @@ class DateTime(WidgetInterface):
     def __init__(self, window, parent, model, attrs=None):
         super(DateTime, self).__init__(window, parent, model, attrs=attrs)
 
-        self.widget = gtk.HBox(spacing=3)
-        self.entry = gtk.Entry()
+        self.format = LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT
+        self.widget = date_widget.ComplexEntry(self.format, spacing=3)
+        self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
         self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
-        self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
@@ -178,8 +176,7 @@ class DateTime(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value,
-                    LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT)
+            date = time.strptime(value, self.format)
         except:
             return False
         if 'timezone' in rpc.CONTEXT and timezone:
@@ -208,7 +205,7 @@ class DateTime(WidgetInterface):
 
     def show(self, dt_val, timezone=True):
         if not dt_val:
-            self.entry.set_text('')
+            self.entry.clear()
         else:
             date = time.strptime(dt_val, DHM_FORMAT)
             if 'timezone' in rpc.CONTEXT and timezone:
@@ -223,9 +220,7 @@ class DateTime(WidgetInterface):
                     date = ldt.timetuple()
                 except:
                     pass
-            value = time.strftime(
-                    LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT,
-                    date)
+            value = time.strftime(self.format, date)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
