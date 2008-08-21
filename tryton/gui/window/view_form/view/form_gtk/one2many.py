@@ -464,6 +464,14 @@ class One2Many(WidgetInterface):
         ctx = self._view.model.expr_eval(self.screen.default_get)
         ctx.update(self._view.model.expr_eval('dict(%s)' % \
                 self.attrs.get('context', '')))
+        sequence = None
+        idx = -1
+        if self.screen.current_view.view_type == 'tree':
+            sequence = self.screen.current_view.widget_tree.sequence
+            select_ids = self.screen.sel_ids_get()
+            if select_ids:
+                model = self.screen.models.get_by_id(select_ids[0])
+                idx = self.screen.models.models.index(model)
         if event.type in (gtk.gdk.BUTTON_PRESS, gtk.gdk.KEY_PRESS):
             if (self.screen.current_view.view_type == 'form') \
                     or self.screen.editable_get():
@@ -487,11 +495,15 @@ class One2Many(WidgetInterface):
                 while res:
                     res, value = dia.run()
                     if res:
-                        self.screen.models.model_add(value)
+                        if idx >= 0:
+                            idx += 1
+                        self.screen.models.model_add(value, position=idx)
                         value.signal('record-changed', value.parent)
                         self.screen.display()
                         dia.new()
                 dia.destroy()
+        if sequence:
+            self.screen.models.set_sequence(field=sequence)
 
     def _sig_edit(self, widget=None, event=None):
         self._view.view_form.set_value()
