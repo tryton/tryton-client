@@ -20,19 +20,6 @@ FIELDS_LIST_TYPE = {
 
 
 class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
-    """
-    BUG: ids = []
-
-    Tree struct:  [ id, values, childs, childs_id ]
-
-       values: [...]
-       childs: [ tree_struct ]
-               [] for no childs
-               None for undevelopped (with childs!)
-           assert: no childs => []
-
-    Node struct: [list of (pos, list) ]
-    """
 
     def __init__(self, ids, view, fields, fields_type, fields_attrs,
             context=None, pixbufs=None, treeview=None):
