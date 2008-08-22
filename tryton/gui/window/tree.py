@@ -1,7 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 "Tree"
 import gtk
-from gtk import glade
 import gettext
 import tryton.common as common
 from tryton.gui.window.view_tree import ViewTree, ViewTreeSC
@@ -51,10 +50,68 @@ class Tree(SignalEvent):
                 common.process_exception(exception, window)
                 raise
 
-        self.glade = glade.XML(GLADE, 'win_tree_container',
-                gettext.textdomain())
-        self.widget = self.glade.get_widget('win_tree_container')
+        self.widget = gtk.VBox()
+
+        hpaned = gtk.HPaned()
+        hpaned.set_position(200)
+
+        self.toolbar_vpaned = gtk.VPaned()
+        self.toolbar_vpaned.set_position(400)
+
+        self.toolbar = gtk.Toolbar()
+        self.toolbar.set_orientation(gtk.ORIENTATION_VERTICAL)
+        self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+        self.toolbar_vpaned.add1(self.toolbar)
+
+        self.toolbar_vpaned.add1(self.toolbar_vpaned)
+
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_AUTOMATIC)
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+
+        vbox = gtk.VBox()
+
+        toolbar = gtk.Toolbar()
+        toolbar.set_style(gtk.TOOLBAR_ICONS)
+        toolitem = gtk.ToolItem()
+        toolitem.add(gtk.Label(_('Shortcuts')))
+        toolbar.insert(toolitem, -1)
+        addbutton = gtk.ToolButton('tryton-list-add')
+        addbutton.connect('clicked', self.sc_add)
+        toolbar.insert(addbutton, -1)
+        removebutton = gtk.ToolButton('tryton-list-remove')
+        removebutton.connect('clicked', self.sc_del)
+        toolbar.insert(removebutton, -1)
+        vbox.pack_start(toolbar, expand=False)
+
+        self.treeview_sc = gtk.TreeView()
+        self.treeview_sc.set_reorderable(False)
+        self.treeview_sc.set_headers_visible(False)
+        vbox.pack_start(self.treeview_sc)
+
+        viewport.add(vbox)
+
+        scrolledwindow.add(viewport)
+
+        self.toolbar_vpaned.add2(scrolledwindow)
+
+        hpaned.add1(self.toolbar_vpaned)
+
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+
+        self.scrolledwindow = gtk.ScrolledWindow()
+        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_AUTOMATIC)
+        viewport.add(self.scrolledwindow)
+
+        hpaned.add2(viewport)
+
+        self.widget.pack_start(hpaned)
         self.widget.show_all()
+
         self.model = view['model'] or model
         self.domain2 = domain
         if view.get('field_childs', False):
@@ -77,18 +134,12 @@ class Tree(SignalEvent):
             self.name = self.tree_res.name
         else:
             self.name = name
-        self.scrollwindow = self.glade.get_widget('main_tree_sw')
 
-        self.toolbar = self.glade.get_widget('widget_vbox')
         if CONFIG['client.modepda'] and not self.tree_res.toolbar:
-            self.toolbar.hide()
-        else:
-            self.toolbar.show()
+            self.toolbar_vpaned.hide()
 
-        widget_sc = self.glade.get_widget('win_tree_sc')
-
-        widget_sc.connect('row-activated', self.sc_go)
-        self.tree_sc = ViewTreeSC(widget_sc, self.model, self.window)
+        self.treeview_sc.connect('row-activated', self.sc_go)
+        self.tree_sc = ViewTreeSC(self.treeview_sc, self.model, self.window)
         self.handlers = {
             'but_new': self.sig_new,
             'but_reload': self.sig_reload,
@@ -98,21 +149,9 @@ class Tree(SignalEvent):
             'but_save_as': self.sig_save_as,
             'but_close': self.sig_close,
         }
-        signals = {
-            'on_but_sc_add_clicked': self.sc_add,
-            'on_but_sc_del_clicked': self.sc_del,
-        }
 
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        viewport.add(self.tree_res.widget_get())
-        viewport.show()
-
-        self.scrollwindow.add(viewport)
+        self.scrolledwindow.add(self.tree_res.widget_get())
         self.sig_reload()
-
-        for signal in signals:
-            self.glade.signal_connect(signal, signals[signal])
 
         self.tree_res.view.grab_focus()
         if self.tree_res.view.get_model().get_iter_root():
@@ -135,9 +174,8 @@ class Tree(SignalEvent):
         if self.tree_res.toolbar:
 
             icon_name = 'icon'
-            wid = self.glade.get_widget('tree_toolbar')
-            for child in wid.get_children():
-                wid.remove(child)
+            for child in self.toolbar.get_children():
+                self.toolbar.remove(child)
             ctx = {}
             ctx.update(rpc.CONTEXT)
             try:
@@ -168,15 +206,13 @@ class Tree(SignalEvent):
                 radiotb.set_data('id', res['id'])
                 radiotb.connect('clicked', self.menu_main_clicked)
                 self.menu_main_clicked(radiotb, focus=False)
-                wid.insert(radiotb, -1)
+                self.toolbar.insert(radiotb, -1)
                 radiotb.child.connect('key_press_event', self.menu_main_key_press)
         else:
             self.tree_res.ids = ids
             self.tree_res.reload()
-            wid = self.glade.get_widget('tree_toolbar')
-            wid.hide()
-            wid = self.glade.get_widget('tree_vpaned')
-            wid.set_position(-1)
+            self.toolbar.hide()
+            self.toolbar_vpaned.set_position(-1)
         self.tree_res.view.grab_focus()
         if self.tree_res.view.get_model().get_iter_root():
             self.tree_res.view.grab_focus()
@@ -263,8 +299,7 @@ class Tree(SignalEvent):
                         selection.select_path(new_path)
                         self.tree_res.view.collapse_row(new_path)
                     elif self.tree_res.toolbar:
-                        wid = self.glade.get_widget('tree_toolbar')
-                        for child in wid.get_children():
+                        for child in self.toolbar.get_children():
                             if child.get_active():
                                 child.child.grab_focus()
                                 break
@@ -307,8 +342,7 @@ class Tree(SignalEvent):
     def sig_edit(self):
         obj_ids = self.ids_get()
         if self.tree_res.toolbar:
-            wid = self.glade.get_widget('tree_toolbar')
-            for child in wid.get_children():
+            for child in self.toolbar.get_children():
                 if child.get_active():
                     obj_ids.append(child.get_data('id'))
         if obj_ids:
