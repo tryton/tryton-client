@@ -709,8 +709,8 @@ def generateColorscheme(masterColor, keys, light=0.06):
         for i, key in enumerate(keys)])
 
 COLOR_SCHEMES = {
-    'red': '#6d1d1d',
-    'green': '#3c581a',
+    'red': '#cf1d1d',
+    'green': '#3fb41b',
     'blue': '#224565',
     'grey': '#444444',
     'black': '#000000',

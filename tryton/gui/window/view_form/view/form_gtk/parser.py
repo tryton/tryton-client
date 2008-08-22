@@ -78,7 +78,7 @@ class Button(object):
                 self.form.screen.reload()
         else:
             if self.form.screen.form:
-                self.form.screen.form.message_state(
+                self.form.screen.form.message_info(
                         _('Invalid Form, correct red fields!'))
             self.form.screen.display()
 

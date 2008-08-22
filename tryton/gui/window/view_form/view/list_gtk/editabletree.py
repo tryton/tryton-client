@@ -96,16 +96,8 @@ class EditableTreeView(gtk.TreeView):
 
     def set_cursor(self, path, focus_column=None, start_editing=False):
         self.grab_focus()
-        if focus_column and (focus_column._type in ('many2one','many2many')) \
-                and self.screen.form:
-            self.screen.form.message_state(_('Relation Field: F3: New F2: Open/Search'))
-        elif focus_column and (focus_column._type in ('one2many')) \
-                and self.screen.form:
-            self.screen.form.message_state(_('Relation Field: F2: Open'))
-        elif focus_column and (focus_column._type in ('boolean')):
+        if focus_column and (focus_column._type in ('boolean')):
             start_editing = False
-        elif self.screen.form:
-            self.screen.form.message_state('')
         return super(EditableTreeView, self).set_cursor(path, focus_column,
                 start_editing)
 
@@ -163,7 +155,7 @@ class EditableTreeView(gtk.TreeView):
                         break
                 self.set_cursor(path, col, True)
                 if self.screen.form:
-                    self.screen.form.message_state(
+                    self.screen.form.message_info(
                             _('Warning; field "%s" is required!') % \
                                     invalid_fields[col.name])
                 return True

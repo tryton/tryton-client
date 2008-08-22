@@ -3,14 +3,15 @@ import gobject
 import gtk
 import gettext
 from interface import WidgetInterface
+from tryton.common import TRYTON_ICON, COLOR_SCHEMES
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.action import Action
-from tryton.config import TRYTON_ICON
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
+import pango
 
 _ = gettext.gettext
 
@@ -47,29 +48,86 @@ class Dialog(object):
 
         self.dia.set_default_response(gtk.RESPONSE_OK)
 
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_placement(gtk.CORNER_TOP_LEFT)
-        scroll.set_shadow_type(gtk.SHADOW_NONE)
-        self.dia.vbox.pack_start(scroll, expand=True, fill=True)
-
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_NONE)
-        scroll.add(viewport)
-
-        self.dia.show()
         self.screen = Screen(model, self.dia, domain=domain, context=context,
                 view_type=['form'])
         if obj_id:
             self.screen.load([obj_id])
         else:
             self.screen.new()
+        name = attrs.get('string', '')
+        if name:
+            name += ' - '
+        name += self.screen.current_view.title
+        self.dia.set_title(name)
+
+        title = gtk.Label()
+        title.set_use_markup(True)
+        title.modify_font(pango.FontDescription("12"))
+        title.set_label('<b>' + name + '</b>')
+        title.set_padding(20, 3)
+        title.set_alignment(0.0, 0.5)
+        title.show()
+
+        self.info_label = gtk.Label()
+        self.info_label.set_padding(3, 3)
+        self.info_label.set_alignment(1.0, 0.5)
+
+        self.eb_info = gtk.EventBox()
+        self.eb_info.add(self.info_label)
+        self.eb_info.connect('button-press-event',
+                lambda *a: self.message_info(''))
+
+        vbox = gtk.VBox()
+        vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
+        vbox.show()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(title, expand=True, fill=True)
+        hbox.pack_start(vbox, expand=False, fill=True, padding=20)
+        hbox.show()
+
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        frame.add(hbox)
+        frame.show()
+
+        eb = gtk.EventBox()
+        eb.add(frame)
+        eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#ffffff"))
+        eb.show()
+
+        self.dia.vbox.pack_start(eb, expand=False, fill=True, padding=3)
+
+        scroll = gtk.ScrolledWindow()
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_placement(gtk.CORNER_TOP_LEFT)
+        scroll.set_shadow_type(gtk.SHADOW_NONE)
+        scroll.show()
+        self.dia.vbox.pack_start(scroll, expand=True, fill=True)
+
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_NONE)
+        viewport.show()
+        scroll.add(viewport)
+
+        self.screen.widget.show()
         viewport.add(self.screen.widget)
+
         i, j = self.screen.screen_container.size_get()
         viewport.set_size_request(i, j + 30)
-        self.dia.show_all()
+        self.dia.show()
         self.screen.current_view.set_cursor()
         self.screen.display()
+
+    def message_info(self, message, color='red'):
+        if message:
+            self.info_label.set_label(message)
+            self.eb_info.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(
+                COLOR_SCHEMES.get(color, 'white')))
+            self.eb_info.show_all()
+        else:
+            self.info_label.set_label('')
+            self.eb_info.hide()
 
     def run(self):
         while True:

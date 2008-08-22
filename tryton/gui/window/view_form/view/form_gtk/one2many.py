@@ -1,7 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
-from tryton.common import TRYTON_ICON
+from tryton.common import TRYTON_ICON, COLOR_SCHEMES
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.view_form.model.group import ModelRecordGroup
@@ -9,6 +9,7 @@ from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
 import tryton.common as common
 import tryton.rpc as rpc
+import pango
 
 _ = gettext.gettext
 
@@ -189,17 +190,6 @@ class Dialog(object):
             hbox, menuitem_title = _create_menu(self, attrs)
             self.dia.vbox.pack_start(hbox, expand=False, fill=True)
 
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_placement(gtk.CORNER_TOP_LEFT)
-        scroll.set_shadow_type(gtk.SHADOW_NONE)
-        self.dia.vbox.pack_start(scroll, expand=True, fill=True)
-
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_NONE)
-        scroll.add(viewport)
-
-        self.dia.show_all()
         self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
                 exclude_field=attrs.get('relation_field', None), readonly=readonly,
                 domain=domain)
@@ -237,12 +227,74 @@ class Dialog(object):
         if menuitem_title:
             menuitem_title.get_child().set_text(name)
 
+        title = gtk.Label()
+        title.set_use_markup(True)
+        title.modify_font(pango.FontDescription("12"))
+        title.set_label('<b>' + name + '</b>')
+        title.set_padding(20, 3)
+        title.set_alignment(0.0, 0.5)
+        title.show()
+
+        self.info_label = gtk.Label()
+        self.info_label.set_padding(3, 3)
+        self.info_label.set_alignment(1.0, 0.5)
+
+        self.eb_info = gtk.EventBox()
+        self.eb_info.add(self.info_label)
+        self.eb_info.connect('button-press-event',
+                lambda *a: self.message_info(''))
+
+        vbox = gtk.VBox()
+        vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
+        vbox.show()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(title, expand=True, fill=True)
+        hbox.pack_start(vbox, expand=False, fill=True, padding=20)
+        hbox.show()
+
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        frame.add(hbox)
+        frame.show()
+
+        eb = gtk.EventBox()
+        eb.add(frame)
+        eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#ffffff"))
+        eb.show()
+
+        self.dia.vbox.pack_start(eb, expand=False, fill=True, padding=3)
+
+        scroll = gtk.ScrolledWindow()
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_placement(gtk.CORNER_TOP_LEFT)
+        scroll.set_shadow_type(gtk.SHADOW_NONE)
+        scroll.show()
+        self.dia.vbox.pack_start(scroll, expand=True, fill=True)
+
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_NONE)
+        viewport.show()
+        scroll.add(viewport)
+
+        self.screen.widget.show()
         viewport.add(self.screen.widget)
+
         width, height = self.screen.screen_container.size_get()
         viewport.set_size_request(width, height + 30)
-        self.dia.show_all()
+        self.dia.show()
         self.screen.display()
         self.screen.current_view.set_cursor()
+
+    def message_info(self, message, color='red'):
+        if message:
+            self.info_label.set_label(message)
+            self.eb_info.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(
+                COLOR_SCHEMES.get(color, 'white')))
+            self.eb_info.show_all()
+        else:
+            self.info_label.set_label('')
+            self.eb_info.hide()
 
     def on_keypress(self, widget, event):
         if self.attrs.get('add_remove') \

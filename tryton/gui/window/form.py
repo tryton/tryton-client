@@ -3,7 +3,6 @@
 import gettext
 import gtk
 import gobject
-from gtk import glade
 import locale
 import gc
 import tryton.rpc as rpc
@@ -17,8 +16,9 @@ from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
-from tryton.common import TRYTON_ICON, message, sur, sur_3b
+from tryton.common import TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES
 import tryton.common as common
+import pango
 
 _ = gettext.gettext
 
@@ -30,6 +30,7 @@ class Form(SignalEvent):
             view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False, search_value=None):
         super(Form, self).__init__()
+
         if not view_type:
             view_type = ['tree', 'form']
         if domain is None:
@@ -39,16 +40,13 @@ class Form(SignalEvent):
         if context is None:
             context = {}
 
-        fields = {}
         self.model = model
         self.window = window
-        self.glade = glade.XML(GLADE, 'win_form_container',
-                gettext.textdomain())
-        self.widget = self.glade.get_widget('win_form_container')
-        self.widget.show_all()
-        self.fields = fields
         self.domain = domain
         self.context = context
+
+        self.widget = gtk.VBox(spacing=3)
+        self.widget.show()
 
         self.screen = Screen(self.model, self.window, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
@@ -60,12 +58,50 @@ class Form(SignalEvent):
                 self._attachment_count)
         self.screen.widget.show()
 
-        self.screen.widget.connect('key_press_event', self._sig_key_press)
-
         if not name:
             self.name = self.screen.current_view.title
         else:
             self.name = name
+
+        title = gtk.Label()
+        title.set_use_markup(True)
+        title.modify_font(pango.FontDescription("14"))
+        title.set_label('<b>' + self.name + '</b>')
+        title.set_padding(20, 3)
+        title.set_alignment(0.0, 0.5)
+        title.show()
+
+
+        self.info_label = gtk.Label()
+        self.info_label.set_padding(3, 3)
+        self.info_label.set_alignment(1.0, 0.5)
+
+        self.eb_info = gtk.EventBox()
+        self.eb_info.add(self.info_label)
+        self.eb_info.connect('button-press-event',
+                lambda *a: self.message_info(''))
+
+        vbox = gtk.VBox()
+        vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
+        vbox.show()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(title, expand=True, fill=True)
+        hbox.pack_start(vbox, expand=False, fill=True, padding=20)
+        hbox.show()
+
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        frame.add(hbox)
+        frame.show()
+
+        eb = gtk.EventBox()
+        eb.add(frame)
+        eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#ffffff"))
+        eb.show()
+
+        self.widget.pack_start(eb, expand=False, fill=True, padding=3)
+
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         viewport.add(self.screen.widget)
@@ -77,10 +113,12 @@ class Form(SignalEvent):
         self.scrolledwindow.add(viewport)
         self.scrolledwindow.show()
 
-        self.has_backup = False
-        self.backup = {}
-
         self.widget.pack_start(self.scrolledwindow)
+
+        self.status = gtk.Statusbar()
+        self.status.show()
+        self.widget.pack_start(self.status, expand=False, fill=True)
+
         self.handlers = {
             'but_new': self.sig_new,
             'but_copy': self.sig_copy,
@@ -157,7 +195,6 @@ class Form(SignalEvent):
         self.screen.signal_unconnect(self)
         self.screen.destroy()
         del self.screen
-        del self.glade
         del self.widget
         self.scrolledwindow.destroy()
         del self.scrolledwindow
@@ -178,7 +215,7 @@ class Form(SignalEvent):
             attachment_count = value.get_attachment_count(reload=True)
             self.signal('attachment-count', attachment_count)
         else:
-            self.message_state(_('No record selected!'))
+            self.message_info(_('No record selected!'))
         return True
 
     def sig_switch(self, widget=None):
@@ -192,7 +229,7 @@ class Form(SignalEvent):
     def sig_logs(self, widget=None):
         obj_id = self._id_get()
         if not obj_id:
-            self.message_state(_('You have to select one record!'))
+            self.message_info(_('You have to select one record!'))
             return False
 
         fields = [
@@ -228,9 +265,9 @@ class Form(SignalEvent):
             msg = _('Are you sure to remove those records?')
         if sur(msg, self.window):
             if not self.screen.remove(delete=True):
-                self.message_state(_('Records not removed!'))
+                self.message_info(_('Records not removed!'))
             else:
-                self.message_state(_('Records removed!'))
+                self.message_info(_('Records removed!'), 'green')
 
     def sig_import(self, widget=None):
         fields = []
@@ -254,7 +291,7 @@ class Form(SignalEvent):
             if not self.modified_save():
                 return
         self.screen.new()
-        self.message_state('')
+        self.message_info('')
 
     def sig_copy(self, widget=None):
         if not self.modified_save():
@@ -269,27 +306,28 @@ class Form(SignalEvent):
             new_id = common.process_exception(exception, self.window, *args)
         if new_id:
             self.screen.load([new_id])
-            self.message_state(_('Working now on the duplicated record!'))
+            self.message_info(_('Working now on the duplicated record!'),
+                    'green')
 
     def sig_save(self, widget=None):
         if self.screen.save_current():
-            self.message_state(_('Record saved!'))
+            self.message_info(_('Record saved!'), 'green')
             return True
         else:
-            self.message_state(_('Invalid form!'))
+            self.message_info(_('Invalid form!'))
             return False
 
     def sig_previous(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_prev()
-        self.message_state('')
+        self.message_info('')
 
     def sig_next(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_next()
-        self.message_state('')
+        self.message_info('')
 
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
@@ -314,7 +352,7 @@ class Form(SignalEvent):
                     self.screen.current_model = model
                     self.screen.display()
                     break
-        self.message_state('')
+        self.message_info('')
         return True
 
     def sig_action(self, keyword='form_action'):
@@ -347,7 +385,7 @@ class Form(SignalEvent):
             if res:
                 self.sig_reload(test_modified=False)
         else:
-            self.message_state(_('No record selected!'))
+            self.message_info(_('No record selected!'))
 
     def sig_print(self):
         self.sig_action('form_print')
@@ -362,13 +400,15 @@ class Form(SignalEvent):
             self.screen.clear()
             self.screen.load(res)
 
-    def message_state(self, message, context='message'):
-        statusbar = self.glade.get_widget('stat_state')
-        cid = statusbar.get_context_id(context)
-        statusbar.push(cid, message)
-
-    def _sig_key_press(self, widget, event):
-        self.message_state('')
+    def message_info(self, message, color='red'):
+        if message:
+            self.info_label.set_label(message)
+            self.eb_info.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(
+                COLOR_SCHEMES.get(color, 'white')))
+            self.eb_info.show_all()
+        else:
+            self.info_label.set_label('')
+            self.eb_info.hide()
 
     def _record_message(self, screen, signal_data):
         if not signal_data[3]:
@@ -384,10 +424,9 @@ class Form(SignalEvent):
             if signal_data[1] < signal_data[2]:
                 msg += _(' of ') + str(signal_data[2])
             msg += ' - ' + name2
-        statusbar = self.glade.get_widget('stat_form')
-        cid = statusbar.get_context_id('message')
-        statusbar.push(cid, msg)
-        self.message_state('')
+        cid = self.status.get_context_id('message')
+        self.status.push(cid, msg)
+        self.message_info('')
 
     def _attachment_count(self, screen, signal_data):
         self.signal('attachment-count', signal_data)

@@ -1386,62 +1386,6 @@
       </widget>
     </child>
   </widget>
-  <widget class="GtkWindow" id="win_form">
-    <property name="visible">True</property>
-    <property name="extension_events">GDK_EXTENSION_EVENTS_ALL</property>
-    <property name="title" translatable="yes">Forms</property>
-    <child>
-      <widget class="GtkVBox" id="win_form_container">
-        <property name="visible">True</property>
-        <property name="spacing">2</property>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <widget class="GtkHBox" id="hbox2">
-            <property name="visible">True</property>
-            <property name="border_width">3</property>
-            <child>
-              <widget class="GtkStatusbar" id="stat_form">
-                <property name="width_request">103</property>
-                <property name="visible">True</property>
-                <property name="border_width">1</property>
-                <property name="has_resize_grip">False</property>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label37">
-                <property name="visible">True</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">State:</property>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkStatusbar" id="stat_state">
-                <property name="visible">True</property>
-                <property name="border_width">1</property>
-                <property name="has_resize_grip">False</property>
-              </widget>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </widget>
-    </child>
-  </widget>
   <widget class="GtkDialog" id="win_sur">
     <property name="width_request">350</property>
     <property name="height_request">143</property>
