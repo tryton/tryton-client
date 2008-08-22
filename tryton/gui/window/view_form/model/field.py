@@ -314,7 +314,6 @@ class M2MField(CharField):
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-        self.validate(model)
 
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
@@ -394,7 +393,6 @@ class O2MField(CharField):
         model.value[self.name].load(value, display=False)
         #self.internal.signal_connect(self.internal, 'model-changed',
         #       self._model_changed)
-        self.validate(model)
 
     def set_client(self, model, value, force_change=False):
         self.set(model, value)
