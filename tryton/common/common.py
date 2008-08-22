@@ -28,7 +28,7 @@ def refresh_dblist(db_widget, host, port, dbtoload=None):
         or -1 if the server version doesn't macth the client version
     '''
     version = rpc.server_version(host, port)
-    if version:
+    if hasattr(version, 'split'):
         if version.split('.')[:2] != VERSION.split('.')[:2]:
             return -1
     if not dbtoload:
