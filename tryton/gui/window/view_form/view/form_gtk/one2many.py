@@ -499,7 +499,7 @@ class One2Many(WidgetInterface):
                             idx += 1
                         self.screen.models.model_add(value, position=idx)
                         value.signal('record-changed', value.parent)
-                        self.screen.display()
+                        self.screen.display_next()
                         dia.new()
                 dia.destroy()
         if sequence:
