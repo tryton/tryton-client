@@ -1,5 +1,7 @@
 #
 # Copyright (C) 2006 Async Open Source
+# Copyright (C) 2008 B2CK
+# Copyright (C) 2008 Cedric Krier
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
