@@ -25,7 +25,7 @@ def refresh_dblist(db_widget, host, port, dbtoload=None):
     '''
     Return the number of database available
         or None if it is impossible to connect
-        or -1 if the server version doesn't macth the client version
+        or -1 if the server version doesn't match the client version
     '''
     version = rpc.server_version(host, port)
     if hasattr(version, 'split'):
