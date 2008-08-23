@@ -37,13 +37,15 @@ class Preference(object):
         except Exception, exception:
             if not common.process_exception(exception, parent):
                 self.win.destroy()
-                raise
+                self.win = None
+                return
             try:
                 res = user.get_preferences_fields_view(rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, parent)
                 self.win.destroy()
-                raise
+                self.win = None
+                return
         arch = res['arch']
         fields = res['fields']
         self.screen = Screen('res.user', self.win, view_type=[])
@@ -69,6 +71,8 @@ class Preference(object):
 
     def run(self):
         "Run the window"
+        if not self.win:
+            return False
         res = False
         while True:
             if self.win.run() == gtk.RESPONSE_OK:

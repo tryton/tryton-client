@@ -37,12 +37,15 @@ class Attachment(object):
         selection.set_mode(gtk.SELECTION_SINGLE)
         selection.connect('changed', self._sig_changed)
 
+        args = ('object', 'execute', 'ir.attachment', 'fields_view_get',
+                False, 'tree')
         try:
-            view = rpc.execute('object', 'execute',
-                    'ir.attachment', 'fields_view_get', False, 'tree')
+            view = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, parent)
-            raise
+            view = common.process_exception(exception, parent, *args)
+            if not view:
+                self.win = None
+                return
 
         parse = Parse(view['fields'])
         parse.parse(view['arch'], self.view)
@@ -321,6 +324,8 @@ class Attachment(object):
             self.preview(int(res_ids[0]['id']))
 
     def run(self):
+        if not self.win:
+            return
         self.win.run()
         self.parent.present()
         self.win.destroy()
