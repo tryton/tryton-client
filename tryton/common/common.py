@@ -609,6 +609,10 @@ def concurrency(resource, obj_id, context, parent):
 def process_exception(exception, parent, obj='', method='', *args):
     global _USERNAME, _DATABASE, _SOCK
     if str(exception.args[0]) == 'NotLogged':
+        if not rpc._SOCK:
+            message(_('Connection error!\n' \
+                    'Unable to connect to the server!'), parent)
+            return False
         host = rpc._SOCK.host
         port = rpc._SOCK.port
         while True:
