@@ -65,7 +65,6 @@ class CharField(object):
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-        self.validate(model)
         return True
 
     def get(self, model, check_load=True, readonly=True, modified=False):
@@ -275,7 +274,6 @@ class M2OField(CharField):
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-        self.validate(model)
 
     def set_client(self, model, value, test_state=False, force_change=False):
         internal = model.value[self.name]
@@ -315,7 +313,6 @@ class M2MField(CharField):
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-        self.validate(model)
 
     def set_client(self, model, value, test_state=False, force_change=False):
         internal = model.value[self.name]
@@ -395,7 +392,6 @@ class O2MField(CharField):
         model.value[self.name].load(value, display=False)
         #self.internal.signal_connect(self.internal, 'model-changed',
         #       self._model_changed)
-        self.validate(model)
 
     def set_client(self, model, value, test_state=False, force_change=False):
         self.set(model, value, test_state=test_state)
@@ -548,7 +544,6 @@ class ReferenceField(CharField):
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-        self.validate(model)
 
 TYPES = {
     'char': CharField,
