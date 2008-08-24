@@ -276,6 +276,7 @@ class ModelRecord(SignalEvent):
             value = res[0]
             self.read_time = time.time()
             self.set(value)
+            self.validate()
 
     def expr_eval(self, dom, check_load=False):
         if not isinstance(dom, basestring):
