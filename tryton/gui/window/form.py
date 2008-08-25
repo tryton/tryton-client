@@ -377,7 +377,7 @@ class Form(SignalEvent):
                 del ctx['active_ids']
             if 'active_id' in ctx:
                 del ctx['active_id']
-            res = Action.exec_keyword(keyword, {
+            res = Action.exec_keyword(keyword, self.window, {
                 'model': self.screen.resource,
                 'id': obj_id or False,
                 'ids': ids,

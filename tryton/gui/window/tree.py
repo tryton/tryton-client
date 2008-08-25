@@ -271,11 +271,10 @@ class Tree(SignalEvent):
                 del ctx['active_ids']
             if 'active_id' in ctx:
                 del ctx['active_id']
-            return Action.exec_keyword(keyword, {
+            return Action.exec_keyword(keyword, self.window, {
                 'model': self.model,
                 'id': obj_id,
                 'ids':ids,
-                'window': self.window,
                 }, context=ctx, warning=warning)
         else:
             common.message(_('No record selected!'), self.window)

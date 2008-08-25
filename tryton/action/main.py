@@ -17,8 +17,7 @@ _ = gettext.gettext
 class Action(object):
 
     @staticmethod
-    def exec_report(name, data, context=None):
-        from tryton.gui import Main
+    def exec_report(name, data, window, context=None):
         if context is None:
             context = {}
         datas = data.copy()
@@ -29,12 +28,12 @@ class Action(object):
                 ids = rpc.execute('object', 'execute', datas['model'],
                         'search', [])
             except Exception, exception:
-                ids = common.process_exception(exception, Main.get_main().window,
+                ids = common.process_exception(exception, window,
                         'object', 'execute', datas['model'], 'search', [])
                 if not ids:
                     return False
             if ids == []:
-                message(_('Nothing to print!'), Main.get_main().window)
+                message(_('Nothing to print!'), window)
                 return False
             datas['id'] = ids[0]
         ctx = rpc.CONTEXT.copy()
@@ -42,7 +41,7 @@ class Action(object):
         try:
             res = rpc.execute('report', 'execute', name, ids, datas, ctx)
         except Exception, exception:
-            res = common.process_exception(exception, Main.get_main().window,
+            res = common.process_exception(exception, window,
                     'report', 'execute', name, ids, datas, ctx)
             if not res:
                 return False
@@ -53,12 +52,11 @@ class Action(object):
         file_d = os.fdopen(fileno, 'wb+')
         file_d.write(base64.decodestring(data))
         file_d.close()
-        file_open(fp_name, type, Main.get_main().window, print_p=print_p)
+        file_open(fp_name, type, window, print_p=print_p)
         return True
 
     @staticmethod
-    def execute(act_id, datas, action_type=None, context=None):
-        from tryton.gui import Main
+    def execute(act_id, datas, window, action_type=None, context=None):
         if context is None:
             context = {}
         ctx = rpc.CONTEXT.copy()
@@ -69,7 +67,7 @@ class Action(object):
                 res = rpc.execute('object', 'execute', 'ir.action', 'read',
                         act_id, ['type'], ctx)
             except Exception, exception:
-                common.process_exception(exception, Main.get_main().window)
+                common.process_exception(exception, window)
                 return
             if not res:
                 raise Exception, 'ActionNotFound'
@@ -78,23 +76,18 @@ class Action(object):
             res = rpc.execute('object', 'execute', action_type, 'search_read',
                     [('action', '=', act_id)], 0, 1, None, ctx, None)
         except Exception, exception:
-            common.process_exception(exception, Main.get_main().window)
+            common.process_exception(exception, window)
             return
-        Action._exec_action(res, datas)
+        Action._exec_action(res, window, datas)
 
     @staticmethod
-    def _exec_action(action, datas=None, context=None):
+    def _exec_action(action, window, datas=None, context=None):
         if context is None:
             context = rpc.CONTEXT.copy()
         if datas is None:
             datas = {}
         if 'type' not in action:
             return
-        from tryton.gui import Main
-        win = Main.get_main().window
-        if 'window' in datas:
-            win = datas['window']
-            del datas['window']
 
         if action['type'] == 'ir.action.act_window':
             for key in (
@@ -145,25 +138,24 @@ class Action(object):
                 name = action.get('name', False)
 
             Window.create(view_ids, datas['res_model'], datas['res_id'], domain,
-                    action['view_type'], win, ctx,
+                    action['view_type'], window, ctx,
                     datas['view_mode'], name=name,
                     limit=datas['limit'], auto_refresh=datas['auto_refresh'],
                     search_value=search_value)
         elif action['type'] == 'ir.action.wizard':
-            Wizard.execute(action['wiz_name'], datas, win,
+            Wizard.execute(action['wiz_name'], datas, window,
                     context=context)
 
         elif action['type'] == 'ir.action.report':
-            Action.exec_report(action['report_name'], datas)
+            Action.exec_report(action['report_name'], datas, window)
 
         elif action['type'] == 'ir.action.url':
             if action['url']:
                 webbrowser.open(action['url'], new=2)
 
     @staticmethod
-    def exec_keyword(keyword, data=None, context=None, warning=True,
+    def exec_keyword(keyword, window, data=None, context=None, warning=True,
             alwaysask=False):
-        from tryton.gui import Main
         actions = []
         if 'id' in data:
             model_id = data.get('id', False)
@@ -172,21 +164,19 @@ class Action(object):
                         'ir.action.keyword', 'get_keyword', keyword,
                         (data['model'], model_id))
             except Exception, exception:
-                from tryton.gui import Main
-                common.process_exception(exception, Main.get_main().window)
+                common.process_exception(exception, window)
                 return False
 
         keyact = {}
         for action in actions:
             keyact[action['name'].replace('_', '')] = action
 
-        from tryton.gui import Main
-        res = selection(_('Select your action'), keyact, Main.get_main().window,
+        res = selection(_('Select your action'), keyact, window,
                 alwaysask=alwaysask)
         if res:
             (name, action) = res
-            Action._exec_action(action, data, context=context)
+            Action._exec_action(action, window, data, context=context)
             return (name, action)
         elif not len(keyact) and warning:
-            message(_('No action defined!'), Main.get_main().window)
+            message(_('No action defined!'), window)
         return False

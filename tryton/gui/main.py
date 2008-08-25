@@ -206,9 +206,11 @@ class Main(object):
     def shortcut_set(self, shortcuts=None):
         def _action_shortcut(widget, action):
             ctx = rpc.CONTEXT.copy()
-            Action.exec_keyword('tree_open', {'model': 'ir.ui.menu',
-                'id': action, 'ids': [action],
-                'window': self.window}, context=ctx)
+            Action.exec_keyword('tree_open', self.window, {
+                'model': 'ir.ui.menu',
+                'id': action,
+                'ids': [action],
+                }, context=ctx)
         if shortcuts is None:
             user = rpc._USER
             try:
@@ -483,7 +485,7 @@ class Main(object):
         act_id = prefs[menu_type]
         if except_id and act_id == except_id:
             return act_id
-        Action.execute(act_id, {'window': self.window})
+        Action.execute(act_id, {}, self.window)
         return act_id
 
     def sig_home_new(self, widget=None, quiet=True, except_id=False,

@@ -138,17 +138,20 @@ class Wizard(object):
                 datas['form'].update(new_data)
                 del new_data
             elif res['type'] == 'action':
-                Action._exec_action(res['action'], datas, context=ctx)
+                Action._exec_action(res['action'], dia or parent, datas,
+                        context=ctx)
                 state = res['state']
             elif res['type'] == 'print':
                 datas['report_id'] = res.get('report_id', False)
                 if res.get('get_id_from_action', False):
                     backup_ids = datas['ids']
                     datas['ids'] = datas['form']['ids']
-                    Action.exec_report(res['report'], datas, context=ctx)
+                    Action.exec_report(res['report'], datas, dia or parent,
+                            context=ctx)
                     datas['ids'] = backup_ids
                 else:
-                    Action.exec_report(res['report'], datas, context=ctx)
+                    Action.exec_report(res['report'], datas, dia or parent,
+                            context=ctx)
                 state = res['state']
             elif res['type'] == 'state':
                 state = res['state']

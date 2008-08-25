@@ -136,7 +136,7 @@ class ViewForm(ParserView):
             'id': obj_id,
             'ids': [obj_id],
         }
-        value = Action._exec_action(act, data, context)
+        value = Action._exec_action(act, self.window, data, context)
         if atype in ('print', 'action'):
             self.screen.reload()
         return value

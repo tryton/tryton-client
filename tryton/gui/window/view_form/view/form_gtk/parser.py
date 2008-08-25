@@ -72,7 +72,7 @@ class Button(object):
                             'model': self.form.screen.name,
                             'id': obj_id,
                             'ids': [obj_id],
-                            })
+                            }, self.form.window)
                 else:
                     raise Exception('Unallowed button type')
                 self.form.screen.reload()

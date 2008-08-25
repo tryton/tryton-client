@@ -331,7 +331,8 @@ class ViewList(ParserView):
         context = {}
         act = action.copy()
         if not(value):
-            message(_('You must select a record to use the relation!'))
+            message(_('You must select a record to use the relation!'),
+                    self.window)
             return False
         from tryton.gui.window.view_form.screen import Screen
         screen = Screen(self.screen.fields[path[1].name]['relation'],
@@ -341,12 +342,14 @@ class ViewList(ParserView):
                 check_load=False)
         act['context'] = str(screen.current_model.expr_eval(act['context'],
             check_load=False))
-        return Action._exec_action(act, data, context)
+        return Action._exec_action(act, self.window, data, context)
 
     def click_and_action(self, atype, value, path):
-        return Action.exec_keyword(atype, {
+        return Action.exec_keyword(atype, self.window, {
             'model': self.screen.fields[path[1].name]['relation'],
-            'id': value or False, 'ids': [value]}, alwaysask=True)
+            'id': value or False,
+            'ids': [value],
+            }, alwaysask=True)
 
     def signal_record_changed(self, signal, *args):
         if self.store:

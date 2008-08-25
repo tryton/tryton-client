@@ -133,7 +133,7 @@ class Graph(gtk.DrawingArea):
             del ctx['active_ids']
         if 'active_id' in ctx:
             del ctx['active_id']
-        return Action.exec_keyword('graph_open', {
+        return Action.exec_keyword('graph_open', window, {
             'model': self.model,
             'id': ids[0],
             'ids': ids,

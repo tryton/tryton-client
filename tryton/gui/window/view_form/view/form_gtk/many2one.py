@@ -504,9 +504,12 @@ class Many2One(WidgetInterface):
                 check_load=False)
         act['context'] = str(screen.current_model.expr_eval(act['context'],
             check_load=False))
-        return Action._exec_action(act, data, context)
+        return Action._exec_action(act, self._window, data, context)
 
     def click_and_action(self, atype):
         obj_id = self._view.modelfield.get(self._view.model)
-        return Action.exec_keyword(atype, {'model': self.model_type,
-            'id': obj_id or False, 'ids': [obj_id]}, alwaysask=True)
+        return Action.exec_keyword(atype, self._window, {
+            'model': self.model_type,
+            'id': obj_id or False,
+            'ids': [obj_id],
+            }, alwaysask=True)
