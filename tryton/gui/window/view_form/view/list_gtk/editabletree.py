@@ -74,6 +74,8 @@ class EditableTreeView(gtk.TreeView):
             renderer = cols[idx].get_cell_renderers()[0]
             if isinstance(renderer, gtk.CellRendererToggle):
                 editable = renderer.get_property('activatable')
+            elif isinstance(renderer, gtk.CellRendererProgress):
+                editable = False
             else:
                 editable = renderer.get_property('editable')
             if cols[idx].get_visible() and editable:
@@ -88,6 +90,8 @@ class EditableTreeView(gtk.TreeView):
             renderer = cols[idx].get_cell_renderers()[0]
             if isinstance(renderer, gtk.CellRendererToggle):
                 editable = renderer.get_property('activatable')
+            elif isinstance(renderer, gtk.CellRendererProgress):
+                editable = False
             else:
                 editable = renderer.get_property('editable')
             if cols[idx].get_visible() and editable:
@@ -183,6 +187,8 @@ class EditableTreeView(gtk.TreeView):
                 renderer = column.get_cell_renderers()[0]
                 if isinstance(renderer, gtk.CellRendererToggle):
                     editable = renderer.get_property('activatable')
+                elif isinstance(renderer, gtk.CellRendererProgress):
+                    editable = False
                 else:
                     editable = renderer.get_property('editable')
                 if column.get_visible() and editable:

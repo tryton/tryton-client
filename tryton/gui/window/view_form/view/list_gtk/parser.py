@@ -101,6 +101,8 @@ class ParserTree(ParserInterface):
                 if editable and not node_attrs.get('readonly', False):
                     if isinstance(renderer, gtk.CellRendererToggle):
                         renderer.set_property('activatable', True)
+                    elif isinstance(renderer, gtk.CellRendererProgress):
+                        pass
                     else:
                         renderer.set_property('editable', True)
                     renderer.connect_after('editing-started', send_keys,
@@ -592,6 +594,45 @@ class Selection(Char):
         return res
 
 
+class ProgressBar(object):
+    orientations = {
+        'left_to_right': gtk.PROGRESS_LEFT_TO_RIGHT,
+        'right_to_left': gtk.PROGRESS_RIGHT_TO_LEFT,
+        'bottom_to_top': gtk.PROGRESS_BOTTOM_TO_TOP,
+        'top_to_bottom': gtk.PROGRESS_TOP_TO_BOTTOM,
+    }
+
+    def __init__(self, field_name, model, treeview=None, attrs=None, window=None):
+        self.field_name = field_name
+        self.model = model
+        self.attrs = attrs or {}
+        self.renderer = gtk.CellRendererProgress()
+        orientation = self.orientations.get(self.attrs.get('orientation',
+            'left_to_right'), gtk.PROGRESS_LEFT_TO_RIGHT)
+        self.renderer.set_property('orientation', orientation)
+        self.treeview = treeview
+        self.window = window
+
+    def setter(self, column, cell, store, iter):
+        model = store.get_value(iter, 0)
+        value = float(self.get_textual_value(model) or 0.0)
+        cell.set_property('value', value)
+        if isinstance(self.attrs.get('digits'), str):
+            digit = model.expr_eval(self.attrs['digits'])[1]
+        else:
+            digit = self.attrs.get('digits', (16, 2))[1]
+        text = locale.format('%.' + str(digit) + 'f', value, True)
+        cell.set_property('text', text + '%')
+
+    def open_remote(self, model, create, changed=False, text=None):
+        raise NotImplementedError
+
+    def get_textual_value(self, model):
+        return model[self.field_name].get_client(model) or ''
+
+    def value_from_text(self, model, text):
+        return float(text)
+
 CELLTYPES = {
     'char': Char,
     'many2one': M2O,
@@ -610,4 +651,5 @@ CELLTYPES = {
     'email': Char,
     'callto': Char,
     'sip': Char,
+    'progressbar': ProgressBar,
 }

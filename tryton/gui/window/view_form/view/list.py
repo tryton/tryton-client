@@ -504,6 +504,8 @@ class ViewList(ParserView):
                 renderer = renderers[0]
                 if isinstance(renderer, gtk.CellRendererToggle):
                     editable = renderer.get_property('activatable')
+                elif isinstance(renderer, gtk.CellRendererProgress):
+                    editable = False
                 else:
                     editable = renderer.get_property('editable')
                 if column.get_visible() and editable:
@@ -535,5 +537,7 @@ class ViewList(ParserView):
             for renderer in col.get_cell_renderers():
                 if isinstance(renderer, gtk.CellRendererToggle):
                     renderer.set_property('activatable', False)
+                elif isinstance(renderer, gtk.CellRendererProgress):
+                    pass
                 else:
                     renderer.set_property('editable', False)

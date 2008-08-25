@@ -752,6 +752,7 @@ from many2many import Many2Many
 from many2one import Many2One
 from url import Email, URL, CallTo, SIP
 from image import Image as Image2
+from progressbar import ProgressBar
 
 
 WIDGETS_TYPE = {
@@ -776,4 +777,5 @@ WIDGETS_TYPE = {
     'callto' : (CallTo, 1, False, False),
     'sip' : (SIP, 1, False, False),
     'image' : (Image2, 1, False, False),
+    'progressbar': (ProgressBar, 1, False, False),
 }
