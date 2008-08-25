@@ -342,57 +342,57 @@ class DBCreate(object):
                         parent, _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
-                    and int(url_m.group(2)) \
-                    and dbname \
-                    and langreal \
-                    and passwd \
-                    and admin_passwd.get_text():
-                    try:
-                        if rpc.db_exec( url_m.group(1), int(url_m.group(2)), \
-                                'db_exist', dbname):
-                            common.warning(_("Database with the same name " \
-                                "already exists.\n" \
-                                "Try another database name."), parent, \
-                                _("Databasename already exist!"))
-                            self.entry_dbname.set_text("")
-                            self.entry_dbname.grab_focus()
-                            continue
-                        else: # Everything runs fine, break the block here
-                            if url_m:
-                                CONFIG['login.server'] = host = url_m.group(1)
-                                CONFIG['login.port'] = port = url_m.group(2)
-                            CONFIG["login.login"] = "admin"
+                        and int(url_m.group(2)) \
+                        and dbname \
+                        and langreal \
+                        and passwd \
+                        and admin_passwd.get_text():
+                    if rpc.db_exec( url_m.group(1), int(url_m.group(2)), \
+                             'db_exist', dbname):
+                         common.warning(_("Database with the same name " \
+                             "already exists.\n" \
+                             "Try another database name."), parent, \
+                             _("Databasename already exist!"))
+                         self.entry_dbname.set_text("")
+                         self.entry_dbname.grab_focus()
+                         continue
+                    else: # Everything runs fine, break the block here
+                        CONFIG['login.server'] = host = url_m.group(1)
+                        CONFIG['login.port'] = port = url_m.group(2)
+                        CONFIG["login.login"] = "admin"
+                        try:
                             rpc.db_exec(host, int(port), 'create', passwd, \
                                 dbname, langreal, admin_passwd.get_text())
-                            from tryton.gui.main import Main
-                            Main.get_main().refresh_ssl()
+                        except Exception, exception:
+                            if str(exception[0]) == "AccessDenied":
+                                common.warning(_("Sorry, the Tryton server " \
+                                    "password seems wrong. Please type again.") \
+                                    , parent, _("Access denied!"))
+                                self.entry_serverpasswd.set_text("")
+                                self.entry_serverpasswd.grab_focus()
+                                continue
+                            else: # Unclassified error
+                                common.warning(_("Can't create the " \
+                                    "database, caused by an unknown reason.\n" \
+                                    "If there is a database created, it could " \
+                                    "be broken. Maybe drop this database! " \
+                                    "Please check the error message for " \
+                                    "possible informations.\n" \
+                                    "Error message:\n") + str(exception[0]), \
+                                    parent, _("Error creating database!"))
                             parent.present()
                             self.dialog.destroy()
-                            self.sig_login(dbname=dbname)
+                            rpc.logout()
+                            from tryton.gui.main import Main
+                            Main.get_main().refresh_ssl()
                             break
-                    except Exception, exception:
-                        if str(exception[0]) == "AccessDenied":
-                            common.warning(_("Sorry, the Tryton server " \
-                                "password seems wrong. Please type again.") \
-                                , parent, _("Access denied!"))
-                            self.entry_serverpasswd.set_text("")
-                            self.entry_serverpasswd.grab_focus()
-                            continue
-                        else: # Unclassified error
-                            common.warning(_("Can't create the " \
-                                "database, caused by an unknown reason.\n" \
-                                "If there is a database created, it could " \
-                                "be broken. Maybe drop this database! " \
-                                "Please check the error message for " \
-                                "possible informations.\n" \
-                                "Error message:\n") + str(exception[0]), \
-                                parent, _("Error creating database!"))
-                        parent.present()
-                        self.dialog.destroy()
-                        rpc.logout()
                         from tryton.gui.main import Main
                         Main.get_main().refresh_ssl()
-                    break
+                        parent.present()
+                        self.dialog.destroy()
+                        self.sig_login(dbname=dbname)
+                        break
+
             break
         parent.present()
         self.dialog.destroy()
