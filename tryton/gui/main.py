@@ -534,6 +534,7 @@ class Main(object):
         eb = gtk.EventBox()
         self.tooltips.set_tip(eb, _('Close Tab'))
         eb.set_events(gtk.gdk.BUTTON_PRESS)
+        eb.set_border_width(1)
 
         img = gtk.Image()
         img.set_from_stock('tryton-close', gtk.ICON_SIZE_SMALL_TOOLBAR)
