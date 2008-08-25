@@ -88,6 +88,8 @@ class ModelRecord(SignalEvent):
 
     def set_modified(self, value):
         self.__modified = value
+        if value:
+            self.signal('record-modified')
 
     modified = property(get_modified, set_modified)
 

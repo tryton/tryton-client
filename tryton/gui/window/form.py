@@ -54,6 +54,7 @@ class Form(SignalEvent):
                 limit=limit, readonly=bool(auto_refresh), form=self,
                 search_value=search_value)
         self.screen.signal_connect(self, 'record-message', self._record_message)
+        self.screen.signal_connect(self, 'record-modified', self._record_modified)
         self.screen.signal_connect(self, 'attachment-count',
                 self._attachment_count)
         self.screen.widget.show()
@@ -427,6 +428,9 @@ class Form(SignalEvent):
         cid = self.status.get_context_id('message')
         self.status.push(cid, msg)
         self.message_info('')
+
+    def _record_modified(self, screen, signal_data):
+        self.message_info('', color='white')
 
     def _attachment_count(self, screen, signal_data):
         self.signal('attachment-count', signal_data)

@@ -170,6 +170,7 @@ class Screen(SignalEvent):
             self.current_model = None
         self.models.signal_connect(self, 'record-cleared', self._record_cleared)
         self.models.signal_connect(self, 'record-changed', self._record_changed)
+        self.models.signal_connect(self, 'record-modified', self._record_modified)
         self.models.signal_connect(self, 'model-changed', self._model_changed)
         models.add_fields(self.fields, models)
         self.fields.update(models.fields)
@@ -182,6 +183,9 @@ class Screen(SignalEvent):
         for view in self.views:
             view.signal_record_changed(signal[0], model_group.models,
                     signal[1], *args)
+
+    def _record_modified(self, model_group, signal, *args):
+        self.signal('record-modified')
 
     def _model_changed(self, model_group, model):
         if self.parent:

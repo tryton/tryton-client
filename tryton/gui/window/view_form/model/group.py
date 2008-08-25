@@ -161,6 +161,7 @@ class ModelRecordGroup(SignalEvent):
             self.models.append(newmod)
             newmods.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
+            newmod.signal_connect(self, 'record-modified', self._record_modified)
             if id in self.model_removed:
                 self.model_removed.remove(id)
             if id in self.model_deleted:
@@ -225,6 +226,7 @@ class ModelRecordGroup(SignalEvent):
         if modified:
             model.modified = True
         model.signal_connect(self, 'record-changed', self._record_changed)
+        model.signal_connect(self, 'record-modified', self._record_modified)
         return model
 
     def model_move(self, model, position=0):
@@ -246,6 +248,7 @@ class ModelRecordGroup(SignalEvent):
         newmod = ModelRecord(self.resource, None, self.window, group=self,
                 parent=self.parent, new=True)
         newmod.signal_connect(self, 'record-changed', self._record_changed)
+        newmod.signal_connect(self, 'record-modified', self._record_modified)
         if default:
             ctx = {}
             ctx.update(context or {})
@@ -266,6 +269,9 @@ class ModelRecordGroup(SignalEvent):
 
     def _record_changed(self, model, signal_data):
         self.signal('model-changed', model)
+
+    def _record_modified(self, model, signal_data):
+        self.signal('record-modified', model)
 
     def prev(self):
         if self.models and self.current_idx is not None:
