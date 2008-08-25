@@ -531,15 +531,27 @@ class Main(object):
         self.tooltips.enable()
         label.set_alignment(0.0, 0.5)
         hbox.pack_start(label, expand=True, fill=True)
-        button = gtk.Button()
+        eb = gtk.EventBox()
+        self.tooltips.set_tip(eb, _('Close Tab'))
+        eb.set_events(gtk.gdk.BUTTON_PRESS)
+
         img = gtk.Image()
         img.set_from_stock('tryton-close', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        button.set_relief(gtk.RELIEF_NONE)
-        button.add(img)
-        hbox.pack_start(button, expand=False, fill=False)
+        eb.add(img)
+
+        def enter(widget, event, img):
+            img.set_from_stock('tryton-close-hi', gtk.ICON_SIZE_SMALL_TOOLBAR)
+
+        def leave(widget, event, img):
+            img.set_from_stock('tryton-close', gtk.ICON_SIZE_SMALL_TOOLBAR)
+
+        eb.connect('button_press_event', self._sig_remove_book, page.widget)
+        eb.connect('enter_notify_event', enter, img)
+        eb.connect('leave_notify_event', leave, img)
+
+        hbox.pack_start(eb, expand=False, fill=False)
         hbox.show_all()
         hbox.set_size_request(120, -1)
-        button.connect('clicked', self._sig_remove_book, page.widget)
         label_menu = gtk.Label(page.name)
         label_menu.set_alignment(0.0, 0.5)
         self.notebook.append_page_menu(page.widget, hbox, label_menu)
@@ -565,7 +577,7 @@ class Main(object):
         else:
             self.buttons['but_attach'].set_stock_id('tryton-attachment')
 
-    def _sig_remove_book(self, widget, page_widget):
+    def _sig_remove_book(self, widget, event, page_widget):
         for page in self.pages:
             if page.widget == page_widget:
                 if 'but_close' in page.handlers:
