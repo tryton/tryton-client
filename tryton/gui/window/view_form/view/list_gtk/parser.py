@@ -222,6 +222,7 @@ class ParserTree(ParserInterface):
             arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
             col.arrow = arrow
             col.arrow_show = False
+            col._type = 'fill'
             col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             treeview.append_column(col)
         treeview.set_fixed_height_mode(True)
