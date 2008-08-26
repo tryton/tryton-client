@@ -20,6 +20,7 @@ import re
 import base64
 import tryton.translate as translate
 import tryton.plugin
+import pango
 
 _ = gettext.gettext
 
@@ -524,15 +525,19 @@ class Main(object):
     def win_add(self, page):
         self.pages.append(page)
         hbox = gtk.HBox()
-        if len(page.name) > 15:
-            name = page.name[:13] + '...'
-        else:
-            name = page.name
+        name = page.name
         label = gtk.Label(name)
         self.tooltips.set_tip(label, page.name)
         self.tooltips.enable()
         label.set_alignment(0.0, 0.5)
         hbox.pack_start(label, expand=True, fill=True)
+        layout = label.get_layout()
+        w, h = layout.get_size()
+        icon_w, icon_h = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        if (w / pango.SCALE) > 120 - icon_w:
+            label2 = gtk.Label('...')
+            self.tooltips.set_tip(label2, page.name)
+            hbox.pack_start(label2, expand=False, fill=False)
         eb = gtk.EventBox()
         self.tooltips.set_tip(eb, _('Close Tab'))
         eb.set_events(gtk.gdk.BUTTON_PRESS)
