@@ -61,6 +61,8 @@ class Parse(object):
             column.set_resizable(True)
             column.set_visible(not attrs.get('tree_invisible', False))
             self.tree.append_column(column)
+        elif name == 'button':
+            pass
         else:
             import logging
             log = logging.getLogger('view')

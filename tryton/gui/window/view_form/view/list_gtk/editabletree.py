@@ -2,6 +2,7 @@
 import gtk
 import parser
 import gettext
+from tryton.common.cellrendererbutton import CellRendererButton
 
 _ = gettext.gettext
 
@@ -74,7 +75,8 @@ class EditableTreeView(gtk.TreeView):
             renderer = cols[idx].get_cell_renderers()[0]
             if isinstance(renderer, gtk.CellRendererToggle):
                 editable = renderer.get_property('activatable')
-            elif isinstance(renderer, gtk.CellRendererProgress):
+            elif isinstance(renderer,
+                    (gtk.CellRendererProgress, CellRendererButton)):
                 editable = False
             else:
                 editable = renderer.get_property('editable')
@@ -90,7 +92,8 @@ class EditableTreeView(gtk.TreeView):
             renderer = cols[idx].get_cell_renderers()[0]
             if isinstance(renderer, gtk.CellRendererToggle):
                 editable = renderer.get_property('activatable')
-            elif isinstance(renderer, gtk.CellRendererProgress):
+            elif isinstance(renderer,
+                    (gtk.CellRendererProgress, CellRendererButton)):
                 editable = False
             else:
                 editable = renderer.get_property('editable')
@@ -187,7 +190,8 @@ class EditableTreeView(gtk.TreeView):
                 renderer = column.get_cell_renderers()[0]
                 if isinstance(renderer, gtk.CellRendererToggle):
                     editable = renderer.get_property('activatable')
-                elif isinstance(renderer, gtk.CellRendererProgress):
+                elif isinstance(renderer,
+                        (gtk.CellRendererProgress, CellRendererButton)):
                     editable = False
                 else:
                     editable = renderer.get_property('editable')

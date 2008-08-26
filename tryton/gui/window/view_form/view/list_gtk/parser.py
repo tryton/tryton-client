@@ -20,6 +20,8 @@ import datetime as DT
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, TRYTON_ICON
 import tryton.common as common
 from _strptime import LocaleTime
+from tryton.common.cellrendererbutton import CellRendererButton
+from tryton.action import Action
 
 def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
@@ -61,6 +63,7 @@ class ParserTree(ParserInterface):
 
     def parse(self, model, root_node, fields):
         dict_widget = {}
+        button_list = []
         attrs = node_attributes(root_node)
         on_write = attrs.get('on_write', '')
         editable = attrs.get('editable', False)
@@ -101,7 +104,8 @@ class ParserTree(ParserInterface):
                 if editable and not node_attrs.get('readonly', False):
                     if isinstance(renderer, gtk.CellRendererToggle):
                         renderer.set_property('activatable', True)
-                    elif isinstance(renderer, gtk.CellRendererProgress):
+                    elif isinstance(renderer,
+                            (gtk.CellRendererProgress, CellRendererButton)):
                         pass
                     else:
                         renderer.set_property('editable', True)
@@ -179,6 +183,38 @@ class ParserTree(ParserInterface):
                         digits = fields.get('digits', (16, 2))[1]
                     dict_widget[i] = (fname, label, label_sum, digits,
                             label_bold)
+            elif node.localName == 'button':
+                #TODO add shortcut
+                cell = Button(treeview, node_attrs, self.window, self.screen)
+                button_list.append(cell)
+                renderer = cell.renderer
+                string = node_attrs.get('string', _('Unknown'))
+                col = gtk.TreeViewColumn(string, renderer)
+                col.name = None
+
+                label = gtk.Label(string)
+                label.show()
+                help = string
+                if node_attrs.get('help'):
+                    help += '\n' + node_attrs['help']
+                tooltips.set_tip(label, help)
+                tooltips.enable()
+                arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
+                col.arrow = arrow
+                col.arrow_show = False
+                col.set_widget(label)
+
+                col._type = 'button'
+                if 'width' in node_attrs:
+                    width = int(node_attrs['width'])
+                else:
+                    width = 80
+                col.width = width
+                if width > 0:
+                    col.set_fixed_width(width)
+                col.set_resizable(True)
+                col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+                i = treeview.append_column(col)
         if not bool(int(attrs.get('fill', '0'))):
             col = gtk.TreeViewColumn()
             col.name = None
@@ -188,7 +224,7 @@ class ParserTree(ParserInterface):
             col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             treeview.append_column(col)
         treeview.set_fixed_height_mode(True)
-        return treeview, dict_widget, [], on_write, [], None
+        return treeview, dict_widget, button_list, on_write, [], None
 
 
 class Char(object):
@@ -632,6 +668,79 @@ class ProgressBar(object):
 
     def value_from_text(self, model, text):
         return float(text)
+
+
+class Button(object):
+
+    def __init__(self, treeview=None, attrs=None, window=None, screen=None):
+        super(Button, self).__init__()
+        self.attrs = attrs or {}
+        self.renderer = CellRendererButton(attrs.get('string', _('Unknown')))
+        self.treeview = treeview
+        self.window = window
+        self.screen = screen
+
+        self.renderer.connect('clicked', self.button_clicked)
+
+    def button_clicked(self, widget, path):
+        if not path:
+            return True
+        store = self.treeview.get_model()
+        model = store.get_value(store.get_iter(path), 0)
+
+        state_changes = self.attrs.get('states', {})
+        if isinstance(state_changes, basestring):
+            state_changes = eval(state_changes)
+        if 'invisible' in state_changes:
+            if model.expr_eval(state_changes['invisible'], check_load=False):
+                return True
+        if 'readonly' in state_changes:
+            if model.expr_eval(state_changes['readonly'], check_load=False):
+                return True
+
+        self.screen.current_model = model
+        obj_id = self.screen.save_current()
+        if obj_id:
+            if not self.attrs.get('confirm', False) or \
+                    common.sur(self.attrs['confirm'], self.window):
+                button_type = self.attrs.get('type', 'workflow')
+                if button_type == 'workflow':
+                    args = ('object', 'exec_workflow', self.screen.name,
+                            self.attrs['name'], obj_id)
+                    try:
+                        rpc.execute(*args)
+                    except Exception, exception:
+                        common.process_exception(exception, self.window, *args)
+                elif button_type == 'object':
+                    args = ('object', 'execute', self.screen.name,
+                            self.attrs['name'], [obj_id], model.context_get())
+                    try:
+                        rpc.execute(*args)
+                    except Exception, exception:
+                        common.process_exception(exception, self.window, *args)
+                elif button_type == 'action':
+                    action_id = None
+                    args = ('object', 'execute', 'ir.action', 'get_action_id',
+                            int(self.attrs['name']), rpc.CONTEXT)
+                    try:
+                        action_id = rpc.execute(*args)
+                    except Exception, exception:
+                        action_id = common.process_exception(exception,
+                                self.window, *args)
+                    if action_id:
+                        Action.execute(action_id, {
+                            'model': self.screen.name,
+                            'id': obj_id,
+                            'ids': [obj_id],
+                            }, self.window)
+                else:
+                    raise Exception('Unallowed button type')
+                self.screen.reload()
+            else:
+                if self.screen.form:
+                    self.screen.form.message_info(
+                            _('Invalid Form, correct red fields!'))
+                self.screen.display()
 
 CELLTYPES = {
     'char': Char,
