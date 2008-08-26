@@ -475,6 +475,8 @@ class O2MField(CharField):
     def validate(self, model):
         res = True
         for model2 in model.value[self.name].models:
+            if not model2.loaded:
+                continue
             if not model2.validate():
                 if not model2.is_modified():
                     model.value[self.name].models.remove(model2)
