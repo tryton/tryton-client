@@ -35,13 +35,13 @@ from mx.DateTime import now
 from mx.DateTime import strptime
 
 mapping = {
-    '%y': ('__', '[_0-9][_0-9]'),
-    '%Y': ('____', '[_1-9][_0-9][_0-9][_0-9]'),
-    '%m': ('__', '[_0-1][_0-9]'),
-    '%d': ('__', '[_0-3][_0-9]'),
-    '%H': ('__', '[_0-2][_0-9]'),
-    '%M': ('__', '[_0-6][_0-9]'),
-    '%S': ('__', '[_0-6][_0-9]'),
+    '%y': ('  ', '[ 0-9][ 0-9]'),
+    '%Y': ('    ', '[ 0-9][ 0-9][ 0-9][ 0-9]'),
+    '%m': ('  ', '([ 0][ 1-9]|[ 1][ 0-2])'),
+    '%d': ('  ', '([ 0][ 1-9]|[ 1-2][ 0-9]|[ 3][ 0-1])'),
+    '%H': ('  ', '([ 0-1][ 0-9]|[ 2][ 0-4])'),
+    '%M': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
+    '%S': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
 }
 
 class DateEntry(gtk.Entry):
@@ -92,7 +92,7 @@ class DateEntry(gtk.Entry):
         text = text[:pos] + value + text[pos + length:]
         if self.regex.match(text):
             pos += 1
-            while (pos<len(self.initial_value)) and (text[pos] != '_'):
+            while (pos<len(self.initial_value)) and (text[pos] != ' '):
                 pos += 1
             self.set_text(text)
             gobject.idle_add(self.set_position, pos)
@@ -104,7 +104,7 @@ class DateEntry(gtk.Entry):
         if not self._interactive_input:
             return
 
-        while (start>0) and (self.initial_value[start] not in ['_','0','X']):
+        while (start>0) and (self.initial_value[start] not in [' ','0','X']):
             start -= 1
         text = self.get_text()
         text = text[:start] + self.initial_value[start:end] + text[end:]
