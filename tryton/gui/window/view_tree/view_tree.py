@@ -9,7 +9,7 @@ import tryton.rpc as rpc
 from parse import Parse
 import datetime as DT
 import locale
-from tryton.common import DT_FORMAT, DHM_FORMAT
+from tryton.common import DT_FORMAT, DHM_FORMAT, encoding_date
 import tryton.common as common
 from _strptime import LocaleTime
 
@@ -67,14 +67,13 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     and 'widget' in self.fields_attrs[field]:
                 field_type = self.fields_attrs[field]['widget']
             if field_type in ('date',):
-                display_format = LocaleTime().LC_date.replace('%y', '%Y')
+                display_format = encoding_date(LocaleTime().LC_date)
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DT_FORMAT)
                         obj[field] = time.strftime(display_format, date)
             elif field_type in ('datetime',):
-                display_format = LocaleTime().LC_date.replace('%y', '%Y') \
-                        + ' %H:%M:%S'
+                display_format = encoding_date(LocaleTime().LC_date + ' %H:%M:%S')
                 for obj in res_ids:
                     if obj[field]:
                         date = time.strptime(obj[field], DHM_FORMAT)

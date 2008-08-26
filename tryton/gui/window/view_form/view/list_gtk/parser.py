@@ -17,7 +17,8 @@ from tryton.gui.window.win_search import WinSearch
 
 import tryton.rpc as rpc
 import datetime as DT
-from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, TRYTON_ICON
+from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
+        TRYTON_ICON, encoding_date
 import tryton.common as common
 from _strptime import LocaleTime
 from tryton.common.cellrendererbutton import CellRendererButton
@@ -313,7 +314,7 @@ class Boolean(Int):
 
 class Date(Char):
     server_format = DT_FORMAT
-    display_format = LocaleTime().LC_date.replace('%y', '%Y')
+    display_format = encoding_date(LocaleTime().LC_date)
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)
@@ -339,8 +340,7 @@ class Date(Char):
 
 class Datetime(Date):
     server_format = DHM_FORMAT
-    display_format = LocaleTime().LC_date.replace('%y', '%Y') + \
-            ' %H:%M:%S'
+    display_format = encoding_date(LocaleTime().LC_date + ' %H:%M:%S')
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)

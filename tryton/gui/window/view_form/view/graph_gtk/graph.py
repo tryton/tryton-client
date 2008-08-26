@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
-from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, COLOR_SCHEMES
+from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
+        COLOR_SCHEMES, encoding_date
 import locale
 import math
 import datetime
@@ -366,8 +367,8 @@ class Graph(gtk.DrawingArea):
             while date <= end_date:
                 key = datetime.date(date.year, date.month, date.day)
                 self.labels[key] = time.strftime(
-                        LocaleTime().LC_date.replace('%y', '%Y'),
-                    time.strptime(str(key), DT_FORMAT))
+                        end_date(LocaleTime().LC_date),
+                        time.strptime(str(key), DT_FORMAT))
                 self.datas.setdefault(key, {})
                 for yfield in self.yfields:
                     self.datas[key].setdefault(

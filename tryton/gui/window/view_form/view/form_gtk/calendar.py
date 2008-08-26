@@ -6,7 +6,8 @@ import gettext
 import locale
 from interface import WidgetInterface
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, TRYTON_ICON
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
+        TRYTON_ICON, encoding_date
 from _strptime import LocaleTime
 from tryton.common import date_widget
 
@@ -19,7 +20,7 @@ class Calendar(WidgetInterface):
     def __init__(self, window, parent=None, model=None, attrs=None):
         super(Calendar, self).__init__(window, parent, model=model, attrs=attrs)
 
-        self.format = LocaleTime().LC_date.replace('%y', '%Y')
+        self.format = encoding_date(LocaleTime().LC_date)
         self.widget = date_widget.ComplexEntry(self.format, spacing=3)
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
@@ -132,7 +133,7 @@ class DateTime(WidgetInterface):
     def __init__(self, window, parent, model, attrs=None):
         super(DateTime, self).__init__(window, parent, model, attrs=attrs)
 
-        self.format = LocaleTime().LC_date.replace('%y', '%Y') + ' ' + HM_FORMAT
+        self.format = encoding_date(LocaleTime().LC_date + ' ' + HM_FORMAT)
         self.widget = date_widget.ComplexEntry(self.format, spacing=3)
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
