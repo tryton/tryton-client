@@ -49,7 +49,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
         layout = widget.create_pango_layout(self.text)
         layout.set_font_description(widget.style.font_desc)
         w, h = layout.get_size()
-        x = cell_area.x + 3
+        x = int(cell_area.x + (cell_area.width - w / pango.SCALE) / 2)
         y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
         window.draw_layout(widget.style.text_gc[0], x, y, layout)
 
