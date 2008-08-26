@@ -396,7 +396,9 @@ class ViewList(ParserView):
         del self.widget_tree
         del self.widget
 
-    def __sig_switch(self, treeview, *args):
+    def __sig_switch(self, treeview, path, column):
+        if column._type == 'button':
+            return
         self.screen.row_activate()
 
     def __select_changed(self, tree_sel):

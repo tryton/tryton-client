@@ -61,7 +61,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
-        if event is not None and ((event.type == gtk.gdk.BUTTON_PRESS) \
+        if (event is None) or ((event.type == gtk.gdk.BUTTON_PRESS) \
                 or (event.type == gtk.gdk.KEY_PRESS \
                     and event.keyval == gtk.keysyms.space)):
             self.clicking = True
