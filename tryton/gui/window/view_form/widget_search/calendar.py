@@ -6,8 +6,8 @@ import gettext
 import locale
 from interface import Interface
 from tryton.common import DT_FORMAT
-from _strptime import LocaleTime
-from tryton.common import date_widget, encoding_date
+from tryton.common import date_widget
+from tryton.translate import date_format
 
 _ = gettext.gettext
 
@@ -20,7 +20,7 @@ class Calendar(Interface):
         tooltips = gtk.Tooltips()
         self.widget = gtk.HBox(spacing=3)
 
-        self.format = encoding_date(LocaleTime().LC_date)
+        self.format = date_format()
 
         self.widget1 = date_widget.ComplexEntry(self.format, spacing=3)
         self.entry1 = self.widget1.widget

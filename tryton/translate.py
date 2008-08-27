@@ -148,8 +148,10 @@ _LOCALE2WIN32 = {
     'zh_TW': 'Chinese_Taiwan',
 }
 
+_DATE_FORMAT = '%m/%d/%Y'
 
-def setlang(lang=None):
+
+def setlang(lang=None, locale_dict=None):
     "Set language"
     locale_dir = os.path.join(CURRENT_DIR, 'share/locale')
     if not os.path.isdir(locale_dir):
@@ -194,8 +196,25 @@ def setlang(lang=None):
     if os.path.isdir(locale_dir):
         gtk.glade.bindtextdomain(PACKAGE, locale_dir)
 
+    if locale_dict:
+        conv = locale.localeconv()
+        for field in locale_dict.keys():
+            if field == 'date':
+                global _DATE_FORMAT
+                _DATE_FORMAT = locale_dict[field]
+                continue
+            conv[field] = locale_dict[field]
+        locale.localeconv = lambda: conv
+
 def set_language_direction(direction):
     if direction == 'rtl':
         gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
     else:
         gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
+
+def date_format():
+    '''
+    Return the locale date format
+    '''
+    global _DATE_FORMAT
+    return _DATE_FORMAT

@@ -671,18 +671,6 @@ def node_attributes(node):
             result[attrs.item(i).localName] = eval(attrs.item(i).nodeValue)
     return result
 
-def encoding_date(format):
-    format.replace('%y', '%Y')
-    for i in ('%a', '%A', '%j', '%w', '%W', '%Z'):
-        format = format.replace(i, '')
-    for i in ('%b', '%B'):
-        if i in format:
-            if '%m' not in format:
-                format = format.replace(i, '%m')
-            else:
-                format = format.replace(i, '')
-    return format
-
 def hex2rgb(hexstring, digits=2):
     """
     Converts a hexstring color to a rgb tuple.

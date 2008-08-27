@@ -367,7 +367,7 @@ class Main(object):
                 self.sig_home_new(quiet=True, except_id=menu_id, prefs=prefs)
             self.request_set()
             if prefs and 'language' in prefs:
-                translate.setlang(prefs['language'])
+                translate.setlang(prefs['language'], prefs.get('locale'))
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
