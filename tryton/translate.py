@@ -4,7 +4,7 @@ import os
 import locale
 import gettext
 from version import PACKAGE
-from tryton import CURRENT_DIR, PREFIX
+from tryton.client import CURRENT_DIR, PREFIX
 import logging
 import gtk
 
