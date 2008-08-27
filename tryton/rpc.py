@@ -138,7 +138,6 @@ def context_reload():
     global CONTEXT, TIMEZONE
     CONTEXT = {}
     user = RPCProxy('res.user')
-    lang = RPCProxy('ir.lang')
     try:
         context = user.get_preferences(True, {})
     except:
