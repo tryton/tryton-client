@@ -381,7 +381,6 @@ class Form(SignalEvent):
                 'model': self.screen.resource,
                 'id': obj_id or False,
                 'ids': ids,
-                'window': self.window,
                 }, context=ctx, alwaysask=True)
             if res:
                 self.sig_reload(test_modified=False)
