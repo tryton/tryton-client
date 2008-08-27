@@ -7,5 +7,5 @@ try:
         sys.path.insert(0, os.path.dirname(DIR))
 except:
     pass
-import tryton.main
+import tryton.client
 tryton.client.TrytonClient().run()
