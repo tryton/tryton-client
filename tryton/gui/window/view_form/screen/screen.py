@@ -291,6 +291,7 @@ class Screen(SignalEvent):
                     view['fields'][self.exclude_field]['readonly'] = True
                     view['fields'][self.exclude_field]['invisible'] = True
                     view['fields'][self.exclude_field]['tree_invisible'] = True
+                    view['fields'][self.exclude_field]['exclude_field'] = True
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 

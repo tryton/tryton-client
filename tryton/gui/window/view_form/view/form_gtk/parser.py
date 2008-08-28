@@ -306,7 +306,10 @@ class ParserForm(ParserInterface):
                 continue
             attrs = common.node_attributes(node)
             if not cursor_widget:
-                cursor_widget = attrs.get('name')
+                if attrs.get('name') and fields.get(attrs['name']) \
+                        and not fields[attrs['name']].get('exclude_field',
+                                False):
+                    cursor_widget = attrs.get('name')
             if node.localName == 'image':
                 icon = Image(attrs)
                 button_list.append(icon)
