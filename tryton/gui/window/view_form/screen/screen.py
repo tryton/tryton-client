@@ -348,8 +348,12 @@ class Screen(SignalEvent):
                 continue
             if dom[0] in fields:
                 field_dom = str(fields[dom[0]].setdefault('domain',[]))
-                fields[dom[0]]['domain'] = field_dom[:1] + \
-                        str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
+                if dom[1] == 'child_of':
+                    fields[dom[0]]['domain'] = field_dom[:1] + \
+                            str((dom[0], dom[1], dom[2])) + ',' + field_dom[1:]
+                else:
+                    fields[dom[0]]['domain'] = field_dom[:1] + \
+                            str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
                 if dom[1] == '=':
                     fields[dom[0]]['readonly'] = True
 
