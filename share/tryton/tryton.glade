@@ -695,6 +695,14 @@
                                   </widget>
                                 </child>
                                 <child>
+                                  <widget class="GtkCheckMenuItem" id="opt_spellcheck">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">Activate spell checking</property>
+                                    <property name="use_underline">True</property>
+                                    <signal name="activate" handler="on_opt_spellcheck_activate"/>
+                                  </widget>
+                                </child>
+                                <child>
                                   <widget class="GtkMenuItem" id="forms_tab">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">Tabs default position</property>

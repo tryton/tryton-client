@@ -2,6 +2,13 @@
 import gtk
 from interface import WidgetInterface
 import tryton.rpc as rpc
+from tryton.config import CONFIG
+
+HAS_GTKSPELL = True
+try:
+    import gtkspell
+except:
+    HAS_GTKSPELL = False
 
 
 class TextBox(WidgetInterface):
@@ -23,12 +30,6 @@ class TextBox(WidgetInterface):
         self.textview.set_accepts_tab(False)
         self.textview.connect('focus-in-event', lambda x, y: self._focus_in())
         self.textview.connect('focus-out-event', lambda x, y: self._focus_out())
-        try:
-            import gtkspell
-            gtkspell.Spell(self.textview).set_language(
-                    rpc.CONTEXT.get('language', 'en_US'))
-        except:
-            pass
         self.scrolledwindow.add(self.textview)
         self.scrolledwindow.show_all()
 
@@ -41,6 +42,27 @@ class TextBox(WidgetInterface):
         super(TextBox, self)._readonly_set(value)
         self.textview.set_editable(not value)
         self.textview.set_sensitive(not value)
+        if HAS_GTKSPELL:
+            spell = None
+            try:
+                spell = gtkspell.get_from_text_view(self.textview)
+            except:
+                pass
+            if spell:
+                spell.detach()
+                del spell
+            if not value and self.attrs.get('spell') \
+                    and CONFIG['client.spellcheck']:
+                language = self._view.model.expr_eval(self.attrs['spell'])
+                try:
+                    spell = gtkspell.Spell(self.textview)
+                    try:
+                        spell.set_language(language)
+                    except:
+                        spell.detach()
+                        del spell
+                except:
+                    pass
 
     def _color_widget(self):
         return self.textview
@@ -61,3 +83,25 @@ class TextBox(WidgetInterface):
         buf.delete(buf.get_start_iter(), buf.get_end_iter())
         iter_start = buf.get_start_iter()
         buf.insert(iter_start, value)
+
+        if HAS_GTKSPELL:
+            spell = None
+            try:
+                spell = gtkspell.get_from_text_view(self.textview)
+            except:
+                pass
+            if spell:
+                spell.detach()
+                del spell
+
+            if self.attrs.get('spell') and CONFIG['client.spellcheck']:
+                language = self._view.model.expr_eval(self.attrs['spell'])
+                try:
+                    spell = gtkspell.Spell(self.textview)
+                    try:
+                        spell.set_language(language)
+                    except:
+                        spell.detach()
+                        del spell
+                except:
+                    pass

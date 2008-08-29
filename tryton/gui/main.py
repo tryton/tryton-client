@@ -168,6 +168,8 @@ class Main(object):
                 'opt_form_toolbar'),
             'on_opt_tree_width_activate': (fnc_menuitem, 'client.tree_width',
                 'opt_tree_width'),
+            'on_opt_spellcheck_activate': (fnc_menuitem, 'client.spellcheck',
+                'opt_spellcheck'),
         }
         self.glade.get_widget('menubar_'+(CONFIG['client.toolbar'] or \
                 'both')).set_active(True)
