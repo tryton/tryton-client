@@ -6,6 +6,7 @@ import tryton.common as common
 import thread, time
 from tryton.gui.window.view_form.screen import Screen
 import os
+import pango
 
 _ = gettext.gettext
 
@@ -52,13 +53,65 @@ class Dialog(object):
         self.screen = Screen(obj_name, self.dia, view_type=[], context=context)
         self.screen.add_view_custom(arch, fields, display=True)
 
+        title = gtk.Label()
+        title.set_use_markup(True)
+        title.modify_font(pango.FontDescription("14"))
+        title.set_label('<b>' + self.screen.current_view.title + '</b>')
+        title.set_padding(20, 3)
+        title.set_alignment(0.0, 0.5)
+        title.show()
+
+        self.info_label = gtk.Label()
+        self.info_label.set_padding(3, 3)
+        self.info_label.set_alignment(1.0, 0.5)
+
+        self.eb_info = gtk.EventBox()
+        self.eb_info.add(self.info_label)
+        self.eb_info.connect('button-press-event',
+                lambda *a: self.message_info(''))
+
+        vbox = gtk.VBox()
+        vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
+        vbox.show()
+
+        hbox = gtk.HBox()
+        hbox.pack_start(title, expand=True, fill=True)
+        hbox.pack_start(vbox, expand=False, fill=True, padding=20)
+        hbox.show()
+
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        frame.add(hbox)
+        frame.show()
+
+        eb = gtk.EventBox()
+        eb.add(frame)
+        eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#ffffff"))
+        eb.show()
+
+        self.dia.vbox.pack_start(eb, expand=False, fill=True, padding=3)
+
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_NONE)
+        viewport.add(self.screen.widget)
+        viewport.show()
+        self.scrolledwindow = gtk.ScrolledWindow()
+        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_AUTOMATIC)
+        self.scrolledwindow.add(viewport)
+        self.scrolledwindow.show()
+
+        self.dia.vbox.pack_start(self.scrolledwindow)
+
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
-        self.screen.widget.set_size_request(min(parent_width - 20, width + 20),
-                min(parent_height - 60, height + 25))
+        widget_width = min(parent_width - 20, width + 20)
+        widget_height = min(parent_height - 60, height + 25)
+        self.screen.widget.set_size_request(widget_width, widget_height)
+        viewport.set_size_request(widget_width, widget_height)
         self.screen.widget.show()
 
-        self.dia.vbox.pack_start(self.screen.widget)
         self.dia.set_title(self.screen.current_view.title)
         self.dia.show()
         self.screen.new(default=False)
@@ -87,6 +140,16 @@ class Dialog(object):
 
     def destroy(self):
         self.dia.destroy()
+
+    def message_info(self, message, color='red'):
+        if message:
+            self.info_label.set_label(message)
+            self.eb_info.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse(
+                COLOR_SCHEMES.get(color, 'white')))
+            self.eb_info.show_all()
+        else:
+            self.info_label.set_label('')
+            self.eb_info.hide()
 
 
 class Wizard(object):
