@@ -189,6 +189,7 @@ class Dialog(object):
         if isinstance(model, ModelRecordGroup):
             hbox, menuitem_title = _create_menu(self, attrs)
             self.dia.vbox.pack_start(hbox, expand=False, fill=True)
+        self.dia.show()
 
         self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
                 exclude_field=attrs.get('relation_field', None), readonly=readonly,
@@ -282,7 +283,6 @@ class Dialog(object):
 
         width, height = self.screen.screen_container.size_get()
         viewport.set_size_request(width, height + 30)
-        self.dia.show()
         self.screen.display()
         self.screen.current_view.set_cursor()
 
