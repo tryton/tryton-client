@@ -66,6 +66,7 @@ class Main(object):
 
         self.notebook.show()
         self.pages = []
+        self.previous_pages = {}
         self.current_page = 0
         self.last_page = 0
 
@@ -525,6 +526,9 @@ class Main(object):
         return True
 
     def win_add(self, page):
+        previous_page_id = self.notebook.get_current_page()
+        previous_widget = self.notebook.get_nth_page(previous_page_id)
+        self.previous_pages[page] = previous_widget
         self.pages.append(page)
         hbox = gtk.HBox()
         name = page.name
@@ -612,9 +616,25 @@ class Main(object):
             self.notebook.remove_page(page_id)
             self.sb_set()
 
+            next_page_id = -1
+            to_pop = []
+            for i in self.previous_pages:
+                if self.previous_pages[i] == page_widget:
+                    to_pop.append(i)
+                if i.widget == page_widget:
+                    if self.previous_pages[i]:
+                        next_page_id = self.notebook.page_num(
+                                self.previous_pages[i])
+                    to_pop.append(i)
+            to_pop.reverse()
+            for i in to_pop:
+                self.previous_pages.pop(i)
+
             if hasattr(page, 'destroy'):
                 page.destroy()
             del page
+
+            self.notebook.set_current_page(next_page_id)
         return self.notebook.get_current_page() != -1
 
     def _wid_get(self):
