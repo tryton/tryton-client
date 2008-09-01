@@ -7,6 +7,7 @@ from tryton.signal_event import SignalEvent
 import field
 import datetime
 import tryton.common as common
+import logging
 
 
 class EvalEnvironment(object):
@@ -73,6 +74,8 @@ class ModelRecord(SignalEvent):
             try:
                 values = self.rpc.read(ids, self.mgroup.mfields.keys(), ctx)
             except Exception, exception:
+                log = logging.getLogger('record')
+                log.error('%s' % exception.args[-1])
                 values = [{'id': x} for x in ids]
             for value in values:
                 for model in self.mgroup.models:
