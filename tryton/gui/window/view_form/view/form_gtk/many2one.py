@@ -171,16 +171,6 @@ class Many2One(WidgetInterface):
         self.focus_out = True
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
-        self.but_new = gtk.Button()
-        img_new = gtk.Image()
-        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
-        self.but_new.set_image(img_new)
-        self.but_new.set_relief(gtk.RELIEF_NONE)
-        self.but_new.connect('clicked', self.sig_new)
-        self.but_new.set_alignment(0.5, 0.5)
-        self.but_new.set_property('can-focus', False)
-        self.widget.pack_start(self.but_new, expand=False, fill=False)
-
         self.but_open = gtk.Button()
         img_find = gtk.Image()
         img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
@@ -192,6 +182,16 @@ class Many2One(WidgetInterface):
         self.but_open.set_alignment(0.5, 0.5)
         self.but_open.set_property('can-focus', False)
         self.widget.pack_start(self.but_open, expand=False, fill=False)
+
+        self.but_new = gtk.Button()
+        img_new = gtk.Image()
+        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
+        self.but_new.set_image(img_new)
+        self.but_new.set_relief(gtk.RELIEF_NONE)
+        self.but_new.connect('clicked', self.sig_new)
+        self.but_new.set_alignment(0.5, 0.5)
+        self.but_new.set_property('can-focus', False)
+        self.widget.pack_start(self.but_new, expand=False, fill=False)
 
         self.tooltips = gtk.Tooltips()
         self.tooltips.set_tip(self.but_new, _('Create a new record'))
