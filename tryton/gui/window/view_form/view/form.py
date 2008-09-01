@@ -68,13 +68,24 @@ class ViewForm(ParserView):
         self.widgets = dict([(name, ViewWidget(self, widget, name))
                              for name, widget in children.items()])
 
-        if toolbar and not CONFIG['client.modepda']:
-            vbox = gtk.VBox()
-            vbox.pack_start(self.widget)
+        vbox = gtk.VBox()
+        vp = gtk.Viewport()
+        vp.set_shadow_type(gtk.SHADOW_NONE)
+        vp.add(self.widget)
+        scroll = gtk.ScrolledWindow()
+        scroll.add(vp)
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.viewport = gtk.Viewport()
+        self.viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        self.viewport.add(scroll)
+        width, height = self.widget.size_request()
+        self.widget = vbox
+        self.widget.set_size_request(width, height)
+        self.widget.pack_start(self.viewport, expand=True, fill=True)
 
+        if toolbar and not CONFIG['client.modepda']:
             hbox = gtk.HBox()
-            vbox.pack_start(hbox, False, False)
-            self.widget = vbox
+            self.widget.pack_start(hbox, False, False)
 
             sep = False
             for icontype in ('print', 'action', 'relate'):
@@ -100,8 +111,6 @@ class ViewForm(ParserView):
                     tbutton.connect('clicked', self._action, tool, icontype)
 
     def _action(self, widget, action, atype):
-        data = {}
-        context = {}
         act = action.copy()
         if atype in ('print', 'action'):
             self.screen.save_current()
@@ -136,7 +145,7 @@ class ViewForm(ParserView):
             'id': obj_id,
             'ids': [obj_id],
         }
-        value = Action._exec_action(act, self.window, data, context)
+        value = Action._exec_action(act, self.window, data, {})
         if atype in ('print', 'action'):
             self.screen.reload()
         return value

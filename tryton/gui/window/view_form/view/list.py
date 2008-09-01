@@ -151,7 +151,10 @@ class ViewList(ParserView):
         scroll = gtk.ScrolledWindow()
         scroll.add(self.widget_tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.widget.pack_start(scroll, expand=True, fill=True)
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        viewport.add(scroll)
+        self.widget.pack_start(viewport, expand=True, fill=True)
         self.widget_tree.screen = screen
         self.reload = False
         self.children = children
@@ -167,6 +170,33 @@ class ViewList(ParserView):
                 hbox2.pack_start(children[i][2], expand=True, fill=False)
                 hbox.pack_start(hbox2, expand=False, fill=False, padding=12)
             hbox.show_all()
+
+        if toolbar and not CONFIG['client.modepda'] \
+                and (toolbar['print'] or toolbar['action']):
+            hbox = gtk.HBox()
+            self.widget.pack_start(hbox, expand=False, fill=False)
+
+            sep = False
+            for icontype in ('print', 'action'):
+                if not toolbar[icontype]:
+                    continue
+                gtktoolbar = gtk.Toolbar()
+                gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+                gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
+                hbox.pack_start(gtktoolbar, True, True)
+
+                for tool in toolbar[icontype]:
+                    iconstock = {
+                        'print': 'tryton-print',
+                        'action': 'tryton-executable',
+                    }.get(icontype)
+
+                    tbutton = gtk.ToolButton(iconstock)
+                    tbutton.set_use_underline(True)
+                    tbutton.set_label(tool['name'])
+                    gtktoolbar.insert(tbutton, -1)
+
+                    tbutton.connect('clicked', self._action, tool, icontype)
 
         self.display()
 
@@ -195,6 +225,23 @@ class ViewList(ParserView):
             self.widget_tree.connect('drag-data-delete', self.drag_data_delete)
 
         self.widget_tree.connect('key_press_event', self.on_keypres)
+
+    def _action(self, widget, action, atype):
+        act = action.copy()
+        obj_ids = self.screen.sel_ids_get()
+        obj_id = self.screen.id_get()
+        if not obj_ids and not obj_id:
+            message(_('No record selected!'), self.window)
+            return False
+        data = {
+            'model': self.screen.name,
+            'id': obj_id,
+            'ids': obj_ids,
+        }
+        value = Action._exec_action(act, self.window, data, {})
+        self.screen.reload()
+        return value
+
 
     def on_keypres(self, widget, event):
         if event.keyval == gtk.keysyms.c and event.state & gtk.gdk.CONTROL_MASK:

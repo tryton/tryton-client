@@ -91,25 +91,13 @@ class Dialog(object):
 
         self.dia.vbox.pack_start(eb, expand=False, fill=True, padding=3)
 
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_NONE)
-        viewport.add(self.screen.widget)
-        viewport.show()
-        self.scrolledwindow = gtk.ScrolledWindow()
-        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_AUTOMATIC)
-        self.scrolledwindow.add(viewport)
-        self.scrolledwindow.show()
-
-        self.dia.vbox.pack_start(self.scrolledwindow)
+        self.dia.vbox.pack_start(self.screen.widget, True, True)
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
         widget_width = min(parent_width - 20, width + 20)
         widget_height = min(parent_height - 60, height + 25)
         self.screen.widget.set_size_request(widget_width, widget_height)
-        viewport.set_size_request(widget_width, widget_height)
         self.screen.widget.show()
 
         self.dia.set_title(self.screen.current_view.title)

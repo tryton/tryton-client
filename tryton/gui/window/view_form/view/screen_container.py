@@ -14,6 +14,7 @@ class ScreenContainer(object):
                 gtk.POLICY_AUTOMATIC)
         self.viewport = gtk.Viewport()
         self.viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self.scrolledwindow.add(self.viewport)
         self.vbox = gtk.VBox(spacing=3)
         self.vbox.pack_end(self.scrolledwindow)
         self.filter_vbox = None
@@ -64,23 +65,16 @@ class ScreenContainer(object):
     def show_filter(self):
         if self.filter_vbox:
             self.filter_vbox.show()
-        self.viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
 
     def hide_filter(self):
         if self.filter_vbox:
             self.filter_vbox.hide()
-        self.viewport.set_shadow_type(gtk.SHADOW_NONE)
 
     def set(self, widget):
         if self.viewport.get_child():
             self.viewport.remove(self.viewport.get_child())
-        if self.scrolledwindow.get_child():
-            self.scrolledwindow.remove(self.scrolledwindow.get_child())
-        if not isinstance(widget, gtk.TreeView):
-            self.viewport.add(widget)
-            widget = self.viewport
-        self.scrolledwindow.add(widget)
+        self.viewport.add(widget)
         self.scrolledwindow.show_all()
 
     def size_get(self):
-        return self.scrolledwindow.get_child().size_request()
+        return self.viewport.get_child().size_request()

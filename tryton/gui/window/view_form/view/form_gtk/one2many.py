@@ -468,11 +468,7 @@ class One2Many(WidgetInterface):
         name += self.screen.current_view.title
         menuitem_title.get_child().set_text(name)
 
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        viewport.add(self.screen.widget)
-        viewport.show()
-        self.widget.pack_start(viewport, expand=True, fill=True)
+        self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
 
