@@ -63,16 +63,16 @@
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkImageMenuItem" id="Databases">
+                          <widget class="GtkImageMenuItem" id="Database">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Data_bases</property>
+                            <property name="label" translatable="yes">Data_base</property>
                             <property name="use_underline">True</property>
                             <child>
-                              <widget class="GtkMenu" id="Databases_menu">
+                              <widget class="GtkMenu" id="Database_menu">
                                 <child>
                                   <widget class="GtkImageMenuItem" id="db_new">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">_New database</property>
+                                    <property name="label" translatable="yes">_New Database</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_db_new_activate"/>
                                     <child internal-child="image">
@@ -87,7 +87,7 @@
                                 <child>
                                   <widget class="GtkImageMenuItem" id="db_restore">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">_Restore database</property>
+                                    <property name="label" translatable="yes">_Restore Database</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_db_restore_activate"/>
                                     <child internal-child="image">
@@ -102,7 +102,7 @@
                                 <child>
                                   <widget class="GtkImageMenuItem" id="db_backup">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">_Backup database</property>
+                                    <property name="label" translatable="yes">_Backup Database</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_db_backup_activate"/>
                                     <child internal-child="image">
@@ -117,7 +117,7 @@
                                 <child>
                                   <widget class="GtkImageMenuItem" id="db_drop">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Dro_p database</property>
+                                    <property name="label" translatable="yes">Dro_p Database</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_db_drop_activate"/>
                                     <child internal-child="image">
@@ -217,7 +217,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="send_request">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Send a request</property>
+                            <property name="label" translatable="yes">_Send a Request</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_send_request_activate"/>
                             <child internal-child="image">
@@ -232,7 +232,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="read_requests">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Read my requests</property>
+                            <property name="label" translatable="yes">_Read my Requests</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_read_requests_activate"/>
                             <child internal-child="image">
@@ -391,7 +391,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="switch_lf">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Switch to list/form</property>
+                            <property name="label" translatable="yes">Switch to List/Form</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_but_switch_clicked"/>
                             <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
@@ -483,7 +483,7 @@
                         <child>
                           <widget class="GtkMenuItem" id="form_log">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">View _logs</property>
+                            <property name="label" translatable="yes">View _Logs</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_log_activate"/>
                           </widget>
@@ -491,7 +491,7 @@
                         <child>
                           <widget class="GtkMenuItem" id="goto_id">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Go to record ID...</property>
+                            <property name="label" translatable="yes">_Go to Record ID...</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_goto_id_activate"/>
                             <accelerator key="G" modifiers="GDK_CONTROL_MASK" signal="activate"/>
@@ -563,7 +563,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="form_save_as">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">Expor_t data...</property>
+                            <property name="label" translatable="yes">Expor_t Data...</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_save_as_activate"/>
                             <child internal-child="image">
@@ -578,7 +578,7 @@
                         <child>
                           <widget class="GtkMenuItem" id="form_import">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">I_mport data...</property>
+                            <property name="label" translatable="yes">I_mport Data...</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_form_import_activate"/>
                           </widget>
@@ -689,7 +689,7 @@
                                 <child>
                                   <widget class="GtkCheckMenuItem" id="opt_tree_width">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Save columns width</property>
+                                    <property name="label" translatable="yes">Save Columns Width</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_opt_tree_width_activate"/>
                                   </widget>
@@ -697,7 +697,7 @@
                                 <child>
                                   <widget class="GtkCheckMenuItem" id="opt_spellcheck">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Activate spell checking</property>
+                                    <property name="label" translatable="yes">Activate Spell Checking</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_opt_spellcheck_activate"/>
                                   </widget>
@@ -705,7 +705,7 @@
                                 <child>
                                   <widget class="GtkMenuItem" id="forms_tab">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Tabs default position</property>
+                                    <property name="label" translatable="yes">Tabs Default Position</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_forms_tabs_activate"/>
                                     <child>
@@ -752,7 +752,7 @@
                                 <child>
                                   <widget class="GtkMenuItem" id="forms_tab_orientation">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">Tabs default orientation</property>
+                                    <property name="label" translatable="yes">Tabs Default Orientation</property>
                                     <property name="use_underline">True</property>
                                     <signal name="activate" handler="on_forms_tabs_orientation_activate"/>
                                     <child>
@@ -798,7 +798,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="opt_save">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Save options</property>
+                            <property name="label" translatable="yes">_Save Options</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_opt_save_activate"/>
                             <child internal-child="image">
@@ -826,7 +826,7 @@
                         <child>
                           <widget class="GtkImageMenuItem" id="plugin_execute">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Execute a plugin</property>
+                            <property name="label" translatable="yes">_Execute a Plugin</property>
                             <property name="use_underline">True</property>
                             <signal name="activate" handler="on_plugin_execute_activate"/>
                             <child internal-child="image">
@@ -4224,7 +4224,7 @@ Latin1</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="win_db_select">
-    <property name="title" translatable="yes">Choose a database...</property>
+    <property name="title" translatable="yes">Choose a Database...</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
@@ -4239,7 +4239,7 @@ Latin1</property>
               <widget class="GtkLabel" id="db_select_label">
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">&lt;b&gt;Backup a database&lt;/b&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;Backup a Database&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </widget>
               <packing>
@@ -4434,7 +4434,7 @@ Latin1</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="win_db_ent">
-    <property name="title" translatable="yes">Restore a database</property>
+    <property name="title" translatable="yes">Restore a Database</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
@@ -4447,7 +4447,7 @@ Latin1</property>
               <widget class="GtkLabel" id="label280">
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">&lt;b&gt;Restore a database&lt;/b&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;Restore a Database&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </widget>
               <packing>
@@ -4522,7 +4522,7 @@ Latin1</property>
                   <widget class="GtkLabel" id="label278">
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
-                    <property name="label" translatable="yes">New database name:</property>
+                    <property name="label" translatable="yes">New Database Name:</property>
                   </widget>
                   <packing>
                     <property name="top_attach">3</property>
