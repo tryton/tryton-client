@@ -201,7 +201,7 @@ def setlang(lang=None, locale_dict=None):
         for field in locale_dict.keys():
             if field == 'date':
                 global _DATE_FORMAT
-                _DATE_FORMAT = locale_dict[field]
+                _DATE_FORMAT = str(locale_dict[field])
                 continue
             conv[field] = locale_dict[field]
         locale.localeconv = lambda: conv
