@@ -25,6 +25,7 @@ class WinSearch(object):
         self.win = gtk.Dialog(_('Search'), self.parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_FIND, gtk.RESPONSE_APPLY,
+                gtk.STOCK_NEW, gtk.RESPONSE_ACCEPT,
                 gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
         self.win.set_icon(TRYTON_ICON)
@@ -151,6 +152,17 @@ class WinSearch(object):
                 end = not self.find()
                 if end:
                     res = self.sel_ids_get() or self.ids
+            elif button == gtk.RESPONSE_ACCEPT:
+                from tryton.gui.window.view_form.view.form_gtk.many2one \
+                        import Dialog
+                dia = Dialog(self.model_name, window=self.win,
+                        domain=self.domain, context=self.context)
+                res, value = dia.run()
+                if res:
+                    res = [value[0]]
+                else:
+                    res = None
+                end = True
             else:
                 res = None
                 end = True
