@@ -77,7 +77,6 @@ class ModelRecordGroup(SignalEvent):
         self.window = window
         self.parent = parent
         self._context = context or {}
-        self._context.update(rpc.CONTEXT)
         self.resource = resource
         self.rpc = RPCProxy(resource)
         self.fields = fields
@@ -200,7 +199,7 @@ class ModelRecordGroup(SignalEvent):
         self.model_deleted = []
 
     def _get_context(self):
-        ctx = {}
+        ctx = rpc.CONTEXT.copy()
         ctx.update(self._context)
         return ctx
     context = property(_get_context)

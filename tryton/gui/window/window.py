@@ -12,7 +12,6 @@ class Window(object):
         from tryton.gui import Main
         if context is None:
             context = {}
-        context.update(rpc.CONTEXT)
 
         if view_type == 'form':
             from form import Form

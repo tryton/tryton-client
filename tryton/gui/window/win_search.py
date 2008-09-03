@@ -18,7 +18,6 @@ class WinSearch(object):
             views_preload = {}
         self.domain = domain or []
         self.context = context or {}
-        self.context.update(rpc.CONTEXT)
         self.sel_multi = sel_multi
         self.parent = parent
 
@@ -61,9 +60,11 @@ class WinSearch(object):
         if 'tree' in views_preload:
             view_form = views_preload['tree']
         else:
+            ctx = self.context.copy()
+            ctx.update(rpc.CONTEXT)
             try:
                 args = ('object', 'execute', self.model_name, 'fields_view_get',
-                        False, 'tree', self.context)
+                        False, 'tree', ctx)
                 view_form = rpc.execute(*args)
             except Exception, exception:
                 view_form = common.process_exception(exception, self.parent, *args)

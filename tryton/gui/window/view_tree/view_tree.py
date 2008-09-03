@@ -328,7 +328,6 @@ class ViewTree(object):
         self.view = gtk.TreeView()
         self.view.set_headers_visible(not CONFIG['client.modepda'])
         self.context = {}
-        self.context.update(rpc.CONTEXT)
         if context:
             self.context.update(context)
         self.fields = view_info['fields']

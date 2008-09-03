@@ -53,7 +53,6 @@ class Screen(SignalEvent):
         self.resource = model_name
         self.rpc = RPCProxy(model_name)
         self.context = context
-        self.context.update(rpc.CONTEXT)
         self.views = []
         self.fields = {}
         self.view_ids = view_ids

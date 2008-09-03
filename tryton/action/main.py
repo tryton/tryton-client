@@ -59,7 +59,7 @@ class Action(object):
     def execute(act_id, datas, window, action_type=None, context=None):
         if context is None:
             context = {}
-        ctx = rpc.CONTEXT.copy()
+        ctx = {}
         ctx.update(context)
         if not action_type:
             res = False
@@ -83,7 +83,7 @@ class Action(object):
     @staticmethod
     def _exec_action(action, window, datas=None, context=None):
         if context is None:
-            context = rpc.CONTEXT.copy()
+            context = {}
         if datas is None:
             datas = {}
         if 'type' not in action:
@@ -117,7 +117,8 @@ class Action(object):
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
             eval_ctx['datetime'] = datetime
-            ctx.update(eval(action.get('context') or '{}', eval_ctx))
+            action_ctx = eval(action.get('context') or '{}', eval_ctx)
+            ctx.update(action_ctx)
             ctx.update(context)
 
             domain_context = ctx.copy()
@@ -138,7 +139,7 @@ class Action(object):
                 name = action.get('name', False)
 
             Window.create(view_ids, datas['res_model'], datas['res_id'], domain,
-                    action['view_type'], window, ctx,
+                    action['view_type'], window, action_ctx,
                     datas['view_mode'], name=name,
                     limit=datas['limit'], auto_refresh=datas['auto_refresh'],
                     search_value=search_value)

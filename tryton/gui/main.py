@@ -209,12 +209,11 @@ class Main(object):
 
     def shortcut_set(self, shortcuts=None):
         def _action_shortcut(widget, action):
-            ctx = rpc.CONTEXT.copy()
             Action.exec_keyword('tree_open', self.window, {
                 'model': 'ir.ui.menu',
                 'id': action,
                 'ids': [action],
-                }, context=ctx)
+                })
         if shortcuts is None:
             user = rpc._USER
             try:
