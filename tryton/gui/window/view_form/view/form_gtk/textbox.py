@@ -52,7 +52,8 @@ class TextBox(WidgetInterface):
                 spell.detach()
                 del spell
             if not value and self.attrs.get('spell') \
-                    and CONFIG['client.spellcheck']:
+                    and CONFIG['client.spellcheck'] \
+                    and self._view and self._view.model:
                 language = self._view.model.expr_eval(self.attrs['spell'])
                 try:
                     spell = gtkspell.Spell(self.textview)
@@ -94,7 +95,8 @@ class TextBox(WidgetInterface):
                 spell.detach()
                 del spell
 
-            if self.attrs.get('spell') and CONFIG['client.spellcheck']:
+            if self.attrs.get('spell') and CONFIG['client.spellcheck'] \
+                    and self._view and self._view.model:
                 language = self._view.model.expr_eval(self.attrs['spell'])
                 try:
                     spell = gtkspell.Spell(self.textview)
