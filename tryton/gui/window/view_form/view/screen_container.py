@@ -7,16 +7,10 @@ _ = gettext.gettext
 class ScreenContainer(object):
 
     def __init__(self):
-        self.old_widget = False
-        self.scrolledwindow = gtk.ScrolledWindow()
-        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_AUTOMATIC)
         self.viewport = gtk.Viewport()
         self.viewport.set_shadow_type(gtk.SHADOW_NONE)
-        self.scrolledwindow.add(self.viewport)
         self.vbox = gtk.VBox(spacing=3)
-        self.vbox.pack_end(self.scrolledwindow)
+        self.vbox.pack_end(self.viewport)
         self.filter_vbox = None
         self.button = None
 
@@ -74,7 +68,7 @@ class ScreenContainer(object):
         if self.viewport.get_child():
             self.viewport.remove(self.viewport.get_child())
         self.viewport.add(widget)
-        self.scrolledwindow.show_all()
+        self.viewport.show_all()
 
     def size_get(self):
         return self.viewport.get_child().size_request()

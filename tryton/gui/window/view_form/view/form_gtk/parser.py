@@ -418,6 +418,14 @@ class ParserForm(ParserInterface):
                 widget, widgets, buttons, on_write, notebook_list2, cursor_widget2 = \
                         self.parse(model, node, fields, notebook,
                                 tooltips=tooltips)
+                max_width, max_height = -1, -1
+                for i in range(notebook.get_n_pages()):
+                    width, height = notebook.get_nth_page(i).size_request()
+                    if width > max_width:
+                        max_width = width
+                    if height > max_height:
+                        max_height = height
+                notebook.set_size_request(max_width + 20, max_height + 20)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
