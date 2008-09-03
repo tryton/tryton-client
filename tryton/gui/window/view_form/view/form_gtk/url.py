@@ -13,7 +13,7 @@ class URL(WidgetInterface):
             attrs = {}
         super(URL, self).__init__(window, parent, model, attrs=attrs)
 
-        self.widget = gtk.HBox(homogeneous=False)
+        self.widget = gtk.HBox(homogeneous=False, spacing=0)
 
         self.entry = gtk.Entry()
         self.entry.set_max_length(int(attrs.get('size', 0)))
@@ -27,7 +27,7 @@ class URL(WidgetInterface):
         self.tooltips = gtk.Tooltips()
         self.button = gtk.Button()
         img = gtk.Image()
-        img.set_from_stock('tryton-web-browser', gtk.ICON_SIZE_BUTTON)
+        img.set_from_stock('tryton-web-browser', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.button.set_image(img)
         self.button.set_relief(gtk.RELIEF_NONE)
         self.button.connect('clicked', self.button_clicked)

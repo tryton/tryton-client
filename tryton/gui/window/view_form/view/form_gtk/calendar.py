@@ -21,7 +21,7 @@ class Calendar(WidgetInterface):
         super(Calendar, self).__init__(window, parent, model=model, attrs=attrs)
 
         self.format = date_format()
-        self.widget = date_widget.ComplexEntry(self.format, spacing=3)
+        self.widget = date_widget.ComplexEntry(self.format, spacing=0)
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
@@ -32,7 +32,7 @@ class Calendar(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)
@@ -134,7 +134,7 @@ class DateTime(WidgetInterface):
         super(DateTime, self).__init__(window, parent, model, attrs=attrs)
 
         self.format = date_format() + ' ' + HM_FORMAT
-        self.widget = date_widget.ComplexEntry(self.format, spacing=3)
+        self.widget = date_widget.ComplexEntry(self.format, spacing=0)
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
@@ -144,7 +144,7 @@ class DateTime(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)

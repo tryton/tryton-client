@@ -17,14 +17,14 @@ class Binary(WidgetInterface):
 
         self.tooltips = gtk.Tooltips()
 
-        self.widget = gtk.HBox(spacing=5)
+        self.widget = gtk.HBox(spacing=0)
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('activates_default', True)
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
-        img_new.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
+        img_new.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
@@ -33,7 +33,7 @@ class Binary(WidgetInterface):
 
         self.but_save_as = gtk.Button()
         img_save_as = gtk.Image()
-        img_save_as.set_from_stock('tryton-save-as', gtk.ICON_SIZE_BUTTON)
+        img_save_as.set_from_stock('tryton-save-as', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_save_as.set_image(img_save_as)
         self.but_save_as.set_relief(gtk.RELIEF_NONE)
         self.but_save_as.connect('clicked', self.sig_save_as)
@@ -42,7 +42,7 @@ class Binary(WidgetInterface):
 
         self.but_remove = gtk.Button()
         img_remove = gtk.Image()
-        img_remove.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
+        img_remove.set_from_stock('tryton-clear', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_remove.set_image(img_remove)
         self.but_remove.set_relief(gtk.RELIEF_NONE)
         self.but_remove.connect('clicked', self.sig_remove)

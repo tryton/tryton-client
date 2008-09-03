@@ -79,7 +79,7 @@ class Form(SignalEvent):
 
         self.eb_info = gtk.EventBox()
         self.eb_info.add(self.info_label)
-        self.eb_info.connect('button-press-event',
+        self.eb_info.connect('button-release-event',
                 lambda *a: self.message_info(''))
 
         vbox = gtk.VBox()

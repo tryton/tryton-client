@@ -559,7 +559,7 @@ class Main(object):
         def leave(widget, event, img):
             img.set_from_stock('tryton-close', gtk.ICON_SIZE_SMALL_TOOLBAR)
 
-        eb.connect('button_press_event', self._sig_remove_book, page.widget)
+        eb.connect('button_release_event', self._sig_remove_book, page.widget)
         eb.connect('enter_notify_event', enter, img)
         eb.connect('leave_notify_event', leave, img)
 

@@ -74,7 +74,7 @@ class Dialog(object):
 
         self.eb_info = gtk.EventBox()
         self.eb_info.add(self.info_label)
-        self.eb_info.connect('button-press-event',
+        self.eb_info.connect('button-release-event',
                 lambda *a: self.message_info(''))
 
         vbox = gtk.VBox()
@@ -153,7 +153,7 @@ class Many2One(WidgetInterface):
             attrs = {}
         WidgetInterface.__init__(self, window, parent, model, attrs)
 
-        self.widget = gtk.HBox(spacing=3)
+        self.widget = gtk.HBox(spacing=0)
         self.widget.set_property('sensitive', True)
         self.widget.connect('focus-in-event', lambda x, y: self._focus_in())
         self.widget.connect('focus-out-event', lambda x, y: self._focus_out())
@@ -173,9 +173,9 @@ class Many2One(WidgetInterface):
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_open = gtk.Image()
-        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
+        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_edit)
@@ -185,7 +185,7 @@ class Many2One(WidgetInterface):
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
-        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
+        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
@@ -448,11 +448,11 @@ class Many2One(WidgetInterface):
         self.wid_text.set_text((res and str(res)) or '')
         img = gtk.Image()
         if res:
-            img.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Open a record'))
         else:
-            img.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
+            img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Search a record'))
         self.changed = True

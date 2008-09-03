@@ -14,7 +14,7 @@ import pango
 _ = gettext.gettext
 
 def _create_menu(self, attrs):
-    hbox = gtk.HBox(homogeneous=False, spacing=5)
+    hbox = gtk.HBox(homogeneous=False, spacing=0)
     menubar = gtk.MenuBar()
     if hasattr(menubar, 'set_pack_direction') and \
             hasattr(menubar, 'set_child_pack_direction'):
@@ -46,94 +46,102 @@ def _create_menu(self, attrs):
         self.wid_text.connect('activate', self._sig_activate)
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
-        self.eb_add = gtk.EventBox()
-        tooltips.set_tip(self.eb_add, _('Add'))
-        self.eb_add.set_events(gtk.gdk.BUTTON_PRESS)
-        self.eb_add.connect('button_press_event', self._sig_add)
+        self.but_add = gtk.Button()
+        tooltips.set_tip(self.but_add, _('Add'))
+        self.but_add.connect('clicked', self._sig_add)
         img_add = gtk.Image()
-        img_add.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
+        img_add.set_from_stock('tryton-list-add', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_add.set_alignment(0.5, 0.5)
-        self.eb_add.add(img_add)
-        hbox.pack_start(self.eb_add, expand=False, fill=False)
+        self.but_add.add(img_add)
+        self.but_add.set_relief(gtk.RELIEF_NONE)
+        self.but_add.set_property('can-focus', False)
+        hbox.pack_start(self.but_add, expand=False, fill=False)
 
-        self.eb_remove = gtk.EventBox()
-        tooltips.set_tip(self.eb_remove, _('Remove'))
-        self.eb_remove.set_events(gtk.gdk.BUTTON_PRESS)
-        self.eb_remove.connect('button_press_event', self._sig_remove, True)
+        self.but_remove = gtk.Button()
+        tooltips.set_tip(self.but_remove, _('Remove'))
+        self.but_remove.connect('clicked', self._sig_remove, True)
         img_remove = gtk.Image()
-        img_remove.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
+        img_remove.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_remove.set_alignment(0.5, 0.5)
-        self.eb_remove.add(img_remove)
-        hbox.pack_start(self.eb_remove, expand=False, fill=False)
+        self.but_remove.add(img_remove)
+        self.but_remove.set_relief(gtk.RELIEF_NONE)
+        self.but_remove.set_property('can-focus', False)
+        hbox.pack_start(self.but_remove, expand=False, fill=False)
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-    self.eb_new = gtk.EventBox()
-    tooltips.set_tip(self.eb_new, _('Create a new record'))
-    self.eb_new.set_events(gtk.gdk.BUTTON_PRESS)
-    self.eb_new.connect('button_press_event', self._sig_new)
+    self.but_new = gtk.Button()
+    tooltips.set_tip(self.but_new, _('Create a new record'))
+    self.but_new.connect('clicked', self._sig_new)
     img_new = gtk.Image()
-    img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
+    img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_new.set_alignment(0.5, 0.5)
-    self.eb_new.add(img_new)
-    hbox.pack_start(self.eb_new, expand=False, fill=False)
+    self.but_new.add(img_new)
+    self.but_new.set_relief(gtk.RELIEF_NONE)
+    self.but_new.set_property('can-focus', False)
+    hbox.pack_start(self.but_new, expand=False, fill=False)
 
-    self.eb_open = gtk.EventBox()
-    tooltips.set_tip(self.eb_open, _('Edit selected record'))
-    self.eb_open.set_events(gtk.gdk.BUTTON_PRESS)
-    self.eb_open.connect('button_press_event', self._sig_edit)
+    self.but_open = gtk.Button()
+    tooltips.set_tip(self.but_open, _('Edit selected record'))
+    self.but_open.connect('clicked', self._sig_edit)
     img_open = gtk.Image()
-    img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
+    img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_open.set_alignment(0.5, 0.5)
-    self.eb_open.add(img_open)
-    hbox.pack_start(self.eb_open, expand=False, fill=False)
+    self.but_open.add(img_open)
+    self.but_open.set_relief(gtk.RELIEF_NONE)
+    self.but_open.set_property('can-focus', False)
+    hbox.pack_start(self.but_open, expand=False, fill=False)
 
-    self.eb_del = gtk.EventBox()
-    tooltips.set_tip(self.eb_del, _('Delete selected record'))
-    self.eb_del.set_events(gtk.gdk.BUTTON_PRESS)
-    self.eb_del.connect('button_press_event', self._sig_remove)
+    self.but_del = gtk.Button()
+    tooltips.set_tip(self.but_del, _('Delete selected record'))
+    self.but_del.connect('clicked', self._sig_remove)
     img_del = gtk.Image()
-    img_del.set_from_stock('tryton-delete', gtk.ICON_SIZE_BUTTON)
+    img_del.set_from_stock('tryton-delete', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_del.set_alignment(0.5, 0.5)
-    self.eb_del.add(img_del)
-    hbox.pack_start(self.eb_del, expand=False, fill=False)
+    self.but_del.add(img_del)
+    self.but_del.set_relief(gtk.RELIEF_NONE)
+    self.but_del.set_property('can-focus', False)
+    hbox.pack_start(self.but_del, expand=False, fill=False)
 
     hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-    eb_pre = gtk.EventBox()
-    tooltips.set_tip(eb_pre, _('Previous'))
-    eb_pre.set_events(gtk.gdk.BUTTON_PRESS)
-    eb_pre.connect('button_press_event', self._sig_previous)
+    but_pre = gtk.Button()
+    tooltips.set_tip(but_pre, _('Previous'))
+    but_pre.connect('clicked', self._sig_previous)
     img_pre = gtk.Image()
-    img_pre.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_BUTTON)
+    img_pre.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_pre.set_alignment(0.5, 0.5)
-    eb_pre.add(img_pre)
-    hbox.pack_start(eb_pre, expand=False, fill=False)
+    but_pre.add(img_pre)
+    but_pre.set_relief(gtk.RELIEF_NONE)
+    but_pre.set_property('can-focus', False)
+    hbox.pack_start(but_pre, expand=False, fill=False)
 
     self.label = gtk.Label('(0,0)')
     hbox.pack_start(self.label, expand=False, fill=False)
 
-    eb_next = gtk.EventBox()
-    tooltips.set_tip(eb_next, _('Next'))
-    eb_next.set_events(gtk.gdk.BUTTON_PRESS)
-    eb_next.connect('button_press_event', self._sig_next)
+    but_next = gtk.Button()
+    tooltips.set_tip(but_next, _('Next'))
+    but_next.connect('clicked', self._sig_next)
     img_next = gtk.Image()
-    img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_BUTTON)
+    img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_next.set_alignment(0.5, 0.5)
-    eb_next.add(img_next)
-    hbox.pack_start(eb_next, expand=False, fill=False)
+    but_next.add(img_next)
+    but_next.set_relief(gtk.RELIEF_NONE)
+    but_next.set_property('can-focus', False)
+    hbox.pack_start(but_next, expand=False, fill=False)
 
     hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-    eb_switch = gtk.EventBox()
-    tooltips.set_tip(eb_switch, _('Switch'))
-    eb_switch.set_events(gtk.gdk.BUTTON_PRESS)
-    eb_switch.connect('button_press_event', self.switch_view)
+    but_switch = gtk.Button()
+    tooltips.set_tip(but_switch, _('Switch'))
+    but_switch.connect('clicked', self.switch_view)
     img_switch = gtk.Image()
-    img_switch.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_BUTTON)
+    img_switch.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_SMALL_TOOLBAR)
     img_switch.set_alignment(0.5, 0.5)
-    eb_switch.add(img_switch)
-    hbox.pack_start(eb_switch, expand=False, fill=False)
+    but_switch.add(img_switch)
+    but_switch.set_relief(gtk.RELIEF_NONE)
+    but_switch.set_property('can-focus', False)
+    hbox.pack_start(but_switch, expand=False, fill=False)
 
     tooltips.enable()
 
@@ -242,7 +250,7 @@ class Dialog(object):
 
         self.eb_info = gtk.EventBox()
         self.eb_info.add(self.info_label)
-        self.eb_info.connect('button-press-event',
+        self.eb_info.connect('button-release-event',
                 lambda *a: self.message_info(''))
 
         vbox = gtk.VBox()
@@ -304,41 +312,40 @@ class Dialog(object):
         if (event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
                 and event.state & gtk.gdk.CONTROL_MASK) \
                 or event.keyval == gtk.keysyms.F3:
-            self._sig_new(widget, event)
+            self._sig_new(widget)
             return False
         if event.keyval == gtk.keysyms.F2:
-            self._sig_edit(widget, event)
+            self._sig_edit(widget)
             return False
         if (event.keyval in (gtk.keysyms.L, gtk.keysyms.l) \
                 and event.state & gtk.gdk.CONTROL_MASK):
-            self.switch_view(widget, event)
+            self.switch_view(widget)
             return False
 
-    def switch_view(self, btn, arg):
+    def switch_view(self, widget):
         self.screen.switch_view()
 
-    def _sig_new(self, widget, event):
-        if event.type in (gtk.gdk.BUTTON_PRESS, gtk.gdk.KEY_PRESS):
-            if (self.screen.current_view.view_type == 'form') \
-                    or self.screen.editable_get():
-                self.screen.new(context=self.default_get_ctx)
-                self.screen.current_view.widget.set_sensitive(True)
-            else:
-                dia = Dialog(self.model_name, parent=self.parent,
-                        attrs=self.attrs, model_ctx=self.model_ctx,
-                        default_get_ctx=self.default_get_ctx,
-                        window=self.window)
-                res = True
-                while res:
-                    res, value = dia.run()
-                    if res:
-                        self.screen.models.model_add(value)
-                        value.signal('record-changed', value.parent)
-                        self.screen.display()
-                        dia.new()
-                dia.destroy()
+    def _sig_new(self, widget):
+        if (self.screen.current_view.view_type == 'form') \
+                or self.screen.editable_get():
+            self.screen.new(context=self.default_get_ctx)
+            self.screen.current_view.widget.set_sensitive(True)
+        else:
+            dia = Dialog(self.model_name, parent=self.parent,
+                    attrs=self.attrs, model_ctx=self.model_ctx,
+                    default_get_ctx=self.default_get_ctx,
+                    window=self.window)
+            res = True
+            while res:
+                res, value = dia.run()
+                if res:
+                    self.screen.models.model_add(value)
+                    value.signal('record-changed', value.parent)
+                    self.screen.display()
+                    dia.new()
+            dia.destroy()
 
-    def _sig_edit(self, widget=None, event=None):
+    def _sig_edit(self, widget=None):
         if self.screen.current_model:
             dia = Dialog(self.model_name, parent=self.parent,
                     model=self.screen.current_model, attrs=self.attrs,
@@ -346,19 +353,16 @@ class Dialog(object):
             res, value = dia.run()
             dia.destroy()
 
-    def _sig_next(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_next()
+    def _sig_next(self, widget):
+        self.screen.display_next()
 
-    def _sig_previous(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_prev()
+    def _sig_previous(self, widget):
+        self.screen.display_prev()
 
-    def _sig_remove(self, widget, event, remove=False):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.remove(remove=remove)
-            if not self.screen.models.models:
-                self.screen.current_view.widget.set_sensitive(False)
+    def _sig_remove(self, widget, remove=False):
+        self.screen.remove(remove=remove)
+        if not self.screen.models.models:
+            self.screen.current_view.widget.set_sensitive(False)
 
     def _sig_activate(self, *args):
         self._sig_add()
@@ -484,10 +488,10 @@ class One2Many(WidgetInterface):
                     and event.state & gtk.gdk.CONTROL_MASK \
                     and event.state & gtk.gdk.SHIFT_MASK) \
                 or event.keyval == gtk.keysyms.F3:
-            self._sig_new(widget, event)
+            self._sig_new(widget)
             return False
         if event.keyval == gtk.keysyms.F2:
-            self._sig_edit(widget, event)
+            self._sig_edit(widget)
             return False
 
     def destroy(self):
@@ -496,18 +500,18 @@ class One2Many(WidgetInterface):
     def _on_activate(self):
         self._sig_edit()
 
-    def switch_view(self, btn, arg):
+    def switch_view(self, widget):
         self.screen.switch_view()
 
     def _readonly_set(self, value):
-        self.eb_new.set_sensitive(not value)
-        self.eb_del.set_sensitive(not value)
+        self.but_new.set_sensitive(not value)
+        self.but_del.set_sensitive(not value)
         if self.attrs.get('add_remove'):
             self.wid_text.set_sensitive(not value)
-            self.eb_add.set_sensitive(not value)
-            self.eb_remove.set_sensitive(not value)
+            self.but_add.set_sensitive(not value)
+            self.but_remove.set_sensitive(not value)
 
-    def _sig_new(self, widget, event):
+    def _sig_new(self, widget):
         self._view.view_form.set_value()
         ctx = self._view.model.expr_eval(self.screen.default_get)
         ctx.update(self._view.model.expr_eval('dict(%s)' % \
@@ -520,40 +524,39 @@ class One2Many(WidgetInterface):
             if select_ids:
                 model = self.screen.models.get_by_id(select_ids[0])
                 idx = self.screen.models.models.index(model)
-        if event.type in (gtk.gdk.BUTTON_PRESS, gtk.gdk.KEY_PRESS):
-            if (self.screen.current_view.view_type == 'form') \
-                    or self.screen.editable_get():
-                self.screen.new(context=ctx)
-                self.screen.current_view.widget.set_sensitive(True)
-            else:
-                readonly = False
-                domain = []
-                if self._view.modelfield and self._view.model:
-                    modelfield = self._view.modelfield
-                    model = self._view.model
-                    readonly = modelfield.get_state_attrs(model
-                            ).get('readonly', False)
-                    domain = modelfield.domain_get(self._view.model)
-                dia = Dialog(self.attrs['relation'], parent=self._view.model,
-                        attrs=self.attrs,
-                        model_ctx=self.screen.models._context,
-                        default_get_ctx=ctx, window=self._window,
-                        readonly=readonly, domain=domain)
-                res = True
-                while res:
-                    res, value = dia.run()
-                    if res:
-                        if idx >= 0:
-                            idx += 1
-                        self.screen.models.model_add(value, position=idx)
-                        value.signal('record-changed', value.parent)
-                        self.screen.display_next()
-                        dia.new()
-                dia.destroy()
+        if (self.screen.current_view.view_type == 'form') \
+                or self.screen.editable_get():
+            self.screen.new(context=ctx)
+            self.screen.current_view.widget.set_sensitive(True)
+        else:
+            readonly = False
+            domain = []
+            if self._view.modelfield and self._view.model:
+                modelfield = self._view.modelfield
+                model = self._view.model
+                readonly = modelfield.get_state_attrs(model
+                        ).get('readonly', False)
+                domain = modelfield.domain_get(self._view.model)
+            dia = Dialog(self.attrs['relation'], parent=self._view.model,
+                    attrs=self.attrs,
+                    model_ctx=self.screen.models._context,
+                    default_get_ctx=ctx, window=self._window,
+                    readonly=readonly, domain=domain)
+            res = True
+            while res:
+                res, value = dia.run()
+                if res:
+                    if idx >= 0:
+                        idx += 1
+                    self.screen.models.model_add(value, position=idx)
+                    value.signal('record-changed', value.parent)
+                    self.screen.display_next()
+                    dia.new()
+            dia.destroy()
         if sequence:
             self.screen.models.set_sequence(field=sequence)
 
-    def _sig_edit(self, widget=None, event=None):
+    def _sig_edit(self, widget=None):
         self._view.view_form.set_value()
         if self.screen.current_model:
             readonly = False
@@ -570,19 +573,16 @@ class One2Many(WidgetInterface):
             res, value = dia.run()
             dia.destroy()
 
-    def _sig_next(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_next()
+    def _sig_next(self, widget):
+        self.screen.display_next()
 
-    def _sig_previous(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_prev()
+    def _sig_previous(self, widget):
+        self.screen.display_prev()
 
-    def _sig_remove(self, widget, event, remove=False):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.remove(remove=remove)
-            if not self.screen.models.models:
-                self.screen.current_view.widget.set_sensitive(False)
+    def _sig_remove(self, widget, remove=False):
+        self.screen.remove(remove=remove)
+        if not self.screen.models.models:
+            self.screen.current_view.widget.set_sensitive(False)
 
     def _sig_activate(self, *args):
         self._sig_add()
