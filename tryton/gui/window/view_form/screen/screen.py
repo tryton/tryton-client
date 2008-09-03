@@ -125,11 +125,12 @@ class Screen(SignalEvent):
         filter_keys = []
         for key, operator, value in values:
             filter_keys.append(key)
-        for key, operator, value in self.domain:
+        for args in self.domain:
+            key, operator, value = args[:3]
             if key not in filter_keys and \
                     not (key == 'active' \
                     and self.context.get('active_test', False)):
-                values.append((key, operator, value))
+                values.append((key, operator, value) + args[3:])
         try:
             try:
                 ids = rpc.execute('object', 'execute',
