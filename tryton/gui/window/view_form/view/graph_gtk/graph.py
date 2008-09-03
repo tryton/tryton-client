@@ -138,7 +138,6 @@ class Graph(gtk.DrawingArea):
             'model': self.model,
             'id': ids[0],
             'ids': ids,
-            'window': window,
             }, context=ctx, warning=False)
 
     def drawBackground(self, cr, width, height):
