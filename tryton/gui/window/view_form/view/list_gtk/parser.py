@@ -21,6 +21,7 @@ from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
 import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
+from tryton.common.cellrendererdate import CellRendererDate
 from tryton.action import Action
 from tryton.translate import date_format
 
@@ -231,7 +232,8 @@ class ParserTree(ParserInterface):
 
 class Char(object):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None, window=None):
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
         self.field_name = field_name
         self.model = model
         self.attrs = attrs or {}
@@ -316,6 +318,15 @@ class Boolean(Int):
 class Date(Char):
     server_format = DT_FORMAT
     display_format = date_format()
+
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        self.field_name = field_name
+        self.model = model
+        self.attrs = attrs or {}
+        self.renderer = CellRendererDate(self.display_format)
+        self.treeview = treeview
+        self.window = window
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)

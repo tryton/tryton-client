@@ -174,11 +174,11 @@ class DateEntry(gtk.Entry):
                 self.stop_emission("key-press-event")
                 return True
         elif event.keyval in (ord('+'),ord('-'),ord('=')):
-                self.mode_cmd = True
-                self.date_get()
-                if self.callback_process: self.callback_process(True, self, event)
-                self.stop_emission("key-press-event")
-                return True
+            self.mode_cmd = True
+            self.date_get()
+            if self.callback_process: self.callback_process(True, self, event)
+            self.stop_emission("key-press-event")
+            return True
         elif self.mode_cmd:
             if self.callback: self.callback(event)
             return True
@@ -218,37 +218,38 @@ class ComplexEntry(gtk.HBox):
             self.widget_cmd.show()
             self._date_cb(event)
         else:
-            data = self.widget.get_text()
             if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
-                lst = {
-                    '^=(\d+)w$': lambda dt,r: dt+RelativeDateTime(day=0, month=0, weeks = int(r.group(1))),
-                    '^=(\d+)d$': lambda dt,r: dt+RelativeDateTime(day=int(r.group(1))),
-                    '^=(\d+)m$': lambda dt,r: dt+RelativeDateTime(day=0, month = int(r.group(1))),
-                    '^=(2\d\d\d)y$': lambda dt,r: dt+RelativeDateTime(year = int(r.group(1))),
-                    '^=(\d+)h$': lambda dt,r: dt+RelativeDateTime(hour = int(r.group(1))),
-                    '^([\\+-]\d+)h$': lambda dt,r: dt+RelativeDateTime(hours = int(r.group(1))),
-                    '^([\\+-]\d+)w$': lambda dt,r: dt+RelativeDateTime(days = 7*int(r.group(1))),
-                    '^([\\+-]\d+)d$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
-                    '^([\\+-]\d+)m$': lambda dt,r: dt+RelativeDateTime(months = int(r.group(1))),
-                    '^([\\+-]\d+)y$': lambda dt,r: dt+RelativeDateTime(years = int(r.group(1))),
-                    '^=$': lambda dt,r: now(),
-                    '^-$': lambda dt,r: False
-                }
                 cmd = self.widget_cmd.get_text()
-                for r,f in lst.items():
-                    groups = re.match(r, cmd)
-                    if groups:
-                        dt = self.widget.date_get()
-                        if not dt:
-                            dt = time.strftime(self.widget.format, time.localtime())
-                            dt = strptime(dt, self.widget.format)
-                        self.widget.date_set(f(dt,groups))
-                        break
-
-                # Compute HERE using DATA and setting WIDGET
-                pass
+                dt = self.widget.date_get()
+                res = compute_date(cmd, dt, self.widget.format)
+                if res:
+                    self.widget.date_set(res)
             self.widget_cmd.set_text('')
             self.widget_cmd.hide()
+
+
+def compute_date(cmd, dt, format):
+    lst = {
+        '^=(\d+)w$': lambda dt,r: dt+RelativeDateTime(day=0, month=0, weeks = int(r.group(1))),
+        '^=(\d+)d$': lambda dt,r: dt+RelativeDateTime(day=int(r.group(1))),
+        '^=(\d+)m$': lambda dt,r: dt+RelativeDateTime(day=0, month = int(r.group(1))),
+        '^=(2\d\d\d)y$': lambda dt,r: dt+RelativeDateTime(year = int(r.group(1))),
+        '^=(\d+)h$': lambda dt,r: dt+RelativeDateTime(hour = int(r.group(1))),
+        '^([\\+-]\d+)h$': lambda dt,r: dt+RelativeDateTime(hours = int(r.group(1))),
+        '^([\\+-]\d+)w$': lambda dt,r: dt+RelativeDateTime(days = 7*int(r.group(1))),
+        '^([\\+-]\d+)d$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
+        '^([\\+-]\d+)m$': lambda dt,r: dt+RelativeDateTime(months = int(r.group(1))),
+        '^([\\+-]\d+)y$': lambda dt,r: dt+RelativeDateTime(years = int(r.group(1))),
+        '^=$': lambda dt,r: now(),
+        '^-$': lambda dt,r: False
+    }
+    for r,f in lst.items():
+        groups = re.match(r, cmd)
+        if groups:
+            if not dt:
+                dt = time.strftime(format, time.localtime())
+                dt = strptime(dt, format)
+            return f(dt, groups)
 
 if __name__ == '__main__':
     import sys
