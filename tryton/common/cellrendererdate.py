@@ -69,7 +69,10 @@ class CellRendererDate(gtk.GenericCellRenderer):
         editable.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
         editable.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("black"))
 
-        editable.set_text(self.text)
+        if self.text:
+            editable.set_text(self.text)
+        else:
+            editable.clear()
         editable.grab_focus()
         editable.show()
         return editable
