@@ -26,10 +26,13 @@ class CellRendererDate(gtk.GenericCellRenderer):
     def __init__(self, format):
         self.__gobject_init__()
         self._renderer = gtk.CellRendererText()
+        self._renderer.set_property('family', 'Monospace')
         self.set_property("mode", self._renderer.get_property("mode"))
 
         self.format = format
         self.cmd = ''
+        self.text = self._renderer.get_property('text')
+        self.editable = self._renderer.get_property('editable')
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
