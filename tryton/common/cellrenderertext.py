@@ -1,16 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
-from date_widget import mapping, DateEntry, compute_date
-import re
-import time
-from mx.DateTime import RelativeDateTime
-from mx.DateTime import DateTime
-from mx.DateTime import now
-from mx.DateTime import strptime
 
 
-class CellRendererDate(gtk.GenericCellRenderer):
+class CellRendererText(gtk.GenericCellRenderer):
     __gproperties__ = {
             'text': (gobject.TYPE_STRING, None, 'Text',
                 'Text', gobject.PARAM_READWRITE),
@@ -22,14 +15,11 @@ class CellRendererDate(gtk.GenericCellRenderer):
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
     }
 
-    def __init__(self, format):
+    def __init__(self):
         self.__gobject_init__()
         self._renderer = gtk.CellRendererText()
-        self._renderer.set_property('family', 'Monospace')
         self.set_property("mode", self._renderer.get_property("mode"))
 
-        self.format = format
-        self.cmd = ''
         self.text = self._renderer.get_property('text')
         self.editable = self._renderer.get_property('editable')
 
@@ -56,7 +46,10 @@ class CellRendererDate(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
-        editable = DateEntry(self.format, self._date_cb, self._process_cb)
+        if not event:
+            event = gtk.gdk.Event(gtk.keysyms.Tab)
+        editable = self._renderer.start_editing(event, widget, path,
+                background_area, cell_area, flags)
 
         colormap = editable.get_colormap()
         if hasattr(self, 'background'):
@@ -69,29 +62,6 @@ class CellRendererDate(gtk.GenericCellRenderer):
         editable.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
         editable.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("black"))
 
-        editable.set_text(self.text)
-        editable.grab_focus()
-        editable.show()
         return editable
 
-    def _date_cb(self, event):
-        if event.keyval in (gtk.keysyms.BackSpace,):
-            self.cmd = self.cmd[:-1]
-            return True
-        if event.keyval < 250:
-            value = chr(event.keyval)
-            self.cmd += value
-        return True
-
-    def _process_cb(self, ok, widget, event=None):
-        if ok:
-            self._date_cb(event)
-        else:
-            if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
-                dt = widget.date_get()
-                res= compute_date(self.cmd, dt, widget.format)
-                if res:
-                    widget.date_set(res)
-            self.cmd = ''
-
-gobject.type_register(CellRendererDate)
+gobject.type_register(CellRendererText)

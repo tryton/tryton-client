@@ -22,6 +22,7 @@ from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
 import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
+from tryton.common.cellrenderertext import CellRendererText
 from tryton.action import Action
 from tryton.translate import date_format
 
@@ -237,7 +238,7 @@ class Char(object):
         self.field_name = field_name
         self.model = model
         self.attrs = attrs or {}
-        self.renderer = gtk.CellRendererText()
+        self.renderer = CellRendererText()
         self.treeview = treeview
         self.window = window
 
