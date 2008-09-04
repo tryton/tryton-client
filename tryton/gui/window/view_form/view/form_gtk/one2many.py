@@ -200,6 +200,7 @@ class Dialog(object):
         self.dia.show()
 
         self.screen = Screen(model_name, self.dia, view_type=[], parent=parent,
+                parent_name=attrs.get('relation_field'),
                 exclude_field=attrs.get('relation_field', None), readonly=readonly,
                 domain=domain)
         self.screen.models._context.update(model_ctx)
@@ -460,7 +461,8 @@ class One2Many(WidgetInterface):
 
         self.screen = Screen(attrs['relation'], self._window,
                 view_type=attrs.get('mode','tree,form').split(','),
-                parent=self.parent, views_preload=attrs.get('views', {}),
+                parent=self.parent, parent_name=attrs.get('relation_field'),
+                views_preload=attrs.get('views', {}),
                 tree_saves=attrs.get('saves', False), create_new=True,
                 row_activate=self._on_activate,
                 default_get=attrs.get('default_get', {}),

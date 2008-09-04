@@ -71,11 +71,12 @@ class ModelList(list):
 
 class ModelRecordGroup(SignalEvent):
 
-    def __init__(self, resource, fields, window, ids=None, parent=None, context=None,
-            readonly=False):
+    def __init__(self, resource, fields, window, ids=None, parent=None,
+            parent_name='', context=None, readonly=False):
         super(ModelRecordGroup, self).__init__()
         self.window = window
         self.parent = parent
+        self.parent_name = parent_name
         self._context = context or {}
         self.resource = resource
         self.rpc = RPCProxy(resource)
@@ -156,7 +157,7 @@ class ModelRecordGroup(SignalEvent):
         newmods = []
         for id in ids:
             newmod = ModelRecord(self.resource, id, self.window,
-                    parent=self.parent, group=self)
+                    parent=self.parent, parent_name=self.parent_name, group=self)
             self.models.append(newmod)
             newmods.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
@@ -221,6 +222,7 @@ class ModelRecordGroup(SignalEvent):
             self.models.insert(position, model)
         self.current_idx = position
         model.parent = self.parent
+        model.parent_name = self.parent_name
         model.window = self.window
         if modified:
             model.modified = True
@@ -245,7 +247,7 @@ class ModelRecordGroup(SignalEvent):
 
     def model_new(self, default=True, domain=None, context=None):
         newmod = ModelRecord(self.resource, None, self.window, group=self,
-                parent=self.parent, new=True)
+                parent=self.parent, parent_name=self.parent_name, new=True)
         newmod.signal_connect(self, 'record-changed', self._record_changed)
         newmod.signal_connect(self, 'record-modified', self._record_modified)
         if default:

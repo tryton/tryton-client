@@ -17,7 +17,7 @@ class EvalEnvironment(object):
         self.check_load = check_load
 
     def __getattr__(self, item):
-        if item == 'parent' and self.parent.parent:
+        if item == '_parent_' + self.parent.parent_name and self.parent.parent:
             return EvalEnvironment(self.parent.parent)
         return self.parent.get_eval(check_load=self.check_load)[item]
 
@@ -27,7 +27,8 @@ class ModelRecord(SignalEvent):
     id = -1
 
 
-    def __init__(self, resource, obj_id, window, group=None, parent=None, new=False ):
+    def __init__(self, resource, obj_id, window, group=None, parent=None,
+            parent_name='', new=False):
         global ID_COUNT
         super(ModelRecord, self).__init__()
         self.window = window
@@ -38,6 +39,7 @@ class ModelRecord(SignalEvent):
             ModelRecord.id -= 1
         self._loaded = False
         self.parent = parent
+        self.parent_name = parent_name
         self.mgroup = group
         self.value = {}
         self.state_attrs = {}
@@ -296,8 +298,9 @@ class ModelRecord(SignalEvent):
         ctx['time'] = time
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
-        if self.parent:
-            ctx['parent'] = EvalEnvironment(self.parent, check_load)
+        if self.parent and self.parent_name:
+            ctx['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
+                    check_load)
         val = eval(dom, ctx)
         return val
 

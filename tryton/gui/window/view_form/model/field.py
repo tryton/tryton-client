@@ -383,7 +383,7 @@ class O2MField(CharField):
     def set(self, model, value, modified=False):
         from group import ModelRecordGroup
         mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
-                parent=model)
+                parent=model, parent_name=self.attrs.get('relation_field', ''))
         mod.signal_connect(mod, 'model-changed', self._model_changed)
         model.value[self.name] = mod
         #self.internal.signal_connect(self.internal, 'model-changed',

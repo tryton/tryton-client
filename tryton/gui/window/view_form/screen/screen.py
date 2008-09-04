@@ -16,9 +16,9 @@ class Screen(SignalEvent):
     "Screen"
 
     def __init__(self, model_name, window, view_ids=None, view_type=None,
-            parent=None, context=None, views_preload=None, tree_saves=True,
-            domain=None, create_new=False, row_activate=None, hastoolbar=False,
-            default_get=None, show_search=False, limit=None,
+            parent=None, parent_name='', context=None, views_preload=None,
+            tree_saves=True, domain=None, create_new=False, row_activate=None,
+            hastoolbar=False, default_get=None, show_search=False, limit=None,
             readonly=False, form=None, exclude_field=None, sort=None,
             search_value=None):
         if view_ids is None:
@@ -58,9 +58,10 @@ class Screen(SignalEvent):
         self.view_ids = view_ids
         self.models = None
         self.parent = parent
+        self.parent_name = parent_name
         self.window = window
         models = ModelRecordGroup(model_name, self.fields, self.window,
-                parent=self.parent, context=self.context,
+                parent=self.parent, parent_name=parent_name, context=self.context,
                 readonly=readonly)
         self.models_set(models)
         self.current_model = None
@@ -164,6 +165,7 @@ class Screen(SignalEvent):
             self.models.signal_unconnect(self.models)
         self.models = models
         self.parent = models.parent
+        self.parent_name = models.parent_name
         if len(models.models):
             self.current_model = models.models[0]
         else:
@@ -326,7 +328,6 @@ class Screen(SignalEvent):
         else:
             self.models.add_fields(fields, self.models, context=context)
 
-        self.set_domain()
         self.fields = self.models.fields
 
         parser = WidgetParse(parent=self.parent, window=self.window)
@@ -339,23 +340,6 @@ class Screen(SignalEvent):
             self.current_view.display()
             self.screen_container.set(view.widget)
         return view
-
-    def set_domain(self):
-        fields = self.models.fields
-        for dom in self.domain:
-            #XXX to improve for new domain structure
-            if not isinstance(dom, tuple):
-                continue
-            if dom[0] in fields:
-                field_dom = str(fields[dom[0]].setdefault('domain',[]))
-                if dom[1] == 'child_of':
-                    fields[dom[0]]['domain'] = field_dom[:1] + \
-                            str((dom[0], dom[1], dom[2])) + ',' + field_dom[1:]
-                else:
-                    fields[dom[0]]['domain'] = field_dom[:1] + \
-                            str(('id', dom[1], dom[2])) + ',' + field_dom[1:]
-                if dom[1] == '=':
-                    fields[dom[0]]['readonly'] = True
 
     def editable_get(self):
         if hasattr(self.current_view, 'widget_tree'):
