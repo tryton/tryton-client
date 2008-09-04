@@ -479,7 +479,7 @@ class Screen(SignalEvent):
             if reload_ids:
                 self.models.reload(reload_ids)
             self.display()
-            res = obj_id
+            res = True
         if self.current_view.view_type == 'tree':
             ids = self.current_view.sel_ids_get()
             if delete and ids:
@@ -512,7 +512,7 @@ class Screen(SignalEvent):
                 self.models.reload(reload_ids)
             self.current_view.set_cursor()
             self.display()
-            res = ids
+            res = True
         return res
 
     def load(self, ids, set_cursor=True, modified=False):
