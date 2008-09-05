@@ -147,11 +147,13 @@ class Wizard(object):
         from tryton.action import Action
         if not 'form' in datas:
             datas['form'] = {}
+        args = ('wizard', 'create', action)
         try:
-            wiz_id = rpc.execute('wizard', 'create', action)
+            wiz_id = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, parent)
-            return
+            wiz_id = common.process_exception(exception, parent, *args)
+            if not wiz_id:
+                return
         dia = None
         while state != 'end':
             ctx = context.copy()
