@@ -24,12 +24,11 @@ class Action(object):
         ids = datas['ids']
         del datas['ids']
         if not ids:
+            args = ('object', 'execute', datas['model'], 'search', [])
             try:
-                ids = rpc.execute('object', 'execute', datas['model'],
-                        'search', [])
+                ids = rpc.execute(*args)
             except Exception, exception:
-                ids = common.process_exception(exception, window,
-                        'object', 'execute', datas['model'], 'search', [])
+                ids = common.process_exception(exception, window, *args)
                 if not ids:
                     return False
             if ids == []:
@@ -38,11 +37,11 @@ class Action(object):
             datas['id'] = ids[0]
         ctx = rpc.CONTEXT.copy()
         ctx.update(context)
+        args = ('report', 'execute', name, ids, datas, ctx)
         try:
-            res = rpc.execute('report', 'execute', name, ids, datas, ctx)
+            res = rpc.execute(*args)
         except Exception, exception:
-            res = common.process_exception(exception, window,
-                    'report', 'execute', name, ids, datas, ctx)
+            res = common.process_exception(exception, window, *args)
             if not res:
                 return False
         if not res:
