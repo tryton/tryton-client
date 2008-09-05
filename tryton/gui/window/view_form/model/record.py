@@ -45,7 +45,7 @@ class ModelRecord(SignalEvent):
         self.state_attrs = {}
         self.__modified = False
         self.modified_fields = {}
-        self.read_time = time.time()
+        self._timestamp = None
         self.attachment_count = -1
         self.next = {}
         for key, val in self.mgroup.mfields.items():
@@ -74,7 +74,8 @@ class ModelRecord(SignalEvent):
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
             try:
-                values = self.rpc.read(ids, self.mgroup.mfields.keys(), ctx)
+                values = self.rpc.read(ids, self.mgroup.mfields.keys() + \
+                        ['_timestamp'], ctx)
             except Exception, exception:
                 log = logging.getLogger('record')
                 log.error('%s' % exception.args[-1])
@@ -165,8 +166,8 @@ class ModelRecord(SignalEvent):
             value = self.get(get_readonly=False, get_modifiedonly=True)
             context = self.context_get()
             context = context.copy()
-            #XXX must compute delta on server side
-            context['read_delta'] = time.time() - self.read_time
+            context['_timestamp'] = {}
+            context['_timestamp'][self.id] = self._timestamp
             args = ('object', 'execute', self.resource, 'write',
                     [self.id], value, context)
             try:
@@ -254,6 +255,9 @@ class ModelRecord(SignalEvent):
     def set(self, val, modified=False, signal=True):
         later = {}
         for fieldname, value in val.items():
+            if fieldname == '_timestamp':
+                self._timestamp = value
+                continue
             if fieldname not in self.mgroup.mfields:
                 continue
             if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
@@ -275,10 +279,12 @@ class ModelRecord(SignalEvent):
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
         try:
-            res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
+            res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
+                    ['_timestamp'], ctx)
         except Exception, exception:
             common.process_exception(exception, self.window)
-            res = self.rpc.read([self.id], self.mgroup.mfields.keys(), ctx)
+            res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
+                    ['_timestamp'], ctx)
         if res:
             value = res[0]
             self.read_time = time.time()

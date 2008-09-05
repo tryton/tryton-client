@@ -637,13 +637,14 @@ def process_exception(exception, parent, obj='', method='', *args):
     if exception.args[0] == 'ConcurrencyException' \
             and len(args) > 4:
         if concurrency(args[0], args[2][0], args[4], parent):
-            if 'read_delta' in args[4]:
-                del args[4]['read_delta']
+            if '_timestamp' in args[4]:
+                del args[4]['_timestamp']
             try:
                 return rpc.execute(obj, method, *args)
             except Exception, exception:
                 return process_exception(exception, parent, obj,
                         method, *args)
+        return False
 
     if exception.args[0] == 'UserError':
         msg = ''

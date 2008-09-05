@@ -174,7 +174,8 @@ class ModelRecordGroup(SignalEvent):
         ctx.update(self.context)
         if self.fields:
             try:
-                values = self.rpc.read(ids[:80], self.fields.keys(), ctx)
+                values = self.rpc.read(ids[:80], self.fields.keys() + \
+                        ['_timestamp'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 return False
