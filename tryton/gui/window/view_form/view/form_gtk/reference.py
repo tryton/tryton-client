@@ -196,11 +196,14 @@ class Reference(WidgetInterface):
         self.display(self._view.model, self._view.modelfield)
 
     def sig_new(self, *args):
-        dia = Dialog(self.get_model(), window=self._window)
+        model = self.get_model()
+        if not model:
+            return
+        dia = Dialog(model, window=self._window)
         res, value = dia.run()
         if res:
             self._view.modelfield.set_client(self._view.model,
-                    (self.get_model(), value))
+                    (model, value))
             self.display(self._view.model, self._view.modelfield)
         dia.destroy()
 
