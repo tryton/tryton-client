@@ -372,6 +372,7 @@ class Screen(SignalEvent):
         self.display()
         if self.current_view:
             self.current_view.set_cursor(new=True)
+        self.request_set()
         return self.current_model
 
     def new_model_position(self):
@@ -417,6 +418,7 @@ class Screen(SignalEvent):
             self.display()
         if self.current_model not in self.models:
             self.models.model_add(self.current_model, modified=False)
+        self.request_set()
         return obj_id
 
     def _get_current_view(self):
@@ -452,6 +454,7 @@ class Screen(SignalEvent):
         if self.parent:
             self.parent.reload()
         self.display()
+        self.request_set()
 
     def remove(self, delete=False, remove=False):
         res = False
@@ -513,6 +516,7 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             self.display()
             res = True
+        self.request_set()
         return res
 
     def load(self, ids, set_cursor=True, modified=False):
@@ -525,6 +529,7 @@ class Screen(SignalEvent):
         else:
             self.current_model = None
             self.display()
+        self.request_set()
 
     def display(self, res_id=None):
         if res_id:
@@ -591,3 +596,8 @@ class Screen(SignalEvent):
     def on_change(self, fieldname, attr):
         self.current_model.on_change(fieldname, attr)
         self.display()
+
+    def request_set(self):
+        if self.name == 'res.request':
+            from tryton.gui.main import Main
+            Main.get_main().request_set()
