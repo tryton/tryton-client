@@ -228,7 +228,8 @@ class Attachment(object):
                 (fileno, file_name) = tempfile.mkstemp(
                         data['name'], 'tryton_')
                 file_p = file(file_name, 'wb+')
-                file_p.write(base64.decodestring(data['datas']))
+                if data['datas']:
+                    file_p.write(base64.decodestring(data['datas']))
                 file_p.close()
                 os.close(fileno)
             ext = file_name.split('.')[-1].lower()
