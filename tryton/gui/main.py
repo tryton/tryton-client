@@ -303,25 +303,34 @@ class Main(object):
         self._sig_child_call(widget, 'but_close')
 
     def sig_request_new(self, widget):
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx['active_test'] = False
         return Window.create(None, 'res.request', False,
                 [('act_from', '=', rpc._USER)], 'form',
                 mode=['form', 'tree'], window=self.window,
-                context={'active_test': False})
+                context=ctx)
 
     def sig_request_open(self, widget):
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx['active_test'] = False
         ids = self.request_set()[0]
         return Window.create(False, 'res.request', ids,
                 [('act_to', '=', rpc._USER), ('active', '=', True)],
                 'form', mode=['tree', 'form'], window=self.window,
-                context={'active_test': False})
+                context=ctx)
 
     def sig_request_wait(self, widget):
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx['active_test'] = False
         ids = self.request_set()[0]
         return Window.create(False, 'res.request', ids,
                 [('act_from', '=', rpc._USER),
                     ('state', '=', 'waiting'), ('active', '=', True)],
                 'form', mode=['tree', 'form'], window=self.window,
-                context={'active_test': False})
+                context=ctx)
 
     def request_set(self):
         try:
