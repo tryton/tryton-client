@@ -10,6 +10,7 @@ from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
         TRYTON_ICON
 from tryton.common import date_widget
 from tryton.translate import date_format
+import mx.DateTime
 
 _ = gettext.gettext
 
@@ -65,10 +66,10 @@ class Calendar(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value, self.format)
+            date = mx.DateTime.strptime(value, self.format)
         except:
             return False
-        return time.strftime(DT_FORMAT, date)
+        return date.strftime(DT_FORMAT)
 
     def set_value(self, model, model_field):
         model_field.set_client(model, self.get_value(model))
@@ -85,8 +86,15 @@ class Calendar(WidgetInterface):
         else:
             if len(value)>10:
                 value = value[:10]
-            date = time.strptime(value, DT_FORMAT)
-            value = time.strftime(self.format, date)
+            date = mx.DateTime.strptime(value, DT_FORMAT)
+            format = self.format
+            if date.year < 10:
+                format = format.replace('%Y', '000%Y')
+            elif date.year < 100:
+                format = format.replace('%Y', '00%Y')
+            elif date.year < 1000:
+                format = format.replace('%Y', '0%Y')
+            value = date.strftime(format)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -120,8 +128,15 @@ class Calendar(WidgetInterface):
         response = win.run()
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
-            date = DT.date(year, month+1, day)
-            self.entry.set_text(date.strftime(self.format))
+            date = mx.DateTime.DateTime(year, month + 1, day)
+            format = self.format
+            if date.year < 10:
+                format = format.replace('%Y', '000%Y')
+            elif date.year < 100:
+                format = format.replace('%Y', '00%Y')
+            elif date.year < 1000:
+                format = format.replace('%Y', '0%Y')
+            self.entry.set_text(date.strftime(format))
         self._focus_out()
         self._window.present()
         win.destroy()
@@ -177,7 +192,7 @@ class DateTime(WidgetInterface):
         if value == '':
             return False
         try:
-            date = time.strptime(value, self.format)
+            date = mx.DateTime.strptime(value, self.format)
         except:
             return False
         if 'timezone' in rpc.CONTEXT and timezone:
@@ -185,14 +200,14 @@ class DateTime(WidgetInterface):
                 import pytz
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
-                datetime = DT.datetime(date[0], date[1], date[2], date[3],
-                        date[4], date[5], date[6])
+                datetime = DT.datetime(date.year, date.month, date.day,
+                        date.hour, date.minute, date.second)
                 ldt = lzone.localize(datetime, is_dst=True)
                 sdt = ldt.astimezone(szone)
-                date = sdt.timetuple()
+                date = mx.DateTime.DateTime(*(sdt.timetuple()[:6]))
             except:
                 pass
-        return time.strftime(DHM_FORMAT, date)
+        return date.strftime(DHM_FORMAT)
 
     def set_value(self, model, model_field):
         model_field.set_client(model, self.get_value(model))
@@ -208,20 +223,27 @@ class DateTime(WidgetInterface):
         if not dt_val:
             self.entry.clear()
         else:
-            date = time.strptime(dt_val, DHM_FORMAT)
+            date = mx.DateTime.strptime(dt_val, DHM_FORMAT)
             if 'timezone' in rpc.CONTEXT and timezone:
                 try:
                     import pytz
                     lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                     szone = pytz.timezone(rpc.TIMEZONE)
-                    datetime = DT.datetime(date[0], date[1], date[2], date[3],
-                            date[4], date[5], date[6])
+                    datetime = DT.datetime(date.year, date.month, date.day,
+                            date.hour, date.minute, date.second)
                     sdt = szone.localize(datetime, is_dst=True)
                     ldt = sdt.astimezone(lzone)
-                    date = ldt.timetuple()
+                    date = mx.DateTime.DateTime(*(ldt.timetuple()[:6]))
                 except:
                     pass
-            value = time.strftime(self.format, date)
+            format = self.format
+            if date.year < 10:
+                format = format.replace('%Y', '000%Y')
+            elif date.year < 100:
+                format = format.replace('%Y', '00%Y')
+            elif date.year < 1000:
+                format = format.replace('%Y', '0%Y')
+            value = date.strftime(format)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -272,8 +294,8 @@ class DateTime(WidgetInterface):
             year = int(cal.get_date()[0])
             month = int(cal.get_date()[1]) + 1
             day = int(cal.get_date()[2])
-            date = DT.datetime(year, month, day, hour, minute)
-            value = time.strftime(DHM_FORMAT, date.timetuple())
+            date = mx.DateTime.DateTime(year, month, day, hour, minute)
+            value = date.strftime(DHM_FORMAT)
             self.show(value, timezone=False)
         self._focus_out()
         self._window.present()

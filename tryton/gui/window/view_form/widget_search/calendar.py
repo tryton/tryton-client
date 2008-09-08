@@ -8,6 +8,7 @@ from interface import Interface
 from tryton.common import DT_FORMAT
 from tryton.common import date_widget
 from tryton.translate import date_format
+import mx.DateTime
 
 _ = gettext.gettext
 
@@ -64,10 +65,10 @@ class Calendar(Interface):
 
     def _date_get(self, value):
         try:
-            date = time.strptime(value, self.format)
+            date = mx.DateTime.strptime(value, self.format)
         except:
             return False
-        return time.strftime(DT_FORMAT, date)
+        return date.strftime(DT_FORMAT)
 
     def _value_get(self):
         res = []
@@ -84,6 +85,7 @@ class Calendar(Interface):
             if not value:
                 return ''
             try:
+                value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
                 return value.strftime(self.format)
             except:
                 return ''
@@ -127,7 +129,7 @@ class Calendar(Interface):
         response = win.run()
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
-            date = DT.date(year, month+1, day)
+            date = mx.DateTime.DateTime(year, month + 1, day)
             dest.set_text(date.strftime(self.format))
         win.destroy()
 

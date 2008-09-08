@@ -25,6 +25,7 @@ from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
 from tryton.action import Action
 from tryton.translate import date_format
+import mx.DateTime
 
 def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
@@ -333,22 +334,17 @@ class Date(Char):
         value = model[self.field_name].get_client(model)
         if not value:
             return ''
-        date = time.strptime(value, self.server_format)
-        return time.strftime(self.display_format, date)
+        date = mx.DateTime.strptime(value, self.server_format)
+        return date.strftime(self.display_format)
 
     def value_from_text(self, model, text):
         if not text:
             return False
         try:
-            date = time.strptime(text, self.display_format)
+            date = mx.DateTime.strptime(text, self.display_format)
         except:
-            try:
-                date = list(time.localtime())
-                date[2] = int(text)
-                date = tuple(date)
-            except:
-                return False
-        return time.strftime(self.server_format, date)
+            return False
+        return date.strftime(self.server_format)
 
 
 class Datetime(Date):
@@ -359,46 +355,41 @@ class Datetime(Date):
         value = model[self.field_name].get_client(model)
         if not value:
             return ''
-        date = time.strptime(value, self.server_format)
+        date = mx.DateTime.strptime(value, self.server_format)
         if 'timezone' in rpc.CONTEXT:
             try:
                 import pytz
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
-                datetime = DT.datetime(date[0], date[1], date[2], date[3],
-                        date[4], date[5], date[6])
+                datetime = DT.datetime(date.year, date.month, date.day,
+                        date.hour, date.minute, date.second)
                 sdt = szone.localize(datetime, is_dst=True)
                 ldt = sdt.astimezone(lzone)
-                date = ldt.timetuple()
+                date = mx.DateTime.DateTime(*(ldt.timetuple()[:6]))
             except:
                 pass
-        return time.strftime(self.display_format, date)
+        return date.strftime(self.display_format)
 
     def value_from_text(self, model, text):
         if not text:
             return False
         try:
-            date = time.strptime(text, self.display_format)
+            date = mx.DateTime.strptime(text, self.display_format)
         except:
-            try:
-                datetime = list(time.localtime())
-                datetime[2] = int(text)
-                date = tuple(datetime)
-            except:
-                return False
+            return False
         if 'timezone' in rpc.CONTEXT:
             try:
                 import pytz
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
-                datetime = DT.datetime(date[0], date[1], date[2], date[3],
-                        date[4], date[5], date[6])
+                datetime = DT.datetime(date.year, date.month, date.day,
+                        date.hour, date.minute, date.second)
                 ldt = lzone.localize(datetime, is_dst=True)
                 sdt = ldt.astimezone(szone)
-                date = sdt.timetuple()
+                date = mx.DateTime.DateTime(*(sdt.timetuple()[:6]))
             except:
                 pass
-        return time.strftime(self.server_format, date)
+        return date.strftime(self.server_format)
 
 class Float(Char):
     def get_textual_value(self, model):

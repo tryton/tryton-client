@@ -366,9 +366,7 @@ class Graph(gtk.DrawingArea):
             end_date = mx.DateTime.mktime(time.strptime(str(maxx), '%Y-%m-%d'))
             while date <= end_date:
                 key = datetime.date(date.year, date.month, date.day)
-                self.labels[key] = time.strftime(
-                        end_date(date_format()),
-                        time.strptime(str(key), DT_FORMAT))
+                self.labels[key] = date.strftime(DT_FORMAT)
                 self.datas.setdefault(key, {})
                 for yfield in self.yfields:
                     self.datas[key].setdefault(

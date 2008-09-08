@@ -36,7 +36,7 @@ from mx.DateTime import strptime
 
 mapping = {
     '%y': ('  ', '[ 0-9][ 0-9]'),
-    '%Y': ('    ', '[ 0-9][ 0-9][ 0-9][ 0-9]'),
+    '%Y': ('    ', '([ 0-9][ 0-9][ 0-9][ 1-9]|[ 1-9][ 0-9][ 0-9][ 0-9]|[ 0-9][ 1-9][ 0-9][ 0-9]|[ 0-9][ 0-9][ 1-9][ 0-9])'),
     '%m': ('  ', '([ 0][ 1-9]|[ 1][ 0-2])'),
     '%d': ('  ', '([ 0][ 1-9]|[ 1-2][ 0-9]|[ 3][ 0-1])'),
     '%H': ('  ', '([ 0-1][ 0-9]|[ 2][ 0-4])'),
@@ -129,7 +129,14 @@ class DateEntry(gtk.Entry):
 
     def date_set(self, dt):
         if dt:
-            self.set_text( dt.strftime(self.format) )
+            format = self.format
+            if dt.year < 10:
+                format = format.replace('%Y', '000%Y')
+            elif dt.year < 100:
+                format = format.replace('%Y', '00%Y')
+            elif dt.year < 1000:
+                format = format.replace('%Y', '0%Y')
+            self.set_text(dt.strftime(format))
         else:
             self.set_text(self.initial_value)
 
@@ -238,6 +245,7 @@ def compute_date(cmd, dt, format):
         '^([\\+-]\d+)h$': lambda dt,r: dt+RelativeDateTime(hours = int(r.group(1))),
         '^([\\+-]\d+)w$': lambda dt,r: dt+RelativeDateTime(days = 7*int(r.group(1))),
         '^([\\+-]\d+)d$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
+        '^([\\+-]\d+)$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
         '^([\\+-]\d+)m$': lambda dt,r: dt+RelativeDateTime(months = int(r.group(1))),
         '^([\\+-]\d+)y$': lambda dt,r: dt+RelativeDateTime(years = int(r.group(1))),
         '^=$': lambda dt,r: now(),
@@ -249,7 +257,10 @@ def compute_date(cmd, dt, format):
             if not dt:
                 dt = time.strftime(format, time.localtime())
                 dt = strptime(dt, format)
-            return f(dt, groups)
+            try:
+                return f(dt, groups)
+            except:
+                continue
 
 if __name__ == '__main__':
     import sys

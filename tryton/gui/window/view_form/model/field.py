@@ -5,6 +5,7 @@ from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
 import time
 import datetime
 from decimal import Decimal
+import mx.DateTime
 
 class ModelField(object):
     '''
@@ -144,29 +145,35 @@ class DateTimeField(CharField):
 
     def set_client(self, model, value, force_change=False):
         if value:
-            date = time.strptime(value, DHM_FORMAT)
-            value = datetime.datetime(date[0], date[1], date[2], date[3],
-                    date[4], date[5])
+            date = mx.DateTime.strptime(value, DHM_FORMAT)
+            value = datetime.datetime(date.year, date.month, date.day,
+                    date.hour, date.minute)
         return super(DateTimeField, self).set_client(model, value,
                 force_change=force_change)
 
     def get_client(self, model):
         value = super(DateTimeField, self).get_client(model)
-        return value and value.strftime(DHM_FORMAT) or False
+        if not value:
+            return False
+        value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
+        return value.strftime(DHM_FORMAT)
 
 
 class DateField(CharField):
 
     def set_client(self, model, value, force_change=False):
         if value:
-            date = time.strptime(value, DT_FORMAT)
-            value = datetime.date(date[0], date[1], date[2])
+            date = mx.DateTime.strptime(value, DT_FORMAT)
+            value = datetime.date(date.year, date.month, date.day)
         return super(DateField, self).set_client(model, value,
                 force_change=force_change)
 
     def get_client(self, model):
         value = super(DateField, self).get_client(model)
-        return value and value.strftime(DT_FORMAT) or False
+        if not value:
+            return False
+        value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
+        return value.strftime(DT_FORMAT)
 
 
 class FloatField(CharField):
