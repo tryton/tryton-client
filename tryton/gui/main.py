@@ -315,22 +315,28 @@ class Main(object):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        ids = self.request_set()[0]
-        return Window.create(False, 'res.request', ids,
-                [('act_to', '=', rpc._USER), ('active', '=', True)],
-                'form', mode=['tree', 'form'], window=self.window,
-                context=ctx)
+        ids1, ids2 = self.request_set()
+        ids = ids1 + ids2
+        return Window.create(False, 'res.request', ids, [
+            ('act_to', '=', rpc._USER),
+            ('active', '=', True),
+            ('id', 'in', ids),
+            ], 'form', mode=['tree', 'form'], window=self.window,
+            context=ctx)
 
     def sig_request_wait(self, widget):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        ids = self.request_set()[0]
-        return Window.create(False, 'res.request', ids,
-                [('act_from', '=', rpc._USER),
-                    ('state', '=', 'waiting'), ('active', '=', True)],
-                'form', mode=['tree', 'form'], window=self.window,
-                context=ctx)
+        ids1, ids2 = self.request_set()
+        ids = ids1 + ids2
+        return Window.create(False, 'res.request', ids, [
+            ('act_from', '=', rpc._USER),
+            ('state', '=', 'waiting'),
+            ('active', '=', True),
+            ('id', 'in', ids),
+            ], 'form', mode=['tree', 'form'], window=self.window,
+            context=ctx)
 
     def request_set(self):
         try:
