@@ -91,10 +91,13 @@ class Screen(SignalEvent):
         if active and self.show_search:
             if not self.filter_widget:
                 if not self.fields_view_tree:
+                    ctx = {}
+                    ctx.update(rpc.CONTEXT)
+                    ctx.update(self.context)
                     try:
                         self.fields_view_tree = rpc.execute('object',
                                 'execute', self.name, 'fields_view_get', False,
-                                'tree', self.context)
+                                'tree', ctx)
                     except:
                         return
                 self.filter_widget = Form(self.fields_view_tree['arch'],
@@ -131,25 +134,28 @@ class Screen(SignalEvent):
                     not (key == 'active' \
                     and self.context.get('active_test', False)):
                 values.append((key, operator, value) + args[3:])
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx.update(self.context)
         try:
             try:
                 ids = rpc.execute('object', 'execute',
                         self.name, 'search', values, offset, limit, self.sort,
-                        self.context)
+                        ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 ids = rpc.execute('object', 'execute',
                         self.name, 'search', values, offset, limit, self.sort,
-                        self.context)
+                        ctx)
             if not only_ids:
                 if len(ids) == limit:
                     try:
                         self.search_count = rpc.execute('object', 'execute',
-                                self.name, 'search_count', values, self.context)
+                                self.name, 'search_count', values, ctx)
                     except Exception, exception:
                         common.process_exception(exception, self.window)
                         self.search_count = rpc.execute('object', 'execute',
-                                self.name, 'search_count', values, self.context)
+                                self.name, 'search_count', values, ctx)
                 else:
                     self.search_count = len(ids)
         except:
@@ -280,12 +286,15 @@ class Screen(SignalEvent):
                     toolbar=self.views_preload[view_type].get('toolbar', False),
                     context=context)
         else:
+            ctx = {}
+            ctx.update(rpc.CONTEXT)
+            ctx.update(self.context)
             try:
-                view = self.rpc.fields_view_get(view_id, view_type, self.context,
+                view = self.rpc.fields_view_get(view_id, view_type, ctx,
                         self.hastoolbar)
             except Exception, exception:
                 common.process_exception(exception, self.window)
-                view = self.rpc.fields_view_get(view_id, view_type, self.context,
+                view = self.rpc.fields_view_get(view_id, view_type, ctx,
                         self.hastoolbar)
             if self.exclude_field:
                 if self.exclude_field in view['fields']:
@@ -360,7 +369,9 @@ class Screen(SignalEvent):
                     break
             if self.current_view.view_type != 'form':
                 return None
-        ctx = self.context.copy()
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx.update(self.context)
         ctx.update(context)
         model = self.models.model_new(default, self.domain, ctx)
         if (not self.current_view) \

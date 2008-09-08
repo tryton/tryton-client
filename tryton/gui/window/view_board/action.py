@@ -139,22 +139,25 @@ class Action(object):
                 self.screen.current_view.title))
             self.screen.signal_connect(self, 'record-message', self._sig_label)
         elif self.action['view_type'] == 'tree':
+            ctx = {}
+            ctx.update(rpc.CONTEXT)
+            ctx.update(self.context)
             try:
                 view_base = rpc.execute('object', 'execute',
                         'ir.ui.view', 'read', view_ids[0],
-                        ['model', 'type'], self.context)
+                        ['model', 'type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 raise
             try:
                 view = rpc.execute('object', 'execute',
                         view_base['model'], 'fields_view_get', view_ids[0],
-                        view_base['type'], self.context)
+                        view_base['type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 raise
             self.tree = ViewTree(view, [], self._window, True,
-                    context=self.context)
+                    context=ctx)
             alignment.add(self.tree.widget_get())
             self.title.set_text(attrs.get('string',
                 self.tree.name))
@@ -168,8 +171,11 @@ class Action(object):
 
     def _sig_search(self, widget, event):
         if event.type == gtk.gdk.BUTTON_PRESS:
+            ctx = {}
+            ctx.update(rpc.CONTEXT)
+            ctx.update(self.context)
             win = WinSearch(self.action['res_model'], domain=self.domain,
-                    context=self.context, parent=self._window)
+                    context=ctx, parent=self._window)
             res = win.run()
             if res:
                 self.screen.clear()
