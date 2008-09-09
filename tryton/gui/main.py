@@ -338,9 +338,9 @@ class Main(object):
                 message = _('No request')
             if len(ids2):
                 if len(ids2) == 1:
-                    message += _(' - %s request sended') % len(ids2)
+                    message += _(' - %s request sent') % len(ids2)
                 else:
-                    message += _(' - %s requests sended') % len(ids2)
+                    message += _(' - %s requests sent') % len(ids2)
             sb_id = self.sb_requests.get_context_id('message')
             self.sb_requests.push(sb_id, message)
             return (ids, ids2)
