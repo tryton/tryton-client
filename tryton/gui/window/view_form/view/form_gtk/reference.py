@@ -255,6 +255,7 @@ class Reference(WidgetInterface):
             model, (obj_id, name) = '', (0, '')
         else:
             model, obj_id = value
+            name = ''
             if isinstance(obj_id, (list, tuple)):
                 obj_id, name = obj_id
         if model:
