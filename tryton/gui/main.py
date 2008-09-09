@@ -315,7 +315,13 @@ class Main(object):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        ids1, ids2 = self.request_set()
+        try:
+            ids1, ids2 = self.request_set(True)
+        except Exception, exception:
+            if common.process_exception(exception, self.window):
+                ids1, ids2 = self.request_set(True)
+            else:
+                raise
         ids = ids1 + ids2
         return Window.create(False, 'res.request', ids, [
             ('act_to', '=', rpc._USER),
@@ -328,7 +334,13 @@ class Main(object):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        ids1, ids2 = self.request_set()
+        try:
+            ids1, ids2 = self.request_set(True)
+        except Exception, exception:
+            if common.process_exception(exception, self.window):
+                ids1, ids2 = self.request_set(True)
+            else:
+                raise
         ids = ids1 + ids2
         return Window.create(False, 'res.request', ids, [
             ('act_from', '=', rpc._USER),
@@ -338,7 +350,7 @@ class Main(object):
             ], 'form', mode=['tree', 'form'], window=self.window,
             context=ctx)
 
-    def request_set(self):
+    def request_set(self, exception=False):
         try:
             ids, ids2 = rpc.execute('object', 'execute',
                     'res.request', 'request_get')
@@ -358,6 +370,8 @@ class Main(object):
             self.sb_requests.push(sb_id, message)
             return (ids, ids2)
         except:
+            if exception:
+                raise
             return ([], [])
 
     def sig_login(self, widget=None, dbname=False, res=None):
