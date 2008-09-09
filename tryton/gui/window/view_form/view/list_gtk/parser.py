@@ -634,6 +634,50 @@ class Selection(Char):
         return res
 
 
+class Reference(Char):
+
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        super(Reference, self).__init__(field_name, model, treeview=treeview,
+                attrs=attrs, window=window)
+        self._selection = {}
+        selection = attrs.get('selection', [])
+        if not isinstance(selection, (list, tuple)):
+            try:
+                selection = rpc.execute('object', 'execute',
+                        model, selection, rpc.CONTEXT)
+            except Exception, exception:
+                common.process_exception(exception, self.window)
+                selection = []
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        for i, j in selection:
+            self._selection[i] = str(j)
+
+    def get_textual_value(self, model):
+        value = model[self.field_name].get_client(model)
+        if not value:
+            model, (obj_id, name) = '', (0, '')
+        else:
+            model, obj_id = value
+            name = ''
+            if isinstance(obj_id, (list, tuple)):
+                obj_id, name = obj_id
+        if model:
+            if not name and obj_id:
+                try:
+                    obj_id, name = RPCProxy(model).name_get(obj_id,
+                            rpc.CONTEXT)[0]
+                except Exception, exception:
+                    common.process_exception(exception, self.window)
+                    name = '???'
+            return self._selection[model] + ',' + name
+        else:
+            return ''
+
+    def value_from_text(self, model, text):
+        pass
+
+
 class ProgressBar(object):
     orientations = {
         'left_to_right': gtk.PROGRESS_LEFT_TO_RIGHT,
@@ -765,4 +809,5 @@ CELLTYPES = {
     'callto': Char,
     'sip': Char,
     'progressbar': ProgressBar,
+    'reference': Reference,
 }
