@@ -80,7 +80,7 @@ class WinExport(object):
                                 fields[field]['relation'], 'fields_get', False,
                                 rpc.CONTEXT)
                     except Exception, exception:
-                        common.process_exception(exception, self.win)
+                        common.process_exception(exception, self.parent)
                         continue
                     model_populate(fields2, prefix_node+field+'/', node,
                             st_name+'/', level-1)
@@ -156,13 +156,13 @@ class WinExport(object):
         try:
             export_ids = ir_export.search([('resource', '=', self.model)])
         except Exception, exception:
-            common.process_exception(exception, self.win)
+            common.process_exception(exception, self.parent)
             return
         for export in ir_export.read(export_ids):
             try:
                 fields = ir_export_line.read(export['export_fields'])
             except Exception, exception:
-                common.process_exception(exception, self.win)
+                common.process_exception(exception, self.parent)
                 continue
             self.predef_model.append((
                 export['id'],
