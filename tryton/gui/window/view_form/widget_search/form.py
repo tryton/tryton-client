@@ -208,10 +208,6 @@ class Form(object):
         self.focusable = parser.focusable
         self.id = 0
         self.name = parser.title
-        for i in domain:
-            if i[0] in self.widgets:
-                if i[1] == '=':
-                    self.widgets[i[0]][0]._readonly_set(True)
         for i in self.widgets.values():
             i[0].sig_activate(self.sig_activate)
         self.spin_limit.connect_after('activate', self.sig_activate)

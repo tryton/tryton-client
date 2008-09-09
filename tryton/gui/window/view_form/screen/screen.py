@@ -125,28 +125,23 @@ class Screen(SignalEvent):
             values = self.filter_widget.value
         else:
             values = [('id', 'in', [x.id for x in self.models])]
-        filter_keys = []
-        for key, operator, value in values:
-            filter_keys.append(key)
-        for args in self.domain:
-            key, operator, value = args[:3]
-            if key not in filter_keys and \
-                    not (key == 'active' \
-                    and self.context.get('active_test', False)):
-                values.append((key, operator, value) + args[3:])
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
+        if values:
+            values = ['AND', values, self.domain]
+        else:
+            values = self.domain
         try:
             try:
                 ids = rpc.execute('object', 'execute',
-                        self.name, 'search', values, offset, limit, self.sort,
-                        ctx)
+                        self.name, 'search', values,
+                        offset, limit, self.sort, ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 ids = rpc.execute('object', 'execute',
-                        self.name, 'search', values, offset, limit, self.sort,
-                        ctx)
+                        self.name, 'search', values,
+                        offset, limit, self.sort, ctx)
             if not only_ids:
                 if len(ids) == limit:
                     try:
