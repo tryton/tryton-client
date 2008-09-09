@@ -84,7 +84,6 @@ class Main(object):
             'on_preference_activate': self.sig_user_preferences,
             'on_read_requests_activate': self.sig_request_open,
             'on_send_request_activate': self.sig_request_new,
-            'on_request_wait_activate': self.sig_request_wait,
             'on_opt_save_activate': lambda x: CONFIG.save(),
             'on_menubar_default_activate': lambda x: self.sig_menubar('default'),
             'on_menubar_icons_activate': lambda x: self.sig_menubar('icons'),
@@ -306,10 +305,9 @@ class Main(object):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        return Window.create(None, 'res.request', False,
-                [('act_from', '=', rpc._USER)], 'form',
-                mode=['form', 'tree'], window=self.window,
-                context=ctx)
+        return Window.create(None, 'res.request', False, [
+            ], 'form', mode=['form', 'tree'], window=self.window,
+            context=ctx)
 
     def sig_request_open(self, widget):
         ctx = {}
@@ -324,29 +322,6 @@ class Main(object):
                 raise
         ids = ids1 + ids2
         return Window.create(False, 'res.request', ids, [
-            ('act_to', '=', rpc._USER),
-            ('active', '=', True),
-            ('id', 'in', ids),
-            ], 'form', mode=['tree', 'form'], window=self.window,
-            context=ctx)
-
-    def sig_request_wait(self, widget):
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx['active_test'] = False
-        try:
-            ids1, ids2 = self.request_set(True)
-        except Exception, exception:
-            if common.process_exception(exception, self.window):
-                ids1, ids2 = self.request_set(True)
-            else:
-                raise
-        ids = ids1 + ids2
-        return Window.create(False, 'res.request', ids, [
-            ('act_from', '=', rpc._USER),
-            ('state', '=', 'waiting'),
-            ('active', '=', True),
-            ('id', 'in', ids),
             ], 'form', mode=['tree', 'form'], window=self.window,
             context=ctx)
 
