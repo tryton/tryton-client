@@ -304,6 +304,7 @@ class ModelRecord(SignalEvent):
         ctx['time'] = time
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
+        ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
             ctx['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
                     check_load)
