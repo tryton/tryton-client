@@ -23,7 +23,6 @@ class ViewTreeSC(object):
 
         column = gtk.TreeViewColumn (_('Description'), cell, text=1)
         self.tree.append_column(column)
-        self.update()
 
     def update(self):
         store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING,
