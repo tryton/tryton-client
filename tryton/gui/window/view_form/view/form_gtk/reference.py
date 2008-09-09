@@ -268,8 +268,12 @@ class Reference(WidgetInterface):
                     common.process_exception(exception, self._window)
                     name = '???'
             self.wid_text.set_text(name)
-            img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.but_open.set_image(img)
+            if obj_id:
+                img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.but_open.set_image(img)
+            else:
+                img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.but_open.set_image(img)
         else:
             self.wid_text.set_text('')
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
