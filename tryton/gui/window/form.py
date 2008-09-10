@@ -139,7 +139,7 @@ class Form(SignalEvent):
             'but_attach': self.sig_attach,
             'but_close': self.sig_close,
         }
-        if res_id:
+        if res_id not in (None, False):
             if isinstance(res_id, int):
                 res_id = [res_id]
             self.screen.load(res_id)
