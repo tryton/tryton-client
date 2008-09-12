@@ -650,7 +650,6 @@ class One2Many(WidgetInterface):
                 domain = modelfield.domain_get(self._view.model)
             if self.screen.domain != domain:
                 self.screen.domain = domain
-                self.screen.set_domain()
             self.screen.models.readonly = readonly
         self.screen.display()
         return True
