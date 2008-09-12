@@ -129,7 +129,8 @@ class Screen(SignalEvent):
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
         if values:
-            values = ['AND', values, self.domain]
+            if self.domain:
+                values = ['AND', values, self.domain]
         else:
             values = self.domain
         try:
