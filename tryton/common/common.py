@@ -667,7 +667,10 @@ def process_exception(exception, parent, obj='', method='', *args):
         return False
 
     if isinstance(exception, socket.error):
-        warning(exception.args[1], parent, _('Network Error!'))
+        msg = ''
+        if len(exception.args) > 2:
+            msg = exception.args[1]
+        warning(msg, parent, _('Network Error!'))
         return False
 
     error(str(exception.args[0]), parent, str(exception.args[-1]))
