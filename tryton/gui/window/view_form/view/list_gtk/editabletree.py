@@ -222,7 +222,7 @@ class EditableTreeView(gtk.TreeView):
             if isinstance(entry, gtk.Entry):
                 entry.set_text(newval)
             else:
-                entry.set_active_text(value)
+                entry.set_active_text(newval)
             entry.editing_done_id = entry.connect('editing_done',
                     self.on_editing_done)
             self.set_cursor(path, column, True)
