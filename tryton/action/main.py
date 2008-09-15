@@ -162,7 +162,7 @@ class Action(object):
             try:
                 actions = rpc.execute('object', 'execute',
                         'ir.action.keyword', 'get_keyword', keyword,
-                        (data['model'], model_id))
+                        (data['model'], model_id), rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, window)
                 return False
