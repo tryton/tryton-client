@@ -58,7 +58,7 @@ class Action(object):
     def execute(act_id, datas, window, action_type=None, context=None):
         if context is None:
             context = {}
-        ctx = {}
+        ctx = rpc.CONTEXT.copy()
         ctx.update(context)
         if not action_type:
             res = False
