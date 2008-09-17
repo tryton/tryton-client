@@ -27,18 +27,19 @@ class Float(Integer):
         return self._get_clause(value1, value2)
 
     def _value_set(self, value):
-        if value == False:
-            text = ''
-        else:
-            text = locale.format('%.' + str(self.digits[1]) + 'f',
-            value or 0.0, True)
-        self.entry1.set_text(text)
-        self.entry2.set_text(text)
+        def conv(value):
+            if value == False:
+                return ''
+            else:
+                return locale.format('%.' + str(self.digits[1]) + 'f',
+                value or 0.0, True)
+        self.entry1.set_text(conv(value[0]))
+        self.entry2.set_text(conv(value[0]))
 
     value = property(_value_get, _value_set)
 
     def clear(self):
-        self.value = False
+        self.value = (False, False)
 
     def sig_insert_text(self, widget, new_text, new_text_length, position):
         value = widget.get_text()

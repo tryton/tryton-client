@@ -66,7 +66,7 @@ class Integer(Interface):
     value = property(_value_get, _value_set)
 
     def clear(self):
-        self.value = False
+        self.value = (False, False)
 
     def sig_activate(self, fct):
         self.entry1.connect_after('activate', fct)
