@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
+import pango
 
 
 class CellRendererText(gtk.GenericCellRenderer):
@@ -38,6 +39,16 @@ class CellRendererText(gtk.GenericCellRenderer):
 
     def on_render(self, window, widget, background_area, cell_area,
             expose_area, flags):
+        # Handle Pixmap window as pygtk failed
+        if type(window) == gtk.gdk.Pixmap:
+            layout = widget.create_pango_layout(self.text)
+            layout.set_font_description(widget.style.font_desc)
+            w, h = layout.get_size()
+            xalign = self._renderer.get_property('xalign')
+            x = int(cell_area.x + (cell_area.width - w / pango.SCALE) * xalign)
+            y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
+            window.draw_layout(widget.style.text_gc[0], x, y, layout)
+            return
         return self._renderer.render(window, widget, background_area,
                 cell_area, expose_area, flags)
 
