@@ -510,6 +510,10 @@ class UnsettableColumn(Exception):
 
 class O2M(Char):
 
+    def setter(self, column, cell, store, iter):
+        super(O2M, self).setter(column, cell, store, iter)
+        cell.set_property('xalign', 0.5)
+
     def get_textual_value(self, model):
         return '( ' + str(len(model[self.field_name].\
                 get_client(model).models)) + ' )'
@@ -532,6 +536,10 @@ class O2M(Char):
 
 
 class M2M(Char):
+
+    def setter(self, column, cell, store, iter):
+        super(M2M, self).setter(column, cell, store, iter)
+        cell.set_property('xalign', 0.5)
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)
