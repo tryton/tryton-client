@@ -13,6 +13,8 @@ class CellRendererText(gtk.GenericCellRenderer):
                 'Background', gobject.PARAM_READWRITE),
             'editable': (gobject.TYPE_INT, 'Editable',
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
+            'xalign': (gobject.TYPE_FLOAT, 'XAlign',
+                'XAlign', 0, 1, 0, gobject.PARAM_READWRITE),
     }
 
     def __init__(self):
