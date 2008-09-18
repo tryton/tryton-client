@@ -16,6 +16,8 @@ from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
 import translate
 import gui
 import traceback
+import mx.DateTime
+import time
 
 
 class TrytonClient(object):
@@ -41,6 +43,10 @@ class TrytonClient(object):
             logging.getLogger().setLevel(logging.INFO)
         else:
             logging.getLogger().setLevel(logging.ERROR)
+
+        if not hasattr(mx.DateTime, 'strptime'):
+            mx.DateTime.strptime = lambda x, y: mx.DateTime.mktime(
+                    time.strptime(x, y))
 
         factory = gtk.IconFactory()
         factory.add_default()
