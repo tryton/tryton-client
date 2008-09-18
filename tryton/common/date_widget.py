@@ -32,7 +32,7 @@ import time
 from mx.DateTime import RelativeDateTime
 from mx.DateTime import DateTime
 from mx.DateTime import now
-from mx.DateTime import strptime
+import mx.DateTime
 
 mapping = {
     '%y': ('  ', '[ 0-9][ 0-9]'),
@@ -150,11 +150,11 @@ class DateEntry(gtk.Entry):
                 tc = tc[:a] + tt[a] + tc[a+1:]
         try:
             self.set_text(tc)
-            return strptime(tc, self.format)
+            return mx.DateTime.strptime(tc, self.format)
         except:
             tc = tt
         self.set_text(tc)
-        return strptime(tc, self.format)
+        return mx.DateTime.strptime(tc, self.format)
 
     def delete_text(self, start, end):
         self._interactive_input = False
@@ -256,7 +256,7 @@ def compute_date(cmd, dt, format):
         if groups:
             if not dt:
                 dt = time.strftime(format, time.localtime())
-                dt = strptime(dt, format)
+                dt = mx.DateTime.strptime(dt, format)
             try:
                 return f(dt, groups)
             except:

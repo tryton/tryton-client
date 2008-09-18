@@ -2,12 +2,6 @@
 import gtk
 import gobject
 from date_widget import mapping, DateEntry, compute_date
-import re
-import time
-from mx.DateTime import RelativeDateTime
-from mx.DateTime import DateTime
-from mx.DateTime import now
-from mx.DateTime import strptime
 
 
 class CellRendererDate(gtk.GenericCellRenderer):
