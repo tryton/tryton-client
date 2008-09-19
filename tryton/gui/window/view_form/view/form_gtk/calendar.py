@@ -201,7 +201,7 @@ class DateTime(WidgetInterface):
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
                 datetime = DT.datetime(date.year, date.month, date.day,
-                        date.hour, date.minute, date.second)
+                        date.hour, date.minute, int(date.second))
                 ldt = lzone.localize(datetime, is_dst=True)
                 sdt = ldt.astimezone(szone)
                 date = mx.DateTime.DateTime(*(sdt.timetuple()[:6]))
@@ -230,7 +230,7 @@ class DateTime(WidgetInterface):
                     lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                     szone = pytz.timezone(rpc.TIMEZONE)
                     datetime = DT.datetime(date.year, date.month, date.day,
-                            date.hour, date.minute, date.second)
+                            date.hour, date.minute, int(date.second))
                     sdt = szone.localize(datetime, is_dst=True)
                     ldt = sdt.astimezone(lzone)
                     date = mx.DateTime.DateTime(*(ldt.timetuple()[:6]))

@@ -85,7 +85,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 szone = pytz.timezone(rpc.TIMEZONE)
                                 datetime = DT.datetime(date.year, date.month,
                                         date.day, date.hour, date.minute,
-                                        date.second)
+                                        int(date.second))
                                 sdt = szone.localize(datetime, is_dst=True)
                                 ldt = sdt.astimezone(lzone)
                                 date = mx.DateTime.DateTime(*(

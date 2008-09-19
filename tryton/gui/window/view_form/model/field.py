@@ -147,7 +147,7 @@ class DateTimeField(CharField):
         if value:
             date = mx.DateTime.strptime(value, DHM_FORMAT)
             value = datetime.datetime(date.year, date.month, date.day,
-                    date.hour, date.minute)
+                    date.hour, date.minute, int(date.second))
         return super(DateTimeField, self).set_client(model, value,
                 force_change=force_change)
 
