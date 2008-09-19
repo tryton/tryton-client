@@ -457,7 +457,8 @@ class Screen(SignalEvent):
         return res
 
     def reload(self):
-        self.current_model.reload()
+        ids = self.sel_ids_get()
+        self.models.reload(ids)
         if self.parent:
             self.parent.reload()
         self.display()
