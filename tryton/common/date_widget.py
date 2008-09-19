@@ -105,7 +105,15 @@ class DateEntry(gtk.Entry):
         if not self._interactive_input:
             return
 
-        while (start>0) and (self.initial_value[start] not in [' ','0','X']):
+        if start > len(self.initial_value):
+            start = len(self.initial_value)
+        if start < 0:
+            start = 0
+        if end > len(self.initial_value):
+            end = len(self.initial_value)
+        if end < 0:
+            end = 0
+        while (start > 0) and (self.initial_value[start] not in [' ','0','X']):
             start -= 1
         text = self.get_text()
         text = text[:start] + self.initial_value[start:end] + text[end:]
