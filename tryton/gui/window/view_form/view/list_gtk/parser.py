@@ -257,12 +257,15 @@ class Char(object):
         if hasattr(self.treeview, 'editable') \
                 and self.treeview.editable:
             field = model[self.field_name]
+            field.state_set(model)
             if not field.get_state_attrs(model).get('valid', True):
                 cell.set_property('background',
                         COLORS.get('invalid', 'white'))
             elif bool(int(field.get_state_attrs(model).get('required', 0))):
                 cell.set_property('background',
                         COLORS.get('required', 'white'))
+            else:
+                cell.set_property('background', 'white')
         cell.set_property('xalign', align)
 
     def get_color(self, model):
