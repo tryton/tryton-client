@@ -200,7 +200,7 @@ class EditableTreeView(gtk.TreeView):
                     break
             self.set_cursor(new_path, col, True)
         elif event.keyval == gtk.keysyms.Escape:
-            if model.id is None:
+            if model.id < 0:
                 store.remove(store.get_iter(path))
                 self.screen.current_model = False
             if not path[0]:
