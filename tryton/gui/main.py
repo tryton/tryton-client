@@ -104,7 +104,6 @@ class Main(object):
                     Main.sig_form_tab_orientation(90),
             'on_opt_files_actions_activate': self.sig_files_actions,
             'on_help_tips_activate': self.sig_tips,
-            'on_help_license_activate': self.sig_license,
             'on_help_credits_activate': self.sig_credits,
             'on_shortcuts_activate' : self.sig_shortcuts,
             'on_db_new_activate': self.sig_db_new,
@@ -435,15 +434,6 @@ class Main(object):
 
     def sig_tips(self, *args):
         Tips(self.window)
-
-    def sig_license(self, widget):
-        dialog = glade.XML(GLADE, "win_license", gettext.textdomain())
-        dialog.signal_connect("on_but_ok_pressed",
-                lambda obj: dialog.get_widget('win_license').destroy())
-
-        win = dialog.get_widget('win_license')
-        win.set_transient_for(self.window)
-        win.show_all()
 
     def sig_credits(self, widget):
         Credits(self.window)
