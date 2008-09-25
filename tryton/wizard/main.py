@@ -157,11 +157,12 @@ class Wizard(object):
         dia = None
         while state != 'end':
             ctx = context.copy()
+            ctx.update(rpc.CONTEXT)
             ctx['active_id'] = datas.get('id')
             ctx['active_ids'] = datas.get('ids')
-            wizardprogress = WizardProgress(wiz_id, state, datas,
-                    parent, ctx)
-            res = wizardprogress.run()
+            rpcprogress = common.RPCProgress('execute', ('wizard',
+                'execute', wiz_id, datas, state, ctx), parent)
+            res = rpcprogress.run()
             if not res:
                 if dia:
                     res = {'type': 'form'}
@@ -217,78 +218,3 @@ class Wizard(object):
             rpc.context_reload()
         except:
             pass
-
-
-class WizardProgress(object):
-
-    def __init__(self, wizard_id, state, datas, parent, context):
-        self.res = None
-        self.error = False
-        self.wizard_id = wizard_id
-        self.state = state
-        self.datas = datas
-        self.parent = parent
-        self.context = context
-        self.exception = None
-
-    def run(self):
-
-        def start(wiz_id, datas, state, context):
-            ctx = rpc.CONTEXT.copy()
-            ctx.update(context)
-            try:
-                self.res = rpc.execute('wizard',
-                        'execute', wiz_id, datas, state, ctx)
-            except Exception, exception:
-                self.error = True
-                self.res = False
-                self.exception = exception
-                return True
-            if not self.res:
-                self.error = True
-            return True
-
-        thread.start_new_thread(start,
-                (self.wizard_id, self.datas, self.state, self.context))
-
-        i = 0
-        win = None
-        progressbar = None
-        while (not self.res) and (not self.error):
-            time.sleep(0.1)
-            i += 1
-            if i > 10:
-                if not win or not progressbar:
-                    win = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
-                    win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-                    vbox = gtk.VBox(False, 0)
-                    hbox = gtk.HBox(False, 13)
-                    hbox.set_border_width(10)
-                    img = gtk.Image()
-                    img.set_from_stock('tryton-dialog-information', gtk.ICON_SIZE_DIALOG)
-                    hbox.pack_start(img, expand=True, fill=False)
-                    vbox2 = gtk.VBox(False, 0)
-                    label = gtk.Label()
-                    label.set_markup('<b>'+_('Operation in progress')+'</b>')
-                    label.set_alignment(0.0, 0.5)
-                    vbox2.pack_start(label, expand=True, fill=False)
-                    vbox2.pack_start(gtk.HSeparator(), expand=True, fill=True)
-                    vbox2.pack_start(gtk.Label(_("Please wait,\n" \
-                            "this operation may take a while...")),
-                            expand=True, fill=False)
-                    hbox.pack_start(vbox2, expand=True, fill=True)
-                    vbox.pack_start(hbox)
-                    progressbar = gtk.ProgressBar()
-                    progressbar.set_orientation(gtk.PROGRESS_LEFT_TO_RIGHT)
-                    vbox.pack_start(progressbar, expand=True, fill=False)
-                    win.add(vbox)
-                    win.set_transient_for(self.parent)
-                    win.show_all()
-                progressbar.pulse()
-                gtk.main_iteration()
-        if win:
-            win.destroy()
-            gtk.main_iteration()
-        if self.exception:
-            common.process_exception(self.exception, self.parent)
-        return self.res

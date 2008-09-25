@@ -347,11 +347,11 @@ class DBCreate(object):
                         and langreal \
                         and passwd \
                         and admin_passwd.get_text():
-                    if rpc.db_exec( url_m.group(1), int(url_m.group(2)), \
+                    if rpc.db_exec(url_m.group(1), int(url_m.group(2)),
                              'db_exist', dbname):
                          common.warning(_("Database with the same name " \
                              "already exists.\n" \
-                             "Try another database name."), parent, \
+                             "Try another database name."), parent,
                              _("Databasename already exist!"))
                          self.entry_dbname.set_text("")
                          self.entry_dbname.grab_focus()
@@ -361,8 +361,12 @@ class DBCreate(object):
                         CONFIG['login.port'] = port = url_m.group(2)
                         CONFIG["login.login"] = "admin"
                         try:
-                            rpc.db_exec(host, int(port), 'create', passwd, \
-                                dbname, langreal, admin_passwd.get_text())
+                            rpcprogress = common.RPCProgress('db_exec',
+                                    (host, int(port), 'create', passwd,
+                                        dbname, langreal,
+                                        admin_passwd.get_text()),
+                                    parent)
+                            rpcprogress.run()
                         except Exception, exception:
                             if str(exception[0]) == "AccessDenied":
                                 common.warning(_("Sorry, the Tryton server " \

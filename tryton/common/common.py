@@ -18,6 +18,7 @@ import tryton.rpc as rpc
 import locale
 import socket
 from tryton.version import VERSION
+import thread
 
 _ = gettext.gettext
 
@@ -728,6 +729,75 @@ def generateColorscheme(masterColor, keys, light=0.06):
     r, g, b = hex2rgb(COLOR_SCHEMES.get(masterColor, masterColor))
     return dict([(key, lighten(r, g, b, light * i))
         for i, key in enumerate(keys)])
+
+
+class RPCProgress(object):
+
+    def __init__(self, method, args, parent):
+        self.method = method
+        self.args = args
+        self.parent = parent
+        self.res = None
+        self.error = False
+        self.exception = None
+
+    def start(self):
+        try:
+            self.res = getattr(rpc, self.method)(*self.args)
+        except Exception, exception:
+            self.error = True
+            self.res = False
+            self.exception = exception
+            return True
+        if not self.res:
+            self.error = True
+        return True
+
+    def run(self):
+        thread.start_new_thread(self.start, ())
+
+        i = 0
+        win = None
+        progressbar = None
+        while (not self.res) and (not self.error):
+            time.sleep(0.1)
+            i += 1
+            if i > 10:
+                if not win or not progressbar:
+                    win = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
+                    win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+                    vbox = gtk.VBox(False, 0)
+                    hbox = gtk.HBox(False, 13)
+                    hbox.set_border_width(10)
+                    img = gtk.Image()
+                    img.set_from_stock('tryton-dialog-information',
+                            gtk.ICON_SIZE_DIALOG)
+                    hbox.pack_start(img, expand=True, fill=False)
+                    vbox2 = gtk.VBox(False, 0)
+                    label = gtk.Label()
+                    label.set_markup('<b>'+_('Operation in progress')+'</b>')
+                    label.set_alignment(0.0, 0.5)
+                    vbox2.pack_start(label, expand=True, fill=False)
+                    vbox2.pack_start(gtk.HSeparator(), expand=True, fill=True)
+                    vbox2.pack_start(gtk.Label(_("Please wait,\n" \
+                            "this operation may take a while...")),
+                            expand=True, fill=False)
+                    hbox.pack_start(vbox2, expand=True, fill=True)
+                    vbox.pack_start(hbox)
+                    progressbar = gtk.ProgressBar()
+                    progressbar.set_orientation(gtk.PROGRESS_LEFT_TO_RIGHT)
+                    vbox.pack_start(progressbar, expand=True, fill=False)
+                    win.add(vbox)
+                    win.set_transient_for(self.parent)
+                    win.show_all()
+                progressbar.pulse()
+                gtk.main_iteration()
+        if win:
+            win.destroy()
+            gtk.main_iteration()
+        if self.exception:
+            raise self.exception
+        return self.res
 
 COLOR_SCHEMES = {
     'red': '#cf1d1d',
