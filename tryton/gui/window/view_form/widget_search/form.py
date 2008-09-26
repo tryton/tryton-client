@@ -21,6 +21,7 @@ class _container(object):
     def new(self, col=8):
         self.col = col+1
         table = gtk.Table(1, col)
+        table.show()
         table.set_homogeneous(False)
         table.set_col_spacings(3)
         table.set_row_spacings(0)
@@ -49,7 +50,9 @@ class _container(object):
             (table, i, j) = self.cont[-1]
         if name:
             vbox = gtk.VBox(homogeneous=False, spacing=1)
+            vbox.show()
             label = gtk.Label(name)
+            label.show()
             label.set_alignment(0.0, 0.5)
             vbox.pack_start(label, expand=False)
             vbox.pack_start(widget, expand=expand, fill=True)
@@ -81,7 +84,9 @@ class Parse(object):
         self.add_widget_end = []
         self.container = None
         self.spin_limit = gtk.SpinButton(climb_rate=1, digits=0)
+        self.spin_limit.show()
         self.spin_offset = gtk.SpinButton(climb_rate=1, digits=0)
+        self.spin_offset.show()
         self.title = 'Form'
         self.notebooks = []
         self.dict_widget = {}
@@ -143,6 +148,7 @@ class Parse(object):
 
         hb_param.pack_start(self.spin_offset, expand=False, fill=False)
 
+        hb_param.show_all()
         return hb_param
 
     def _psr_end(self, name):
@@ -161,10 +167,13 @@ class Parse(object):
         psr.Parse(xml_data)
 
         vbox = gtk.VBox()
+        vbox.show()
         vbox.pack_start(self.container.pop())
 
         expander = gtk.Expander(_('Advanced Search'))
+        expander.show()
         vbox2 = gtk.VBox()
+        vbox2.show()
 
         self.container = _container(max_width)
         self.container.new(self.col)
@@ -175,7 +184,6 @@ class Parse(object):
         vbox2.pack_start(self.container.pop())
 
         vbox2.pack_start(self.add_parameters())
-        vbox2.show_all()
         expander.add(vbox2)
         vbox.pack_start(expander)
 
@@ -199,7 +207,7 @@ class Form(object):
         if self.parent:
             width = self.parent.size_request()[0]
         (self.widgets, self.widget) = parser.parse(xml, width)
-        self.widget.show_all()
+        self.widget.show()
         self.spin_limit = parser.spin_limit
         self.spin_limit.connect('value-changed', self.limit_changed)
         self.spin_limit.set_activates_default(True)

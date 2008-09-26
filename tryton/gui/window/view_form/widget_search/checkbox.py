@@ -28,6 +28,7 @@ class CheckBox(Interface):
         completion.set_model(self.widget.get_model())
         self.widget.child.set_completion(completion)
         completion.set_text_column(0)
+        self.widget.show()
 
     def sig_key_press(self, widget, event):
         if event.type == gtk.gdk.KEY_PRESS \

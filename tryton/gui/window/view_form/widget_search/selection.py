@@ -3,6 +3,7 @@ import gtk
 from interface import Interface
 import tryton.rpc as rpc
 import tryton.common as common
+import gobject
 
 class Selection(Interface):
 
@@ -11,11 +12,25 @@ class Selection(Interface):
             attrs = {}
         super(Selection, self).__init__(name, parent, attrs)
 
-        self.widget = gtk.combo_box_entry_new_text()
-        self.widget.child.set_editable(True)
-        self.widget.child.set_property('activates_default', True)
-        self.widget.child.connect('key_press_event', self.sig_key_press)
-        self.widget.set_focus_chain([self.widget.child])
+        self.widget = gtk.HBox()
+
+        self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.combo = gtk.ComboBox(self.liststore)
+        cell = gtk.CellRendererText()
+        self.combo.pack_start(cell, True)
+        self.combo.add_attribute(cell, 'text', 1)
+        for oper in (['=', _('equal')],
+                ['!=', _('different')],
+                ):
+            self.liststore.append(oper)
+        self.combo.set_active(0)
+        self.widget.pack_start(self.combo, False, False)
+
+        self.entry = gtk.combo_box_entry_new_text()
+        self.entry.child.set_editable(True)
+        self.entry.child.set_property('activates_default', True)
+        self.entry.child.connect('key_press_event', self.sig_key_press)
+        self.entry.set_focus_chain([self.entry.child])
         self._selection = {}
         selection = attrs.get('selection', [])
         if 'relation' in attrs:
@@ -37,9 +52,11 @@ class Selection(Interface):
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection
         self.set_popdown(selection)
+        self.widget.pack_start(self.entry, True, True)
+        self.widget.show_all()
 
     def set_popdown(self, selection):
-        model = self.widget.get_model()
+        model = self.entry.get_model()
         model.clear()
         self._selection = {}
         lst = []
@@ -49,15 +66,15 @@ class Selection(Interface):
                 name += ' (' + str(i) + ')'
             lst.append(name)
             self._selection[name] = i
-        self.widget.append_text('')
+        self.entry.append_text('')
         for name in lst:
-            self.widget.append_text(name)
+            self.entry.append_text(name)
         completion = gtk.EntryCompletion()
         #Only available in PyGTK 2.6 and above.
         if hasattr(completion, 'set_inline_selection'):
             completion.set_inline_selection(True)
         completion.set_model(model)
-        self.widget.child.set_completion(completion)
+        self.entry.child.set_completion(completion)
         completion.set_text_column(0)
         return lst
 
@@ -65,32 +82,41 @@ class Selection(Interface):
         if event.type == gtk.gdk.KEY_PRESS \
                 and event.state & gtk.gdk.CONTROL_MASK \
                 and event.keyval == gtk.keysyms.space:
-            self.widget.popup()
+            self.entry.popup()
 
     def _value_get(self):
-        res = self._selection.get(self.widget.child.get_text(), False)
-        if res:
-            return [(self.name, '=', res)]
-        self.widget.child.set_text('')
-        return []
+        value = self._selection.get(self.entry.child.get_text(), False)
+        oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
+        if value or oper != '=':
+            return [(self.name, oper, value)]
+        else:
+            self.entry.child.set_text('')
+            return []
 
     def _value_set(self, value):
-        if value == False:
-            self.widget.child.set_text('')
+        i = self.liststore.get_iter_root()
+        while i:
+            if self.liststore.get_value(i, 0) == value[0]:
+                self.combo.set_active_iter(i)
+                break
+            i = self.liststore.iter_next(i)
+        if value[1] == False:
+            self.entry.child.set_text('')
             return
         for long_text, sel_value in self._selection.items():
-            if sel_value == value:
-                self.widget.child.set_text(long_text)
+            if sel_value == value[1]:
+                self.entry.child.set_text(long_text)
                 break
 
     def clear(self):
-        self.value = False
+        self.value = ['=', False]
 
     value = property(_value_get, _value_set, None,
       'The content of the widget or ValueError if not valid')
 
     def _readonly_set(self, value):
-        self.widget.set_sensitive(not value)
+        self.combo.set_sensitive(not value)
+        self.entry.set_sensitive(not value)
 
     def sig_activate(self, fct):
-        self.widget.child.connect_after('activate', fct)
+        self.entry.child.connect_after('activate', fct)

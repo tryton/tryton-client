@@ -3,6 +3,7 @@ import gtk
 from interface import Interface
 import locale
 import gettext
+import gobject
 
 _ = gettext.gettext
 
@@ -12,6 +13,22 @@ class Integer(Interface):
     def __init__(self, name, parent, attrs=None):
         super(Integer, self).__init__(name, parent, attrs=attrs)
         self.widget = gtk.HBox(spacing=3)
+
+        self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.combo = gtk.ComboBox(self.liststore)
+        cell = gtk.CellRendererText()
+        self.combo.pack_start(cell, True)
+        self.combo.add_attribute(cell, 'text', 1)
+        for oper in (['=', _('equal')],
+                ['between', _('between')],
+                ['not between', _('not between')],
+                ['!=', _('not equal')],
+                ):
+            self.liststore.append(oper)
+        self.combo.set_active(0)
+        self.widget.pack_start(self.combo, False, False)
+        self.combo.connect('changed', self._changed)
+
         self.entry1 = gtk.Entry()
         self.entry1.set_max_length(0)
         self.entry1.set_width_chars(5)
@@ -19,7 +36,8 @@ class Integer(Interface):
         self.entry1.set_alignment(1.0)
         self.entry1.connect('insert_text', self.sig_insert_text)
         self.widget.pack_start(self.entry1, expand=False, fill=True)
-        self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
+        self.separator = gtk.Label('-')
+        self.widget.pack_start(self.separator, expand=False, fill=False)
         self.entry2 = gtk.Entry()
         self.entry2.set_max_length(0)
         self.entry2.set_width_chars(5)
@@ -27,6 +45,18 @@ class Integer(Interface):
         self.entry2.set_alignment(1.0)
         self.entry2.connect('insert_text', self.sig_insert_text)
         self.widget.pack_start(self.entry2, expand=False, fill=True)
+
+        self.widget.show_all()
+        self._changed(self.combo)
+
+    def _changed(self, widget):
+        oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
+        if oper in ('=', '!='):
+            self.entry2.hide()
+            self.separator.hide()
+        else:
+            self.entry2.show()
+            self.separator.show()
 
     def _value_get(self):
         try:
@@ -40,19 +70,25 @@ class Integer(Interface):
         return self._get_clause(value1, value2)
 
     def _get_clause(self, value1, value2):
-        res = []
-        if value1 > value2:
-            if value2 != 0:
-                res.append((self.name, '>=', value2))
-                res.append((self.name, '<=', value1))
+        oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
+        if oper in ('=', '!='):
+            if self.entry1.get_text():
+                return [(self.name, oper, value1)]
             else:
-                res.append((self.name, '>=', value1))
-        elif value1 < value2:
-            res.append((self.name, '>=', value1))
-            res.append((self.name, '<=', value2))
-        elif value1 == value2 and value1 != 0:
-            res.append((self.name, '=', value1))
-        return res
+                return []
+        else:
+            res = []
+            if oper == 'between':
+                oper1 = '>='
+                oper2 = '<='
+            else:
+                oper1 = '<='
+                oper2 = '>='
+            if value1:
+                res.append((self.name, oper1, value1))
+            if value2:
+                res.append((self.name, oper2, value2))
+            return res
 
     def _value_set(self, value):
         def conv(value):
@@ -60,13 +96,24 @@ class Integer(Interface):
                 return ''
             else:
                 return locale.format('%d', value or 0, True)
-        self.entry1.set_text(conv(value[0]))
-        self.entry2.set_text(conv(value[1]))
+
+        i = self.liststore.get_iter_root()
+        while i:
+            if self.liststore.get_value(i, 0) == value[0]:
+                self.combo.set_active_iter(i)
+                break
+            i = self.liststore.iter_next(i)
+
+        self.entry1.set_text(conv(value[1]))
+        if len(value) == 2:
+            self.entry2.set_text('')
+        else:
+            self.entry2.set_text(conv(value[2]))
 
     value = property(_value_get, _value_set)
 
     def clear(self):
-        self.value = (False, False)
+        self.value = ('=', False, False)
 
     def sig_activate(self, fct):
         self.entry1.connect_after('activate', fct)

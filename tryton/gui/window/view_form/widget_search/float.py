@@ -33,13 +33,24 @@ class Float(Integer):
             else:
                 return locale.format('%.' + str(self.digits[1]) + 'f',
                 value or 0.0, True)
-        self.entry1.set_text(conv(value[0]))
-        self.entry2.set_text(conv(value[0]))
+
+        i = self.liststore.get_iter_root()
+        while i:
+            if self.liststore.get_value(i, 0) == value[0]:
+                self.combo.set_active_iter(i)
+                break
+            i = self.liststore.iter_next(i)
+
+        self.entry1.set_text(conv(value[1]))
+        if len(value) == 2:
+            self.entry2.set_text('')
+        else:
+            self.entry2.set_text(conv(value[2]))
 
     value = property(_value_get, _value_set)
 
     def clear(self):
-        self.value = (False, False)
+        self.value = ('=', False, False)
 
     def sig_insert_text(self, widget, new_text, new_text_length, position):
         value = widget.get_text()

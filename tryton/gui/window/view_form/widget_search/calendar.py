@@ -9,6 +9,7 @@ from tryton.common import DT_FORMAT
 from tryton.common import date_widget
 from tryton.translate import date_format
 import mx.DateTime
+import gobject
 
 _ = gettext.gettext
 
@@ -23,7 +24,23 @@ class Calendar(Interface):
 
         self.format = date_format()
 
+        self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.combo = gtk.ComboBox(self.liststore)
+        cell = gtk.CellRendererText()
+        self.combo.pack_start(cell, True)
+        self.combo.add_attribute(cell, 'text', 1)
+        for oper in (['=', _('at')],
+                ['between', _('between')],
+                ['not between', _('not between')],
+                ['!=', _('not at')],
+                ):
+            self.liststore.append(oper)
+        self.combo.set_active(0)
+        self.widget.pack_start(self.combo, False, False)
+        self.combo.connect('changed', self._changed)
+
         self.widget1 = date_widget.ComplexEntry(self.format, spacing=3)
+        self.widget1.show()
         self.entry1 = self.widget1.widget
         self.entry1.set_property('width-chars', 10)
         self.entry1.set_property('activates_default', True)
@@ -41,7 +58,8 @@ class Calendar(Interface):
         self.eb1.add(img)
         self.widget.pack_start(self.eb1, expand=False, fill=False)
 
-        self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
+        self.separator = gtk.Label('-')
+        self.widget.pack_start(self.separator, expand=False, fill=False)
 
         self.widget2 = date_widget.ComplexEntry(self.format, spacing=3)
         self.entry2 = self.widget2.widget
@@ -61,7 +79,21 @@ class Calendar(Interface):
         self.eb2.add(img)
         self.widget.pack_start(self.eb2, expand=False, fill=False)
 
+        self.widget.show_all()
+        self._changed(self.combo)
+
         tooltips.enable()
+
+    def _changed(self, widget):
+        oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
+        if oper in ('=', '!='):
+            self.entry2.hide()
+            self.separator.hide()
+            self.eb2.hide()
+        else:
+            self.entry2.show()
+            self.separator.show()
+            self.eb2.show()
 
     def _date_get(self, value):
         try:
@@ -71,14 +103,24 @@ class Calendar(Interface):
         return date.strftime(DT_FORMAT)
 
     def _value_get(self):
-        res = []
-        val = self._date_get(self.entry1.get_text())
-        if val:
-            res.append((self.name, '>=', val))
-        val = self._date_get(self.entry2.get_text())
-        if val:
-            res.append((self.name, '<=', val))
-        return res
+        oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
+        if oper in ('=', '!='):
+            return [(self.name, oper, self._date_get(self.entry1.get_text()))]
+        else:
+            res = []
+            if oper == 'between':
+                oper1 = '>='
+                oper2 = '<='
+            else:
+                oper1 = '<='
+                oper2 = '>='
+            val = self._date_get(self.entry1.get_text())
+            if val:
+                res.append((self.name, oper1, val))
+            val = self._date_get(self.entry2.get_text())
+            if val:
+                res.append((self.name, oper2, val))
+            return res
 
     def _value_set(self, value):
         def conv(value):
@@ -90,16 +132,18 @@ class Calendar(Interface):
             except:
                 return ''
 
-        val = conv(value[0])
-        if val:
-            self.entry1.set_text()
-        else:
-            self.entry1.clear()
-        val = conv(value[1])
-        if val:
-            self.entry2.set_text()
-        else:
+        i = self.liststore.get_iter_root()
+        while i:
+            if self.liststore.get_value(i, 0) == value[0]:
+                self.combo.set_active_iter(i)
+                break
+            i = self.liststore.iter_next(i)
+
+        self.entry1.set_text(conv(value[1]))
+        if len(value) == 2:
             self.entry2.clear()
+        else:
+            self.entry2.set_text(conv(value[2]))
 
     value = property(_value_get, _value_set)
 
@@ -134,7 +178,7 @@ class Calendar(Interface):
         win.destroy()
 
     def clear(self):
-        self.value = ('', '')
+        self.value = ('=', '')
 
     def sig_activate(self, fct):
         self.entry1.connect_after('activate', fct)
