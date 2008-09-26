@@ -105,7 +105,11 @@ class Calendar(Interface):
     def _value_get(self):
         oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
         if oper in ('=', '!='):
-            return [(self.name, oper, self._date_get(self.entry1.get_text()))]
+            value = self._date_get(self.entry1.get_text())
+            if value:
+                return [(self.name, oper, value)]
+            else:
+                return []
         else:
             res = []
             if oper == 'between':
