@@ -105,19 +105,18 @@ class ParserTree(ParserInterface):
                     treeview, node_attrs, self.window)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
-                if editable and not node_attrs.get('readonly', False):
-                    if isinstance(renderer, gtk.CellRendererToggle):
-                        renderer.set_property('activatable', True)
-                    elif isinstance(renderer,
-                            (gtk.CellRendererProgress, CellRendererButton)):
-                        pass
-                    else:
-                        renderer.set_property('editable', True)
+
+                readonly = not (editable and not node_attrs.get('readonly', False))
+                if isinstance(renderer, gtk.CellRendererToggle):
+                    renderer.set_property('activatable', not readonly)
+                elif isinstance(renderer,
+                        (gtk.CellRendererProgress, CellRendererButton)):
+                    pass
+                else:
+                    renderer.set_property('editable', not readonly)
+                if not readonly:
                     renderer.connect_after('editing-started', send_keys,
                             treeview)
-                else:
-                    if isinstance(renderer, gtk.CellRendererToggle):
-                        renderer.set_property('activatable', False)
 
                 col = gtk.TreeViewColumn(fields[fname]['string'], renderer)
                 col.name = fname
@@ -266,6 +265,14 @@ class Char(object):
                         COLORS.get('required', 'white'))
             else:
                 cell.set_property('background', 'white')
+            readonly = field.get_state_attrs(model).get('readonly', False)
+            if isinstance(cell, gtk.CellRendererToggle):
+                cell.set_property('activatable', not readonly)
+            elif isinstance(cell,
+                    (gtk.CellRendererProgress, CellRendererButton)):
+                pass
+            else:
+                cell.set_property('editable', not readonly)
         cell.set_property('xalign', align)
 
     def get_color(self, model):
