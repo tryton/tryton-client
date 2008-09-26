@@ -881,11 +881,18 @@
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkImageMenuItem" id="help_credits">
+                          <widget class="GtkImageMenuItem" id="help_about">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">_Credits</property>
+                            <property name="label" translatable="yes">_About</property>
                             <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_help_credits_activate"/>
+                            <signal name="activate" handler="on_help_about_activate"/>
+                            <child internal-child="image">
+                              <widget class="GtkImage" id="image_about">
+                                <property name="visible">True</property>
+                                <property name="stock">gtk-about</property>
+                                <property name="icon_size">1</property>
+                              </widget>
+                            </child>
                           </widget>
                         </child>
                       </widget>

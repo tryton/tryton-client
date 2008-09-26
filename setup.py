@@ -92,8 +92,7 @@ setup(name=PACKAGE,
         ('share/pixmaps', glob.glob('share/pixmaps/*.png') + \
                 glob.glob('share/pixmaps/*.svg')),
         ('share/tryton', glob.glob('share/tryton/tryton.glade') + \
-                glob.glob('share/tryton/tipoftheday.txt') + \
-                glob.glob('share/tryton/contributors.txt')),
+                glob.glob('share/tryton/tipoftheday.txt')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],

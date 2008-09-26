@@ -15,7 +15,7 @@ from tryton.gui.window import FilesActions
 from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
 from tryton.gui.window.tips import Tips
-from tryton.gui.window.credits import Credits
+from tryton.gui.window.about import About
 import re
 import base64
 import tryton.translate as translate
@@ -104,7 +104,7 @@ class Main(object):
                     Main.sig_form_tab_orientation(90),
             'on_opt_files_actions_activate': self.sig_files_actions,
             'on_help_tips_activate': self.sig_tips,
-            'on_help_credits_activate': self.sig_credits,
+            'on_help_about_activate': self.sig_about,
             'on_shortcuts_activate' : self.sig_shortcuts,
             'on_db_new_activate': self.sig_db_new,
             'on_db_restore_activate': self.sig_db_restore,
@@ -435,8 +435,8 @@ class Main(object):
     def sig_tips(self, *args):
         Tips(self.window)
 
-    def sig_credits(self, widget):
-        Credits(self.window)
+    def sig_about(self, widget):
+        About(self.window)
 
     def sig_shortcuts(self, widget):
         shortcuts_win = glade.XML(GLADE, 'shortcuts_dia', gettext.textdomain())
