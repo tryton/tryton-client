@@ -628,7 +628,8 @@ class Selection(Char):
                 except Exception, exception:
                     common.process_exception(exception, self.window)
                     selection = []
-        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        if self.attrs.get('sort', True):
+            selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.attrs['selection'] = selection
         self.selection = selection
         for i in self.selection:

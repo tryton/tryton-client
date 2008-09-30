@@ -46,7 +46,8 @@ class Selection(WidgetInterface):
                 except Exception, exception:
                     common.process_exception(exception, self._window)
                     selection = []
-        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        if attrs.get('sort', True):
+            selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection
         self.set_popdown(selection)
         self.last_key = (None, 0)
