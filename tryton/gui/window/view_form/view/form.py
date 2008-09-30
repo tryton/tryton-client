@@ -219,7 +219,7 @@ class ViewForm(ParserView):
                 if not modelfield:
                     continue
                 if not modelfield.get_state_attrs(model).get('valid', True):
-                    if widget.widget.position >= position:
+                    if widget.widget.position > position:
                         continue
                     position = widget.widget.position
                     focus_widget = widget
