@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 import os
 import glob
 import sys
@@ -68,32 +69,14 @@ setup(name=PACKAGE,
     author='B2CK',
     author_email='info@b2ck.com',
     url=WEBSITE,
-    packages=[
-        'tryton',
-        'tryton.action',
-        'tryton.common',
-        'tryton.gui',
-        'tryton.gui.window',
-        'tryton.gui.window.view_form',
-        'tryton.gui.window.view_form.model',
-        'tryton.gui.window.view_form.screen',
-        'tryton.gui.window.view_form.view',
-        'tryton.gui.window.view_form.view.form_gtk',
-        'tryton.gui.window.view_form.view.list_gtk',
-        'tryton.gui.window.view_form.view.graph_gtk',
-        'tryton.gui.window.view_form.widget_search',
-        'tryton.gui.window.view_tree',
-        'tryton.gui.window.view_board',
-        'tryton.plugins.translation',
-        'tryton.plugins.workflow',
-        'tryton.wizard',
-    ],
+    packages=find_packages(),
     data_files=[
         ('share/pixmaps', glob.glob('share/pixmaps/*.png') + \
                 glob.glob('share/pixmaps/*.svg')),
         ('share/tryton', glob.glob('share/tryton/tryton.glade') + \
                 glob.glob('share/tryton/tipoftheday.txt')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
+        ('share/locale/de_DE/LC_MESSAGES', glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],
     classifiers=[
@@ -106,8 +89,9 @@ setup(name=PACKAGE,
         'Topic :: Office/Business',
     ],
     license=LICENSE,
-    #requires=[
-    #    'pygtk (>2.0)',
-    #],
+    install_requires=[
+        "pygtk >= 2.0",
+        "egenix-mx-base",
+    ],
     **args
 )
