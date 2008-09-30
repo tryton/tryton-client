@@ -70,17 +70,18 @@ class Many2Many(WidgetInterface):
     def _sig_add(self, *args):
         domain = self._view.modelfield.domain_get(self._view.model)
         context = self._view.modelfield.context_get(self._view.model)
+        value = self.wid_text.get_text()
 
         try:
             ids = rpc.execute('object', 'execute',
                     self.attrs['relation'], 'name_search',
-                    self.wid_text.get_text(), domain, 'ilike', context,
+                    value, domain, 'ilike', context,
                     _LIMIT)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False
         ids = [x[0] for x in ids]
-        if len(ids) != 1:
+        if len(ids) != 1 or not value:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
                     context=context, domain=domain, parent=self._window,
                     views_preload=self.attrs.get('views', {}))
