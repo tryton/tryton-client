@@ -161,21 +161,17 @@ def execute(obj, method, *args):
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
             args = args[:]
             args = args + (_VIEW_CACHE[key][0],)
+    _SEMAPHORE.acquire()
     try:
-        _SEMAPHORE.acquire()
         try:
             _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
             result = _SOCK.receive()
-        finally:
-            _SEMAPHORE.release()
-    except socket.error:
-        _SEMAPHORE.acquire()
-        try:
+        except socket.error:
             _SOCK.reconnect()
             _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
             result = _SOCK.receive()
-        finally:
-            _SEMAPHORE.release()
+    finally:
+        _SEMAPHORE.release()
     if key:
         if result is True and key in _VIEW_CACHE:
             result = _VIEW_CACHE[key][1]
