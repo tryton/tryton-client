@@ -351,6 +351,8 @@ class ModelRecord(SignalEvent):
                 continue
             if field_name not in on_change_with:
                 continue
+            if field_name == fieldname:
+                continue
             args = {}
             for arg in on_change_with:
                 try:
