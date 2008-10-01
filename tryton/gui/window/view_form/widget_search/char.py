@@ -23,8 +23,8 @@ class Char(Interface):
         self.combo.add_attribute(cell, 'text', 1)
         for oper in (['ilike', _('contains')],
                 ['not ilike', _('not contains')],
-                ['=', _('equal')],
-                ['!=', _('different')],
+                ['=', _('equals')],
+                ['!=', _('is different')],
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)

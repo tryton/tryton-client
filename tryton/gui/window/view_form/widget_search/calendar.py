@@ -29,10 +29,10 @@ class Calendar(Interface):
         cell = gtk.CellRendererText()
         self.combo.pack_start(cell, True)
         self.combo.add_attribute(cell, 'text', 1)
-        for oper in (['=', _('at')],
-                ['between', _('between')],
-                ['not between', _('not between')],
-                ['!=', _('not at')],
+        for oper in (['=', _('is')],
+                ['between', _('is between')],
+                ['not between', _('is not between')],
+                ['!=', _('is not')],
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)

@@ -19,8 +19,8 @@ class Selection(Interface):
         cell = gtk.CellRendererText()
         self.combo.pack_start(cell, True)
         self.combo.add_attribute(cell, 'text', 1)
-        for oper in (['=', _('equal')],
-                ['!=', _('different')],
+        for oper in (['=', _('equals')],
+                ['!=', _('is different')],
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)
