@@ -3993,7 +3993,7 @@ Latin1</property>
                     <property name="xalign">1</property>
                     <property name="xpad">3</property>
                     <property name="ypad">3</property>
-                    <property name="label" translatable="yes">Password:</property>
+                    <property name="label" translatable="yes">Tryton Server Password:</property>
                     <property name="justify">GTK_JUSTIFY_RIGHT</property>
                   </widget>
                   <packing>
