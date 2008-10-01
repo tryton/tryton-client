@@ -433,11 +433,13 @@ class Dialog(object):
         return (False, None)
 
     def _sig_close(self, widget):
-        self.screen.current_view.set_value()
+        if self.screen.current_view:
+            self.screen.current_view.set_value()
         if not self.but_cancel \
                 and self.screen.current_model \
                 and not self.screen.current_model.validate():
-            self.screen.current_view.set_cursor()
+            if self.screen.current_view:
+                self.screen.current_view.set_cursor()
             self.screen.display()
             widget.emit_stop_by_name('close')
 
