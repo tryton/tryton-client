@@ -356,10 +356,15 @@ class Main(object):
             except Exception, exception:
                 if exception.args == ('QueryCanceled',):
                     return False
-                raise
+                common.process_exception(exception, self.window)
+                return
         self.window.present()
         self.sig_logout(widget, disconnect=False)
-        log_response = rpc.login(*res)
+        try:
+            log_response = rpc.login(*res)
+        except Exception, exception:
+            common.process_exception(exception, self.window)
+            return
         self.refresh_ssl()
         if log_response > 0:
             try:
