@@ -395,6 +395,7 @@ class ParserForm(ParserInterface):
 
             elif node.localName == 'notebook':
                 notebook = gtk.Notebook()
+                notebook.set_scrollable(True)
                 notebook_list.append(notebook)
                 if attrs and 'tabpos' in attrs:
                     pos = {'up':gtk.POS_TOP,
