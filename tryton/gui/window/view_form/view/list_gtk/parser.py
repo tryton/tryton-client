@@ -444,7 +444,9 @@ class FloatTime(Char):
 class M2O(Char):
 
     def value_from_text(self, model, text):
-        if not text:
+        modelfield = model.mgroup.mfields[self.field_name]
+        if not text and not modelfield.get_state_attrs(
+                model)['required']:
             return False
 
         relation = model[self.field_name].attrs['relation']

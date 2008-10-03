@@ -24,8 +24,9 @@ class EditableTreeView(gtk.TreeView):
             del modelfield.editabletree_entry
         cell = self.cells[fieldname]
 
-        # The value has not changed ... do nothing.
-        if value == cell.get_textual_value(current_model):
+        # The value has not changed and is valid ... do nothing.
+        if value == cell.get_textual_value(current_model) \
+                and modelfield.validate(current_model):
             return
 
         try:
