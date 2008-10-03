@@ -84,7 +84,7 @@ def save(widget, graph, window):
                     graph.export_png(filename, width, height)
                     break
                 except MemoryError:
-                    common.message(_('Image size to large!'), dia,
+                    common.message(_('Image size too large!'), dia,
                             gtk.MESSAGE_ERROR)
         else:
             break

@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-10-01 21:41+0200\n"
+"POT-Creation-Date: 2008-10-02 18:11-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 0.9.1\n"
+"Generated-By: Babel 0.9.4\n"
 
 #: tryton/config.py:93
 msgid "specify alternate config file"
@@ -84,19 +84,19 @@ msgstr ""
 msgid "No action defined!"
 msgstr ""
 
-#: tryton/common/common.py:75
+#: tryton/common/common.py:74
 msgid "Tryton Connection"
 msgstr ""
 
-#: tryton/common/common.py:85 tryton/gui/window/dblogin.py:65
+#: tryton/common/common.py:84 tryton/gui/window/dblogin.py:65
 msgid "Server:"
 msgstr ""
 
-#: tryton/common/common.py:103
+#: tryton/common/common.py:102
 msgid "Port:"
 msgstr ""
 
-#: tryton/common/common.py:277 tryton/gui/main.py:793
+#: tryton/common/common.py:276 tryton/gui/main.py:793
 #: tryton/gui/window/attachment.py:155 tryton/gui/window/win_export.py:244
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:40
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:84
@@ -104,76 +104,76 @@ msgstr ""
 msgid "Save As..."
 msgstr ""
 
-#: tryton/common/common.py:306 tryton/gui/window/win_export.py:279
+#: tryton/common/common.py:305 tryton/gui/window/win_export.py:279
 #: tryton/gui/window/win_import.py:118 tryton/gui/window/win_import.py:132
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:80
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:93
 msgid "Error"
 msgstr ""
 
-#: tryton/common/common.py:310
+#: tryton/common/common.py:309
 msgid "Report Bug"
 msgstr ""
 
-#: tryton/common/common.py:317
+#: tryton/common/common.py:316
 msgid "Application Error!"
 msgstr ""
 
-#: tryton/common/common.py:336
+#: tryton/common/common.py:335
 msgid "Error: "
 msgstr ""
 
-#: tryton/common/common.py:355
+#: tryton/common/common.py:354
 msgid "To report bugs you must have an account on "
 msgstr ""
 
-#: tryton/common/common.py:378
+#: tryton/common/common.py:377
 msgid "Bug Tracker"
 msgstr ""
 
-#: tryton/common/common.py:395
+#: tryton/common/common.py:394
 msgid "User:"
 msgstr ""
 
-#: tryton/common/common.py:403 tryton/common/common.py:673
+#: tryton/common/common.py:402 tryton/common/common.py:633
 #: tryton/gui/window/dblogin.py:87 tryton/gui/window/tree.py:322
 msgid "Password:"
 msgstr ""
 
-#: tryton/common/common.py:490
+#: tryton/common/common.py:450
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 
-#: tryton/common/common.py:501
+#: tryton/common/common.py:461
 msgid "Created new bug with ID "
 msgstr ""
 
-#: tryton/common/common.py:508
+#: tryton/common/common.py:468
 msgid "Exception:"
 msgstr ""
 
-#: tryton/common/common.py:562
+#: tryton/common/common.py:522
 msgid "Confirmation"
 msgstr ""
 
-#: tryton/common/common.py:667 tryton/common/common.py:678
+#: tryton/common/common.py:627 tryton/common/common.py:638
 #: tryton/gui/main.py:379 tryton/gui/window/tree.py:329
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
 msgstr ""
 
-#: tryton/common/common.py:714
+#: tryton/common/common.py:674
 msgid "Network Error!"
 msgstr ""
 
-#: tryton/common/common.py:818
+#: tryton/common/common.py:778
 msgid "Operation in progress"
 msgstr ""
 
-#: tryton/common/common.py:822
+#: tryton/common/common.py:782
 msgid ""
 "Please wait,\n"
 "this operation may take a while..."
