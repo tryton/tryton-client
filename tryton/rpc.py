@@ -150,7 +150,7 @@ def context_reload():
             except:
                 pass
 
-def execute(obj, method, *args):
+def _execute(blocking, obj, method, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
     if not _SOCK or not _SOCK.connected:
         raise Exception('NotLogged')
@@ -161,7 +161,9 @@ def execute(obj, method, *args):
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
             args = args[:]
             args = args + (_VIEW_CACHE[key][0],)
-    _SEMAPHORE.acquire()
+    res = _SEMAPHORE.acquire(blocking)
+    if not res:
+        return
     try:
         try:
             _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
@@ -178,6 +180,12 @@ def execute(obj, method, *args):
         else:
             _VIEW_CACHE[key] = (result['md5'], result)
     return result
+
+def execute(obj, method, *args):
+    return _execute(True, obj, method, *args)
+
+def execute_nonblocking(obj, method, *args):
+    return _execute(False, obj, method, *args)
 
 class RPCProxy(object):
 

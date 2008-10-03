@@ -326,8 +326,15 @@ class Main(object):
 
     def request_set(self, exception=False):
         try:
-            ids, ids2 = rpc.execute('object', 'execute',
-                    'res.request', 'request_get')
+            if not exception:
+                res = rpc.execute('object', 'execute',
+                        'res.request', 'request_get')
+                if not res:
+                    return ([], [])
+                ids1, ids2 = res
+            else:
+                ids, ids2 = rpc.execute('object', 'execute',
+                        'res.request', 'request_get')
             if len(ids):
                 if len(ids) == 1:
                     message = _('%s request') % len(ids)
