@@ -162,7 +162,11 @@ class Wizard(object):
             ctx['active_ids'] = datas.get('ids')
             rpcprogress = common.RPCProgress('execute', ('wizard',
                 'execute', wiz_id, datas, state, ctx), parent)
-            res = rpcprogress.run()
+            try:
+                res = rpcprogress.run()
+            except Exception, exception:
+                common.process_exception(exception, parent)
+                break
             if not res:
                 if dia:
                     res = {'type': 'form'}
