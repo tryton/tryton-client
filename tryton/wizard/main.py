@@ -171,7 +171,7 @@ class Wizard(object):
                 if dia:
                     res = {'type': 'form'}
                 else:
-                    return
+                    break
             else:
                 if dia:
                     dia.destroy()
