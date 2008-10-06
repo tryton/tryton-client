@@ -65,8 +65,9 @@ class ViewForm(ParserView):
         for button in self.buttons:
             button.form = self
 
-        self.widgets = dict([(name, ViewWidget(self, widget, name))
-                             for name, widget in children.items()])
+        self.widgets = dict([(name, [ViewWidget(self, widget, name)
+            for widget in widgets])
+            for name, widgets in children.items()])
 
         vbox = gtk.VBox()
         vp = gtk.Viewport()
@@ -151,12 +152,13 @@ class ViewForm(ParserView):
         return value
 
     def __getitem__(self, name):
-        return self.widgets[name]
+        return self.widgets[name][0]
 
     def destroy(self):
-        for widget in self.widgets.keys():
-            self.widgets[widget].widget.destroy()
-            del self.widgets[widget]
+        for widget_name in self.widgets.keys():
+            for widget in self.widgets[widget_name]:
+                widget.widget.destroy()
+            del self.widgets[widget_name]
         self.widget.destroy()
         del self.widget
         del self.widgets
@@ -169,8 +171,9 @@ class ViewForm(ParserView):
     def set_value(self):
         model = self.screen.current_model
         if model:
-            for widget in self.widgets.values():
-                widget.set_value(model)
+            for widgets in self.widgets.values():
+                for widget in widgets:
+                    widget.set_value(model)
 
     def sel_ids_get(self):
         if self.screen.current_model:
@@ -184,14 +187,16 @@ class ViewForm(ParserView):
 
     def reset(self):
         model = self.screen.current_model
-        for name, widget in self.widgets.items():
-            widget.reset(model)
+        for name, widgets in self.widgets.items():
+            for widget in widgets:
+                widget.reset(model)
 
     def signal_record_changed(self, *args):
-        for widget in self.widgets.values():
-            if hasattr(widget.widget, 'screen'):
-                for view in widget.widget.screen.views:
-                    view.signal_record_changed(*args)
+        for widgets in self.widgets.values():
+            for widget in widgets:
+                if hasattr(widget.widget, 'screen'):
+                    for view in widget.widget.screen.views:
+                        view.signal_record_changed(*args)
 
     def display(self):
         model = self.screen.current_model
@@ -199,8 +204,9 @@ class ViewForm(ParserView):
             # Force to set mfields in model
             for field in model.mgroup.fields:
                 model[field].get(model, check_load=False)
-        for widget in self.widgets.values():
-            widget.display(model)
+        for widgets in self.widgets.values():
+            for widget in widgets:
+                widget.display(model)
         for button in self.buttons:
             button.state_set(model)
         return True
@@ -209,20 +215,23 @@ class ViewForm(ParserView):
         for notebook in self.notebooks:
             notebook.set_current_page(0)
         if self.cursor_widget in self.widgets:
-            self.widgets[self.cursor_widget].widget.grab_focus()
+            self.widgets[self.cursor_widget][0].widget.grab_focus()
         model = self.screen.current_model
-        position = len(self.widgets)
+        position = 0
+        for widgets in self.widgets:
+            position += len(widgets)
         focus_widget = None
         if model:
-            for widget in self.widgets.values():
-                modelfield = model.mgroup.mfields.get(widget.widget_name, None)
-                if not modelfield:
-                    continue
-                if not modelfield.get_state_attrs(model).get('valid', True):
-                    if widget.widget.position > position:
+            for widgets in self.widgets.values():
+                for widget in widgets:
+                    modelfield = model.mgroup.mfields.get(widget.widget_name, None)
+                    if not modelfield:
                         continue
-                    position = widget.widget.position
-                    focus_widget = widget
+                    if not modelfield.get_state_attrs(model).get('valid', True):
+                        if widget.widget.position > position:
+                            continue
+                        position = widget.widget.position
+                        focus_widget = widget
         if focus_widget:
             for notebook in self.notebooks:
                 for i in range(notebook.get_n_pages()):

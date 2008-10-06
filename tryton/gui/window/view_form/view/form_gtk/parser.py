@@ -431,7 +431,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
 
             elif node.localName == 'page':
                 if attrs and 'angle' in attrs:
@@ -447,7 +449,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 notebook.append_page(widget, label)
 
             elif node.localName == 'field':
@@ -473,7 +477,8 @@ class ParserForm(ParserInterface):
                         model, fields[name])
                 self.widget_id += 1
                 widget_act.position = self.widget_id
-                dict_widget[name] = widget_act
+                dict_widget.setdefault(name, [])
+                dict_widget[name].append(widget_act)
                 size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
                 expand = WIDGETS_TYPE[ftype][2]
                 if 'expand' in attrs:
@@ -503,7 +508,9 @@ class ParserForm(ParserInterface):
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 button_list += buttons
                 text = ''
                 if 'name' in attrs and attrs['name'] in fields:
@@ -534,7 +541,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
                     hpaned.set_position(int(attrs['position']))
             elif node.localName == 'vpaned':
@@ -548,7 +557,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
                     vpaned.set_position(int(attrs['position']))
             elif node.localName == 'child1':
@@ -559,7 +570,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 paned.pack1(widget, resize=True, shrink=True)
             elif node.localName == 'child2':
                 widget, widgets, buttons, on_write, notebook_list, cursor_widget2 = \
@@ -569,7 +582,9 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                dict_widget.update(widgets)
+                for widget_name, widgets in widgets.items():
+                    dict_widget.setdefault(widget_name, [])
+                    dict_widget[widget_name].extend(widgets)
                 paned.pack2(widget, resize=True, shrink=True)
         for (button, src, name, widget) in container.trans_box:
             button.connect('clicked', self.translate, model, name,
