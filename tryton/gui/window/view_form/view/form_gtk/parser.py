@@ -440,7 +440,16 @@ class ParserForm(ParserInterface):
                     angle = int(attrs['angle'])
                 else:
                     angle = int(CONFIG['client.form_tab_orientation'])
-                label = gtk.Label(attrs.get('string','No String Attr.'))
+                text = attrs.get('string', '')
+                if 'name' in attrs and attrs['name'] in fields:
+                    if 'states' in fields[attrs['name']]:
+                        attrs['states'] = \
+                                fields[attrs['name']]['states']
+                    if not text:
+                        text = fields[attrs['name']]['string']
+                if not text:
+                    text = _('No String Attr.')
+                label = gtk.Label(text)
                 label.set_angle(angle)
                 widget, widgets, buttons, on_write, notebook_list2, cursor_widget2 = \
                         self.parse(model, node, fields, notebook,
@@ -452,7 +461,11 @@ class ParserForm(ParserInterface):
                 for widget_name, widgets in widgets.items():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
-                notebook.append_page(widget, label)
+
+                vbox = VBox(attrs=attrs)
+                button_list.append(vbox)
+                vbox.pack_start(widget)
+                notebook.append_page(vbox, label)
 
             elif node.localName == 'field':
                 name = str(attrs['name'])
