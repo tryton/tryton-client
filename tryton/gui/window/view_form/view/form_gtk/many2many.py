@@ -95,10 +95,12 @@ class Many2Many(WidgetInterface):
         if self.screen.current_view:
             self.screen.current_view.set_cursor()
         self.wid_text.set_text('')
+        self.set_value(self._view.model, self._view.modelfield)
 
     def _sig_remove(self, *args):
         self.screen.remove()
         self.screen.display()
+        self.set_value(self._view.model, self._view.modelfield)
 
     def _sig_activate(self, *args):
         self._sig_add()
