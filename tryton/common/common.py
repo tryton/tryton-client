@@ -169,7 +169,7 @@ def selection(title, values, parent, alwaysask=False):
         if sel:
             (model, i) = sel
             if i:
-                value = model.get_value(i, 0)
+                value = model.get_value(i, 0).decode('utf-8')
                 res = (value, values[value])
     parent.present()
     win.destroy()
