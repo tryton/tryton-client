@@ -519,11 +519,11 @@ def warning(msg, parent, title=''):
     return True
 
 def sur(msg, parent):
-    dialog = gtk.Dialog(_('Confirmation'), parent, gtk.DIALOG_MODAL 
-            | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT 
-            | gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
+    dialog = gtk.Dialog(_('Confirmation'), parent, gtk.DIALOG_MODAL
+            | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
+            | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     dialog.set_icon(TRYTON_ICON)
-    dialog.set_size_request(350, 143)
+    dialog.set_size_request(350, 150)
     hbox = gtk.HBox()
     image = gtk.Image()
     image.set_from_stock('tryton-dialog-information',
@@ -535,31 +535,43 @@ def sur(msg, parent):
     hbox.pack_start(label, True, True)
     dialog.vbox.pack_start(hbox)
     dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
-    dialog.add_button("gtk-ok", gtk.RESPONSE_OK | gtk.CAN_DEFAULT 
+    dialog.add_button("gtk-ok", gtk.RESPONSE_OK | gtk.CAN_DEFAULT
             | gtk.HAS_DEFAULT)
     dialog.set_default_response(gtk.RESPONSE_OK)
     dialog.set_transient_for(parent)
     dialog.show_all()
-    dialog.set_transient_for(parent)
-    dialog.set_icon(TRYTON_ICON)
     response = dialog.run()
     parent.present()
     dialog.destroy()
     return response == gtk.RESPONSE_OK
 
 def sur_3b(msg, parent):
-    xml = glade.XML(GLADE, "win_quest_3b",
-            gettext.textdomain())
-    win = xml.get_widget('win_quest_3b')
-    label = xml.get_widget('label')
-    label.set_text(msg)
+    dialog = gtk.Dialog(_('Confirmation'), parent, gtk.DIALOG_MODAL
+            | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
+            | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+    dialog.set_icon(TRYTON_ICON)
+    dialog.set_size_request(350, 150)
+    hbox = gtk.HBox()
+    image = gtk.Image()
+    image.set_from_stock('tryton-dialog-information',
+            gtk.ICON_SIZE_DIALOG)
+    image.set_padding(15, 15)
+    hbox.pack_start(image, False, False)
+    label = gtk.Label('%s' % (to_xml(msg)))
+    label.set_size_request(200, 60)
+    hbox.pack_start(label, True, True)
+    dialog.vbox.pack_start(hbox)
+    dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
+    dialog.add_button("gtk-no", gtk.RESPONSE_NO)
+    dialog.add_button("gtk-yes", gtk.RESPONSE_YES | gtk.CAN_DEFAULT
+            | gtk.HAS_DEFAULT)
+    dialog.set_default_response(gtk.RESPONSE_YES)
+    dialog.set_transient_for(parent)
+    dialog.show_all()
 
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
-
-    response = win.run()
+    response = dialog.run()
     parent.present()
-    win.destroy()
+    dialog.destroy()
     if response == gtk.RESPONSE_YES:
         return 'ok'
     elif response == gtk.RESPONSE_NO:
