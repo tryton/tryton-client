@@ -115,10 +115,8 @@ class ModelRecordGroup(SignalEvent):
 
     def reload(self, ids):
         for obj_id in ids:
-            cont = False
             for model in self.models:
                 if model.id == obj_id:
-                    cont = True
                     model.reload()
 
     def on_write_ids(self, ids):
