@@ -117,7 +117,7 @@ class ViewForm(ParserView):
             self.screen.save_current()
             obj_id = self.screen.current_model \
                     and self.screen.current_model.id
-            if not obj_id:
+            if obj_id < 0:
                 if atype in ('print'):
                     message(_('You must save this record ' \
                         'to use the print button!'), self.window)
