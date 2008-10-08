@@ -140,6 +140,7 @@ class WinSearch(object):
 
     def destroy(self):
         self.parent.present()
+        self.screen.destroy()
         self.win.destroy()
 
     def run(self):
