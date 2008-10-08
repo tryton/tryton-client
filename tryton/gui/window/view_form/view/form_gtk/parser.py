@@ -198,6 +198,30 @@ class Frame(gtk.Frame):
             self.show()
 
 
+class ScrolledWindow(gtk.ScrolledWindow):
+
+    def __init__(self, hadjustment=None, vadjustment=None, attrs=None):
+        super(ScrolledWindow, self).__init__(hadjustment=hadjustment,
+                vadjustment=vadjustment)
+        self.attrs = attrs or {}
+
+    def state_set(self, model):
+        state_changes = self.attrs.get('states', {})
+        try:
+            if isinstance(state_changes, basestring):
+                state_changes = eval(state_changes)
+            if 'invisible' in state_changes:
+                if model.expr_eval(state_changes['invisible'],
+                        check_load=False):
+                    self.hide()
+                else:
+                    self.show()
+            else:
+                self.show()
+        except:
+            self.show()
+
+
 class _container(object):
     def __init__(self, tooltips):
         self.cont = []
@@ -462,10 +486,18 @@ class ParserForm(ParserInterface):
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
 
-                vbox = VBox(attrs=attrs)
-                button_list.append(vbox)
-                vbox.pack_start(widget)
-                notebook.append_page(vbox, label)
+                viewport = gtk.Viewport()
+                viewport.set_shadow_type(gtk.SHADOW_NONE)
+                viewport.add(widget)
+                viewport.show()
+                scrolledwindow = ScrolledWindow(attrs=attrs)
+                scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+                scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                        gtk.POLICY_AUTOMATIC)
+                scrolledwindow.add(viewport)
+
+                button_list.append(scrolledwindow)
+                notebook.append_page(scrolledwindow, label)
 
             elif node.localName == 'field':
                 name = str(attrs['name'])
