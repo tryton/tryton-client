@@ -156,7 +156,7 @@ def selection(title, values, parent, alwaysask=False):
     keys = values.keys()
     keys.sort()
     for val in keys:
-        model.append([val])
+        model.append([str(val)])
 
     sel_tree.set_model(model)
     sel_tree.connect('row-activated',
