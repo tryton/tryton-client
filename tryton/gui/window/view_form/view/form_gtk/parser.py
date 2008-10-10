@@ -715,6 +715,7 @@ class ParserForm(ParserInterface):
 
         win = gtk.Dialog(_('Add Translation'), self.window,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        win.set_has_separator(True)
         win.vbox.set_spacing(5)
         win.set_property('default-width', 600)
         win.set_property('default-height', 400)

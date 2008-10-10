@@ -105,6 +105,7 @@ class Calendar(WidgetInterface):
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
+        win.set_has_separator(True)
         win.set_icon(TRYTON_ICON)
 
         cal = gtk.Calendar()
@@ -254,6 +255,8 @@ class DateTime(WidgetInterface):
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
+        win.set_has_separator(True)
+        win.set_icon(TRYTON_ICON)
 
         hbox = gtk.HBox()
         hbox.pack_start(gtk.Label(_('Hour:')), expand=False, fill=False)

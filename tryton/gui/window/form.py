@@ -161,6 +161,7 @@ class Form(SignalEvent):
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
         win.set_icon(TRYTON_ICON)
+        win.set_has_separator(True)
         win.set_default_response(gtk.RESPONSE_OK)
 
         table = gtk.Table(2, 2)

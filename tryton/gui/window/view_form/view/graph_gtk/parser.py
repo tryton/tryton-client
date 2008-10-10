@@ -22,6 +22,7 @@ def save(widget, graph, window):
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
     dia.set_icon(TRYTON_ICON)
+    dia.set_has_separator(True)
     dia.set_default_response(gtk.RESPONSE_OK)
 
     dia.vbox.set_spacing(5)

@@ -22,9 +22,9 @@ class Preference(object):
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
 
         self.win.set_default_response(gtk.RESPONSE_OK)
+        self.win.set_has_separator(False)
         self.win.vbox.pack_start(gtk.Label(_('Edit User Preferences')),
                 expand=False, fill=True)
-        self.win.vbox.pack_start(gtk.HSeparator())
         self.win.set_icon(TRYTON_ICON)
         self.win.set_transient_for(parent)
         self.parent = parent

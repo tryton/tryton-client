@@ -16,7 +16,7 @@ class DBLogin(object):
             flags=gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dialog.set_size_request(500, 301)
         self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        self.dialog.set_has_separator(False)
+        self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
 
         tooltips = gtk.Tooltips()

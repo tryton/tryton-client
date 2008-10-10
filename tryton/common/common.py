@@ -71,11 +71,12 @@ def refresh_langlist(lang_widget, host, port):
 def request_server(server_widget, parent):
     result = False
     dialog = gtk.Dialog(
-        title =  _('Tryton Connection'),
-        parent = parent,
-        flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
-            gtk.WIN_POS_CENTER_ON_PARENT | 
+        title= _('Tryton Connection'),
+        parent=parent,
+        flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT |
             gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
+    dialog.set_has_separator(True)
     vbox = gtk.VBox()
     table = gtk.Table(2, 2, False)
     table.set_border_width(12)
@@ -305,6 +306,7 @@ def error(title, parent, details):
     dialog = gtk.Dialog(_('Error'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
     dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
 
     but_send = gtk.Button(_('Report Bug'))
     dialog.add_action_widget(but_send, gtk.RESPONSE_OK)
@@ -380,6 +382,7 @@ def send_bugtracker(msg, parent):
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
     win.set_icon(TRYTON_ICON)
     win.set_default_response(gtk.RESPONSE_OK)
+    win.set_has_separator(True)
 
     hbox = gtk.HBox()
     image = gtk.Image()
@@ -474,6 +477,7 @@ def message(msg, parent, msg_type=gtk.MESSAGE_INFO):
       msg_type, gtk.BUTTONS_OK,
       msg)
     dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
     dialog.run()
     parent.present()
     dialog.destroy()
@@ -503,6 +507,7 @@ def sur(msg, parent):
             | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
             | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
     dialog.set_size_request(350, 150)
     hbox = gtk.HBox()
     image = gtk.Image()
@@ -530,6 +535,7 @@ def sur_3b(msg, parent):
             | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
             | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
     dialog.set_size_request(350, 150)
     hbox = gtk.HBox()
     image = gtk.Image()
@@ -567,6 +573,7 @@ def ask(question, parent, visibility=True):
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
     win.set_icon(TRYTON_ICON)
+    win.set_has_separator(True)
     win.set_default_response(gtk.RESPONSE_OK)
 
     hbox = gtk.HBox()

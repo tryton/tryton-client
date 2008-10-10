@@ -175,6 +175,7 @@ class Dialog(object):
         self.dia.set_property('default-height', 500)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dia.set_icon(TRYTON_ICON)
+        self.dia.set_has_separator(False)
 
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)

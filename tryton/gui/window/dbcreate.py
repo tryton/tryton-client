@@ -140,7 +140,7 @@ class DBCreate(object):
             flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
             | gtk.WIN_POS_CENTER_ON_PARENT,
         )
-        self.dialog.set_has_separator(False)
+        self.dialog.set_has_separator(True)
         self.dialog.set_size_request(700, 301)
         self.dialog.set_icon(TRYTON_ICON)
         # This event is needed for controlling the button_create

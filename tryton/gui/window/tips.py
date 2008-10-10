@@ -13,6 +13,7 @@ class Tips(object):
         self.win = gtk.Dialog(_('Tips'), parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_icon(TRYTON_ICON)
+        self.win.set_has_separator(True)
 
         self.win.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 

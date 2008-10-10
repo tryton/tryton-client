@@ -5,7 +5,7 @@ import gtk
 import gettext
 import locale
 from interface import Interface
-from tryton.common import DT_FORMAT
+from tryton.common import DT_FORMAT, TRYTON_ICON
 from tryton.common import date_widget
 from tryton.translate import date_format
 import mx.DateTime
@@ -156,6 +156,8 @@ class Calendar(Interface):
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
+        win.set_has_separator(True)
+        win.set_icon(TRYTON_ICON)
 
         cal = gtk.Calendar()
         cal.display_options(gtk.CALENDAR_SHOW_HEADING | \
