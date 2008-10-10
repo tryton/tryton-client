@@ -137,43 +137,53 @@ def selection(title, values, parent, alwaysask=False):
         key = values.keys()[0]
         return (key, values[key])
 
-    xml = glade.XML(GLADE, "win_selection",
-            gettext.textdomain())
-    win = xml.get_widget('win_selection')
-    win.set_icon(TRYTON_ICON)
-    win.set_transient_for(parent)
+    dialog = gtk.Dialog(_('Selection'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                gtk.STOCK_OK, gtk.RESPONSE_OK))
+    dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
+    dialog.set_default_response(gtk.RESPONSE_OK)
+    dialog.set_size_request(400, 400)
 
-    label = xml.get_widget('win_sel_title')
-    if title:
-        label.set_text(title)
+    label = gtk.Label(title or _('Your selection:'))
+    dialog.vbox.pack_start(label, False, False)
+    dialog.vbox.pack_start(gtk.HSeparator(), False, True)
 
-    sel_tree = xml.get_widget('win_sel_tree')
-    sel_tree.get_selection().set_mode('single')
+    scrolledwindow = gtk.ScrolledWindow()
+    scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    treeview = gtk.TreeView()
+    treeview.set_headers_visible(False)
+    scrolledwindow.add(treeview)
+    dialog.vbox.pack_start(scrolledwindow, True, True)
+
+    treeview.get_selection().set_mode('single')
     cell = gtk.CellRendererText()
     column = gtk.TreeViewColumn("Widget", cell, text=0)
-    sel_tree.append_column(column)
-    sel_tree.set_search_column(0)
+    treeview.append_column(column)
+    treeview.set_search_column(0)
     model = gtk.ListStore(gobject.TYPE_STRING)
     keys = values.keys()
     keys.sort()
     for val in keys:
         model.append([str(val)])
 
-    sel_tree.set_model(model)
-    sel_tree.connect('row-activated',
-            lambda x, y, z: win.response(gtk.RESPONSE_OK) or True)
+    treeview.set_model(model)
+    treeview.connect('row-activated',
+            lambda x, y, z: dialog.response(gtk.RESPONSE_OK) or True)
 
-    response = win.run()
+    dialog.show_all()
+    response = dialog.run()
     res = None
     if response == gtk.RESPONSE_OK:
-        sel = sel_tree.get_selection().get_selected()
+        sel = treeview.get_selection().get_selected()
         if sel:
             (model, i) = sel
             if i:
                 value = model.get_value(i, 0).decode('utf-8')
                 res = (value, values[value])
     parent.present()
-    win.destroy()
+    dialog.destroy()
     return res
 
 def file_selection(title, filename='', parent=None,
