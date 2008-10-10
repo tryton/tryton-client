@@ -594,15 +594,46 @@ def ask(question, parent, visibility=True):
         return None
 
 def concurrency(resource, obj_id, context, parent):
-    dia = glade.XML(GLADE, 'dialog_concurrency_exception', gettext.textdomain())
-    win = dia.get_widget('dialog_concurrency_exception')
+    dialog = gtk.Dialog(_('Concurrency Exception'), parent, gtk.DIALOG_MODAL
+            | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
+            | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+    dialog.set_icon(TRYTON_ICON)
+    dialog.set_has_separator(True)
+    dialog.set_default_response(gtk.RESPONSE_CANCEL)
+    hbox = gtk.HBox()
+    image = gtk.Image()
+    image.set_from_stock('tryton-dialog-information',
+            gtk.ICON_SIZE_DIALOG)
+    image.set_padding(15, 15)
+    hbox.pack_start(image, False, False)
+    label = gtk.Label()
+    label.set_padding(15, 15)
+    label.set_use_markup(True)
+    label.set_markup(_('''<b>Write Concurrency Warning:</b>
 
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
+This record has been modified while you were editing it.
+  Choose:
+   - "Cancel" to cancel saving;
+   - "Compare" to see the modified version;
+   - "Write Anyway" to save your current version.'''))
+    hbox.pack_start(label, True, True)
+    dialog.vbox.pack_start(hbox)
+    dialog.add_button('gtk-cancel', gtk.RESPONSE_CANCEL)
+    compare_button = gtk.Button(_('Compare'))
+    image = gtk.Image()
+    image.set_from_stock('tryton-find-replace', gtk.ICON_SIZE_BUTTON)
+    compare_button.set_image(image)
+    dialog.add_action_widget(compare_button, gtk.RESPONSE_APPLY)
+    write_button = gtk.Button(_('Write Anyway'))
+    image = gtk.Image()
+    image.set_from_stock('tryton-save', gtk.ICON_SIZE_BUTTON)
+    write_button.set_image(image)
+    dialog.add_action_widget(write_button, gtk.RESPONSE_OK)
+    dialog.show_all()
 
-    res = win.run()
+    res = dialog.run()
     parent.present()
-    win.destroy()
+    dialog.destroy()
 
     if res == gtk.RESPONSE_OK:
         return True
