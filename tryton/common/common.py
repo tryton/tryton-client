@@ -487,7 +487,6 @@ def message(msg, parent, msg_type=gtk.MESSAGE_INFO):
       msg_type, gtk.BUTTONS_OK,
       msg)
     dialog.set_icon(TRYTON_ICON)
-    dialog.set_has_separator(True)
     dialog.run()
     parent.present()
     dialog.destroy()
