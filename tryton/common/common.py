@@ -482,26 +482,6 @@ def message(msg, parent, msg_type=gtk.MESSAGE_INFO):
 def to_xml(string):
     return string.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
 
-def message_box(title, msg, parent):
-    dia = glade.XML(GLADE, "dia_message_box",
-            gettext.textdomain())
-    win = dia.get_widget('dia_message_box')
-    label = dia.get_widget('msg_title')
-    label.set_text(title)
-
-    buf = dia.get_widget('msg_tv').get_buffer()
-    iter_start = buf.get_start_iter()
-    buf.insert(iter_start, msg)
-
-    win.set_transient_for(parent)
-    win.set_icon(TRYTON_ICON)
-
-    win.run()
-    parent.present()
-    win.destroy()
-    return True
-
-
 def warning(msg, parent, title=''):
     dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, gtk.BUTTONS_OK)
