@@ -16,6 +16,7 @@ from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
 from tryton.gui.window.tips import Tips
 from tryton.gui.window.about import About
+from tryton.gui.window.shortcuts import Shortcuts
 import re
 import base64
 import tryton.translate as translate
@@ -451,13 +452,7 @@ class Main(object):
         About(self.window)
 
     def sig_shortcuts(self, widget):
-        shortcuts_win = glade.XML(GLADE, 'shortcuts_dia', gettext.textdomain())
-        shortcuts_win.signal_connect("on_but_ok_pressed",
-                lambda obj: shortcuts_win.get_widget('shortcuts_dia').destroy())
-
-        win = shortcuts_win.get_widget('shortcuts_dia')
-        win.set_transient_for(self.window)
-        win.show_all()
+        Shortcuts(self.window).run()
 
     def sig_win_menu(self, widget=None, quiet=True, prefs=None):
         for page in range(len(self.pages)):
