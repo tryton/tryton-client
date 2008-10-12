@@ -34,173 +34,761 @@ class Main(object):
     def __init__(self):
         super(Main, self).__init__()
 
-        self.glade = glade.XML(GLADE, "win_main", gettext.textdomain())
-        self.status_bar_main = self.glade.get_widget('hbox_status_main')
-        self.toolbar = self.glade.get_widget('main_toolbar')
-        self.sb_requests = self.glade.get_widget('sb_requests')
-        self.sb_username = self.glade.get_widget('sb_user_name')
-        self.sb_servername = self.glade.get_widget('sb_user_server')
-        sb_id = self.sb_servername.get_context_id('message')
-        self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
-        self.secure_img = self.glade.get_widget('secure_img')
-
-        window = self.glade.get_widget('win_main')
-        window.connect("destroy", Main.sig_quit)
-        window.connect("delete_event", self.sig_delete)
-        self.window = window
+        self.window = gtk.Window()
+        self.window.set_default_size(800, 700)
+        self.window.set_title('Tryton')
         self.window.set_icon(TRYTON_ICON)
+        self.window.connect("destroy", Main.sig_quit)
+        self.window.connect("delete_event", self.sig_delete)
+
+        self.accel_group = gtk.AccelGroup()
+        self.window.add_accel_group(self.accel_group)
+
+        self.tooltips = gtk.Tooltips()
+
+        toolbar = gtk.Toolbar()
+        self.toolbar = toolbar
+        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        toolbar.set_style(gtk.TOOLBAR_BOTH)
+
+        vbox = gtk.VBox()
+        self.window.add(vbox)
+
+        menubar = gtk.MenuBar()
+        vbox.pack_start(menubar, False, True)
+
+        menuitem_file = gtk.MenuItem(_('_File'))
+        menubar.add(menuitem_file)
+
+        menu_file = self._set_menu_file()
+        menuitem_file.set_submenu(menu_file)
+
+        menuitem_user = gtk.MenuItem(_('_User'))
+        self.menuitem_user = menuitem_user
+        menuitem_user.set_sensitive(False)
+        menubar.add(menuitem_user)
+
+        menu_user = self._set_menu_user()
+        menuitem_user.set_submenu(menu_user)
+
+        menuitem_form = gtk.MenuItem(_('For_m'))
+        self.menuitem_form = menuitem_form
+        menuitem_form.set_sensitive(False)
+        menubar.add(menuitem_form)
+
+        menu_form = self._set_menu_form()
+        menuitem_form.set_submenu(menu_form)
+
+        menuitem_options = gtk.MenuItem(_('_Options'))
+        menubar.add(menuitem_options)
+
+        menu_options = self._set_menu_options()
+        menuitem_options.set_submenu(menu_options)
+
+        menuitem_plugins = gtk.MenuItem(_('_Plugins'))
+        self.menuitem_plugins = menuitem_plugins
+        self.menuitem_plugins.set_sensitive(False)
+        menubar.add(menuitem_plugins)
+
+        menu_plugins = self._set_menu_plugins()
+        menuitem_plugins.set_submenu(menu_plugins)
+
+        menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
+        self.menuitem_shortcut = menuitem_shortcut
+        self.menuitem_shortcut.set_sensitive(False)
+        menubar.add(menuitem_shortcut)
+
+        menuitem_help = gtk.MenuItem(_('_Help'))
+        menubar.add(menuitem_help)
+
+        menu_help = self._set_menu_help()
+        menuitem_help.set_submenu(menu_help)
+
+        vbox.pack_start(toolbar, False, True)
+
+        self.buttons = {}
+        self._set_toolbar()
 
         self.notebook = gtk.Notebook()
         self.notebook.popup_enable()
         self.notebook.set_scrollable(True)
         self.notebook.connect_after('switch-page', self._sig_page_changt)
-        vbox = self.glade.get_widget('vbox_main')
-        vbox.pack_start(self.notebook, expand=True, fill=True)
+        vbox.pack_start(self.notebook, True, True)
 
-        self.tooltips = gtk.Tooltips()
+        self.status_hbox = gtk.HBox(spacing=2)
+        vbox.pack_start(self.status_hbox, False, True, padding=2)
 
-        self.shortcut_menu = self.glade.get_widget('shortcut')
+        self.sb_servername = gtk.Statusbar()
+        self.sb_servername.set_size_request(150, -1)
+        self.sb_servername.set_has_resize_grip(False)
+        self.status_hbox.pack_start(self.sb_servername, True, True)
+        sb_id = self.sb_servername.get_context_id('message')
+        self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
 
-        #
-        # Default Notebook
-        #
+        self.sb_username = gtk.Statusbar()
+        self.sb_username.set_size_request(130, -1)
+        self.sb_username.set_has_resize_grip(False)
+        self.status_hbox.pack_start(self.sb_username, True, True)
 
-        self.notebook.show()
+        self.status_hbox.pack_start(gtk.Label(_('Requests:')), False, True)
+
+        self.sb_requests = gtk.Statusbar()
+        self.sb_requests.set_size_request(130, -1)
+        self.sb_requests.set_has_resize_grip(False)
+        self.status_hbox.pack_start(self.sb_requests, True, True)
+
+        button_request_new = gtk.Button()
+        self.button_request_new = button_request_new
+        image = gtk.Image()
+        image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
+        button_request_new.set_image(image)
+        button_request_new.set_relief(gtk.RELIEF_NONE)
+        button_request_new.connect('clicked', self.sig_request_new)
+        button_request_new.set_sensitive(False)
+        self.tooltips.set_tip(button_request_new, _('Send a new request'))
+        self.status_hbox.pack_start(button_request_new, False, True)
+
+        button_request_search = gtk.Button()
+        self.button_request_search = button_request_search
+        image = gtk.Image()
+        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
+        button_request_search.set_image(image)
+        button_request_search.set_relief(gtk.RELIEF_NONE)
+        button_request_search.connect('clicked', self.sig_request_open)
+        button_request_search.set_sensitive(False)
+        self.tooltips.set_tip(button_request_search, _('Read my Requests'))
+        self.status_hbox.pack_start(button_request_search, False, True)
+
+        self.secure_img = gtk.Image()
+        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
+        self.status_hbox.pack_start(self.secure_img, False, True)
+
+        self.window.show_all()
+
         self.pages = []
         self.previous_pages = {}
         self.current_page = 0
         self.last_page = 0
 
-        signals = {
-            'on_login_activate': self.sig_login,
-            'on_logout_activate': self.sig_logout,
-            'on_win_next_activate': self.sig_win_next,
-            'on_win_prev_activate': self.sig_win_prev,
-            'on_plugin_execute_activate': self.sig_plugin_execute,
-            'on_quit_activate': self.sig_close,
-            'on_but_menu_clicked': self.sig_win_menu,
-            'on_win_new_activate': self.sig_win_menu,
-            'on_win_home_activate': self.sig_home_new,
-            'on_win_close_activate': self.sig_win_close,
-            'on_preference_activate': self.sig_user_preferences,
-            'on_read_requests_activate': self.sig_request_open,
-            'on_send_request_activate': self.sig_request_new,
-            'on_opt_save_activate': lambda x: CONFIG.save(),
-            'on_menubar_default_activate': lambda x: self.sig_menubar('default'),
-            'on_menubar_icons_activate': lambda x: self.sig_menubar('icons'),
-            'on_menubar_text_activate': lambda x: self.sig_menubar('text'),
-            'on_menubar_both_activate': lambda x: self.sig_menubar('both'),
-            'on_mode_normal_activate': lambda x: self.sig_mode_change(False),
-            'on_mode_pda_activate': lambda x: self.sig_mode_change(True),
-            'on_opt_form_tab_top_activate': lambda x: Main.sig_form_tab('top'),
-            'on_opt_form_tab_left_activate': lambda x: \
-                    Main.sig_form_tab('left'),
-            'on_opt_form_tab_right_activate': lambda x: \
-                    Main.sig_form_tab('right'),
-            'on_opt_form_tab_bottom_activate': lambda x: \
-                    Main.sig_form_tab('bottom'),
-            'on_opt_form_tab_orientation_horizontal_activate': lambda x: \
-                    Main.sig_form_tab_orientation(0),
-            'on_opt_form_tab_orientation_vertical_activate': lambda x: \
-                    Main.sig_form_tab_orientation(90),
-            'on_opt_files_actions_activate': self.sig_files_actions,
-            'on_help_tips_activate': self.sig_tips,
-            'on_help_about_activate': self.sig_about,
-            'on_shortcuts_activate' : self.sig_shortcuts,
-            'on_db_new_activate': self.sig_db_new,
-            'on_db_restore_activate': self.sig_db_restore,
-            'on_db_backup_activate': self.sig_db_dump,
-            'on_db_drop_activate': self.sig_db_drop,
-            'on_admin_password_activate': self.sig_db_password,
-        }
-        for signal in signals:
-            self.glade.signal_connect(signal, signals[signal])
-
-        self.buttons = {}
-        for button in (
-                'but_new',
-                'but_save',
-                'but_remove',
-                'but_search',
-                'but_previous',
-                'but_next',
-                'but_action',
-                'but_print',
-                'but_close',
-                'but_reload',
-                'but_switch',
-                'but_attach',
-                ):
-            self.glade.signal_connect('on_'+button+'_clicked',
-                    self._sig_child_call, button)
-            self.buttons[button] = self.glade.get_widget(button)
-
-        menus = {
-            'form_del': 'but_remove',
-            'form_new': 'but_new',
-            'form_copy': 'but_copy',
-            'form_reload': 'but_reload',
-            'form_log': 'but_log',
-            'form_search': 'but_search',
-            'form_previous': 'but_previous',
-            'form_next': 'but_next',
-            'form_save': 'but_save',
-            'goto_id': 'but_goto_id',
-            'form_actions': 'but_action',
-            'form_print': 'but_print',
-            'form_save_as': 'but_save_as',
-            'form_import': 'but_import',
-            'form_filter': 'but_filter',
-        }
-        for menu in menus:
-            self.glade.signal_connect('on_'+menu+'_activate',
-                    self._sig_child_call, menus[menu])
-
+        if CONFIG['client.modepda']:
+            self.radiomenuitem_pda.set_active(True)
+        else:
+            self.radiomenuitem_normal.set_active(True)
         self.sb_set()
 
         settings = gtk.settings_get_default()
         settings.set_long_property('gtk-button-images', 1, 'Tryton:gui.main')
 
-        def fnc_menuitem(menuitem, opt_name):
-            CONFIG[opt_name] = menuitem.get_active()
-        signals = {
-            'on_opt_form_toolbar_activate': (fnc_menuitem, 'form.toolbar',
-                'opt_form_toolbar'),
-            'on_opt_tree_width_activate': (fnc_menuitem, 'client.tree_width',
-                'opt_tree_width'),
-            'on_opt_spellcheck_activate': (fnc_menuitem, 'client.spellcheck',
-                'opt_spellcheck'),
-        }
-        self.glade.get_widget('menubar_'+(CONFIG['client.toolbar'] or \
-                'both')).set_active(True)
-        self.sig_menubar(CONFIG['client.toolbar'] or 'default')
-        self.glade.get_widget('opt_form_tab_' + (CONFIG['client.form_tab'] or \
-                'left')).set_active(True)
-        Main.sig_form_tab(CONFIG['client.form_tab'] or 'left')
-        self.glade.get_widget('opt_form_tab_orientation_' + \
-                (str(CONFIG['client.form_tab_orientation']) or \
-                '0')).set_active(True)
-        Main.sig_form_tab_orientation(CONFIG['client.form_tab_orientation'] or \
-                0)
-        if CONFIG['client.modepda']:
-            self.glade.get_widget('mode_pda').set_active(True)
-        else:
-            self.glade.get_widget('mode_normal').set_active(True)
         self.sig_mode()
-        for signal in signals:
-            self.glade.signal_connect(signal, signals[signal][0],
-                    signals[signal][1])
-            self.glade.get_widget(signals[signal][2]).set_active(
-                    int(bool(CONFIG[signals[signal][1]])))
 
         if os.name in ('nt', 'mac') or os.uname()[0] == 'Darwin':
             # Disable actions, on win32 we use os.startfile
             # and on mac we use /usr/bin/open
-            self.glade.get_widget('actions').set_sensitive(False)
+            self.menuitem_actions.set_sensitive(False)
 
         # Adding a timer the check to requests
         gobject.timeout_add(5 * 60 * 1000, self.request_set)
         _MAIN.append(self)
+
+    def _set_menu_file(self):
+        menu_file = gtk.Menu()
+
+        imagemenuitem_connect = gtk.ImageMenuItem(_('_Connect...'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-connect', gtk.ICON_SIZE_MENU)
+        imagemenuitem_connect.set_image(image)
+        imagemenuitem_connect.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.O, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_connect.connect('activate', self.sig_login)
+        menu_file.add(imagemenuitem_connect)
+
+        imagemenuitem_disconnect = gtk.ImageMenuItem(_('_Disconnect...'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
+        imagemenuitem_disconnect.set_image(image)
+        imagemenuitem_disconnect.connect('activate', self.sig_logout)
+        menu_file.add(imagemenuitem_disconnect)
+
+        menu_file.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_database = gtk.ImageMenuItem(_('Data_base'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-system-file-manager', gtk.ICON_SIZE_MENU)
+        imagemenuitem_database.set_image(image)
+        menu_file.add(imagemenuitem_database)
+
+        menu_database = gtk.Menu()
+        imagemenuitem_database.set_submenu(menu_database)
+
+        imagemenuitem_db_new = gtk.ImageMenuItem(_('_New Database'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-folder-new', gtk.ICON_SIZE_MENU)
+        imagemenuitem_db_new.set_image(image)
+        imagemenuitem_db_new.connect('activate', self.sig_db_new)
+        menu_database.add(imagemenuitem_db_new)
+
+        imagemenuitem_db_restore = gtk.ImageMenuItem(_('_Restore Database'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-folder-saved-search', gtk.ICON_SIZE_MENU)
+        imagemenuitem_db_restore.set_image(image)
+        imagemenuitem_db_restore.connect('activate', self.sig_db_restore)
+        menu_database.add(imagemenuitem_db_restore)
+
+        imagemenuitem_db_dump = gtk.ImageMenuItem(_('_Backup Database'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
+        imagemenuitem_db_dump.set_image(image)
+        imagemenuitem_db_dump.connect('activate', self.sig_db_dump)
+        menu_database.add(imagemenuitem_db_dump)
+
+        imagemenuitem_db_drop = gtk.ImageMenuItem(_('Dro_p Database'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
+        imagemenuitem_db_drop.set_image(image)
+        imagemenuitem_db_drop.connect('activate', self.sig_db_drop)
+        menu_database.add(imagemenuitem_db_drop)
+
+        menu_database.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_db_password = gtk.ImageMenuItem(_('_Administrator Password'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-users', gtk.ICON_SIZE_MENU)
+        imagemenuitem_db_password.set_image(image)
+        imagemenuitem_db_password.connect('activate', self.sig_db_password)
+        menu_database.add(imagemenuitem_db_password)
+
+        menu_file.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_close = gtk.ImageMenuItem(_('_Quit'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-log-out', gtk.ICON_SIZE_MENU)
+        imagemenuitem_close.set_image(image)
+        imagemenuitem_close.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Q, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_close.connect('activate', self.sig_close)
+        menu_file.add(imagemenuitem_close)
+        return menu_file
+
+    def _set_menu_user(self):
+        menu_user = gtk.Menu()
+
+        imagemenuitem_preference = gtk.ImageMenuItem(_('_Preferences'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-preferences-system-session',
+                gtk.ICON_SIZE_MENU)
+        imagemenuitem_preference.set_image(image)
+        imagemenuitem_preference.connect('activate', self.sig_user_preferences)
+        menu_user.add(imagemenuitem_preference)
+
+        menu_user.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_send_request = gtk.ImageMenuItem(_('_Send a Request'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
+        imagemenuitem_send_request.set_image(image)
+        imagemenuitem_send_request.connect('activate', self.sig_request_new)
+        menu_user.add(imagemenuitem_send_request)
+
+        imagemenuitem_open_request = gtk.ImageMenuItem(_('_Read my Requests'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
+        imagemenuitem_open_request.set_image(image)
+        imagemenuitem_open_request.connect('activate', self.sig_request_open)
+        menu_user.add(imagemenuitem_open_request)
+        return menu_user
+
+    def _set_menu_form(self):
+        menu_form = gtk.Menu()
+
+        imagemenuitem_new = gtk.ImageMenuItem(_('_New'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-new', gtk.ICON_SIZE_MENU)
+        imagemenuitem_new.set_image(image)
+        imagemenuitem_new.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.N, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_new.connect('activate', self._sig_child_call, 'but_new')
+        menu_form.add(imagemenuitem_new)
+
+        imagemenuitem_save = gtk.ImageMenuItem(_('_Save'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-save', gtk.ICON_SIZE_MENU)
+        imagemenuitem_save.set_image(image)
+        imagemenuitem_save.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.S, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_save.connect('activate', self._sig_child_call, 'but_save')
+        menu_form.add(imagemenuitem_save)
+
+        imagemenuitem_copy = gtk.ImageMenuItem(_('_Duplicate'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-copy', gtk.ICON_SIZE_MENU)
+        imagemenuitem_copy.set_image(image)
+        imagemenuitem_copy.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.D, gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK,
+                gtk.ACCEL_VISIBLE)
+        imagemenuitem_copy.connect('activate', self._sig_child_call, 'but_copy')
+        menu_form.add(imagemenuitem_copy)
+
+        imagemenuitem_delete = gtk.ImageMenuItem(_('_Delete'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
+        imagemenuitem_delete.set_image(image)
+        imagemenuitem_delete.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.D, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_delete.connect('activate', self._sig_child_call, 'but_remove')
+        menu_form.add(imagemenuitem_delete)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_search = gtk.ImageMenuItem(_('_Find'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
+        imagemenuitem_search.set_image(image)
+        imagemenuitem_search.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.F, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_search.connect('activate', self._sig_child_call, 'but_search')
+        menu_form.add(imagemenuitem_search)
+
+        imagemenuitem_next = gtk.ImageMenuItem(_('_Next'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-go-next', gtk.ICON_SIZE_MENU)
+        imagemenuitem_next.set_image(image)
+        imagemenuitem_next.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Page_Down, 0, gtk.ACCEL_VISIBLE)
+        imagemenuitem_next.connect('activate', self._sig_child_call, 'but_next')
+        menu_form.add(imagemenuitem_next)
+
+        imagemenuitem_previous = gtk.ImageMenuItem(_('_Previous'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_MENU)
+        imagemenuitem_previous.set_image(image)
+        imagemenuitem_previous.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Page_Up, 0, gtk.ACCEL_VISIBLE)
+        imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
+        menu_form.add(imagemenuitem_previous)
+
+        imagemenuitem_previous = gtk.ImageMenuItem(_('_Previous'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_MENU)
+        imagemenuitem_previous.set_image(image)
+        imagemenuitem_previous.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Page_Up, 0, gtk.ACCEL_VISIBLE)
+        imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
+        menu_form.add(imagemenuitem_previous)
+
+        imagemenuitem_switch = gtk.ImageMenuItem(_('_Switch View'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_MENU)
+        imagemenuitem_switch.set_image(image)
+        imagemenuitem_switch.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.L, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_switch.connect('activate', self._sig_child_call, 'but_switch')
+        menu_form.add(imagemenuitem_switch)
+
+        imagemenuitem_menu = gtk.ImageMenuItem(_('_Menu'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-start-here', gtk.ICON_SIZE_MENU)
+        imagemenuitem_menu.set_image(image)
+        imagemenuitem_menu.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.T, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_menu.connect('activate', self.sig_win_menu)
+        menu_form.add(imagemenuitem_menu)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_home = gtk.ImageMenuItem(_('_Home'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-go-home', gtk.ICON_SIZE_MENU)
+        imagemenuitem_home.set_image(image)
+        imagemenuitem_home.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.H, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_home.connect('activate', self.sig_home_new)
+        menu_form.add(imagemenuitem_home)
+
+        imagemenuitem_close = gtk.ImageMenuItem(_('_Close'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-close', gtk.ICON_SIZE_MENU)
+        imagemenuitem_close.set_image(image)
+        imagemenuitem_close.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.W, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_close.connect('activate', self.sig_win_close)
+        menu_form.add(imagemenuitem_close)
+
+        imagemenuitem_win_prev = gtk.ImageMenuItem(_('_Previous Tab'), self.accel_group)
+        imagemenuitem_win_prev.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Page_Up, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_win_prev.connect('activate', self.sig_win_prev)
+        menu_form.add(imagemenuitem_win_prev)
+
+        imagemenuitem_win_next = gtk.ImageMenuItem(_('_Next Tab'), self.accel_group)
+        imagemenuitem_win_next.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.Page_Down, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_win_next.connect('activate', self.sig_win_next)
+        menu_form.add(imagemenuitem_win_next)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_log = gtk.ImageMenuItem(_('View _Logs'))
+        imagemenuitem_log.connect('activate', self._sig_child_call, 'but_log')
+        menu_form.add(imagemenuitem_log)
+
+        imagemenuitem_goto_id = gtk.ImageMenuItem(_('_Go to Record ID...'),
+                self.accel_group)
+        imagemenuitem_win_next.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.G, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_goto_id.connect('activate', self._sig_child_call,
+                'but_goto_id')
+        menu_form.add(imagemenuitem_goto_id)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_reload = gtk.ImageMenuItem(_('_Reload/Undo'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-refresh', gtk.ICON_SIZE_MENU)
+        imagemenuitem_reload.set_image(image)
+        imagemenuitem_reload.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.R, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_reload.connect('activate', self._sig_child_call,
+                'but_reload')
+        menu_form.add(imagemenuitem_reload)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_action = gtk.ImageMenuItem(_('_Actions'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
+        imagemenuitem_action.set_image(image)
+        imagemenuitem_action.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.E, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_action.connect('activate', self._sig_child_call,
+                'but_action')
+        menu_form.add(imagemenuitem_action)
+
+        imagemenuitem_print = gtk.ImageMenuItem(_('_Print'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-print', gtk.ICON_SIZE_MENU)
+        imagemenuitem_print.set_image(image)
+        imagemenuitem_print.add_accelerator('activate', self.accel_group,
+                gtk.keysyms.P, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        imagemenuitem_print.connect('activate', self._sig_child_call,
+                'but_print')
+        menu_form.add(imagemenuitem_print)
+
+        menu_form.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_export = gtk.ImageMenuItem(_('_Export Data...'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
+        imagemenuitem_export.set_image(image)
+        imagemenuitem_export.connect('activate', self._sig_child_call,
+                'but_save_as')
+        menu_form.add(imagemenuitem_export)
+
+        menuitem_import = gtk.MenuItem(_('_Import Data...'))
+        menuitem_import.connect('activate', self._sig_child_call,
+                'but_import')
+        menu_form.add(menuitem_import)
+        return menu_form
+
+    def _set_menu_options(self):
+        menu_options = gtk.Menu()
+
+        menuitem_menubar = gtk.MenuItem(_('_Menubar'))
+        menu_options.add(menuitem_menubar)
+
+        menu_menubar = gtk.Menu()
+        menuitem_menubar.set_submenu(menu_menubar)
+
+        radiomenuitem_default = gtk.RadioMenuItem(label=_('_Default'))
+        radiomenuitem_default.connect('activate',
+                lambda x: self.sig_menubar('default'))
+        menu_menubar.add(radiomenuitem_default)
+        if (CONFIG['client.toolbar'] or 'both') == 'default':
+            radiomenuitem_default.set_active(True)
+
+        radiomenuitem_both = gtk.RadioMenuItem(group=radiomenuitem_default,
+                label=_('_Text and Icons'))
+        radiomenuitem_both.connect('activate',
+                lambda x: self.sig_menubar('both'))
+        menu_menubar.add(radiomenuitem_both)
+        if (CONFIG['client.toolbar'] or 'both') == 'both':
+            radiomenuitem_both.set_active(True)
+
+        radiomenuitem_icons = gtk.RadioMenuItem(group=radiomenuitem_default,
+                label=_('_Icons'))
+        radiomenuitem_icons.connect('activate',
+                lambda x: self.sig_menubar('icons'))
+        menu_menubar.add(radiomenuitem_icons)
+        if (CONFIG['client.toolbar'] or 'both') == 'icons':
+            radiomenuitem_icons.set_active(True)
+
+        radiomenuitem_text = gtk.RadioMenuItem(group=radiomenuitem_default,
+                label=_('_Text'))
+        radiomenuitem_text.connect('activate',
+                lambda x: self.sig_menubar('text'))
+        menu_menubar.add(radiomenuitem_text)
+        if (CONFIG['client.toolbar'] or 'both') == 'text':
+            radiomenuitem_text.set_active(True)
+
+        menuitem_mode = gtk.MenuItem(_('_Mode'))
+        menu_options.add(menuitem_mode)
+
+        menu_mode = gtk.Menu()
+        menuitem_mode.set_submenu(menu_mode)
+
+        radiomenuitem_normal = gtk.RadioMenuItem(label=_('_Normal'))
+        self.radiomenuitem_normal = radiomenuitem_normal
+        radiomenuitem_normal.connect('activate',
+                lambda x: self.sig_mode_change(False))
+        menu_mode.add(radiomenuitem_normal)
+
+        radiomenuitem_pda = gtk.RadioMenuItem(group=radiomenuitem_normal,
+                label=_('_PDA'))
+        radiomenuitem_pda.connect('activate',
+                lambda x: self.sig_mode_change(True))
+        menu_mode.add(radiomenuitem_pda)
+
+        menuitem_form = gtk.MenuItem(_('_Form'))
+        menu_options.add(menuitem_form)
+
+        menu_form = gtk.Menu()
+        menuitem_form.set_submenu(menu_form)
+
+        checkmenuitem_toolbar = gtk.CheckMenuItem(_('Toolbar'))
+        checkmenuitem_toolbar.connect('activate',
+                lambda menuitem: self.sig_toolbar(menuitem.get_active()))
+        menu_form.add(checkmenuitem_toolbar)
+        if CONFIG['form.toolbar']:
+            checkmenuitem_toolbar.set_active(True)
+
+        checkmenuitem_tree_width = gtk.CheckMenuItem(_('Save Columns Width'))
+        checkmenuitem_tree_width.connect('activate',
+                lambda menuitem: CONFIG.__setitem__('client.tree_width',
+                    menuitem.get_active()))
+        menu_form.add(checkmenuitem_tree_width)
+        if CONFIG['client.tree_width']:
+            checkmenuitem_tree_width.set_active(True)
+
+        checkmenuitem_spellcheck = gtk.CheckMenuItem(_('Spell Checking'))
+        checkmenuitem_spellcheck.connect('activate',
+                lambda menuitem: CONFIG.__setitem__('client.spellcheck',
+                    menuitem.get_active()))
+        menu_form.add(checkmenuitem_spellcheck)
+        if CONFIG['client.spellcheck']:
+            checkmenuitem_spellcheck.set_active(True)
+
+        menuitem_tab = gtk.MenuItem(_('Tabs Position'))
+        menu_form.add(menuitem_tab)
+
+        menu_tab = gtk.Menu()
+        menuitem_tab.set_submenu(menu_tab)
+
+        radiomenuitem_top = gtk.RadioMenuItem(label=_('Top'))
+        radiomenuitem_top.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab', 'top'))
+        menu_tab.add(radiomenuitem_top)
+        if (CONFIG['client.form_tab'] or 'left') == 'top':
+            radiomenuitem_top.set_active(True)
+
+        radiomenuitem_left = gtk.RadioMenuItem(group=radiomenuitem_top,
+                label=_('Left'))
+        radiomenuitem_left.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab', 'left'))
+        menu_tab.add(radiomenuitem_left)
+        if (CONFIG['client.form_tab'] or 'left') == 'left':
+            radiomenuitem_left.set_active(True)
+
+        radiomenuitem_right = gtk.RadioMenuItem(group=radiomenuitem_top,
+                label=_('Right'))
+        radiomenuitem_right.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab', 'right'))
+        menu_tab.add(radiomenuitem_right)
+        if (CONFIG['client.form_tab'] or 'left') == 'right':
+            radiomenuitem_right.set_active(True)
+
+        radiomenuitem_bottom = gtk.RadioMenuItem(group=radiomenuitem_top,
+                label=_('Bottom'))
+        radiomenuitem_bottom.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab', 'bottom'))
+        menu_tab.add(radiomenuitem_bottom)
+        if (CONFIG['client.form_tab'] or 'left') == 'bottom':
+            radiomenuitem_bottom.set_active(True)
+
+        menuitem_orientation = gtk.MenuItem(_('Tabs Orientation'))
+        menu_form.add(menuitem_orientation)
+
+        menu_orientation = gtk.Menu()
+        menuitem_orientation.set_submenu(menu_orientation)
+
+        radiomenuitem_horizontal = gtk.RadioMenuItem(label=_('Horizontal'))
+        radiomenuitem_horizontal.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab_orientation',
+                    0))
+        menu_orientation.add(radiomenuitem_horizontal)
+        if (str(CONFIG['client.form_tab_orientation']) or '0') == '0':
+            radiomenuitem_horizontal.set_active(True)
+
+        radiomenuitem_vertical = gtk.RadioMenuItem(group=radiomenuitem_horizontal,
+                label=_('Vertical'))
+        radiomenuitem_vertical.connect('activate',
+                lambda x: CONFIG.__setitem__('client.form_tab_orientation',
+                    90))
+        menu_orientation.add(radiomenuitem_vertical)
+        if (str(CONFIG['client.form_tab_orientation']) or '0') == '90':
+            radiomenuitem_vertical.set_active(True)
+
+        menuitem_actions = gtk.MenuItem(_('Files _Actions'))
+        self.menuitem_actions = menuitem_actions
+        menuitem_actions.connect('activate', self.sig_files_actions)
+        menu_options.add(menuitem_actions)
+
+        menu_options.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_opt_save = gtk.ImageMenuItem(_('_Save Options'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-save', gtk.ICON_SIZE_MENU)
+        imagemenuitem_opt_save.set_image(image)
+        imagemenuitem_opt_save.connect('activate', lambda x: CONFIG.save())
+        menu_options.add(imagemenuitem_opt_save)
+        return menu_options
+
+    def _set_menu_plugins(self):
+        menu_plugins = gtk.Menu()
+
+        imagemenuitem_plugin_execute = gtk.ImageMenuItem(_('_Execute a Plugin'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
+        imagemenuitem_plugin_execute.set_image(image)
+        imagemenuitem_plugin_execute.connect('activate', self.sig_plugin_execute)
+        menu_plugins.add(imagemenuitem_plugin_execute)
+        return menu_plugins
+
+    def _set_menu_help(self):
+        menu_help = gtk.Menu()
+
+        imagemenuitem_tips = gtk.ImageMenuItem(_('_Tips'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-information', gtk.ICON_SIZE_MENU)
+        imagemenuitem_tips.set_image(image)
+        imagemenuitem_tips.connect('activate', self.sig_tips)
+        menu_help.add(imagemenuitem_tips)
+
+        imagemenuitem_shortcuts = gtk.ImageMenuItem(_('_Keyboard Shortcuts'))
+        image = gtk.Image()
+        image.set_from_stock('tryton-help', gtk.ICON_SIZE_MENU)
+        imagemenuitem_shortcuts.set_image(image)
+        imagemenuitem_shortcuts.connect('activate', self.sig_shortcuts)
+        menu_help.add(imagemenuitem_shortcuts)
+
+        menu_help.add(gtk.SeparatorMenuItem())
+
+        imagemenuitem_about = gtk.ImageMenuItem(_('_About'))
+        image = gtk.Image()
+        image.set_from_stock('gtk-about', gtk.ICON_SIZE_MENU)
+        imagemenuitem_about.set_image(image)
+        imagemenuitem_about.connect('activate', self.sig_about)
+        menu_help.add(imagemenuitem_about)
+        return menu_help
+
+    def _set_toolbar(self):
+        toolbutton_new = gtk.ToolButton('tryton-new')
+        toolbutton_new.set_use_underline(True)
+        toolbutton_new.set_label(_('_New'))
+        self.toolbar.insert(toolbutton_new, -1)
+        toolbutton_new.connect('clicked', self._sig_child_call, 'but_new')
+        self.tooltips.set_tip(toolbutton_new, _('Create a new record'))
+        self.buttons['but_new'] = toolbutton_new
+
+        toolbutton_save = gtk.ToolButton('tryton-save')
+        toolbutton_save.set_use_underline(True)
+        toolbutton_save.set_label(_('_Save'))
+        self.toolbar.insert(toolbutton_save, -1)
+        toolbutton_save.connect('clicked', self._sig_child_call, 'but_save')
+        self.tooltips.set_tip(toolbutton_save, _('Save this record'))
+        self.buttons['but_save'] = toolbutton_save
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_remove = gtk.ToolButton('tryton-delete')
+        toolbutton_remove.set_use_underline(True)
+        toolbutton_remove.set_label(_('_Delete'))
+        self.toolbar.insert(toolbutton_remove, -1)
+        toolbutton_remove.connect('clicked', self._sig_child_call, 'but_remove')
+        self.tooltips.set_tip(toolbutton_remove, _('Delete this record'))
+        self.buttons['but_remove'] = toolbutton_remove
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_search = gtk.ToolButton('tryton-find')
+        toolbutton_search.set_use_underline(True)
+        toolbutton_search.set_label(_('_Find'))
+        self.toolbar.insert(toolbutton_search, -1)
+        toolbutton_search.connect('clicked', self._sig_child_call, 'but_search')
+        self.tooltips.set_tip(toolbutton_search, _('Find records'))
+        self.buttons['but_search'] = toolbutton_search
+
+        toolbutton_previous = gtk.ToolButton('tryton-go-previous')
+        toolbutton_previous.set_label(_('Previous'))
+        self.toolbar.insert(toolbutton_previous, -1)
+        toolbutton_previous.connect('clicked', self._sig_child_call, 'but_previous')
+        self.buttons['but_previous'] = toolbutton_previous
+
+        toolbutton_next = gtk.ToolButton('tryton-go-next')
+        toolbutton_next.set_label(_('Next'))
+        self.toolbar.insert(toolbutton_next, -1)
+        toolbutton_next.connect('clicked', self._sig_child_call, 'but_next')
+        self.buttons['but_next'] = toolbutton_next
+
+        toolbutton_switch = gtk.ToolButton('tryton-fullscreen')
+        toolbutton_switch.set_label(_('Switch'))
+        self.toolbar.insert(toolbutton_switch, -1)
+        toolbutton_switch.connect('clicked', self._sig_child_call, 'but_switch')
+        self.tooltips.set_tip(toolbutton_switch, _('Switch view'))
+        self.buttons['but_switch'] = toolbutton_switch
+
+        toolbutton_reload = gtk.ToolButton('tryton-refresh')
+        toolbutton_reload.set_use_underline(True)
+        toolbutton_reload.set_label(_('_Reload'))
+        self.toolbar.insert(toolbutton_reload, -1)
+        toolbutton_reload.connect('clicked', self._sig_child_call, 'but_reload')
+        self.buttons['but_reload'] = toolbutton_reload
+
+        toolbutton_menu = gtk.ToolButton('tryton-start-here')
+        self.toolbutton_menu = toolbutton_menu
+        toolbutton_menu.set_label(_('Menu'))
+        self.toolbar.insert(toolbutton_menu, -1)
+        toolbutton_menu.connect('clicked', self.sig_win_menu)
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_action = gtk.ToolButton('tryton-executable')
+        toolbutton_action.set_label(_('Action'))
+        self.toolbar.insert(toolbutton_action, -1)
+        toolbutton_action.connect('clicked', self._sig_child_call, 'but_action')
+        self.buttons['but_action'] = toolbutton_action
+
+        toolbutton_action = gtk.ToolButton('tryton-print')
+        toolbutton_action.set_label(_('Print'))
+        self.toolbar.insert(toolbutton_action, -1)
+        toolbutton_action.connect('clicked', self._sig_child_call, 'but_print')
+        self.buttons['but_print'] = toolbutton_action
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_attach = gtk.ToolButton('tryton-attachment')
+        toolbutton_attach.set_label(_('Attachment(0)'))
+        self.toolbar.insert(toolbutton_attach, -1)
+        toolbutton_attach.connect('clicked', self._sig_child_call, 'but_attach')
+        self.tooltips.set_tip(toolbutton_attach, _('Add an attachment to the record'))
+        self.buttons['but_attach'] = toolbutton_attach
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_close = gtk.ToolButton('tryton-close')
+        toolbutton_close.set_label(_('Close'))
+        self.toolbar.insert(toolbutton_close, -1)
+        toolbutton_close.connect('clicked', self._sig_child_call, 'but_close')
+        self.tooltips.set_tip(toolbutton_close, _('Close the tab'))
+        self.buttons['but_close'] = toolbutton_close
 
     @staticmethod
     def get_main():
@@ -227,14 +815,21 @@ class Main(object):
             menuitem.connect('activate', _action_shortcut, shortcut['res_id'])
             menu.add(menuitem)
         menu.show_all()
-        self.shortcut_menu.set_submenu(menu)
-        self.shortcut_menu.set_sensitive(True)
+        self.menuitem_shortcut.set_submenu(menu)
+        self.menuitem_shortcut.set_sensitive(True)
 
     def shortcut_unset(self):
         menu = gtk.Menu()
         menu.show_all()
-        self.shortcut_menu.set_submenu(menu)
-        self.shortcut_menu.set_sensitive(False)
+        self.menuitem_shortcut.set_submenu(menu)
+        self.menuitem_shortcut.set_sensitive(False)
+
+    def sig_toolbar(self, value):
+        CONFIG['form.toolbar'] = value
+        if value:
+            self.toolbar.show()
+        else:
+            self.toolbar.hide()
 
     def sig_mode_change(self, pda_mode=False):
         CONFIG['client.modepda'] = pda_mode
@@ -243,9 +838,9 @@ class Main(object):
     def sig_mode(self):
         pda_mode = CONFIG['client.modepda']
         if pda_mode:
-            self.status_bar_main.hide()
+            self.status_hbox.hide()
         else:
-            self.status_bar_main.show()
+            self.status_hbox.show()
         return pda_mode
 
     def sig_menubar(self, option):
@@ -395,14 +990,14 @@ class Main(object):
             common.message(_('Connection error!\n' \
                     'Bad username or password!'), self.window)
             return self.sig_login()
-        if not self.shortcut_menu.get_property('sensitive'):
+        if not self.menuitem_shortcut.get_property('sensitive'):
             self.shortcut_set()
-        self.glade.get_widget('but_menu').set_sensitive(True)
-        self.glade.get_widget('user').set_sensitive(True)
-        self.glade.get_widget('form').set_sensitive(True)
-        self.glade.get_widget('plugins').set_sensitive(True)
-        self.glade.get_widget('request_new_but').set_sensitive(True)
-        self.glade.get_widget('req_search_but').set_sensitive(True)
+        self.toolbutton_menu.set_sensitive(True)
+        self.menuitem_user.set_sensitive(True)
+        self.menuitem_form.set_sensitive(True)
+        self.menuitem_plugins.set_sensitive(True)
+        self.button_request_new.set_sensitive(True)
+        self.button_request_search.set_sensitive(True)
         self.notebook.grab_focus()
         return True
 
@@ -425,12 +1020,12 @@ class Main(object):
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
         self.shortcut_unset()
-        self.glade.get_widget('but_menu').set_sensitive(False)
-        self.glade.get_widget('user').set_sensitive(False)
-        self.glade.get_widget('form').set_sensitive(False)
-        self.glade.get_widget('plugins').set_sensitive(False)
-        self.glade.get_widget('request_new_but').set_sensitive(False)
-        self.glade.get_widget('req_search_but').set_sensitive(False)
+        self.toolbutton_menu.set_sensitive(False)
+        self.menuitem_user.set_sensitive(False)
+        self.menuitem_form.set_sensitive(False)
+        self.menuitem_plugins.set_sensitive(False)
+        self.button_request_new.set_sensitive(False)
+        self.button_request_search.set_sensitive(False)
         if disconnect:
             rpc.logout()
         self.refresh_ssl()
