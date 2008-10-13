@@ -927,7 +927,7 @@ class Main(object):
                         'res.request', 'request_get')
                 if not res:
                     return ([], [])
-                ids1, ids2 = res
+                ids, ids2 = res
             else:
                 ids, ids2 = rpc.execute('object', 'execute',
                         'res.request', 'request_get')
