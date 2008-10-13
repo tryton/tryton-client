@@ -118,6 +118,7 @@ class Reference(WidgetInterface):
 
     def _readonly_set(self, value):
         self._readonly = value
+        self.widget_combo.set_sensitive(not value)
         self.wid_text.set_editable(not value)
         self.wid_text.set_sensitive(not value)
         self.but_new.set_sensitive(not value)
