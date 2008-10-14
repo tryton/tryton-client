@@ -13,14 +13,15 @@ from mx.DateTime import now
 import mx.DateTime
 
 mapping = {
-    '%y': ('  ', '[ 0-9][ 0-9]'),
-    '%Y': ('    ', '([ 0-9][ 0-9][ 0-9][ 1-9]|[ 1-9][ 0-9][ 0-9][ 0-9]|[ 0-9][ 1-9][ 0-9][ 0-9]|[ 0-9][ 0-9][ 1-9][ 0-9])'),
+    '%y': ('  ', '([ 0-9][ 0-9])'),
+    '%Y': ('    ', '([ 0-9][ 0-9][ 0-9][ 1-9]|[ 1-9][ 0-9][ 0-9][ 0-9]|' \
+            '[ 0-9][ 1-9][ 0-9][ 0-9]|[ 0-9][ 0-9][ 1-9][ 0-9])'),
     '%m': ('  ', '([ 0][ 1-9]|[ 1][ 0-2])'),
     '%d': ('  ', '([ 0][ 1-9]|[ 1-2][ 0-9]|[ 3][ 0-1])'),
     '%H': ('  ', '([ 0-1][ 0-9]|[ 2][ 0-4])'),
     '%M': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
     '%S': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
-    '%p': ('  ', '[ AP][ M]'),
+    '%p': ('  ', '([ AP][ M])'),
 }
 
 class DateEntry(gtk.Entry):
@@ -37,7 +38,8 @@ class DateEntry(gtk.Entry):
         self.set_text(self.initial_value)
         self.regex = re.compile(self.regex)
 
-        assert self.regex.match(self.initial_value), 'Error, the initial value should be validated by regex'
+        assert self.regex.match(self.initial_value), \
+                'Error, the initial value should be validated by regex'
         self.set_width_chars(len(self.initial_value))
         self.set_max_length(len(self.initial_value))
 
@@ -129,8 +131,24 @@ class DateEntry(gtk.Entry):
     def date_get(self):
         tt = time.strftime(self.format, time.localtime())
         tc = self.get_text()
-        if tc==self.initial_value:
+        if tc == self.initial_value:
             return False
+
+        match = self.regex.match(tc)
+        for i in range(len(match.groups())):
+            val = match.group(i + 1)
+            n = len(val)
+            val = val.strip()
+            if not val:
+                continue
+            fchar = '0'
+            if n == 4:
+                fchar = ' '
+            val = (fchar * (n - len(val))) + val
+            start = match.start(i + 1)
+            end = match.end(i + 1)
+            tc = tc[:start] + val + tc[end:]
+
         for a in range(len(self.initial_value)):
             if self.initial_value[a] == tc[a]:
                 tc = tc[:a] + tt[a] + tc[a+1:]
@@ -160,20 +178,24 @@ class DateEntry(gtk.Entry):
         self.set_text(self.initial_value)
 
     def _on_key_press(self, editable, event):
-        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Escape, gtk.keysyms.Return):
+        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Escape,
+                gtk.keysyms.Return):
             if self.mode_cmd:
                 self.mode_cmd = False
-                if self.callback_process: self.callback_process(False, self, event)
+                if self.callback_process:
+                    self.callback_process(False, self, event)
                 self.stop_emission("key-press-event")
                 return True
-        elif event.keyval in (ord('+'),ord('-'),ord('=')):
+        elif event.keyval in (ord('+'), ord('-'), ord('=')):
             self.mode_cmd = True
             self.date_get()
-            if self.callback_process: self.callback_process(True, self, event)
+            if self.callback_process:
+                self.callback_process(True, self, event)
             self.stop_emission("key-press-event")
             return True
         elif self.mode_cmd:
-            if self.callback: self.callback(event)
+            if self.callback:
+                self.callback(event)
             return True
         return False
 
@@ -223,17 +245,28 @@ class ComplexEntry(gtk.HBox):
 
 def compute_date(cmd, dt, format):
     lst = {
-        '^=(\d+)w$': lambda dt,r: dt+RelativeDateTime(day=0, month=0, weeks = int(r.group(1))),
-        '^=(\d+)d$': lambda dt,r: dt+RelativeDateTime(day=int(r.group(1))),
-        '^=(\d+)m$': lambda dt,r: dt+RelativeDateTime(day=0, month = int(r.group(1))),
-        '^=(2\d\d\d)y$': lambda dt,r: dt+RelativeDateTime(year = int(r.group(1))),
-        '^=(\d+)h$': lambda dt,r: dt+RelativeDateTime(hour = int(r.group(1))),
-        '^([\\+-]\d+)h$': lambda dt,r: dt+RelativeDateTime(hours = int(r.group(1))),
-        '^([\\+-]\d+)w$': lambda dt,r: dt+RelativeDateTime(days = 7*int(r.group(1))),
-        '^([\\+-]\d+)d$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
-        '^([\\+-]\d+)$': lambda dt,r: dt+RelativeDateTime(days = int(r.group(1))),
-        '^([\\+-]\d+)m$': lambda dt,r: dt+RelativeDateTime(months = int(r.group(1))),
-        '^([\\+-]\d+)y$': lambda dt,r: dt+RelativeDateTime(years = int(r.group(1))),
+        '^=(\d+)w$': lambda dt, r: dt + \
+                RelativeDateTime(day=0, month=0, weeks=int(r.group(1))),
+        '^=(\d+)d$': lambda dt, r: dt + \
+                RelativeDateTime(day=int(r.group(1))),
+        '^=(\d+)m$': lambda dt, r: dt + \
+                RelativeDateTime(day=0, month=int(r.group(1))),
+        '^=(2\d\d\d)y$': lambda dt, r: dt + \
+                RelativeDateTime(year=int(r.group(1))),
+        '^=(\d+)h$': lambda dt, r: dt + \
+                RelativeDateTime(hour=int(r.group(1))),
+        '^([\\+-]\d+)h$': lambda dt, r: dt + \
+                RelativeDateTime(hours=int(r.group(1))),
+        '^([\\+-]\d+)w$': lambda dt, r: dt + \
+                RelativeDateTime(days=7 * int(r.group(1))),
+        '^([\\+-]\d+)d$': lambda dt, r: dt + \
+                RelativeDateTime(days=int(r.group(1))),
+        '^([\\+-]\d+)$': lambda dt, r: dt + \
+                RelativeDateTime(days=int(r.group(1))),
+        '^([\\+-]\d+)m$': lambda dt, r: dt + \
+                RelativeDateTime(months=int(r.group(1))),
+        '^([\\+-]\d+)y$': lambda dt, r: dt + \
+                RelativeDateTime(years=int(r.group(1))),
         '^=$': lambda dt,r: now(),
         '^-$': lambda dt,r: False
     }
@@ -264,4 +297,3 @@ if __name__ == '__main__':
         gtk.main()
 
     sys.exit(main(sys.argv))
-
