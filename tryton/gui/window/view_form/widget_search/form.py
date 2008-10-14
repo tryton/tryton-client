@@ -18,7 +18,7 @@ class _container(object):
         self.count = 0
         self.col = 0
 
-    def new(self, col=8):
+    def new(self, col=6):
         self.col = col+1
         table = gtk.Table(1, col)
         table.show()
@@ -79,7 +79,7 @@ class Parse(object):
         self.fields = fields
         self.parent = parent
         self.model = model
-        self.col = 8
+        self.col = 6
         self.focusable = None
         self.add_widget_end = []
         self.container = None
