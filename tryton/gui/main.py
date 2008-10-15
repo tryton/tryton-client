@@ -1154,7 +1154,7 @@ class Main(object):
         def on_style_set(widget, prevstyle):
             x, y = gtk.icon_size_lookup_for_settings(button.get_settings(),
                     gtk.ICON_SIZE_MENU)
-            button.set_size_request(x + 2, y + 2)
+            button.set_size_request(x, y)
         hbox.connect("style-set", on_style_set)
 
         hbox.show_all()
