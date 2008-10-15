@@ -557,7 +557,7 @@ class Screen(SignalEvent):
 
     def display_next(self):
         self.current_view.set_value()
-        self.current_view.set_cursor()
+        self.current_view.set_cursor(reset_view=False)
         if self.current_model in self.models.models:
             idx = self.models.models.index(self.current_model)
             idx = (idx+1) % len(self.models.models)
@@ -565,14 +565,14 @@ class Screen(SignalEvent):
         else:
             self.current_model = len(self.models.models) \
                     and self.models.models[0]
-        self.current_view.set_cursor()
+        self.current_view.set_cursor(reset_view=False)
         if self.current_model:
             self.current_model.validate_set()
         self.display()
 
     def display_prev(self):
         self.current_view.set_value()
-        self.current_view.set_cursor()
+        self.current_view.set_cursor(reset_view=False)
         if self.current_model in self.models.models:
             idx = self.models.models.index(self.current_model)-1
             if idx < 0:
@@ -581,7 +581,7 @@ class Screen(SignalEvent):
         else:
             self.current_model = len(self.models.models) \
                     and self.models.models[-1]
-        self.current_view.set_cursor()
+        self.current_view.set_cursor(reset_view=False)
         if self.current_model:
             self.current_model.validate_set()
         self.display()

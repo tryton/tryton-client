@@ -44,5 +44,5 @@ class ViewGraph(ParserView):
             widget.display(self.screen.models)
         return True
 
-    def set_cursor(self, new=False):
+    def set_cursor(self, new=False, reset_view=True):
         pass

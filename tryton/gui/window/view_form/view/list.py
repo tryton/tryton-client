@@ -545,7 +545,7 @@ class ViewList(ParserView):
             else:
                 self.children[child][2].set_markup(label_str)
 
-    def set_cursor(self, new=False):
+    def set_cursor(self, new=False, reset_view=True):
         self.widget_tree.grab_focus()
         if self.screen.current_model:
             path = self.store.on_get_path(self.screen.current_model)

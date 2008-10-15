@@ -211,11 +211,12 @@ class ViewForm(ParserView):
             button.state_set(model)
         return True
 
-    def set_cursor(self, new=False):
-        for notebook in self.notebooks:
-            notebook.set_current_page(0)
-        if self.cursor_widget in self.widgets:
-            self.widgets[self.cursor_widget][0].widget.grab_focus()
+    def set_cursor(self, new=False, reset_view=True):
+        if reset_view:
+            for notebook in self.notebooks:
+                notebook.set_current_page(0)
+            if self.cursor_widget in self.widgets:
+                self.widgets[self.cursor_widget][0].widget.grab_focus()
         model = self.screen.current_model
         position = 0
         for widgets in self.widgets:
