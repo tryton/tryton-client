@@ -1291,10 +1291,9 @@ class Main(object):
         except Exception, exception:
             self.refresh_ssl()
             if exception[0] == "AccessDenied":
-                common.warning(_("The Tryton Server Password you provided " \
-                        "is different to the stored password in the " \
-                        "configuration.\n\nPlease try again."), \
-                        self.window, _('Access denied!'))
+                common.warning(_("Wrong Tryton Server Password" \
+                        "\nPlease try again."), self.window,
+                        _('Access denied!'))
                 self.sig_db_drop(self.window)
             else:
                 common.warning(_('Database drop failed with ' \
@@ -1399,18 +1398,14 @@ class Main(object):
             dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
         except Exception, exception:
             if exception[0] == "Couldn't dump database with password":
-                common.warning(_("It is impossible to dump a password " \
-                        "protected Database.\nBackground: \n" \
-                        "The Postgres database backup and restore " \
-                        "functions 'pg_dump' and 'pg_restore' did not " \
-                        "support passwords at all. Backup and restore " \
-                        "needed to be proceed manual."), \
+                common.warning(_("It is not possible to dump a password " \
+                        "protected Database.\nBackup and restore " \
+                        "needed to be proceed manual."),
                         self.window, _('Database is password protected!'))
             elif exception[0] == "AccessDenied":
-                common.warning(_("The Tryton Server Password you provided " \
-                        "is different to the stored password in the " \
-                        "configuration.\n\nPlease try again."), \
-                        self.window, _('Access denied!'))
+                common.warning(_("Wrong Tryton Server Password.\n" \
+                        "Please try again."), self.window,
+                        _('Access denied!'))
                 self.sig_db_dump(self.window)
             else:
                 common.warning(_('Database dump failed with ' \
