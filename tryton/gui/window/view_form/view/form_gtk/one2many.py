@@ -230,10 +230,7 @@ class Dialog(object):
                 self.screen.add_view_id(False, 'form', display=True,
                         context=default_get_ctx)
 
-        name = attrs.get('string', '')
-        if name:
-            name += ' - '
-        name += self.screen.current_view.title
+        name = self.screen.current_view.title
         self.dia.set_title(name)
         if menuitem_title:
             menuitem_title.get_child().set_text(name)
@@ -471,11 +468,7 @@ class One2Many(WidgetInterface):
                 default_get=attrs.get('default_get', {}),
                 exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
-        name = attrs.get('string', '')
-        if name:
-            name += ' - '
-        name += self.screen.current_view.title
-        menuitem_title.get_child().set_text(name)
+        menuitem_title.get_child().set_text(attrs.get('string', ''))
 
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
