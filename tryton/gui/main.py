@@ -14,6 +14,7 @@ from tryton.gui.window.preference import Preference
 from tryton.gui.window import FilesActions
 from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
+from tryton.gui.window.dbdumpdrop import DBBackupDrop
 from tryton.gui.window.tips import Tips
 from tryton.gui.window.about import About
 from tryton.gui.window.shortcuts import Shortcuts
@@ -1273,24 +1274,35 @@ class Main(object):
     def sig_db_drop(self, widget):
         if not self.sig_logout(widget):
             return False
-        url, dbname, passwd = self._choose_db_select(_('Delete a database'))
+        dialog = DBBackupDrop(self.window, function='drop')
+        url, dbname, passwd = dialog.run(self.window)
         if not dbname:
             rpc.logout()
             Main.get_main().refresh_ssl()
             return
 
         host, port = url.rsplit(':', 1)
-
+        sure = common.sur_3b(_("You are going to delete a Tryton " \
+                "database.\nAre you really sure to proceed?"), self.window)
+        if sure == "ko" or sure == "cancel":
+            return
         try:
             rpc.db_exec(host, int(port), 'drop', passwd, dbname)
         except Exception, exception:
             self.refresh_ssl()
-            common.warning(_('Database drop failed with '\
-                    'error message:\n') + str(exception[0]), self.window,
-                    _('Database drop failed!'))
+            if exception[0] == "AccessDenied":
+                common.warning(_("The Tryton Server Password you provided " \
+                        "is different to the stored password in the " \
+                        "configuration.\n\nPlease try again."), \
+                        self.window, _('Access denied!'))
+                self.sig_db_drop(self.window)
+            else:
+                common.warning(_('Database drop failed with ' \
+                        'error message:\n') + str(exception[0]), \
+                        self.window, _('Database drop failed!'))
             return
         self.refresh_ssl()
-        common.message(_("Database dropped successfully!"),
+        common.message(_("Database dropped successfully!"), \
                 parent=self.window)
 
     def sig_db_restore(self, widget):
@@ -1374,8 +1386,10 @@ class Main(object):
         win.destroy()
 
     def sig_db_dump(self, widget):
-        url, dbname, passwd = self._choose_db_select(_('Backup a database'))
-        if not dbname:
+        dialog = DBBackupDrop(self.window, function='backup')
+        url, dbname, passwd = dialog.run(self.window)
+
+        if not (dbname and url and passwd):
             rpc.logout()
             Main.get_main().refresh_ssl()
             return
@@ -1384,104 +1398,44 @@ class Main(object):
         try:
             dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
         except Exception, exception:
+            if exception[0] == "Couldn't dump database with password":
+                common.warning(_("It is impossible to dump a password " \
+                        "protected Database.\nBackground: \n" \
+                        "The Postgres database backup and restore " \
+                        "functions 'pg_dump' and 'pg_restore' did not " \
+                        "support passwords at all. Backup and restore " \
+                        "needed to be proceed manual."), \
+                        self.window, _('Database is password protected!'))
+            elif exception[0] == "AccessDenied":
+                common.warning(_("The Tryton Server Password you provided " \
+                        "is different to the stored password in the " \
+                        "configuration.\n\nPlease try again."), \
+                        self.window, _('Access denied!'))
+                self.sig_db_dump(self.window)
+            else:
+                common.warning(_('Database dump failed with ' \
+                        'error message:\n') + str(exception[0]), \
+                        self.window, _('Database dump failed!'))
             rpc.logout()
             Main.get_main().refresh_ssl()
-            common.warning(_('Database dump failed with error message:\n') + \
-                    str(exception[0]), self.window, _('Database dump failed!'))
             return
+
         self.refresh_ssl()
         dump = base64.decodestring(dump_b64)
 
-        filename = common.file_selection(_('Save As...'),
-                action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window,
+        filename = common.file_selection(_('Save As...'), \
+                action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window, \
                 preview=False)
 
         if filename:
             file_ = file(filename, 'wb')
             file_.write(dump)
             file_.close()
-            common.message(_("Database backuped successfully!"),
+            common.message(_("Database backuped successfully!"), \
                     parent=self.window)
         else:
             rpc.logout()
             Main.get_main().refresh_ssl()
-
-    def _choose_db_select(self, title=_("Backup a database")):
-        def refreshlist(widget, db_widget, label, host, port):
-            res = common.refresh_dblist(db_widget, host, port)
-            if res is None or res == -1:
-                if res is None:
-                    label.set_label('<b>' + _('Could not connect to server!') +\
-                            '</b>')
-                else:
-                    label.set_label('<b>' + \
-                            _('Incompatible version of the server!') + '</b>')
-                db_widget.hide()
-                label.show()
-            elif res == 0:
-                label.set_label('<b>' + \
-                        _('No database found, you must create one!') + '</b>')
-                db_widget.hide()
-                label.show()
-            else:
-                label.hide()
-                db_widget.show()
-            return res
-
-        def refreshlist_ask(widget, server_widget, db_widget, label,
-                parent=None):
-            res = common.request_server(server_widget, parent)
-            if not res:
-                return None
-            host, port = res
-            refreshlist(widget, db_widget, label, host, port)
-            return (host, port)
-
-        dialog = glade.XML(GLADE, "win_db_select",
-                gettext.textdomain())
-        win = dialog.get_widget('win_db_select')
-        win.set_icon(TRYTON_ICON)
-        win.set_default_response(gtk.RESPONSE_OK)
-        win.set_transient_for(self.window)
-        win.show_all()
-
-        pass_widget = dialog.get_widget('ent_passwd_select')
-        server_widget = dialog.get_widget('ent_server_select')
-        db_widget = dialog.get_widget('combo_db_select')
-        label = dialog.get_widget('label_db_select')
-
-
-        dialog.get_widget('db_select_label').set_markup('<b>'+title+'</b>')
-
-        host = CONFIG['login.server']
-        port = int(CONFIG['login.port'])
-        url = '%s:%d' % (host, port)
-        server_widget.set_text(url)
-
-        liststore = gtk.ListStore(str)
-        db_widget.set_model(liststore)
-
-        refreshlist(None, db_widget, label, host, port)
-        change_button = dialog.get_widget('but_server_select')
-        change_button.connect_after('clicked', refreshlist_ask,
-                server_widget, db_widget, label, win)
-
-        cell = gtk.CellRendererText()
-        db_widget.pack_start(cell, True)
-        db_widget.add_attribute(cell, 'text', 0)
-
-        res = win.run()
-
-        database = False
-        url = False
-        passwd = False
-        if res == gtk.RESPONSE_OK:
-            database = db_widget.get_active_text()
-            url = server_widget.get_text()
-            passwd = pass_widget.get_text()
-        self.window.present()
-        win.destroy()
-        return (url, database, passwd)
 
     def _choose_db_ent(self):
         dialog = glade.XML(GLADE, "win_db_ent",
