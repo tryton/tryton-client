@@ -53,7 +53,7 @@ class Tree(SignalEvent):
         self.widget = gtk.VBox()
 
         hpaned = gtk.HPaned()
-        hpaned.set_position(200)
+        hpaned.set_position(220)
 
         self.toolbar_vpaned = gtk.VPaned()
         self.toolbar_vpaned.set_position(400)
