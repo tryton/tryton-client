@@ -7,6 +7,7 @@ from tryton.action import Action
 from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
+from tryton.gui.main import Main
 
 _ = gettext.gettext
 
@@ -444,11 +445,13 @@ class ParserForm(ParserInterface):
                         self.parse(model, node, fields, notebook,
                                 tooltips=tooltips)
                 max_width, max_height = -1, -1
+                window_width, window_height = Main.get_main().window.get_size()
                 for i in range(notebook.get_n_pages()):
-                    width, height = notebook.get_nth_page(i).size_request()
-                    if width > max_width:
+                    width, height = notebook.get_nth_page(i)\
+                            .get_child().get_child().size_request()
+                    if width > max_width and width < window_width - 50:
                         max_width = width
-                    if height > max_height:
+                    if height > max_height and height < window_height - 50:
                         max_height = height
                 notebook.set_size_request(max_width + 20, max_height + 20)
                 if not cursor_widget:
