@@ -86,7 +86,6 @@ class DBBackupDrop(object):
                 flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT \
                 | gtk.WIN_POS_CENTER_ON_PARENT,)
         self.dialog.set_has_separator(True)
-        self.dialog.set_size_request(500, 201)
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.connect("key-press-event", self.event_show_button_ok)
         self.tooltips = gtk.Tooltips()

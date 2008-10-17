@@ -14,7 +14,6 @@ class DBLogin(object):
     def __init__(self, parent):
         self.dialog = gtk.Dialog(title=_('Login'), parent=parent,
             flags=gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.dialog.set_size_request(500, 301)
         self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
@@ -38,7 +37,6 @@ class DBLogin(object):
         vbox_image = gtk.VBox()
         image = gtk.Image()
         image.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
-        image.set_size_request(500, 129)
         vbox_image.pack_start(image)
         dialog_vbox.pack_start(vbox_image)
         table_main = gtk.Table(4, 3, False)

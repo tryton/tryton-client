@@ -517,7 +517,6 @@ def sur(msg, parent):
             | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     dialog.set_icon(TRYTON_ICON)
     dialog.set_has_separator(True)
-    dialog.set_size_request(350, 150)
     hbox = gtk.HBox()
     image = gtk.Image()
     image.set_from_stock('tryton-dialog-information',
@@ -525,7 +524,6 @@ def sur(msg, parent):
     image.set_padding(15, 15)
     hbox.pack_start(image, False, False)
     label = gtk.Label('%s' % (to_xml(msg)))
-    label.set_size_request(200, 60)
     hbox.pack_start(label, True, True)
     dialog.vbox.pack_start(hbox)
     dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
@@ -545,7 +543,6 @@ def sur_3b(msg, parent):
             | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
     dialog.set_icon(TRYTON_ICON)
     dialog.set_has_separator(True)
-    dialog.set_size_request(350, 150)
     hbox = gtk.HBox()
     image = gtk.Image()
     image.set_from_stock('tryton-dialog-information',
@@ -553,7 +550,6 @@ def sur_3b(msg, parent):
     image.set_padding(15, 15)
     hbox.pack_start(image, False, False)
     label = gtk.Label('%s' % (to_xml(msg)))
-    label.set_size_request(200, 60)
     hbox.pack_start(label, True, True)
     dialog.vbox.pack_start(hbox)
     dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
