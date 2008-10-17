@@ -367,15 +367,6 @@ class Main(object):
         imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
         menu_form.add(imagemenuitem_previous)
 
-        imagemenuitem_previous = gtk.ImageMenuItem(_('_Previous'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_MENU)
-        imagemenuitem_previous.set_image(image)
-        imagemenuitem_previous.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Page_Up, 0, gtk.ACCEL_VISIBLE)
-        imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
-        menu_form.add(imagemenuitem_previous)
-
         imagemenuitem_switch = gtk.ImageMenuItem(_('_Switch View'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_MENU)
