@@ -342,16 +342,18 @@ class Tree(SignalEvent):
 
     def sig_edit(self):
         obj_ids = self.ids_get()
+        if not obj_ids:
+            obj_ids = []
         if self.tree_res.toolbar:
             for child in self.toolbar.get_children():
                 if child.get_active():
                     obj_ids.append(child.get_data('id'))
-        if obj_ids:
-            Window.create(None, self.model, obj_ids, self.domain,
-                    window=self.window, context=self.context,
-                    mode=['form', 'tree'])
-        else:
-            common.message(_('No record selected!'), self.window)
+        mode = ['form', 'tree']
+        if len(obj_ids) > 1:
+            mode = ['tree', 'form']
+        Window.create(None, self.model, obj_ids, self.domain,
+                window=self.window, context=self.context,
+                mode=mode)
 
     def sc_del(self, widget):
         obj_id = self.tree_sc.sel_id_get()
