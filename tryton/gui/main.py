@@ -249,15 +249,6 @@ class Main(object):
         imagemenuitem_db_drop.connect('activate', self.sig_db_drop)
         menu_database.add(imagemenuitem_db_drop)
 
-        menu_database.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_db_password = gtk.ImageMenuItem(_('_Administrator Password'))
-        image = gtk.Image()
-        image.set_from_stock('tryton-users', gtk.ICON_SIZE_MENU)
-        imagemenuitem_db_password.set_image(image)
-        imagemenuitem_db_password.connect('activate', self.sig_db_password)
-        menu_database.add(imagemenuitem_db_password)
-
         menu_file.add(gtk.SeparatorMenuItem())
 
         imagemenuitem_close = gtk.ImageMenuItem(_('_Quit'), self.accel_group)
@@ -1328,52 +1319,6 @@ class Main(object):
         else:
             rpc.logout()
             Main.get_main().refresh_ssl()
-
-    def sig_db_password(self, widget):
-        dialog = glade.XML(GLADE, "dia_passwd_change",
-                gettext.textdomain())
-        win = dialog.get_widget('dia_passwd_change')
-        win.set_icon(TRYTON_ICON)
-        win.set_transient_for(self.window)
-        win.show_all()
-        server_widget = dialog.get_widget('ent_server')
-        old_pass_widget = dialog.get_widget('old_passwd')
-        new_pass_widget = dialog.get_widget('new_passwd')
-        new_pass2_widget = dialog.get_widget('new_passwd2')
-        change_button = dialog.get_widget('but_server_change')
-        change_button.connect_after('clicked', \
-                lambda a,b: common.request_server(b, win), server_widget)
-
-        host = CONFIG['login.server']
-        port = int(CONFIG['login.port'])
-        url = '%s:%d' % (host, port)
-        server_widget.set_text(url)
-
-        res = win.run()
-        if res == gtk.RESPONSE_OK:
-            url = server_widget.get_text()
-            old_passwd = old_pass_widget.get_text()
-            new_passwd = new_pass_widget.get_text()
-            new_passwd2 = new_pass2_widget.get_text()
-            if new_passwd != new_passwd2:
-                common.warning(_("Confirmation password do not match " \
-                        "new password, operation cancelled!"), win,
-                        _("Validation Error."))
-            else:
-                try:
-                    rpc.db_exec(host, port, 'change_admin_password',
-                            old_passwd, new_passwd)
-                except Exception, exception:
-                    rpc.logout()
-                    common.warning(_('Change Admin password failed with ' \
-                            'error message:\n') + str(exception[0]),
-                            self.window, _('Change Admin password failed!'))
-                self.refresh_ssl()
-        else:
-            rpc.logout()
-            Main.get_main().refresh_ssl()
-        self.window.present()
-        win.destroy()
 
     def sig_db_dump(self, widget):
         dialog = DBBackupDrop(self.window, function='backup')
