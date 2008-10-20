@@ -225,6 +225,7 @@ def file_selection(title, filename='', parent=None,
 
     button = win.run()
     if button != gtk.RESPONSE_OK:
+        parent.present()
         win.destroy()
         return False
     if not multi:
