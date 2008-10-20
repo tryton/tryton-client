@@ -116,7 +116,7 @@ class DBLogin(object):
                         _('Incompatible version of the server!') + '</b>')
             db_widget.hide()
             label.show()
-            button.show()
+            button.hide()
             if butconnect:
                 butconnect.set_sensitive(False)
         elif res == 0:
