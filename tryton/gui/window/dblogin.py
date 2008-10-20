@@ -6,6 +6,7 @@ import gettext
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
 import tryton.rpc as rpc
+from tryton.gui.window.dbcreate import DBCreate
 
 _ = gettext.gettext
 
@@ -45,12 +46,20 @@ class DBLogin(object):
         table_main.set_col_spacings(3)
         vbox_image.pack_start(table_main, True, True, 0)
         vbox_combo = gtk.VBox()
+        self.hbox_combo = gtk.HBox()
         self.combo_database = gtk.ComboBox()
         self.combo_label = gtk.Label()
         self.combo_label.set_use_markup(True)
-        self.combo_label.set_alignment(0, 1)
+        self.combo_label.set_alignment(0, 0.5)
+        self.combo_button = gtk.Button(_('C_reate'))
+        self.combo_button.connect('clicked', self.db_create)
+        image = gtk.Image()
+        image.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
+        self.combo_button.set_image(image)
         vbox_combo.pack_start(self.combo_database, True, True, 0)
-        vbox_combo.pack_start(self.combo_label, False, False, 0)
+        self.hbox_combo.pack_start(self.combo_label, True, True, 0)
+        self.hbox_combo.pack_start(self.combo_button, False, False, 0)
+        vbox_combo.pack_start(self.hbox_combo, True, True, 0)
         table_main.attach(vbox_combo, 1, 3, 1, 2)
         self.entry_password = gtk.Entry()
         self.entry_password.set_visibility(False)
@@ -95,7 +104,8 @@ class DBLogin(object):
         self.dialog.vbox.pack_start(dialog_vbox)
 
     @staticmethod
-    def refreshlist(widget, db_widget, label, host, port, butconnect=None):
+    def refreshlist(widget, db_widget, label, button, host, port,
+            butconnect=None):
         res = common.refresh_dblist(db_widget, host, port)
         if res is None or res == -1:
             if res is None:
@@ -106,6 +116,7 @@ class DBLogin(object):
                         _('Incompatible version of the server!') + '</b>')
             db_widget.hide()
             label.show()
+            button.show()
             if butconnect:
                 butconnect.set_sensitive(False)
         elif res == 0:
@@ -113,28 +124,41 @@ class DBLogin(object):
                     _('No database found, you must create one!') + '</b>')
             db_widget.hide()
             label.show()
+            button.show()
             if butconnect:
                 butconnect.set_sensitive(False)
         else:
             label.hide()
+            button.hide()
             db_widget.show()
             if butconnect:
                 butconnect.set_sensitive(True)
         return res
 
     @staticmethod
-    def refreshlist_ask(widget, server_widget, db_widget, label,
+    def refreshlist_ask(widget, server_widget, db_widget, label, button,
             butconnect=False, host=False, port=0, parent=None):
         res = common.request_server(server_widget, parent) or (host, port)
         if not res:
             return False
         host, port = res
-        return DBLogin.refreshlist(widget, db_widget, label, host, port,
+        return DBLogin.refreshlist(widget, db_widget, label, button, host, port,
                 butconnect)
+
+    def db_create(self, widget):
+        dia = DBCreate()
+        dia.run(self.dialog)
+        host = CONFIG['login.server']
+        port = int(CONFIG['login.port'])
+        DBLogin.refreshlist(None, self.combo_database,
+                self.combo_label, self.combo_button, host, port,
+                self.button_connect)
+        return
 
     def run(self, dbname, parent):
         self.dialog.show_all()
         self.combo_label.hide()
+        self.combo_button.hide()
 
         host = CONFIG['login.server']
         port = int(CONFIG['login.port'])
@@ -151,11 +175,11 @@ class DBLogin(object):
         self.combo_database.add_attribute(cell, 'text', 0)
 
         res = self.refreshlist(None, self.combo_database, self.combo_label,
-                host, port, self.button_connect)
+                self.combo_button, host, port, self.button_connect)
 
         self.button_server.connect_after('clicked', DBLogin.refreshlist_ask,
                 self.entry_server, self.combo_database, self.combo_label,
-                self.button_connect, host, port, self.dialog)
+                self.combo_button, self.button_connect, host, port, self.dialog)
         if dbname:
             i = liststore.get_iter_root()
             while i:
@@ -172,8 +196,8 @@ class DBLogin(object):
             CONFIG['login.login'] = self.entry_login.get_text()
             CONFIG['login.port'] = url_m.group(2)
             CONFIG['login.db'] = self.combo_database.get_active_text()
-            result = (self.entry_login.get_text(), 
-                self.entry_password.get_text(), url_m.group(1), 
+            result = (self.entry_login.get_text(),
+                self.entry_password.get_text(), url_m.group(1),
                 int(url_m.group(2)), self.combo_database.get_active_text())
         else:
             parent.present()

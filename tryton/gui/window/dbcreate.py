@@ -130,7 +130,7 @@ class DBCreate(object):
             gobject.idle_add(_move_cursor, entry, _pos)
         entry.stop_emission("insert-text")
 
-    def __init__(self, sig_login):
+    def __init__(self, sig_login=None):
         """
         This method defines the complete GUI.
         """
@@ -394,7 +394,8 @@ class DBCreate(object):
                         Main.get_main().refresh_ssl()
                         parent.present()
                         self.dialog.destroy()
-                        self.sig_login(dbname=dbname)
+                        if self.sig_login:
+                            self.sig_login(dbname=dbname)
                         break
 
             break
