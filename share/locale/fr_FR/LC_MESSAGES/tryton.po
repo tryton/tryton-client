@@ -190,7 +190,7 @@ msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
 msgstr ""
-"Erreur de connection !\n"
+"Erreur de connexion !\n"
 "Impossible de se connecter au serveur !"
 
 #: tryton/gui/main.py:374
@@ -198,7 +198,7 @@ msgid ""
 "Connection error!\n"
 "Bad username or password!"
 msgstr ""
-"Erreur de connection !\n"
+"Erreur de connexion !\n"
 "Mauvais nom d'utilisateur ou de mot de passe !"
 
 #: tryton/gui/main.py:403
@@ -358,7 +358,7 @@ msgstr ""
 
 #: tryton/gui/window/dbcreate.py:42
 msgid "No connection!"
-msgstr "Pas de connection !"
+msgstr "Pas de connexion !"
 
 #: tryton/gui/window/dbcreate.py:45
 msgid ""
@@ -395,7 +395,7 @@ msgstr "Configuration du Serveur :"
 
 #: tryton/gui/window/dbcreate.py:174
 msgid "Server connection:"
-msgstr "Connection au serveur :"
+msgstr "Connexion au serveur :"
 
 #: tryton/gui/window/dbcreate.py:184
 msgid ""
@@ -413,7 +413,7 @@ msgstr "C_hanger"
 
 #: tryton/gui/window/dbcreate.py:195
 msgid "Setup the server connection..."
-msgstr "Configurer la connection au serveur"
+msgstr "Configurer la connexion au serveur"
 
 #: tryton/gui/window/dbcreate.py:197
 msgid "Tryton Server Password:"
@@ -587,7 +587,7 @@ msgstr "A_nnuler"
 
 #: tryton/gui/window/dblogin.py:27
 msgid "Cancel connection to the Tryton server"
-msgstr "Annuler la connection au serveur Tryton"
+msgstr "Annuler la connexion au serveur Tryton"
 
 #: tryton/gui/window/dblogin.py:29
 msgid "C_onnect"
@@ -603,7 +603,7 @@ msgstr "Base de Donnée :"
 
 #: tryton/gui/window/dblogin.py:86
 msgid "Configure the Tryton server connection"
-msgstr "Configurer la connection au serveur Tryton"
+msgstr "Configurer la connexion au serveur Tryton"
 
 #: tryton/gui/window/dblogin.py:93
 msgid "User name:"
