@@ -286,6 +286,8 @@ class Tree(SignalEvent):
                 self.tree_res.view.collapse_row(iter)
             else:
                 self.tree_res.view.expand_row(iter, False)
+            if self.model != 'ir.ui.menu':
+                self.sig_edit()
 
     def sig_key_press(self, widget, event):
         if event.keyval == gtk.keysyms.Left:
