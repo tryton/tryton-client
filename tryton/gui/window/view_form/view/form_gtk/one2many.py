@@ -360,8 +360,6 @@ class Dialog(object):
 
     def _sig_remove(self, widget, remove=False):
         self.screen.remove(remove=remove)
-        if not self.screen.models.models:
-            self.screen.current_view.widget.set_sensitive(False)
 
     def _sig_activate(self, *args):
         self._sig_add()
@@ -579,8 +577,6 @@ class One2Many(WidgetInterface):
 
     def _sig_remove(self, widget, remove=False):
         self.screen.remove(remove=remove)
-        if not self.screen.models.models:
-            self.screen.current_view.widget.set_sensitive(False)
 
     def _sig_activate(self, *args):
         self._sig_add()
