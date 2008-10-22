@@ -18,6 +18,7 @@ from tryton.gui.window.dbdumpdrop import DBBackupDrop
 from tryton.gui.window.tips import Tips
 from tryton.gui.window.about import About
 from tryton.gui.window.shortcuts import Shortcuts
+from tryton.gui.window.dbrestore import DBRestore
 import re
 import base64
 import tryton.translate as translate
@@ -1287,34 +1288,47 @@ class Main(object):
                 parent=self.window)
 
     def sig_db_restore(self, widget):
-        filename = common.file_selection(_('Open...'), parent=self.window,
-                preview=False)
+        filename = common.file_selection(_('Open Backup File to Restore...'), \
+                parent=self.window, preview=False)
         if not filename:
             rpc.logout()
             Main.get_main().refresh_ssl()
             return
-
-        url, dbname, passwd = self._choose_db_ent()
+        dialog = DBRestore(self.window, filename=filename)
+        url, dbname, passwd = dialog.run(self.window)
         if dbname:
             file_p = file(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
             host, port = url.rsplit(':' , 1)
             try:
-                res = rpc.db_exec(host, int(port), 'restore', passwd, dbname,
+                res = rpc.db_exec(host, int(port), 'restore', passwd, dbname, \
                         data_b64)
             except Exception, exception:
                 self.refresh_ssl()
-                common.warning(_('Database restore failed with ' \
-                        'error message:\n') + str(exception[0]), self.window,
-                        _('Database restore failed!'))
+                if exception[0] == \
+                        "Couldn't restore database with password":
+                    common.warning(_("It is not possible to restore a " \
+                            "password protected database.\n" \
+                            "Backup and restore needed to be proceed " \
+                            "manual."), self.window, \
+                            _('Database is password protected!'))
+                elif exception[0] == "AccessDenied":
+                    common.warning(_("Wrong Tryton Server Password.\n" \
+                            "Please try again."), self.window, \
+                            _('Access denied!'))
+                    self.sig_db_restore(self.window)
+                else:
+                    common.warning(_('Database restore failed with ' \
+                            'error message:\n') + str(exception[0]), \
+                            self.window, _('Database restore failed!'))
                 return
             self.refresh_ssl()
             if res:
-                common.message(_("Database restored successfully!"),
+                common.message(_("Database restored successfully!"), \
                         parent=self.window)
             else:
-                common.message(_('Database restore failed!'),
+                common.message(_('Database restore failed!'), \
                         parent=self.window)
         else:
             rpc.logout()
@@ -1367,36 +1381,3 @@ class Main(object):
         else:
             rpc.logout()
             Main.get_main().refresh_ssl()
-
-    def _choose_db_ent(self):
-        dialog = glade.XML(GLADE, "win_db_ent",
-                gettext.textdomain())
-        win = dialog.get_widget('win_db_ent')
-        win.set_icon(TRYTON_ICON)
-        win.set_transient_for(self.window)
-        win.show_all()
-
-        db_widget = dialog.get_widget('ent_db')
-        widget_pass = dialog.get_widget('ent_password')
-        widget_url = dialog.get_widget('ent_server')
-
-        url = '%s:%d' % (CONFIG['login.server'], int(CONFIG['login.port']))
-        widget_url.set_text(url)
-
-        change_button = dialog.get_widget('but_server_change')
-        change_button.connect_after('clicked',
-                lambda a, b: common.request_server(b, win), widget_url)
-
-        res = win.run()
-
-        database = False
-        passwd = False
-        url = False
-        if res == gtk.RESPONSE_OK:
-            database = db_widget.get_text()
-            url = widget_url.get_text()
-            passwd = widget_pass.get_text()
-        self.window.present()
-        win.destroy()
-        return url, database, passwd
-
