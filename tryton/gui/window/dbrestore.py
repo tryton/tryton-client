@@ -3,7 +3,6 @@
 import gtk
 import gobject
 import gettext
-import os.path
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
 import tryton.rpc as rpc
@@ -63,8 +62,6 @@ class DBRestore(object):
         """
         Database restore widget
         """
-        if filename:
-            (fpath, fname) = os.path.split(filename)
         self.dialog = gtk.Dialog( \
                 title = _("Restore Database"), \
                 parent=parent, \
@@ -73,7 +70,7 @@ class DBRestore(object):
         vbox = gtk.VBox()
         self.dialog.vbox.pack_start(vbox)
         self.tooltips = gtk.Tooltips()
-        table = gtk.Table(7, 3, False)
+        table = gtk.Table(5, 3, False)
         table.set_border_width(9)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
@@ -121,20 +118,12 @@ class DBRestore(object):
         hseparator = gtk.HSeparator()
         table.attach(hseparator, 0, 3, 2, 3)
         label_filename = gtk.Label()
-        label_filename.set_markup(_("Restore File:"))
+        label_filename.set_markup(_("File to Restore:"))
         label_filename.set_alignment(1, 0.5)
         table.attach(label_filename, 0, 1, 3, 4)
         entry_filename = gtk.Label()
-        entry_filename.set_markup("<tt>" + fname + "</tt>")
+        entry_filename.set_markup("<tt>" + filename + "</tt>")
         table.attach(entry_filename, 1, 3, 3, 4)
-        label_filepath = gtk.Label()
-        label_filepath.set_markup(_("Restore File Path:"))
-        label_filepath.set_alignment(1, 0.5)
-        table.attach(label_filepath, 0, 1, 4, 5)
-        entry_filepath = gtk.Label()
-        entry_filepath.set_markup("<tt>" + fpath + "</tt>")
-        entry_filepath.set_alignment(0, 0.5)
-        table.attach(entry_filepath, 1, 3, 4, 5)
         self.entry_db_name = gtk.Entry()
         self.entry_db_name.set_visibility(True)
         self.entry_db_name.set_activates_default(True)
@@ -148,10 +137,10 @@ class DBRestore(object):
                 "Allowed characters are alphanumerical or _ (underscore)\n" \
                 "You need to avoid all accents, space or special " \
                 "characters! \nExample: tryton"), None)
-        table.attach(self.entry_db_name, 1, 3, 5, 6)
+        table.attach(self.entry_db_name, 1, 3, 4, 5)
         label_db_name = gtk.Label(_("New Database Name:"))
         label_db_name.set_alignment(1, 0.5)
-        table.attach(label_db_name, 0, 1, 5, 6)
+        table.attach(label_db_name, 0, 1, 4, 5)
         # Buttons and events
         self.dialog.connect("key-press-event", \
                 self.event_show_button_restore)
