@@ -157,7 +157,7 @@ class DBBackupDrop(object):
         self.combo_database_label.set_alignment(0, 1)
         vbox_combo.pack_start(self.combo_database, True, True, 0)
         vbox_combo.pack_start(self.combo_database_label, False, False, 0)
-        table.attach(vbox_combo, 1, 2, 3, 4)
+        table.attach(vbox_combo, 1, 3, 3, 4)
 
         label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
@@ -172,7 +172,7 @@ class DBBackupDrop(object):
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
                 "configuration."), None)
-        table.attach(self.entry_serverpasswd, 1, 2, 4, 5)
+        table.attach(self.entry_serverpasswd, 1, 3, 4, 5)
 
         self.entry_serverpasswd.grab_focus()
         self.dialog.vbox.pack_start(self.dialog_vbox)
