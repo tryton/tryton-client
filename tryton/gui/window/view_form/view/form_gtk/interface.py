@@ -145,12 +145,13 @@ class WidgetInterface(object):
 
     def _menu_sig_default_set(self):
         deps = []
-        for wname, wview in self._view.view_form.widgets.items():
-            if wview.modelfield.attrs.get('change_default', False):
-                wvalue = wview.modelfield.get(self._view.model)
-                name = wview.modelfield.attrs.get('string', wname)
-                value = wview.modelfield.get_client(self._view.model)
-                deps.append((wname, name, wvalue, value))
+        for wname, wviews in self._view.view_form.widgets.items():
+            for wview in wviews:
+                if wview.modelfield.attrs.get('change_default', False):
+                    wvalue = wview.modelfield.get(self._view.model)
+                    name = wview.modelfield.attrs.get('string', wname)
+                    value = wview.modelfield.get_client(self._view.model)
+                    deps.append((wname, name, wvalue, value))
         value = self._view.modelfield.get_default(self._view.model)
         model = self._view.modelfield.parent.resource
         field_pref_set(self._view.widget_name,
