@@ -204,7 +204,7 @@ class Main(object):
         imagemenuitem_connect.connect('activate', self.sig_login)
         menu_file.add(imagemenuitem_connect)
 
-        imagemenuitem_disconnect = gtk.ImageMenuItem(_('_Disconnect...'))
+        imagemenuitem_disconnect = gtk.ImageMenuItem(_('_Disconnect'))
         image = gtk.Image()
         image.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
         imagemenuitem_disconnect.set_image(image)
@@ -222,28 +222,28 @@ class Main(object):
         menu_database = gtk.Menu()
         imagemenuitem_database.set_submenu(menu_database)
 
-        imagemenuitem_db_new = gtk.ImageMenuItem(_('_New Database'))
+        imagemenuitem_db_new = gtk.ImageMenuItem(_('_New Database...'))
         image = gtk.Image()
         image.set_from_stock('tryton-folder-new', gtk.ICON_SIZE_MENU)
         imagemenuitem_db_new.set_image(image)
         imagemenuitem_db_new.connect('activate', self.sig_db_new)
         menu_database.add(imagemenuitem_db_new)
 
-        imagemenuitem_db_restore = gtk.ImageMenuItem(_('_Restore Database'))
+        imagemenuitem_db_restore = gtk.ImageMenuItem(_('_Restore Database...'))
         image = gtk.Image()
         image.set_from_stock('tryton-folder-saved-search', gtk.ICON_SIZE_MENU)
         imagemenuitem_db_restore.set_image(image)
         imagemenuitem_db_restore.connect('activate', self.sig_db_restore)
         menu_database.add(imagemenuitem_db_restore)
 
-        imagemenuitem_db_dump = gtk.ImageMenuItem(_('_Backup Database'))
+        imagemenuitem_db_dump = gtk.ImageMenuItem(_('_Backup Database...'))
         image = gtk.Image()
         image.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
         imagemenuitem_db_dump.set_image(image)
         imagemenuitem_db_dump.connect('activate', self.sig_db_dump)
         menu_database.add(imagemenuitem_db_dump)
 
-        imagemenuitem_db_drop = gtk.ImageMenuItem(_('Dro_p Database'))
+        imagemenuitem_db_drop = gtk.ImageMenuItem(_('Dro_p Database...'))
         image = gtk.Image()
         image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
         imagemenuitem_db_drop.set_image(image)
@@ -252,7 +252,7 @@ class Main(object):
 
         menu_file.add(gtk.SeparatorMenuItem())
 
-        imagemenuitem_close = gtk.ImageMenuItem(_('_Quit'), self.accel_group)
+        imagemenuitem_close = gtk.ImageMenuItem(_('_Quit...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-log-out', gtk.ICON_SIZE_MENU)
         imagemenuitem_close.set_image(image)
@@ -265,7 +265,7 @@ class Main(object):
     def _set_menu_user(self):
         menu_user = gtk.Menu()
 
-        imagemenuitem_preference = gtk.ImageMenuItem(_('_Preferences'))
+        imagemenuitem_preference = gtk.ImageMenuItem(_('_Preferences...'))
         image = gtk.Image()
         image.set_from_stock('tryton-preferences-system-session',
                 gtk.ICON_SIZE_MENU)
@@ -321,7 +321,7 @@ class Main(object):
         imagemenuitem_copy.connect('activate', self._sig_child_call, 'but_copy')
         menu_form.add(imagemenuitem_copy)
 
-        imagemenuitem_delete = gtk.ImageMenuItem(_('_Delete'), self.accel_group)
+        imagemenuitem_delete = gtk.ImageMenuItem(_('_Delete...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
         imagemenuitem_delete.set_image(image)
@@ -332,7 +332,7 @@ class Main(object):
 
         menu_form.add(gtk.SeparatorMenuItem())
 
-        imagemenuitem_search = gtk.ImageMenuItem(_('_Find'), self.accel_group)
+        imagemenuitem_search = gtk.ImageMenuItem(_('_Find...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
         imagemenuitem_search.set_image(image)
@@ -411,7 +411,7 @@ class Main(object):
 
         menu_form.add(gtk.SeparatorMenuItem())
 
-        imagemenuitem_log = gtk.ImageMenuItem(_('View _Logs'))
+        imagemenuitem_log = gtk.ImageMenuItem(_('View _Logs...'))
         imagemenuitem_log.connect('activate', self._sig_child_call, 'but_log')
         menu_form.add(imagemenuitem_log)
 
@@ -437,7 +437,7 @@ class Main(object):
 
         menu_form.add(gtk.SeparatorMenuItem())
 
-        imagemenuitem_action = gtk.ImageMenuItem(_('_Actions'), self.accel_group)
+        imagemenuitem_action = gtk.ImageMenuItem(_('_Actions...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
         imagemenuitem_action.set_image(image)
@@ -447,7 +447,7 @@ class Main(object):
                 'but_action')
         menu_form.add(imagemenuitem_action)
 
-        imagemenuitem_print = gtk.ImageMenuItem(_('_Print'), self.accel_group)
+        imagemenuitem_print = gtk.ImageMenuItem(_('_Print...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-print', gtk.ICON_SIZE_MENU)
         imagemenuitem_print.set_image(image)
@@ -620,7 +620,7 @@ class Main(object):
         if (str(CONFIG['client.form_tab_orientation']) or '0') == '90':
             radiomenuitem_vertical.set_active(True)
 
-        menuitem_actions = gtk.MenuItem(_('Files _Actions'))
+        menuitem_actions = gtk.MenuItem(_('Files _Actions...'))
         self.menuitem_actions = menuitem_actions
         menuitem_actions.connect('activate', self.sig_files_actions)
         menu_options.add(menuitem_actions)
@@ -649,14 +649,14 @@ class Main(object):
     def _set_menu_help(self):
         menu_help = gtk.Menu()
 
-        imagemenuitem_tips = gtk.ImageMenuItem(_('_Tips'))
+        imagemenuitem_tips = gtk.ImageMenuItem(_('_Tips...'))
         image = gtk.Image()
         image.set_from_stock('tryton-information', gtk.ICON_SIZE_MENU)
         imagemenuitem_tips.set_image(image)
         imagemenuitem_tips.connect('activate', self.sig_tips)
         menu_help.add(imagemenuitem_tips)
 
-        imagemenuitem_shortcuts = gtk.ImageMenuItem(_('_Keyboard Shortcuts'))
+        imagemenuitem_shortcuts = gtk.ImageMenuItem(_('_Keyboard Shortcuts...'))
         image = gtk.Image()
         image.set_from_stock('tryton-help', gtk.ICON_SIZE_MENU)
         imagemenuitem_shortcuts.set_image(image)
@@ -665,7 +665,7 @@ class Main(object):
 
         menu_help.add(gtk.SeparatorMenuItem())
 
-        imagemenuitem_about = gtk.ImageMenuItem(_('_About'))
+        imagemenuitem_about = gtk.ImageMenuItem(_('_About...'))
         image = gtk.Image()
         image.set_from_stock('gtk-about', gtk.ICON_SIZE_MENU)
         imagemenuitem_about.set_image(image)
