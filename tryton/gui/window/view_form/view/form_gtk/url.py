@@ -64,6 +64,7 @@ class URL(WidgetInterface):
             self.entry.hide()
         else:
             self.entry.show()
+        self.button.set_property('can-focus', value)
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
