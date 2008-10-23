@@ -183,7 +183,8 @@ class Main(object):
 
         self.sig_mode()
 
-        if os.name in ('nt', 'mac') or os.uname()[0] == 'Darwin':
+        if os.name in ('nt', 'mac') or \
+                (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
             # Disable actions, on win32 we use os.startfile
             # and on mac we use /usr/bin/open
             self.menuitem_actions.set_sensitive(False)

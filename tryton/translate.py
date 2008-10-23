@@ -169,7 +169,8 @@ def setlang(lang=None, locale_dict=None):
             if os.name == 'nt':
                 lang2 = _LOCALE2WIN32.get(lang, lang)
                 os.environ['LANG'] = lang
-            elif os.name == 'mac' or os.uname()[0] == 'Darwin':
+            elif os.name == 'mac' or \
+                    (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
                 encoding = 'UTF-8'
             locale.setlocale(locale.LC_ALL, str(lang2 + '.' + encoding))
         except:
