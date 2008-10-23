@@ -208,7 +208,7 @@ class Many2One(WidgetInterface):
             try:
                 ids = rpc.execute('object', 'execute',
                         self.attrs['relation'], 'name_search', '', [],
-                        'ilike', {})
+                        'ilike', rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 ids = []
@@ -247,7 +247,8 @@ class Many2One(WidgetInterface):
     def on_completion_match(self, completion, model, iter):
         name = model[iter][1]
         domain = self._view.modelfield.domain_get(self._view.model)
-        context = self._view.modelfield.context_get(self._view.model)
+        context = rpc.CONTEXT.copy()
+        context.update(self._view.modelfield.context_get(self._view.model))
         try:
             ids = rpc.execute('object', 'execute',
                     self.attrs['relation'], 'name_search', name, domain, 'ilike',
@@ -296,7 +297,8 @@ class Many2One(WidgetInterface):
                     (self._view.modelfield.get_state_attrs(
                         self._view.model)['required']) and key_press):
                 domain = self._view.modelfield.domain_get(self._view.model)
-                context = self._view.modelfield.context_get(self._view.model)
+                context = rpc.CONTEXT.copy()
+                context.update(self._view.modelfield.context_get(self._view.model))
                 self.wid_text.grab_focus()
 
                 try:
@@ -376,7 +378,8 @@ class Many2One(WidgetInterface):
         else:
             if not self._readonly:
                 domain = self._view.modelfield.domain_get(self._view.model)
-                context = self._view.modelfield.context_get(self._view.model)
+                context = rpc.CONTEXT.copy()
+                context.update(self._view.modelfield.context_get(self._view.model))
                 self.wid_text.grab_focus()
 
                 try:

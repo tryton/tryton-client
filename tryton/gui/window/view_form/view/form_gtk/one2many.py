@@ -367,6 +367,7 @@ class Dialog(object):
 
     def _sig_add(self, *args):
         domain = []
+        context = rpc.CONTEXT.copy()
 
         try:
             ids = rpc.execute('object', 'execute', self.attrs['relation'],
@@ -585,7 +586,8 @@ class One2Many(WidgetInterface):
     def _sig_add(self, *args):
         self._view.view_form.set_value()
         domain = self._view.modelfield.domain_get(self._view.model)
-        context = self._view.modelfield.context_get(self._view.model)
+        context = rpc.CONTEXT.copy()
+        context.update(self._view.modelfield.context_get(self._view.model))
         domain = domain[:]
         domain.extend(self._view.model.expr_eval(self.attrs.get('add_remove'),
             context))
