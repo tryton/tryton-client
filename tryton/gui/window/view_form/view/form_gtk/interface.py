@@ -5,6 +5,8 @@ from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.common import COLORS, process_exception
 from tryton.config import GLADE, TRYTON_ICON
+from tryton.gui.window.view_form.view.form_gtk.preference \
+        import WidgetFieldPreference
 import gettext
 
 _ = gettext.gettext
@@ -15,22 +17,19 @@ _ATTRS_BOOLEAN = {
 }
 
 def field_pref_set(field, name, model, value, dependance=None, window=None):
-    win_gl = glade.XML(GLADE, 'win_field_pref', gettext.textdomain())
+    dialog = WidgetFieldPreference(window)
     if dependance is None:
         dependance = []
-    win = win_gl.get_widget('win_field_pref')
-    win.set_transient_for(window)
-    win.set_icon(TRYTON_ICON)
-    ent = win_gl.get_widget('ent_field')
-    ent.set_text(name)
-    ent = win_gl.get_widget('ent_domain')
-    ent.set_text(model)
-    ent = win_gl.get_widget('ent_value')
-    ent.set_text((value and str(value)) or '/')
+    entry = dialog.entry_field_name
+    entry.set_text(name)
+    entry = dialog.entry_domain
+    entry.set_text(model)
+    entry = dialog.entry_default_value
+    entry.set_text((value and str(value)) or _('<empty>'))
 
-    radio = win_gl.get_widget('radio_user_pref')
+    radio = dialog.radio_current_user
 
-    vbox = win_gl.get_widget('pref_vbox')
+    vbox = dialog.vbox_condition
     widgets = {}
     addwidget = False
     widget = None
@@ -40,14 +39,14 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
     for (fname, name, fvalue, dvalue) in dependance:
         if fvalue:
             addwidget = True
-            widget = gtk.RadioButton(widget, name+' = '+str(dvalue))
+            widget = gtk.RadioButton(widget, name + ' = ' + str(dvalue))
             widgets[(fname, fvalue)] = widget
             vbox.pack_start(widget)
     if not len(dependance) or not addwidget:
         vbox.pack_start(gtk.Label(_('Always applicable!')))
     vbox.show_all()
 
-    res = win.run()
+    res = dialog.run(window=window)
 
     clause = False
     for val in widgets.keys():
@@ -57,8 +56,6 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
     user = False
     if radio.get_active():
         user = rpc._USER
-    window.present()
-    win.destroy()
     if res == gtk.RESPONSE_OK:
         ir_default = RPCProxy('ir.default')
         try:
