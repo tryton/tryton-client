@@ -837,6 +837,7 @@ WIDGETS_TYPE = {
     'float': (Float, 1, False, False),
     'numeric': (Float, 1, False, False),
     'integer': (Integer, 1, False, False),
+    'biginteger': (Integer, 1, False, False),
     'selection': (Selection, 1, False, False),
     'char': (Char, 1, False, False),
     'sha': (Sha, 1, False, False),

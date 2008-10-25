@@ -275,6 +275,7 @@ WIDGETS_TYPE = {
     'float': (float.Float, 2),
     'numeric': (float.Float, 2),
     'integer': (integer.Integer, 2),
+    'biginteger': (integer.Integer, 2),
     'selection': (selection.Selection, 2),
     'many2one_selection': (selection.Selection, 2),
     'char': (char.Char, 2),

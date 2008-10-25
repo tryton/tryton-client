@@ -17,6 +17,7 @@ import mx.DateTime
 FIELDS_LIST_TYPE = {
     'boolean': gobject.TYPE_BOOLEAN,
     'integer': gobject.TYPE_INT,
+    'biginteger': gobject.TYPE_INT,
 }
 
 

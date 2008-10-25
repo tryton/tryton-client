@@ -559,6 +559,7 @@ TYPES = {
     'sha': CharField,
     'float_time': FloatField,
     'integer' : IntegerField,
+    'biginteger' : IntegerField,
     'float' : FloatField,
     'numeric' : NumericField,
     'many2one' : M2OField,
