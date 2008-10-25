@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 from gtk import glade
 from tryton.rpc import RPCProxy
@@ -46,7 +47,7 @@ def field_pref_set(field, name, model, value, dependance=None, window=None):
         vbox.pack_start(gtk.Label(_('Always applicable!')))
     vbox.show_all()
 
-    res = dialog.run(window=window)
+    res = dialog.run()
 
     clause = False
     for val in widgets.keys():

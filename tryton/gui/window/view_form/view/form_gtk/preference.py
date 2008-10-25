@@ -13,15 +13,16 @@ class WidgetFieldPreference(object):
     """
     Widget for field preferences.
     """
-    def __init__(self, window=None):
+    def __init__(self, window):
+        self.parent = window
         self.dialog = gtk.Dialog(
-                title = _("Field Preference target"),
-                parent = window,
-                flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+                title=_("Field Preference target"),
+                parent=window,
+                flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
-        self.dialog.add_button("gtk-cancel",
-                gtk.RESPONSE_CANCEL)
+        self.dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
+
         button_ok = gtk.Button(_("Set"))
         button_ok.set_flags(gtk.CAN_DEFAULT)
         button_ok.set_flags(gtk.HAS_DEFAULT)
@@ -43,26 +44,20 @@ class WidgetFieldPreference(object):
         label_field_name.set_alignment(1, 0.5)
         table.attach(label_field_name, 0, 1, 0, 1)
         self.entry_field_name = gtk.Entry()
-        self.entry_field_name.set_sensitive(False)
         self.entry_field_name.set_editable(False)
-        label_field_name.set_mnemonic_widget(self.entry_field_name)
         table.attach(self.entry_field_name, 1, 2, 0, 1)
         label_domain = gtk.Label(_("Domain:"))
         label_domain.set_justify(gtk.JUSTIFY_RIGHT)
         label_domain.set_alignment(1, 0.5)
         table.attach(label_domain, 0, 1, 1, 2)
         self.entry_domain = gtk.Entry()
-        self.entry_domain.set_sensitive(False)
         self.entry_domain.set_editable(False)
-        label_domain.set_mnemonic_widget(self.entry_domain)
         table.attach(self.entry_domain, 1, 2, 1, 2)
         label_default_value = gtk.Label(_("Default value:"))
         label_default_value.set_alignment(1, 0.5)
         table.attach(label_default_value, 0, 1, 2, 3)
         self.entry_default_value = gtk.Entry()
-        self.entry_default_value.set_sensitive(False)
         self.entry_default_value.set_editable(False)
-        label_default_value.set_mnemonic_widget(self.entry_default_value)
         table.attach(self.entry_default_value, 1, 2, 2, 3)
 
         frame_user = gtk.Frame()
@@ -94,17 +89,13 @@ class WidgetFieldPreference(object):
         alignment_condition.add(self.vbox_condition)
         table.attach(frame_condition, 0, 2, 4, 5)
 
-
-    def run(self, window=None):
-        self.dialog.set_default_response(gtk.RESPONSE_OK)
-        self.dialog.set_transient_for(window)
         self.dialog.show_all()
+        radio_all_user.grab_focus()
 
+    def run(self):
         while True:
             res = self.dialog.run()
             if res :
-                if window is not None:
-                    window.present()
+                self.parent.present()
                 self.dialog.destroy()
                 return res
-
