@@ -1,11 +1,10 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
-from gtk import glade
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.common import COLORS, process_exception
-from tryton.config import GLADE, TRYTON_ICON
+from tryton.config import TRYTON_ICON
 from tryton.gui.window.view_form.view.form_gtk.preference \
         import WidgetFieldPreference
 import gettext

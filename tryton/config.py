@@ -203,4 +203,3 @@ def _data_dir():
         data_dir = os.path.join(PREFIX, 'share', 'tryton')
     return data_dir
 DATA_DIR = _data_dir()
-GLADE = os.path.join(DATA_DIR, 'tryton.glade')

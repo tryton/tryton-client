@@ -6,7 +6,7 @@ import tryton.common as common
 import tryton.rpc as rpc
 import csv
 import StringIO
-from tryton.config import GLADE, TRYTON_ICON, CONFIG
+from tryton.config import TRYTON_ICON, CONFIG
 
 _ = gettext.gettext
 

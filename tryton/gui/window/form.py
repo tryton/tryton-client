@@ -7,7 +7,6 @@ import locale
 import gc
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
-from tryton.config import GLADE
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.gui.window.win_search import WinSearch

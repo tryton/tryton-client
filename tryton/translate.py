@@ -194,8 +194,6 @@ def setlang(lang=None, locale_dict=None):
             gettext.bindtextdomain(PACKAGE, locale_dir)
         gettext.textdomain(PACKAGE)
         gettext.install(PACKAGE, unicode=1)
-    if os.path.isdir(locale_dir):
-        gtk.glade.bindtextdomain(PACKAGE, locale_dir)
 
     if locale_dict:
         conv = locale.localeconv()

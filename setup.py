@@ -73,8 +73,7 @@ setup(name=PACKAGE,
     data_files=[
         ('share/pixmaps', glob.glob('share/pixmaps/*.png') + \
                 glob.glob('share/pixmaps/*.svg')),
-        ('share/tryton', glob.glob('share/tryton/tryton.glade') + \
-                glob.glob('share/tryton/tipoftheday.txt')),
+        ('share/tryton', glob.glob('share/tryton/tipoftheday.txt')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
         ('share/locale/de_DE/LC_MESSAGES', glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
     ],

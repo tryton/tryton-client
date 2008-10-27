@@ -11,7 +11,7 @@ import tempfile
 from tryton.gui.window.view_tree.parse import Parse
 import tryton.rpc as rpc
 import tryton.common as common
-from tryton.config import GLADE, TRYTON_ICON
+from tryton.config import TRYTON_ICON
 
 _ = gettext.gettext
 

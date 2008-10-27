@@ -1,13 +1,13 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
-from gtk import glade
 import gobject
 import gettext
 import os
 import re
 import logging
 from tryton.config import CONFIG
-from tryton.config import GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import time
 import sys
 import xmlrpclib

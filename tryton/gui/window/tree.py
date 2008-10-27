@@ -7,7 +7,6 @@ from tryton.gui.window.view_tree import ViewTree, ViewTreeSC
 import tryton.rpc as rpc
 from tryton.config import CONFIG
 from tryton.gui.window.win_export import WinExport
-from tryton.config import GLADE
 from window import Window
 from tryton.action import Action
 from tryton.signal_event import SignalEvent

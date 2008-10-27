@@ -4,7 +4,7 @@ import gettext
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 import tryton.gui.window.view_form.widget_search as widget_search
-from tryton.config import TRYTON_ICON, GLADE
+from tryton.config import TRYTON_ICON
 import tryton.common as common
 
 _ = gettext.gettext

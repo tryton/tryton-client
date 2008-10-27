@@ -64,8 +64,6 @@ class TrytonClient(object):
                 continue
             icon_set = gtk.IconSet(pixbuf)
             factory.add(name, icon_set)
-            #XXX override gtk icon until we remove glade
-            factory.add('gtk-' + name[7:], icon_set)
 
     def run(self):
         main = gui.Main()

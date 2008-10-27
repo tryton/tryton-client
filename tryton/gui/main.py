@@ -4,9 +4,8 @@ import gettext
 import urlparse
 import gobject
 import gtk
-from gtk import glade
 import tryton.rpc as rpc
-from tryton.config import CONFIG, GLADE, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import tryton.common as common
 from tryton.action import Action
 from tryton.gui.window import Window
