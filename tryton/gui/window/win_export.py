@@ -21,35 +21,31 @@ class WinExport(object):
             context=None):
         if preload is None:
             preload = []
-        self.dialog  = gtk.Dialog(
-                title =  _("Export to CSV"),
-                parent = parent,
-                flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+        self.dialog = gtk.Dialog(
+                title= _("Export to CSV"),
+                parent=parent,
+                flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
-        self.dialog.set_size_request(515, 600)
+        self.dialog.set_size_request(500, 600)
         self.dialog.set_icon(TRYTON_ICON)
 
-        vbox = gtk.VBox(False, 0)
+        vbox = gtk.VBox()
         frame_predef_exports = gtk.Frame()
-        frame_predef_exports.set_size_request(-1, 60)
         frame_predef_exports.set_border_width(2)
         frame_predef_exports.set_shadow_type(gtk.SHADOW_NONE)
         vbox.pack_start(frame_predef_exports, True, True, 0)
-        alignment_predef_exports = gtk.Alignment(0.5, 0.5, 1, 1)
-        alignment_predef_exports.set_padding(0, 0, 12, 0)
-        frame_predef_exports.add(alignment_predef_exports)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_border_width(2)
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_ALWAYS)
-        alignment_predef_exports.add(scrolledwindow)
+                gtk.POLICY_AUTOMATIC)
+        frame_predef_exports.add(scrolledwindow)
         label_predef_exports = gtk.Label(_("<b>Predefined exports</b>"))
         label_predef_exports.set_use_markup(True)
         frame_predef_exports.set_label_widget(label_predef_exports)
         predefined_exports = gtk.Viewport()
         scrolledwindow.add(predefined_exports)
 
-        hbox = gtk.HBox(False, 0)
+        hbox = gtk.HBox(True)
         vbox.pack_start(hbox, True, True, 0)
 
         frame_all_fields = gtk.Frame()
@@ -58,19 +54,16 @@ class WinExport(object):
         label_all_fields = gtk.Label(_("<b>All fields</b>"))
         label_all_fields.set_use_markup(True)
         frame_all_fields.set_label_widget(label_all_fields)
-        alignment_all_fields = gtk.Alignment(0.5, 0.5, 1, 1)
-        alignment_all_fields.set_padding(0, 0, 12, 0)
-        frame_all_fields.add(alignment_all_fields)
         scrolledwindow_all_fields = gtk.ScrolledWindow()
         scrolledwindow_all_fields.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_ALWAYS)
-        alignment_all_fields.add(scrolledwindow_all_fields)
+                gtk.POLICY_AUTOMATIC)
+        frame_all_fields.add(scrolledwindow_all_fields)
 
         viewport_all_fields = gtk.Viewport()
 
         scrolledwindow_all_fields.add(viewport_all_fields)
 
-        vbox_buttons = gtk.VBox(True, 2)
+        vbox_buttons = gtk.VBox(False, 10)
         vbox_buttons.set_border_width(5)
         hbox.pack_start(vbox_buttons, False, True, 0)
 
@@ -133,10 +126,10 @@ class WinExport(object):
         frame_export.add(alignment_export)
         scrolledwindow_export = gtk.ScrolledWindow(None, None)
         scrolledwindow_export.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_ALWAYS)
+                gtk.POLICY_AUTOMATIC)
         alignment_export.add(scrolledwindow_export)
 
-        viewport_fields_to_export = gtk.Viewport(None, None)
+        viewport_fields_to_export = gtk.Viewport()
         scrolledwindow_export.add(viewport_fields_to_export)
 
         frame_options = gtk.Frame()
