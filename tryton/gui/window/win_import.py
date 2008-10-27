@@ -19,26 +19,26 @@ class WinImport(object):
                 title=_("Import from CSV"), parent=parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
+        self.dialog.set_icon(TRYTON_ICON)
+
         dialog_vbox = gtk.VBox()
-        hbox_mapping = gtk.HBox(False, 0)
+        hbox_mapping = gtk.HBox(True)
         dialog_vbox.pack_start(hbox_mapping, True, True, 0)
 
-        frame_fields = gtk.Frame(None)
+        frame_fields = gtk.Frame()
         frame_fields.set_shadow_type(gtk.SHADOW_NONE)
         hbox_mapping.pack_start(frame_fields, True, True, 0)
-        alignment_fields = gtk.Alignment(0.5, 0.5, 1, 1)
-        alignment_fields.set_padding(0, 0, 12, 0)
-        frame_fields.add(alignment_fields)
-        scrolledwindow_fields = gtk.ScrolledWindow(None, None)
+        scrolledwindow_fields = gtk.ScrolledWindow()
         scrolledwindow_fields.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        alignment_fields.add(scrolledwindow_fields)
+        frame_fields.add(scrolledwindow_fields)
         viewport_fields = gtk.Viewport(None, None)
         scrolledwindow_fields.add(viewport_fields)
         label_all_fields = gtk.Label(_("<b>All fields</b>"))
         label_all_fields.set_use_markup(True)
         frame_fields.set_label_widget(label_all_fields)
-        vbox_buttons = gtk.VBox(True, 0)
+
+        vbox_buttons = gtk.VBox()
         vbox_buttons.set_border_width(5)
         hbox_mapping.pack_start(vbox_buttons, False, True, 0)
 
@@ -80,17 +80,13 @@ class WinImport(object):
         button_autodetect.connect_after('clicked',  self.sig_autodetect)
         vbox_buttons.pack_start(button_autodetect, False, False, 0)
 
-        frame_import = gtk.Frame(None)
-        hbox_mapping.pack_start(frame_import, True, True, 0)
+        frame_import = gtk.Frame()
         frame_import.set_shadow_type(gtk.SHADOW_NONE)
-
-        alignment_import = gtk.Alignment(0.5, 0.5, 1, 1)
-        alignment_import.set_padding(0, 0, 12, 0)
-        frame_import.add(alignment_import)
-        scrolledwindow_import = gtk.ScrolledWindow(None, None)
+        hbox_mapping.pack_start(frame_import, True, True, 0)
+        scrolledwindow_import = gtk.ScrolledWindow()
         scrolledwindow_import.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_ALWAYS)
-        alignment_import.add(scrolledwindow_import)
+                gtk.POLICY_AUTOMATIC)
+        frame_import.add(scrolledwindow_import)
         viewport_import = gtk.Viewport(None, None)
         scrolledwindow_import.add(viewport_import)
         label_fields_import = gtk.Label(_("<b>Fields to import</b>"))
@@ -104,9 +100,9 @@ class WinImport(object):
         alignment_csv_param.set_padding(7, 7, 7, 7)
         frame_csv_param.add(alignment_csv_param)
 
-        vbox_csv_param = gtk.VBox(False, 0)
+        vbox_csv_param = gtk.VBox()
         alignment_csv_param.add(vbox_csv_param)
-        hbox_csv_import = gtk.HBox(False, 0)
+        hbox_csv_import = gtk.HBox()
         vbox_csv_param.pack_start(hbox_csv_import, False, True, 4)
         label_csv_import = gtk.Label(_("File to Import:"))
         hbox_csv_import.pack_start(label_csv_import, False, False, 0)
@@ -173,8 +169,6 @@ class WinImport(object):
         self.model = model
         self.fields_data = {}
 
-        self.dialog.set_transient_for(parent)
-        self.dialog.set_icon(TRYTON_ICON)
         self.parent = parent
         self.dialog.show_all()
         self.import_csv_file.set_current_folder(CONFIG['client.default_path'])
