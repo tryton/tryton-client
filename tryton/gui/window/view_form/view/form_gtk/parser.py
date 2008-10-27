@@ -43,9 +43,11 @@ class Button(object):
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm'], self.form.window):
                 button_type = self.attrs.get('type', 'workflow')
+                ctx = rpc.CONTEXT.copy()
+                ctx.update(model.context_get())
                 if button_type == 'workflow':
                     args = ('object', 'exec_workflow', self.form.screen.name,
-                            self.attrs['name'], obj_id)
+                            self.attrs['name'], obj_id, ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
@@ -53,7 +55,7 @@ class Button(object):
                                 *args)
                 elif button_type == 'object':
                     args = ('object', 'execute', self.form.screen.name,
-                            self.attrs['name'], [obj_id], model.context_get())
+                            self.attrs['name'], [obj_id], ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
@@ -62,7 +64,7 @@ class Button(object):
                 elif button_type == 'action':
                     action_id = None
                     args = ('object', 'execute', 'ir.action', 'get_action_id',
-                            int(self.attrs['name']), rpc.CONTEXT)
+                            int(self.attrs['name']), ctx)
                     try:
                         action_id = rpc.execute(*args)
                     except Exception, exception:
@@ -73,7 +75,7 @@ class Button(object):
                             'model': self.form.screen.name,
                             'id': obj_id,
                             'ids': [obj_id],
-                            }, self.form.window)
+                            }, self.form.window, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
                 self.form.screen.reload()
