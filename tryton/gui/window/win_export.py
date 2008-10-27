@@ -1,12 +1,13 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of this
+#repository contains the full copyright notices and license terms.
 import gtk
-from gtk import glade
+#from gtk import glade
 import gobject
 import gettext
 import tryton.common as common
 import tryton.rpc as rpc
 import types
-from tryton.config import GLADE, TRYTON_ICON
+from tryton.config import TRYTON_ICON
 import csv
 
 _ = gettext.gettext
@@ -20,24 +21,169 @@ class WinExport(object):
             context=None):
         if preload is None:
             preload = []
-        self.glade = glade.XML(GLADE, 'win_save_as',
-                gettext.textdomain())
-        self.win = self.glade.get_widget('win_save_as')
+        self.dialog  = gtk.Dialog(
+                title =  _("Export to CSV"),
+                parent = parent,
+                flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+                | gtk.WIN_POS_CENTER_ON_PARENT)
+        self.dialog.set_size_request(515, 600)
+        self.dialog.set_icon(TRYTON_ICON)
+
+        vbox = gtk.VBox(False, 0)
+        frame_predef_exports = gtk.Frame()
+        frame_predef_exports.set_size_request(-1, 60)
+        frame_predef_exports.set_border_width(2)
+        frame_predef_exports.set_shadow_type(gtk.SHADOW_NONE)
+        vbox.pack_start(frame_predef_exports, True, True, 0)
+        alignment_predef_exports = gtk.Alignment(0.5, 0.5, 1, 1)
+        alignment_predef_exports.set_padding(0, 0, 12, 0)
+        frame_predef_exports.add(alignment_predef_exports)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_border_width(2)
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_ALWAYS)
+        alignment_predef_exports.add(scrolledwindow)
+        label_predef_exports = gtk.Label(_("<b>Predefined exports</b>"))
+        label_predef_exports.set_use_markup(True)
+        frame_predef_exports.set_label_widget(label_predef_exports)
+        predefined_exports = gtk.Viewport()
+        scrolledwindow.add(predefined_exports)
+
+        hbox = gtk.HBox(False, 0)
+        vbox.pack_start(hbox, True, True, 0)
+
+        frame_all_fields = gtk.Frame()
+        frame_all_fields.set_shadow_type(gtk.SHADOW_NONE)
+        hbox.pack_start(frame_all_fields, True, True, 0)
+        label_all_fields = gtk.Label(_("<b>All fields</b>"))
+        label_all_fields.set_use_markup(True)
+        frame_all_fields.set_label_widget(label_all_fields)
+        alignment_all_fields = gtk.Alignment(0.5, 0.5, 1, 1)
+        alignment_all_fields.set_padding(0, 0, 12, 0)
+        frame_all_fields.add(alignment_all_fields)
+        scrolledwindow_all_fields = gtk.ScrolledWindow()
+        scrolledwindow_all_fields.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_ALWAYS)
+        alignment_all_fields.add(scrolledwindow_all_fields)
+
+        viewport_all_fields = gtk.Viewport()
+
+        scrolledwindow_all_fields.add(viewport_all_fields)
+
+        vbox_buttons = gtk.VBox(True, 2)
+        vbox_buttons.set_border_width(5)
+        hbox.pack_start(vbox_buttons, False, True, 0)
+
+        button_select = gtk.Button(_("_Add"), stock=None, use_underline=True)
+        button_select.set_alignment(0.0, 0.0)
+        img_button = gtk.Image()
+        img_button.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
+        button_select.set_image(img_button)
+        button_select.connect_after('clicked',  self.sig_sel)
+        vbox_buttons.pack_start(button_select, False, False, 0)
+
+        button_unselect = gtk.Button(_("_Remove"), stock=None,
+                use_underline=True)
+        button_unselect.set_alignment(0.0, 0.0)
+        img_button = gtk.Image()
+        img_button.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
+        button_unselect.set_image(img_button)
+        button_unselect.connect_after('clicked',  self.sig_unsel)
+        vbox_buttons.pack_start(button_unselect, False, False, 0)
+
+        button_unselect_all = gtk.Button(_("Clear"), stock=None,
+                use_underline=True)
+        button_unselect_all.set_alignment(0.0, 0.0)
+        img_button = gtk.Image()
+        img_button.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
+        button_unselect_all.set_image(img_button)
+        button_unselect_all.connect_after('clicked',  self.sig_unsel_all)
+        vbox_buttons.pack_start(button_unselect_all, False, False, 0)
+
+        hseparator_buttons = gtk.HSeparator()
+        vbox_buttons.pack_start(hseparator_buttons, False, True, 0)
+
+        button_save_export = gtk.Button(_("Save Export"), stock=None,
+                use_underline=True)
+        button_save_export.set_alignment(0.0, 0.0)
+        img_button = gtk.Image()
+        img_button.set_from_stock('tryton-save', gtk.ICON_SIZE_BUTTON)
+        button_save_export.set_image(img_button)
+        button_save_export.connect_after('clicked',  self.add_predef)
+        vbox_buttons.pack_start(button_save_export, False, False, 0)
+
+        button_del_export = gtk.Button(_("Delete Export"), stock=None,
+                use_underline=True)
+        button_del_export.set_alignment(0.0, 0.0)
+        img_button = gtk.Image()
+        img_button.set_from_stock('tryton-delete', gtk.ICON_SIZE_BUTTON)
+        button_del_export.set_image(img_button)
+        button_del_export.connect_after('clicked',  self.remove_predef)
+        vbox_buttons.pack_start(button_del_export, False, False, 0)
+
+        frame_export = gtk.Frame()
+        frame_export.set_shadow_type(gtk.SHADOW_NONE)
+        hbox.pack_start(frame_export, True, True, 0)
+        label_export = gtk.Label(_("<b>Fields to export</b>"))
+        label_export.set_use_markup(True)
+        frame_export.set_label_widget(label_export)
+
+        alignment_export = gtk.Alignment(0.5, 0.5, 1, 1)
+        alignment_export.set_padding(0, 0, 12, 0)
+        frame_export.add(alignment_export)
+        scrolledwindow_export = gtk.ScrolledWindow(None, None)
+        scrolledwindow_export.set_policy(gtk.POLICY_AUTOMATIC,
+                gtk.POLICY_ALWAYS)
+        alignment_export.add(scrolledwindow_export)
+
+        viewport_fields_to_export = gtk.Viewport(None, None)
+        scrolledwindow_export.add(viewport_fields_to_export)
+
+        frame_options = gtk.Frame()
+        frame_options.set_border_width(2)
+        label_options = gtk.Label(_("<b>Options</b>"))
+        label_options.set_use_markup(True)
+        frame_options.set_label_widget(label_options)
+        vbox.pack_start(frame_options, False, True, 5)
+        hbox_options = gtk.HBox(False, 2)
+        frame_options.add(hbox_options)
+        hbox_options.set_border_width(2)
+
+        combo_saveas = gtk.combo_box_new_text()
+        hbox_options.pack_start(combo_saveas, True, True, 0)
+        combo_saveas.append_text(_("Open in Excel"))
+        combo_saveas.append_text(_("Save as CSV"))
+        vseparator_options = gtk.VSeparator()
+        hbox_options.pack_start(vseparator_options, False, False, 10)
+
+        checkbox_add_field_names = gtk.CheckButton(_("Add _field names"))
+        checkbox_add_field_names.set_active(True)
+        hbox_options.pack_start(checkbox_add_field_names, False, False, 0)
+
+        button_cancel = gtk.Button("gtk-cancel", stock="gtk-cancel")
+        self.dialog.add_action_widget(button_cancel, gtk.RESPONSE_CANCEL)
+        button_cancel.set_flags(gtk.CAN_DEFAULT)
+
+        button_ok = gtk.Button("gtk-ok", stock="gtk-ok")
+        self.dialog.add_action_widget(button_ok, gtk.RESPONSE_OK)
+        button_ok.set_flags(gtk.CAN_DEFAULT)
+
+        self.dialog.vbox.pack_start(vbox)
+        self.dialog.show_all()
+
         self.ids = ids
         self.model = model
         self.fields_data = {}
         self.context = context
 
-        self.win.set_transient_for(parent)
-        self.win.set_icon(TRYTON_ICON)
         self.parent = parent
 
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self.glade.get_widget('exp_vp1').add(self.view1)
+        viewport_all_fields.add(self.view1)
         self.view2 = gtk.TreeView()
         self.view2.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        self.glade.get_widget('exp_vp2').add(self.view2)
+        viewport_fields_to_export.add(self.view2)
         self.view1.set_headers_visible(False)
         self.view2.set_headers_visible(False)
 
@@ -69,7 +215,7 @@ class WinExport(object):
                             '%s%s' % (prefix_value,
                                     self.fields_data[prefix_node + \
                                             field]['string'])
-                st_name = fields[field]['string'] or field 
+                st_name = fields[field]['string'] or field
                 node = self.model1.insert(prefix, 0,
                         [st_name, prefix_node+field])
                 self.fields[prefix_node+field] = (st_name,
@@ -91,18 +237,9 @@ class WinExport(object):
         self.view1.show_all()
         self.view2.show_all()
 
-        self.wid_action = self.glade.get_widget('win_saveas_combo')
-        self.wid_write_field_names = self.glade.get_widget('add_field_names_cb')
+        self.wid_action = combo_saveas
+        self.wid_write_field_names = checkbox_add_field_names
         self.wid_action.set_active(1)
-
-        self.glade.signal_connect('on_but_unselect_all_clicked',
-                self.sig_unsel_all)
-        self.glade.signal_connect('on_but_select_all_clicked', self.sig_sel_all)
-        self.glade.signal_connect('on_but_select_clicked', self.sig_sel)
-        self.glade.signal_connect('on_but_unselect_clicked', self.sig_unsel)
-        self.glade.signal_connect('on_but_predefined_clicked', self.add_predef)
-        self.glade.signal_connect('on_but_remove_predefined_clicked',
-                self.remove_predef)
 
         # Creating the predefined export view
         self.pref_export = gtk.TreeView()
@@ -110,7 +247,7 @@ class WinExport(object):
             gtk.CellRendererText(), text=2))
         self.pref_export.append_column(gtk.TreeViewColumn('Exported fields',
             gtk.CellRendererText(), text=3))
-        self.glade.get_widget('predefined_exports').add(self.pref_export)
+        predefined_exports.add(self.pref_export)
 
         self.pref_export.connect("row-activated", self.sel_predef)
 
@@ -188,7 +325,7 @@ class WinExport(object):
             new_id = ir_export.create({'name' : name, 'resource' : self.model,
                 'export_fields' : [('create', {'name' : f}) for f in fields]})
         except Exception, exception:
-            common.process_exception(exception, self.win)
+            common.process_exception(exception, self.dialog)
             return
         self.predef_model.append((
             new_id,
@@ -209,7 +346,7 @@ class WinExport(object):
         try:
             ir_export.delete(export_id)
         except Exception, exception:
-            common.process_exception(exception, self.win)
+            common.process_exception(exception, self.dialog)
             return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
@@ -223,7 +360,7 @@ class WinExport(object):
             self.model2.append((self.fields_data[field]['string'], field))
 
     def run(self):
-        button = self.win.run()
+        button = self.dialog.run()
         if button == gtk.RESPONSE_OK:
             fields = []
             fields2 = []
@@ -234,7 +371,7 @@ class WinExport(object):
                 iter = self.model2.iter_next(iter)
             action = self.wid_action.get_active()
             self.parent.present()
-            self.win.destroy()
+            self.dialog.destroy()
             result = self.datas_read(self.ids, self.model, fields,
                     context=self.context)
 
@@ -242,14 +379,15 @@ class WinExport(object):
                 pass
             else:
                 fname = common.file_selection(_('Save As...'),
-                        parent=self.parent, action=gtk.FILE_CHOOSER_ACTION_SAVE)
+                        parent=self.parent,
+                        action=gtk.FILE_CHOOSER_ACTION_SAVE)
                 if fname:
                     self.export_csv(fname, fields2, result,
                             self.wid_write_field_names.get_active())
             return True
         else:
             self.parent.present()
-            self.win.destroy()
+            self.dialog.destroy()
             return False
 
     def export_csv(self, fname, fields, result, write_title=False):
@@ -288,6 +426,6 @@ class WinExport(object):
             datas = rpc.execute('object', 'execute', model,
                     'export_data', ids, fields, ctx)
         except Exception, exception:
-            common.process_exception(exception, self.win)
+            common.process_exception(exception, self.dialog)
             return []
         return datas
