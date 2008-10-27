@@ -21,29 +21,29 @@ class Attachment(object):
 
     def __init__(self, model, obj_id, parent):
         self.dialog = gtk.Dialog(
-                title =  _("Attachment"),
-                parent = parent,
-                flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+                title= _("Attachment"),
+                parent=parent,
+                flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT
-                | gtk.gdk.WINDOW_TYPE_HINT_DIALOG,)
+                | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
         dialog_vbox = gtk.VBox()
-        dialog_vbox.set_size_request(740,590)
+        dialog_vbox.set_size_request(700, 600)
         vpaned = gtk.VPaned()
-        vpaned.set_position(432)
+        vpaned.set_position(450)
         dialog_vbox.pack_start(vpaned, True, True, 0)
         hpaned2 = gtk.HPaned()
-        hpaned2.set_position(553)
+        hpaned2.set_position(400)
         vpaned.pack1(hpaned2, False, True)
         vbox_preview = gtk.VBox(False, 0)
         hpaned2.pack1(vbox_preview, False, True)
         self.attach_filename = gtk.Label(_("Preview:"))
         vbox_preview.pack_start(self.attach_filename, False, False, 0)
 
-        scrolledwindow_preview = gtk.ScrolledWindow(None, None)
+        scrolledwindow_preview = gtk.ScrolledWindow()
         scrolledwindow_preview.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        scrolledwindow_preview.set_shadow_type(gtk.SHADOW_IN)
-        viewport_preview = gtk.Viewport(None, None)
+        scrolledwindow_preview.set_shadow_type(gtk.SHADOW_NONE)
+        viewport_preview = gtk.Viewport()
         scrolledwindow_preview.add(viewport_preview)
         vbox_preview.pack_start(scrolledwindow_preview, True, True, 0)
 
@@ -56,7 +56,7 @@ class Attachment(object):
         hpaned2.pack2(vbox_descr, True, True)
         self.label_descr = gtk.Label(_("Description:"))
         vbox_descr.pack_start(self.label_descr, False, False, 0)
-        scrolledwindow_descr = gtk.ScrolledWindow(None, None)
+        scrolledwindow_descr = gtk.ScrolledWindow()
         scrolledwindow_descr.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
         scrolledwindow_descr.set_shadow_type(gtk.SHADOW_IN)
@@ -74,8 +74,6 @@ class Attachment(object):
         hbox = gtk.HBox(False, 0)
         vpaned.pack2(hbox, True, True)
         vbox_buttons = gtk.VBox(False, 0)
-        vbox_buttons.set_size_request(121, -1)
-        hbox.set_size_request(-1, 470)
         hbox.pack_start(vbox_buttons, False, False, 0)
 
         button_add_file = gtk.Button(_("Add _File..."), stock=None,
@@ -119,17 +117,14 @@ class Attachment(object):
         self.dialog.add_action_widget(button_close, gtk.RESPONSE_CLOSE)
         button_close.set_flags(gtk.CAN_DEFAULT)
 
-        alignment = gtk.Alignment(0.5, 0.5, 1, 1)
-        hbox.pack_start(alignment, True, True, 0)
-        scrol_win_all_attachments = gtk.ScrolledWindow(None, None)
-        scrol_win_all_attachments.set_policy( gtk.POLICY_NEVER,
+        scrol_win_all_attachments = gtk.ScrolledWindow()
+        scrol_win_all_attachments.set_policy( gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        scrol_win_all_attachments.set_shadow_type(gtk.SHADOW_IN)
-        viewport_all_attachments = gtk.Viewport(None, None)
+        scrol_win_all_attachments.set_shadow_type(gtk.SHADOW_NONE)
+        viewport_all_attachments = gtk.Viewport()
         scrol_win_all_attachments.add(viewport_all_attachments)
-        alignment.add(scrol_win_all_attachments)
+        hbox.pack_start(scrol_win_all_attachments, True, True)
 
-        self.dialog.set_transient_for(parent)
         self.parent = parent
         self.resource = (model, obj_id)
 
