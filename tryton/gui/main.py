@@ -937,6 +937,7 @@ class Main(object):
             return ([], [])
 
     def sig_login(self, widget=None, dbname=False, res=None):
+        self.sig_logout(widget, disconnect=False)
         if not res:
             try:
                 dblogin = DBLogin(self.window)
@@ -947,7 +948,6 @@ class Main(object):
                 common.process_exception(exception, self.window)
                 return
         self.window.present()
-        self.sig_logout(widget, disconnect=False)
         try:
             log_response = rpc.login(*res)
         except Exception, exception:
