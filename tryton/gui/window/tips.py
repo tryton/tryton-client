@@ -1,10 +1,35 @@
+# -*- coding: utf-8 -*-
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
 import os
-from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
 
 _ = gettext.gettext
+
+TIPS = [
+    _('''<b>Welcome to Tryton</b>
+
+
+'''),
+    _('''<b>Do you know Triton, one of the namesake's for our Project?</b>
+
+/ˈtraɪtən/, or as in Greek Τρίτων), is the largest moon of the planet
+Neptune, discovered on October 10, 1846 by William Lassell. It is the
+only large moon in the Solar System with a retrograde orbit, which is
+an orbit in the opposite direction to its planet's rotation. At 2,700
+km in diameter, it is the seventh-largest moon in the Solar System.
+Triton comprises more than 99.5% of all the mass known to orbit
+Neptune, including the planet's rings and twelve other known moons. It
+is also more massive than all the Solar System's 159 known smaller
+moons combined.
+'''),
+    _('''<b>Export list records</b>
+
+You can copy records from any list with Ctrl + C
+and paste in any application with Ctrl + V
+'''),
+]
 
 
 class Tips(object):
@@ -12,6 +37,7 @@ class Tips(object):
     def __init__(self, parent):
         self.win = gtk.Dialog(_('Tips'), parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(True)
 
@@ -72,17 +98,7 @@ class Tips(object):
         self.win.destroy()
 
     def tip_set(self):
-        lang = CONFIG['client.lang']
-        tip_file = False
-        if lang:
-            tip_file = os.path.join(DATA_DIR, 'tipoftheday.'+lang+'.txt')
-        if not os.path.isfile(tip_file):
-            tip_file = os.path.join(DATA_DIR, 'tipoftheday.txt')
-        if not os.path.isfile(tip_file):
-            return
-        tips = file(tip_file).read().split('---')
-        tip = tips[self.number % len(tips)].lstrip()
-        del tips
+        tip = TIPS[self.number % len(TIPS)]
         self.label.set_text(tip)
         self.label.set_use_markup(True)
 

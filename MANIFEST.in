@@ -3,5 +3,4 @@ include COPYRIGHT
 include doc/*
 include share/pixmaps/*.png
 include share/pixmaps/*.svg
-include share/tryton/*.txt
 recursive-include share/locale/ *.mo
