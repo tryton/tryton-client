@@ -40,14 +40,14 @@ def save(widget, graph, window):
     table.attach(gtk.Label(_('Width:')), 0, 1, 0, 1, yoptions=False,
             xoptions=gtk.FILL)
     spinwidth = gtk.SpinButton(gtk.Adjustment(400.0,
-            0.0, sys.maxint, 1.0, 10.0, 10.0))
+            0.0, sys.maxint, 1.0, 10.0))
     spinwidth.set_numeric(True)
     spinwidth.set_activates_default(True)
     table.attach(spinwidth, 1, 2, 0, 1, yoptions=False, xoptions=gtk.FILL)
     table.attach(gtk.Label(_('Height:')), 0, 1, 1, 2, yoptions=False,
             xoptions=gtk.FILL)
     spinheight = gtk.SpinButton(gtk.Adjustment(200.0,
-            0.0, sys.maxint, 1.0, 10.0, 10.0))
+            0.0, sys.maxint, 1.0, 10.0))
     spinheight.set_numeric(True)
     spinheight.set_activates_default(True)
     table.attach(spinheight, 1, 2, 1, 2, yoptions=False, xoptions=gtk.FILL)

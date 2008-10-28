@@ -135,7 +135,7 @@ class Parse(object):
 
         self.spin_limit.set_numeric(False)
         self.spin_limit.set_adjustment(gtk.Adjustment(value=_LIMIT, lower=1,
-            upper=sys.maxint, step_incr=10, page_incr=100, page_size=100))
+            upper=sys.maxint, step_incr=10, page_incr=100))
         self.spin_limit.set_property('visible', True)
 
         hb_param.pack_start(self.spin_limit, expand=False, fill=False)
@@ -144,7 +144,7 @@ class Parse(object):
 
         self.spin_offset.set_numeric(False)
         self.spin_offset.set_adjustment(gtk.Adjustment(value=0, lower=0,
-            upper=sys.maxint, step_incr=_LIMIT, page_incr=100, page_size=100))
+            upper=sys.maxint, step_incr=_LIMIT, page_incr=100))
 
         hb_param.pack_start(self.spin_offset, expand=False, fill=False)
 

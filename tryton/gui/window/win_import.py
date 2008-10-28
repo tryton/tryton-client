@@ -152,7 +152,7 @@ class WinImport(object):
         label_import_csv_skip.set_alignment( 1, 0.5)
         table.attach(label_import_csv_skip, 2, 3, 1, 2)
 
-        self.import_csv_skip_adj = gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        self.import_csv_skip_adj = gtk.Adjustment(0, 0, 100, 1, 10)
         self.import_csv_skip = gtk.SpinButton(self.import_csv_skip_adj, 1, 0)
         table.attach(self.import_csv_skip, 3, 4, 1, 2)
 
