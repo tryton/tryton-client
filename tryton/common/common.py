@@ -354,6 +354,8 @@ def error(title, parent, details):
     buf = gtk.TextBuffer()
     buf.set_text(details)
     textview.set_buffer(buf)
+    textview.set_editable(False)
+    textview.set_sensitive(True)
     box.pack_start(textview, False, False)
 
     viewport.add(box)
