@@ -4,6 +4,9 @@ from interface import Interface
 import tryton.rpc as rpc
 import tryton.common as common
 import gobject
+import gettext
+
+_ = gettext.gettext
 
 class Selection(Interface):
 

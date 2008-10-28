@@ -6,6 +6,9 @@ import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
 import tryton.common as common
+import gettext
+
+_ = gettext.gettext
 
 
 class Many2Many(WidgetInterface):
