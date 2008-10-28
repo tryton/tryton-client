@@ -7,12 +7,16 @@ from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
 
 _ = gettext.gettext
 
-TIPS = [
-    _('''<b>Welcome to Tryton</b>
+
+class Tips(object):
+
+    def __init__(self, parent):
+        self.tips = [
+            _('''<b>Welcome to Tryton</b>
 
 
 '''),
-    _('''<b>Do you know Triton, one of the namesake's for our Project?</b>
+            _('''<b>Do you know Triton, one of the namesake's for our Project?</b>
 
 /ˈtraɪtən/, or as in Greek Τρίτων), is the largest moon of the planet
 Neptune, discovered on October 10, 1846 by William Lassell. It is the
@@ -24,17 +28,14 @@ Neptune, including the planet's rings and twelve other known moons. It
 is also more massive than all the Solar System's 159 known smaller
 moons combined.
 '''),
-    _('''<b>Export list records</b>
+            _('''<b>Export list records</b>
 
 You can copy records from any list with Ctrl + C
 and paste in any application with Ctrl + V
 '''),
-]
+        ]
 
 
-class Tips(object):
-
-    def __init__(self, parent):
         self.win = gtk.Dialog(_('Tips'), parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
@@ -98,7 +99,7 @@ class Tips(object):
         self.win.destroy()
 
     def tip_set(self):
-        tip = TIPS[self.number % len(TIPS)]
+        tip = self.tips[self.number % len(self.tips)]
         self.label.set_text(tip)
         self.label.set_use_markup(True)
 
