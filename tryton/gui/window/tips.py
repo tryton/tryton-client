@@ -23,7 +23,7 @@ Neptune, discovered on October 10, 1846 by William Lassell. It is the
 only large moon in the Solar System with a retrograde orbit, which is
 an orbit in the opposite direction to its planet's rotation. At 2,700
 km in diameter, it is the seventh-largest moon in the Solar System.
-Triton comprises more than 99.5% of all the mass known to orbit
+Triton comprises more than 99.5 percent of all the mass known to orbit
 Neptune, including the planet's rings and twelve other known moons. It
 is also more massive than all the Solar System's 159 known smaller
 moons combined.
