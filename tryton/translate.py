@@ -179,14 +179,6 @@ def setlang(lang=None, locale_dict=None):
         except:
             logging.getLogger('translate').info(
                     _('Unable to set locale %s') % lang2 + '.' + encoding)
-    else:
-        try:
-            if os.name == 'nt':
-                os.environ['LANG'] = ''
-            locale.setlocale(locale.LC_ALL, '')
-        except:
-            logging.getLogger('translate').warn(
-                    _('Unable to unset locale'))
 
     if os.path.isdir(locale_dir):
         gettext.bindtextdomain(PACKAGE, locale_dir)
