@@ -245,20 +245,20 @@ class ComplexEntry(gtk.HBox):
 
 def compute_date(cmd, dt, format):
     lst = {
-        '^=(\d+)w$': lambda dt, r: dt + \
-                RelativeDateTime(day=0, month=0, weeks=int(r.group(1))),
         '^=(\d+)d$': lambda dt, r: dt + \
                 RelativeDateTime(day=int(r.group(1))),
         '^=(\d+)m$': lambda dt, r: dt + \
-                RelativeDateTime(day=0, month=int(r.group(1))),
-        '^=(2\d\d\d)y$': lambda dt, r: dt + \
+                RelativeDateTime(month=int(r.group(1))),
+        '^=(\d\d)y$': lambda dt, r: dt + \
+                RelativeDateTime(year=int(str(dt.year)[:2] + r.group(1))),
+        '^=(\d+)y$': lambda dt, r: dt + \
                 RelativeDateTime(year=int(r.group(1))),
         '^=(\d+)h$': lambda dt, r: dt + \
                 RelativeDateTime(hour=int(r.group(1))),
         '^([\\+-]\d+)h$': lambda dt, r: dt + \
                 RelativeDateTime(hours=int(r.group(1))),
         '^([\\+-]\d+)w$': lambda dt, r: dt + \
-                RelativeDateTime(days=7 * int(r.group(1))),
+                RelativeDateTime(weeks=int(r.group(1))),
         '^([\\+-]\d+)d$': lambda dt, r: dt + \
                 RelativeDateTime(days=int(r.group(1))),
         '^([\\+-]\d+)$': lambda dt, r: dt + \
@@ -270,7 +270,7 @@ def compute_date(cmd, dt, format):
         '^=$': lambda dt,r: now(),
         '^-$': lambda dt,r: False
     }
-    for r,f in lst.items():
+    for r, f in lst.items():
         groups = re.match(r, cmd)
         if groups:
             if not dt:
