@@ -250,7 +250,7 @@ def compute_date(cmd, dt, format):
         '^=(\d+)m$': lambda dt, r: dt + \
                 RelativeDateTime(month=int(r.group(1))),
         '^=(\d\d)y$': lambda dt, r: dt + \
-                RelativeDateTime(year=int(str(dt.year)[:2] + r.group(1))),
+                RelativeDateTime(year=int(str(dt.year)[:-2] + r.group(1))),
         '^=(\d+)y$': lambda dt, r: dt + \
                 RelativeDateTime(year=int(r.group(1))),
         '^=(\d+)h$': lambda dt, r: dt + \
