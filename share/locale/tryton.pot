@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-10-28 11:26+0100\n"
+"POT-Creation-Date: 2008-10-29 11:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,12 +63,12 @@ msgstr ""
 msgid "Choose a Plugin"
 msgstr ""
 
-#: tryton/translate.py:178
+#: tryton/translate.py:181
 #, python-format
 msgid "Unable to set locale %s"
 msgstr ""
 
-#: tryton/translate.py:192
+#: tryton/translate.py:189
 msgid "Unable to unset locale"
 msgstr ""
 
@@ -88,7 +88,7 @@ msgstr ""
 msgid "Tryton Connection"
 msgstr ""
 
-#: tryton/common/common.py:85 tryton/gui/window/dblogin.py:72
+#: tryton/common/common.py:85 tryton/gui/window/dblogin.py:71
 msgid "Server:"
 msgstr ""
 
@@ -131,46 +131,46 @@ msgstr ""
 msgid "Error: "
 msgstr ""
 
-#: tryton/common/common.py:368
+#: tryton/common/common.py:370
 msgid "To report bugs you must have an account on "
 msgstr ""
 
-#: tryton/common/common.py:391
+#: tryton/common/common.py:393
 msgid "Bug Tracker"
 msgstr ""
 
-#: tryton/common/common.py:409
+#: tryton/common/common.py:411
 msgid "User:"
 msgstr ""
 
-#: tryton/common/common.py:417 tryton/common/common.py:670
-#: tryton/gui/window/dblogin.py:94 tryton/gui/window/tree.py:323
+#: tryton/common/common.py:419 tryton/common/common.py:672
+#: tryton/gui/window/dblogin.py:93 tryton/gui/window/tree.py:323
 msgid "Password:"
 msgstr ""
 
-#: tryton/common/common.py:465
+#: tryton/common/common.py:467
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 
-#: tryton/common/common.py:476
+#: tryton/common/common.py:478
 msgid "Created new bug with ID "
 msgstr ""
 
-#: tryton/common/common.py:483
+#: tryton/common/common.py:485
 msgid "Exception:"
 msgstr ""
 
-#: tryton/common/common.py:517 tryton/common/common.py:543
+#: tryton/common/common.py:519 tryton/common/common.py:545
 msgid "Confirmation"
 msgstr ""
 
-#: tryton/common/common.py:611
+#: tryton/common/common.py:613
 msgid "Concurrency Exception"
 msgstr ""
 
-#: tryton/common/common.py:626
+#: tryton/common/common.py:628
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
 "\n"
@@ -181,30 +181,30 @@ msgid ""
 "   - \"Write Anyway\" to save your current version."
 msgstr ""
 
-#: tryton/common/common.py:636
+#: tryton/common/common.py:638
 msgid "Compare"
 msgstr ""
 
-#: tryton/common/common.py:641
+#: tryton/common/common.py:643
 msgid "Write Anyway"
 msgstr ""
 
-#: tryton/common/common.py:664 tryton/common/common.py:675
+#: tryton/common/common.py:666 tryton/common/common.py:677
 #: tryton/gui/main.py:971 tryton/gui/window/tree.py:330
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
 msgstr ""
 
-#: tryton/common/common.py:711
+#: tryton/common/common.py:713
 msgid "Network Error!"
 msgstr ""
 
-#: tryton/common/common.py:815
+#: tryton/common/common.py:817
 msgid "Operation in progress"
 msgstr ""
 
-#: tryton/common/common.py:819
+#: tryton/common/common.py:821
 msgid ""
 "Please wait,\n"
 "this operation may take a while..."
@@ -509,13 +509,13 @@ msgstr ""
 msgid "Find records"
 msgstr ""
 
-#: tryton/gui/main.py:714 tryton/gui/window/tips.py:65
+#: tryton/gui/main.py:714 tryton/gui/window/tips.py:67
 #: tryton/gui/window/view_board/action.py:93
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:109
 msgid "Previous"
 msgstr ""
 
-#: tryton/gui/main.py:720 tryton/gui/window/tips.py:72
+#: tryton/gui/main.py:720 tryton/gui/window/tips.py:74
 #: tryton/gui/window/view_board/action.py:106
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:123
 msgid "Next"
@@ -795,7 +795,7 @@ msgstr ""
 msgid "Create new database"
 msgstr ""
 
-#: tryton/gui/window/dbcreate.py:152 tryton/gui/window/dblogin.py:54
+#: tryton/gui/window/dbcreate.py:152 tryton/gui/window/dblogin.py:53
 msgid "C_reate"
 msgstr ""
 
@@ -820,7 +820,7 @@ msgid ""
 msgstr ""
 
 #: tryton/gui/window/dbcreate.py:189 tryton/gui/window/dbdumpdrop.py:138
-#: tryton/gui/window/dblogin.py:89 tryton/gui/window/dbrestore.py:95
+#: tryton/gui/window/dblogin.py:88 tryton/gui/window/dbrestore.py:95
 msgid "C_hange"
 msgstr ""
 
@@ -944,15 +944,15 @@ msgstr ""
 msgid "Error creating database!"
 msgstr ""
 
-#: tryton/gui/window/dbdumpdrop.py:21 tryton/gui/window/dblogin.py:112
+#: tryton/gui/window/dbdumpdrop.py:21 tryton/gui/window/dblogin.py:110
 msgid "Could not connect to server!"
 msgstr ""
 
-#: tryton/gui/window/dbdumpdrop.py:24 tryton/gui/window/dblogin.py:116
+#: tryton/gui/window/dbdumpdrop.py:24 tryton/gui/window/dblogin.py:114
 msgid "Incompatible version of the server!"
 msgstr ""
 
-#: tryton/gui/window/dbdumpdrop.py:29 tryton/gui/window/dblogin.py:124
+#: tryton/gui/window/dbdumpdrop.py:29 tryton/gui/window/dblogin.py:122
 msgid "No database found, you must create one!"
 msgstr ""
 
@@ -992,7 +992,7 @@ msgstr ""
 msgid "Server Connection:"
 msgstr ""
 
-#: tryton/gui/window/dbdumpdrop.py:148 tryton/gui/window/dblogin.py:77
+#: tryton/gui/window/dbdumpdrop.py:148 tryton/gui/window/dblogin.py:76
 msgid "Database:"
 msgstr ""
 
@@ -1016,20 +1016,16 @@ msgstr ""
 msgid "Connect the Tryton server"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:92
+#: tryton/gui/window/dblogin.py:91
 msgid "Configure the Tryton server connection"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:99
+#: tryton/gui/window/dblogin.py:98
 msgid "User name:"
 msgstr ""
 
 #: tryton/gui/window/dbrestore.py:66
 msgid "Restore Database"
-msgstr ""
-
-#: tryton/gui/window/dbrestore.py:87
-msgid "http://localhost:8070"
 msgstr ""
 
 #: tryton/gui/window/dbrestore.py:121
@@ -1309,15 +1305,14 @@ msgstr ""
 msgid "Edition Widgets"
 msgstr ""
 
-#: tryton/gui/window/tips.py:11
+#: tryton/gui/window/tips.py:15
 msgid ""
 "<b>Welcome to Tryton</b>\n"
 "\n"
 "\n"
 msgstr ""
 
-#: tryton/gui/window/tips.py:15
-#, python-format
+#: tryton/gui/window/tips.py:19
 msgid ""
 "<b>Do you know Triton, one of the namesake's for our Project?</b>\n"
 "\n"
@@ -1326,13 +1321,13 @@ msgid ""
 "only large moon in the Solar System with a retrograde orbit, which is\n"
 "an orbit in the opposite direction to its planet's rotation. At 2,700\n"
 "km in diameter, it is the seventh-largest moon in the Solar System.\n"
-"Triton comprises more than 99.5% of all the mass known to orbit\n"
+"Triton comprises more than 99.5 percent of all the mass known to orbit\n"
 "Neptune, including the planet's rings and twelve other known moons. It\n"
 "is also more massive than all the Solar System's 159 known smaller\n"
 "moons combined.\n"
 msgstr ""
 
-#: tryton/gui/window/tips.py:27
+#: tryton/gui/window/tips.py:31
 msgid ""
 "<b>Export list records</b>\n"
 "\n"
@@ -1340,11 +1335,11 @@ msgid ""
 "and paste in any application with Ctrl + V\n"
 msgstr ""
 
-#: tryton/gui/window/tips.py:38
+#: tryton/gui/window/tips.py:39
 msgid "Tips"
 msgstr ""
 
-#: tryton/gui/window/tips.py:57
+#: tryton/gui/window/tips.py:59
 msgid "_Display a new tip next time"
 msgstr ""
 
@@ -1597,11 +1592,11 @@ msgstr ""
 msgid "Date Time Selection"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:262
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:263
 msgid "Hour:"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:265
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:266
 msgid "Minute:"
 msgstr ""
 
@@ -1635,12 +1630,12 @@ msgstr ""
 msgid "Set as default"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:32
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:35
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:50
 msgid "Add"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:45
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:48
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:61
 msgid "Remove"
 msgstr ""
@@ -1808,14 +1803,14 @@ msgstr ""
 #: tryton/gui/window/view_form/widget_search/char.py:26
 #: tryton/gui/window/view_form/widget_search/integer.py:22
 #: tryton/gui/window/view_form/widget_search/reference.py:26
-#: tryton/gui/window/view_form/widget_search/selection.py:22
+#: tryton/gui/window/view_form/widget_search/selection.py:25
 msgid "equals"
 msgstr ""
 
 #: tryton/gui/window/view_form/widget_search/char.py:27
 #: tryton/gui/window/view_form/widget_search/integer.py:25
 #: tryton/gui/window/view_form/widget_search/reference.py:27
-#: tryton/gui/window/view_form/widget_search/selection.py:23
+#: tryton/gui/window/view_form/widget_search/selection.py:26
 msgid "is different"
 msgstr ""
 
