@@ -1060,7 +1060,7 @@ class Main(object):
             if quiet:
                 return False
             common.warning(_('You can not log into the system!\n' \
-                    'Verify if you have an menu defined on your user.'),
+                    'Verify if you have a menu defined on your user.'),
                     'Access Denied!', self.window)
             rpc.logout()
             self.refresh_ssl()
