@@ -16,7 +16,7 @@ class Tips(object):
 
 
 '''),
-            _('''<b>Do you know Triton, one of the namesake's for our Project?</b>
+            _(u'''<b>Do you know Triton, one of the namesake's for our Project?</b>
 
 /ˈtraɪtən/, or as in Greek Τρίτων), is the largest moon of the planet
 Neptune, discovered on October 10, 1846 by William Lassell. It is the
