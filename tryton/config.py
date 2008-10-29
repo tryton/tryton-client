@@ -7,6 +7,7 @@ import gettext
 from version import VERSION
 import logging
 import sys
+import locale
 
 _ = gettext.gettext
 
@@ -74,7 +75,7 @@ class ConfigManager(object):
             'client.form_tab_orientation': 90,
             'client.tree_width': True,
             'client.spellcheck': False,
-            'client.lang': 'en_US',
+            'client.lang': locale.getdefaultlocale()[0],
             'client.actions': {
                 'odt': {0: find_path(['ooffice', 'ooffice2'], '%s'),
                     1: find_path(['ooffice', 'ooffice2'], '-p %s')},
