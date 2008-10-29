@@ -278,7 +278,7 @@ msgstr "_Déconnecter"
 
 #: tryton/gui/main.py:216
 msgid "Data_base"
-msgstr "Base de Donnée"
+msgstr "_Base de Donnée"
 
 #: tryton/gui/main.py:225
 msgid "_New Database..."
@@ -478,7 +478,7 @@ msgstr "_Actions sur les Fichiers..."
 
 #: tryton/gui/main.py:630
 msgid "_Save Options"
-msgstr "_Sauver les Options"
+msgstr "_Sauver les options"
 
 #: tryton/gui/main.py:641
 msgid "_Execute a Plugin"
