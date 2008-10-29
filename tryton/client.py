@@ -12,7 +12,7 @@ import logging
 
 import version
 import config
-from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON
+from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON, get_home_dir
 import translate
 import gui
 import traceback
@@ -93,7 +93,12 @@ class TrytonClient(object):
         #except ImportError:
         #    pass
 
-        gtk.main()
+        try:
+            gtk.main()
+        except KeyboardInterrupt:
+            CONFIG.save()
+            if hasattr(gtk, 'accel_map_save'):
+                gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
 
 if __name__ == "__main__":
     CLIENT = TrytonClient()
