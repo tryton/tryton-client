@@ -41,6 +41,7 @@ and paste in any application with Ctrl + V
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(True)
+        self.win.set_size_request(500, 400)
 
         self.win.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
