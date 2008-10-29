@@ -480,6 +480,7 @@ class ParserForm(ParserInterface):
                     text = _('No String Attr.')
                 label = gtk.Label(text)
                 label.set_angle(angle)
+                label.set_use_underline(True)
                 widget, widgets, buttons, on_write, notebook_list2, cursor_widget2 = \
                         self.parse(model, node, fields, notebook,
                                 tooltips=tooltips)
