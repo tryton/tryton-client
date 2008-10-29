@@ -45,6 +45,45 @@ class Main(object):
         self.accel_group = gtk.AccelGroup()
         self.window.add_accel_group(self.accel_group)
 
+        gtk.accel_map_add_entry('<tryton>/File/Connect', gtk.keysyms.O,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/New', gtk.keysyms.N,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Save', gtk.keysyms.S,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Duplicate', gtk.keysyms.D,
+                gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Delete', gtk.keysyms.D,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Find', gtk.keysyms.F,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Next', gtk.keysyms.Page_Down,
+                0)
+        gtk.accel_map_add_entry('<tryton>/Form/Previous', gtk.keysyms.Page_Up,
+                0)
+        gtk.accel_map_add_entry('<tryton>/Form/Switch View', gtk.keysyms.L,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Menu', gtk.keysyms.T,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Home', gtk.keysyms.H,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Close', gtk.keysyms.W,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Previous Tab', gtk.keysyms.Page_Up,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Next Tab', gtk.keysyms.Page_Down,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Goto', gtk.keysyms.G,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Reload', gtk.keysyms.R,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Actions', gtk.keysyms.E,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Print', gtk.keysyms.P,
+                gtk.gdk.CONTROL_MASK)
+
         self.tooltips = gtk.Tooltips()
 
         toolbar = gtk.Toolbar()
@@ -63,6 +102,8 @@ class Main(object):
 
         menu_file = self._set_menu_file()
         menuitem_file.set_submenu(menu_file)
+        menu_file.set_accel_group(self.accel_group)
+        menu_file.set_accel_path('<tryton>/File')
 
         menuitem_user = gtk.MenuItem(_('_User'))
         self.menuitem_user = menuitem_user
@@ -71,6 +112,7 @@ class Main(object):
 
         menu_user = self._set_menu_user()
         menuitem_user.set_submenu(menu_user)
+        menuitem_user.set_accel_path('<tryton>/User')
 
         menuitem_form = gtk.MenuItem(_('For_m'))
         self.menuitem_form = menuitem_form
@@ -79,12 +121,15 @@ class Main(object):
 
         menu_form = self._set_menu_form()
         menuitem_form.set_submenu(menu_form)
+        menu_form.set_accel_group(self.accel_group)
+        menu_form.set_accel_path('<tryton>/Form')
 
         menuitem_options = gtk.MenuItem(_('_Options'))
         menubar.add(menuitem_options)
 
         menu_options = self._set_menu_options()
         menuitem_options.set_submenu(menu_options)
+        menuitem_options.set_accel_path('<tryton>/Options')
 
         menuitem_plugins = gtk.MenuItem(_('_Plugins'))
         self.menuitem_plugins = menuitem_plugins
@@ -93,17 +138,20 @@ class Main(object):
 
         menu_plugins = self._set_menu_plugins()
         menuitem_plugins.set_submenu(menu_plugins)
+        menuitem_plugins.set_accel_path('<tryton>/Plugins')
 
         menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
         self.menuitem_shortcut = menuitem_shortcut
         self.menuitem_shortcut.set_sensitive(False)
         menubar.add(menuitem_shortcut)
+        menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
 
         menuitem_help = gtk.MenuItem(_('_Help'))
         menubar.add(menuitem_help)
 
         menu_help = self._set_menu_help()
         menuitem_help.set_submenu(menu_help)
+        menuitem_help.set_accel_path('<tryton>/Help')
 
         vbox.pack_start(toolbar, False, True)
 
@@ -199,9 +247,8 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-connect', gtk.ICON_SIZE_MENU)
         imagemenuitem_connect.set_image(image)
-        imagemenuitem_connect.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.O, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_connect.connect('activate', self.sig_login)
+        imagemenuitem_connect.set_accel_path('<tryton>/File/Connect')
         menu_file.add(imagemenuitem_connect)
 
         imagemenuitem_disconnect = gtk.ImageMenuItem(_('_Disconnect'))
@@ -256,9 +303,8 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-log-out', gtk.ICON_SIZE_MENU)
         imagemenuitem_close.set_image(image)
-        imagemenuitem_close.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Q, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_close.connect('activate', self.sig_close)
+        imagemenuitem_close.set_accel_path('<tryton>/File/Quit')
         menu_file.add(imagemenuitem_close)
         return menu_file
 
@@ -297,37 +343,32 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-new', gtk.ICON_SIZE_MENU)
         imagemenuitem_new.set_image(image)
-        imagemenuitem_new.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.N, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_new.connect('activate', self._sig_child_call, 'but_new')
+        imagemenuitem_new.set_accel_path('<tryton>/Form/New')
         menu_form.add(imagemenuitem_new)
 
         imagemenuitem_save = gtk.ImageMenuItem(_('_Save'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-save', gtk.ICON_SIZE_MENU)
         imagemenuitem_save.set_image(image)
-        imagemenuitem_save.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.S, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_save.connect('activate', self._sig_child_call, 'but_save')
+        imagemenuitem_save.set_accel_path('<tryton>/Form/Save')
         menu_form.add(imagemenuitem_save)
 
         imagemenuitem_copy = gtk.ImageMenuItem(_('_Duplicate'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-copy', gtk.ICON_SIZE_MENU)
         imagemenuitem_copy.set_image(image)
-        imagemenuitem_copy.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.D, gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK,
-                gtk.ACCEL_VISIBLE)
         imagemenuitem_copy.connect('activate', self._sig_child_call, 'but_copy')
+        imagemenuitem_copy.set_accel_path('<tryton>/Form/Duplicate')
         menu_form.add(imagemenuitem_copy)
 
         imagemenuitem_delete = gtk.ImageMenuItem(_('_Delete...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
         imagemenuitem_delete.set_image(image)
-        imagemenuitem_delete.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.D, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_delete.connect('activate', self._sig_child_call, 'but_remove')
+        imagemenuitem_delete.set_accel_path('<tryton>/Form/Delete')
         menu_form.add(imagemenuitem_delete)
 
         menu_form.add(gtk.SeparatorMenuItem())
@@ -336,45 +377,40 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
         imagemenuitem_search.set_image(image)
-        imagemenuitem_search.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.F, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_search.connect('activate', self._sig_child_call, 'but_search')
+        imagemenuitem_search.set_accel_path('<tryton>/Form/Find')
         menu_form.add(imagemenuitem_search)
 
         imagemenuitem_next = gtk.ImageMenuItem(_('_Next'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-go-next', gtk.ICON_SIZE_MENU)
         imagemenuitem_next.set_image(image)
-        imagemenuitem_next.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Page_Down, 0, gtk.ACCEL_VISIBLE)
         imagemenuitem_next.connect('activate', self._sig_child_call, 'but_next')
+        imagemenuitem_next.set_accel_path('<tryton>/Form/Next')
         menu_form.add(imagemenuitem_next)
 
         imagemenuitem_previous = gtk.ImageMenuItem(_('_Previous'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_MENU)
         imagemenuitem_previous.set_image(image)
-        imagemenuitem_previous.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Page_Up, 0, gtk.ACCEL_VISIBLE)
         imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
+        imagemenuitem_previous.set_accel_path('<tryton>/Form/Previous')
         menu_form.add(imagemenuitem_previous)
 
         imagemenuitem_switch = gtk.ImageMenuItem(_('_Switch View'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_MENU)
         imagemenuitem_switch.set_image(image)
-        imagemenuitem_switch.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.L, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_switch.connect('activate', self._sig_child_call, 'but_switch')
+        imagemenuitem_switch.set_accel_path('<tryton>/Form/Switch View')
         menu_form.add(imagemenuitem_switch)
 
         imagemenuitem_menu = gtk.ImageMenuItem(_('_Menu'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-start-here', gtk.ICON_SIZE_MENU)
         imagemenuitem_menu.set_image(image)
-        imagemenuitem_menu.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.T, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_menu.connect('activate', self.sig_win_menu)
+        imagemenuitem_menu.set_accel_path('<tryton>/Form/Menu')
         menu_form.add(imagemenuitem_menu)
 
         menu_form.add(gtk.SeparatorMenuItem())
@@ -383,30 +419,26 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-go-home', gtk.ICON_SIZE_MENU)
         imagemenuitem_home.set_image(image)
-        imagemenuitem_home.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.H, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_home.connect('activate', self.sig_home_new)
+        imagemenuitem_home.set_accel_path('<tryton>/Form/Home')
         menu_form.add(imagemenuitem_home)
 
         imagemenuitem_close = gtk.ImageMenuItem(_('_Close'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-close', gtk.ICON_SIZE_MENU)
         imagemenuitem_close.set_image(image)
-        imagemenuitem_close.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.W, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_close.connect('activate', self.sig_win_close)
+        imagemenuitem_close.set_accel_path('<tryton>/Form/Close')
         menu_form.add(imagemenuitem_close)
 
         imagemenuitem_win_prev = gtk.ImageMenuItem(_('_Previous Tab'), self.accel_group)
-        imagemenuitem_win_prev.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Page_Up, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_win_prev.connect('activate', self.sig_win_prev)
+        imagemenuitem_win_prev.set_accel_path('<tryton>/Form/Previous Tab')
         menu_form.add(imagemenuitem_win_prev)
 
         imagemenuitem_win_next = gtk.ImageMenuItem(_('_Next Tab'), self.accel_group)
-        imagemenuitem_win_next.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.Page_Down, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_win_next.connect('activate', self.sig_win_next)
+        imagemenuitem_win_next.set_accel_path('<tryton>/Form/Next Tab')
         menu_form.add(imagemenuitem_win_next)
 
         menu_form.add(gtk.SeparatorMenuItem())
@@ -417,10 +449,9 @@ class Main(object):
 
         imagemenuitem_goto_id = gtk.ImageMenuItem(_('_Go to Record ID...'),
                 self.accel_group)
-        imagemenuitem_win_next.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.G, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_goto_id.connect('activate', self._sig_child_call,
                 'but_goto_id')
+        imagemenuitem_goto_id.set_accel_path('<tryton>/Form/Goto')
         menu_form.add(imagemenuitem_goto_id)
 
         menu_form.add(gtk.SeparatorMenuItem())
@@ -429,10 +460,9 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-refresh', gtk.ICON_SIZE_MENU)
         imagemenuitem_reload.set_image(image)
-        imagemenuitem_reload.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.R, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_reload.connect('activate', self._sig_child_call,
                 'but_reload')
+        imagemenuitem_reload.set_accel_path('<tryton>/Form/Reload')
         menu_form.add(imagemenuitem_reload)
 
         menu_form.add(gtk.SeparatorMenuItem())
@@ -441,20 +471,18 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
         imagemenuitem_action.set_image(image)
-        imagemenuitem_action.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.E, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_action.connect('activate', self._sig_child_call,
                 'but_action')
+        imagemenuitem_action.set_accel_path('<tryton>/Form/Actions')
         menu_form.add(imagemenuitem_action)
 
         imagemenuitem_print = gtk.ImageMenuItem(_('_Print...'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-print', gtk.ICON_SIZE_MENU)
         imagemenuitem_print.set_image(image)
-        imagemenuitem_print.add_accelerator('activate', self.accel_group,
-                gtk.keysyms.P, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         imagemenuitem_print.connect('activate', self._sig_child_call,
                 'but_print')
+        imagemenuitem_print.set_accel_path('<tryton>/Form/Print')
         menu_form.add(imagemenuitem_print)
 
         menu_form.add(gtk.SeparatorMenuItem())
