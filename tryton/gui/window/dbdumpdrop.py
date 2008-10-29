@@ -21,7 +21,8 @@ class DBBackupDrop(object):
                         _('Could not connect to server!') + '</b>')
             else:
                 label.set_label('<b>' + \
-                        _('Incompatible version of the server!') + '</b>')
+                        _('This client version is not compatible with the server!') +\
+                        '</b>')
             db_widget.hide()
             label.show()
         elif res == 0:
