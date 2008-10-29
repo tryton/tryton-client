@@ -25,7 +25,6 @@ class TrytonClient(object):
 
     def __init__(self):
         logging.basicConfig()
-        translate.setlang()
         translate.setlang(CONFIG['client.lang'])
 
         for logger in CONFIG['logging.logger'].split(','):
