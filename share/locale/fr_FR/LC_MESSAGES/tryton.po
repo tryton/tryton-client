@@ -278,7 +278,7 @@ msgstr "_Déconnecter"
 
 #: tryton/gui/main.py:216
 msgid "Data_base"
-msgstr "Base de Donnée"
+msgstr "_Base de Donnée"
 
 #: tryton/gui/main.py:225
 msgid "_New Database..."
