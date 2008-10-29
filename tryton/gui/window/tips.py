@@ -44,7 +44,7 @@ and paste in any application with Ctrl + V
         self.win.set_size_request(500, 400)
 
         self.win.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-
+        self.win.set_default_response(gtk.RESPONSE_CLOSE)
         vbox = gtk.VBox()
         img = gtk.Image()
         img.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
