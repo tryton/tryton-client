@@ -34,17 +34,16 @@ class DBLogin(object):
         tooltips.set_tip(self.button_connect, _('Connect the Tryton server'))
         self.dialog.add_action_widget(self.button_connect, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
-        dialog_vbox = gtk.VBox()
         vbox_image = gtk.VBox()
         image = gtk.Image()
         image.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
         vbox_image.pack_start(image)
-        dialog_vbox.pack_start(vbox_image)
+        self.dialog.vbox.pack_start(vbox_image)
         table_main = gtk.Table(4, 3, False)
         table_main.set_border_width(10)
         table_main.set_row_spacings(3)
         table_main.set_col_spacings(3)
-        vbox_image.pack_start(table_main, True, True, 0)
+        self.dialog.vbox.pack_start(table_main, True, True, 0)
         vbox_combo = gtk.VBox()
         self.hbox_combo = gtk.HBox()
         self.combo_database = gtk.ComboBox()
@@ -101,7 +100,6 @@ class DBLogin(object):
         label_username.set_padding(3, 3)
         table_main.attach(label_username, 0, 1, 2, 3, xoptions=gtk.FILL)
         self.entry_password.grab_focus()
-        self.dialog.vbox.pack_start(dialog_vbox)
 
     @staticmethod
     def refreshlist(widget, db_widget, label, button, host, port,
