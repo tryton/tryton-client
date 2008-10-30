@@ -6,6 +6,8 @@ class Char(WidgetInterface):
     "Char"
 
     def __init__(self, window, parent, model, attrs=None):
+        if attrs is None:
+            attrs = {}
         super(Char, self).__init__(window, parent, model=model, attrs=attrs)
 
         self.widget = gtk.HBox()

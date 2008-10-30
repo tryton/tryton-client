@@ -1,28 +1,17 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gettext
 import gtk
-from interface import WidgetInterface
+from char import Char
 import webbrowser
 
 
-class URL(WidgetInterface):
+class URL(Char):
     "url"
 
     def __init__(self, window, parent, model, attrs=None):
         if attrs is None:
             attrs = {}
         super(URL, self).__init__(window, parent, model, attrs=attrs)
-
-        self.widget = gtk.HBox(homogeneous=False, spacing=0)
-
-        self.entry = gtk.Entry()
-        self.entry.set_max_length(int(attrs.get('size', 0)))
-        self.entry.set_width_chars(5)
-        self.entry.set_property('activates_default', True)
-        self.entry.connect('activate', self.sig_activate)
-        self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
-        self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
-        self.widget.pack_start(self.entry, expand=True, fill=True)
 
         self.tooltips = gtk.Tooltips()
         self.button = gtk.Button()
@@ -35,18 +24,8 @@ class URL(WidgetInterface):
         self.button.set_property('can-focus', False)
         self.widget.pack_start(self.button, expand=False, fill=False)
 
-    def grab_focus(self):
-        return self.entry.grab_focus()
-
-    def set_value(self, model, model_field):
-        return model_field.set_client(model, self.entry.get_text() or False)
-
     def display(self, model, model_field):
-        if not model_field:
-            self.entry.set_text('')
-            return False
         super(URL, self).display(model, model_field)
-        self.entry.set_text(model_field.get(model) or '')
         self.set_tooltips()
 
     def set_tooltips(self):
@@ -58,8 +37,7 @@ class URL(WidgetInterface):
             self.tooltips.disable()
 
     def _readonly_set(self, value):
-        self.entry.set_editable(not value)
-        self.entry.set_sensitive(not value)
+        super(URL, self)._readonly_set(value)
         if value:
             self.entry.hide()
         else:
@@ -71,8 +49,6 @@ class URL(WidgetInterface):
         if value:
             webbrowser.open(value, new=2)
 
-    def _color_widget(self):
-        return self.entry
 
 class Email(URL):
     "email"
