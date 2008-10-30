@@ -21,8 +21,8 @@ class URL(Char):
         self.button.set_relief(gtk.RELIEF_NONE)
         self.button.connect('clicked', self.button_clicked)
         self.button.set_alignment(0.5, 0.5)
-        self.button.set_property('can-focus', False)
         self.widget.pack_start(self.button, expand=False, fill=False)
+        self.widget.set_focus_chain([self.entry])
 
     def display(self, model, model_field):
         super(URL, self).display(model, model_field)
@@ -40,9 +40,10 @@ class URL(Char):
         super(URL, self)._readonly_set(value)
         if value:
             self.entry.hide()
+            self.widget.set_focus_chain([self.button])
         else:
             self.entry.show()
-        self.button.set_property('can-focus', value)
+            self.widget.set_focus_chain([self.entry])
 
     def button_clicked(self, widget):
         value = self.entry.get_text()

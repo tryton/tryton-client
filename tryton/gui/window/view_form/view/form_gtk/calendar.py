@@ -38,8 +38,8 @@ class Calendar(WidgetInterface):
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)
         self.but_open.set_alignment(0.5, 0.5)
-        self.but_open.set_property('can-focus', False)
         self.widget.pack_start(self.but_open, expand=False, fill=False)
+        self.widget.set_focus_chain([self.entry])
 
         tooltips = gtk.Tooltips()
         tooltips.set_tip(self.but_open, _('Open the calendar'))
@@ -165,8 +165,8 @@ class DateTime(WidgetInterface):
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.cal_open)
         self.but_open.set_alignment(0.5, 0.5)
-        self.but_open.set_property('can-focus', False)
         self.widget.pack_start(self.but_open, expand=False, fill=False)
+        self.widget.set_focus_chain([self.entry])
 
         tooltips = gtk.Tooltips()
         tooltips.set_tip(self.but_open, _('Open the calendar'))

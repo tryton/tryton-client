@@ -54,7 +54,6 @@ def _create_menu(self, attrs):
         img_add.set_alignment(0.5, 0.5)
         self.but_add.add(img_add)
         self.but_add.set_relief(gtk.RELIEF_NONE)
-        self.but_add.set_property('can-focus', False)
         hbox.pack_start(self.but_add, expand=False, fill=False)
 
         self.but_remove = gtk.Button()
@@ -65,7 +64,6 @@ def _create_menu(self, attrs):
         img_remove.set_alignment(0.5, 0.5)
         self.but_remove.add(img_remove)
         self.but_remove.set_relief(gtk.RELIEF_NONE)
-        self.but_remove.set_property('can-focus', False)
         hbox.pack_start(self.but_remove, expand=False, fill=False)
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
@@ -78,7 +76,6 @@ def _create_menu(self, attrs):
     img_new.set_alignment(0.5, 0.5)
     self.but_new.add(img_new)
     self.but_new.set_relief(gtk.RELIEF_NONE)
-    self.but_new.set_property('can-focus', False)
     hbox.pack_start(self.but_new, expand=False, fill=False)
 
     self.but_open = gtk.Button()
@@ -89,7 +86,6 @@ def _create_menu(self, attrs):
     img_open.set_alignment(0.5, 0.5)
     self.but_open.add(img_open)
     self.but_open.set_relief(gtk.RELIEF_NONE)
-    self.but_open.set_property('can-focus', False)
     hbox.pack_start(self.but_open, expand=False, fill=False)
 
     self.but_del = gtk.Button()
@@ -100,7 +96,6 @@ def _create_menu(self, attrs):
     img_del.set_alignment(0.5, 0.5)
     self.but_del.add(img_del)
     self.but_del.set_relief(gtk.RELIEF_NONE)
-    self.but_del.set_property('can-focus', False)
     hbox.pack_start(self.but_del, expand=False, fill=False)
 
     hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
@@ -113,7 +108,6 @@ def _create_menu(self, attrs):
     img_pre.set_alignment(0.5, 0.5)
     but_pre.add(img_pre)
     but_pre.set_relief(gtk.RELIEF_NONE)
-    but_pre.set_property('can-focus', False)
     hbox.pack_start(but_pre, expand=False, fill=False)
 
     self.label = gtk.Label('(0,0)')
@@ -127,7 +121,6 @@ def _create_menu(self, attrs):
     img_next.set_alignment(0.5, 0.5)
     but_next.add(img_next)
     but_next.set_relief(gtk.RELIEF_NONE)
-    but_next.set_property('can-focus', False)
     hbox.pack_start(but_next, expand=False, fill=False)
 
     hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
@@ -140,8 +133,8 @@ def _create_menu(self, attrs):
     img_switch.set_alignment(0.5, 0.5)
     but_switch.add(img_switch)
     but_switch.set_relief(gtk.RELIEF_NONE)
-    but_switch.set_property('can-focus', False)
     hbox.pack_start(but_switch, expand=False, fill=False)
+    hbox.set_focus_chain([])
 
     tooltips.enable()
 
