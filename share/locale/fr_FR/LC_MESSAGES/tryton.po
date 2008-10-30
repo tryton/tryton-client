@@ -1142,7 +1142,7 @@ msgstr "Editer les actions sur les fichiers"
 
 #: tryton/gui/window/filesactions.py:31
 msgid "File Type"
-msgstr "Type de Fichier"
+msgstr "Type de fichier"
 
 #: tryton/gui/window/filesactions.py:33
 #: tryton/gui/window/view_board/action.py:80
@@ -1152,7 +1152,7 @@ msgstr "Ouvrir"
 #: tryton/gui/window/filesactions.py:41
 #, python-format
 msgid "%s file: "
-msgstr "%s fichier : "
+msgstr "Fichier  %s : "
 
 #: tryton/gui/window/form.py:158
 msgid "Go to ID"
