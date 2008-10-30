@@ -77,7 +77,7 @@ class ModelRecord(SignalEvent):
                 values = self.rpc.read(ids, self.mgroup.mfields.keys() + \
                         ['_timestamp'], ctx)
             except Exception, exception:
-                if str(exception) != 'NotLogged':
+                if str(exception[0]) != 'NotLogged':
                     log = logging.getLogger('record')
                     log.error('%s' % exception.args[-1])
                 values = [{'id': x} for x in ids]
