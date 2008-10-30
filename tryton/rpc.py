@@ -20,11 +20,12 @@ def db_list(host, port):
     _SEMAPHORE.acquire()
     try:
         try:
-            if _SOCK:
+            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
-            else:
+            if _SOCK is None:
                 _SOCK = pysocket.PySocket()
-            _SOCK.connect(host, port)
+            if not _SOCK.connected:
+                _SOCK.connect(host, port)
             try:
                 _SOCK.send(('db', 'list'))
             except Exception, exception:
