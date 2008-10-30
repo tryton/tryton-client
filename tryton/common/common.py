@@ -832,6 +832,7 @@ class RPCProgress(object):
                     vbox.pack_start(progressbar, expand=True, fill=False)
                     win.add(vbox)
                     win.set_transient_for(self.parent)
+                    win.set_modal(True)
                     win.show_all()
                 progressbar.pulse()
                 gtk.main_iteration()
