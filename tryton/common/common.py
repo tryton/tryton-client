@@ -28,6 +28,7 @@ def refresh_dblist(db_widget, host, port, dbtoload=None):
         or None if it is impossible to connect
         or -1 if the server version doesn't match the client version
     '''
+    rpc.logout()
     version = rpc.server_version(host, port)
     if hasattr(version, 'split'):
         if version.split('.')[:2] != VERSION.split('.')[:2]:
@@ -831,6 +832,7 @@ class RPCProgress(object):
                     vbox.pack_start(progressbar, expand=True, fill=False)
                     win.add(vbox)
                     win.set_transient_for(self.parent)
+                    win.set_modal(True)
                     win.show_all()
                 progressbar.pulse()
                 gtk.main_iteration()
