@@ -1974,7 +1974,7 @@ msgstr "Décalage :"
 
 #: tryton/gui/window/view_form/widget_search/form.py:173
 msgid "Advanced Search"
-msgstr "Recherche Avancée"
+msgstr "Recherche avancée"
 
 #: tryton/gui/window/view_tree/parse.py:17
 msgid "Tree"
