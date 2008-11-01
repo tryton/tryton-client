@@ -119,8 +119,11 @@ class Reference(WidgetInterface):
         self._readonly = value
         self.widget_combo.set_sensitive(not value)
         self.wid_text.set_editable(not value)
-        self.wid_text.set_sensitive(not value)
         self.but_new.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.widget_combo, self.wid_text])
 
     def _color_widget(self):
         return self.wid_text

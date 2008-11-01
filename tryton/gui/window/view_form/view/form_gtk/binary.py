@@ -57,9 +57,12 @@ class Binary(WidgetInterface):
         if value:
             self.but_new.hide()
             self.but_remove.hide()
+            self.widget.set_focus_chain([])
         else:
             self.but_new.show()
             self.but_remove.show()
+            self.widget.set_focus_chain([self.but_new, self.but_save_as,
+                self.but_remove])
 
     def grab_focus(self):
         return self.wid_text.grab_focus()

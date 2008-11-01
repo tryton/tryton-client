@@ -279,6 +279,10 @@ class Many2One(WidgetInterface):
         self._readonly = value
         self.wid_text.set_editable(not value)
         self.but_new.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.wid_text])
 
     def _color_widget(self):
         return self.wid_text

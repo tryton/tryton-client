@@ -41,7 +41,10 @@ class TextBox(WidgetInterface):
     def _readonly_set(self, value):
         super(TextBox, self)._readonly_set(value)
         self.textview.set_editable(not value)
-        self.textview.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.textview])
         if HAS_GTKSPELL:
             spell = None
             try:

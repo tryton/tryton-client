@@ -50,8 +50,11 @@ class Calendar(WidgetInterface):
 
     def _readonly_set(self, value):
         self.entry.set_editable(not value)
-        self.entry.set_sensitive(not value)
         self.but_open.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.entry])
 
     def sig_key_press(self, widget, event):
         if event.keyval == gtk.keysyms.F2:
@@ -177,8 +180,11 @@ class DateTime(WidgetInterface):
 
     def _readonly_set(self, value):
         self.entry.set_editable(not value)
-        self.entry.set_sensitive(not value)
         self.but_open.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.entry])
 
     def sig_key_press(self, widget, event):
         if event.keyval == gtk.keysyms.F2:

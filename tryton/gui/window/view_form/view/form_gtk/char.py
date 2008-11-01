@@ -41,7 +41,10 @@ class Char(WidgetInterface):
     def _readonly_set(self, value):
         super(Char, self)._readonly_set(value)
         self.entry.set_editable(not value)
-        self.entry.set_sensitive(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.entry])
 
 
 class Sha(Char):
