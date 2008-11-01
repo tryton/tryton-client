@@ -142,7 +142,11 @@ class Reference(WidgetInterface):
         if not value:
             model, (obj_id, name) = self.get_model() or '', (0, '')
         else:
-            model, (obj_id, name) = value
+            try:
+                model, (obj_id, name) = value
+            except ValueError:
+                self.focus_out = True
+                return False
         if obj_id:
             if not leave:
                 dia = Dialog(model, obj_id, attrs=self.attrs,
