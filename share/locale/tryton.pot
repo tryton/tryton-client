@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-10-30 14:41-0500\n"
+"POT-Creation-Date: 2008-11-01 20:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,93 +80,93 @@ msgstr ""
 msgid "No action defined!"
 msgstr ""
 
-#: tryton/common/common.py:75
+#: tryton/common/common.py:76
 msgid "Tryton Connection"
 msgstr ""
 
-#: tryton/common/common.py:86 tryton/gui/window/dblogin.py:71
+#: tryton/common/common.py:87 tryton/gui/window/dblogin.py:71
 msgid "Server:"
 msgstr ""
 
-#: tryton/common/common.py:104
+#: tryton/common/common.py:105
 msgid "Port:"
 msgstr ""
 
-#: tryton/common/common.py:141
+#: tryton/common/common.py:142
 msgid "Selection"
 msgstr ""
 
-#: tryton/common/common.py:150
+#: tryton/common/common.py:151
 msgid "Your selection:"
 msgstr ""
 
-#: tryton/common/common.py:290 tryton/gui/main.py:1459
+#: tryton/common/common.py:291 tryton/gui/main.py:1459
 #: tryton/gui/window/attachment.py:245 tryton/gui/window/win_export.py:373
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:40
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:84
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:87
 #: tryton/gui/window/view_form/view/form_gtk/image.py:98
 msgid "Save As..."
 msgstr ""
 
-#: tryton/common/common.py:319 tryton/gui/window/win_export.py:409
+#: tryton/common/common.py:320 tryton/gui/window/win_export.py:409
 #: tryton/gui/window/win_import.py:256 tryton/gui/window/win_import.py:270
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:80
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:93
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:83
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:96
 msgid "Error"
 msgstr ""
 
-#: tryton/common/common.py:324
+#: tryton/common/common.py:325
 msgid "Report Bug"
 msgstr ""
 
-#: tryton/common/common.py:331
+#: tryton/common/common.py:332
 msgid "Application Error!"
 msgstr ""
 
-#: tryton/common/common.py:350
+#: tryton/common/common.py:351
 msgid "Error: "
 msgstr ""
 
-#: tryton/common/common.py:371
+#: tryton/common/common.py:372
 msgid "To report bugs you must have an account on "
 msgstr ""
 
-#: tryton/common/common.py:394
+#: tryton/common/common.py:395
 msgid "Bug Tracker"
 msgstr ""
 
-#: tryton/common/common.py:412
+#: tryton/common/common.py:413
 msgid "User:"
 msgstr ""
 
-#: tryton/common/common.py:420 tryton/common/common.py:676
+#: tryton/common/common.py:421 tryton/common/common.py:716
 #: tryton/gui/window/dblogin.py:93 tryton/gui/window/tree.py:323
 msgid "Password:"
 msgstr ""
 
-#: tryton/common/common.py:471
+#: tryton/common/common.py:511
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 
-#: tryton/common/common.py:482
+#: tryton/common/common.py:522
 msgid "Created new bug with ID "
 msgstr ""
 
-#: tryton/common/common.py:489
+#: tryton/common/common.py:529
 msgid "Exception:"
 msgstr ""
 
-#: tryton/common/common.py:523 tryton/common/common.py:549
+#: tryton/common/common.py:563 tryton/common/common.py:589
 msgid "Confirmation"
 msgstr ""
 
-#: tryton/common/common.py:617
+#: tryton/common/common.py:657
 msgid "Concurrency Exception"
 msgstr ""
 
-#: tryton/common/common.py:632
+#: tryton/common/common.py:672
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
 "\n"
@@ -177,30 +177,30 @@ msgid ""
 "   - \"Write Anyway\" to save your current version."
 msgstr ""
 
-#: tryton/common/common.py:642
+#: tryton/common/common.py:682
 msgid "Compare"
 msgstr ""
 
-#: tryton/common/common.py:647
+#: tryton/common/common.py:687
 msgid "Write Anyway"
 msgstr ""
 
-#: tryton/common/common.py:670 tryton/common/common.py:681
+#: tryton/common/common.py:710 tryton/common/common.py:721
 #: tryton/gui/main.py:1058 tryton/gui/window/tree.py:330
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
 msgstr ""
 
-#: tryton/common/common.py:717
+#: tryton/common/common.py:757
 msgid "Network Error!"
 msgstr ""
 
-#: tryton/common/common.py:821
+#: tryton/common/common.py:861
 msgid "Operation in progress"
 msgstr ""
 
-#: tryton/common/common.py:825
+#: tryton/common/common.py:865
 msgid ""
 "Please wait,\n"
 "this operation may take a while..."
@@ -757,7 +757,7 @@ msgid "Images"
 msgstr ""
 
 #: tryton/gui/window/attachment.py:273 tryton/gui/window/win_import.py:109
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:69
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:72
 #: tryton/gui/window/view_form/view/form_gtk/image.py:91
 msgid "Open..."
 msgstr ""
@@ -1533,17 +1533,17 @@ msgid "You must select a record to use the relate button !"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/list.py:350
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:473
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:477
 msgid "Actions"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/list.py:353
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:475
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:479
 msgid "Reports"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/list.py:382
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:502
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:506
 msgid "You must select a record to use the relation!"
 msgstr ""
 
@@ -1555,7 +1555,7 @@ msgstr ""
 msgid "Select a File"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:79
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:82
 #, python-format
 msgid ""
 "Error reading the file.\n"
@@ -1563,7 +1563,7 @@ msgid ""
 "%s"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:92
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:95
 #, python-format
 msgid ""
 "Error writing the file.\n"
@@ -1571,30 +1571,30 @@ msgid ""
 "%s"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:113
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:116
 msgid "bytes"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/form_gtk/calendar.py:45
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:172
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:175
 #: tryton/gui/window/view_form/widget_search/calendar.py:51
 #: tryton/gui/window/view_form/widget_search/calendar.py:72
 msgid "Open the calendar"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:104
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:107
 msgid "Date Selection"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:254
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:260
 msgid "Date Time Selection"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:263
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:269
 msgid "Hour:"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:266
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:272
 msgid "Minute:"
 msgstr ""
 
@@ -1639,16 +1639,16 @@ msgid "Remove"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:26
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:163
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:167
 msgid "Link"
 msgstr ""
 
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:199
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:457
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:461
 msgid "Open a record"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:461
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:465
 msgid "Search a record"
 msgstr ""
 
@@ -1755,7 +1755,7 @@ msgstr ""
 msgid "Image size too large!"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:169
+#: tryton/gui/window/view_form/view/list_gtk/editabletree.py:154
 #, python-format
 msgid "Warning; field \"%s\" is required!"
 msgstr ""
