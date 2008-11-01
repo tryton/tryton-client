@@ -133,23 +133,8 @@ class EditableTreeView(gtk.TreeView):
         model = store.get_value(store.get_iter(path), 0)
 
         if event.keyval in self.leaving_events:
-            shift_pressed = bool(gtk.gdk.SHIFT_MASK & event.state)
             if isinstance(entry, gtk.Entry):
                 txt = entry.get_text()
-            elif isinstance(entry, gtk.ComboBoxEntry) \
-                    and shift_pressed \
-                    and event.keyval != gtk.keysyms.ISO_Left_Tab:
-                model = entry.get_property('model')
-                txt = entry.get_active_text()
-                idx = 0
-                for idx, line in enumerate(model):
-                    if line[1] == txt:
-                        break
-                if event.keyval == gtk.keysyms.Up:
-                    entry.set_active((idx - 1) % 3)
-                elif event.keyval == gtk.keysyms.Down:
-                    entry.set_active((idx + 1) % 3)
-                return True
             else:
                 txt = entry.get_active_text()
             entry.disconnect(entry.editing_done_id)
