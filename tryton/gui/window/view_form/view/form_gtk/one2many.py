@@ -134,7 +134,11 @@ def _create_menu(self, attrs):
     but_switch.add(img_switch)
     but_switch.set_relief(gtk.RELIEF_NONE)
     hbox.pack_start(but_switch, expand=False, fill=False)
-    hbox.set_focus_chain([])
+
+    if attrs.get('add_remove'):
+        hbox.set_focus_chain([self.wid_text])
+    else:
+        hbox.set_focus_chain([])
 
     tooltips.enable()
 
