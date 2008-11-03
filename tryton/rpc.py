@@ -137,12 +137,12 @@ def logout():
 
 def context_reload():
     global CONTEXT, TIMEZONE
-    CONTEXT = {}
     user = RPCProxy('res.user')
     try:
         context = user.get_preferences(True, {})
     except:
         return
+    CONTEXT = {}
     for i in context:
         value = context[i]
         CONTEXT[i] = value
