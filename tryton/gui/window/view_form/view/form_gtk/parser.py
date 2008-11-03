@@ -87,27 +87,34 @@ class Button(object):
 
     def state_set(self, model):
         state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
+        if isinstance(state_changes, basestring):
+            try:
                 state_changes = eval(state_changes)
-            if 'invisible' in state_changes:
+            except:
+                self.widget.show()
+                self.widget.set_sensitive(True)
+                return
+        if 'invisible' in state_changes:
+            try:
                 if model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.widget.hide()
                 else:
                     self.widget.show()
-            else:
+            except:
                 self.widget.show()
-            if 'readonly' in state_changes:
+        else:
+            self.widget.show()
+        if 'readonly' in state_changes:
+            try:
                 if model.expr_eval(state_changes['readonly'],
                         check_load=False):
                     self.widget.set_sensitive(False)
                 else:
                     self.widget.set_sensitive(True)
-            else:
+            except:
                 self.widget.set_sensitive(True)
-        except:
-            self.widget.show()
+        else:
             self.widget.set_sensitive(True)
 
 class Label(gtk.Label):

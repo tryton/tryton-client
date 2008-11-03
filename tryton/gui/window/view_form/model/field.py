@@ -102,27 +102,33 @@ class CharField(object):
 
     def state_set(self, model):
         state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
+        if isinstance(state_changes, basestring):
+            try:
                 state_changes = eval(state_changes)
-            for key in ('readonly', 'required', 'invisible'):
-                if key == 'readonly' and self.attrs.get(key, False):
-                    continue
-                if key in state_changes:
+            except:
+                return
+        for key in ('readonly', 'required', 'invisible'):
+            if key == 'readonly' and self.attrs.get(key, False):
+                continue
+            if key in state_changes:
+                try:
                     self.get_state_attrs(model)[key] = \
                             model.expr_eval(state_changes[key],
                                     check_load=False)
-                elif key in self.attrs:
-                    self.get_state_attrs(model)[key] = self.attrs[key]
-            if model.mgroup.readonly:
-                self.get_state_attrs(model)['readonly'] = True
-            if 'value' in state_changes:
+                except:
+                    continue
+            elif key in self.attrs:
+                self.get_state_attrs(model)[key] = self.attrs[key]
+        if model.mgroup.readonly:
+            self.get_state_attrs(model)['readonly'] = True
+        if 'value' in state_changes:
+            try:
                 value = model.expr_eval(state_changes['value'],
                         check_load=False)
-                if value:
-                    self.set(model, value, modified=True)
-        except:
-            pass
+            except:
+                return
+            if value:
+                self.set(model, value, modified=True)
 
     def get_state_attrs(self, model):
         if self.name not in model.state_attrs:
