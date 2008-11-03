@@ -107,6 +107,7 @@ def login(username, password, host, port, database):
         finally:
             _SEMAPHORE.release()
     except socket.error:
+        _SOCK.reconnect()
         _USER = 0
         _SESSION = ''
         return -1
@@ -170,9 +171,13 @@ def _execute(blocking, obj, method, *args):
             _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
             result = _SOCK.receive()
         except socket.error:
-            _SOCK.reconnect()
-            _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
-            result = _SOCK.receive()
+            try:
+                _SOCK.reconnect()
+                _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
+                result = _SOCK.receive()
+            except socket.error:
+                _SOCK.reconnect()
+                raise
     finally:
         _SEMAPHORE.release()
     if key:
