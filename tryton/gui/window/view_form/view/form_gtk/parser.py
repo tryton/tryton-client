@@ -24,7 +24,7 @@ class Button(object):
             try:
                 stock = attrs['icon']
                 icon = gtk.Image()
-                icon.set_from_stock(stock, gtk.ICON_SIZE_BUTTON)
+                icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.widget.set_image(icon)
             except Exception:
                 import logging
