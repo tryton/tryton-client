@@ -30,7 +30,6 @@ class Button(object):
                 import logging
                 log = logging.getLogger('common')
                 log.warning(_('Wrong icon for the button!'))
-        self.widget.show()
         self.widget.connect('clicked', self.button_clicked)
         self.form = None #fill later by ViewForm
 
@@ -116,6 +115,22 @@ class Button(object):
                 self.widget.set_sensitive(True)
         else:
             self.widget.set_sensitive(True)
+        if 'icon' in state_changes:
+            try:
+                stock = model.expr_eval(state_changes['icon'], check_load=False)
+                if stock:
+                    try:
+                        icon = gtk.Image()
+                        icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                        self.widget.set_image(icon)
+                    except:
+                        import logging
+                        log = logging.getLogger('common')
+                        log.warning(_('Wrong icon for the button!'))
+                else:
+                    self.widget.set_image(gtk.Image())
+            except:
+                self.widget.set_image(gtk.Image())
 
 class Label(gtk.Label):
 
