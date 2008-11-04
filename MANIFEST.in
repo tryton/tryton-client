@@ -1,5 +1,7 @@
 include LICENSE
 include COPYRIGHT
+include README
+include INSTALL
 include doc/*
 include share/pixmaps/*.png
 include share/pixmaps/*.svg
