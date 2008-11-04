@@ -272,7 +272,10 @@ def file_open(filename, type, parent, print_p=False):
         if not pid:
             pid = os.fork()
             if not pid:
-                os.execv('/usr/bin/open', ['/usr/bin/open', filename])
+                try:
+                    os.execv('/usr/bin/open', ['/usr/bin/open', filename])
+                except:
+                    sys.exit(0)
             time.sleep(0.1)
             sys.exit(0)
         os.waitpid(pid, 0)
@@ -308,7 +311,10 @@ def file_open(filename, type, parent, print_p=False):
         if not pid:
             prog, args = cmd.split(' ', 1)
             args = [os.path.basename(prog)] + args.split(' ')
-            os.execv(prog, args)
+            try:
+                os.execv(prog, args)
+            except:
+                sys.exit(0)
         time.sleep(0.1)
         sys.exit(0)
     os.waitpid(pid, 0)
