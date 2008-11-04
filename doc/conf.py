@@ -36,16 +36,16 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'Tryton'
+project = 'tryton'
 copyright = '2008, B2CK'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '0.1'
+version = '0.0.1'
 # The full version, including alpha/beta/rc tags.
-release = '0.1'
+release = '0.0.1'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -126,7 +126,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Trytondoc'
+htmlhelp_basename = 'trytondoc'
 
 
 # Options for LaTeX output
@@ -141,7 +141,7 @@ htmlhelp_basename = 'Trytondoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'Tryton.tex', 'Tryton Documentation', 'Bertrand Chenal, Cédric Krier',
+  ('index', 'tryton.tex', 'tryton Documentation', 'Bertrand Chenal, Cédric Krier',
    'manual'),
 ]
 
