@@ -172,8 +172,8 @@ def setlang(lang=None, locale_dict=None):
                     (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
                 encoding = 'UTF-8'
             os.environ['LANGUAGE'] = lang
-            os.environ['LC_ALL'] = lang
-            os.environ['LC_MESSAGES'] = lang
+            os.environ['LC_ALL'] = lang2 + '.' + encoding
+            os.environ['LC_MESSAGES'] = lang2 + '.' + encoding
             os.environ['LANG'] = lang
             locale.setlocale(locale.LC_ALL, str(lang2 + '.' + encoding))
         except:
