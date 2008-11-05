@@ -85,7 +85,7 @@ class Action(object):
             context = {}
         if datas is None:
             datas = {}
-        if 'type' not in action:
+        if 'type' not in (action or {}):
             return
 
         if action['type'] == 'ir.action.act_window':
