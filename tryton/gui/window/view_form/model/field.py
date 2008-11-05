@@ -280,9 +280,10 @@ class M2OField(CharField):
                 result = rpc2.name_get([value], rpc.CONTEXT)
             except:
                 return
-            model.value[self.name] = result[0]
-        else:
-            model.value[self.name] = value
+            value = result[0]
+        if value and len(value) != 2:
+            value = False
+        model.value[self.name] = value
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
