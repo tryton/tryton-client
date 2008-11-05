@@ -235,8 +235,6 @@ class Main(object):
         settings = gtk.settings_get_default()
         settings.set_long_property('gtk-button-images', 1, 'Tryton:gui.main')
         settings.set_property('gtk-can-change-accels', True)
-        settings.set_long_property('gtk-entry-select-on-focus', 0,
-                'Tryton:gui.main')
 
         self.sig_mode()
 
