@@ -396,6 +396,8 @@ class Screen(SignalEvent):
     def cancel_current(self):
         if self.current_model:
             self.current_model.cancel()
+            if self.current_model.id < 0:
+                self.remove()
         if self.current_view:
             self.current_view.cancel()
 
@@ -480,13 +482,14 @@ class Screen(SignalEvent):
                     common.process_exception(exception, self.window)
                     return False
             self.current_view.set_cursor()
-            idx = self.models.models.index(self.current_model)
-            self.models.remove(self.current_model, remove=remove)
-            if self.models.models:
-                idx = min(idx, len(self.models.models)-1)
-                self.current_model = self.models.models[idx]
-            else:
-                self.current_model = None
+            if self.current_model in self.models.models:
+                idx = self.models.models.index(self.current_model)
+                self.models.remove(self.current_model, remove=remove)
+                if self.models.models:
+                    idx = min(idx, len(self.models.models)-1)
+                    self.current_model = self.models.models[idx]
+                else:
+                    self.current_model = None
             if reload_ids:
                 self.models.reload(reload_ids)
             self.display()
