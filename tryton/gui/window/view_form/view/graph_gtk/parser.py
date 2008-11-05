@@ -8,6 +8,9 @@ from line import Line
 from pie import Pie
 from tryton.config import TRYTON_ICON, CONFIG
 import sys, os
+import gettext
+
+_ = gettext.gettext
 
 GRAPH_TYPE = {
     'vbar': VerticalBar,
@@ -96,7 +99,10 @@ def save(widget, graph, window):
 def button_press(widget, event, graph, window):
     if event.button == 3:
         menu = gtk.Menu()
-        item = gtk.ImageMenuItem('tryton-save-as')
+        item = gtk.ImageMenuItem(_('Save As...'))
+        img = gtk.Image()
+        img.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
+        item.set_image(img)
         item.connect('activate', save, graph, window)
         item.show()
         menu.append(item)
