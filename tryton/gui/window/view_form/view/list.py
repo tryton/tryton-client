@@ -546,7 +546,6 @@ class ViewList(ParserView):
                 self.children[child][2].set_markup(label_str)
 
     def set_cursor(self, new=False, reset_view=True):
-        self.widget_tree.grab_focus()
         if self.screen.current_model:
             path = self.store.on_get_path(self.screen.current_model)
             focus_column = None
@@ -566,6 +565,7 @@ class ViewList(ParserView):
                     focus_column = column
                     break
             self.widget_tree.set_cursor(path, focus_column, new)
+        self.widget_tree.grab_focus()
 
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
