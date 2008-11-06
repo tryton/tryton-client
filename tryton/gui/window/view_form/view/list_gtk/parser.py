@@ -265,8 +265,6 @@ class Char(object):
             elif bool(int(field.get_state_attrs(model).get('required', 0))):
                 cell.set_property('background',
                         COLORS.get('required', 'white'))
-            else:
-                cell.set_property('background', 'white')
             readonly = field.get_state_attrs(model).get('readonly', False)
             if isinstance(cell, gtk.CellRendererToggle):
                 cell.set_property('activatable', not readonly)
