@@ -466,7 +466,8 @@ class ViewList(ParserView):
                 and self.widget_tree.editable \
                 and self.screen.tree_saves \
                 and previous_model != self.screen.current_model:
-            if previous_model and not previous_model.save():
+            if previous_model and \
+                    not (previous_model.validate() and previous_model.save()):
                 self.screen.current_model = previous_model
                 self.set_cursor()
                 return True
