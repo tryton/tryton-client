@@ -24,27 +24,6 @@ class Shortcuts(object):
         self.dialog.vbox.pack_start(notebook)
 
         shortcuts = [
-                (_('Global Shortcuts'),),
-                ('<Ctrl> + O', _('Connect')),
-                ('<Ctrl> + N', _('New')),
-                ('<Ctrl> + S', _('Save')),
-                ('<Ctrl> + D', _('Delete')),
-                ('<Ctrl> + F', _('Find/Search')),
-                ('<PgUp>', _('Previous record')),
-                ('<PgDn>', _('Next record')),
-                ('<Ctrl> + L', _('Switch view mode')),
-                ('<Ctrl> + <PgUp>', _('Previous tab')),
-                ('<Ctrl> + <PgDn>', _('Next tab')),
-                ('<Ctrl> + W', _('Close tab')),
-                (_('Popup Shortcuts'),),
-                ('<Ctrl> + <Enter>', _('Validate popup')),
-                ('<Ctrl> + <Esc>', _('Close popup')),
-                ]
-
-        notebook.append_page(self._fill_table(shortcuts),
-                gtk.Label(_('Main Window')))
-
-        shortcuts = [
                 (_('Text Entries Shortcuts'),),
                 ('<Ctrl> + X', _('Cut selected text')),
                 ('<Ctrl> + C', _('Copy selected text')),
