@@ -44,15 +44,6 @@ class Reference(WidgetInterface):
         self.focus_out = True
         self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
-        self.but_new = gtk.Button()
-        img_new = gtk.Image()
-        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        self.but_new.set_image(img_new)
-        self.but_new.set_relief(gtk.RELIEF_NONE)
-        self.but_new.connect('clicked', self.sig_new)
-        self.but_new.set_alignment(0.5, 0.5)
-        self.widget.pack_start(self.but_new, expand=False, fill=False)
-
         self.but_open = gtk.Button()
         img_find = gtk.Image()
         img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -64,11 +55,21 @@ class Reference(WidgetInterface):
         self.but_open.set_alignment(0.5, 0.5)
         self.widget.pack_start(self.but_open, padding=2, expand=False,
                 fill=False)
+
+        self.but_new = gtk.Button()
+        img_new = gtk.Image()
+        img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        self.but_new.set_image(img_new)
+        self.but_new.set_relief(gtk.RELIEF_NONE)
+        self.but_new.connect('clicked', self.sig_new)
+        self.but_new.set_alignment(0.5, 0.5)
+        self.widget.pack_start(self.but_new, expand=False, fill=False)
+
         self.widget.set_focus_chain([self.widget_combo, self.wid_text])
 
         tooltips = gtk.Tooltips()
-        tooltips.set_tip(self.but_new, _('Create a new record'))
         tooltips.set_tip(self.but_open, _('Search / Open a record'))
+        tooltips.set_tip(self.but_new, _('Create a new record'))
         tooltips.enable()
 
         self._readonly = False
