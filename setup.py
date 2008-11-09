@@ -63,6 +63,16 @@ if os.name == 'nt':
                 'libgtk-win32-2.0-0.dll',
                 'libpango-1.0-0.dll',
                 'libpangowin32-1.0-0.dll',
+                'libcairo-2.dll',
+                'libfontconfig-1.dll',
+                'libfreetype-6.dll',
+                'libgdkglext-win32-1.0.0.dll',
+                'libglade-2.0-0.dll',
+                'libgtkglext-win32-1.0-0.dll',
+                'libpangocairo-1.0-0.dll',
+                'libpangoft2-1.0-0.dll',
+                'libxml2.dll',
+                'zlib1.dll',
             ],
         }
     }
