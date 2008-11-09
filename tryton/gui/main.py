@@ -585,6 +585,7 @@ class Main(object):
 
         radiomenuitem_pda = gtk.RadioMenuItem(group=radiomenuitem_normal,
                 label=_('_PDA'))
+        self.radiomenuitem_pda = radiomenuitem_pda
         radiomenuitem_pda.connect('activate',
                 lambda x: self.sig_mode_change(True))
         radiomenuitem_pda.set_accel_path('<tryton>/Options/Mode/PDA')
