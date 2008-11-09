@@ -5,6 +5,16 @@
 import os
 import sys
 
+if os.name == 'nt':
+    sys.path.insert(0, os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
+                                    'GTK\\bin'))
+    sys.path.insert(0, os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
+                                    'GTK\\lib'))
+    os.environ['PATH'] = os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
+                                      'GTK\\bin') + ';' + os.environ['PATH']
+    os.environ['PATH'] = os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
+                                      'GTK\\lib') + ';' + os.environ['PATH']
+
 import pygtk
 pygtk.require('2.0')
 import gtk
