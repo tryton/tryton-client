@@ -815,6 +815,9 @@ class RPCProgress(object):
                 if not win or not progressbar:
                     win = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
                     win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+                    if hasattr(win, 'set_deletable'):
+                        win.set_deletable(False)
+                    win.set_decorated(False)
                     vbox = gtk.VBox(False, 0)
                     hbox = gtk.HBox(False, 13)
                     hbox.set_border_width(10)
