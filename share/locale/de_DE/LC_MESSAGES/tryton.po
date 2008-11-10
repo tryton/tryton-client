@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-11-01 20:53+0100\n"
+"PO-Revision-Date: 2008-11-08 20:52+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -891,7 +891,7 @@ msgstr "Tryton Server Passwort:"
 #: tryton/gui/window/dbdumpdrop.py:172
 #: tryton/gui/window/dbrestore.py:113
 msgid "This is the password of the Tryton server. It doesn't belong to a real user. This password is usually defined in the trytond configuration."
-msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort gehört nicht zu einem Tryton Benutzer. Das Paswort wird normalerweise in der Tryton Konfiguration angegeben."
+msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort gehört nicht zu einem Tryton Benutzer. Das Passwort wird üblicherweise in der Tryton Konfiguration angegeben."
 
 #: tryton/gui/window/dbcreate.py:218
 msgid "New database setup:"
@@ -921,7 +921,7 @@ msgstr "Wählen Sie die Standardsprache für die neue Datenbank. Nach der Instal
 
 #: tryton/gui/window/dbcreate.py:254
 msgid "Admin password:"
-msgstr "Admin Passwort:"
+msgstr "Administrator Passwort:"
 
 #: tryton/gui/window/dbcreate.py:262
 msgid ""
@@ -935,11 +935,11 @@ msgstr ""
 
 #: tryton/gui/window/dbcreate.py:270
 msgid "Confirm admin password:"
-msgstr "Admin Passwort Wiederholung:"
+msgstr "Passwort Wiederholung:"
 
 #: tryton/gui/window/dbcreate.py:278
 msgid "Type the Admin password again"
-msgstr "Wiederholen Sie die Eingabe des Admin Passworts um sicher zu gehen, dass Sie sich beim ersten Mal nicht vertippt haben."
+msgstr "Wiederholen Sie die Eingabe des Administrator Passworts um sicher zu gehen, dass Sie sich beim ersten Mal nicht vertippt haben."
 
 #: tryton/gui/window/dbcreate.py:324
 msgid ""
@@ -955,7 +955,7 @@ msgstr "Unerlaubte Zeichen im Datenbank Namen!"
 
 #: tryton/gui/window/dbcreate.py:334
 msgid "The new admin password doesn't match the confirmation field.\n"
-msgstr "Die beiden Eingaben für das neue Admin Passwort stimmen nicht überein.\n"
+msgstr "Die beiden Eingaben für das neue Administrator Passwort stimmen nicht überein.\n"
 
 #: tryton/gui/window/dbcreate.py:337
 msgid "Passwords doesn't match!"
@@ -963,11 +963,11 @@ msgstr "Passwörter sind nicht identisch!"
 
 #: tryton/gui/window/dbcreate.py:340
 msgid "Admin password and confirmation are required to create a new database."
-msgstr "Das Admin Passwort und dessen Wiederholung sind notwendig um eine neue Datenbank für Tryton anlegen zu können."
+msgstr "Das Administrator Passwort und dessen Wiederholung werden benötigt um eine neue Datenbank für Tryton anlegen zu können."
 
 #: tryton/gui/window/dbcreate.py:342
 msgid "Missing admin password!"
-msgstr "Admin Passwort fehlt!"
+msgstr "Administrator Passwort fehlt!"
 
 #: tryton/gui/window/dbcreate.py:352
 msgid ""
