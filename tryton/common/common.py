@@ -163,11 +163,13 @@ def selection(title, values, parent, alwaysask=False):
     column = gtk.TreeViewColumn("Widget", cell, text=0)
     treeview.append_column(column)
     treeview.set_search_column(0)
-    model = gtk.ListStore(gobject.TYPE_STRING)
+
+    model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_INT)
     keys = values.keys()
     keys.sort()
+    i = 0
     for val in keys:
-        model.append([str(val)])
+        model.append([str(val), i])
 
     treeview.set_model(model)
     treeview.connect('row-activated',
@@ -181,7 +183,8 @@ def selection(title, values, parent, alwaysask=False):
         if sel:
             (model, i) = sel
             if i:
-                value = model.get_value(i, 0).decode('utf-8')
+                index = model.get_value(i, 1)
+                value = values.keys()[index]
                 res = (value, values[value])
     parent.present()
     dialog.destroy()
