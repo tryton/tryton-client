@@ -99,29 +99,30 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     if obj[field]:
                         obj[field] = obj[field][1]
             elif field_type in ('selection'):
+                selection = self.fields_type[field]['selection']
+                if 'relation' in self.fields_type[field]:
+                    try:
+                        selection = rpc.execute('object', 'execute',
+                                self.fields_type[field]['relation'],
+                                'name_search', '',
+                                self.fields_type[field].get('domain', []),
+                                'ilike', rpc.CONTEXT)
+                    except:
+                        selection = []
+                else:
+                    if not isinstance(self.fields_type[field]['selection'],
+                            (list, tuple)):
+                        try:
+                            selection = rpc.execute('object', 'execute',
+                                    self.view['model'],
+                                    self.fields_type[field]['selection'],
+                                    rpc.CONTEXT)
+                        except:
+                            selection = []
+                self.fields_type[field]['selection'] = selection
                 for obj in res_ids:
-                    if obj[field]:
-                        selection = self.fields_type[field]['selection']
-                        if 'relation' in self.fields_type[field]:
-                            try:
-                                selection = rpc.execute('object', 'execute',
-                                        self.fields_type[field]['relation'],
-                                        'name_search', '',
-                                        self.fields_type[field].get('domain', []),
-                                        'ilike', rpc.CONTEXT)
-                            except:
-                                selection = []
-                        else:
-                            if not isinstance(self.fields_type[field]['selection'],
-                                    (list, tuple)):
-                                try:
-                                    selection = rpc.execute('object', 'execute',
-                                            self.view['model'],
-                                            self.fields_type[field]['selection'],
-                                            rpc.CONTEXT)
-                                except:
-                                    selection = []
-                        self.fields_type[field]['selection'] = selection
+                    obj[field] = dict(self.fields_type[field]['selection']
+                            ).get(obj[field],'')
             elif field_type in ('float', 'numeric'):
                 digits = self.fields_type[field].get('digits', (16, 2))
                 for obj in res_ids:
