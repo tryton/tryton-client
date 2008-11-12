@@ -23,8 +23,11 @@ class Action(object):
         datas = data.copy()
         ids = datas['ids']
         del datas['ids']
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(context)
         if not ids:
-            args = ('object', 'execute', datas['model'], 'search', [])
+            args = ('object', 'execute', datas['model'], 'search', [],
+                    0, None, None, ctx)
             try:
                 ids = rpc.execute(*args)
             except Exception, exception:
@@ -35,8 +38,6 @@ class Action(object):
                 message(_('Nothing to print!'), window)
                 return False
             datas['id'] = ids[0]
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(context)
         args = ('report', 'execute', name, ids, datas, ctx)
         try:
             res = rpc.execute(*args)
