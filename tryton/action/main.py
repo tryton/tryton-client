@@ -39,12 +39,12 @@ class Action(object):
                 return False
             datas['id'] = ids[0]
         args = ('report', 'execute', name, ids, datas, ctx)
+        rpcprogress = common.RPCProgress('execute', args, window)
         try:
-            res = rpc.execute(*args)
+            res = rpcprogress.run()
         except Exception, exception:
-            res = common.process_exception(exception, window, *args)
-            if not res:
-                return False
+            common.process_exception(exception, window)
+            return False
         if not res:
             return False
         (type, data, print_p) = res
