@@ -174,7 +174,7 @@ def setlang(lang=None, locale_dict=None):
             os.environ['LANGUAGE'] = lang
             os.environ['LC_ALL'] = lang2 + '.' + encoding
             os.environ['LC_MESSAGES'] = lang2 + '.' + encoding
-            os.environ['LANG'] = lang
+            os.environ['LANG'] = lang + '.' + encoding
             locale.setlocale(locale.LC_ALL, str(lang2 + '.' + encoding))
         except:
             logging.getLogger('translate').info(
