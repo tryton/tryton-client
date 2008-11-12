@@ -1,1 +1,2 @@
 - Add set_search_column on treeview
+- Use unicode for value from gtk.Entry
