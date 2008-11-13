@@ -511,10 +511,13 @@ class Many2One(WidgetInterface):
             return False
         screen = Screen(self.attrs['relation'], self._window)
         screen.load([obj_id])
-        act['domain'] = screen.current_model.expr_eval(act['domain'],
+        act['domain'] = screen.current_model.expr_eval(act.get('domain', []),
                 check_load=False)
-        act['context'] = str(screen.current_model.expr_eval(act['context'],
-            check_load=False))
+        act['context'] = str(screen.current_model.expr_eval(
+            act.get('context', {}), check_load=False))
+        data['model'] = self.model_type
+        data['id'] = obj_id
+        data['ids'] = [obj_id]
         return Action._exec_action(act, self._window, data, context)
 
     def click_and_action(self, atype):
