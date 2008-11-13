@@ -262,7 +262,8 @@ class Many2One(WidgetInterface):
         else:
             win = WinSearch(self.attrs['relation'], sel_multi=False,
                     ids = [x[0] for x in ids], context=context,
-                    domain=domain, window=self._window)
+                    domain=domain, window=self._window,
+                    views_preload=self.attrs.get('views', {}))
             ids = win.go()
             if ids:
                 try:
@@ -324,7 +325,8 @@ class Many2One(WidgetInterface):
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids = [x[0] for x in ids], context=context,
-                        domain=domain, parent=self._window)
+                        domain=domain, parent=self._window,
+                        views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
                     try:
@@ -405,7 +407,8 @@ class Many2One(WidgetInterface):
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids = [x[0] for x in (ids or [])], context=context,
-                        domain=domain, parent=self._window)
+                        domain=domain, parent=self._window,
+                        views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
                     try:
