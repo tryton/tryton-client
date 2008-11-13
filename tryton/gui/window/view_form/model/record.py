@@ -185,20 +185,12 @@ class ModelRecord(SignalEvent):
         return self.id
 
     def default_get(self, domain=None, context=None):
-        if domain is None:
-            domain = []
         if len(self.mgroup.fields):
             try:
                 val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 val = self.rpc.default_get(self.mgroup.fields.keys(), context)
-            for clause in domain:
-                if clause[0] in self.mgroup.fields:
-                    if clause[1] == '=':
-                        val[clause[0]] = clause[2]
-                    if clause[1] == 'in' and len(clause[2]) == 1:
-                        val[clause[0]] = clause[2][0]
             self.set_default(val)
 
     def name_get(self):
