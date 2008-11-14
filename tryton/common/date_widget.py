@@ -224,10 +224,8 @@ class ComplexEntry(gtk.HBox):
             text = self.widget_cmd.get_text()[:-1]
             self.widget_cmd.set_text(text)
             return True
-        if event.keyval<250:
-            value = chr(event.keyval)
-            text = self.widget_cmd.get_text()
-            self.widget_cmd.set_text(text+value)
+        text = self.widget_cmd.get_text()
+        self.widget_cmd.set_text(text + event.string)
         return True
 
     def _process_cb(self, ok, widget, event=None):
