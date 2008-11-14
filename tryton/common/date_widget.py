@@ -179,7 +179,7 @@ class DateEntry(gtk.Entry):
 
     def _on_key_press(self, editable, event):
         if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Escape,
-                gtk.keysyms.Return):
+                gtk.keysyms.Return, gtk.keysyms.KP_Enter):
             if self.mode_cmd:
                 self.mode_cmd = False
                 if self.callback_process:
