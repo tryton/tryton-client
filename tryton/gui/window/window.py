@@ -21,6 +21,9 @@ class Window(object):
                     search_value=search_value)
             Main.get_main().win_add(win)
         elif view_type == 'tree':
+            if model == 'ir.ui.menu':
+                if Main.get_main().sig_reload_menu():
+                    return
             from tree import Tree
             win = Tree(model, window, res_id, view_ids and view_ids[0] or None,
                     domain, context, name=name)

@@ -1119,6 +1119,14 @@ class Main(object):
     def sig_shortcuts(self, widget):
         Shortcuts(self.window).run()
 
+    def sig_reload_menu(self):
+        res = False
+        for page in range(len(self.pages)):
+            if self.pages[page].model == 'ir.ui.menu':
+                self.pages[page].sig_reload()
+                res = True
+        return res
+
     def sig_win_menu(self, widget=None, quiet=True, prefs=None):
         for page in range(len(self.pages)):
             if self.pages[page].model == 'ir.ui.menu':
