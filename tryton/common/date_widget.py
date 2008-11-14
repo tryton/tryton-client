@@ -186,7 +186,9 @@ class DateEntry(gtk.Entry):
                     self.callback_process(False, self, event)
                 self.stop_emission("key-press-event")
                 return True
-        elif event.keyval in (ord('+'), ord('-'), ord('=')):
+        elif event.keyval in (gtk.keysyms.KP_Add, gtk.keysyms.plus,
+                gtk.keysyms.KP_Subtract, gtk.keysyms.minus,
+                gtk.keysyms.KP_Equal, gtk.keysyms.equal):
             self.mode_cmd = True
             self.date_get()
             if self.callback_process:
