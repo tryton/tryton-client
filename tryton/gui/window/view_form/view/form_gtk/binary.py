@@ -107,9 +107,11 @@ class Binary(WidgetInterface):
         super(Binary, self).display(model, model_field)
         if not model_field:
             self.wid_text.set_text('')
+            self.but_save_as.set_sensitive(False)
             return False
         self.model_field = model_field
         self.wid_text.set_text(self._size_get(model_field.get(model)))
+        self.but_save_as.set_sensitive(bool(model_field.get(model)))
         return True
 
     def _size_get(self, value):
