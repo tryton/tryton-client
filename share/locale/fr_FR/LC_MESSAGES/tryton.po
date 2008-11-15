@@ -1786,7 +1786,7 @@ msgstr ""
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:26
 msgid "Set"
-msgstr "Régler"
+msgstr "Ok"
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:42
 msgid "Field Name:"
