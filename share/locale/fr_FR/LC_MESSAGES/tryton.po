@@ -1782,7 +1782,7 @@ msgstr "Ajouter une traduction"
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:19
 msgid "Field Preference target"
-msgstr ""
+msgstr "Valeur par défaut"
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:26
 msgid "Set"
