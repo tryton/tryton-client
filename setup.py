@@ -39,6 +39,7 @@ if os.name == 'nt':
 
     args['windows'] = [{
         'script': os.path.join('bin', 'tryton'),
+        'icon_resources': [(1, os.path.join('share', 'pixmaps', 'tryton.ico'))],
     }]
     args['options'] = {
         'py2exe': {
