@@ -170,6 +170,7 @@ def selection(title, values, parent, alwaysask=False):
     i = 0
     for val in keys:
         model.append([str(val), i])
+        i += 1
 
     treeview.set_model(model)
     treeview.connect('row-activated',
