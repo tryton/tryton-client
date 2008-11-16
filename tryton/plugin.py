@@ -2,12 +2,17 @@
 #this repository contains the full copyright notices and license terms.
 import common
 import os
+import sys
 import imp
 import gettext
 
 _ = gettext.gettext
 
 PLUGINS_PATH = os.path.join(os.path.dirname(__file__), 'plugins')
+if not os.path.isdir(PLUGINS_PATH):
+    # try for py2exe
+    PLUGINS_PATH = os.path.join(os.path.abspath(os.path.normpath(
+        os.path.dirname(sys.argv[0]))), 'plugins')
 MODULES = []
 
 if os.path.isdir(PLUGINS_PATH):
