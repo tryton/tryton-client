@@ -91,6 +91,11 @@ SectionIn 1 2 RO
 
     ;Put file
     File /r "dist\*"
+    File "COPYRIGHT"
+    File "INSTALL"
+    File "LICENSE"
+    File "README"
+    File "TODO"
 
     SetOutPath "$INSTDIR\GTK\bin"
     File /r "${GTKDIR}\bin\*"
