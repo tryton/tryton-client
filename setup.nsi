@@ -127,7 +127,7 @@ SectionIn 1 2 RO
     WriteRegStr HKLM "Software\tryton-${VERSION}" "" $INSTDIR
 
     ;Write the uninstall keys for Windows
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tryton-${VERSION}" "Tryton ${VERSION} (remove only)" "$INSTDIR\uninstall.exe"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tryton-${VERSION}" "DisplayName" "Tryton ${VERSION} (remove only)"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tryton-${VERSION}" "UninstallString" "$INSTDIR\uninstall.exe"
 
     ;Create the uninstaller
