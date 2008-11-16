@@ -127,6 +127,9 @@ SectionIn 1 2 RO
     SetOutPath "$INSTDIR\doc"
     File /r "doc\*"
 
+    SetOutPath "$INSTDIR\plugins"
+    File /r "tryton\plugins\*"
+
     ;Write the installation path into the registry
     WriteRegStr HKCU "Software\tryton-${VERSION}" "" $INSTDIR
     WriteRegStr HKLM "Software\tryton-${VERSION}" "" $INSTDIR
