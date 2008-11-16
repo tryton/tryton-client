@@ -267,7 +267,17 @@ def file_open(filename, type, parent, print_p=False):
             os.startfile(os.path.normpath(filename), operation)
         except:
             # Try without operation, it is not supported on version < 2.5
-            os.startfile(os.path.normpath(filename))
+            try:
+                os.startfile(os.path.normpath(filename))
+            except:
+                save_name = file_selection(_('Save As...'), parent=parent,
+                        action=gtk.FILE_CHOOSER_ACTION_SAVE)
+                if save_name:
+                    file_p = file(filename, 'rb')
+                    save_p = file(save_name, 'wb+')
+                    save_p.write(file_p.read())
+                    save_p.close()
+                    file_p.close()
         return
     elif os.name == 'mac' or \
             (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
