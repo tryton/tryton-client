@@ -9,5 +9,4 @@ include doc/*
 include share/pixmaps/*.png
 include share/pixmaps/*.svg
 include share/pixmaps/*.ico
-include share/pixmaps/*.bmp
 recursive-include share/locale/ *.mo
