@@ -12,11 +12,10 @@ Contents:
 
    introduction
    installation
-   databases
-   options
-   preferences
-   forms
-   plugins
+
+   usage
+
+   glossary
 
 Indices and tables
 ##################
