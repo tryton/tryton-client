@@ -96,6 +96,7 @@ SectionIn 1 2 RO
     File "LICENSE"
     File "README"
     File "TODO"
+    File "CHANGELOG"
 
     SetOutPath "$INSTDIR\GTK\bin"
     File /r "${GTKDIR}\bin\*"
