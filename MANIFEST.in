@@ -3,6 +3,7 @@ include COPYRIGHT
 include README
 include INSTALL
 include TODO
+include CHANGELOG
 include setup.nsi
 include *.nsh
 include doc/*
