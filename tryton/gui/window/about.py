@@ -11,9 +11,20 @@ import webbrowser
 COPYRIGHT='''Copyright (C) 2008 B2CK SPRL.
 Copyright (C) 2007-2008 Cédric Krier.
 Copyright (C) 2007-2008 Bertrand Chenal.
+Copyright (C) 2008 virtual things - Preisler & Spallek GbR.
+Copyright (C) 2008 Udo Spallek.
 Copyright (C) 2004-2008 Tiny SPRL.
 Copyright (C) 2006 Async Open Source.
 '''
+AUTHORS=[
+        'Cédric Krier <cedric.krier@b2ck.com>',
+        'Bertrand Chenal <bertrand.chenal@b2ck.com>',
+        'Udo Spallek <info@virtual-things.biz>',
+        'Korbinian Preisler <info@virtual-things.biz>',
+        'Hartmut Goebel',
+        'Franz Wiesinger',
+        'Mathias Behrle',
+        ]
 LICENSE='''                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -688,15 +699,7 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.'''
-AUTHORS=[
-        'Cédric Krier <cedric.krier@b2ck.com>',
-        'Bertrand Chenal <bertrand.chenal@b2ck.com>',
-        'Udo Spallek',
-        'Korbinian Preisler',
-        'Hartmut Goebel',
-        'Franz Wiesinger',
-        'Mathias Behrle',
-        ]
+
 
 _ = gettext.gettext
 
