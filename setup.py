@@ -111,7 +111,7 @@ setup(name=PACKAGE,
     ],
     license=LICENSE,
     install_requires=[
-        "pygtk >= 2.0",
+#        "pygtk >= 2.0",
         "egenix-mx-base",
     ],
     **args
