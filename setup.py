@@ -114,5 +114,9 @@ setup(name=PACKAGE,
 #        "pygtk >= 2.0",
         "egenix-mx-base",
     ],
+    extras_require={
+        'SSL': ['pyOpenSSL'],
+        'timezone': ['pytz'],
+    },
     **args
 )
