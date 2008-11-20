@@ -50,7 +50,7 @@ class Dialog(object):
         self.dia.set_default_response(gtk.RESPONSE_OK)
 
         self.screen = Screen(model, self.dia, domain=domain, context=context,
-                view_type=['form'])
+                view_type=['form'], views_preload=attrs.get('views', {}))
         if obj_id:
             self.screen.load([obj_id])
         else:
