@@ -158,12 +158,12 @@ def setlang(lang=None, locale_dict=None):
         locale_dir = os.path.join(PREFIX, 'share/locale')
     if lang:
         encoding = locale.getdefaultlocale()[1]
-        if encoding == 'utf':
+        if not encoding:
+            encoding = 'UTF-8'
+        if encoding.lower() in ('utf', 'utf8'):
             encoding = 'UTF-8'
         if encoding == 'cp1252':
             encoding = '1252'
-        if not encoding:
-            encoding = 'UTF-8'
         try:
             lang2 = lang
             if os.name == 'nt':
