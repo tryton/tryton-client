@@ -184,11 +184,12 @@ class ModelRecordGroup(SignalEvent):
         if newmod and display:
             self.signal('model-changed', newmod)
 
-        if modified:
+        if modified and newmods:
             for newmod in newmods:
                 newmod.modified = True
-                if newmod.parent:
-                    newmod.signal('record-changed', newmod.parent)
+            # send record-changed only once
+            if newmod.parent:
+                newmod.signal('record-changed', newmod.parent)
 
         self.current_idx = 0
         return True
@@ -291,7 +292,7 @@ class ModelRecordGroup(SignalEvent):
             return None
         return self.models[self.current_idx]
 
-    def remove(self, model, remove=False, modified=True):
+    def remove(self, model, remove=False, modified=True, signal=True):
         idx = self.models.index(model)
         if self.models[idx].id > 0:
             if remove:
@@ -303,7 +304,8 @@ class ModelRecordGroup(SignalEvent):
         if modified:
             model.modified = True
         self.models.remove(self.models[idx])
-        model.signal('record-changed', model.parent)
+        if signal:
+            model.signal('record-changed', model.parent)
 
     def add_fields_custom(self, fields, models):
         to_add = []
