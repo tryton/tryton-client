@@ -509,6 +509,9 @@ class O2MField(CharField):
         else:
             model.value[self.name].readonly = False
 
+    def get_removed_ids(self, model):
+        return model.value[self.name].model_removed
+
 
 class ReferenceField(CharField):
 

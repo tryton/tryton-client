@@ -592,10 +592,12 @@ class One2Many(WidgetInterface):
         domain = domain[:]
         domain.extend(self._view.model.expr_eval(self.attrs.get('add_remove'),
             context))
+        removed_ids = self._view.modelfield.get_removed_ids(self._view.model)
 
         try:
             ids = rpc.execute('object', 'execute', self.attrs['relation'],
-                    'name_search', self.wid_text.get_text(), domain, 'ilike',
+                    'name_search', self.wid_text.get_text(),
+                    ['OR', domain, ('id', 'in', removed_ids)], 'ilike',
                     context, _LIMIT)
         except Exception, exception:
             common.process_exception(exception, self._window)
