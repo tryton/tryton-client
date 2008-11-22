@@ -25,6 +25,7 @@ mapping = {
 }
 
 class DateEntry(gtk.Entry):
+
     def __init__(self, format, callback=None, callback_process=None):
         super(DateEntry, self).__init__()
         self.modify_font(pango.FontDescription("monospace"))
@@ -201,8 +202,10 @@ class DateEntry(gtk.Entry):
             return True
         return False
 
+
 class CmdEntry(gtk.Label):
     pass
+
 
 class ComplexEntry(gtk.HBox):
     def __init__(self, format, *args, **argv):
@@ -241,7 +244,6 @@ class ComplexEntry(gtk.HBox):
                     self.widget.date_set(res)
             self.widget_cmd.set_text('')
             self.widget_cmd.hide()
-
 
 def compute_date(cmd, dt, format):
     lst = {
@@ -283,6 +285,7 @@ def compute_date(cmd, dt, format):
 
 if __name__ == '__main__':
     import sys
+
     def main(args):
         win = gtk.Window()
         win.set_title('gtk.Entry subclass')
