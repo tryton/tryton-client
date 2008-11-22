@@ -427,13 +427,14 @@ class Many2One(WidgetInterface):
         self.changed = True
 
     def sig_key_press(self, widget, event, *args):
-        if event.keyval == gtk.keysyms.F3:
+        editable = self.wid_text.get_editable()
+        if event.keyval == gtk.keysyms.F3 and editable:
             self.sig_new(widget, event)
             return True
         elif event.keyval == gtk.keysyms.F2:
             self.sig_edit(widget)
             return True
-        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return):
+        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
             return not self.sig_activate(widget, event, key_press=True)
         return False
 

@@ -179,6 +179,8 @@ class DateEntry(gtk.Entry):
         self.set_text(self.initial_value)
 
     def _on_key_press(self, editable, event):
+        if not self.get_editable():
+            return False
         if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Escape,
                 gtk.keysyms.Return, gtk.keysyms.KP_Enter):
             if self.mode_cmd:

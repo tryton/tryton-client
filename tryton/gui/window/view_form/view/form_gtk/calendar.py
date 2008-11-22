@@ -57,6 +57,8 @@ class Calendar(WidgetInterface):
             self.widget.set_focus_chain([self.entry])
 
     def sig_key_press(self, widget, event):
+        if not self.entry.get_editable():
+            return False
         if event.keyval == gtk.keysyms.F2:
             self.cal_open(widget)
             return True
@@ -187,6 +189,8 @@ class DateTime(WidgetInterface):
             self.widget.set_focus_chain([self.entry])
 
     def sig_key_press(self, widget, event):
+        if not self.entry.get_editable():
+            return False
         if event.keyval == gtk.keysyms.F2:
             self.cal_open(widget)
             return True
