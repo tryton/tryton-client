@@ -216,13 +216,14 @@ class Reference(WidgetInterface):
         dia.destroy()
 
     def sig_key_press(self, widget, event):
-        if event.keyval == gtk.keysyms.F3:
+        editable = self.wid_text.get_editable()
+        if event.keyval == gtk.keysyms.F3 and editable:
             self.sig_new(widget, event)
             return True
         elif event.keyval == gtk.keysyms.F2:
             self.sig_focus_out(widget, event)
             return True
-        elif event.keyval == gtk.keysyms.Tab:
+        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
             if self._view.modelfield.get(self._view.model) or \
                     not self.wid_text.get_text():
                 return False

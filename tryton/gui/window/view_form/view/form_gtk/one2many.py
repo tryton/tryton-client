@@ -302,12 +302,14 @@ class Dialog(object):
 
     def on_keypress(self, widget, event):
         if self.attrs.get('add_remove') \
-                and event.keyval == gtk.keysyms.F3:
+                and event.keyval == gtk.keysyms.F3 \
+                and self.but_add.get_property('sensitive'):
             self._sig_add()
             return False
-        if (event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
+        if ((event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
                 and event.state & gtk.gdk.CONTROL_MASK) \
-                or event.keyval == gtk.keysyms.F3:
+                or event.keyval == gtk.keysyms.F3) \
+                and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
             return False
         if event.keyval == gtk.keysyms.F2:
@@ -475,13 +477,15 @@ class One2Many(WidgetInterface):
 
     def on_keypress(self, widget, event):
         if self.attrs.get('add_remove') \
-                and event.keyval == gtk.keysyms.F3:
+                and event.keyval == gtk.keysyms.F3 \
+                and self.but_add.get_property('sensitive'):
             self._sig_add()
             return False
-        if (event.keyval == gtk.keysyms.N \
+        if ((event.keyval == gtk.keysyms.N \
                     and event.state & gtk.gdk.CONTROL_MASK \
                     and event.state & gtk.gdk.SHIFT_MASK) \
-                or event.keyval == gtk.keysyms.F3:
+                or event.keyval == gtk.keysyms.F3) \
+                and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
             return False
         if event.keyval == gtk.keysyms.F2:
