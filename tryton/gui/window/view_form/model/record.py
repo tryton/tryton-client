@@ -81,10 +81,17 @@ class ModelRecord(SignalEvent):
                     log = logging.getLogger('record')
                     log.error('%s' % exception.args[-1])
                 values = [{'id': x} for x in ids]
+            model_set = None
+            signal = True
+            if len(values) > 10:
+                signal = False
             for value in values:
                 for model in self.mgroup.models:
                     if model.id == value['id']:
-                        model.set(value, signal=True)
+                        model.set(value, signal=signal)
+                        model_set = model
+            if not signal and model_set:
+                model_set.signal('record-changed')
         return self.mgroup.mfields.get(name, False)
 
     def __repr__(self):
