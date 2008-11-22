@@ -194,8 +194,7 @@ class Screen(SignalEvent):
     def _model_changed(self, model_group, model):
         if self.parent:
             self.parent.signal('record-changed', self.parent)
-        if (not model) or (model == self.current_model):
-            self.display()
+        self.display()
 
     def _get_current_model(self):
         return self.__current_model
