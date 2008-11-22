@@ -70,11 +70,18 @@ class DateEntry(gtk.Entry):
         if text == self.initial_value and pos >= len(self.initial_value):
             pos = 0
 
-        text = text[:pos] + value + text[pos + length:]
-        if self.regex.match(text):
+        for char in value:
+            if pos >= len(self.initial_value):
+                continue
+            if char != ' ' and char in self.initial_value[pos:]:
+                pos += self.initial_value[pos:].index(char)
+            else:
+                while self.initial_value[pos] != ' ':
+                    pos += 1
+                text = text[:pos] + char + text[pos + 1:]
             pos += 1
-            while (pos<len(self.initial_value)) and (text[pos] != ' '):
-                pos += 1
+
+        if self.regex.match(text):
             self.set_text(text)
             gobject.idle_add(self.set_position, pos)
         self.stop_emission('insert-text')
