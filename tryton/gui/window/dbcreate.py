@@ -136,9 +136,8 @@ class DBCreate(object):
         This method defines the complete GUI.
         """
         self.dialog = gtk.Dialog(
-            title =  _("Create new database"),
-            parent = None,
-            flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+            title= _("Create new database"),
+            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
             | gtk.WIN_POS_CENTER_ON_PARENT,
         )
         self.dialog.set_has_separator(True)
