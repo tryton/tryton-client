@@ -28,6 +28,7 @@ import gui
 import traceback
 import mx.DateTime
 import time
+import signal
 
 
 class TrytonClient(object):
@@ -76,6 +77,10 @@ class TrytonClient(object):
 
     def run(self):
         main = gui.Main()
+
+        signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(0))
+        signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
+        signal.signal(signal.SIGQUIT, lambda signum, frame: sys.exit(0))
 
         def excepthook(exctyp, value, tb):
             import common
