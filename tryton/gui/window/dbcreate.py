@@ -326,20 +326,20 @@ class DBCreate(object):
                         'It must begin with a letter and max. sized to 63 ' \
                         'characters at all.\n' \
                         'Try to avoid all accents, space ' \
-                        'and any other special characters.'), parent, \
+                        'and any other special characters.'), self.dialog, \
                         _('Wrong characters in database name!'))
                     continue
                 elif admin_passwd.get_text() != admin_passwd2.get_text():
                     common.warning(
                         _("The new admin password " \
                               "doesn't match the confirmation field.\n"),
-                        parent,
+                        self.dialog,
                         _("Passwords doesn't match!"))
                     continue
                 elif not admin_passwd.get_text():
                     common.warning(_("Admin password and confirmation are " \
                         "required to create a new database."), \
-                        parent, _('Missing admin password!'))
+                        self.dialog, _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
                         and int(url_m.group(2)) \
@@ -351,7 +351,7 @@ class DBCreate(object):
                              'db_exist', dbname):
                          common.warning(_("A database with the same name " \
                              "already exists.\n" \
-                             "Try another database name."), parent,
+                             "Try another database name."), self.dialog,
                              _("This database name already exist!"))
                          self.entry_dbname.set_text("")
                          self.entry_dbname.grab_focus()
@@ -365,13 +365,13 @@ class DBCreate(object):
                                     (host, int(port), 'create', passwd,
                                         dbname, langreal,
                                         admin_passwd.get_text()),
-                                    parent)
+                                    self.dialog)
                             rpcprogress.run()
                         except Exception, exception:
                             if str(exception[0]) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
-                                    "the Tryton server. Please try again.") \
-                                    , parent, _("Access denied!"))
+                                    "the Tryton server. Please try again."),
+                                    self.dialog, _("Access denied!"))
                                 self.entry_serverpasswd.set_text("")
                                 self.entry_serverpasswd.grab_focus()
                                 continue
@@ -382,8 +382,8 @@ class DBCreate(object):
                                     "be broken. Maybe drop this database! " \
                                     "Please check the error message for " \
                                     "possible informations.\n" \
-                                    "Error message:\n") + str(exception[0]), \
-                                    parent, _("Error creating database!"))
+                                    "Error message:\n") + str(exception[0]),
+                                    self.dialog, _("Error creating database!"))
                             parent.present()
                             self.dialog.destroy()
                             rpc.logout()
