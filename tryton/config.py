@@ -196,7 +196,7 @@ if os.name == 'nt':
 import gtk
 
 TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
-        os.path.join(PIXMAPS_DIR, 'tryton-icon.png'))
+        os.path.join(PIXMAPS_DIR, '..', 'tryton-icon.png'))
 
 def _data_dir():
     data_dir = os.path.join(CURRENT_DIR, 'share', 'tryton')

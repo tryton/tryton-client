@@ -89,6 +89,7 @@ setup(name=PACKAGE,
     url=WEBSITE,
     packages=find_packages(),
     data_files=[
+        ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton-icon.png')),
         ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
                 glob.glob('share/pixmaps/tryton/*.svg')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),

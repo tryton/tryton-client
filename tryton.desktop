@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Tryton
+Comment=Access tryton server.
+Exec=tryton
+Icon=tryton-icon
+Terminal=false
+Categories=Office;Finance;
+GenericName=Tryton Client
