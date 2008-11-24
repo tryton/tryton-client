@@ -10,7 +10,7 @@ import tryton.common as common
 from tryton.action import Action
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
-from tryton.gui.window import FilesActions
+from tryton.gui.window import FileActions
 from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
 from tryton.gui.window.dbdumpdrop import DBBackupDrop
@@ -699,10 +699,10 @@ class Main(object):
         if (str(CONFIG['client.form_tab_orientation']) or '0') == '90':
             radiomenuitem_vertical.set_active(True)
 
-        menuitem_actions = gtk.MenuItem(_('Files _Actions...'))
+        menuitem_actions = gtk.MenuItem(_('File _Actions...'))
         self.menuitem_actions = menuitem_actions
-        menuitem_actions.connect('activate', self.sig_files_actions)
-        menuitem_actions.set_accel_path('<tryton>/Options/Files Actions')
+        menuitem_actions.connect('activate', self.sig_file_actions)
+        menuitem_actions.set_accel_path('<tryton>/Options/File Actions')
         menu_options.add(menuitem_actions)
 
         menu_options.add(gtk.SeparatorMenuItem())
@@ -932,8 +932,8 @@ class Main(object):
     def sig_form_tab_orientation(option):
         CONFIG['client.form_tab_orientation'] = option
 
-    def sig_files_actions(self, widget):
-        FilesActions(self.window).run()
+    def sig_file_actions(self, widget):
+        FileActions(self.window).run()
 
     def sig_win_next(self, widget):
         page = self.notebook.get_current_page()

@@ -815,7 +815,7 @@ Tabs Orientation
 
 .. _Menu-Options-File_Actions:
 
-Files Actions...:
+File Actions...:
   Opens a dialog to setting up file types for print and open actions.
   Use ``%s`` as a placeholder for the document name.
 
