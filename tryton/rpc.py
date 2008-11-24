@@ -107,7 +107,10 @@ def login(username, password, host, port, database):
         finally:
             _SEMAPHORE.release()
     except socket.error:
-        _SOCK.reconnect()
+        try:
+            _SOCK.reconnect()
+        except socket.error:
+            pass
         _USER = 0
         _SESSION = ''
         return -1
