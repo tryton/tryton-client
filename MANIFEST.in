@@ -7,7 +7,7 @@ include CHANGELOG
 include setup.nsi
 include *.nsh
 include doc/*
-include share/pixmaps/*.png
-include share/pixmaps/*.svg
-include share/pixmaps/*.ico
+include share/pixmaps/tryton/*.png
+include share/pixmaps/tryton/*.svg
+include share/pixmaps/tryton/*.ico
 recursive-include share/locale/ *.mo

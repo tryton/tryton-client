@@ -39,7 +39,7 @@ if os.name == 'nt':
 
     args['windows'] = [{
         'script': os.path.join('bin', 'tryton'),
-        'icon_resources': [(1, os.path.join('share', 'pixmaps', 'tryton.ico'))],
+        'icon_resources': [(1, os.path.join('share', 'pixmaps', 'tryton', 'tryton.ico'))],
     }]
     args['options'] = {
         'py2exe': {
@@ -89,8 +89,8 @@ setup(name=PACKAGE,
     url=WEBSITE,
     packages=find_packages(),
     data_files=[
-        ('share/pixmaps', glob.glob('share/pixmaps/*.png') + \
-                glob.glob('share/pixmaps/*.svg')),
+        ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
+                glob.glob('share/pixmaps/tryton/*.svg')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
         ('share/locale/de_DE/LC_MESSAGES', glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
         ('share/locale/es_ES/LC_MESSAGES', glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
