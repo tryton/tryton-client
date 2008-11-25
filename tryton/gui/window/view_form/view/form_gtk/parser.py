@@ -95,7 +95,7 @@ class Button(object):
                 return
         if 'invisible' in state_changes:
             try:
-                if model.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.widget.hide()
                 else:
@@ -111,7 +111,7 @@ class Button(object):
             self.widget.show()
         if 'readonly' in state_changes:
             try:
-                if model.expr_eval(state_changes['readonly'],
+                if model and model.expr_eval(state_changes['readonly'],
                         check_load=False):
                     self.widget.set_sensitive(False)
                 else:
@@ -128,7 +128,8 @@ class Button(object):
             self.widget.set_sensitive(True)
         if 'icon' in state_changes:
             try:
-                stock = model.expr_eval(state_changes['icon'], check_load=False)
+                stock = model and model.expr_eval(
+                    state_changes['icon'], check_load=False)
                 if stock:
                     try:
                         icon = gtk.Image()
@@ -159,7 +160,7 @@ class Label(gtk.Label):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.hide()
                 else:
@@ -187,7 +188,7 @@ class VBox(gtk.VBox):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.hide()
                 else:
@@ -214,7 +215,7 @@ class Image(gtk.Image):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if mode.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.hide()
                 else:
@@ -271,7 +272,7 @@ class ScrolledWindow(gtk.ScrolledWindow):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.hide()
                 else:

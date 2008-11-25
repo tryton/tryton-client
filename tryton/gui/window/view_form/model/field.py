@@ -134,7 +134,6 @@ class CharField(object):
                 log = logging.getLogger('record')
                 log.error("Unable to eval %s for field %s (record id: %s)."% \
                               (state_changes['value'], self.name, model.id))
-
                 return
             if value:
                 self.set(model, value, modified=True)
