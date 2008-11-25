@@ -105,7 +105,7 @@ class Button(object):
                 log.error("Unable to eval '%s' for button %s (record id: %s)."% \
                               (state_changes['invisible'],
                                self.attrs.get('string', _('Unknown')),
-                               model.id))
+                               model and model.id or _('Unknown')))
                 self.widget.show()
         else:
             self.widget.show()
@@ -121,7 +121,7 @@ class Button(object):
                 log.error("Unable to eval '%s' for button %s (record id: %s)."% \
                               (state_changes['readonly'],
                                self.attrs.get('string', _('Unknown')),
-                               model.id))
+                               model and model.id or _('Unknown')))
 
                 self.widget.set_sensitive(True)
         else:
@@ -144,7 +144,7 @@ class Button(object):
                 log.error("Unable to eval '%s' for button %s (record id: %s)."% \
                               (state_changes['icon'],
                                self.attrs.get('string', _('Unknown')),
-                               model.id))
+                               model and model.id or _('Unknown')))
                 self.widget.set_image(gtk.Image())
 
 class Label(gtk.Label):
@@ -171,7 +171,7 @@ class Label(gtk.Label):
             log.error("Unable to eval '%s' for label %s (record id: %s)."% \
                           (state_changes['invisible'],
                            self.attrs.get('string', _('Unknown')),
-                           model.id))
+                           model and model.id or _('Unknown')))
             self.show()
 
 
@@ -199,7 +199,7 @@ class VBox(gtk.VBox):
             log.error("Unable to eval '%s' for separator %s (record id: %s)."% \
                           (state_changes['invisible'],
                            self.attrs.get('string', _('Unknown')),
-                           model.id))
+                           model and model.id or _('Unknown')))
             self.show()
 
 class Image(gtk.Image):
@@ -226,7 +226,7 @@ class Image(gtk.Image):
             log.error("Unable to eval '%s' for image %s (record id: %s)."% \
                           (state_changes['invisible'],
                            self.attrs.get('string', _('Unknown')),
-                           model.id))
+                           model and model.id or _('Unknown')))
             self.show()
 
 
@@ -254,7 +254,7 @@ class Frame(gtk.Frame):
             log.error("Unable to eval '%s' for group %s (record id: %s)."% \
                           (state_changes['invisible'],
                            self.attrs.get('string', _('Unknown')),
-                           model.id))
+                           model and model.id or _('Unknown')))
             self.show()
 
 
@@ -283,7 +283,7 @@ class ScrolledWindow(gtk.ScrolledWindow):
             log.error("Unable to eval '%s' for page %s (record id: %s)."% \
                           (state_changes['invisible'],
                            self.attrs.get('string', _('Unknown')),
-                           model.id))
+                           model and model.id or _('Unknown')))
             self.show()
 
 
