@@ -8,6 +8,7 @@ from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
 from tryton.gui.main import Main
+import logging
 
 _ = gettext.gettext
 
@@ -27,7 +28,6 @@ class Button(object):
                 icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.widget.set_image(icon)
             except Exception:
-                import logging
                 log = logging.getLogger('common')
                 log.warning(_('Wrong icon for the button!'))
         self.widget.connect('clicked', self.button_clicked)
@@ -101,6 +101,11 @@ class Button(object):
                 else:
                     self.widget.show()
             except:
+                log = logging.getLogger('record')
+                log.error("Unable to eval '%s' for button %s (record id: %s)."% \
+                              (state_changes['invisible'],
+                               self.attrs.get('string', _('Unknown')),
+                               model.id))
                 self.widget.show()
         else:
             self.widget.show()
@@ -112,6 +117,12 @@ class Button(object):
                 else:
                     self.widget.set_sensitive(True)
             except:
+                log = logging.getLogger('record')
+                log.error("Unable to eval '%s' for button %s (record id: %s)."% \
+                              (state_changes['readonly'],
+                               self.attrs.get('string', _('Unknown')),
+                               model.id))
+
                 self.widget.set_sensitive(True)
         else:
             self.widget.set_sensitive(True)
@@ -124,12 +135,16 @@ class Button(object):
                         icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                         self.widget.set_image(icon)
                     except:
-                        import logging
                         log = logging.getLogger('common')
                         log.warning(_('Wrong icon for the button!'))
                 else:
                     self.widget.set_image(gtk.Image())
             except:
+                log = logging.getLogger('record')
+                log.error("Unable to eval '%s' for button %s (record id: %s)."% \
+                              (state_changes['icon'],
+                               self.attrs.get('string', _('Unknown')),
+                               model.id))
                 self.widget.set_image(gtk.Image())
 
 class Label(gtk.Label):
@@ -152,6 +167,11 @@ class Label(gtk.Label):
             else:
                 self.show()
         except:
+            log = logging.getLogger('record')
+            log.error("Unable to eval '%s' for label %s (record id: %s)."% \
+                          (state_changes['invisible'],
+                           self.attrs.get('string', _('Unknown')),
+                           model.id))
             self.show()
 
 
@@ -175,6 +195,11 @@ class VBox(gtk.VBox):
             else:
                 self.show()
         except:
+            log = logging.getLogger('record')
+            log.error("Unable to eval '%s' for separator %s (record id: %s)."% \
+                          (state_changes['invisible'],
+                           self.attrs.get('string', _('Unknown')),
+                           model.id))
             self.show()
 
 class Image(gtk.Image):
@@ -197,6 +222,11 @@ class Image(gtk.Image):
             else:
                 self.show()
         except:
+            log = logging.getLogger('record')
+            log.error("Unable to eval '%s' for image %s (record id: %s)."% \
+                          (state_changes['invisible'],
+                           self.attrs.get('string', _('Unknown')),
+                           model.id))
             self.show()
 
 
@@ -220,6 +250,11 @@ class Frame(gtk.Frame):
             else:
                 self.show()
         except:
+            log = logging.getLogger('record')
+            log.error("Unable to eval '%s' for group %s (record id: %s)."% \
+                          (state_changes['invisible'],
+                           self.attrs.get('string', _('Unknown')),
+                           model.id))
             self.show()
 
 
@@ -244,6 +279,11 @@ class ScrolledWindow(gtk.ScrolledWindow):
             else:
                 self.show()
         except:
+            log = logging.getLogger('record')
+            log.error("Unable to eval '%s' for page %s (record id: %s)."% \
+                          (state_changes['invisible'],
+                           self.attrs.get('string', _('Unknown')),
+                           model.id))
             self.show()
 
 
@@ -532,7 +572,6 @@ class ParserForm(ParserInterface):
                 del attrs['name']
                 if name not in fields:
                     container.empty_add(int(attrs.get('colspan', 1)))
-                    import logging
                     log = logging.getLogger('view')
                     log.error('Unknown field "%s"' % str(name))
                     continue

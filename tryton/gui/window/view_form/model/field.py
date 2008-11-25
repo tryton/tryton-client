@@ -6,6 +6,8 @@ import time
 import datetime
 from decimal import Decimal
 import mx.DateTime
+import logging
+
 
 class ModelField(object):
     '''
@@ -116,6 +118,9 @@ class CharField(object):
                             model.expr_eval(state_changes[key],
                                     check_load=False)
                 except:
+                    log = logging.getLogger('record')
+                    log.error("Unable to eval %s for field %s (record id: %s)."% \
+                                  (state_changes[key], self.name, model.id))
                     continue
             elif key in self.attrs:
                 self.get_state_attrs(model)[key] = self.attrs[key]
@@ -126,6 +131,10 @@ class CharField(object):
                 value = model.expr_eval(state_changes['value'],
                         check_load=False)
             except:
+                log = logging.getLogger('record')
+                log.error("Unable to eval %s for field %s (record id: %s)."% \
+                              (state_changes['value'], self.name, model.id))
+
                 return
             if value:
                 self.set(model, value, modified=True)
