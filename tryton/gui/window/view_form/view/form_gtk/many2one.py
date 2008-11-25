@@ -48,6 +48,7 @@ class Dialog(object):
                 gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 
         self.dia.set_default_response(gtk.RESPONSE_OK)
+        self.dia.show()
 
         self.screen = Screen(model, self.dia, domain=domain, context=context,
                 view_type=['form'], views_preload=attrs.get('views', {}))
