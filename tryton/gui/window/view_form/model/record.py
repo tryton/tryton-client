@@ -320,7 +320,7 @@ class ModelRecord(SignalEvent):
                 args[arg] = self.expr_eval(arg)
             except:
                 log = logging.getLogger('record')
-                log.error("Unable to eval %s for field %s (record: %s@%s)."% \
+                log.error("Unable to eval %s for field %s (record: %s@%s)"% \
                               (arg, fieldname, self.id, self.resource))
                 args[arg] = False
         ids = [self.id]
@@ -362,7 +362,7 @@ class ModelRecord(SignalEvent):
                     args[arg] = self.expr_eval(arg)
                 except:
                     log = logging.getLogger('record')
-                    log.error("Unable to eval %s for field %s (record: %s@%s)."%\
+                    log.error("Unable to eval %s for field %s (record: %s@%s)"%\
                                   (arg, field_name, self.id, self.resource))
 
                     args[arg] = False
