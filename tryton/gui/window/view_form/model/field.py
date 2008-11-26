@@ -79,11 +79,17 @@ class CharField(object):
 
     def set_client(self, model, value, force_change=False):
         internal = model.value.get(self.name, False)
+        prev_modified = model.modified
         self.set(model, value)
         if (internal or False) != (model.value.get(self.name, False) or False):
             model.modified = True
             model.modified_fields.setdefault(self.name)
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
+                model.modified = prev_modified
+                return
             model.signal('record-changed', model)
 
     def get_client(self, model):
@@ -194,6 +200,7 @@ class FloatField(CharField):
 
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
+        prev_modified = model.modified
         self.set(model, value)
         if isinstance(self.attrs.get('digits'), str):
             digits = model.expr_eval(self.attrs['digits'])
@@ -204,7 +211,11 @@ class FloatField(CharField):
             if not self.get_state_attrs(model).get('readonly', False):
                 model.modified = True
                 model.modified_fields.setdefault(self.name)
-                self.sig_changed(model)
+                try:
+                    self.sig_changed(model)
+                except:
+                    model.value[self.name] = internal
+                    model.modified = prev_modified
                 model.signal('record-changed', model)
 
 
@@ -213,6 +224,7 @@ class NumericField(FloatField):
     def set_client(self, model, value, force_change=False):
         value = Decimal(str(value))
         internal = model.value[self.name]
+        prev_modified = model.modified
         self.set(model, value)
         if isinstance(self.attrs.get('digits'), str):
             digits = model.expr_eval(self.attrs['digits'])
@@ -223,7 +235,12 @@ class NumericField(FloatField):
             if not self.get_state_attrs(model).get('readonly', False):
                 model.modified = True
                 model.modified_fields.setdefault(self.name)
-                self.sig_changed(model)
+                try:
+                    self.sig_changed(model)
+                except:
+                    model.value[self.name] = internal
+                    model.modified = prev_modified
+                    return
                 model.signal('record-changed', model)
 
 
@@ -240,11 +257,17 @@ class BooleanField(CharField):
     def set_client(self, model, value, force_change=False):
         value = bool(value)
         internal = bool(model.value.get(self.name, False))
+        prev_modified = model.modified
         self.set(model, value)
         if internal != bool(model.value.get(self.name, False)):
             model.modified = True
             model.modified_fields.setdefault(self.name)
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
+                model.modified = prev_modified
+                return
             model.signal('record-changed', model)
 
     def get(self, model, check_load=True, readonly=True, modified=False):
@@ -298,14 +321,23 @@ class M2OField(CharField):
 
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
+        prev_modified = model.modified
         self.set(model, value)
         if internal != model.value[self.name]:
             model.modified = True
             model.modified_fields.setdefault(self.name)
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
+                model.modified = prev_modified
+                return
             model.signal('record-changed', model)
         elif force_change:
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
 
 
 class M2MField(CharField):
@@ -337,11 +369,17 @@ class M2MField(CharField):
 
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
+        prev_modified = model.modified
         self.set(model, value, modified=False)
         if set(internal) != set(value):
             model.modified = True
             model.modified_fields.setdefault(self.name)
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
+                model.modified = prev_modified
+                return
             model.signal('record-changed', model)
 
     def get_default(self, model):
@@ -540,11 +578,17 @@ class ReferenceField(CharField):
 
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
+        prev_modified = model.modified
         model.value[self.name] = value
         if (internal or False) != (model.value[self.name] or False):
             model.modified = True
             model.modified_fields.setdefault(self.name)
-            self.sig_changed(model)
+            try:
+                self.sig_changed(model)
+            except:
+                model.value[self.name] = internal
+                model.modified = prev_modified
+                return
             model.signal('record-changed', model)
 
     def set(self, model, value, modified=False):
