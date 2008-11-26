@@ -19,8 +19,11 @@ class Button(object):
         super(Button, self).__init__()
         self.attrs = attrs or {}
         self.widget = gtk.Button()
+        text = attrs.get('string', _('Unknown'))
+        if '_' not in text:
+            text = '_' + text
         self.widget.set_use_underline(True)
-        self.widget.set_label(attrs.get('string', _('Unknown')))
+        self.widget.set_label(text)
         if attrs.get('icon', False):
             try:
                 stock = attrs['icon']
@@ -557,6 +560,8 @@ class ParserForm(ParserInterface):
                         text = fields[attrs['name']]['string']
                 if not text:
                     text = _('No String Attr.')
+                if '_' not in text:
+                    text = '_' + text
                 label = gtk.Label(text)
                 label.set_angle(angle)
                 label.set_use_underline(True)

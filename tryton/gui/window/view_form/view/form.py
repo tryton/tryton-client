@@ -106,7 +106,10 @@ class ViewForm(ParserView):
 
                     tbutton = gtk.ToolButton(iconstock)
                     tbutton.set_use_underline(True)
-                    tbutton.set_label(tool['name'])
+                    text = tool['name']
+                    if '_' not in text:
+                        text = '_' + text
+                    tbutton.set_label(text)
                     gtktoolbar.insert(tbutton, -1)
 
                     tbutton.connect('clicked', self._action, tool, icontype)
