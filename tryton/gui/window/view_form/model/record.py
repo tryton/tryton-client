@@ -320,8 +320,8 @@ class ModelRecord(SignalEvent):
                 args[arg] = self.expr_eval(arg)
             except:
                 log = logging.getLogger('record')
-                log.error("Unable to eval %s for field %s (record id: %s)."% \
-                              (arg, fieldname, self.id))
+                log.error("Unable to eval %s for field %s (record: %s@%s)."% \
+                              (arg, fieldname, self.id, self.resource))
                 args[arg] = False
         ids = [self.id]
         ctx = rpc.CONTEXT.copy()
@@ -362,8 +362,8 @@ class ModelRecord(SignalEvent):
                     args[arg] = self.expr_eval(arg)
                 except:
                     log = logging.getLogger('record')
-                    log.error("Unable to eval %s for field %s (record id: %s)."%\
-                                  (arg, field_name, self.id))
+                    log.error("Unable to eval %s for field %s (record: %s@%s)."%\
+                                  (arg, field_name, self.id, self.resource))
 
                     args[arg] = False
             ids = [self.id]

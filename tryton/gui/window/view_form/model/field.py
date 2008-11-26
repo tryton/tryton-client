@@ -125,8 +125,9 @@ class CharField(object):
                                     check_load=False)
                 except:
                     log = logging.getLogger('record')
-                    log.error("Unable to eval %s for field %s (record id: %s)."% \
-                                  (state_changes[key], self.name, model.id))
+                    log.error("Unable to eval %s for field %s (record: %s@%s)"% \
+                                  (state_changes[key], self.name, model.id,
+                                   model.resource))
                     continue
             elif key in self.attrs:
                 self.get_state_attrs(model)[key] = self.attrs[key]
@@ -138,8 +139,9 @@ class CharField(object):
                         check_load=False)
             except:
                 log = logging.getLogger('record')
-                log.error("Unable to eval %s for field %s (record id: %s)."% \
-                              (state_changes['value'], self.name, model.id))
+                log.error("Unable to eval %s for field %s (record: %s@%s)"% \
+                              (state_changes['value'], self.name, model.id,
+                               model.resource))
                 return
             if value:
                 self.set(model, value, modified=True)
