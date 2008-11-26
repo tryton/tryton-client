@@ -498,7 +498,9 @@ class ViewList(ParserView):
             if self.store:
                 self.widget_tree.set_model(self.store)
         self.widget_tree.queue_draw()
-        self.set_state()
+        if hasattr(self.widget_tree, 'editable') \
+                and self.widget_tree.editable:
+            self.set_state()
         self.update_children()
 
     def set_state(self):
