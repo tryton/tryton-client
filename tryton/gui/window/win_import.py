@@ -240,8 +240,8 @@ class WinImport(object):
     def sig_autodetect(self, widget=None):
         fname = self.import_csv_file.get_filename()
         if not fname:
-            common.message('You must select an import file first !',
-                    self.parent)
+            common.message(_('You must select an import file first!'),
+                    self.dialog)
             return True
         csvsep = self.import_csv_sep.get_text()
         csvdel = self.import_csv_del.get_text()
@@ -252,7 +252,7 @@ class WinImport(object):
         try:
             data = csv.reader(file(fname), quotechar=csvdel, delimiter=csvsep)
         except:
-            common.warning(_('Error opening CSV file'), self.parent,
+            common.warning(_('Error opening CSV file'), self.dialog,
                     _('Error'))
             return True
         self.sig_unsel_all()
@@ -267,7 +267,7 @@ class WinImport(object):
         except Exception, exception:
             common.warning(_('Error processing the file at field %s.\n' \
                     'Error message:\n%s') % (word, str(exception)),
-                    self.parent, _('Error'))
+                    self.dialog, _('Error'))
         return True
 
     def sig_sel_all(self, widget=None):
