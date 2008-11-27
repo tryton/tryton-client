@@ -266,7 +266,7 @@ class WinImport(object):
                 break
         except Exception, exception:
             common.warning(_('Error processing the file at field %s.\n' \
-                    'Error message:\n%s') % (word, str(exception)),
+                    'Error message:\n%s') % (word, repr(exception)),
                     self.dialog, _('Error'))
         return True
 
