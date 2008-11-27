@@ -631,10 +631,12 @@ class ParserForm(ParserInterface):
                     widget_act.widget.set_size_request(
                             int(attrs.get('width', -1)),
                             int(attrs.get('height', -1)))
+                translate = False
+                if ftype in ('char', 'text'):
+                    translate = fields[name].get('translate', False)
                 container.wid_add(widget_act.widget, fields[name]['string'],
-                        expand, translate=fields[name].get('translate', False),
-                        colspan=size, fname=name, help_tip=hlp, fill=fill,
-                        xexpand=xexpand, xfill=xfill)
+                        expand, translate=translate, colspan=size, fname=name,
+                        help_tip=hlp, fill=fill, xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
                 widget, widgets, buttons, on_write, notebook_list2, cursor_widget2 = \
