@@ -147,12 +147,12 @@ class WinSearch(object):
         while not end:
             button = self.win.run()
             if button == gtk.RESPONSE_OK:
-                res = self.sel_ids_get() or self.ids
+                res = self.sel_ids_get()
                 end = True
             elif button == gtk.RESPONSE_APPLY:
                 end = not self.find()
                 if end:
-                    res = self.sel_ids_get() or self.ids
+                    res = self.sel_ids_get()
             elif button == gtk.RESPONSE_ACCEPT:
                 from tryton.gui.window.view_form.view.form_gtk.many2one \
                         import Dialog
