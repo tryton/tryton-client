@@ -133,8 +133,6 @@ class WinSearch(object):
         self.screen.clear()
         self.screen.load(self.ids)
         sel = self.view.widget_tree.get_selection()
-        if sel.get_mode() == gtk.SELECTION_MULTIPLE:
-            sel.select_all()
 
     def sel_ids_get(self):
         return self.screen.sel_ids_get()
