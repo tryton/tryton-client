@@ -258,7 +258,7 @@ class Frame(gtk.Frame):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model.expr_eval(state_changes['invisible'],
+                if model and model.expr_eval(state_changes['invisible'],
                         check_load=False):
                     self.hide()
                 else:
