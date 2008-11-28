@@ -297,11 +297,9 @@ class WinImport(object):
         button = self.dialog.run()
         if button == gtk.RESPONSE_OK:
             fields = []
-            fields2 = []
             iter = self.model2.get_iter_root()
             while iter:
                 fields.append(self.model2.get_value(iter, 1))
-                fields2.append(self.model2.get_value(iter, 0))
                 iter = self.model2.iter_next(iter)
 
             csv_data = {
