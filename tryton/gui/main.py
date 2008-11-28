@@ -799,12 +799,14 @@ class Main(object):
         toolbutton_previous = gtk.ToolButton('tryton-go-previous')
         toolbutton_previous.set_label(_('Previous'))
         self.toolbar.insert(toolbutton_previous, -1)
+        self.tooltips.set_tip(toolbutton_previous, _('Previous Record'))
         toolbutton_previous.connect('clicked', self._sig_child_call, 'but_previous')
         self.buttons['but_previous'] = toolbutton_previous
 
         toolbutton_next = gtk.ToolButton('tryton-go-next')
         toolbutton_next.set_label(_('Next'))
         self.toolbar.insert(toolbutton_next, -1)
+        self.tooltips.set_tip(toolbutton_next, _('Next Record'))
         toolbutton_next.connect('clicked', self._sig_child_call, 'but_next')
         self.buttons['but_next'] = toolbutton_next
 
@@ -820,12 +822,14 @@ class Main(object):
         toolbutton_reload.set_label(_('_Reload'))
         self.toolbar.insert(toolbutton_reload, -1)
         toolbutton_reload.connect('clicked', self._sig_child_call, 'but_reload')
+        self.tooltips.set_tip(toolbutton_reload, _('Reload'))
         self.buttons['but_reload'] = toolbutton_reload
 
         toolbutton_menu = gtk.ToolButton('tryton-start-here')
         self.toolbutton_menu = toolbutton_menu
         toolbutton_menu.set_label(_('Menu'))
         self.toolbar.insert(toolbutton_menu, -1)
+        self.tooltips.set_tip(toolbutton_menu, _('Menu'))
         toolbutton_menu.connect('clicked', self.sig_win_menu)
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
@@ -833,14 +837,16 @@ class Main(object):
         toolbutton_action = gtk.ToolButton('tryton-executable')
         toolbutton_action.set_label(_('Action'))
         self.toolbar.insert(toolbutton_action, -1)
+        self.tooltips.set_tip(toolbutton_action, _('Action'))
         toolbutton_action.connect('clicked', self._sig_child_call, 'but_action')
         self.buttons['but_action'] = toolbutton_action
 
-        toolbutton_action = gtk.ToolButton('tryton-print')
-        toolbutton_action.set_label(_('Print'))
-        self.toolbar.insert(toolbutton_action, -1)
-        toolbutton_action.connect('clicked', self._sig_child_call, 'but_print')
-        self.buttons['but_print'] = toolbutton_action
+        toolbutton_print = gtk.ToolButton('tryton-print')
+        toolbutton_print.set_label(_('Print'))
+        self.toolbar.insert(toolbutton_print, -1)
+        self.tooltips.set_tip(toolbutton_print, _('Print'))
+        toolbutton_print.connect('clicked', self._sig_child_call, 'but_print')
+        self.buttons['but_print'] = toolbutton_print
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
