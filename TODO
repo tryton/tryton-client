@@ -2,3 +2,4 @@
 - Use unicode for value from gtk.Entry
 - Allow to open relation in new form
 - Add a calculator for number fields
+- Use a view from the server for attachment
