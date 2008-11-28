@@ -260,7 +260,7 @@ class WinImport(object):
         try:
             for line in data:
                 for word in line:
-                    word = word.decode(csvcode).encode('utf-8')
+                    word = word.decode(csvcode)
                     num = self.model2.append()
                     self.model2.set(num, 0, word, 1, self.fields_invert[word])
                 break
