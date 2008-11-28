@@ -1,3 +1,4 @@
+* Improve date widget to display mask only when having focus
 * Fix for host with IPv6 enable but without default IPv6 route
 * Add desktop entry
 * Add win32 single executable

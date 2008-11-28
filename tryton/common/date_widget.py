@@ -13,15 +13,15 @@ from mx.DateTime import now
 import mx.DateTime
 
 mapping = {
-    '%y': ('  ', '([ 0-9][ 0-9])'),
-    '%Y': ('    ', '([ 0-9][ 0-9][ 0-9][ 1-9]|[ 1-9][ 0-9][ 0-9][ 0-9]|' \
-            '[ 0-9][ 1-9][ 0-9][ 0-9]|[ 0-9][ 0-9][ 1-9][ 0-9])'),
-    '%m': ('  ', '([ 0][ 1-9]|[ 1][ 0-2])'),
-    '%d': ('  ', '([ 0][ 1-9]|[ 1-2][ 0-9]|[ 3][ 0-1])'),
-    '%H': ('  ', '([ 0-1][ 0-9]|[ 2][ 0-4])'),
-    '%M': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
-    '%S': ('  ', '([ 0-5][ 0-9]|[ 6][ 0])'),
-    '%p': ('  ', '([ AP][ M])'),
+    '%y': ('__', '([_ 0-9][_ 0-9])'),
+    '%Y': ('____', '([_ 0-9][_ 0-9][_ 0-9][_ 1-9]|[_ 1-9][_ 0-9][_ 0-9][_ 0-9]|' \
+            '[_ 0-9][_ 1-9][_ 0-9][_ 0-9]|[_ 0-9][_ 0-9][_ 1-9][_ 0-9])'),
+    '%m': ('__', '([_ 0][_ 1-9]|[_ 1][_ 0-2])'),
+    '%d': ('__', '([_ 0][_ 1-9]|[_ 1-2][_ 0-9]|[_ 3][_ 0-1])'),
+    '%H': ('__', '([_ 0-1][_ 0-9]|[_ 2][_ 0-4])'),
+    '%M': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
+    '%S': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
+    '%p': ('__', '([_ AP][_ M])'),
 }
 
 class DateEntry(gtk.Entry):
@@ -36,7 +36,6 @@ class DateEntry(gtk.Entry):
             self.regex = self.regex.replace(key, val[1])
             self.initial_value = self.initial_value.replace(key, val[0])
 
-        self.set_text(self.initial_value)
         self.regex = re.compile(self.regex)
 
         assert self.regex.match(self.initial_value), \
@@ -48,6 +47,7 @@ class DateEntry(gtk.Entry):
         self.connect('insert-text', self._on_insert_text)
         self.connect('delete-text', self._on_delete_text)
 
+        self.connect('focus-in-event', self._focus_in)
         self.connect('focus-out-event', self._focus_out)
         self.callback = callback
         self.callback_process = callback_process
@@ -74,10 +74,10 @@ class DateEntry(gtk.Entry):
         for char in value:
             if pos >= len(self.initial_value):
                 continue
-            if char != ' ' and char in self.initial_value[pos:]:
+            if char not in ('_', ' ') and char in self.initial_value[pos:]:
                 pos += self.initial_value[pos:].index(char)
             else:
-                while self.initial_value[pos] != ' ':
+                while self.initial_value[pos] not in ('_', ' '):
                     pos += 1
                 text = text[:pos] + char + text[pos + 1:]
             pos += 1
@@ -101,7 +101,7 @@ class DateEntry(gtk.Entry):
             end = len(self.initial_value)
         if end < 0:
             end = 0
-        while (start > 0) and (self.initial_value[start] not in [' ','0','X']):
+        while (start > 0) and (self.initial_value[start] not in ['_', ' ','0','X']):
             start -= 1
         text = self.get_text()
         text = text[:start] + self.initial_value[start:end] + text[end:]
@@ -110,11 +110,17 @@ class DateEntry(gtk.Entry):
         self.stop_emission('delete-text')
         return
 
+    def _focus_in(self, editable, event):
+        if not self.get_text():
+            self.set_text(self.initial_value)
+
     def _focus_out(self, editable, event):
         self.date_get()
         if self.mode_cmd:
             self.mode_cmd = False
             if self.callback_process: self.callback_process(False, self, event)
+        if self.get_text() == self.initial_value:
+            self.set_text('')
 
     def set_text(self, text):
         self._interactive_input = False
@@ -147,11 +153,12 @@ class DateEntry(gtk.Entry):
             val = match.group(i + 1)
             n = len(val)
             val = val.strip()
+            val = val.strip('_')
             if not val:
                 continue
             fchar = '0'
             if n == 4:
-                fchar = ' '
+                fchar = '_'
             val = (fchar * (n - len(val))) + val
             start = match.start(i + 1)
             end = match.end(i + 1)
@@ -183,7 +190,10 @@ class DateEntry(gtk.Entry):
             self._interactive_input = True
 
     def clear(self):
-        self.set_text(self.initial_value)
+        if self.is_focus():
+            self.set_text(self.initial_value)
+        else:
+            self.set_text('')
 
     def _on_key_press(self, editable, event):
         if not self.get_editable():
@@ -196,6 +206,10 @@ class DateEntry(gtk.Entry):
                     self.callback_process(False, self, event)
                 self.stop_emission("key-press-event")
                 return True
+            else:
+                self.date_get()
+                if self.get_text() == self.initial_value:
+                    self.set_text('')
         elif event.keyval in (gtk.keysyms.KP_Add, gtk.keysyms.plus,
                 gtk.keysyms.KP_Subtract, gtk.keysyms.minus,
                 gtk.keysyms.KP_Equal, gtk.keysyms.equal):
