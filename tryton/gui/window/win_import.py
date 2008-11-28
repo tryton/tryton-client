@@ -27,16 +27,16 @@ class WinImport(object):
 
         frame_fields = gtk.Frame()
         frame_fields.set_shadow_type(gtk.SHADOW_NONE)
-        hbox_mapping.pack_start(frame_fields, True, True, 0)
+        viewport_fields = gtk.Viewport()
         scrolledwindow_fields = gtk.ScrolledWindow()
         scrolledwindow_fields.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        frame_fields.add(scrolledwindow_fields)
-        viewport_fields = gtk.Viewport(None, None)
-        scrolledwindow_fields.add(viewport_fields)
+        viewport_fields.add(scrolledwindow_fields)
+        frame_fields.add(viewport_fields)
         label_all_fields = gtk.Label(_("<b>All fields</b>"))
         label_all_fields.set_use_markup(True)
         frame_fields.set_label_widget(label_all_fields)
+        hbox_mapping.pack_start(frame_fields, True, True, 0)
 
         vbox_buttons = gtk.VBox()
         vbox_buttons.set_border_width(5)
@@ -82,16 +82,16 @@ class WinImport(object):
 
         frame_import = gtk.Frame()
         frame_import.set_shadow_type(gtk.SHADOW_NONE)
-        hbox_mapping.pack_start(frame_import, True, True, 0)
+        viewport_import = gtk.Viewport()
         scrolledwindow_import = gtk.ScrolledWindow()
         scrolledwindow_import.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        frame_import.add(scrolledwindow_import)
-        viewport_import = gtk.Viewport(None, None)
-        scrolledwindow_import.add(viewport_import)
+        viewport_import.add(scrolledwindow_import)
+        frame_import.add(viewport_import)
         label_fields_import = gtk.Label(_("<b>Fields to import</b>"))
         label_fields_import.set_use_markup(True)
         frame_import.set_label_widget(label_fields_import)
+        hbox_mapping.pack_start(frame_import, True, True, 0)
 
         frame_csv_param = gtk.Frame(None)
         frame_csv_param.set_shadow_type(gtk.SHADOW_ETCHED_OUT)
@@ -175,10 +175,10 @@ class WinImport(object):
 
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        viewport_fields.add(self.view1)
+        scrolledwindow_fields.add(self.view1)
         self.view2 = gtk.TreeView()
         self.view2.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        viewport_import.add(self.view2)
+        scrolledwindow_import.add(self.view2)
         self.view1.set_headers_visible(False)
         self.view2.set_headers_visible(False)
 

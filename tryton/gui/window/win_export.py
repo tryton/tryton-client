@@ -25,7 +25,6 @@ class WinExport(object):
                 parent=parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
-        self.dialog.set_size_request(500, 600)
         self.dialog.set_icon(TRYTON_ICON)
 
         vbox = gtk.VBox()
@@ -33,16 +32,15 @@ class WinExport(object):
         frame_predef_exports.set_border_width(2)
         frame_predef_exports.set_shadow_type(gtk.SHADOW_NONE)
         vbox.pack_start(frame_predef_exports, True, True, 0)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_border_width(2)
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+        viewport_exports = gtk.Viewport()
+        scrolledwindow_exports = gtk.ScrolledWindow()
+        scrolledwindow_exports.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        frame_predef_exports.add(scrolledwindow)
         label_predef_exports = gtk.Label(_("<b>Predefined exports</b>"))
         label_predef_exports.set_use_markup(True)
         frame_predef_exports.set_label_widget(label_predef_exports)
-        predefined_exports = gtk.Viewport()
-        scrolledwindow.add(predefined_exports)
+        viewport_exports.add(scrolledwindow_exports)
+        frame_predef_exports.add(viewport_exports)
 
         hbox = gtk.HBox(True)
         vbox.pack_start(hbox, True, True, 0)
@@ -53,14 +51,12 @@ class WinExport(object):
         label_all_fields = gtk.Label(_("<b>All fields</b>"))
         label_all_fields.set_use_markup(True)
         frame_all_fields.set_label_widget(label_all_fields)
+        viewport_all_fields = gtk.Viewport()
         scrolledwindow_all_fields = gtk.ScrolledWindow()
         scrolledwindow_all_fields.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        frame_all_fields.add(scrolledwindow_all_fields)
-
-        viewport_all_fields = gtk.Viewport()
-
-        scrolledwindow_all_fields.add(viewport_all_fields)
+        viewport_all_fields.add(scrolledwindow_all_fields)
+        frame_all_fields.add(viewport_all_fields)
 
         vbox_buttons = gtk.VBox(False, 10)
         vbox_buttons.set_border_width(5)
@@ -115,7 +111,6 @@ class WinExport(object):
 
         frame_export = gtk.Frame()
         frame_export.set_shadow_type(gtk.SHADOW_NONE)
-        hbox.pack_start(frame_export, True, True, 0)
         label_export = gtk.Label(_("<b>Fields to export</b>"))
         label_export.set_use_markup(True)
         frame_export.set_label_widget(label_export)
@@ -123,13 +118,13 @@ class WinExport(object):
         alignment_export = gtk.Alignment(0.5, 0.5, 1, 1)
         alignment_export.set_padding(0, 0, 12, 0)
         frame_export.add(alignment_export)
-        scrolledwindow_export = gtk.ScrolledWindow(None, None)
+        viewport_fields_to_export = gtk.Viewport()
+        scrolledwindow_export = gtk.ScrolledWindow()
         scrolledwindow_export.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
-        alignment_export.add(scrolledwindow_export)
-
-        viewport_fields_to_export = gtk.Viewport()
-        scrolledwindow_export.add(viewport_fields_to_export)
+        viewport_fields_to_export.add(scrolledwindow_export)
+        alignment_export.add(viewport_fields_to_export)
+        hbox.pack_start(frame_export, True, True, 0)
 
         frame_options = gtk.Frame()
         frame_options.set_border_width(2)
@@ -172,10 +167,10 @@ class WinExport(object):
 
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        viewport_all_fields.add(self.view1)
+        scrolledwindow_all_fields.add(self.view1)
         self.view2 = gtk.TreeView()
         self.view2.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        viewport_fields_to_export.add(self.view2)
+        scrolledwindow_export.add(self.view2)
         self.view1.set_headers_visible(False)
         self.view2.set_headers_visible(False)
 
@@ -239,7 +234,7 @@ class WinExport(object):
             gtk.CellRendererText(), text=2))
         self.pref_export.append_column(gtk.TreeViewColumn('Exported fields',
             gtk.CellRendererText(), text=3))
-        predefined_exports.add(self.pref_export)
+        scrolledwindow_exports.add(self.pref_export)
 
         self.pref_export.connect("row-activated", self.sel_predef)
 
