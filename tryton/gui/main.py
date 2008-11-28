@@ -441,7 +441,7 @@ class Main(object):
         imagemenuitem_home.set_accel_path('<tryton>/Form/Home')
         menu_form.add(imagemenuitem_home)
 
-        imagemenuitem_close = gtk.ImageMenuItem(_('_Close'), self.accel_group)
+        imagemenuitem_close = gtk.ImageMenuItem(_('_Close Tab'), self.accel_group)
         image = gtk.Image()
         image.set_from_stock('tryton-close', gtk.ICON_SIZE_MENU)
         imagemenuitem_close.set_image(image)
