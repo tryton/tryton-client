@@ -98,11 +98,12 @@ class Button(object):
                 return
         if 'invisible' in state_changes:
             try:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.widget.hide()
-                else:
-                    self.widget.show()
+                        self.widget.hide()
+                    else:
+                        self.widget.show()
             except:
                 log = logging.getLogger('record')
                 log.error("Unable to eval '%s' for button %s (record: %s@%s)"% \
@@ -169,11 +170,12 @@ class Label(gtk.Label):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.hide()
-                else:
-                    self.show()
+                        self.hide()
+                    else:
+                        self.show()
             else:
                 self.show()
         except:
@@ -199,11 +201,12 @@ class VBox(gtk.VBox):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.hide()
-                else:
-                    self.show()
+                        self.hide()
+                    else:
+                        self.show()
             else:
                 self.show()
         except:
@@ -228,11 +231,12 @@ class Image(gtk.Image):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.hide()
-                else:
-                    self.show()
+                        self.hide()
+                    else:
+                        self.show()
             else:
                 self.show()
         except:
@@ -258,11 +262,12 @@ class Frame(gtk.Frame):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.hide()
-                else:
-                    self.show()
+                        self.hide()
+                    else:
+                        self.show()
             else:
                 self.show()
         except:
@@ -289,11 +294,12 @@ class ScrolledWindow(gtk.ScrolledWindow):
             if isinstance(state_changes, basestring):
                 state_changes = eval(state_changes)
             if 'invisible' in state_changes:
-                if model and model.expr_eval(state_changes['invisible'],
+                if model:
+                    if model.expr_eval(state_changes['invisible'],
                         check_load=False):
-                    self.hide()
-                else:
-                    self.show()
+                        self.hide()
+                    else:
+                        self.show()
             else:
                 self.show()
         except:
