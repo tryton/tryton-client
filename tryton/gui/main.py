@@ -857,15 +857,6 @@ class Main(object):
         self.tooltips.set_tip(toolbutton_attach, _('Add an attachment to the record'))
         self.buttons['but_attach'] = toolbutton_attach
 
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        toolbutton_close = gtk.ToolButton('tryton-close')
-        toolbutton_close.set_label(_('Close'))
-        self.toolbar.insert(toolbutton_close, -1)
-        toolbutton_close.connect('clicked', self._sig_child_call, 'but_close')
-        self.tooltips.set_tip(toolbutton_close, _('Close the tab'))
-        self.buttons['but_close'] = toolbutton_close
-
     @staticmethod
     def get_main():
         return _MAIN[0]
