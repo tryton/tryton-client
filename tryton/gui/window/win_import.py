@@ -262,7 +262,11 @@ class WinImport(object):
                 for word in line:
                     word = word.decode(csvcode)
                     num = self.model2.append()
-                    self.model2.set(num, 0, word, 1, self.fields_invert[word])
+                    try:
+                        self.model2.set(num, 0, word, 1, self.fields_invert[word])
+                    except:
+                        self.model2.remove(num)
+                        raise
                 break
         except Exception, exception:
             common.warning(_('Error processing the file at field %s.\n' \
