@@ -68,6 +68,8 @@ class DateEntry(gtk.Entry):
         pos = self.get_position()
 
         text = self.get_text()
+        if not text:
+            text = self.initial_value
         if text == self.initial_value and pos >= len(self.initial_value):
             pos = 0
 
@@ -140,12 +142,15 @@ class DateEntry(gtk.Entry):
                 format = format.replace('%Y', '0%Y')
             self.set_text(dt.strftime(format))
         else:
-            self.set_text(self.initial_value)
+            if self.is_focus():
+                self.set_text(self.initial_value)
+            else:
+                self.set_text('')
 
     def date_get(self):
         tt = time.strftime(self.format, time.localtime())
         tc = self.get_text()
-        if tc == self.initial_value:
+        if tc == self.initial_value or not tc:
             return False
 
         match = self.regex.match(tc)
