@@ -142,6 +142,8 @@ class PySocket:
                 break
         size, msg = buf.split(' ', 1)
         size = int(size)
+        if size > MAX_SIZE:
+            raise RuntimeError, "socket connection broken"
         if msg == '':
             if self.ssl:
                 msg = self.ssl_sock.read(4096)
