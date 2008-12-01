@@ -87,6 +87,8 @@ setup(name=PACKAGE,
     author='B2CK',
     author_email='info@b2ck.com',
     url=WEBSITE,
+    download_url="http://downloads.tryton.org/" + \
+            VERSION.rsplit('.', 1)[0] + '/',
     packages=find_packages(),
     data_files=[
         ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton-icon.png')),
