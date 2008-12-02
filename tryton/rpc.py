@@ -106,10 +106,10 @@ def login(username, password, host, port, database):
             res = _SOCK.receive()
         finally:
             _SEMAPHORE.release()
-    except socket.error:
+    except (socket.error, RuntimeError):
         try:
             _SOCK.reconnect()
-        except socket.error:
+        except (socket.error, RuntimeError):
             pass
         _USER = 0
         _SESSION = ''
@@ -173,12 +173,12 @@ def _execute(blocking, obj, method, *args):
         try:
             _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
             result = _SOCK.receive()
-        except socket.error:
+        except (socket.error, RuntimeError):
             try:
                 _SOCK.reconnect()
                 _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
                 result = _SOCK.receive()
-            except socket.error:
+            except (socket.error, RuntimeError):
                 _SOCK.reconnect()
                 raise
     finally:
