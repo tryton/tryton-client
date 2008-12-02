@@ -2,8 +2,8 @@
    completely to your liking, but it should at least contain the root
    `toctree` directive.
 
-Index
-#####
+Tryton Client
+#############
 
 Contents:
 
@@ -18,7 +18,7 @@ Contents:
    glossary
 
 Indices and tables
-##################
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`
