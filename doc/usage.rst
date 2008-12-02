@@ -1,3 +1,6 @@
+
+:tocdepth: 2
+
 Client Usage
 ############
 This document is the reference about the concepts of the graphical user
