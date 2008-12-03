@@ -329,10 +329,10 @@ class Boolean(Int):
 
 class Date(Char):
     server_format = DT_FORMAT
-    display_format = date_format()
 
     def __init__(self, field_name, model, treeview=None, attrs=None,
             window=None):
+        self.display_format = date_format()
         self.field_name = field_name
         self.model = model
         self.attrs = attrs or {}
@@ -359,7 +359,12 @@ class Date(Char):
 
 class Datetime(Date):
     server_format = DHM_FORMAT
-    display_format = date_format() + ' ' + HM_FORMAT
+
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        self.display_format = date_format() + ' ' + HM_FORMAT
+        return super(Datetime, self).__init__(field_name, model,
+                treeview=treeview, attrs=attrs, window=window)
 
     def get_textual_value(self, model):
         value = model[self.field_name].get_client(model)
