@@ -957,7 +957,7 @@ class Main(object):
             sb_id = self.sb_username.get_context_id('message')
             self.sb_username.push(sb_id, prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
-                translate.setlang(prefs['language'])
+                translate.setlang(prefs['language'], prefs.get('locale'))
                 CONFIG['client.lang'] = prefs['language']
                 CONFIG.save()
         self.window.present()
