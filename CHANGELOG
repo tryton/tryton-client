@@ -1,3 +1,4 @@
+* Add Model in logs
 * Allow to duplicate many records at once
 * Improve netrpc communication speed
 * Improve date widget to display mask only when having focus
