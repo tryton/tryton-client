@@ -211,7 +211,7 @@ class Form(SignalEvent):
         return self.screen.id_get()
 
     def sig_attach(self, widget=None):
-        obj_id = self.screen.id_get()
+        obj_id = self.id_get()
         if obj_id:
             win = Attachment(self.model, obj_id, self.window)
             win.run()
@@ -227,11 +227,8 @@ class Form(SignalEvent):
             return
         self.screen.switch_view()
 
-    def _id_get(self):
-        return self.screen.id_get()
-
     def sig_logs(self, widget=None):
-        obj_id = self._id_get()
+        obj_id = self.id_get()
         if not obj_id:
             self.message_info(_('You have to select one record!'))
             return False
@@ -285,7 +282,7 @@ class Form(SignalEvent):
         fields = []
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
-        win = WinExport(self.model, self.screen.ids_get(),
+        win = WinExport(self.model, self.ids_get(),
                 self.screen.fields, fields, parent=self.window,
                 context=self.context)
         win.run()
@@ -349,7 +346,7 @@ class Form(SignalEvent):
             self.screen.cancel_current()
             self.screen.display()
         else:
-            obj_id = self.screen.id_get()
+            obj_id = self.id_get()
             self.screen.search_filter()
             for model in self.screen.models:
                 if model.id == obj_id:
@@ -360,7 +357,7 @@ class Form(SignalEvent):
         return True
 
     def sig_action(self, keyword='form_action'):
-        ids = self.screen.ids_get()
+        ids = self.ids_get()
         if self.screen.current_model:
             obj_id = self.screen.current_model.id
         else:
