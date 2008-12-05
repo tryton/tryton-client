@@ -18,6 +18,9 @@ from tryton.signal_event import SignalEvent
 from tryton.common import TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES
 import tryton.common as common
 import pango
+from tryton.translate import date_format
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+import mx.DateTime
 
 _ = gettext.gettext
 
@@ -234,11 +237,11 @@ class Form(SignalEvent):
             return False
 
         fields = [
-            ('id', _('ID')),
-            ('create_uid', _('Creation User')),
-            ('create_date', _('Creation Date')),
-            ('write_uid', _('Latest Modification by')),
-            ('write_date', _('Latest Modification Date')),
+            ('id', _('ID:')),
+            ('create_uid', _('Creation User:')),
+            ('create_date', _('Creation Date:')),
+            ('write_uid', _('Latest Modification by:')),
+            ('write_date', _('Latest Modification Date:')),
         ]
 
         args = ('object', 'execute', self.model, 'read', [obj_id],
@@ -255,7 +258,28 @@ class Form(SignalEvent):
                 if line.get(key, False) and \
                         (key in ('create_uid', 'write_uid')):
                     line[key] = line[key][1]
-                message_str += val+': ' + str(line.get(key, False) or '/')+'\n'
+                value = str(line.get(key, False) or '/')
+                if line.get(key, False) \
+                        and key in ('create_date', 'write_date'):
+                    display_format = date_format() + ' ' + HM_FORMAT
+                    date = mx.DateTime.strptime(str(line[key]), DHM_FORMAT)
+                    if 'timezone' in rpc.CONTEXT:
+                        try:
+                            import pytz
+                            lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+                            szone = pytz.timezone(rpc.TIMEZONE)
+                            datetime = DT.datetime(date.year, date.month,
+                                    date.day, date.hour, date.minute,
+                                    int(date.second))
+                            sdt = szone.localize(datetime, is_dst=True)
+                            ldt = sdt.astimezone(lzone)
+                            date = mx.DateTime.DateTime(*(
+                                ldt.timetuple()[:6]))
+                        except:
+                            pass
+                    value = date.strftime(display_format)
+                message_str += val + ' ' + value +'\n'
+        message_str += _('Model:') + ' ' + self.model
         message(message_str, self.window)
         return True
 
