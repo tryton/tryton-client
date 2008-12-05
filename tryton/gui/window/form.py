@@ -201,6 +201,9 @@ class Form(SignalEvent):
         del self.scrolledwindow
         gc.collect()
 
+    def sel_ids_get(self):
+        return self.screen.sel_ids_get()
+
     def ids_get(self):
         return self.screen.ids_get()
 
@@ -297,17 +300,17 @@ class Form(SignalEvent):
     def sig_copy(self, widget=None):
         if not self.modified_save():
             return
-        res_id = self._id_get()
+        res_ids = self.sel_ids_get()
         ctx = self.context.copy()
         ctx.update(rpc.CONTEXT)
-        args = ('object', 'execute', self.model, 'copy', res_id, {}, ctx)
+        args = ('object', 'execute', self.model, 'copy', res_ids, {}, ctx)
         try:
-            new_id = rpc.execute(*args)
+            new_ids = rpc.execute(*args)
         except Exception, exception:
-            new_id = common.process_exception(exception, self.window, *args)
-        if new_id:
-            self.screen.load([new_id])
-            self.message_info(_('Working now on the duplicated record!'),
+            new_ids = common.process_exception(exception, self.window, *args)
+        if new_ids:
+            self.screen.load(new_ids)
+            self.message_info(_('Working now on the duplicated record(s)!'),
                     'green')
 
     def sig_save(self, widget=None):
