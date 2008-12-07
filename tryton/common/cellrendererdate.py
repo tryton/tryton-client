@@ -9,9 +9,9 @@ class CellRendererDate(gtk.GenericCellRenderer):
             'text': (gobject.TYPE_STRING, None, 'Text',
                 'Text', gobject.PARAM_READWRITE),
             'foreground': (gobject.TYPE_STRING, None, 'Foreground',
-                'Foreground', gobject.PARAM_READWRITE),
+                'Foreground', gobject.PARAM_WRITABLE),
             'background': (gobject.TYPE_STRING, None, 'Background',
-                'Background', gobject.PARAM_READWRITE),
+                'Background', gobject.PARAM_WRITABLE),
             'editable': (gobject.TYPE_INT, 'Editable',
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
     }
