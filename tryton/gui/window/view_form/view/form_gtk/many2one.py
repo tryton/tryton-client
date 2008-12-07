@@ -68,6 +68,7 @@ class Dialog(object):
         title.set_label('<b>' + name + '</b>')
         title.set_padding(20, 3)
         title.set_alignment(0.0, 0.5)
+        title.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#000000"))
         title.show()
 
         self.info_label = gtk.Label()
