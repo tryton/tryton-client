@@ -22,7 +22,7 @@ AUTHORS = [
         'Hartmut Goebel',
         'Korbinian Preisler <info@virtual-things.biz>',
         'Mathias Behrle',
-        'Sednacom',
+        'Sednacom <contact@sednacom.fr>',
         'Udo Spallek <info@virtual-things.biz>',
         ]
 LICENSE = '''                    GNU GENERAL PUBLIC LICENSE
