@@ -10,7 +10,8 @@ except ImportError:
 DNS_CACHE = {}
 MAX_SIZE = 999999999
 MAX_LENGHT = len(str(MAX_SIZE))
-TIMEOUT = 120
+CONNECT_TIMEOUT = 5
+TIMEOUT = 3600
 
 _ALLOWED_MODULES = {'datetime': ['datetime', 'date'], 'decimal': ['Decimal']}
 
@@ -46,13 +47,13 @@ class PySocket:
                 socket.getaddrinfo(host, int(port), socket.AF_INET6)
                 self.sock = socket.socket(socket.AF_INET6,
                         socket.SOCK_STREAM)
-                self.sock.settimeout(TIMEOUT)
+                self.sock.settimeout(CONNECT_TIMEOUT)
                 self.sock.connect((host, int(port)))
             except:
                 self.sock = None
         if self.sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.settimeout(TIMEOUT)
+            self.sock.settimeout(CONNECT_TIMEOUT)
             self.sock.connect((host, int(port)))
         DNS_CACHE[hostname], port = self.sock.getpeername()[:2]
         try:
@@ -61,19 +62,20 @@ class PySocket:
                 try:
                     socket.getaddrinfo(host, int(port), socket.AF_INET6)
                     sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-                    sock.settimeout(TIMEOUT)
+                    sock.settimeout(CONNECT_TIMEOUT)
                     sock.connect((host, int(port)))
                 except:
                     sock = None
             if sock is None:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(TIMEOUT)
+                sock.settimeout(CONNECT_TIMEOUT)
                 sock.connect((host, int(port)))
             if hasattr(socket, 'ssl'):
                 ssl_sock = socket.ssl(sock)
                 self.ssl = True
         except:
             pass
+        self.sock.settimeout(TIMEOUT)
         if self.ssl:
             self.ssl_sock = socket.ssl(self.sock)
         self.host = host
