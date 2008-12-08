@@ -89,6 +89,7 @@ class WidgetInterface(object):
         ]
         self.widget = None
         self.position = 0
+        self.bg_color = None
 
     def destroy(self):
         pass
@@ -126,12 +127,27 @@ class WidgetInterface(object):
     def color_set(self, name):
         widget = self._color_widget()
         colormap = widget.get_colormap()
-        colour = colormap.alloc_color(COLORS.get(name,'white'))
-        widget.modify_bg(gtk.STATE_ACTIVE, colour)
-        widget.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-        widget.modify_base(gtk.STATE_NORMAL, colour)
-        widget.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-        widget.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("black"))
+        style = widget.get_style()
+        if COLORS.get(name):
+            bg_color = colormap.alloc_color(COLORS.get(name, 'white'))
+            fg_color = gtk.gdk.color_parse("black")
+            widget.modify_bg(gtk.STATE_ACTIVE, bg_color)
+            widget.modify_base(gtk.STATE_NORMAL, bg_color)
+            widget.modify_fg(gtk.STATE_NORMAL, fg_color)
+            widget.modify_text(gtk.STATE_NORMAL, fg_color)
+            widget.modify_text(gtk.STATE_INSENSITIVE, fg_color)
+        elif name == 'readonly':
+            widget.modify_bg(gtk.STATE_ACTIVE, style.bg[gtk.STATE_INSENSITIVE])
+            widget.modify_base(gtk.STATE_NORMAL, style.base[gtk.STATE_INSENSITIVE])
+            widget.modify_fg(gtk.STATE_NORMAL, style.fg[gtk.STATE_INSENSITIVE])
+            widget.modify_text(gtk.STATE_NORMAL, style.text[gtk.STATE_INSENSITIVE])
+            widget.modify_text(gtk.STATE_INSENSITIVE, style.text[gtk.STATE_INSENSITIVE])
+        else:
+            widget.modify_bg(gtk.STATE_ACTIVE, style.bg[gtk.STATE_ACTIVE])
+            widget.modify_base(gtk.STATE_NORMAL, style.base[gtk.STATE_NORMAL])
+            widget.modify_fg(gtk.STATE_NORMAL, style.fg[gtk.STATE_NORMAL])
+            widget.modify_text(gtk.STATE_NORMAL, style.text[gtk.STATE_NORMAL])
+            widget.modify_text(gtk.STATE_INSENSITIVE, style.text[gtk.STATE_INSENSITIVE])
 
     def invisible_set(self, value):
         widget = self._invisible_widget()

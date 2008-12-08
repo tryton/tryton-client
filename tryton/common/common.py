@@ -880,9 +880,7 @@ COLOR_SCHEMES = {
 
 COLORS = {
     'invalid':'#ff6969',
-    'readonly':'#eeebe7',
     'required':'#d2d2ff',
-    'normal':'white'
 }
 
 DT_FORMAT = '%Y-%m-%d'

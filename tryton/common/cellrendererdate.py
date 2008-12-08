@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
 from date_widget import mapping, DateEntry, compute_date
@@ -10,8 +11,12 @@ class CellRendererDate(gtk.GenericCellRenderer):
                 'Text', gobject.PARAM_READWRITE),
             'foreground': (gobject.TYPE_STRING, None, 'Foreground',
                 'Foreground', gobject.PARAM_WRITABLE),
+            'foreground-set': (gobject.TYPE_INT, 'Foreground Set',
+                'Foreground Set', 0, 10, 0, gobject.PARAM_READWRITE),
             'background': (gobject.TYPE_STRING, None, 'Background',
                 'Background', gobject.PARAM_WRITABLE),
+            'background-set': (gobject.TYPE_INT, 'Background Set',
+                'Background Set', 0, 10, 0, gobject.PARAM_READWRITE),
             'editable': (gobject.TYPE_INT, 'Editable',
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
     }
@@ -63,15 +68,22 @@ class CellRendererDate(gtk.GenericCellRenderer):
         editable = DateEntry(self.format, self._date_cb, self._process_cb)
 
         colormap = editable.get_colormap()
-        if hasattr(self, 'background'):
-            colour = colormap.alloc_color(getattr(self, 'background'))
+        style = editable.get_style()
+        if hasattr(self, 'background') \
+                and getattr(self, 'background') != 'white':
+            bg_color = colormap.alloc_color(getattr(self, 'background'))
+            fg_color = gtk.gdk.color_parse("black")
+            editable.modify_bg(gtk.STATE_ACTIVE, bg_color)
+            editable.modify_base(gtk.STATE_NORMAL, bg_color)
+            editable.modify_fg(gtk.STATE_NORMAL, fg_color)
+            editable.modify_text(gtk.STATE_NORMAL, fg_color)
+            editable.modify_text(gtk.STATE_INSENSITIVE, fg_color)
         else:
-            colour = colormap.alloc_color('white')
-        editable.modify_bg(gtk.STATE_ACTIVE, colour)
-        editable.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-        editable.modify_base(gtk.STATE_NORMAL, colour)
-        editable.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-        editable.modify_text(gtk.STATE_INSENSITIVE, gtk.gdk.color_parse("black"))
+            editable.modify_bg(gtk.STATE_ACTIVE, style.bg[gtk.STATE_ACTIVE])
+            editable.modify_base(gtk.STATE_NORMAL, style.base[gtk.STATE_NORMAL])
+            editable.modify_fg(gtk.STATE_NORMAL, style.fg[gtk.STATE_NORMAL])
+            editable.modify_text(gtk.STATE_NORMAL, style.text[gtk.STATE_NORMAL])
+            editable.modify_text(gtk.STATE_INSENSITIVE, style.text[gtk.STATE_INSENSITIVE])
 
         if self.text:
             editable.set_text(self.text)

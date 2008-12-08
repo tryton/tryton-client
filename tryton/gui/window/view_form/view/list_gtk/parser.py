@@ -248,8 +248,12 @@ class Char(object):
         model = store.get_value(iter, 0)
         text = self.get_textual_value(model)
         cell.set_property('text', text)
-        color = self.get_color(model)
-        cell.set_property('foreground', str(color))
+        fg_color = self.get_color(model)
+        cell.set_property('foreground', fg_color)
+        if fg_color == 'black':
+            cell.set_property('foreground-set', False)
+        else:
+            cell.set_property('foreground-set', True)
         if self.attrs['type'] in ('float', 'integer', 'biginteger', 'boolean',
                 'numeric', 'float_time'):
             align = 1
@@ -259,12 +263,17 @@ class Char(object):
                 and self.treeview.editable:
             field = model[self.field_name]
             field.state_set(model)
+            bg_color = 'white'
             if not field.get_state_attrs(model).get('valid', True):
-                cell.set_property('background',
-                        COLORS.get('invalid', 'white'))
+                bg_color = COLORS.get('invalid', 'white')
             elif bool(int(field.get_state_attrs(model).get('required', 0))):
-                cell.set_property('background',
-                        COLORS.get('required', 'white'))
+                bg_color = COLORS.get('required', 'white')
+            cell.set_property('background', bg_color)
+            if bg_color == 'white':
+                cell.set_property('background-set', False)
+            else:
+                cell.set_property('background-set', True)
+                cell.set_property('foreground-set', True)
             readonly = field.get_state_attrs(model).get('readonly', False)
             if isinstance(cell, gtk.CellRendererToggle):
                 cell.set_property('activatable', not readonly)
@@ -279,7 +288,7 @@ class Char(object):
         to_display = ''
         for color, expr in self.treeview.colors.items():
             if model.expr_eval(expr, check_load=False):
-                to_display = color
+                to_display = str(color)
                 break
         return to_display or 'black'
 
