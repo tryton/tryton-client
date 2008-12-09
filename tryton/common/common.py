@@ -754,11 +754,15 @@ def process_exception(exception, parent, obj='', method='', *args):
             msg = exception.args[3]
         res = userwarning(str(msg), parent, str(exception.args[2]))
         if res in ('always', 'ok'):
-            rpc.execute('object', 'execute', 'res.user.warning', 'create', {
-                'user': rpc._USER,
-                'name': exception.args[1],
-                'always': (res == 'always'),
-                }, rpc.CONTEXT)
+            args = ('object', 'execute', 'res.user.warning', 'create', {
+                    'user': rpc._USER,
+                    'name': exception.args[1],
+                    'always': (res == 'always'),
+                    }, rpc.CONTEXT)
+            try:
+                rpc.execute(*args)
+            except Exception, exception:
+                process_exception(exception, parent, *args)
             try:
                 return rpc.execute(obj, method, *args)
             except Exception, exception:
