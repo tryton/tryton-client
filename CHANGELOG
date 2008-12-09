@@ -1,3 +1,4 @@
+* Add user warnings
 * Add Model in logs
 * Allow to duplicate many records at once
 * Improve netrpc communication speed

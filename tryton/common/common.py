@@ -539,6 +539,31 @@ def warning(msg, parent, title=''):
     dialog.destroy()
     return True
 
+def userwarning(msg, parent, title=''):
+    dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_WARNING, gtk.BUTTONS_OK_CANCEL)
+    dialog.set_icon(TRYTON_ICON)
+    # format_secondary_markup available in PyGTK 2.6 and above.
+    if hasattr(dialog, 'format_secondary_markup'):
+        dialog.set_markup('<b>%s</b>' % (to_xml(title)))
+        dialog.format_secondary_markup(to_xml(msg))
+    else:
+        dialog.set_markup('<b>%s</b>\n%s' % (to_xml(title), to_xml(msg)))
+    check = gtk.CheckButton(_('Always ignore this warning.'))
+    alignment = gtk.Alignment(1, 0.5)
+    alignment.add(check)
+    dialog.vbox.pack_end(alignment, True, False)
+    dialog.show_all()
+    response = dialog.run()
+    parent.present()
+    always = check.get_active()
+    dialog.destroy()
+    if response == gtk.RESPONSE_OK:
+        if always:
+            return 'always'
+        return 'ok'
+    return 'cancel'
+
 def sur(msg, parent):
     dialog = gtk.Dialog(_('Confirmation'), parent, gtk.DIALOG_MODAL
             | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
@@ -721,6 +746,23 @@ def process_exception(exception, parent, obj='', method='', *args):
             except Exception, exception:
                 return process_exception(exception, parent, obj,
                         method, *args)
+        return False
+
+    if exception.args[0] == 'UserWarning':
+        msg = ''
+        if len(exception.args) > 4:
+            msg = exception.args[3]
+        res = userwarning(str(msg), parent, str(exception.args[2]))
+        if res in ('always', 'ok'):
+            rpc.execute('object', 'execute', 'res.user.warning', 'create', {
+                'user': rpc._USER,
+                'name': exception.args[1],
+                'always': (res == 'always'),
+                }, rpc.CONTEXT)
+            try:
+                return rpc.execute(obj, method, *args)
+            except Exception, exception:
+                return process_exception(exception, parent, obj, method, *args)
         return False
 
     if exception.args[0] == 'UserError':
