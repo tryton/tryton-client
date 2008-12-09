@@ -9,6 +9,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
     __gproperties__ = {
             "text": (gobject.TYPE_STRING, None, "Text",
                 "Displayed text", gobject.PARAM_READWRITE),
+            'visible': (gobject.TYPE_INT, 'Visible',
+                'Visible', 0, 10, 0, gobject.PARAM_READWRITE),
     }
 
     __gsignals__ = {
@@ -21,6 +23,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
         self.text = text
         self.set_property('mode', gtk.CELL_RENDERER_MODE_EDITABLE)
         self.clicking = False
+        self.visible = True
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
@@ -30,6 +33,11 @@ class CellRendererButton(gtk.GenericCellRenderer):
 
     def on_render(self, window, widget, background_area, cell_area,
             expose_area, flags):
+        if not self.visible:
+            return
+        # Handle Pixmap window as pygtk failed
+        if type(window) == gtk.gdk.Pixmap:
+            return
         state = gtk.STATE_NORMAL
         shadow = gtk.SHADOW_OUT
         if self.clicking and flags & gtk.CELL_RENDERER_SELECTED:
@@ -61,6 +69,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
+        if not self.visible:
+            return
         if (event is None) or ((event.type == gtk.gdk.BUTTON_PRESS) \
                 or (event.type == gtk.gdk.KEY_PRESS \
                     and event.keyval == gtk.keysyms.space)):

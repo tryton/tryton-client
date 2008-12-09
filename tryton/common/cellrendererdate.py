@@ -19,6 +19,8 @@ class CellRendererDate(gtk.GenericCellRenderer):
                 'Background Set', 0, 10, 0, gobject.PARAM_READWRITE),
             'editable': (gobject.TYPE_INT, 'Editable',
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
+            'visible': (gobject.TYPE_INT, 'Visible',
+                'Visible', 0, 10, 0, gobject.PARAM_READWRITE),
     }
 
     def __init__(self, format):
@@ -31,9 +33,12 @@ class CellRendererDate(gtk.GenericCellRenderer):
         self.cmd = ''
         self.text = self._renderer.get_property('text')
         self.editable = self._renderer.get_property('editable')
+        self.visible = True
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
+        if pspec.name == 'visible':
+            return
         self._renderer.set_property(pspec.name, value)
         self.set_property("mode", self._renderer.get_property("mode"))
 
@@ -45,6 +50,8 @@ class CellRendererDate(gtk.GenericCellRenderer):
 
     def on_render(self, window, widget, background_area, cell_area,
             expose_area, flags):
+        if not self.visible:
+            return
         # Handle Pixmap window as pygtk failed
         if type(window) == gtk.gdk.Pixmap:
             layout = widget.create_pango_layout(self.text)
@@ -60,11 +67,15 @@ class CellRendererDate(gtk.GenericCellRenderer):
 
     def on_activate(self, event, widget, path, background_area, cell_area,
             flags):
+        if not self.visible:
+            return
         return self._renderer.activate(event, widget, path, background_area,
                 cell_area, flags)
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
+        if not self.visible:
+            return
         editable = DateEntry(self.format, self._date_cb, self._process_cb)
 
         colormap = editable.get_colormap()

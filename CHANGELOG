@@ -1,3 +1,4 @@
+* Handle invisible states on list view
 * Add user warnings
 * Add Model in logs
 * Allow to duplicate many records at once

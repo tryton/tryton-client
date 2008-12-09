@@ -11,6 +11,7 @@ import gettext
 import tryton.common as common
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
+from tryton.common.cellrenderertoggle import CellRendererToggle
 
 _ = gettext.gettext
 
@@ -561,7 +562,7 @@ class ViewList(ParserView):
                 if not renderers:
                     continue
                 renderer = renderers[0]
-                if isinstance(renderer, gtk.CellRendererToggle):
+                if isinstance(renderer, CellRendererToggle):
                     editable = renderer.get_property('activatable')
                 elif isinstance(renderer,
                         (gtk.CellRendererProgress, CellRendererButton)):
@@ -595,7 +596,7 @@ class ViewList(ParserView):
         self.widget_tree.editable = False
         for col in self.widget_tree.get_columns():
             for renderer in col.get_cell_renderers():
-                if isinstance(renderer, gtk.CellRendererToggle):
+                if isinstance(renderer, CellRendererToggle):
                     renderer.set_property('activatable', False)
                 elif isinstance(renderer,
                         (gtk.CellRendererProgress, CellRendererButton)):

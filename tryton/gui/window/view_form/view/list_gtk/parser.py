@@ -23,6 +23,7 @@ import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
+from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.action import Action
 from tryton.translate import date_format
 import mx.DateTime
@@ -107,7 +108,7 @@ class ParserTree(ParserInterface):
                 renderer = cell.renderer
 
                 readonly = not (editable and not node_attrs.get('readonly', False))
-                if isinstance(renderer, gtk.CellRendererToggle):
+                if isinstance(renderer, CellRendererToggle):
                     renderer.set_property('activatable', not readonly)
                 elif isinstance(renderer,
                         (gtk.CellRendererProgress, CellRendererButton)):
@@ -247,41 +248,61 @@ class Char(object):
     def setter(self, column, cell, store, iter):
         model = store.get_value(iter, 0)
         text = self.get_textual_value(model)
-        cell.set_property('text', text)
-        fg_color = self.get_color(model)
-        cell.set_property('foreground', fg_color)
-        if fg_color == 'black':
-            cell.set_property('foreground-set', False)
+
+        if isinstance(cell, CellRendererToggle):
+            cell.set_active(bool(text))
         else:
-            cell.set_property('foreground-set', True)
+            cell.set_property('text', text)
+            fg_color = self.get_color(model)
+            cell.set_property('foreground', fg_color)
+            if fg_color == 'black':
+                cell.set_property('foreground-set', False)
+            else:
+                cell.set_property('foreground-set', True)
+
         if self.attrs['type'] in ('float', 'integer', 'biginteger', 'boolean',
                 'numeric', 'float_time'):
             align = 1
         else:
             align = 0
+
+        states = ('invisible')
         if hasattr(self.treeview, 'editable') \
                 and self.treeview.editable:
-            field = model[self.field_name]
-            field.state_set(model)
-            bg_color = 'white'
-            if not field.get_state_attrs(model).get('valid', True):
-                bg_color = COLORS.get('invalid', 'white')
-            elif bool(int(field.get_state_attrs(model).get('required', 0))):
-                bg_color = COLORS.get('required', 'white')
-            cell.set_property('background', bg_color)
-            if bg_color == 'white':
-                cell.set_property('background-set', False)
-            else:
-                cell.set_property('background-set', True)
-                cell.set_property('foreground-set', True)
+            states = ('readonly', 'required', 'invisible')
+
+        field = model[self.field_name]
+        field.state_set(model, states=states)
+        invisible = field.get_state_attrs(model).get('invisible', False)
+        cell.set_property('visible', not invisible)
+
+        if hasattr(self.treeview, 'editable') \
+                and self.treeview.editable:
             readonly = field.get_state_attrs(model).get('readonly', False)
-            if isinstance(cell, gtk.CellRendererToggle):
+            if invisible:
+                readonly = True
+
+            if not isinstance(cell, CellRendererToggle):
+                bg_color = 'white'
+                if not field.get_state_attrs(model).get('valid', True):
+                    bg_color = COLORS.get('invalid', 'white')
+                elif bool(int(field.get_state_attrs(model).get('required', 0))):
+                    bg_color = COLORS.get('required', 'white')
+                cell.set_property('background', bg_color)
+                if bg_color == 'white':
+                    cell.set_property('background-set', False)
+                else:
+                    cell.set_property('background-set', True)
+                    cell.set_property('foreground-set', True)
+
+            if isinstance(cell, CellRendererToggle):
                 cell.set_property('activatable', not readonly)
             elif isinstance(cell,
                     (gtk.CellRendererProgress, CellRendererButton)):
                 pass
             else:
                 cell.set_property('editable', not readonly)
+
         cell.set_property('xalign', align)
 
     def get_color(self, model):
@@ -314,16 +335,11 @@ class Boolean(Int):
 
     def __init__(self, *args):
         super(Boolean, self).__init__(*args)
-        self.renderer = gtk.CellRendererToggle()
+        self.renderer = CellRendererToggle()
         self.renderer.connect('toggled', self._sig_toggled)
 
     def get_textual_value(self, model):
         return model[self.field_name].get_client(model)
-
-    def setter(self, column, cell, store, iter):
-        model = store.get_value(iter, 0)
-        value = self.get_textual_value(model)
-        cell.set_active(bool(value))
 
     def _sig_toggled(self, renderer, path):
         store = self.treeview.get_model()

@@ -108,14 +108,14 @@ class CharField(object):
     def create(self, model):
         return False
 
-    def state_set(self, model):
+    def state_set(self, model, states=('readonly', 'required', 'invisible')):
         state_changes = self.attrs.get('states', {})
         if isinstance(state_changes, basestring):
             try:
                 state_changes = eval(state_changes)
             except:
                 return
-        for key in ('readonly', 'required', 'invisible'):
+        for key in states:
             if key == 'readonly' and self.attrs.get(key, False):
                 continue
             if key in state_changes:
@@ -550,8 +550,8 @@ class O2MField(CharField):
         self.get_state_attrs(model)['valid'] = res
         return res
 
-    def state_set(self, model):
-        super(O2MField, self).state_set(model)
+    def state_set(self, model, states=('readonly', 'required', 'invisible')):
+        super(O2MField, self).state_set(model, states=states)
         if self.get_state_attrs(model).get('readonly', False):
             model.value[self.name].readonly = True
         else:
