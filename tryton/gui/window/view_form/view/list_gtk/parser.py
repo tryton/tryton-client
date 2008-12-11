@@ -24,6 +24,7 @@ from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
 from tryton.common.cellrenderertoggle import CellRendererToggle
+from tryton.common.cellrenderercombo import CellRendererCombo
 from tryton.action import Action
 from tryton.translate import date_format
 import mx.DateTime
@@ -641,7 +642,7 @@ class Selection(Char):
 
     def __init__(self, *args):
         super(Selection, self).__init__(*args)
-        self.renderer = gtk.CellRendererCombo()
+        self.renderer = CellRendererCombo()
         selection_data = gtk.ListStore(str, str)
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
