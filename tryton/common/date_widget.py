@@ -210,6 +210,7 @@ class DateEntry(gtk.Entry):
                 if self.callback_process:
                     self.callback_process(False, self, event)
                 self.stop_emission("key-press-event")
+                self.activate()
                 return True
             else:
                 self.date_get()
