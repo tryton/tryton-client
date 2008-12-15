@@ -1,3 +1,4 @@
+* Allow to directly print or create email with reports
 * Handle invisible states on list view
 * Add user warnings
 * Add Model in logs

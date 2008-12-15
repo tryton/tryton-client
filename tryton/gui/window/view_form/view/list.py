@@ -177,7 +177,6 @@ class ViewList(ParserView):
             hbox = gtk.HBox()
             self.widget.pack_start(hbox, expand=False, fill=False)
 
-            sep = False
             for icontype in ('print', 'action'):
                 if not toolbar[icontype]:
                     continue
@@ -192,7 +191,10 @@ class ViewList(ParserView):
                         'action': 'tryton-executable',
                     }.get(icontype)
 
-                    tbutton = gtk.ToolButton(iconstock)
+                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
+                        tbutton = gtk.MenuToolButton(iconstock)
+                    else:
+                        tbutton = gtk.ToolButton(iconstock)
                     tbutton.set_use_underline(True)
                     text = tool['name']
                     if '_' not in text:
@@ -200,7 +202,25 @@ class ViewList(ParserView):
                     tbutton.set_label(text)
                     gtktoolbar.insert(tbutton, -1)
 
-                    tbutton.connect('clicked', self._action, tool, icontype)
+                    tbutton.connect('clicked', self._sig_clicked, tool,
+                            icontype)
+                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
+                        menu = gtk.Menu()
+                        for mtype, text in (('print', _('Print')),
+                                ('email', _('Email'))):
+                            menuitem = gtk.MenuItem(text)
+                            tool2 = tool.copy()
+                            if mtype == 'print':
+                                tool2['direct_print'] = True
+                                tool2['email_print'] = False
+                            else:
+                                tool2['direct_print'] = False
+                                tool2['email_print'] = True
+                            menuitem.connect('activate', self._sig_clicked,
+                                    tool2, icontype)
+                            menu.add(menuitem)
+                            menuitem.show()
+                        tbutton.set_menu(menu)
 
         self.display()
 
@@ -230,13 +250,22 @@ class ViewList(ParserView):
 
         self.widget_tree.connect('key_press_event', self.on_keypres)
 
-    def _action(self, widget, action, atype):
+    def _sig_clicked(self, widget, action, atype):
+        return self._action(action, atype)
+
+    def _action(self, action, atype):
         act = action.copy()
         obj_ids = self.screen.sel_ids_get()
         obj_id = self.screen.id_get()
         if not obj_ids and not obj_id:
             message(_('No record selected!'), self.window)
             return False
+        if 'email' in action:
+            email = self.screen.current_model.expr_eval(action['email'])
+            if not email:
+                email = {}
+            email['subject'] = action['name'].replace('_', '')
+            act['email'] = email
         data = {
             'model': self.screen.name,
             'id': obj_id,

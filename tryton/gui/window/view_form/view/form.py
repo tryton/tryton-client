@@ -88,7 +88,6 @@ class ViewForm(ParserView):
             hbox = gtk.HBox()
             self.widget.pack_start(hbox, False, False)
 
-            sep = False
             for icontype in ('print', 'action', 'relate'):
                 if not toolbar[icontype]:
                     continue
@@ -104,7 +103,10 @@ class ViewForm(ParserView):
                         'relate': 'tryton-go-jump',
                     }.get(icontype)
 
-                    tbutton = gtk.ToolButton(iconstock)
+                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
+                        tbutton = gtk.MenuToolButton(iconstock)
+                    else:
+                        tbutton = gtk.ToolButton(iconstock)
                     tbutton.set_use_underline(True)
                     text = tool['name']
                     if '_' not in text:
@@ -112,9 +114,31 @@ class ViewForm(ParserView):
                     tbutton.set_label(text)
                     gtktoolbar.insert(tbutton, -1)
 
-                    tbutton.connect('clicked', self._action, tool, icontype)
+                    tbutton.connect('clicked', self._sig_clicked, tool,
+                            icontype)
+                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
+                        menu = gtk.Menu()
+                        for mtype, text in (('print', _('Print')),
+                                ('email', _('Email'))):
+                            menuitem = gtk.MenuItem(text)
+                            tool = tool.copy()
+                            if mtype == 'print':
+                                tool['direct_print'] = True
+                                tool['email_print'] = False
+                            else:
+                                tool['direct_print'] = False
+                                tool['email_print'] = True
+                            menuitem.connect('activate', self._sig_clicked,
+                                    tool, icontype)
+                            menu.add(menuitem)
+                            menuitem.show()
+                        tbutton.set_menu(menu)
 
-    def _action(self, widget, action, atype):
+
+    def _sig_clicked(self, widget, action, atype):
+        return self._action(action, atype)
+
+    def _action(self, action, atype):
         act = action.copy()
         if atype in ('print', 'action'):
             self.screen.save_current()
@@ -128,6 +152,12 @@ class ViewForm(ParserView):
                     message(_('You must save this record ' \
                         'to use the action button!'), self.window)
                 return False
+            if 'email' in action:
+                email = self.screen.current_model.expr_eval(action['email'])
+                if not email:
+                    email = {}
+                email['subject'] = action['name'].replace('_', '')
+                act['email'] = email
             self.screen.display()
         if atype == 'relate':
             obj_id = self.screen.current_model \

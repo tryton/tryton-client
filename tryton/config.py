@@ -86,6 +86,7 @@ class ConfigManager(object):
                 'png': {0: find_path(['display', 'qiv', 'eye', 'mspaint.exe'],
                     '%s'), 1: ''},
                 },
+            'client.email': '',
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }

@@ -11,6 +11,7 @@ from tryton.action import Action
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
 from tryton.gui.window import FileActions
+from tryton.gui.window import Email
 from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
 from tryton.gui.window.dbdumpdrop import DBBackupDrop
@@ -705,6 +706,12 @@ class Main(object):
         menuitem_actions.set_accel_path('<tryton>/Options/File Actions')
         menu_options.add(menuitem_actions)
 
+        menuitem_email = gtk.MenuItem(_('_Email...'))
+        self.menuitem_email = menuitem_email
+        menuitem_email.connect('activate', self.sig_email)
+        menuitem_email.set_accel_path('<tryton>/Options/Email')
+        menu_options.add(menuitem_email)
+
         menu_options.add(gtk.SeparatorMenuItem())
 
         imagemenuitem_opt_save = gtk.ImageMenuItem(_('_Save Options'))
@@ -931,6 +938,9 @@ class Main(object):
 
     def sig_file_actions(self, widget):
         FileActions(self.window).run()
+
+    def sig_email(self, widget):
+        Email(self.window).run()
 
     def sig_win_next(self, widget):
         page = self.notebook.get_current_page()

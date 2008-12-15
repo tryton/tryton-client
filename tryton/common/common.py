@@ -19,6 +19,8 @@ import locale
 import socket
 from tryton.version import VERSION
 import thread
+import urllib
+from string import Template
 
 _ = gettext.gettext
 
@@ -332,6 +334,45 @@ def file_open(filename, type, parent, print_p=False):
         time.sleep(0.1)
         sys.exit(0)
     os.waitpid(pid, 0)
+
+def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
+    if CONFIG['client.email']:
+        cmd = Template(CONFIG['client.email']).substitute(
+                to=to or '',
+                cc=cc or '',
+                subject=subject or '',
+                body=body or '',
+                attachment=attachment or '',
+                )
+        pid = os.fork()
+        if not pid:
+            pid = os.fork()
+            if not pid:
+                prog, args = cmd.split(' ', 1)
+                args = [os.path.basename(prog)] + args.split(' ')
+                try:
+                    os.execv(prog, args)
+                except:
+                    sys.exit(0)
+            time.sleep(0.1)
+            sys.exit(0)
+        os.waitpid(pid, 0)
+        return
+    #http://www.faqs.org/rfcs/rfc2368.html
+    url = "mailto:"
+    if to:
+        url += urllib.quote(to.strip(), "@,")
+    url += '?'
+    if cc:
+        url += "&cc=" + urllib.quote(cc, "@,")
+    if subject:
+        url += "&subject=" + urllib.quote(subject, "")
+    if body:
+        body = "\r\n".join(body.splitlines())
+        url += "&body=" + urllib.quote(body, "")
+    if attachment:
+        url += "&attachment=" + urllib.quote(attachment, "")
+    webbrowser.open(url, new=1)
 
 def error(title, parent, details):
     log = logging.getLogger('common.message')
