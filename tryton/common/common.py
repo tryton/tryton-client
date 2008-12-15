@@ -21,6 +21,7 @@ from tryton.version import VERSION
 import thread
 import urllib
 from string import Template
+import shlex
 
 _ = gettext.gettext
 
@@ -317,18 +318,17 @@ def file_open(filename, type, parent, print_p=False):
         return
     cmd = cmd % filename
     if print_p:
-        prog, args = cmd.split(' ', 1)
-        args = [os.path.basename(prog)] + args.split(' ')
-        os.spawnv(os.P_WAIT, prog, args)
+        args = shlex.split(cmd)
+        os.spawnv(os.P_WAIT, args[0], args)
         return
     pid = os.fork()
     if not pid:
         pid = os.fork()
         if not pid:
-            prog, args = cmd.split(' ', 1)
-            args = [os.path.basename(prog)] + args.split(' ')
+            args = shlex.split(str(cmd))
+            print args
             try:
-                os.execv(prog, args)
+                os.execv(args[0], args)
             except:
                 sys.exit(0)
         time.sleep(0.1)
@@ -344,14 +344,16 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
                 body=body or '',
                 attachment=attachment or '',
                 )
+        args = shlex.split(str(cmd))
+        if os.name == 'nt':
+            os.spawnv(os.P_NOWAIT, args[0], args)
+            return
         pid = os.fork()
         if not pid:
             pid = os.fork()
             if not pid:
-                prog, args = cmd.split(' ', 1)
-                args = [os.path.basename(prog)] + args.split(' ')
                 try:
-                    os.execv(prog, args)
+                    os.execv(args[0], args)
                 except:
                     sys.exit(0)
             time.sleep(0.1)
