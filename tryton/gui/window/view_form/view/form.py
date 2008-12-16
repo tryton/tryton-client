@@ -118,8 +118,8 @@ class ViewForm(ParserView):
                             icontype)
                     if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
                         menu = gtk.Menu()
-                        for mtype, text in (('print', _('Print')),
-                                ('email', _('Email'))):
+                        for mtype, text in (('print', _('_Direct Print')),
+                                ('email', _('_Email as Attachment'))):
                             menuitem = gtk.MenuItem(text)
                             tool = tool.copy()
                             if mtype == 'print':
