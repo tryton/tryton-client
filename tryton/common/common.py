@@ -326,7 +326,6 @@ def file_open(filename, type, parent, print_p=False):
         pid = os.fork()
         if not pid:
             args = shlex.split(str(cmd))
-            print args
             try:
                 os.execv(args[0], args)
             except:
