@@ -834,6 +834,24 @@ File Actions...:
     - Open: Setting up program system call which opens the specific file type.
     - Print: Setting up program system call printing the specific file type.
 
+.. _Menu-Options-Email:
+
+Email...:
+  Open a dialog to setting up email program.
+
+  * Usage:
+
+    - ``${to}``: the destination emails
+    - ``${cc}``: the copy emails
+    - ``${subject}``: the subject of the email
+    - ``${body}``: the body of the email
+    - ``${attachment}``: the attachment of the email
+
+  * Example:
+
+    - Thunderbird:
+      ``thunderbird -compose to="${to}",cc="${cc}",subject="${subject}",body="${body}",attachment="${attachment}``
+
 .. _Menu-Options-Save_Options:
 
 Save Options:
