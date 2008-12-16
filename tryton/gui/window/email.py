@@ -22,7 +22,7 @@ class Email(object):
         self.win.set_transient_for(parent)
         self.win.vbox.set_spacing(3)
         self.win.vbox.pack_start(gtk.Label(
-            _('Sending reports as email attachments')), expand=False, fill=True)
+            _('Setting Email Program')), expand=False, fill=True)
         self.win.vbox.pack_start(gtk.HSeparator())
         hbox = gtk.HBox(spacing=3)
         hbox.pack_start(gtk.Label(_('Email program:')), expand=True,
