@@ -25,6 +25,19 @@ import shlex
 
 _ = gettext.gettext
 
+def find_in_path(name):
+    if os.name == "nt":
+        sep = ';'
+    else:
+        sep = ':'
+    path = [directory for directory in os.environ['PATH'].split(sep)
+            if os.path.isdir(directory)]
+    for directory in path:
+        val = os.path.join(directory, name)
+        if os.path.isfile(val) or os.path.islink(val):
+            return val
+    return name
+
 def refresh_dblist(db_widget, host, port, dbtoload=None):
     '''
     Return the number of database available
@@ -317,17 +330,18 @@ def file_open(filename, type, parent, print_p=False):
             file_p.close()
         return
     cmd = cmd % filename
+    args = shlex.split(str(cmd))
+    prog = find_in_path(args[0])
+    args[0] = os.path.basename(args[0])
     if print_p:
-        args = shlex.split(cmd)
-        os.spawnv(os.P_WAIT, args[0], args)
+        os.spawnv(os.P_WAIT, prog, args)
         return
     pid = os.fork()
     if not pid:
         pid = os.fork()
         if not pid:
-            args = shlex.split(str(cmd))
             try:
-                os.execv(args[0], args)
+                os.execv(prog, args)
             except:
                 sys.exit(0)
         time.sleep(0.1)
@@ -344,15 +358,17 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
                 attachment=attachment or '',
                 )
         args = shlex.split(str(cmd))
+        prog = find_in_path(args[0])
+        args[0] = os.path.basename(args[0])
         if os.name == 'nt':
-            os.spawnv(os.P_NOWAIT, args[0], args)
+            os.spawnv(os.P_NOWAIT, prog, args)
             return
         pid = os.fork()
         if not pid:
             pid = os.fork()
             if not pid:
                 try:
-                    os.execv(args[0], args)
+                    os.execv(prog, args)
                 except:
                     sys.exit(0)
             time.sleep(0.1)
