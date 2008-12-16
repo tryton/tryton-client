@@ -41,14 +41,19 @@ def get_home_dir():
         return '.'
 
 def find_path(progs, args):
-    #TODO check for win32
+    if os.name == 'nt':
+        return ''
+    if os.name == 'mac' or \
+            (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+        return ''
     paths = [x for x in os.environ['PATH'].split(':')
             if os.path.isdir(x)]
     for dir in paths:
-        content = os.listdir(dir)
         for prog in progs:
-            if prog in content:
-                return os.path.join(dir, prog) + ' ' + args
+            val = os.path.join(dir, prog)
+            print val
+            if os.path.isfile(val) or os.path.islink(val):
+                return val + ' ' + args
     return ''
 
 
@@ -82,8 +87,7 @@ class ConfigManager(object):
                     1: find_path(['ooffice', 'ooffice2'], '-p %s')},
                 'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
                     'kpdf', 'epdfview', 'acroread'], '%s'), 1: ''},
-                'png': {0: find_path(['display', 'qiv', 'eye', 'mspaint.exe'],
-                    '%s'), 1: ''},
+                'png': {0: find_path(['display', 'qiv', 'eye'], '%s'), 1: ''},
                 },
             'client.email': '',
             'roundup.url': 'http://bugs.tryton.org/roundup/',
