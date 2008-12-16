@@ -22,54 +22,61 @@ class FileActions(object):
         self.win.set_has_separator(True)
         self.win.set_transient_for(parent)
         self.win.vbox.pack_start(gtk.Label(
-            _('Edit files actions')), expand=False, fill=True)
+            _('Edit Files Actions')), expand=False, fill=True)
         self.win.vbox.pack_start(gtk.HSeparator())
-        self.entries = {}
-        table = gtk.Table(len(CONFIG['client.actions']) + 1, 3)
-        table.set_col_spacings(3)
-        table.set_row_spacings(3)
-        table.set_border_width(1)
-        table.attach(gtk.Label(_('File Type')), 0, 1, 0, 1, yoptions=False,
-                xoptions=gtk.FILL)
-        table.attach(gtk.Label(_('Open')), 1, 2, 0, 1, yoptions=False,
-                xoptions=gtk.FILL)
-        table.attach(gtk.Label(_('Print')), 2, 3, 0, 1, yoptions=False,
-                xoptions=gtk.FILL)
+        self.treeview = gtk.TreeView()
+
+        self.model = gtk.ListStore(str, str, str, str)
+        self.treeview.set_model(self.model)
+
+        for index, text in enumerate((_('File Type'), _('Open'), _('Print'))):
+            renderer = gtk.CellRendererText()
+            if index != 0:
+                renderer.set_property('editable', True)
+                renderer.connect('edited', self._sig_edited)
+            column = gtk.TreeViewColumn(text, renderer, text=index + 1)
+            column.set_resizable(True)
+            self.treeview.append_column(column)
+
         i = 1
         extensions = CONFIG['client.actions'].keys()
         extensions.sort()
         for extension in extensions:
-            table.attach(gtk.Label(_('%s file: ') % extension.upper()),
-                    0, 1, i, i + 1, yoptions=False, xoptions=gtk.FILL)
-            self.entries[extension] = {}
-            self.entries[extension][0] = gtk.Entry()
-            self.entries[extension][0].set_property(
-                    'activates_default', True)
-            self.entries[extension][0].set_text(
-                    CONFIG['client.actions'][extension][0])
-            table.attach(self.entries[extension][0], 1, 2, i, i + 1,
-                yoptions = False, xoptions=gtk.FILL)
-            self.entries[extension][1] = gtk.Entry()
-            self.entries[extension][1].set_property(
-                    'activates_default', True)
-            self.entries[extension][1].set_text(
-                    CONFIG['client.actions'][extension][1])
-            table.attach(self.entries[extension][1], 2, 3, i, i + 1,
-                yoptions = False, xoptions=gtk.FILL)
-            i += 1
-        self.win.vbox.pack_start(table, expand=True, fill=True)
+            iter = self.model.append()
+            self.model.set(iter, 0, extension,
+                    1, _('%s file') % extension.upper(),
+                    2, CONFIG['client.actions'][extension][0],
+                    3, CONFIG['client.actions'][extension][1])
+
+        scroll = gtk.ScrolledWindow()
+        scroll.add(self.treeview)
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        viewport= gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        viewport.set_size_request(400, 200)
+        viewport.add(scroll)
+        self.win.vbox.pack_start(viewport, expand=True, fill=True)
+
+        label = gtk.Label(_('Use "%s" as a placeholder for the file name'))
+        label.set_alignment(0.0, 0.5)
+        label.set_padding(0, 10)
+        self.win.vbox.pack_start(label, expand=False, fill=True)
         self.win.show_all()
 
     def run(self):
         "Run the window"
         res = self.win.run()
         if res == gtk.RESPONSE_OK:
-            for extension in self.entries:
-                CONFIG['client.actions'][extension][0] = \
-                        self.entries[extension][0].get_text()
-                CONFIG['client.actions'][extension][1] = \
-                        self.entries[extension][1].get_text()
+            for extension, _, cmd_open, cmd_print in self.model:
+                CONFIG['client.actions'][extension][0] = cmd_open
+                CONFIG['client.actions'][extension][1] = cmd_print
             CONFIG.save()
         self.parent.present()
         self.win.destroy()
         return res
+
+    def _sig_edited(self, cell, path, new_text):
+        iter = self.model.get_iter_from_string(path)
+        (path, column) = self.treeview.get_cursor()
+        column_id = self.treeview.get_columns().index(column)
+        self.model.set(iter, column_id + 1, new_text)
