@@ -120,6 +120,7 @@ class Form(SignalEvent):
         self.widget.pack_start(self.scrolledwindow)
 
         self.status = gtk.Statusbar()
+        self.status.set_has_resize_grip(False)
         self.status.show()
         self.widget.pack_start(self.status, expand=False, fill=True)
 
