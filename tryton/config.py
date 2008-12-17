@@ -51,7 +51,6 @@ def find_path(progs, args):
     for dir in paths:
         for prog in progs:
             val = os.path.join(dir, prog)
-            print val
             if os.path.isfile(val) or os.path.islink(val):
                 return val + ' ' + args
     return ''
