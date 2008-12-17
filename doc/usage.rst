@@ -852,6 +852,9 @@ Email...:
     - Thunderbird:
       ``thunderbird -compose to="${to}",cc="${cc}",subject="${subject}",body="${body}",attachment="${attachment}``
 
+    - Thunderbird on Windows:
+      ``"C:\\Program Files\\Mozilla Thunderbird\\thunderbird.exe" -compose to="${to}",cc="${cc}",subject="${subject}",body="${body}",attachment="${attachment}``
+
 .. _Menu-Options-Save_Options:
 
 Save Options:
