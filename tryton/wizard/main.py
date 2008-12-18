@@ -143,7 +143,9 @@ class Dialog(object):
 class Wizard(object):
 
     @staticmethod
-    def execute(action, datas, parent, state='init', context=None):
+    def execute(action, datas, parent, state='init',
+            direct_print=False, email_print=False, email=None,
+            context=None):
         from tryton.action import Action
         if not 'form' in datas:
             datas['form'] = {}
@@ -205,11 +207,13 @@ class Wizard(object):
                     backup_ids = datas['ids']
                     datas['ids'] = datas['form']['ids']
                     Action.exec_report(res['report'], datas, dia or parent,
-                            context=ctx)
+                            direct_print=direct_print, email_print=email_print,
+                            email=email, context=ctx)
                     datas['ids'] = backup_ids
                 else:
                     Action.exec_report(res['report'], datas, dia or parent,
-                            context=ctx)
+                            direct_print=direct_print, email_print=email_print,
+                            email=email, context=ctx)
                 state = res['state']
             elif res['type'] == 'state':
                 state = res['state']

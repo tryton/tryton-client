@@ -18,10 +18,12 @@ _ = gettext.gettext
 class Action(object):
 
     @staticmethod
-    def exec_report(name, data, window, direct_print=False, email_print=None,
+    def exec_report(name, data, window, direct_print=False, email_print=False,
             email=None, context=None):
         if context is None:
             context = {}
+        if email is None:
+            email = {}
         datas = data.copy()
         ids = datas['ids']
         del datas['ids']
@@ -56,7 +58,7 @@ class Action(object):
         file_d = os.fdopen(fileno, 'wb+')
         file_d.write(base64.decodestring(data))
         file_d.close()
-        if email_print and email:
+        if email_print:
             mailto(to=email.get('to'), cc=email.get('cc'),
                     subject=email.get('subject'), body=email.get('body'),
                     attachment=fp_name)
@@ -154,13 +156,15 @@ class Action(object):
                     search_value=search_value)
         elif action['type'] == 'ir.action.wizard':
             Wizard.execute(action['wiz_name'], datas, window,
-                    context=context)
+                    direct_print=action.get('direct_print', False),
+                    email_print=action.get('email_print', False),
+                    email=action.get('email'), context=context)
 
         elif action['type'] == 'ir.action.report':
             Action.exec_report(action['report_name'], datas, window,
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
-                    email=action.get('email'))
+                    email=action.get('email'), context=context)
 
         elif action['type'] == 'ir.action.url':
             if action['url']:
