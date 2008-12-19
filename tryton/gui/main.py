@@ -37,7 +37,8 @@ class Main(object):
         super(Main, self).__init__()
 
         self.window = gtk.Window()
-        self.window.set_default_size(900, 750)
+        self.window.set_size_request(900, 750)
+        self.window.set_resizable(True)
         self.window.set_title('Tryton')
         self.window.set_icon(TRYTON_ICON)
         self.window.connect("destroy", Main.sig_quit)
