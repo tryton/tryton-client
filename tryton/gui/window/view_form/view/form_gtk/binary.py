@@ -114,6 +114,9 @@ class Binary(WidgetInterface):
         self.but_save_as.set_sensitive(bool(model_field.get(model)))
         return True
 
+    def display_value(self):
+        return self.wid_text.get_text()
+
     def _size_get(self, value):
         return value and ('%d ' + _('bytes')) % len(value) or ''
 

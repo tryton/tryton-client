@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
@@ -127,6 +128,9 @@ class Many2Many(WidgetInterface):
             self.old = ids
         self.screen.display()
         return True
+
+    def display_value(self):
+        return self._view.modelfield.name_get(self._view.model)
 
     def set_value(self, model, model_field):
         model_field.set_client(model, [x.id for x in self.screen.models.models])

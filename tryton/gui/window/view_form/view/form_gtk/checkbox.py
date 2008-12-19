@@ -1,6 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 from interface import WidgetInterface
+import gettext
+
+_ = gettext.gettext
 
 class CheckBox(WidgetInterface):
 
@@ -25,3 +28,9 @@ class CheckBox(WidgetInterface):
             self.widget.set_active(False)
             return False
         self.widget.set_active(bool(model_field.get(model)))
+
+    def display_value(self):
+        if self.widget.get_active():
+            return _('True')
+        else:
+            return _('False')

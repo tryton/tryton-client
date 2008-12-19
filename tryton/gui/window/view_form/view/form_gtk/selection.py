@@ -136,6 +136,9 @@ class Selection(WidgetInterface):
                     break
         self.changed = True
 
+    def display_value(self):
+        return self.entry.get_child().get_text()
+
     def sig_changed(self, *args):
         if self.changed:
             self._focus_out()

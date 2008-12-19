@@ -110,3 +110,10 @@ class TextBox(WidgetInterface):
                         del spell
                 except:
                     pass
+
+    def display_value(self):
+        lines = (self._view.modelfield.get_client(self._view.model) or '').split('\n')
+        if len(lines) > 1:
+            return lines[0] + '...'
+        else:
+            return lines[0]

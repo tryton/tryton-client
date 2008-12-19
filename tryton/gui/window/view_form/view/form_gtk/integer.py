@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 from char import Char
 import locale
 
@@ -26,6 +27,9 @@ class Integer(Char):
             return False
         self.entry.set_text(locale.format('%d',
             model_field.get(model) or 0, True))
+
+    def display_value(self):
+        return self.entry.get_text()
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()

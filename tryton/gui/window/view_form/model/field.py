@@ -388,6 +388,14 @@ class M2MField(CharField):
     def get_default(self, model):
         return self.get_client(model)
 
+    def name_get(self, model):
+        rpc2 = RPCProxy(self.attrs['relation'])
+        try:
+            result = rpc2.name_get(self.get_client(model), rpc.CONTEXT)
+        except:
+            return self.get_client(model)
+        return ', '.join(dict(result).values())
+
 
 class O2MField(CharField):
     '''

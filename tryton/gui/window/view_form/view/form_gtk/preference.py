@@ -16,7 +16,7 @@ class WidgetFieldPreference(object):
     def __init__(self, window):
         self.parent = window
         self.dialog = gtk.Dialog(
-                title=_("Field Preference target"),
+                title=_("Field Preference"),
                 parent=window,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
@@ -33,10 +33,10 @@ class WidgetFieldPreference(object):
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         vbox = gtk.VBox()
         self.dialog.vbox.pack_start(vbox)
-        table = gtk.Table(5, 2, False)
+        table = gtk.Table(4, 2, False)
         table.set_border_width(4)
         table.set_row_spacings(4)
-        table.set_col_spacings(5)
+        table.set_col_spacings(4)
         vbox.pack_start(table, True, True, 0)
 
         label_field_name = gtk.Label(_("Field Name:"))
@@ -45,20 +45,28 @@ class WidgetFieldPreference(object):
         table.attach(label_field_name, 0, 1, 0, 1)
         self.entry_field_name = gtk.Entry()
         self.entry_field_name.set_editable(False)
+        style = self.entry_field_name.get_style()
+        self.entry_field_name.modify_bg(gtk.STATE_NORMAL,
+                style.bg[gtk.STATE_INSENSITIVE])
+        self.entry_field_name.modify_base(gtk.STATE_NORMAL,
+                style.base[gtk.STATE_INSENSITIVE])
+        self.entry_field_name.modify_fg(gtk.STATE_NORMAL,
+                style.fg[gtk.STATE_INSENSITIVE])
         table.attach(self.entry_field_name, 1, 2, 0, 1)
-        label_domain = gtk.Label(_("Domain:"))
-        label_domain.set_justify(gtk.JUSTIFY_RIGHT)
-        label_domain.set_alignment(1, 0.5)
-        table.attach(label_domain, 0, 1, 1, 2)
-        self.entry_domain = gtk.Entry()
-        self.entry_domain.set_editable(False)
-        table.attach(self.entry_domain, 1, 2, 1, 2)
         label_default_value = gtk.Label(_("Default value:"))
         label_default_value.set_alignment(1, 0.5)
-        table.attach(label_default_value, 0, 1, 2, 3)
+        table.attach(label_default_value, 0, 1, 1, 2)
         self.entry_default_value = gtk.Entry()
         self.entry_default_value.set_editable(False)
-        table.attach(self.entry_default_value, 1, 2, 2, 3)
+        self.entry_default_value.set_width_chars(32)
+        style = self.entry_field_name.get_style()
+        self.entry_default_value.modify_bg(gtk.STATE_NORMAL,
+                style.bg[gtk.STATE_INSENSITIVE])
+        self.entry_default_value.modify_base(gtk.STATE_NORMAL,
+                style.base[gtk.STATE_INSENSITIVE])
+        self.entry_default_value.modify_fg(gtk.STATE_NORMAL,
+                style.fg[gtk.STATE_INSENSITIVE])
+        table.attach(self.entry_default_value, 1, 2, 1, 2)
 
         frame_user = gtk.Frame()
         alignment_user = gtk.Alignment(0.5, 0.5, 1, 1)
@@ -70,13 +78,13 @@ class WidgetFieldPreference(object):
         hbox_user = gtk.HBox(True, 0)
         alignment_user.add(hbox_user)
         hbox_user.set_border_width(6)
-        self.radio_current_user = gtk.RadioButton(None, _("current _user"))
+        self.radio_current_user = gtk.RadioButton(None, _("Current _User"))
         radio_all_user = gtk.RadioButton(self.radio_current_user,
-                _("_all users"))
+                _("_All Users"))
         hbox_user.pack_start(self.radio_current_user, False, False, 0)
         hbox_user.pack_start(radio_all_user, False, False, 0)
         radio_all_user.set_active(True)
-        table.attach(frame_user, 0, 2, 3, 4)
+        table.attach(frame_user, 0, 2, 2, 3)
 
         frame_condition = gtk.Frame()
         alignment_condition = gtk.Alignment(0.5, 0.5, 1, 1)
@@ -87,7 +95,7 @@ class WidgetFieldPreference(object):
         frame_condition.set_label_widget(label_condition)
         self.vbox_condition = gtk.VBox(False, 0)
         alignment_condition.add(self.vbox_condition)
-        table.attach(frame_condition, 0, 2, 4, 5)
+        table.attach(frame_condition, 0, 2, 3, 4)
 
         self.dialog.show_all()
         radio_all_user.grab_focus()

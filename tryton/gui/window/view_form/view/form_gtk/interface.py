@@ -16,16 +16,15 @@ _ATTRS_BOOLEAN = {
     'readonly': False
 }
 
-def field_pref_set(field, name, model, value, dependance=None, window=None):
+def field_pref_set(field, name, model, value, client_value, dependance=None,
+        window=None):
     dialog = WidgetFieldPreference(window)
     if dependance is None:
         dependance = []
     entry = dialog.entry_field_name
     entry.set_text(name)
-    entry = dialog.entry_domain
-    entry.set_text(model)
     entry = dialog.entry_default_value
-    entry.set_text((value and str(value)) or _('<empty>'))
+    entry.set_text((client_value and str(client_value)) or _('<empty>'))
 
     radio = dialog.radio_current_user
 
@@ -188,10 +187,14 @@ class WidgetInterface(object):
                     value = wview.modelfield.get_client(self._view.model)
                     deps.append((wname, name, wvalue, value))
         value = self._view.modelfield.get_default(self._view.model)
+        client_value = self.display_value()
         model = self._view.modelfield.parent.resource
         field_pref_set(self._view.widget_name,
                 self.attrs.get('string', self._view.widget_name), model,
-                value, deps, window=self._window)
+                value, client_value, deps, window=self._window)
+
+    def display_value(self):
+        return self._view.modelfield.get_client(self._view.model)
 
     def _menu_open(self, obj, event):
         if event.button == 3:

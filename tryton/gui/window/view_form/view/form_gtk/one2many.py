@@ -654,6 +654,9 @@ class One2Many(WidgetInterface):
         self.screen.display()
         return True
 
+    def display_value(self):
+        return '<' + self.attrs.get('string', '') + '>'
+
     def set_value(self, model, model_field):
         self.screen.current_view.set_value()
         if self.screen.is_modified():
