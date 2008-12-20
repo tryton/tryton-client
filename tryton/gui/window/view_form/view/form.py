@@ -152,12 +152,13 @@ class ViewForm(ParserView):
                     message(_('You must save this record ' \
                         'to use the action button!'), self.window)
                 return False
+            email = {}
             if 'email' in action:
                 email = self.screen.current_model.expr_eval(action['email'])
                 if not email:
                     email = {}
-                email['subject'] = action['name'].replace('_', '')
-                act['email'] = email
+            email['subject'] = action['name'].replace('_', '')
+            act['email'] = email
             self.screen.display()
         if atype == 'relate':
             obj_id = self.screen.current_model \

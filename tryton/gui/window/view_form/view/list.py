@@ -260,12 +260,13 @@ class ViewList(ParserView):
         if not obj_ids and not obj_id:
             message(_('No record selected!'), self.window)
             return False
+        email = {}
         if 'email' in action:
             email = self.screen.current_model.expr_eval(action['email'])
             if not email:
                 email = {}
-            email['subject'] = action['name'].replace('_', '')
-            act['email'] = email
+        email['subject'] = action['name'].replace('_', '')
+        act['email'] = email
         data = {
             'model': self.screen.name,
             'id': obj_id,
