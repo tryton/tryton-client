@@ -54,8 +54,15 @@ class CellRendererToggle(gtk.GenericCellRenderer):
             flags):
         if not self.visible:
             return
+        if not event:
+            event = gtk.gdk.Event(gtk.keysyms.KP_Space)
         return self._renderer.activate(event, widget, path, background_area,
                 cell_area, flags)
+
+    def on_start_editing(self, event, widget, path, background_area,
+            cell_area, flags):
+        return self._renderer.start_editing(event, widget, path,
+                background_area, cell_area, flags)
 
     def get_active(self):
         return self._renderer.get_active()
