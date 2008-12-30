@@ -1,8 +1,12 @@
 [Desktop Entry]
+Encoding=UTF-8
 Version=1.0
 Type=Application
 Name=Tryton
-Comment=Access tryton server.
+GenericName=Client for the Tryton Application Platform
+GenericName[de]=Client für die Tryton Application Platform
+Comment=Access Tryton server
+Comment[de]=Verbindet zu einem Tryton Server
 Exec=tryton
 Icon=tryton-icon
 Terminal=false
