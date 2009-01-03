@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-12-25 23:55+0100\n"
+"PO-Revision-Date: 2008-12-27 18:36+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -1765,7 +1765,7 @@ msgstr "Immer"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:45
 msgid "Always applicable!"
-msgstr "Immer anwendbar!"
+msgstr "Immer anzuwenden!"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:84
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:27
@@ -1886,7 +1886,7 @@ msgstr "Standardwert:"
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:75
 msgid "<b>Value applicable for:</b>"
-msgstr "<b>Wert anzuwenden für:</b>"
+msgstr "<b>Wert anwenden für:</b>"
 
 #: tryton/gui/window/view_form/view/form_gtk/preference.py:81
 msgid "Current _User"
