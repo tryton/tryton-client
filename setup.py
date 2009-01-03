@@ -94,9 +94,10 @@ setup(name=PACKAGE,
         ('share/pixmaps', glob.glob('share/pixmaps/tryton-icon.png')),
         ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
                 glob.glob('share/pixmaps/tryton/*.svg')),
-        ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
+        ('share/locale/cs_CZ/LC_MESSAGES', glob.glob('share/locale/cs_CZ/LC_MESSAGES/*.mo')),
         ('share/locale/de_DE/LC_MESSAGES', glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
         ('share/locale/es_ES/LC_MESSAGES', glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
+        ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],
     classifiers=[
