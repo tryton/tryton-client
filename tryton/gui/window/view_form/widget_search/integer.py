@@ -35,7 +35,7 @@ class Integer(Interface):
         self.entry1.set_activates_default(True)
         self.entry1.set_alignment(1.0)
         self.entry1.connect('insert_text', self.sig_insert_text)
-        self.widget.pack_start(self.entry1, expand=False, fill=True)
+        self.widget.pack_start(self.entry1, expand=True, fill=True)
         self.separator = gtk.Label('-')
         self.widget.pack_start(self.separator, expand=False, fill=False)
         self.entry2 = gtk.Entry()
@@ -44,7 +44,7 @@ class Integer(Interface):
         self.entry2.set_activates_default(True)
         self.entry2.set_alignment(1.0)
         self.entry2.connect('insert_text', self.sig_insert_text)
-        self.widget.pack_start(self.entry2, expand=False, fill=True)
+        self.widget.pack_start(self.entry2, expand=True, fill=True)
 
         self.widget.show_all()
         self._changed(self.combo)
