@@ -179,6 +179,11 @@ class Parse(object):
         self.container.new(self.col)
         for i in self.add_widget_end:
             self.add_widget(*i)
+        if ('active' in self.fields) and ('active' not in self.dict_widget):
+            val = self.fields['active'].get('select', 0)
+            val = int(val)
+            self.add_widget(self.fields['active'], val)
+
         self.add_widget_end = []
 
         vbox2.pack_start(self.container.pop())
