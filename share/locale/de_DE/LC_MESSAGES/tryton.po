@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2008-12-27 18:36+0100\n"
+"PO-Revision-Date: 2009-01-10 14:41+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -1656,7 +1656,7 @@ msgstr "_E-Mail als Anhang"
 
 #: tryton/gui/window/view_form/view/form.py:149
 msgid "You must save this record to use the print button!"
-msgstr "Nur ausgewählte gültige Datensätze können gedruckt werden! Korrigieren Sie die rot markierten Felder und wählen SIe einen oder mehrere Datensätze aus. Wiederholen sie nach den letzten Vorgang."
+msgstr "Der Datensatz muss vor dem Drucken gespeichert werden! Korrigieren Sie die rot markierten Felder und wiederholen Sie den letzten Vorgang."
 
 #: tryton/gui/window/view_form/view/form.py:152
 msgid "You must save this record to use the action button!"
@@ -1775,6 +1775,10 @@ msgstr "Auf Voreinstellung zurücksetzen"
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:86
 msgid "Set as default"
 msgstr "Als Standard setzen"
+
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:190
+msgid "Invalid field!"
+msgstr "Ungültiges Feld!"
 
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:36
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:50
