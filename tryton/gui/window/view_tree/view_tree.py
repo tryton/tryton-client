@@ -144,8 +144,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
 
     def _node_process(self, ids):
         tree = []
+        fields = self.fields_type.keys()
         if self.view.get('field_childs', False):
-            res = self._read(ids, self.fields + [self.view['field_childs']])
+            res = self._read(ids, fields + [self.view['field_childs']])
             for obj in res:
                 tree.append([obj['id'], None, [],
                     obj[self.view['field_childs']]])
@@ -153,7 +154,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 if obj[self.view['field_childs']]:
                     tree[-1][2] = None
         else:
-            res = self._read(ids, self.fields)
+            res = self._read(ids, fields)
             for obj in res:
                 tree.append([obj['id'], [obj[y] for y in self.fields], []])
         return tree
