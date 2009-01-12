@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2009-01-10 14:41+0100\n"
+"PO-Revision-Date: 2009-01-12 14:05+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -493,7 +493,7 @@ msgstr "Einstellungen _speichern"
 
 #: tryton/gui/main.py:730
 msgid "_Execute a Plugin"
-msgstr "Ein _Plugin ausführen"
+msgstr "_Plugin ausführen"
 
 #: tryton/gui/main.py:743
 msgid "_Tips..."
@@ -512,7 +512,7 @@ msgstr "_Über"
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:72
 #: tryton/gui/window/view_form/view/form_gtk/reference.py:72
 msgid "Create a new record"
-msgstr "erstelle Datensatz"
+msgstr "Neuen Datensatz erstellen"
 
 #: tryton/gui/main.py:784
 msgid "Save this record"
@@ -539,7 +539,7 @@ msgstr "Datensätze suchen"
 #: tryton/gui/window/view_board/action.py:93
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:104
 msgid "Previous"
-msgstr "Zurück"
+msgstr "Vorheriger"
 
 #: tryton/gui/main.py:810
 msgid "Previous Record"
@@ -1776,7 +1776,7 @@ msgstr "Auf Voreinstellung zurücksetzen"
 msgid "Set as default"
 msgstr "Als Standard setzen"
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:190
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:193
 msgid "Invalid field!"
 msgstr "Ungültiges Feld!"
 
