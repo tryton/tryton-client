@@ -95,6 +95,7 @@ class WidgetInterface(object):
         self.fg_color_normal = None
         self.fg_color_insensitive = None
         self.text_color_normal = None
+        self.visible = True
 
     def destroy(self):
         pass
@@ -173,8 +174,10 @@ class WidgetInterface(object):
     def invisible_set(self, value):
         widget = self._invisible_widget()
         if value and value != '0':
+            self.visible = False
             widget.hide()
         else:
+            self.visible = True
             widget.show()
 
     def _menu_sig_default_set(self):
@@ -236,6 +239,8 @@ class WidgetInterface(object):
 
     def _focus_out(self):
         if not self._view.modelfield:
+            return False
+        if not self.visible:
             return False
         self.set_value(self._view.model, self._view.modelfield)
 
