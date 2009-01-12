@@ -4,3 +4,4 @@
 - Add a calculator for number fields
 - Use a view from the server for attachment
 - Improve pysocket to allow **kwargs
+- Add post-it on records
