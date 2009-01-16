@@ -6,3 +6,4 @@
 - Improve pysocket to allow **kwargs
 - Add post-it on records
 - Add tip on shortcut customize
+- Add domain on char, date, float and interger widgets
