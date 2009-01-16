@@ -5,3 +5,4 @@
 - Use a view from the server for attachment
 - Improve pysocket to allow **kwargs
 - Add post-it on records
+- Add tip on shortcut customize
