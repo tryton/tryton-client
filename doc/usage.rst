@@ -37,6 +37,8 @@ Options
 
 -v, --verbose                        Enable basic debugging
 
+-d LOG_LOGGER, --log=LOG_LOGGER      Specify channels to log (ex: rpc.request, rpc.result, ...)
+
 -l LOG_LEVEL, --log-level=LOG_LEVEL  Specify the log level: INFO, DEBUG,
                                      WARNING, ERROR, CRITICAL
 

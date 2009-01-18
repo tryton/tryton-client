@@ -26,6 +26,7 @@ def db_list(host, port):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
+            logging.getLogger('rpc.request').info(repr(('db', 'list')))
             try:
                 _SOCK.send(('db', 'list'))
             except Exception, exception:
@@ -38,8 +39,10 @@ def db_list(host, port):
             SECURE = _SOCK.ssl
         finally:
             _SEMAPHORE.release()
+        logging.getLogger('rpc.result').debug(repr(res))
         return res
     except:
+        logging.getLogger('rpc.result').debug(repr(None))
         return None
 
 def db_exec(host, port, method, *args):
@@ -53,11 +56,13 @@ def db_exec(host, port, method, *args):
                 _SOCK= pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
+            logging.getLogger('rpc.request').info(repr(('db', method) + args))
             _SOCK.send(('db', method) + args)
             res = _SOCK.receive()
             SECURE = _SOCK.ssl
         finally:
             _SEMAPHORE.release()
+        logging.getLogger('rpc.result').debug(repr(res))
         return res
     except:
         raise
@@ -73,6 +78,7 @@ def server_version(host, port):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
+            logging.getLogger('rpc.request').info(repr(('common', 'version')))
             try:
                 _SOCK.send(('common', 'version'))
             except Exception, exception:
@@ -85,8 +91,10 @@ def server_version(host, port):
             SECURE = _SOCK.ssl
         finally:
             _SEMAPHORE.release()
+        logging.getLogger('rpc.result').debug(repr(res))
         return res
     except:
+        logging.getLogger('rpc.result').debug(repr(None))
         return None
 
 def login(username, password, host, port, database):
@@ -102,8 +110,11 @@ def login(username, password, host, port, database):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
+            logging.getLogger('rpc.request').info(repr(('common', 'login',
+                database, username, ''.join(['*' for x in password]))))
             _SOCK.send(('common', 'login', database, username, password))
             res = _SOCK.receive()
+            logging.getLogger('rpc.result').debug(repr(res))
         finally:
             _SEMAPHORE.release()
     except (socket.error, RuntimeError):
@@ -159,7 +170,7 @@ def _execute(blocking, obj, method, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
     if not _SOCK or not _SOCK.connected:
         raise Exception('NotLogged')
-    logging.getLogger('rpc.request').info(str((obj, method, args)))
+    logging.getLogger('rpc.request').info(repr((obj, method, args)))
     key = False
     if len(args) >= 6 and args[1] == 'fields_view_get':
         key = str(args)
@@ -188,6 +199,7 @@ def _execute(blocking, obj, method, *args):
             result = _VIEW_CACHE[key][1]
         else:
             _VIEW_CACHE[key] = (result['md5'], result)
+    logging.getLogger('rpc.result').debug(repr(result))
     return result
 
 def execute(obj, method, *args):

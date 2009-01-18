@@ -71,7 +71,6 @@ class ConfigManager(object):
             'tip.position': 0,
             'logging.logger': '',
             'logging.level': 'ERROR',
-            'logging.verbose': False,
             'client.default_path': get_home_dir(),
             'form.toolbar': True,
             'client.form_tab': 'left',
@@ -115,10 +114,11 @@ class ConfigManager(object):
         self.rcfile = opt.config or os.path.join(get_home_dir(), '.tryton')
         self.load()
 
-        if opt.verbose:
-            self.options['logging.verbose'] = True
         self.options['logging.logger'] = opt.log_logger
-        self.options['logging.level'] = opt.log_level
+        if opt.verbose and opt.log_level == 'ERROR':
+            self.options['logging.level'] = 'INFO'
+        else:
+            self.options['logging.level'] = opt.log_level
 
         for arg in ('login', 'port', 'server'):
             if getattr(opt, arg):

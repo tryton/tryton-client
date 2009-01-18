@@ -39,22 +39,20 @@ class TrytonClient(object):
     def __init__(self):
         logging.basicConfig()
         translate.setlang(CONFIG['client.lang'])
-
+        loglevel = {
+                'DEBUG': logging.DEBUG,
+                'INFO': logging.INFO,
+                'WARNING': logging.WARNING,
+                'ERROR': logging.ERROR,
+                'CRITICAL': logging.CRITICAL,
+                }
         for logger in CONFIG['logging.logger'].split(','):
             if logger:
-                loglevel = {
-                        'DEBUG': logging.DEBUG,
-                        'INFO': logging.INFO,
-                        'WARNING': logging.WARNING,
-                        'ERROR': logging.ERROR,
-                        'CRITICAL': logging.CRITICAL,
-                        }
                 log = logging.getLogger(logger)
                 log.setLevel(loglevel[CONFIG['logging.level'].upper()])
-        if CONFIG['logging.verbose']:
-            logging.getLogger().setLevel(logging.INFO)
-        else:
-            logging.getLogger().setLevel(logging.ERROR)
+        if not CONFIG['logging.logger']:
+            logging.getLogger().setLevel(
+                    loglevel[CONFIG['logging.level'].upper()])
 
         if not hasattr(mx.DateTime, 'strptime'):
             mx.DateTime.strptime = lambda x, y: mx.DateTime.mktime(
