@@ -124,8 +124,6 @@ class DBCreate(object):
             _hid = entry.get_data('handlerid')
             entry.handler_block(_hid)
             _pos = entry.get_position()
-            if _pos == 0 and not new_text.isalpha():
-                new_text = ""
             _pos = entry.insert_text(new_text, _pos)
             entry.handler_unblock(_hid)
             gobject.idle_add(_move_cursor, entry, _pos)
@@ -318,12 +316,10 @@ class DBCreate(object):
             passwd = pass_widget.get_text()
             if res == gtk.RESPONSE_OK:
                 if (not dbname) \
-                    or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', dbname)):
+                    or (not re.match('^[a-zA-Z0-9_]+$', dbname)):
                     common.warning(_('The database name is restricted to ' \
                         'alpha-nummerical characters and "_" (underscore). ' \
-                        'It must begin with a letter and max. sized to 63 ' \
-                        'characters at all.\n' \
-                        'Try to avoid all accents, space ' \
+                        'Avoid all accents, space ' \
                         'and any other special characters.'), self.dialog, \
                         _('Wrong characters in database name!'))
                     continue
