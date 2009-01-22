@@ -794,17 +794,21 @@ def process_exception(exception, parent, obj='', method='', *args):
                             method, *args)
             return True
 
-    if exception.args[0] == 'ConcurrencyException' \
-            and len(args) > 4:
-        if concurrency(args[0], args[2][0], args[4], parent):
-            if '_timestamp' in args[4]:
-                del args[4]['_timestamp']
-            try:
-                return rpc.execute(obj, method, *args)
-            except Exception, exception:
-                return process_exception(exception, parent, obj,
-                        method, *args)
-        return False
+    if exception.args[0] == 'ConcurrencyException':
+        if len(args) > 4:
+            if concurrency(args[0], args[2][0], args[4], parent):
+                if '_timestamp' in args[4]:
+                    del args[4]['_timestamp']
+                try:
+                    return rpc.execute(obj, method, *args)
+                except Exception, exception:
+                    return process_exception(exception, parent, obj,
+                            method, *args)
+            return False
+        else:
+            message(_('Concurrency Exception'), parent,
+                    msg_type=gtk.MESSAGE_ERROR)
+            return False
 
     if exception.args[0] == 'UserWarning':
         msg = ''

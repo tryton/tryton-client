@@ -160,10 +160,12 @@ class ModelRecordGroup(SignalEvent):
             newmods.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
             newmod.signal_connect(self, 'record-modified', self._record_modified)
-            if id in self.model_removed:
-                self.model_removed.remove(id)
-            if id in self.model_deleted:
-                self.model_deleted.remove(id)
+            for model in list(self.model_removed):
+                if model.id == id:
+                    self.model_removed.remove(model)
+            for model in list(self.model_deleted):
+                if model.id == id:
+                    self.model_deleted.remove(model)
         if len(ids) > 10:
             self.models.lock_signal = False
             self.signal('record-cleared')
@@ -296,9 +298,9 @@ class ModelRecordGroup(SignalEvent):
         idx = self.models.index(model)
         if self.models[idx].id > 0:
             if remove:
-                self.model_removed.append(self.models[idx].id)
+                self.model_removed.append(self.models[idx])
             else:
-                self.model_deleted.append(self.models[idx].id)
+                self.model_deleted.append(self.models[idx])
         if model.parent:
             model.parent.modified = True
         if modified:

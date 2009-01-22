@@ -154,6 +154,9 @@ class CharField(object):
             model.state_attrs[self.name]['readonly'] = True
         return model.state_attrs[self.name]
 
+    def get_timestamp(self, model):
+        return {}
+
 
 class SelectionField(CharField):
 
@@ -438,9 +441,21 @@ class O2MField(CharField):
                 result.append(('create',
                     model2.get(check_load=check_load, get_readonly=readonly)))
         if model.value[self.name].model_removed:
-            result.append(('unlink', model.value[self.name].model_removed))
+            result.append(('unlink', [x.id for x in \
+                    model.value[self.name].model_removed]))
         if model.value[self.name].model_deleted:
-            result.append(('delete', model.value[self.name].model_deleted))
+            result.append(('delete', [x.id for x in \
+                    model.value[self.name].model_deleted]))
+        return result
+
+    def get_timestamp(self, model):
+        if not model.value[self.name]:
+            return {}
+        result = {}
+        for model2 in (model.value[self.name].models \
+                + model.value[self.name].model_removed \
+                + model.value[self.name].model_deleted):
+             result.update(model2.get_timestamp())
         return result
 
     def get_eval(self, model, check_load=True):
@@ -568,7 +583,7 @@ class O2MField(CharField):
             model.value[self.name].readonly = False
 
     def get_removed_ids(self, model):
-        return model.value[self.name].model_removed
+        return [x.id for x in model.value[self.name].model_removed]
 
 
 class ReferenceField(CharField):

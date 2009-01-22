@@ -155,6 +155,12 @@ class ModelRecord(SignalEvent):
         self._loaded = False
         self.reload()
 
+    def get_timestamp(self):
+        result = {self.resource + ',' + str(self.id): self._timestamp}
+        for name, mfield in self.mgroup.mfields.items():
+            result.update(mfield.get_timestamp(self))
+        return result
+
     def save(self, force_reload=True):
         self._check_load()
         if self.id < 0:
@@ -174,8 +180,7 @@ class ModelRecord(SignalEvent):
             value = self.get(get_readonly=False, get_modifiedonly=True)
             context = self.context_get()
             context = context.copy()
-            context['_timestamp'] = {}
-            context['_timestamp'][self.id] = self._timestamp
+            context['_timestamp'] = self.get_timestamp()
             args = ('object', 'execute', self.resource, 'write',
                     [self.id], value, context)
             try:

@@ -470,11 +470,15 @@ class Screen(SignalEvent):
         if self.current_view.view_type == 'form' and self.current_model:
             obj_id = self.current_model.id
             if delete and obj_id > 0:
+                context = {}
+                context.update(rpc.CONTEXT)
+                context.update(self.context)
+                context['_timestamp'] = self.current_model.get_timestamp()
                 try:
                     reload_ids = self.models.on_write_ids(obj_id)
                     if reload_ids and obj_id in reload_ids:
                         reload_ids.remove(obj_id)
-                    if not self.rpc.delete([obj_id], rpc.CONTEXT):
+                    if not self.rpc.delete([obj_id], context):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)
@@ -495,13 +499,20 @@ class Screen(SignalEvent):
         if self.current_view.view_type == 'tree':
             ids = self.current_view.sel_ids_get()
             if delete and ids:
+                context = {}
+                context.update(rpc.CONTEXT)
+                context.update(self.context)
+                context['_timestamp'] = {}
+                for obj_id in ids:
+                    model = self.models.get_by_id(obj_id)
+                    context['_timestamp'].update(model.get_timestamp())
                 try:
                     reload_ids = self.models.on_write_ids(ids)
                     if reload_ids:
                         for obj_id in ids:
                             if obj_id in reload_ids:
                                 reload_ids.remove(obj_id)
-                    if not self.rpc.delete(ids, rpc.CONTEXT):
+                    if not self.rpc.delete(ids, context):
                         return False
                 except Exception, exception:
                     common.process_exception(exception, self.window)
