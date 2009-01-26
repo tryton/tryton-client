@@ -14,7 +14,7 @@ class Interface(object):
         self.parent = parent
         self.name = name
         self.model = attrs.get('model', None)
-        self.attrs = attrs
+        self.attrs = attrs or {}
         self.context = context or {}
 
     def clear(self):

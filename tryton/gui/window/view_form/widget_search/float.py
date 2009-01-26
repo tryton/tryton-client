@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import locale
 from integer import Integer
 import gettext
@@ -10,10 +11,10 @@ class Float(Integer):
 
     def __init__(self, name, parent, attrs=None, context=None):
         super(Float, self).__init__(name, parent, attrs=attrs, context=context)
-        if isinstance(attrs.get('digits'), str):
+        if isinstance(self.attrs.get('digits'), str):
             self.digits = (14, 2)
         else:
-            self.digits = attrs.get('digits', (14, 2))
+            self.digits = self.attrs.get('digits', (14, 2))
 
     def _value_get(self):
         try:

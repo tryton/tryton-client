@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
 from interface import Interface
@@ -10,8 +11,6 @@ _ = gettext.gettext
 class Char(Interface):
 
     def __init__(self, name, parent, attrs=None, context=None):
-        if attrs is None:
-            attrs = {}
         super(Char, self).__init__(name, parent, attrs=attrs, context=context)
 
         self.widget = gtk.HBox()
@@ -31,7 +30,7 @@ class Char(Interface):
         self.widget.pack_start(self.combo, False, False)
 
         self.entry = gtk.Entry()
-        self.entry.set_max_length(int(attrs.get('size', 0)))
+        self.entry.set_max_length(int(self.attrs.get('size', 0)))
         self.entry.set_width_chars(5)
         self.entry.set_property('activates_default', True)
         self.widget.pack_start(self.entry, True, True)

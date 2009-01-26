@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 from interface import Interface
 import tryton.rpc as rpc
@@ -11,8 +12,6 @@ _ = gettext.gettext
 class Selection(Interface):
 
     def __init__(self, name, parent, attrs=None, context=None):
-        if attrs is None:
-            attrs = {}
         super(Selection, self).__init__(name, parent, attrs=attrs,
                 context=context)
 
@@ -36,12 +35,12 @@ class Selection(Interface):
         self.entry.child.connect('key_press_event', self.sig_key_press)
         self.entry.set_focus_chain([self.entry.child])
         self._selection = {}
-        selection = attrs.get('selection', [])
-        if 'relation' in attrs:
+        selection = self.attrs.get('selection', [])
+        if 'relation' in self.attrs:
             try:
                 selection = rpc.execute('object', 'execute',
-                        attrs['relation'], 'name_search', '',
-                        attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+                        self.attrs['relation'], 'name_search', '',
+                        self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, parent)
                 selection = []
@@ -49,12 +48,12 @@ class Selection(Interface):
             if not isinstance(selection, (list, tuple)):
                 try:
                     selection = rpc.execute('object', 'execute',
-                            attrs['model'], selection, rpc.CONTEXT)
+                            self.attrs['model'], selection, rpc.CONTEXT)
                 except Exception, exception:
                     common.process_exception(exception, parent)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
-        attrs['selection'] = selection
+        self.attrs['selection'] = selection
         self.set_popdown(selection)
         self.widget.pack_start(self.entry, True, True)
         self.widget.show_all()
