@@ -8,8 +8,9 @@ _ = gettext.gettext
 
 class CheckBox(Interface):
 
-    def __init__(self, name, parent, attrs=None):
-        super(CheckBox, self).__init__(name, parent, attrs)
+    def __init__(self, name, parent, attrs=None, context=None):
+        super(CheckBox, self).__init__(name, parent, attrs=attrs,
+                context=context)
 
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(True)
@@ -17,7 +18,13 @@ class CheckBox(Interface):
         self.widget.child.connect('key_press_event', self.sig_key_press)
         self.widget.set_focus_chain([self.widget.child])
 
-        self.widget.append_text('')
+        if self.name != 'active' or \
+                not (self.name == 'active' \
+                and self.context.get('active_test', True)):
+            self.widget.append_text('')
+            self.widget.child.set_text('')
+        else:
+            self.widget.child.set_text(_('Yes'))
         self.widget.append_text(_('Yes'))
         self.widget.append_text(_('No'))
 
@@ -38,6 +45,11 @@ class CheckBox(Interface):
 
     def _value_get(self):
         val = self.widget.child.get_text()
+        if not val \
+                and self.name == 'active' \
+                and self.context.get('active_test', True):
+            val = _('Yes')
+            self.widget.child.set_text(val)
         if val:
             return [(self.name, '=', int(val == _('Yes')))]
         self.widget.child.set_text('')
@@ -45,7 +57,12 @@ class CheckBox(Interface):
 
     def _value_set(self, value):
         if value == '':
-            self.widget.child.set_text('')
+            if self.name != 'active' or \
+                    (self.name == 'active' \
+                    and self.context.get('active_test', True)):
+                self.widget.child.set_text('')
+            else:
+                self.widget.child.set_text(_('Yes'))
             return
         if value:
             self.widget.child.set_text(_('Yes'))

@@ -16,8 +16,9 @@ _ = gettext.gettext
 
 class Calendar(Interface):
 
-    def __init__(self, name, parent, attrs=None):
-        super(Calendar, self).__init__(name, parent, attrs)
+    def __init__(self, name, parent, attrs=None, context=None):
+        super(Calendar, self).__init__(name, parent, attrs=attrs,
+                context=context)
 
         tooltips = gtk.Tooltips()
         self.widget = gtk.HBox(spacing=3)

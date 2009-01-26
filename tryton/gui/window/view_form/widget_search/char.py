@@ -9,10 +9,10 @@ _ = gettext.gettext
 
 class Char(Interface):
 
-    def __init__(self, name, parent, attrs=None):
+    def __init__(self, name, parent, attrs=None, context=None):
         if attrs is None:
             attrs = {}
-        super(Char, self).__init__(name, parent, attrs)
+        super(Char, self).__init__(name, parent, attrs=attrs, context=context)
 
         self.widget = gtk.HBox()
 

@@ -75,7 +75,7 @@ class _container(object):
 
 class Parse(object):
 
-    def __init__(self, parent, fields, model=''):
+    def __init__(self, parent, fields, model='', context=None):
         self.fields = fields
         self.parent = parent
         self.model = model
@@ -90,6 +90,7 @@ class Parse(object):
         self.title = 'Form'
         self.notebooks = []
         self.dict_widget = {}
+        self.context = context or {}
 
     def _psr_start(self, name, attrs):
 
@@ -115,7 +116,7 @@ class Parse(object):
         if ftype not in WIDGETS_TYPE:
             return False
         widget_act = WIDGETS_TYPE[ftype][0](str(attrs['name']), self.parent,
-                self.fields[attrs['name']])
+                attrs=self.fields[attrs['name']], context=self.context)
         if 'string' in self.fields[str(attrs['name'])]:
             label = self.fields[str(attrs['name'])]['string'] + _(':')
         else:
@@ -198,15 +199,18 @@ class Parse(object):
 class Form(object):
 
     def __init__(self, xml, fields, model=None, parent=None, domain=None,
-            call=None):
+            call=None, context=None):
         if domain is None:
             domain = []
-        parser = Parse(parent, fields, model=model)
+        if context is None:
+            context = {}
+        parser = Parse(parent, fields, model=model, context=context)
         self.parent = parent
         self.fields = fields
         self.model = model
         self.parser = parser
         self.call = call
+        self.context = context
         #get the size of the window and the limite / decalage Hbox element
         width = 640
         if self.parent:

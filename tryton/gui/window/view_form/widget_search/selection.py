@@ -10,10 +10,11 @@ _ = gettext.gettext
 
 class Selection(Interface):
 
-    def __init__(self, name, parent, attrs=None):
+    def __init__(self, name, parent, attrs=None, context=None):
         if attrs is None:
             attrs = {}
-        super(Selection, self).__init__(name, parent, attrs)
+        super(Selection, self).__init__(name, parent, attrs=attrs,
+                context=context)
 
         self.widget = gtk.HBox()
 

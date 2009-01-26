@@ -102,7 +102,7 @@ class Screen(SignalEvent):
                         return
                 self.filter_widget = Form(self.fields_view_tree['arch'],
                         self.fields_view_tree['fields'], self.name, self.window,
-                        self.domain, (self, self.search_filter))
+                        self.domain, (self, self.search_filter), self.context)
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear)
                 self.filter_widget.set_limit(self.limit)

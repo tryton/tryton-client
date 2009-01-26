@@ -8,8 +8,8 @@ _ = gettext.gettext
 
 class Float(Integer):
 
-    def __init__(self, name, parent, attrs=None):
-        super(Float, self).__init__(name, parent, attrs=attrs)
+    def __init__(self, name, parent, attrs=None, context=None):
+        super(Float, self).__init__(name, parent, attrs=attrs, context=context)
         if isinstance(attrs.get('digits'), str):
             self.digits = (14, 2)
         else:

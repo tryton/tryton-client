@@ -11,10 +11,11 @@ _ = gettext.gettext
 
 class Reference(Interface):
 
-    def __init__(self, name, parent, attrs=None):
+    def __init__(self, name, parent, attrs=None, context=None):
         if attrs is None:
             attrs = {}
-        super(Reference, self).__init__(name, parent, attrs)
+        super(Reference, self).__init__(name, parent, attrs=attrs,
+                context=context)
 
         self.widget = gtk.HBox()
 
