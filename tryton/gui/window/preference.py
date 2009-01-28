@@ -20,15 +20,11 @@ class Preference(object):
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
-
+        self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_default_response(gtk.RESPONSE_OK)
         self.win.set_has_separator(False)
-        self.win.vbox.pack_start(gtk.Label(_('Edit User Preferences')),
-                expand=False, fill=True)
         self.win.set_icon(TRYTON_ICON)
-        self.win.set_transient_for(parent)
         self.parent = parent
-        self.win.show_all()
 
         user = RPCProxy('res.user')
 
@@ -46,6 +42,10 @@ class Preference(object):
                 self.win.destroy()
                 self.win = None
                 return
+
+        title = gtk.Label(_('Edit User Preferences'))
+        title.show()
+        self.win.vbox.pack_start(title, expand=False, fill=True)
         arch = res['arch']
         fields = res['fields']
         self.screen = Screen('res.user', self.win, view_type=[])
