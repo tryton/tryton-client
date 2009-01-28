@@ -21,6 +21,7 @@ class Dialog(object):
         default = -1
         self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         if hasattr(self.dia, 'set_deletable') and os.name != 'nt':
             self.dia.set_deletable(False)
 
