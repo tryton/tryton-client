@@ -5,7 +5,6 @@ import gettext
 import tryton.common as common
 import tryton.rpc as rpc
 import csv
-import StringIO
 from tryton.config import TRYTON_ICON, CONFIG
 
 _ = gettext.gettext
@@ -250,7 +249,8 @@ class WinImport(object):
 
         self.import_csv_skip.set_value(1)
         try:
-            data = csv.reader(file(fname), quotechar=csvdel, delimiter=csvsep)
+            data = csv.reader(file(fname, 'rb'), quotechar=csvdel,
+                    delimiter=csvsep)
         except:
             common.warning(_('Error opening CSV file'), self.dialog,
                     _('Error'))
@@ -326,9 +326,7 @@ class WinImport(object):
     def import_csv(self, csv_data, fields, model):
         # TODO: make it works with references
         fname = csv_data['fname']
-        content = file(fname,'rb').read()
-        file_p = StringIO.StringIO(content)
-        data = list(csv.reader(file_p, quotechar=csv_data['del'],
+        data = list(csv.reader(file(fname, 'rb'), quotechar=csv_data['del'],
             delimiter=csv_data['sep']))[int(csv_data['skip']):]
         datas = []
 
