@@ -71,10 +71,18 @@ class Image(WidgetInterface):
 
         self.tooltips.enable()
 
+        self._readonly = False
+
         self.update_img()
 
     def grab_focus(self):
         return self.image.grab_focus()
+
+    def _readonly_set(self, value):
+        self._readonly = value
+        self.but_add.set_sensitive(not value)
+        self.but_save_as.set_sensitive(not value)
+        self.but_remove.set_sensitive(not value)
 
     def sig_add(self, widget):
         filter_all = gtk.FileFilter()
@@ -105,11 +113,15 @@ class Image(WidgetInterface):
         self.update_img()
 
     def drag_motion(self, widget, context, x, y, timestamp):
+        if self._readonly:
+            return False
         context.drag_status(gtk.gdk.ACTION_COPY, timestamp)
         return True
 
     def drag_data_received(self, widget, context, x, y, selection,
             info, timestamp):
+        if self._readonly:
+            return
         if info == 0:
             uri = selection.get_text().split('\n')[0]
             if uri:
