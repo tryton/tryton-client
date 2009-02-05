@@ -158,6 +158,8 @@ class DBRestore(object):
         self.dialog.add_action_widget(self.button_restore, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
 
+        self.entry_server_password.grab_focus()
+
     def run(self, parent):
         """
         Database Restore widget run part
