@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
 from tryton.common import TRYTON_ICON, COLOR_SCHEMES
@@ -372,7 +373,7 @@ class Dialog(object):
         context = rpc.CONTEXT.copy()
 
         try:
-            ids = rpc.execute('object', 'execute', self.attrs['relation'],
+            ids = rpc.execute('model', self.attrs['relation'],
                     'name_search', self.wid_text.get_text(), domain, 'ilike',
                     context, _LIMIT)
         except Exception, exception:
@@ -598,7 +599,7 @@ class One2Many(WidgetInterface):
         removed_ids = self._view.modelfield.get_removed_ids(self._view.model)
 
         try:
-            ids = rpc.execute('object', 'execute', self.attrs['relation'],
+            ids = rpc.execute('model', self.attrs['relation'],
                     'name_search', self.wid_text.get_text(),
                     ['OR', domain, ('id', 'in', removed_ids)], 'ilike',
                     context, _LIMIT)

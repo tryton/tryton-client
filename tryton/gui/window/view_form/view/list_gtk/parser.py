@@ -647,7 +647,7 @@ class Selection(Char):
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
             try:
-                selection = rpc.execute('object', 'execute',
+                selection = rpc.execute('model',
                         self.attrs['relation'], 'name_search', '',
                         self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
@@ -656,7 +656,7 @@ class Selection(Char):
         else:
             if not isinstance(selection, (list, tuple)):
                 try:
-                    selection = rpc.execute('object', 'execute',
+                    selection = rpc.execute('model',
                             self.model, selection, rpc.CONTEXT)
                 except Exception, exception:
                     common.process_exception(exception, self.window)
@@ -696,7 +696,7 @@ class Reference(Char):
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
             try:
-                selection = rpc.execute('object', 'execute',
+                selection = rpc.execute('model',
                         model, selection, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
@@ -804,24 +804,27 @@ class Button(object):
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm'], self.window):
                 button_type = self.attrs.get('type', 'workflow')
+                ctx = rpc.CONTEXT.copy()
+                ctx.update(model.context_get())
                 if button_type == 'workflow':
-                    args = ('object', 'exec_workflow', self.screen.name,
-                            self.attrs['name'], obj_id)
+                    args = ('model', self.screen.name,
+                            'workflow_trigger_validate', obj_id,
+                            self.attrs['name'], ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
                         common.process_exception(exception, self.window, *args)
                 elif button_type == 'object':
-                    args = ('object', 'execute', self.screen.name,
-                            self.attrs['name'], [obj_id], model.context_get())
+                    args = ('model', self.screen.name,
+                            self.attrs['name'], [obj_id], ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
                         common.process_exception(exception, self.window, *args)
                 elif button_type == 'action':
                     action_id = None
-                    args = ('object', 'execute', 'ir.action', 'get_action_id',
-                            int(self.attrs['name']), rpc.CONTEXT)
+                    args = ('model', 'ir.action', 'get_action_id',
+                            int(self.attrs['name']), ctx)
                     try:
                         action_id = rpc.execute(*args)
                     except Exception, exception:
@@ -832,7 +835,7 @@ class Button(object):
                             'model': self.screen.name,
                             'id': obj_id,
                             'ids': [obj_id],
-                            }, self.window)
+                            }, self.window, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
                 self.screen.reload()

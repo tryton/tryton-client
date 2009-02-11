@@ -136,8 +136,7 @@ class Attachment(object):
         selection.set_mode(gtk.SELECTION_SINGLE)
         selection.connect('changed', self._sig_changed)
 
-        args = ('object', 'execute', 'ir.attachment', 'fields_view_get',
-                False, 'tree')
+        args = ('model', 'ir.attachment', 'fields_view_get', False, 'tree')
         try:
             view = rpc.execute(*args)
         except Exception, exception:
@@ -177,7 +176,7 @@ class Attachment(object):
             return None
         obj_id = model.get_value(iter, 0)
         if obj_id:
-            args = ('object', 'execute', 'ir.attachment', 'write',
+            args = ('model', 'ir.attachment', 'write',
                     [int(obj_id)], {'description': comment}, context)
             try:
                 rpc.execute(*args)
@@ -196,8 +195,8 @@ class Attachment(object):
             if common.sur(_('Are you sure you want to remove this '
                         'attachment?'), self.dialog):
                 try:
-                    rpc.execute('object', 'execute',
-                            'ir.attachment', 'delete', [int(obj_id)])
+                    rpc.execute('model', 'ir.attachment', 'delete',
+                            [int(obj_id)])
                 except Exception, exception:
                     common.process_exception(exception, self.dialog, *args)
         self.reload()
@@ -209,8 +208,7 @@ class Attachment(object):
         try:
             if filename:
                 fname = os.path.basename(filename)
-                args = ('object', 'execute',
-                        'ir.attachment', 'create', {
+                args = ('model', 'ir.attachment', 'create', {
                             'name': fname,
                             'res_model': self.resource[0],
                             'res_id': self.resource[1],
@@ -235,8 +233,8 @@ class Attachment(object):
         obj_id = model.get_value(iter, 0)
         if obj_id:
             try:
-                data = rpc.execute('object', 'execute',
-                        'ir.attachment', 'read', int(obj_id))
+                data = rpc.execute('model', 'ir.attachment', 'read',
+                        int(obj_id))
             except Exception, exception:
                 common.process_exception(exception, self.dialog)
                 return None
@@ -278,8 +276,7 @@ class Attachment(object):
         for filename in filenames:
             value = file(filename, 'rb').read()
             name = os.path.basename(filename)
-            args = ('object', 'execute',
-                    'ir.attachment', 'create', {
+            args = ('model', 'ir.attachment', 'create', {
                         'name': name,
                         'datas': base64.encodestring(value),
                         'res_model': self.resource[0],
@@ -306,8 +303,8 @@ class Attachment(object):
         obj_id = self.model.get_value(iter, 0)
         if obj_id:
             try:
-                data = rpc.execute('object', 'execute',
-                        'ir.attachment', 'read', int(obj_id))
+                data = rpc.execute('model', 'ir.attachment', 'read',
+                        int(obj_id))
             except Exception, exception:
                 common.process_exception(exception, self.dialog)
                 return None
@@ -327,8 +324,7 @@ class Attachment(object):
 
     def preview(self, obj_id):
         try:
-            data = rpc.execute('object', 'execute',
-                    'ir.attachment', 'read', obj_id)
+            data = rpc.execute('model', 'ir.attachment', 'read', obj_id)
         except Exception, exception:
             common.process_exception(exception, self.dialog)
             return None
@@ -380,8 +376,7 @@ class Attachment(object):
     def reload(self, preview=True):
         self.model.clear()
         try:
-            ids = rpc.execute('object', 'execute',
-                    'ir.attachment', 'search', [
+            ids = rpc.execute('model', 'ir.attachment', 'search', [
                         ('res_model', '=', self.resource[0]),
                         ('res_id', '=', self.resource[1]),
                         ])
@@ -389,8 +384,7 @@ class Attachment(object):
             common.process_exception(exception, self.dialog)
             return
         try:
-            res_ids = rpc.execute('object', 'execute',
-                    'ir.attachment', 'read', ids,
+            res_ids = rpc.execute('model', 'ir.attachment', 'read', ids,
                     self.fields_order + ['link'])
         except Exception, exception:
             common.process_exception(exception, self.dialog)

@@ -30,8 +30,7 @@ class Action(object):
         ctx = rpc.CONTEXT.copy()
         ctx.update(context)
         if not ids:
-            args = ('object', 'execute', datas['model'], 'search', [],
-                    0, None, None, ctx)
+            args = ('model', datas['model'], 'search', [], 0, None, None, ctx)
             try:
                 ids = rpc.execute(*args)
             except Exception, exception:
@@ -42,7 +41,7 @@ class Action(object):
                 message(_('Nothing to print!'), window)
                 return False
             datas['id'] = ids[0]
-        args = ('report', 'execute', name, ids, datas, ctx)
+        args = ('report', name, 'execute', ids, datas, ctx)
         rpcprogress = common.RPCProgress('execute', args, window)
         try:
             res = rpcprogress.run()
@@ -75,8 +74,8 @@ class Action(object):
         if not action_type:
             res = False
             try:
-                res = rpc.execute('object', 'execute', 'ir.action', 'read',
-                        act_id, ['type'], ctx)
+                res = rpc.execute('model', 'ir.action', 'read', act_id,
+                        ['type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 return
@@ -84,7 +83,7 @@ class Action(object):
                 raise Exception, 'ActionNotFound'
             action_type = res['type']
         try:
-            res = rpc.execute('object', 'execute', action_type, 'search_read',
+            res = rpc.execute('model', action_type, 'search_read',
                     [('action', '=', act_id)], 0, 1, None, ctx, None)
         except Exception, exception:
             common.process_exception(exception, window)
@@ -177,9 +176,9 @@ class Action(object):
         if 'id' in data:
             model_id = data.get('id', False)
             try:
-                actions = rpc.execute('object', 'execute',
-                        'ir.action.keyword', 'get_keyword', keyword,
-                        (data['model'], model_id), rpc.CONTEXT)
+                actions = rpc.execute('model', 'ir.action.keyword',
+                        'get_keyword', keyword, (data['model'], model_id),
+                        rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, window)
                 return False

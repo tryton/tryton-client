@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 "View tree"
 import gtk
 import gobject
@@ -43,8 +44,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         ctx.update(rpc.CONTEXT)
         res_ids = []
         if ids:
-            args = ('object', 'execute', self.view['model'], 'read', ids, fields,
-                    ctx)
+            args = ('model', self.view['model'], 'read', ids, fields, ctx)
             try:
                 res_ids = rpc.execute(*args)
                 for obj_id in ids:
@@ -102,7 +102,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 selection = self.fields_type[field]['selection']
                 if 'relation' in self.fields_type[field]:
                     try:
-                        selection = rpc.execute('object', 'execute',
+                        selection = rpc.execute('model',
                                 self.fields_type[field]['relation'],
                                 'name_search', '',
                                 self.fields_type[field].get('domain', []),
@@ -113,7 +113,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     if not isinstance(self.fields_type[field]['selection'],
                             (list, tuple)):
                         try:
-                            selection = rpc.execute('object', 'execute',
+                            selection = rpc.execute('model',
                                     self.view['model'],
                                     self.fields_type[field]['selection'],
                                     rpc.CONTEXT)

@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import tryton.rpc as rpc
 import gobject
 import gtk
@@ -28,8 +29,8 @@ class ViewTreeSC(object):
         store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING,
                 gobject.TYPE_STRING)
         user =  rpc._USER
-        args = ('object', 'execute', 'ir.ui.view_sc', 'get_sc', user,
-                self.model, rpc.CONTEXT)
+        args = ('model', 'ir.ui.view_sc', 'get_sc', user, self.model,
+                rpc.CONTEXT)
         try:
             view_sc = rpc.execute(*args)
         except Exception, exception:

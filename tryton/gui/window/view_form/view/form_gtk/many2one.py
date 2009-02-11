@@ -208,9 +208,8 @@ class Many2One(WidgetInterface):
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         if attrs.get('completion', False):
             try:
-                names = rpc.execute('object', 'execute',
-                        self.attrs['relation'], 'name_search', '', [],
-                        'ilike', rpc.CONTEXT)
+                names = rpc.execute('model', self.attrs['relation'],
+                        'name_search', '', [], 'ilike', rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 names = []
@@ -276,10 +275,9 @@ class Many2One(WidgetInterface):
                 self.wid_text.grab_focus()
 
                 try:
-                    ids = rpc.execute('object', 'execute',
-                            self.attrs['relation'], 'name_search',
-                            self.wid_text.get_text(), domain, 'ilike', context,
-                            _LIMIT)
+                    ids = rpc.execute('model', self.attrs['relation'],
+                            'name_search', self.wid_text.get_text(), domain,
+                            'ilike', context, _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -299,9 +297,8 @@ class Many2One(WidgetInterface):
                 ids = win.run()
                 if ids:
                     try:
-                        name = rpc.execute('object', 'execute',
-                                self.attrs['relation'], 'name_get', [ids[0]],
-                                rpc.CONTEXT)[0]
+                        name = rpc.execute('model', self.attrs['relation'],
+                                'name_get', [ids[0]], rpc.CONTEXT)[0]
                     except Exception, exception:
                         self.focus_out = True
                         common.process_exception(exception, self._window)
@@ -358,10 +355,9 @@ class Many2One(WidgetInterface):
                 self.wid_text.grab_focus()
 
                 try:
-                    ids = rpc.execute('object', 'execute',
-                            self.attrs['relation'], 'name_search',
-                            self.wid_text.get_text(), domain, 'ilike', context,
-                            _LIMIT)
+                    ids = rpc.execute('model', self.attrs['relation'],
+                            'name_search', self.wid_text.get_text(), domain,
+                            'ilike', context, _LIMIT)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -381,9 +377,8 @@ class Many2One(WidgetInterface):
                 ids = win.run()
                 if ids:
                     try:
-                        name = rpc.execute('object', 'execute',
-                                self.attrs['relation'], 'name_get', [ids[0]],
-                                rpc.CONTEXT)[0]
+                        name = rpc.execute('model', self.attrs['relation'],
+                                'name_get', [ids[0]], rpc.CONTEXT)[0]
                     except Exception, exception:
                         self.focus_out = True
                         common.process_exception(exception, self._window)

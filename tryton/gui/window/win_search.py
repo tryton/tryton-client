@@ -64,7 +64,7 @@ class WinSearch(object):
             ctx = self.context.copy()
             ctx.update(rpc.CONTEXT)
             try:
-                args = ('object', 'execute', self.model_name, 'fields_view_get',
+                args = ('model', self.model_name, 'fields_view_get',
                         False, 'tree', ctx)
                 view_form = rpc.execute(*args)
             except Exception, exception:
@@ -118,9 +118,8 @@ class WinSearch(object):
         value = self.form.value
         value += self.domain
         try:
-            self.ids = rpc.execute('object', 'execute',
-                    self.model_name, 'search', value, offset, limit, 0,
-                    rpc.CONTEXT)
+            self.ids = rpc.execute('model', self.model_name, 'search', value,
+                    offset, limit, 0, rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self.win)
             return False

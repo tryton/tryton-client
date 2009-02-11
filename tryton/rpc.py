@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import pysocket
 import logging
 import socket
@@ -26,13 +27,14 @@ def db_list(host, port):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
-            logging.getLogger('rpc.request').info(repr(('db', 'list')))
+            args = (None, None, None, 'common', 'db', 'list')
+            logging.getLogger('rpc.request').info(repr(args))
             try:
-                _SOCK.send(('db', 'list'))
+                _SOCK.send(args)
             except Exception, exception:
                 if exception[0] == 32:
                     _SOCK.reconnect()
-                    _SOCK.send(('db', 'list'))
+                    _SOCK.send(args)
                 else:
                     raise
             res = _SOCK.receive()
@@ -56,8 +58,9 @@ def db_exec(host, port, method, *args):
                 _SOCK= pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
-            logging.getLogger('rpc.request').info(repr(('db', method) + args))
-            _SOCK.send(('db', method) + args)
+            args = (None, None, None, 'common', 'db', method) + args
+            logging.getLogger('rpc.request').info(repr(args))
+            _SOCK.send(args)
             res = _SOCK.receive()
             SECURE = _SOCK.ssl
         finally:
@@ -78,13 +81,14 @@ def server_version(host, port):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
-            logging.getLogger('rpc.request').info(repr(('common', 'version')))
+            args = (None, None, None, 'common', None, 'version')
+            logging.getLogger('rpc.request').info(repr(args))
             try:
-                _SOCK.send(('common', 'version'))
+                _SOCK.send(args)
             except Exception, exception:
                 if exception[0] == 32:
                     _SOCK.reconnect()
-                    _SOCK.send(('db', 'list'))
+                    _SOCK.send(args)
                 else:
                     raise
             res = _SOCK.receive()
@@ -110,9 +114,9 @@ def login(username, password, host, port, database):
                 _SOCK = pysocket.PySocket()
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
-            logging.getLogger('rpc.request').info(repr(('common', 'login',
-                database, username, ''.join(['*' for x in password]))))
-            _SOCK.send(('common', 'login', database, username, password))
+            args = (database, username, password, 'common', 'db', 'login')
+            logging.getLogger('rpc.request').info(repr(args))
+            _SOCK.send(args)
             res = _SOCK.receive()
             logging.getLogger('rpc.result').debug(repr(res))
         finally:
@@ -162,15 +166,15 @@ def context_reload():
         CONTEXT[i] = value
         if i == 'timezone':
             try:
-                TIMEZONE = execute('common', 'timezone_get')
+                TIMEZONE = execute('common', None, 'timezone_get')
             except:
                 pass
 
-def _execute(blocking, obj, method, *args):
+def _execute(blocking, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
     if not _SOCK or not _SOCK.connected:
         raise Exception('NotLogged')
-    logging.getLogger('rpc.request').info(repr((obj, method, args)))
+    logging.getLogger('rpc.request').info(repr((args)))
     key = False
     if len(args) >= 6 and args[1] == 'fields_view_get':
         key = str(args)
@@ -182,12 +186,12 @@ def _execute(blocking, obj, method, *args):
         return
     try:
         try:
-            _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
+            _SOCK.send((_DATABASE, _USER, _SESSION) + args)
             result = _SOCK.receive()
         except (socket.error, RuntimeError):
             try:
                 _SOCK.reconnect()
-                _SOCK.send((obj, method, _DATABASE, _USER, _SESSION) + args)
+                _SOCK.send((_DATABASE, _USER, _SESSION) + args)
                 result = _SOCK.receive()
             except (socket.error, RuntimeError):
                 _SOCK.reconnect()
@@ -202,11 +206,11 @@ def _execute(blocking, obj, method, *args):
     logging.getLogger('rpc.result').debug(repr(result))
     return result
 
-def execute(obj, method, *args):
-    return _execute(True, obj, method, *args)
+def execute(*args):
+    return _execute(True, *args)
 
-def execute_nonblocking(obj, method, *args):
-    return _execute(False, obj, method, *args)
+def execute_nonblocking(*args):
+    return _execute(False, *args)
 
 class RPCProxy(object):
 
@@ -226,4 +230,4 @@ class RPCFunction(object):
         self.func = func_name
 
     def __call__(self, *args):
-        return execute('object', 'execute', self.name, self.func, *args)
+        return execute('model', self.name, self.func, *args)

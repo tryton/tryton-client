@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 "Board"
 import gtk
 from tryton.signal_event import SignalEvent
@@ -15,7 +16,7 @@ class Board(SignalEvent):
         super(Board, self).__init__()
 
         try:
-            view = rpc.execute('object', 'execute', 'ir.ui.view', 'read',
+            view = rpc.execute('model', 'ir.ui.view', 'read',
                     view_id, ['arch'], context)
         except Exception, exception:
             common.process_exception(exception, window)

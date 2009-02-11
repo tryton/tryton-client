@@ -221,9 +221,9 @@ class WinImport(object):
                     self.fields_invert[st_name] = prefix_node+field
                     if fields[field]['type'] == 'one2many' and level > 0:
                         try:
-                            fields2 = rpc.execute('object',
-                                    'execute', fields[field]['relation'],
-                                    'fields_get', None, rpc.CONTEXT)
+                            fields2 = rpc.execute('model',
+                                    fields[field]['relation'], 'fields_get',
+                                    None, rpc.CONTEXT)
                         except Exception, exception:
                             common.process_exception(exception, self.dialog)
                             continue
@@ -336,8 +336,7 @@ class WinImport(object):
             datas.append([x.decode(csv_data['combo']).encode('utf-8') \
                     for x in line])
         try:
-            res = rpc.execute('object', 'execute',
-                    model, 'import_data', fields, datas)
+            res = rpc.execute('model', model, 'import_data', fields, datas)
         except Exception, exception:
             common.process_exception(exception, self.dialog)
             return False

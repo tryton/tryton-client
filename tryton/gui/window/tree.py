@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 "Tree"
 import gtk
 import gettext
@@ -28,23 +29,21 @@ class Tree(SignalEvent):
         ctx.update(rpc.CONTEXT)
         if view_id:
             try:
-                view_base =  rpc.execute('object', 'execute',
-                        'ir.ui.view', 'read', view_id,
+                view_base =  rpc.execute('model', 'ir.ui.view', 'read', view_id,
                         ['model', 'type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
             try:
-                view = rpc.execute('object', 'execute',
-                        view_base['model'], 'fields_view_get', view_id,
-                        view_base['type'], ctx)
+                view = rpc.execute('model', view_base['model'],
+                        'fields_view_get', view_id, view_base['type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
         else:
             try:
-                view = rpc.execute('object', 'execute', model,
-                    'fields_view_get', False, 'tree', ctx)
+                view = rpc.execute('model', model, 'fields_view_get', False,
+                        'tree', ctx)
             except Exception, exception:
                 common.process_exception(exception, window)
                 raise
@@ -163,8 +162,8 @@ class Tree(SignalEvent):
             ctx = {}
             ctx.update(self.context)
             ctx.update(rpc.CONTEXT)
-            args = ('object', 'execute', self.model,
-                    'search', self.domain2, 0, None, None, ctx)
+            args = ('model', self.model, 'search', self.domain2, 0, None,
+                    None, ctx)
             ids = rpc.execute(*args)
         except Exception, exception:
             ids = common.process_exception(exception, self.window, *args)
@@ -178,8 +177,8 @@ class Tree(SignalEvent):
             ctx = {}
             ctx.update(rpc.CONTEXT)
             try:
-                args = ('object', 'execute',
-                        self.view['model'], 'read', ids, ['name', icon_name], ctx)
+                args = ('model', self.view['model'], 'read', ids,
+                        ['name', icon_name], ctx)
                 results = rpc.execute(*args)
             except Exception, exception:
                 results = common.process_exception(exception, self.window, *args)
@@ -222,8 +221,8 @@ class Tree(SignalEvent):
     def menu_main_clicked(self, widget, focus=True):
         if widget.get_active():
             obj_id = widget.get_data('id')
-            args = ('object', 'execute', self.model,
-                        'read', obj_id, [self.view['field_childs']], rpc.CONTEXT)
+            args = ('model', self.model, 'read', obj_id,
+                    [self.view['field_childs']], rpc.CONTEXT)
             try:
                 ids = rpc.execute(*args)[self.view['field_childs']]
             except Exception, exception:
@@ -359,8 +358,8 @@ class Tree(SignalEvent):
         if obj_id is not None:
             sc_id = int(self.tree_sc.value_get(2))
             try:
-                rpc.execute('object', 'execute', 'ir.ui.view_sc',
-                        'delete', sc_id, rpc.CONTEXT)
+                rpc.execute('model', 'ir.ui.view_sc', 'delete', sc_id,
+                        rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
         self.tree_sc.update()
@@ -369,12 +368,11 @@ class Tree(SignalEvent):
         ids = self.ids_get()
         if len(ids):
             try:
-                res = rpc.execute('object', 'execute', self.model,
-                        'name_get', ids, rpc.CONTEXT)
+                res = rpc.execute('model', self.model, 'name_get', ids,
+                        rpc.CONTEXT)
                 for (obj_id, name) in res:
                     user = rpc._USER
-                    rpc.execute('object', 'execute',
-                            'ir.ui.view_sc', 'create', {
+                    rpc.execute('model', 'ir.ui.view_sc', 'create', {
                                 'resource': self.model,
                                 'user_id': user,
                                 'res_id': obj_id,

@@ -356,9 +356,8 @@ class DBCreate(object):
                         CONFIG["login.login"] = "admin"
                         try:
                             rpcprogress = common.RPCProgress('db_exec',
-                                    (host, int(port), 'create', passwd,
-                                        dbname, langreal,
-                                        admin_passwd.get_text()),
+                                    (host, int(port), 'create', dbname, passwd,
+                                        langreal, admin_passwd.get_text()),
                                     self.dialog)
                             rpcprogress.run()
                         except Exception, exception:

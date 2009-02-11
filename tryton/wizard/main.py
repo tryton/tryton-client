@@ -150,7 +150,7 @@ class Wizard(object):
         from tryton.action import Action
         if not 'form' in datas:
             datas['form'] = {}
-        args = ('wizard', 'create', action)
+        args = ('wizard', action, 'create')
         try:
             wiz_id = rpc.execute(*args)
         except Exception, exception:
@@ -164,7 +164,7 @@ class Wizard(object):
             ctx['active_id'] = datas.get('id')
             ctx['active_ids'] = datas.get('ids')
             rpcprogress = common.RPCProgress('execute', ('wizard',
-                'execute', wiz_id, datas, state, ctx), parent)
+                action, 'execute', wiz_id, datas, state, ctx), parent)
             try:
                 res = rpcprogress.run()
             except Exception, exception:
@@ -222,7 +222,7 @@ class Wizard(object):
             dia.destroy()
             dia = None
         try:
-            rpc.execute('wizard', 'delete', wiz_id)
+            rpc.execute('wizard', action, 'delete', wiz_id)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
         except:

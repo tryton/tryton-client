@@ -106,8 +106,8 @@ class WidgetInterface(object):
             return False
         model = self._view.modelfield.parent.resource
         try:
-            res = rpc.execute('object', 'execute', model,
-                    'default_get', [self.attrs['name']])
+            res = rpc.execute('model', model, 'default_get',
+                    [self.attrs['name']])
         except Exception, exception:
             process_exception(exception, self._window)
         self._view.modelfield.set(self._view.model,

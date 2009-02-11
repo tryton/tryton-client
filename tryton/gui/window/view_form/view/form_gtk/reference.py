@@ -78,7 +78,7 @@ class Reference(WidgetInterface):
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
             try:
-                selection = rpc.execute('object', 'execute',
+                selection = rpc.execute('model',
                         self.model, selection, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self._window)
@@ -166,7 +166,7 @@ class Reference(WidgetInterface):
                 context = self._view.modelfield.context_get(self._view.model)
 
                 try:
-                    ids = rpc.execute('object', 'execute', model,
+                    ids = rpc.execute('model', model,
                             'name_search', self.wid_text.get_text(), domain,
                             'ilike', context)
                 except Exception, exception:
@@ -189,9 +189,8 @@ class Reference(WidgetInterface):
                 ids = win.run()
                 if ids:
                     try:
-                        obj_id, name = rpc.execute('object',
-                                'execute', model, 'name_get', [ids[0]],
-                                rpc.CONTEXT)[0]
+                        obj_id, name = rpc.execute('model', model, 'name_get',
+                                [ids[0]], rpc.CONTEXT)[0]
                     except Exception, exception:
                         self.focus_out = True
                         self.changed = True

@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gobject
 import gtk
 from tryton.rpc import RPCProxy
@@ -475,7 +476,7 @@ class ViewList(ParserView):
 
             if fields:
                 try:
-                    rpc.execute('object', 'execute', 'ir.ui.view_tree_width',
+                    rpc.execute('model', 'ir.ui.view_tree_width',
                             'set_width', self.screen.name, fields, rpc.CONTEXT)
                 except:
                     pass

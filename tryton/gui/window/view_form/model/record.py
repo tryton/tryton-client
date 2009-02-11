@@ -181,8 +181,7 @@ class ModelRecord(SignalEvent):
             context = self.context_get()
             context = context.copy()
             context['_timestamp'] = self.get_timestamp()
-            args = ('object', 'execute', self.resource, 'write',
-                    [self.id], value, context)
+            args = ('model', self.resource, 'write', [self.id], value, context)
             try:
                 if not rpc.execute(*args):
                     return False

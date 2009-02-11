@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
 from interface import WidgetInterface
@@ -32,7 +33,7 @@ class Selection(WidgetInterface):
         selection = attrs.get('selection', [])
         if 'relation' in attrs:
             try:
-                selection = rpc.execute('object', 'execute',
+                selection = rpc.execute('model',
                         attrs['relation'], 'name_search', '',
                         attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
@@ -41,7 +42,7 @@ class Selection(WidgetInterface):
         else:
             if not isinstance(selection, (list, tuple)):
                 try:
-                    selection = rpc.execute('object', 'execute',
+                    selection = rpc.execute('model',
                             self.model, selection, rpc.CONTEXT)
                 except Exception, exception:
                     common.process_exception(exception, self._window)

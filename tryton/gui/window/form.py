@@ -246,8 +246,7 @@ class Form(SignalEvent):
             ('write_date', _('Latest Modification Date:')),
         ]
 
-        args = ('object', 'execute', self.model, 'read', [obj_id],
-                [x[0] for x in fields])
+        args = ('model', self.model, 'read', [obj_id], [x[0] for x in fields])
         try:
             res = rpc.execute(*args)
         except Exception, exception:
@@ -326,7 +325,7 @@ class Form(SignalEvent):
         res_ids = self.sel_ids_get()
         ctx = self.context.copy()
         ctx.update(rpc.CONTEXT)
-        args = ('object', 'execute', self.model, 'copy', res_ids, {}, ctx)
+        args = ('model', self.model, 'copy', res_ids, {}, ctx)
         try:
             new_ids = rpc.execute(*args)
         except Exception, exception:

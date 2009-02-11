@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 'Action'
 import gtk
 from tryton.gui.window.view_form.screen import Screen
@@ -20,9 +21,8 @@ class Action(object):
         self.tree = None
 
         try:
-            self.action = rpc.execute('object', 'execute',
-                    'ir.action.act_window', 'read', self.act_id, False,
-                    rpc.CONTEXT)
+            self.action = rpc.execute('model', 'ir.action.act_window', 'read',
+                    self.act_id, False, rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self._window)
             raise
@@ -143,16 +143,14 @@ class Action(object):
             ctx.update(rpc.CONTEXT)
             ctx.update(self.context)
             try:
-                view_base = rpc.execute('object', 'execute',
-                        'ir.ui.view', 'read', view_ids[0],
-                        ['model', 'type'], ctx)
+                view_base = rpc.execute('model', 'ir.ui.view', 'read',
+                        view_ids[0], ['model', 'type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 raise
             try:
-                view = rpc.execute('object', 'execute',
-                        view_base['model'], 'fields_view_get', view_ids[0],
-                        view_base['type'], ctx)
+                view = rpc.execute('model', view_base['model'],
+                        'fields_view_get', view_ids[0], view_base['type'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 raise
@@ -184,9 +182,8 @@ class Action(object):
     def _sig_open(self, widget, event):
         if event.type == gtk.gdk.BUTTON_PRESS:
             try:
-                action_id = rpc.execute('object', 'execute', 'ir.action',
-                        'get_action_id', self.act_id,
-                        rpc.CONTEXT)
+                action_id = rpc.execute('model', 'ir.action',
+                        'get_action_id', self.act_id, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self._window)
             if action_id:
@@ -213,9 +210,8 @@ class Action(object):
 
     def display(self):
         try:
-            res_ids = rpc.execute('object', 'execute',
-                    self.action['res_model'], 'search', self.domain, 0,
-                    self.action.get('limit', 80))
+            res_ids = rpc.execute('model', self.action['res_model'], 'search',
+                    self.domain, 0, self.action.get('limit', 80))
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

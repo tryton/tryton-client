@@ -77,10 +77,8 @@ class Many2Many(WidgetInterface):
         value = self.wid_text.get_text()
 
         try:
-            ids = rpc.execute('object', 'execute',
-                    self.attrs['relation'], 'name_search',
-                    value, domain, 'ilike', context,
-                    _LIMIT)
+            ids = rpc.execute('model', self.attrs['relation'], 'name_search',
+                    value, domain, 'ilike', context, _LIMIT)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

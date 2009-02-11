@@ -95,8 +95,8 @@ class Screen(SignalEvent):
                     ctx.update(rpc.CONTEXT)
                     ctx.update(self.context)
                     try:
-                        self.fields_view_tree = rpc.execute('object',
-                                'execute', self.name, 'fields_view_get', False,
+                        self.fields_view_tree = rpc.execute('model',
+                                self.name, 'fields_view_get', False,
                                 'tree', ctx)
                     except:
                         return
@@ -135,23 +135,21 @@ class Screen(SignalEvent):
             values = self.domain
         try:
             try:
-                ids = rpc.execute('object', 'execute',
-                        self.name, 'search', values,
+                ids = rpc.execute('model', self.name, 'search', values,
                         offset, limit, self.sort, ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
-                ids = rpc.execute('object', 'execute',
-                        self.name, 'search', values,
+                ids = rpc.execute('model', self.name, 'search', values,
                         offset, limit, self.sort, ctx)
             if not only_ids:
                 if len(ids) == limit:
                     try:
-                        self.search_count = rpc.execute('object', 'execute',
-                                self.name, 'search_count', values, ctx)
+                        self.search_count = rpc.execute('model', self.name,
+                                'search_count', values, ctx)
                     except Exception, exception:
                         common.process_exception(exception, self.window)
-                        self.search_count = rpc.execute('object', 'execute',
-                                self.name, 'search_count', values, ctx)
+                        self.search_count = rpc.execute('model', self.name,
+                                'search_count', values, ctx)
                 else:
                     self.search_count = len(ids)
         except:

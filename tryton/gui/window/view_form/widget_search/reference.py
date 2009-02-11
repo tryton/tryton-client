@@ -39,7 +39,7 @@ class Reference(Interface):
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
             try:
-                selection = rpc.execute('object', 'execute',
+                selection = rpc.execute('model',
                         self.attrs['relation'], 'name_search', '',
                         self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
             except Exception, exception:
@@ -48,7 +48,7 @@ class Reference(Interface):
         else:
             if not isinstance(selection, (list, tuple)):
                 try:
-                    selection = rpc.execute('object', 'execute',
+                    selection = rpc.execute('model',
                             self.attrs['model'], selection, rpc.CONTEXT)
                 except Exception, exception:
                     common.process_exception(exception, parent)

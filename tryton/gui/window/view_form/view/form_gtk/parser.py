@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
 import copy
@@ -48,16 +49,17 @@ class Button(object):
                 ctx = rpc.CONTEXT.copy()
                 ctx.update(model.context_get())
                 if button_type == 'workflow':
-                    args = ('object', 'exec_workflow', self.form.screen.name,
-                            self.attrs['name'], obj_id, ctx)
+                    args = ('model', self.form.screen.name,
+                            'workflow_trigger_validate', obj_id,
+                            self.attrs['name'], ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
                         common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'object':
-                    args = ('object', 'execute', self.form.screen.name,
-                            self.attrs['name'], [obj_id], ctx)
+                    args = ('model', self.form.screen.name, self.attrs['name'],
+                            [obj_id], ctx)
                     try:
                         rpc.execute(*args)
                     except Exception, exception:
@@ -65,7 +67,7 @@ class Button(object):
                                 *args)
                 elif button_type == 'action':
                     action_id = None
-                    args = ('object', 'execute', 'ir.action', 'get_action_id',
+                    args = ('model', 'ir.action', 'get_action_id',
                             int(self.attrs['name']), ctx)
                     try:
                         action_id = rpc.execute(*args)
@@ -744,7 +746,7 @@ class ParserForm(ParserInterface):
 
         obj_id = self.screen.current_model.save(force_reload=False)
         try:
-            lang_ids = rpc.execute('object', 'execute', 'ir.lang',
+            lang_ids = rpc.execute('model', 'ir.lang',
                     'search', [('translatable', '=', '1')])
         except Exception, exception:
             common.process_exception(exception, self.window)
@@ -755,9 +757,9 @@ class ParserForm(ParserInterface):
                     parent=self.window)
             return False
         try:
-            lang_ids += rpc.execute('object', 'execute', 'ir.lang',
+            lang_ids += rpc.execute('model', 'ir.lang',
                     'search', [('code', '=', 'en_US')])
-            langs = rpc.execute('object', 'execute', 'ir.lang',
+            langs = rpc.execute('model', 'ir.lang',
                     'read', lang_ids, ['code', 'name'])
         except Exception, exception:
             common.process_exception(exception, self.window)
@@ -841,7 +843,7 @@ class ParserForm(ParserInterface):
             context = copy.copy(rpc.CONTEXT)
             context['language'] = lang['code']
             try:
-                val = rpc.execute('object', 'execute', model,
+                val = rpc.execute('model', model,
                         'read', [obj_id], [name], context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
@@ -892,7 +894,7 @@ class ParserForm(ParserInterface):
                     value_set(widget_entry, new_val['value'])
                 context = copy.copy(rpc.CONTEXT)
                 context['language'] = new_val['code']
-                args = ('object', 'execute', model, 'write', [obj_id],
+                args = ('model', model, 'write', [obj_id],
                         {str(name):  new_val['value']}, context)
                 try:
                     rpc.execute(*args)

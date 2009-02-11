@@ -766,7 +766,7 @@ This record has been modified while you were editing it.
                 parent, context, ['form', 'tree'])
     return False
 
-def process_exception(exception, parent, obj='', method='', *args):
+def process_exception(exception, parent, *args):
     global _USERNAME, _DATABASE, _SOCK
     if str(exception.args[0]) == 'NotLogged':
         if not rpc._SOCK:
@@ -786,24 +786,22 @@ def process_exception(exception, parent, obj='', method='', *args):
                 return False
             if res < 0:
                 continue
-            if obj and method:
+            if args:
                 try:
-                    return rpc.execute(obj, method, *args)
+                    return rpc.execute(*args)
                 except Exception, exception:
-                    return process_exception(exception, parent, obj,
-                            method, *args)
+                    return process_exception(exception, parent, *args)
             return True
 
     if exception.args[0] == 'ConcurrencyException':
-        if len(args) > 4:
-            if concurrency(args[0], args[2][0], args[4], parent):
-                if '_timestamp' in args[4]:
-                    del args[4]['_timestamp']
+        if len(args) >= 6:
+            if concurrency(args[1], args[3][0], args[5], parent):
+                if '_timestamp' in args[5]:
+                    del args[5]['_timestamp']
                 try:
-                    return rpc.execute(obj, method, *args)
+                    return rpc.execute(*args)
                 except Exception, exception:
-                    return process_exception(exception, parent, obj,
-                            method, *args)
+                    return process_exception(exception, parent, *args)
             return False
         else:
             message(_('Concurrency Exception'), parent,
@@ -816,7 +814,7 @@ def process_exception(exception, parent, obj='', method='', *args):
             msg = exception.args[3]
         res = userwarning(str(msg), parent, str(exception.args[2]))
         if res in ('always', 'ok'):
-            args2 = ('object', 'execute', 'res.user.warning', 'create', {
+            args2 = ('model', 'res.user.warning', 'create', {
                     'user': rpc._USER,
                     'name': exception.args[1],
                     'always': (res == 'always'),
@@ -826,9 +824,9 @@ def process_exception(exception, parent, obj='', method='', *args):
             except Exception, exception:
                 process_exception(exception, parent, *args2)
             try:
-                return rpc.execute(obj, method, *args)
+                return rpc.execute(*args)
             except Exception, exception:
-                return process_exception(exception, parent, obj, method, *args)
+                return process_exception(exception, parent, *args)
         return False
 
     if exception.args[0] == 'UserError':

@@ -879,9 +879,8 @@ class Main(object):
         if shortcuts is None:
             user = rpc._USER
             try:
-                shortcuts = rpc.execute('object', 'execute',
-                        'ir.ui.view_sc', 'get_sc', user, 'ir.ui.menu',
-                        rpc.CONTEXT)
+                shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
+                        user, 'ir.ui.menu', rpc.CONTEXT)
             except:
                 shortcuts = []
         menu = gtk.Menu()
@@ -960,7 +959,7 @@ class Main(object):
             if 'language_direction' in rpc.CONTEXT:
                 translate.set_language_direction(
                         rpc.CONTEXT['language_direction'])
-            prefs = rpc.execute('object', 'execute', 'res.user',
+            prefs = rpc.execute('model', 'res.user',
                     'get_preferences', False, rpc.CONTEXT)
             sb_id = self.sb_username.get_context_id('message')
             self.sb_username.push(sb_id, prefs.get('status_bar', ''))
@@ -1001,14 +1000,12 @@ class Main(object):
     def request_set(self, exception=False):
         try:
             if not exception:
-                res = rpc.execute('object', 'execute',
-                        'res.request', 'request_get')
+                res = rpc.execute('model', 'res.request', 'request_get')
                 if not res:
                     return ([], [])
                 ids, ids2 = res
             else:
-                ids, ids2 = rpc.execute('object', 'execute',
-                        'res.request', 'request_get')
+                ids, ids2 = rpc.execute('model', 'res.request', 'request_get')
             if len(ids):
                 if len(ids) == 1:
                     message = _('%s request') % len(ids)
@@ -1049,8 +1046,8 @@ class Main(object):
         self.refresh_ssl()
         if log_response > 0:
             try:
-                prefs = rpc.execute('object', 'execute',
-                        'res.user', 'get_preferences', False, rpc.CONTEXT)
+                prefs = rpc.execute('model', 'res.user', 'get_preferences',
+                        False, rpc.CONTEXT)
             except:
                 prefs = None
             menu_id = self.sig_win_menu(quiet=False, prefs=prefs)
@@ -1149,8 +1146,8 @@ class Main(object):
             except_id=False, prefs=None):
         if not prefs:
             try:
-                prefs = rpc.execute('object', 'execute',
-                        'res.user', 'get_preferences', False, rpc.CONTEXT)
+                prefs = rpc.execute('model', 'res.user', 'get_preferences',
+                        False, rpc.CONTEXT)
             except:
                 return False
         sb_id = self.sb_username.get_context_id('message')
@@ -1373,7 +1370,7 @@ class Main(object):
         if sure == "ko" or sure == "cancel":
             return
         try:
-            rpc.db_exec(host, int(port), 'drop', passwd, dbname)
+            rpc.db_exec(host, int(port), 'drop', dbname, passwd)
         except Exception, exception:
             self.refresh_ssl()
             if exception[0] == "AccessDenied":
@@ -1405,7 +1402,7 @@ class Main(object):
             file_p.close()
             host, port = url.rsplit(':' , 1)
             try:
-                res = rpc.db_exec(host, int(port), 'restore', passwd, dbname, \
+                res = rpc.db_exec(host, int(port), 'restore', dbname, passwd, \
                         data_b64)
             except Exception, exception:
                 self.refresh_ssl()
@@ -1447,7 +1444,7 @@ class Main(object):
 
         host, port = url.rsplit(':', 1)
         try:
-            dump_b64 = rpc.db_exec(host, int(port), 'dump', passwd, dbname)
+            dump_b64 = rpc.db_exec(host, int(port), 'dump', dbname, passwd)
         except Exception, exception:
             if exception[0] == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
