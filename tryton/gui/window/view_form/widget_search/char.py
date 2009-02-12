@@ -21,9 +21,9 @@ class Char(Interface):
         self.combo.pack_start(cell, True)
         self.combo.add_attribute(cell, 'text', 1)
         for oper in (['ilike', _('contains')],
-                ['not ilike', _('not contains')],
+                ['not ilike', _('does not contain')],
                 ['=', _('equals')],
-                ['!=', _('is different')],
+                ['!=', _('does not equal')],
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)
