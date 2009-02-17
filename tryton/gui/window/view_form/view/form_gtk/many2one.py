@@ -137,7 +137,8 @@ class Dialog(object):
             res = self.dia.run()
             if res == gtk.RESPONSE_OK:
                 if self.screen.save_current():
-                    return (True, self.screen.current_model.rec_name())
+                    return (True, (self.screen.current_model.id,
+                        self.screen.current_model.rec_name()))
                 else:
                     self.screen.display()
             else:

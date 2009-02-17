@@ -156,10 +156,10 @@ class Reference(WidgetInterface):
             if not leave:
                 dia = Dialog(model, obj_id, attrs=self.attrs,
                         window=self._window)
-                res, obj_id = dia.run()
+                res, value = dia.run()
                 if res:
                     self._view.modelfield.set_client(self._view.model,
-                            (model, (obj_id, '')), force_change=True)
+                            (model, value), force_change=True)
                 dia.destroy()
         elif model:
             if not self._readonly and ( self.wid_text.get_text() or not leave):
@@ -206,7 +206,7 @@ class Reference(WidgetInterface):
         res, value = dia.run()
         if res:
             self._view.modelfield.set_client(self._view.model,
-                    (model, (value, '')))
+                    (model, value))
             self.display(self._view.model, self._view.modelfield)
         dia.destroy()
 
