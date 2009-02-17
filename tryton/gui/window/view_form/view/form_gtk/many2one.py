@@ -137,7 +137,7 @@ class Dialog(object):
             res = self.dia.run()
             if res == gtk.RESPONSE_OK:
                 if self.screen.save_current():
-                    return (True, self.screen.current_model.name_get())
+                    return (True, self.screen.current_model.rec_name())
                 else:
                     self.screen.display()
             else:
@@ -208,8 +208,10 @@ class Many2One(WidgetInterface):
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         if attrs.get('completion', False):
             try:
-                names = rpc.execute('model', self.attrs['relation'],
-                        'name_search', '', [], 'ilike', rpc.CONTEXT)
+                result = rpc.execute('model', self.attrs['relation'],
+                        'search_read', [], 0, None, None, rpc.CONTEXT,
+                        ['rec_name'])
+                names = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, self._window)
                 names = []
@@ -276,8 +278,10 @@ class Many2One(WidgetInterface):
 
                 try:
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'name_search', self.wid_text.get_text(), domain,
-                            'ilike', context, _LIMIT)
+                            'search',
+                            [('rec_name', 'ilike', self.wid_text.get_text()),
+                                domain],
+                            0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -291,20 +295,12 @@ class Many2One(WidgetInterface):
                     return True
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
-                        ids = [x[0] for x in ids], context=context,
-                        domain=domain, parent=self._window,
+                        ids=ids, context=context, domain=domain,
+                        parent=self._window,
                         views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
-                    try:
-                        name = rpc.execute('model', self.attrs['relation'],
-                                'name_get', [ids[0]], rpc.CONTEXT)[0]
-                    except Exception, exception:
-                        self.focus_out = True
-                        common.process_exception(exception, self._window)
-                        self.changed = True
-                        return False
-                    self._view.modelfield.set_client(self._view.model, name,
+                    self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
                     self.focus_out = True
                     self.display(self._view.model, self._view.modelfield)
@@ -356,8 +352,10 @@ class Many2One(WidgetInterface):
 
                 try:
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'name_search', self.wid_text.get_text(), domain,
-                            'ilike', context, _LIMIT)
+                            'search',
+                            [('rec_name', 'ilike', self.wid_text.get_text()),
+                                domain],
+                            0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -371,20 +369,12 @@ class Many2One(WidgetInterface):
                     return True
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
-                        ids = [x[0] for x in (ids or [])], context=context,
+                        ids=ids, context=context,
                         domain=domain, parent=self._window,
                         views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
-                    try:
-                        name = rpc.execute('model', self.attrs['relation'],
-                                'name_get', [ids[0]], rpc.CONTEXT)[0]
-                    except Exception, exception:
-                        self.focus_out = True
-                        common.process_exception(exception, self._window)
-                        self.changed = True
-                        return False
-                    self._view.modelfield.set_client(self._view.model, name,
+                    self._view.modelfield.set_client(self._view.model, ids[0],
                             force_change=True)
         self.focus_out = True
         self.display(self._view.model, self._view.modelfield)

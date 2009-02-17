@@ -374,12 +374,12 @@ class Dialog(object):
 
         try:
             ids = rpc.execute('model', self.attrs['relation'],
-                    'name_search', self.wid_text.get_text(), domain, 'ilike',
-                    context, _LIMIT)
+                    'search',
+                    [('rec_name', 'ilike', self.wid_text.get_text()), domaini],
+                    0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False
-        ids = [x[0] for x in ids]
         if len(ids) != 1:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
                     context=context, domain=domain, parent=self._window,
@@ -600,13 +600,13 @@ class One2Many(WidgetInterface):
 
         try:
             ids = rpc.execute('model', self.attrs['relation'],
-                    'name_search', self.wid_text.get_text(),
-                    ['OR', domain, ('id', 'in', removed_ids)], 'ilike',
-                    context, _LIMIT)
+                    'search',
+                    [('rec_name', 'ilike', self.wid_text.get_text()),
+                    ['OR', domain, ('id', 'in', removed_ids)]],
+                    0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False
-        ids = [x[0] for x in ids]
         if len(ids) != 1:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
                     context=context, domain=domain, parent=self._window,

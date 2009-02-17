@@ -487,14 +487,15 @@ class M2O(Char):
         context = model[self.field_name].context_get(model)
 
         try:
-            names = rpc_relation.name_search(text, domain, 'ilike', context)
+            ids = rpc_relation.search([('rec_name', 'ilike', text), domain],
+                    0, None, None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return '???'
-        if len(names) != 1:
-            return self.search_remote(relation, [x[0] for x in names],
+        if len(ids) != 1:
+            return self.search_remote(relation, ids,
                              domain=domain, context=context)[0]
-        return names[0]
+        return ids[0]
 
     def open_remote(self, model, create=True, changed=False, text=None):
         modelfield = model.mgroup.mfields[self.field_name]
@@ -510,14 +511,15 @@ class M2O(Char):
             rpc_relation = RPCProxy(relation)
 
             try:
-                names = rpc_relation.name_search(text, domain, 'ilike', context)
+                ids = rpc_relation.search([('rec_name', 'ilike', text), domain],
+                        0, None, None, context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 return False, False
-            if len(names) == 1:
-                return True, names[0]
-            searched = self.search_remote(relation, [x[0] for x in names],
-                    domain=domain, context=context)
+            if len(ids) == 1:
+                return True, ids[0]
+            searched = self.search_remote(relation, ids, domain=domain,
+                    context=context)
             if searched[0]:
                 return True, searched
             return False, False
@@ -538,7 +540,9 @@ class M2O(Char):
         found = win.run()
         if found:
             try:
-                return rpc_relation.name_get([found[0]], context)[0]
+                name = rpc_relation.read(found[0], ['rec_name'],
+                        context)['rec_name']
+                return found[0], name
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 return False, None
@@ -601,11 +605,11 @@ class M2M(Char):
         domain = model[self.field_name].domain_get(model)
         context = model[self.field_name].context_get(model)
         try:
-            names = rpc_relation.name_search(text, domain, 'ilike', context)
+            ids = rpc_relation.search([('rec_name', 'ilike', text), domain],
+                    0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return []
-        ids = [x[0] for x in names]
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain)
         found = win.go()
@@ -647,9 +651,11 @@ class Selection(Char):
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
             try:
-                selection = rpc.execute('model',
-                        self.attrs['relation'], 'name_search', '',
-                        self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+                result = rpc.execute('model',
+                        self.attrs['relation'], 'search_read',
+                        self.attrs.get('domain', []),
+                        0, None, None, rpc.CONTEXT, ['rec_name'])
+                selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 selection = []
@@ -710,21 +716,18 @@ class Reference(Char):
         if not value:
             model, (obj_id, name) = '', (0, '')
         else:
-            model, obj_id = value
-            name = ''
-            if isinstance(obj_id, (list, tuple)):
-                obj_id, name = obj_id
+            model, (obj_id, name) = value
         if model:
             if not name and obj_id:
                 try:
-                    obj_id, name = RPCProxy(model).name_get(obj_id,
-                            rpc.CONTEXT)[0]
+                    name = RPCProxy(model).read(obj_id, ['rec_name'],
+                            rpc.CONTEXT)['rec_name']
                 except Exception, exception:
                     common.process_exception(exception, self.window)
                     name = '???'
             return self._selection[model] + ',' + name
         else:
-            return ''
+            return name
 
     def value_from_text(self, model, text):
         pass

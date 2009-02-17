@@ -8,6 +8,7 @@ from tryton.gui.window.win_search import WinSearch
 import tryton.rpc as rpc
 from tryton.rpc import RPCProxy
 import tryton.common as common
+from tryton.gui.window.view_form.widget_search.form import _LIMIT
 
 _ = gettext.gettext
 
@@ -151,14 +152,14 @@ class Reference(WidgetInterface):
             except ValueError:
                 self.focus_out = True
                 return False
-        if obj_id:
+        if model and obj_id:
             if not leave:
                 dia = Dialog(model, obj_id, attrs=self.attrs,
                         window=self._window)
                 res, obj_id = dia.run()
                 if res:
                     self._view.modelfield.set_client(self._view.model,
-                            (model, obj_id), force_change=True)
+                            (model, (obj_id, '')), force_change=True)
                 dia.destroy()
         elif model:
             if not self._readonly and ( self.wid_text.get_text() or not leave):
@@ -167,37 +168,32 @@ class Reference(WidgetInterface):
 
                 try:
                     ids = rpc.execute('model', model,
-                            'name_search', self.wid_text.get_text(), domain,
-                            'ilike', context)
+                            'search',
+                            [('rec_name', 'ilike', self.wid_text.get_text()),
+                                domain],
+                            0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True
                     common.process_exception(exception, self._window)
                     return False
                 if ids and len(ids) == 1:
-                    obj_id, name = ids[0]
                     self._view.modelfield.set_client(self._view.model,
-                            (model, [obj_id, name]))
+                            (model, (ids[0], '')))
                     self.display(self._view.model, self._view.modelfield)
                     self.focus_out = True
                     self.changed = True
                     return True
 
-                win = WinSearch(model, sel_multi=False,
-                        ids=[x[0] for x in (ids or [])], context=context,
+                win = WinSearch(model, sel_multi=False, ids=ids, context=context,
                         domain=domain, parent=self._window)
                 ids = win.run()
                 if ids:
-                    try:
-                        obj_id, name = rpc.execute('model', model, 'name_get',
-                                [ids[0]], rpc.CONTEXT)[0]
-                    except Exception, exception:
-                        self.focus_out = True
-                        self.changed = True
-                        common.process_exception(exception, self._window)
-                        return False
                     self._view.modelfield.set_client(self._view.model,
-                            (model, [obj_id, name]))
+                            (model, (ids[0], '')))
+        else:
+            self._view.modelfield.set_client(self._view.model,
+                    ('', (name, name)))
         self.focus_out = True
         self.changed = True
         self.display(self._view.model, self._view.modelfield)
@@ -210,7 +206,7 @@ class Reference(WidgetInterface):
         res, value = dia.run()
         if res:
             self._view.modelfield.set_client(self._view.model,
-                    (model, value))
+                    (model, (value, '')))
             self.display(self._view.model, self._view.modelfield)
         dia.destroy()
 
@@ -235,15 +231,17 @@ class Reference(WidgetInterface):
             return
         self.wid_text.set_text('')
         self._view.modelfield.set_client(self._view.model,
-                (self.get_model(), [0, '']))
+                (self.get_model(), (0, '')))
 
     def sig_changed(self, *args):
         if not self.changed:
             return False
-        val = self._view.modelfield.get(self._view.model)
-        if val:
-            val = int(val.split(',')[1])
-        if val:
+        val = self._view.modelfield.get_client(self._view.model)
+        if not val:
+            model, (obj_id, name) = '', (0, '')
+        else:
+            model, (obj_id, name) = val
+        if self.get_model() and obj_id:
             self._view.modelfield.set_client(self._view.model,
                     (self.get_model(), (0, '')))
             self.display(self._view.model, self._view.modelfield)
@@ -262,16 +260,13 @@ class Reference(WidgetInterface):
         if not value:
             model, (obj_id, name) = '', (0, '')
         else:
-            model, obj_id = value
-            name = ''
-            if isinstance(obj_id, (list, tuple)):
-                obj_id, name = obj_id
+            model, (obj_id, name) = value
         if model:
             child.set_text(self._selection2[model])
             if not name and obj_id:
                 try:
-                    obj_id, name = RPCProxy(model).name_get(obj_id,
-                            rpc.CONTEXT)[0]
+                    name = RPCProxy(model).read(obj_id, ['rec_name'],
+                            rpc.CONTEXT)['rec_name']
                 except Exception, exception:
                     common.process_exception(exception, self._window)
                     name = '???'
@@ -283,7 +278,8 @@ class Reference(WidgetInterface):
                 img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.but_open.set_image(img)
         else:
-            self.wid_text.set_text('')
+            child.set_text('')
+            self.wid_text.set_text(str(name))
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
         self.changed = True

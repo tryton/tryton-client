@@ -38,9 +38,11 @@ class Selection(Interface):
         selection = self.attrs.get('selection', [])
         if 'relation' in self.attrs:
             try:
-                selection = rpc.execute('model',
-                        self.attrs['relation'], 'name_search', '',
-                        self.attrs.get('domain', []), 'ilike', rpc.CONTEXT)
+                result = rpc.execute('model',
+                        self.attrs['relation'], 'search_read',
+                        self.attrs.get('domain', []),
+                        0, None, None, rpc.CONTEXT, ['rec_name'])
+                selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, parent)
                 selection = []

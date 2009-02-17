@@ -311,16 +311,21 @@ class M2OField(CharField):
         return False
 
     def set(self, model, value, modified=False):
-        if value and isinstance(value, (int, basestring, long)):
+        if value and isinstance(value, (int, long)):
             rpc2 = RPCProxy(self.attrs['relation'])
             try:
-                result = rpc2.name_get([value], rpc.CONTEXT)
+                result = rpc2.read(value, ['rec_name'], rpc.CONTEXT)
             except:
                 return
-            value = result[0]
+            value = value, result['rec_name']
         if value and len(value) != 2:
             value = False
-        model.value[self.name] = value
+        else:
+            if value:
+                model.value[self.name + '.rec_name'] = value[1]
+            else:
+                model.value[self.name + '.rec_name'] = ''
+        model.value[self.name] = value or False
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
@@ -391,13 +396,14 @@ class M2MField(CharField):
     def get_default(self, model):
         return self.get_client(model)
 
-    def name_get(self, model):
+    def rec_name(self, model):
         rpc2 = RPCProxy(self.attrs['relation'])
         try:
-            result = rpc2.name_get(self.get_client(model), rpc.CONTEXT)
+            result = rpc2.read(self.get_client(model), ['rec_name'],
+                    rpc.CONTEXT)
         except:
             return self.get_client(model)
-        return ', '.join(dict(result).values())
+        return ', '.join([x['rec_name'] for x in result])
 
 
 class O2MField(CharField):
@@ -606,7 +612,8 @@ class ReferenceField(CharField):
     def set_client(self, model, value, force_change=False):
         internal = model.value[self.name]
         prev_modified = model.modified
-        model.value[self.name] = value
+        #model.value[self.name] = value
+        self.set(model, value)
         if (internal or False) != (model.value[self.name] or False):
             model.modified = True
             model.modified_fields.setdefault(self.name)
@@ -622,23 +629,31 @@ class ReferenceField(CharField):
         if not value:
             model.value[self.name] = False
             return
-        ref_model, ref_id = value.split(',', 1)
-        try:
-            ref_id = eval(ref_id)
-        except:
-            pass
-        if isinstance(ref_id, (int, basestring, long)) and ref_model:
-            rpc2 = RPCProxy(ref_model)
-            try:
-                result = rpc2.name_get([ref_id], rpc.CONTEXT)
-            except:
-                return
-            if result:
-                model.value[self.name] = ref_model, result[0]
+        ref_model, (ref_id, ref_str) = value
+        if ref_model:
+            ref_id = int(ref_id)
+            if not ref_id:
+                ref_str = ''
+            if not ref_str and ref_id:
+                rpc2 = RPCProxy(ref_model)
+                try:
+                    result = rpc2.read(ref_id, ['rec_name'],
+                            rpc.CONTEXT)['rec_name']
+                except:
+                    return
+                if result:
+                    model.value[self.name] = ref_model, (ref_id, result)
+                    model.value[self.name + '.rec_name'] = result
+                else:
+                    model.value[self.name] = ref_model, (0, '')
+                    model.value[self.name + '.rec_name'] = ''
             else:
-                model.value[self.name] = ref_model, (0, '')
+                model.value[self.name] = ref_model, (ref_id, ref_str)
+                model.value[self.name + '.rec_name'] = ref_str
         else:
-            model.value[self.name] = ref_model, ref_id
+            model.value[self.name] = ref_model, (ref_id, ref_id)
+            if self.name + '.rec_name' in model.value:
+                del model.value[self.name + '.rec_name']
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)

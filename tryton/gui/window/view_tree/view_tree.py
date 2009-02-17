@@ -97,16 +97,18 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
             elif field_type in ('many2one',):
                 for obj in res_ids:
                     if obj[field]:
-                        obj[field] = obj[field][1]
+                        obj[field] = obj[field + '.rec_name']
             elif field_type in ('selection'):
                 selection = self.fields_type[field]['selection']
                 if 'relation' in self.fields_type[field]:
                     try:
-                        selection = rpc.execute('model',
+                        result = rpc.execute('model',
                                 self.fields_type[field]['relation'],
-                                'name_search', '',
+                                'search_read',
                                 self.fields_type[field].get('domain', []),
-                                'ilike', rpc.CONTEXT)
+                                0, None, None,
+                                rpc.CONTEXT, ['rec_name'])
+                        selection = [(x['id'], x['rec_name']) for x in result]
                     except:
                         selection = []
                 else:
@@ -145,6 +147,9 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
     def _node_process(self, ids):
         tree = []
         fields = self.fields_type.keys()
+        for field_name in self.fields_type:
+            if self.fields_type[field_name]['type'] == 'many2one':
+                fields.append(field_name + '.rec_name')
         if self.view.get('field_childs', False):
             res = self._read(ids, fields + [self.view['field_childs']])
             for obj in res:

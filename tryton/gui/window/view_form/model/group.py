@@ -175,6 +175,9 @@ class ModelRecordGroup(SignalEvent):
         if self.fields:
             try:
                 values = self.rpc.read(ids[:80], self.fields.keys() + \
+                        [x + '.rec_name' for x in self.fields
+                            if self.fields[x]['type'] in \
+                                    ('many2one', 'reference')] + \
                         ['_timestamp'], ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
@@ -347,7 +350,10 @@ class ModelRecordGroup(SignalEvent):
             ctx.update(rpc.CONTEXT)
             ctx.update(self.context)
             try:
-                values = self.rpc.read(old, to_add, ctx)
+                values = self.rpc.read(old, to_add + \
+                        [x + '.rec_name' for x in to_add
+                            if self.fields[x]['type'] \
+                                    in ('many2one', 'reference')], ctx)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 return False

@@ -77,12 +77,12 @@ class Many2Many(WidgetInterface):
         value = self.wid_text.get_text()
 
         try:
-            ids = rpc.execute('model', self.attrs['relation'], 'name_search',
-                    value, domain, 'ilike', context, _LIMIT)
+            ids = rpc.execute('model', self.attrs['relation'], 'search',
+                    [('rec_name', 'ilike', value), domain], 0, _LIMIT,
+                    None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False
-        ids = [x[0] for x in ids]
         if len(ids) != 1 or not value:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
                     context=context, domain=domain, parent=self._window,
@@ -128,7 +128,7 @@ class Many2Many(WidgetInterface):
         return True
 
     def display_value(self):
-        return self._view.modelfield.name_get(self._view.model)
+        return self._view.modelfield.rec_name(self._view.model)
 
     def set_value(self, model, model_field):
         model_field.set_client(model, [x.id for x in self.screen.models.models])

@@ -1,3 +1,4 @@
+* Display values of reference fields even if there is no model
 * Allow to directly print or create email with reports
 * Handle invisible states on list view
 * Add user warnings

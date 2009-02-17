@@ -75,6 +75,9 @@ class ModelRecord(SignalEvent):
             ctx.update(self.context_get())
             try:
                 values = self.rpc.read(ids, self.mgroup.mfields.keys() + \
+                        [x + '.rec_name' for x in self.mgroup.mfields.keys()
+                            if self.mgroup.fields[x]['type'] \
+                                    in ('many2one', 'reference')] + \
                         ['_timestamp'], ctx)
             except Exception, exception:
                 if str(exception[0]) != 'NotLogged':
@@ -204,12 +207,12 @@ class ModelRecord(SignalEvent):
                 val = self.rpc.default_get(self.mgroup.fields.keys(), context)
             self.set_default(val)
 
-    def name_get(self):
+    def rec_name(self):
         try:
-            name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
+            name = self.rpc.read(self.id, ['rec_name'], rpc.CONTEXT)['rec_name']
         except Exception, exception:
             common.process_exception(exception, self.window)
-            name = self.rpc.name_get([self.id], rpc.CONTEXT)[0]
+            name = self.rpc.read(self.id, ['rec_name'], rpc.CONTEXT)['rec_name']
         return name
 
     def validate_set(self):
@@ -252,6 +255,16 @@ class ModelRecord(SignalEvent):
         for fieldname, value in val.items():
             if fieldname not in self.mgroup.mfields:
                 continue
+            if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+                if fieldname + '.rec_name' in val:
+                    value = (value, val[fieldname + '.rec_name'])
+            elif isinstance(self.mgroup.mfields[fieldname], field.ReferenceField):
+                if value:
+                    ref_model, ref_id = value.split(',', 1)
+                    if fieldname + '.rec_name' in val:
+                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                    else:
+                        value = ref_model, (ref_id, ref_id)
             self.mgroup.mfields[fieldname].set_default(self, value)
         self._loaded = True
         if signal:
@@ -268,6 +281,16 @@ class ModelRecord(SignalEvent):
             if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
                 later[fieldname] = value
                 continue
+            if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+                if fieldname + '.rec_name' in val:
+                    value = (value, val[fieldname + '.rec_name'])
+            elif isinstance(self.mgroup.mfields[fieldname], field.ReferenceField):
+                if value:
+                    ref_model, ref_id = value.split(',', 1)
+                    if fieldname + '.rec_name' in val:
+                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                    else:
+                        value = ref_model, (ref_id, ref_id)
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
         for fieldname, value in later.items():
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
@@ -285,10 +308,16 @@ class ModelRecord(SignalEvent):
         ctx.update(self.context_get())
         try:
             res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
+                    [x + '.rec_name' for x in self.mgroup.mfields.keys()
+                        if self.mgroup.fields[x]['type'] \
+                                in ('many2one', 'reference')] + \
                     ['_timestamp'], ctx)
         except Exception, exception:
             common.process_exception(exception, self.window)
             res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
+                    [x + '.rec_name' for x in self.mgroup.mfields.keys()
+                        if self.mgroup.fields[x]['type'] \
+                                in ('many2one', 'reference')] + \
                     ['_timestamp'], ctx)
         if res:
             value = res[0]
@@ -343,6 +372,18 @@ class ModelRecord(SignalEvent):
                 if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
                     later[fieldname] = value
                     continue
+                if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+                    if fieldname + '.rec_name' in res:
+                        value = (value, res[fieldname + '.rec_name'])
+                elif isinstance(self.mgroup.mfields[fieldname],
+                        field.ReferenceField):
+                    if value:
+                        ref_mode, ref_id = value.split(',', 1)
+                        if fieldname + '.rec_name' in res:
+                            value = ref_model, (ref_id,
+                                    res[fieldname + '.rec_name'])
+                        else:
+                            value = ref_model, (ref_id, ref_id)
                 self.mgroup.mfields[fieldname].set_on_change(self, value)
             for fieldname, value in later.items():
                 self.mgroup.mfields[fieldname].set_on_change(self, value)
