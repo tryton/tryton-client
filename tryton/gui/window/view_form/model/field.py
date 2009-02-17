@@ -320,6 +320,7 @@ class M2OField(CharField):
             value = value, result['rec_name']
         if value and len(value) != 2:
             value = False
+            model.value[self.name + '.rec_name'] = ''
         else:
             if value:
                 model.value[self.name + '.rec_name'] = value[1]
