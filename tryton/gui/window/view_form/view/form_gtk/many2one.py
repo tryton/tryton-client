@@ -243,7 +243,7 @@ class Many2One(WidgetInterface):
         return modelstr.startswith(key_string)
 
     def on_completion_match(self, completion, model, iter):
-        self._view.modelfield.set_client(self._view.model, model[iter][0])
+        self._view.modelfield.set_client(self._view.model, int(model[iter][0]))
         self.display(self._view.model, self._view.modelfield)
         return True
 
