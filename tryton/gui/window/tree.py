@@ -371,7 +371,7 @@ class Tree(SignalEvent):
                 res = rpc.execute('model', self.model, 'read', ids,
                         ['rec_name'], rpc.CONTEXT)
                 for obj in res:
-                    obj_i = obj['id']
+                    obj_id = obj['id']
                     name = obj['rec_name']
                     user = rpc._USER
                     rpc.execute('model', 'ir.ui.view_sc', 'create', {
