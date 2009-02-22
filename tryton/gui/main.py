@@ -1145,11 +1145,13 @@ class Main(object):
     def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
             except_id=False, prefs=None):
         if not prefs:
+            args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
             try:
-                prefs = rpc.execute('model', 'res.user', 'get_preferences',
-                        False, rpc.CONTEXT)
-            except:
-                return False
+                prefs = rpc.execute(*args)
+            except Exception, exception:
+                prefs = common.process_exception(exception, self.window, *args)
+                if not prefs:
+                    return False
         sb_id = self.sb_username.get_context_id('message')
         self.sb_username.push(sb_id, prefs['status_bar'] or '')
         sb_id = self.sb_servername.get_context_id('message')
