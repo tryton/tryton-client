@@ -823,10 +823,12 @@ def process_exception(exception, parent, *args):
                 rpc.execute(*args2)
             except Exception, exception:
                 process_exception(exception, parent, *args2)
-            try:
-                return rpc.execute(*args)
-            except Exception, exception:
-                return process_exception(exception, parent, *args)
+            if args:
+                try:
+                    return rpc.execute(*args)
+                except Exception, exception:
+                    return process_exception(exception, parent, *args)
+            return True
         return False
 
     if exception.args[0] == 'UserError':
