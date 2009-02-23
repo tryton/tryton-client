@@ -90,6 +90,8 @@ class ModelRecordGroup(SignalEvent):
         self.model_deleted = []
         self.on_write = ''
         self.readonly = readonly
+        if self._context.get('_datetime'):
+            self.readonly = True
 
     def __repr__(self):
         return '<ModelRecordGroup %s>' % (self.resource,)

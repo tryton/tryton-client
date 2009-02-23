@@ -1,3 +1,5 @@
+* Handle datetime_field in Many2One
+* Set readonly on records with _datetime in the context
 * Display values of reference fields even if there is no model
 * Allow to directly print or create email with reports
 * Handle invisible states on list view

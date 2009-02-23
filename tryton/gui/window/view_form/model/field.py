@@ -351,6 +351,14 @@ class M2OField(CharField):
             except:
                 model.value[self.name] = internal
 
+    def context_get(self, model, check_load=True, eval_context=True):
+        context = super(M2OField, self).context_get(model,
+                check_load=check_load, eval_context=eval_context)
+        if eval_context and self.attrs.get('datetime_field'):
+            context['_datetime'] = model.get_eval(
+                    check_load=check_load)[self.attrs.get('datetime_field')]
+        return context
+
 
 class M2MField(CharField):
     '''
