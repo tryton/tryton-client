@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
+import pango
 from date_widget import mapping, DateEntry, compute_date
 
 
