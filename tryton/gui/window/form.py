@@ -240,9 +240,9 @@ class Form(SignalEvent):
 
         fields = [
             ('id', _('ID:')),
-            ('create_uid', _('Creation User:')),
+            ('create_uid.rec_name', _('Creation User:')),
             ('create_date', _('Creation Date:')),
-            ('write_uid', _('Latest Modification by:')),
+            ('write_uid.rec_name', _('Latest Modification by:')),
             ('write_date', _('Latest Modification Date:')),
         ]
 
@@ -256,9 +256,6 @@ class Form(SignalEvent):
         message_str = ''
         for line in res:
             for (key, val) in fields:
-                if line.get(key, False) and \
-                        (key in ('create_uid', 'write_uid')):
-                    line[key] = line[key][1]
                 value = str(line.get(key, False) or '/')
                 if line.get(key, False) \
                         and key in ('create_date', 'write_date'):
