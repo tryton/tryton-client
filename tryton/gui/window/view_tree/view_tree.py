@@ -63,6 +63,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     res_ids.append(val)
                     if obj_id not in self.to_reload:
                         self.to_reload.append(obj_id)
+        res_ids.sort(lambda x, y: cmp(ids.index(x['id']), ids.index(y['id'])))
         for field in self.fields:
             field_type = self.fields_type[field]['type']
             if field in self.fields_attrs \

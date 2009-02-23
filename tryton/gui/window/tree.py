@@ -184,6 +184,8 @@ class Tree(SignalEvent):
                 results = common.process_exception(exception, self.window, *args)
                 if not results:
                     return
+            results.sort(lambda x, y: cmp(ids.index(x['id']),
+                ids.index(y['id'])))
             radiotb = None
             for res in results:
                 radiotb = gtk.RadioToolButton(group=radiotb)
