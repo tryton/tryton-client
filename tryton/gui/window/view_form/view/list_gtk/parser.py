@@ -25,6 +25,8 @@ from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common.cellrenderercombo import CellRendererCombo
+from tryton.common.cellrendererinteger import CellRendererInteger
+from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.action import Action
 from tryton.translate import date_format
 import mx.DateTime
@@ -325,6 +327,12 @@ class Char(object):
 
 class Int(Char):
 
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        super(Int, self).__init__(field_name, model, treeview=treeview,
+                attrs=attrs, window=window)
+        self.renderer = CellRendererInteger()
+
     def value_from_text(self, model, text):
         return int(text)
 
@@ -432,7 +440,24 @@ class Datetime(Date):
                 pass
         return date.strftime(self.server_format)
 
+
 class Float(Char):
+
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        super(Float, self).__init__(field_name, model, treeview=treeview,
+                attrs=attrs, window=window)
+        self.renderer = CellRendererFloat()
+
+    def setter(self, column, cell, store, iter):
+        super(Float, self).setter(column, cell, store, iter)
+        model = store.get_value(iter, 0)
+        if isinstance(self.attrs.get('digits'), str):
+            digits = model.expr_eval(self.attrs['digits'])
+        else:
+            digits = self.attrs.get('digits', (16, 2))
+        cell.digits = digits
+
     def get_textual_value(self, model):
         if isinstance(self.attrs.get('digits'), str):
             digit = model.expr_eval(self.attrs['digits'])[1]
