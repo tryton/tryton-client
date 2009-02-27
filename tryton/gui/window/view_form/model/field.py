@@ -319,14 +319,14 @@ class M2OField(CharField):
                 return
             value = value, result['rec_name']
         if value and len(value) != 2:
-            value = False
+            value = (False, '')
             model.value[self.name + '.rec_name'] = ''
         else:
             if value:
                 model.value[self.name + '.rec_name'] = value[1]
             else:
                 model.value[self.name + '.rec_name'] = ''
-        model.value[self.name] = value or False
+        model.value[self.name] = value or (False, '')
         if modified:
             model.modified = True
             model.modified_fields.setdefault(self.name)
@@ -335,7 +335,7 @@ class M2OField(CharField):
         internal = model.value[self.name]
         prev_modified = model.modified
         self.set(model, value)
-        if internal != model.value[self.name]:
+        if (internal[0] or False) != (model.value[self.name][0] or False):
             model.modified = True
             model.modified_fields.setdefault(self.name)
             try:
