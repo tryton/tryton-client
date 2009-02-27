@@ -917,7 +917,7 @@ class Main(object):
             'but_attach': _('Add an attachment to the record'),
         }
         for i in self.buttons:
-            self.buttons[i].set_label(labels[i][0])
+            self.buttons[i].set_label(labels[i])
             self.tooltips.set_tip(self.buttons[i], tooltips[i])
 
     @staticmethod
