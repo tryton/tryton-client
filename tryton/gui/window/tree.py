@@ -74,7 +74,8 @@ class Tree(SignalEvent):
         toolbar = gtk.Toolbar()
         toolbar.set_style(gtk.TOOLBAR_ICONS)
         toolitem = gtk.ToolItem()
-        toolitem.add(gtk.Label(_('Shortcuts')))
+        self.toolitem_label = gtk.Label()
+        toolitem.add(self.toolitem_label)
         toolbar.insert(toolitem, -1)
         addbutton = gtk.ToolButton('tryton-list-add')
         addbutton.connect('clicked', self.sc_add)
@@ -158,6 +159,7 @@ class Tree(SignalEvent):
             selection.select_path((0))
 
     def sig_reload(self, widget=None):
+        self.toolitem_label.set_text(_('Shortcuts'))
         try:
             ctx = {}
             ctx.update(self.context)

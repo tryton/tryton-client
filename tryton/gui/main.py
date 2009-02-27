@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import os
 import gettext
 import urlparse
@@ -96,130 +97,29 @@ class Main(object):
         toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
         toolbar.set_style(gtk.TOOLBAR_BOTH)
 
-        vbox = gtk.VBox()
-        self.window.add(vbox)
+        self.vbox = gtk.VBox()
+        self.window.add(self.vbox)
 
-        menubar = gtk.MenuBar()
-        vbox.pack_start(menubar, False, True)
+        self.menubar = None
+        self.menuitem_user = None
+        self.menuitem_form = None
+        self.menuitem_plugins = None
+        self.set_menubar()
 
-        menuitem_file = gtk.MenuItem(_('_File'))
-        menubar.add(menuitem_file)
-
-        menu_file = self._set_menu_file()
-        menuitem_file.set_submenu(menu_file)
-        menu_file.set_accel_group(self.accel_group)
-        menu_file.set_accel_path('<tryton>/File')
-
-        menuitem_user = gtk.MenuItem(_('_User'))
-        self.menuitem_user = menuitem_user
-        menuitem_user.set_sensitive(False)
-        menubar.add(menuitem_user)
-
-        menu_user = self._set_menu_user()
-        menuitem_user.set_submenu(menu_user)
-        menu_user.set_accel_group(self.accel_group)
-        menu_user.set_accel_path('<tryton>/User')
-
-        menuitem_form = gtk.MenuItem(_('For_m'))
-        self.menuitem_form = menuitem_form
-        menuitem_form.set_sensitive(False)
-        menubar.add(menuitem_form)
-
-        menu_form = self._set_menu_form()
-        menuitem_form.set_submenu(menu_form)
-        menu_form.set_accel_group(self.accel_group)
-        menu_form.set_accel_path('<tryton>/Form')
-
-        menuitem_options = gtk.MenuItem(_('_Options'))
-        menubar.add(menuitem_options)
-
-        menu_options = self._set_menu_options()
-        menuitem_options.set_submenu(menu_options)
-        menu_options.set_accel_group(self.accel_group)
-        menu_options.set_accel_path('<tryton>/Options')
-
-        menuitem_plugins = gtk.MenuItem(_('_Plugins'))
-        self.menuitem_plugins = menuitem_plugins
-        self.menuitem_plugins.set_sensitive(False)
-        menubar.add(menuitem_plugins)
-
-        menu_plugins = self._set_menu_plugins()
-        menuitem_plugins.set_submenu(menu_plugins)
-        menu_plugins.set_accel_group(self.accel_group)
-        menu_plugins.set_accel_path('<tryton>/Plugins')
-
-        menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
-        self.menuitem_shortcut = menuitem_shortcut
-        self.menuitem_shortcut.set_sensitive(False)
-        menubar.add(menuitem_shortcut)
-        menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
-
-        menuitem_help = gtk.MenuItem(_('_Help'))
-        menubar.add(menuitem_help)
-
-        menu_help = self._set_menu_help()
-        menuitem_help.set_submenu(menu_help)
-        menu_help.set_accel_group(self.accel_group)
-        menu_help.set_accel_path('<tryton>/Help')
-
-        vbox.pack_start(toolbar, False, True)
+        self.vbox.pack_start(toolbar, False, True)
 
         self.buttons = {}
         self._set_toolbar()
+        self.set_toolbar_label()
 
         self.notebook = gtk.Notebook()
         self.notebook.popup_enable()
         self.notebook.set_scrollable(True)
         self.notebook.connect_after('switch-page', self._sig_page_changt)
-        vbox.pack_start(self.notebook, True, True)
+        self.vbox.pack_start(self.notebook, True, True)
 
-        self.status_hbox = gtk.HBox(spacing=2)
-        vbox.pack_start(self.status_hbox, False, True, padding=2)
-
-        self.sb_servername = gtk.Statusbar()
-        self.sb_servername.set_size_request(150, -1)
-        self.sb_servername.set_has_resize_grip(False)
-        self.status_hbox.pack_start(self.sb_servername, True, True)
-        sb_id = self.sb_servername.get_context_id('message')
-        self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
-
-        self.sb_username = gtk.Statusbar()
-        self.sb_username.set_size_request(130, -1)
-        self.sb_username.set_has_resize_grip(False)
-        self.status_hbox.pack_start(self.sb_username, True, True)
-
-        self.status_hbox.pack_start(gtk.Label(_('Requests:')), False, True)
-
-        self.sb_requests = gtk.Statusbar()
-        self.sb_requests.set_size_request(130, -1)
-        self.sb_requests.set_has_resize_grip(False)
-        self.status_hbox.pack_start(self.sb_requests, True, True)
-
-        button_request_new = gtk.Button()
-        self.button_request_new = button_request_new
-        image = gtk.Image()
-        image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
-        button_request_new.set_image(image)
-        button_request_new.set_relief(gtk.RELIEF_NONE)
-        button_request_new.connect('clicked', self.sig_request_new)
-        button_request_new.set_sensitive(False)
-        self.tooltips.set_tip(button_request_new, _('Send a new request'))
-        self.status_hbox.pack_start(button_request_new, False, True)
-
-        button_request_search = gtk.Button()
-        self.button_request_search = button_request_search
-        image = gtk.Image()
-        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
-        button_request_search.set_image(image)
-        button_request_search.set_relief(gtk.RELIEF_NONE)
-        button_request_search.connect('clicked', self.sig_request_open)
-        button_request_search.set_sensitive(False)
-        self.tooltips.set_tip(button_request_search, _('Read my Requests'))
-        self.status_hbox.pack_start(button_request_search, False, True)
-
-        self.secure_img = gtk.Image()
-        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
-        self.status_hbox.pack_start(self.secure_img, False, True)
+        self.status_hbox = None
+        self.set_statusbar()
 
         self.window.show_all()
 
@@ -249,6 +149,151 @@ class Main(object):
         # Adding a timer the check to requests
         gobject.timeout_add(5 * 60 * 1000, self.request_set)
         _MAIN.append(self)
+
+    def set_menubar(self):
+        if self.menubar:
+            self.menubar.destroy()
+        menubar = gtk.MenuBar()
+        self.menubar = menubar
+        self.vbox.pack_start(menubar, False, True)
+        self.vbox.reorder_child(menubar, 0)
+
+        menuitem_file = gtk.MenuItem(_('_File'))
+        menubar.add(menuitem_file)
+
+        menu_file = self._set_menu_file()
+        menuitem_file.set_submenu(menu_file)
+        menu_file.set_accel_group(self.accel_group)
+        menu_file.set_accel_path('<tryton>/File')
+
+        menuitem_user = gtk.MenuItem(_('_User'))
+        if self.menuitem_user:
+            menuitem_user.set_sensitive(
+                    self.menuitem_user.get_property('sensitive'))
+        else:
+            menuitem_user.set_sensitive(False)
+        self.menuitem_user = menuitem_user
+        menubar.add(menuitem_user)
+
+        menu_user = self._set_menu_user()
+        menuitem_user.set_submenu(menu_user)
+        menu_user.set_accel_group(self.accel_group)
+        menu_user.set_accel_path('<tryton>/User')
+
+        menuitem_form = gtk.MenuItem(_('For_m'))
+        if self.menuitem_form:
+            menuitem_form.set_sensitive(
+                    self.menuitem_form.get_property('sensitive'))
+        else:
+            menuitem_form.set_sensitive(False)
+        self.menuitem_form = menuitem_form
+        menubar.add(menuitem_form)
+
+        menu_form = self._set_menu_form()
+        menuitem_form.set_submenu(menu_form)
+        menu_form.set_accel_group(self.accel_group)
+        menu_form.set_accel_path('<tryton>/Form')
+
+        menuitem_options = gtk.MenuItem(_('_Options'))
+        menubar.add(menuitem_options)
+
+        menu_options = self._set_menu_options()
+        menuitem_options.set_submenu(menu_options)
+        menu_options.set_accel_group(self.accel_group)
+        menu_options.set_accel_path('<tryton>/Options')
+
+        menuitem_plugins = gtk.MenuItem(_('_Plugins'))
+        if self.menuitem_plugins:
+            menuitem_plugins.set_sensitive(
+                    self.menuitem_plugins.get_property('sensitive'))
+        else:
+            menuitem_plugins.set_sensitive(False)
+        self.menuitem_plugins = menuitem_plugins
+        menubar.add(menuitem_plugins)
+
+        menu_plugins = self._set_menu_plugins()
+        menuitem_plugins.set_submenu(menu_plugins)
+        menu_plugins.set_accel_group(self.accel_group)
+        menu_plugins.set_accel_path('<tryton>/Plugins')
+
+        menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
+        self.menuitem_shortcut = menuitem_shortcut
+        self.menuitem_shortcut.set_sensitive(False)
+        menubar.add(menuitem_shortcut)
+        menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
+
+        menuitem_help = gtk.MenuItem(_('_Help'))
+        menubar.add(menuitem_help)
+
+        menu_help = self._set_menu_help()
+        menuitem_help.set_submenu(menu_help)
+        menu_help.set_accel_group(self.accel_group)
+        menu_help.set_accel_path('<tryton>/Help')
+
+        self.menubar.show_all()
+
+    def set_statusbar(self):
+        update = True
+        if not self.status_hbox:
+            self.status_hbox = gtk.HBox(spacing=2)
+            update = False
+            self.vbox.pack_end(self.status_hbox, False, True, padding=2)
+
+        if not update:
+            self.sb_servername = gtk.Statusbar()
+            self.sb_servername.set_size_request(150, -1)
+            self.sb_servername.set_has_resize_grip(False)
+            self.status_hbox.pack_start(self.sb_servername, True, True)
+
+        if not update:
+            self.sb_username = gtk.Statusbar()
+            self.sb_username.set_size_request(130, -1)
+            self.sb_username.set_has_resize_grip(False)
+            self.status_hbox.pack_start(self.sb_username, True, True)
+
+        if update:
+            self.status_hbox_label.destroy()
+        self.status_hbox_label = gtk.Label(_('Requests:'))
+        self.status_hbox.pack_start(self.status_hbox_label, False, True)
+        self.status_hbox.reorder_child(self.status_hbox_label, 0)
+
+        if not update:
+            self.sb_requests = gtk.Statusbar()
+            self.sb_requests.set_size_request(130, -1)
+            self.sb_requests.set_has_resize_grip(False)
+            self.status_hbox.pack_start(self.sb_requests, True, True)
+
+        if not update:
+            button_request_new = gtk.Button()
+            self.button_request_new = button_request_new
+            image = gtk.Image()
+            image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
+            button_request_new.set_image(image)
+            button_request_new.set_relief(gtk.RELIEF_NONE)
+            button_request_new.connect('clicked', self.sig_request_new)
+            button_request_new.set_sensitive(False)
+            self.status_hbox.pack_start(button_request_new, False, True)
+        self.tooltips.set_tip(self.button_request_new, _('Send a new request'))
+
+        if not update:
+            button_request_search = gtk.Button()
+            self.button_request_search = button_request_search
+            image = gtk.Image()
+            image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
+            button_request_search.set_image(image)
+            button_request_search.set_relief(gtk.RELIEF_NONE)
+            button_request_search.connect('clicked', self.sig_request_open)
+            button_request_search.set_sensitive(False)
+            self.status_hbox.pack_start(button_request_search, False, True)
+        self.tooltips.set_tip(self.button_request_search, _('Read my Requests'))
+
+        if not update:
+            self.secure_img = gtk.Image()
+            self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
+            self.status_hbox.pack_start(self.secure_img, False, True)
+
+        if not update:
+            self.status_hbox.show_all()
 
     def _set_menu_file(self):
         menu_file = gtk.Menu()
@@ -770,100 +815,110 @@ class Main(object):
     def _set_toolbar(self):
         toolbutton_new = gtk.ToolButton('tryton-new')
         toolbutton_new.set_use_underline(True)
-        toolbutton_new.set_label(_('_New'))
         self.toolbar.insert(toolbutton_new, -1)
         toolbutton_new.connect('clicked', self._sig_child_call, 'but_new')
-        self.tooltips.set_tip(toolbutton_new, _('Create a new record'))
         self.buttons['but_new'] = toolbutton_new
 
         toolbutton_save = gtk.ToolButton('tryton-save')
         toolbutton_save.set_use_underline(True)
-        toolbutton_save.set_label(_('_Save'))
         self.toolbar.insert(toolbutton_save, -1)
         toolbutton_save.connect('clicked', self._sig_child_call, 'but_save')
-        self.tooltips.set_tip(toolbutton_save, _('Save this record'))
         self.buttons['but_save'] = toolbutton_save
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         toolbutton_remove = gtk.ToolButton('tryton-delete')
         toolbutton_remove.set_use_underline(True)
-        toolbutton_remove.set_label(_('_Delete'))
         self.toolbar.insert(toolbutton_remove, -1)
         toolbutton_remove.connect('clicked', self._sig_child_call, 'but_remove')
-        self.tooltips.set_tip(toolbutton_remove, _('Delete this record'))
         self.buttons['but_remove'] = toolbutton_remove
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         toolbutton_search = gtk.ToolButton('tryton-find')
         toolbutton_search.set_use_underline(True)
-        toolbutton_search.set_label(_('_Find'))
         self.toolbar.insert(toolbutton_search, -1)
         toolbutton_search.connect('clicked', self._sig_child_call, 'but_search')
-        self.tooltips.set_tip(toolbutton_search, _('Find records'))
         self.buttons['but_search'] = toolbutton_search
 
         toolbutton_previous = gtk.ToolButton('tryton-go-previous')
-        toolbutton_previous.set_label(_('Previous'))
         self.toolbar.insert(toolbutton_previous, -1)
-        self.tooltips.set_tip(toolbutton_previous, _('Previous Record'))
         toolbutton_previous.connect('clicked', self._sig_child_call, 'but_previous')
         self.buttons['but_previous'] = toolbutton_previous
 
         toolbutton_next = gtk.ToolButton('tryton-go-next')
-        toolbutton_next.set_label(_('Next'))
         self.toolbar.insert(toolbutton_next, -1)
-        self.tooltips.set_tip(toolbutton_next, _('Next Record'))
         toolbutton_next.connect('clicked', self._sig_child_call, 'but_next')
         self.buttons['but_next'] = toolbutton_next
 
         toolbutton_switch = gtk.ToolButton('tryton-fullscreen')
-        toolbutton_switch.set_label(_('Switch'))
         self.toolbar.insert(toolbutton_switch, -1)
         toolbutton_switch.connect('clicked', self._sig_child_call, 'but_switch')
-        self.tooltips.set_tip(toolbutton_switch, _('Switch view'))
         self.buttons['but_switch'] = toolbutton_switch
 
         toolbutton_reload = gtk.ToolButton('tryton-refresh')
         toolbutton_reload.set_use_underline(True)
-        toolbutton_reload.set_label(_('_Reload'))
         self.toolbar.insert(toolbutton_reload, -1)
         toolbutton_reload.connect('clicked', self._sig_child_call, 'but_reload')
-        self.tooltips.set_tip(toolbutton_reload, _('Reload'))
         self.buttons['but_reload'] = toolbutton_reload
 
         toolbutton_menu = gtk.ToolButton('tryton-start-here')
         self.toolbutton_menu = toolbutton_menu
-        toolbutton_menu.set_label(_('Menu'))
         self.toolbar.insert(toolbutton_menu, -1)
-        self.tooltips.set_tip(toolbutton_menu, _('Menu'))
         toolbutton_menu.connect('clicked', self.sig_win_menu)
+        self.buttons['but_menu'] = toolbutton_menu
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         toolbutton_action = gtk.ToolButton('tryton-executable')
-        toolbutton_action.set_label(_('Action'))
         self.toolbar.insert(toolbutton_action, -1)
-        self.tooltips.set_tip(toolbutton_action, _('Action'))
         toolbutton_action.connect('clicked', self._sig_child_call, 'but_action')
         self.buttons['but_action'] = toolbutton_action
 
         toolbutton_print = gtk.ToolButton('tryton-print')
-        toolbutton_print.set_label(_('Print'))
         self.toolbar.insert(toolbutton_print, -1)
-        self.tooltips.set_tip(toolbutton_print, _('Print'))
         toolbutton_print.connect('clicked', self._sig_child_call, 'but_print')
         self.buttons['but_print'] = toolbutton_print
 
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         toolbutton_attach = gtk.ToolButton('tryton-attachment')
-        toolbutton_attach.set_label(_('Attachment(0)'))
         self.toolbar.insert(toolbutton_attach, -1)
         toolbutton_attach.connect('clicked', self._sig_child_call, 'but_attach')
-        self.tooltips.set_tip(toolbutton_attach, _('Add an attachment to the record'))
         self.buttons['but_attach'] = toolbutton_attach
+
+    def set_toolbar_label(self):
+        labels = {
+            'but_new': _('_New'),
+            'but_save': _('_Save'),
+            'but_remove': _('_Delete'),
+            'but_search': _('_Find'),
+            'but_previous': _('Previous'),
+            'but_next': _('Next'),
+            'but_switch': _('Switch'),
+            'but_reload': _('_Reload'),
+            'but_menu': _('Menu'),
+            'but_action': _('Action'),
+            'but_print': _('Print'),
+            'but_attach': _('Attachment(0)'),
+        }
+        tooltips = {
+            'but_new': _('Create a new record'),
+            'but_save': _('Save this record'),
+            'but_remove': _('Delete this record'),
+            'but_search': _('Find records'),
+            'but_previous': _('Previous Record'),
+            'but_next': _('Next Record'),
+            'but_switch': _('Switch view'),
+            'but_reload': _('Reload'),
+            'but_menu': _('Menu'),
+            'but_action': _('Action'),
+            'but_print': _('Print'),
+            'but_attach': _('Add an attachment to the record'),
+        }
+        for i in self.buttons:
+            self.buttons[i].set_label(labels[i][0])
+            self.tooltips.set_tip(self.buttons[i], tooltips[i])
 
     @staticmethod
     def get_main():
@@ -965,6 +1020,13 @@ class Main(object):
             self.sb_username.push(sb_id, prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
+                if CONFIG['client.lang'] != prefs['language']:
+                    self.set_menubar()
+                    self.set_toolbar_label()
+                    self.shortcut_set()
+                    self.set_statusbar()
+                    self.request_set()
+                    self.sig_reload_menu()
                 CONFIG['client.lang'] = prefs['language']
                 CONFIG.save()
         self.window.present()
@@ -1129,6 +1191,9 @@ class Main(object):
         for page in range(len(self.pages)):
             if self.pages[page].model == 'ir.ui.menu':
                 self.pages[page].sig_reload()
+                hbox = self.notebook.get_tab_label(self.pages[page].widget)
+                label = hbox.get_children()[0]
+                label.set_text(_('Menu'))
                 res = True
         return res
 
@@ -1213,6 +1278,8 @@ class Main(object):
         self.pages.append(page)
         hbox = gtk.HBox()
         name = page.name
+        if page.model == 'ir.ui.menu':
+            name = _('Menu')
         label = gtk.Label(name)
         self.tooltips.set_tip(label, page.name)
         self.tooltips.enable()
@@ -1257,6 +1324,8 @@ class Main(object):
         if not view:
             view = self._wid_get()
         for i in self.buttons:
+            if i == 'but_menu':
+                continue
             if self.buttons[i]:
                 self.buttons[i].set_sensitive(
                         bool(view and (i in view.handlers)))
