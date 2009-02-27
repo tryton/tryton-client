@@ -3,6 +3,7 @@
 import gtk
 from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
+from one2many import Dialog
 import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
@@ -57,7 +58,8 @@ class Many2Many(WidgetInterface):
         self.widget.pack_start(hbox, expand=False, fill=False)
 
         self.screen = Screen(attrs['relation'], self._window,
-                view_type=['tree'], views_preload=attrs.get('views', {}))
+                view_type=['tree'], views_preload=attrs.get('views', {}),
+                row_activate=self._on_activate)
 
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
@@ -107,6 +109,25 @@ class Many2Many(WidgetInterface):
     def _sig_activate(self, *args):
         self._sig_add()
         self.wid_text.grab_focus()
+
+    def _on_activate(self):
+        self._sig_edit()
+
+    def _sig_edit(self):
+        if self.screen.current_model:
+            readonly = False
+            domain = []
+            if self._view.modelfield and self._view.model:
+                modelfield = self._view.modelfield
+                model = self._view.model
+                readonly = modelfield.get_state_attrs(model
+                        ).get('readonly', False)
+                domain = modelfield.domain_get(self._view.model)
+            dia = Dialog(self.attrs['relation'], parent=self._view.model,
+                    model=self.screen.current_model, attrs=self.attrs,
+                    window=self._window, readonly=readonly, domain=domain)
+            res, value = dia.run()
+            dia.destroy()
 
     def _readonly_set(self, value):
         super(Many2Many, self)._readonly_set(value)

@@ -1,3 +1,4 @@
+* Add edition on Many2Many
 * Fix open in csv export to use file actions
 * Update client labels at language change
 * Handle datetime_field in Many2One
