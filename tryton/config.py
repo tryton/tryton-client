@@ -86,6 +86,8 @@ class ConfigManager(object):
                 'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
                     'kpdf', 'epdfview', 'acroread'], '%s'), 1: ''},
                 'png': {0: find_path(['display', 'qiv', 'eye'], '%s'), 1: ''},
+                'csv': {0: find_path(['ooffice', 'ooffice2'], '%s'),
+                    1: find_path(['ooffice', 'ooffice2'], '-p %s')},
                 },
             'client.email': '',
             'roundup.url': 'http://bugs.tryton.org/roundup/',

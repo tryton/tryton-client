@@ -8,6 +8,8 @@ import tryton.rpc as rpc
 import types
 from tryton.config import TRYTON_ICON
 import csv
+import tempfile
+import os
 
 _ = gettext.gettext
 
@@ -138,8 +140,8 @@ class WinExport(object):
 
         combo_saveas = gtk.combo_box_new_text()
         hbox_options.pack_start(combo_saveas, True, True, 0)
-        combo_saveas.append_text(_("Open in Excel"))
-        combo_saveas.append_text(_("Save as CSV"))
+        combo_saveas.append_text(_("Open"))
+        combo_saveas.append_text(_("Save"))
         vseparator_options = gtk.VSeparator()
         hbox_options.pack_start(vseparator_options, False, False, 10)
 
@@ -226,7 +228,7 @@ class WinExport(object):
 
         self.wid_action = combo_saveas
         self.wid_write_field_names = checkbox_add_field_names
-        self.wid_action.set_active(1)
+        self.wid_action.set_active(0)
 
         # Creating the predefined export view
         self.pref_export = gtk.TreeView()
@@ -363,7 +365,11 @@ class WinExport(object):
                     context=self.context)
 
             if action == 0:
-                pass
+                fileno, fname = tempfile.mkstemp('.csv', 'tryton_')
+                self.export_csv(fname, fields2, result,
+                        self.wid_write_field_names.get_active(), popup=False)
+                common.file_open(fname, 'csv', self.parent)
+                os.close(fileno)
             else:
                 fname = common.file_selection(_('Save As...'),
                         parent=self.parent,
@@ -377,7 +383,7 @@ class WinExport(object):
             self.dialog.destroy()
             return False
 
-    def export_csv(self, fname, fields, result, write_title=False):
+    def export_csv(self, fname, fields, result, write_title=False, popup=True):
         try:
             file_p = file(fname, 'wb+')
             writer = csv.writer(file_p)
@@ -392,12 +398,13 @@ class WinExport(object):
                         row.append(val)
                 writer.writerow(row)
             file_p.close()
-            if len(result) == 1:
-                common.message(_('%d record saved!') % len(result),
-                        self.parent)
-            else:
-                common.message(_('%d records saved!') % len(result),
-                        self.parent)
+            if popup:
+                if len(result) == 1:
+                    common.message(_('%d record saved!') % len(result),
+                            self.parent)
+                else:
+                    common.message(_('%d records saved!') % len(result),
+                            self.parent)
             return True
         except Exception, exception:
             common.warning(_("Operation failed!\nError message:\n%s") \

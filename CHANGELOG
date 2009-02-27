@@ -1,3 +1,4 @@
+* Fix open in csv export to use file actions
 * Update client labels at language change
 * Handle datetime_field in Many2One
 * Set readonly on records with _datetime in the context
