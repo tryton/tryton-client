@@ -89,7 +89,7 @@ class Selection(WidgetInterface):
     def value_get(self):
         child = self.entry.get_child()
         res = child.get_text()
-        return self._selection.get(res, False)
+        return self._selection.get(res, False), res
 
     def sig_key_press(self, widget, event):
         if event.type == gtk.gdk.KEY_PRESS \
