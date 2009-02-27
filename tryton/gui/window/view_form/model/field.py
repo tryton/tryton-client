@@ -289,7 +289,7 @@ class M2OField(CharField):
     '''
 
     def create(self, model):
-        return False
+        return (False, '')
 
     def get(self, model, check_load=True, readonly=True, modified=False):
         if model.value[self.name]:
