@@ -8,3 +8,4 @@
 - Add tip on shortcut customize
 - Add domain on char, date, float and interger widgets
 - Allow to set default for search field depending of the view id and the action
+- Make export windows load relation fields when expanded
