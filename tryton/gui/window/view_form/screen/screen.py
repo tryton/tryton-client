@@ -307,8 +307,6 @@ class Screen(SignalEvent):
             if node.nodeType == node.ELEMENT_NODE:
                 if node.localName == 'field':
                     attrs = node_attributes(node)
-                    if attrs.get('widget', False):
-                        attrs['type'] = attrs['widget']
                     fields[str(attrs['name'])].update(attrs)
             for node2 in node.childNodes:
                 _parse_fields(node2, fields)
