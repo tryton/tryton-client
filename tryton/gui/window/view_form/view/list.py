@@ -266,7 +266,7 @@ class ViewList(ParserView):
             return False
         email = {}
         if 'email' in action:
-            email = self.screen.current_model.expr_eval(action['email'])
+            email = self.screen.current_model.expr_eval(action['email'] or '')
             if not email:
                 email = {}
         email['subject'] = action['name'].replace('_', '')
