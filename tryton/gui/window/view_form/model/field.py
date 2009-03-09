@@ -57,7 +57,7 @@ class CharField(object):
     def validate(self, model):
         res = True
         if bool(int(self.get_state_attrs(model).get('required') or 0)):
-            if not model.value[self.name] \
+            if not self.get(model) \
                     and not bool(int(self.get_state_attrs(model
                         ).get('readonly') or 0)):
                 res = False
