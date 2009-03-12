@@ -350,6 +350,8 @@ class M2OField(CharField):
                 self.sig_changed(model)
             except:
                 model.value[self.name] = internal
+                return
+            model.signal('record-changed', model)
 
     def context_get(self, model, check_load=True, eval_context=True):
         context = super(M2OField, self).context_get(model,
