@@ -82,7 +82,7 @@ class Button(object):
                             }, self.form.window, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
-                self.form.screen.reload()
+                self.form.screen.reload(writen=True)
         else:
             if self.form.screen.form:
                 self.form.screen.form.message_info(

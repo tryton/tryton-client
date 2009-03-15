@@ -109,17 +109,23 @@ class ModelRecordGroup(SignalEvent):
             saved = model.save()
             self.writen(saved)
 
-    def writen(self, edited_id):
-        ids = self.on_write_ids([edited_id])
+    def writen(self, ids):
+        if isinstance(ids, (int, long)):
+            ids = [ids]
+        ids = self.on_write_ids(ids)
         if not ids:
             return
         self.reload(ids)
+        return ids
 
     def reload(self, ids):
+        models = []
         for obj_id in ids:
             for model in self.models:
-                if model.id == obj_id:
-                    model.reload()
+                if model.id == obj_id and not model.modified:
+                    models.append(model)
+        for model in models:
+            model._loaded = False
 
     def on_write_ids(self, ids):
         if not self.on_write:
