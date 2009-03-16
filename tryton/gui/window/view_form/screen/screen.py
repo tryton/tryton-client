@@ -385,7 +385,8 @@ class Screen(SignalEvent):
         return position
 
     def set_on_write(self, func_name):
-        self.models.on_write.add(func_name)
+        if func_name:
+            self.models.on_write.add(func_name)
 
     def cancel_current(self):
         if self.current_model:
