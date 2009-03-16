@@ -88,7 +88,7 @@ class ModelRecordGroup(SignalEvent):
         self.load(ids)
         self.model_removed = []
         self.model_deleted = []
-        self.on_write = ''
+        self.on_write = set()
         self.readonly = readonly
         if self._context.get('_datetime'):
             self.readonly = True
@@ -130,12 +130,14 @@ class ModelRecordGroup(SignalEvent):
     def on_write_ids(self, ids):
         if not self.on_write:
             return False
-        try:
-            res = getattr(self.rpc, self.on_write)(ids, self.context)
-        except Exception, exception:
-            common.process_exception(exception, self.window)
-            return False
-        return res
+        res = []
+        for fnct in self.on_write:
+            try:
+                res += getattr(self.rpc, fnct)(ids, self.context)
+            except Exception, exception:
+                common.process_exception(exception, self.window)
+                return False
+        return list({}.fromkeys(res))
 
     def _load_for(self, values):
         if len(values)>10:
