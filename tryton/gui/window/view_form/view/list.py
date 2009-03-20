@@ -181,13 +181,14 @@ class ViewList(ParserView):
             hbox = gtk.HBox()
             self.widget.pack_start(hbox, expand=False, fill=False)
 
+            gtktoolbar = gtk.Toolbar()
+            gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+            gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
+            hbox.pack_start(gtktoolbar, True, True)
+
             for icontype in ('print', 'action'):
                 if not toolbar[icontype]:
                     continue
-                gtktoolbar = gtk.Toolbar()
-                gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-                gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
-                hbox.pack_start(gtktoolbar, True, True)
 
                 for tool in toolbar[icontype]:
                     iconstock = {

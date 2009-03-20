@@ -85,16 +85,16 @@ class ViewForm(ParserView):
         self.widget.pack_start(self.viewport, expand=True, fill=True)
 
         if toolbar and not CONFIG['client.modepda']:
-            hbox = gtk.HBox()
+            hbox = gtk.HBox(homogeneous=False)
             self.widget.pack_start(hbox, False, False)
 
+            gtktoolbar = gtk.Toolbar()
+            gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+            gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
+            hbox.pack_start(gtktoolbar, expand=True, fill=True)
             for icontype in ('print', 'action', 'relate'):
                 if not toolbar[icontype]:
                     continue
-                gtktoolbar = gtk.Toolbar()
-                gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-                gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
-                hbox.pack_start(gtktoolbar, True, True)
 
                 for tool in toolbar[icontype]:
                     iconstock = {
