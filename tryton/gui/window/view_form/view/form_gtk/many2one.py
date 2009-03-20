@@ -178,8 +178,6 @@ class Many2One(WidgetInterface):
         self.but_open = gtk.Button()
         img_find = gtk.Image()
         img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        img_open = gtk.Image()
-        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_edit)
