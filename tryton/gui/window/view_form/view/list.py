@@ -226,6 +226,7 @@ class ViewList(ParserView):
                             menu.add(menuitem)
                             menuitem.show()
                         tbutton.set_menu(menu)
+            hbox.show_all()
 
         self.display()
 

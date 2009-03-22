@@ -133,6 +133,7 @@ class ViewForm(ParserView):
                             menu.add(menuitem)
                             menuitem.show()
                         tbutton.set_menu(menu)
+            hbox.show_all()
 
 
     def _sig_clicked(self, widget, action, atype):
