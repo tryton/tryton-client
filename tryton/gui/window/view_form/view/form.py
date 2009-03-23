@@ -148,10 +148,10 @@ class ViewForm(ParserView):
             if obj_id < 0:
                 if atype in ('print'):
                     message(_('You must save this record ' \
-                        'to use the print button!'), self.window)
+                        'to be able to use the print button!'), self.window)
                 if atype in ('action'):
                     message(_('You must save this record ' \
-                        'to use the action button!'), self.window)
+                        'to be able to use the action button!'), self.window)
                 return False
             email = {}
             if 'email' in action:
@@ -166,7 +166,7 @@ class ViewForm(ParserView):
                     and self.screen.current_model.id
             if not obj_id:
                 message(_('You must select a record ' \
-                        'to use the relate button !'), self.window)
+                        'to be able to use the relate button !'), self.window)
                 return False
             if 'domain' in act:
                 act['domain'] = str(

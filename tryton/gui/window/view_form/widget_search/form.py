@@ -132,7 +132,7 @@ class Parse(object):
 
     def add_parameters(self):
         hb_param = gtk.HBox(spacing=3)
-        hb_param.pack_start(gtk.Label(_('Limit :')), expand=False, fill=False)
+        hb_param.pack_start(gtk.Label(_('Limit:')), expand=False, fill=False)
 
         self.spin_limit.set_numeric(False)
         self.spin_limit.set_adjustment(gtk.Adjustment(value=_LIMIT, lower=1,
@@ -141,7 +141,7 @@ class Parse(object):
 
         hb_param.pack_start(self.spin_limit, expand=False, fill=False)
 
-        hb_param.pack_start(gtk.Label(_('Offset :')), expand=False, fill=False)
+        hb_param.pack_start(gtk.Label(_('Offset:')), expand=False, fill=False)
 
         self.spin_offset.set_numeric(False)
         self.spin_offset.set_adjustment(gtk.Adjustment(value=0, lower=0,
