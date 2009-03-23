@@ -232,9 +232,10 @@ class Attachment(object):
             return None
         obj_id = model.get_value(iter, 0)
         if obj_id:
+            rpcprogress = common.RPCProgress('execute', ('model',
+                'ir.attachment', 'read', int(obj_id)), self.dialog)
             try:
-                data = rpc.execute('model', 'ir.attachment', 'read',
-                        int(obj_id))
+                data = rpcprogress.run()
             except Exception, exception:
                 common.process_exception(exception, self.dialog)
                 return None
@@ -281,13 +282,12 @@ class Attachment(object):
                         'datas': base64.encodestring(value),
                         'res_model': self.resource[0],
                         'res_id': self.resource[1],})
+            rpcprogress = common.RPCProgress('execute', args, self.dialog)
             try:
-                obj_id = rpc.execute(*args)
+                obj_id = rpcprogress.run()
             except Exception, exception:
-                obj_id = common.process_exception(exception, self.dialog,
-                        *args)
-                if not obj_id:
-                    return
+                common.process_exception(exception, self.dialog)
+                return
             self.reload(preview=False)
             self.preview(int(obj_id))
 
@@ -302,9 +302,10 @@ class Attachment(object):
         iter = self.model.get_iter(path)
         obj_id = self.model.get_value(iter, 0)
         if obj_id:
+            rpcprogress = common.RPCProgress('execute', ('model',
+                'ir.attachment', 'read', int(obj_id)), self.dialog)
             try:
-                data = rpc.execute('model', 'ir.attachment', 'read',
-                        int(obj_id))
+                data = rpcprogress.run()
             except Exception, exception:
                 common.process_exception(exception, self.dialog)
                 return None
@@ -323,8 +324,10 @@ class Attachment(object):
             common.file_open(file_name, ext, self.parent)
 
     def preview(self, obj_id):
+        rpcprogress = common.RPCProgress('execute', ('model',
+            'ir.attachment', 'read', obj_id), self.dialog)
         try:
-            data = rpc.execute('model', 'ir.attachment', 'read', obj_id)
+            data = rpcprogress.run()
         except Exception, exception:
             common.process_exception(exception, self.dialog)
             return None
