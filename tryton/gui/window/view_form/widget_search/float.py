@@ -12,9 +12,9 @@ class Float(Integer):
     def __init__(self, name, parent, attrs=None, context=None):
         super(Float, self).__init__(name, parent, attrs=attrs, context=context)
         if isinstance(self.attrs.get('digits'), str):
-            self.digits = (14, 2)
+            self.digits = (16, 2)
         else:
-            self.digits = self.attrs.get('digits', (14, 2))
+            self.digits = self.attrs.get('digits', (16, 2))
 
     def _value_get(self):
         try:

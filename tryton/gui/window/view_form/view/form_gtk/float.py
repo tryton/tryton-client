@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 from char import Char
 from integer import Integer
 import locale
@@ -9,7 +10,7 @@ class Float(Integer):
 
     def __init__(self, window, parent, model, attrs=None):
         super(Float, self).__init__(window, parent, model=model, attrs=attrs)
-        self.digits = attrs.get('digits', (14, 2))
+        self.digits = attrs.get('digits', (16, 2))
 
     def set_value(self, model, model_field):
         try:
@@ -43,11 +44,18 @@ class Float(Integer):
             else:
                 digits = self.digits
 
-            if len(str(int(locale.atof(new_value)))) > digits[0]:
+            locale.atof(new_value)
+
+            decimal_point = locale.localeconv()['decimal_point']
+
+            new_int = new_value
+            new_decimal = ''
+            if decimal_point in new_value:
+                new_int, new_decimal = new_value.rsplit(decimal_point, 1)
+
+            if len(new_int) > digits[0] \
+                    or len(new_decimal) > digits[1]:
                 entry.stop_emission('insert-text')
 
-            exp_value = locale.atof(new_value) * (10 ** digits[1])
-            if exp_value - int(exp_value) != 0.0:
-                entry.stop_emission('insert-text')
         except:
             entry.stop_emission('insert-text')
