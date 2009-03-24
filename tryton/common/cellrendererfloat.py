@@ -19,12 +19,19 @@ class CellRendererFloat(CellRendererInteger):
             if new_value == '-':
                 return
 
-            if len(str(int(locale.atof(new_value)))) > self.digits[0]:
+            locale.atof(new_value)
+
+            decimal_point = locale.localeconv()['decimal_point']
+
+            new_int = new_value
+            new_decimal = ''
+            if decimal_point in new_value:
+                new_int, new_decimal = new_value.rsplit(decimal_point, 1)
+
+            if len(new_int) > self.digits[0] \
+                    or len(new_decimal) > self.digits[1]:
                 entry.stop_emission('insert-text')
 
-            exp_value = locale.atof(new_value) * (10 ** self.digits[1])
-            if exp_value - int(exp_value) != 0.0:
-                entry.stop_emission('insert-text')
         except:
             entry.stop_emission('insert-text')
 
