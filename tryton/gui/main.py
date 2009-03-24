@@ -138,6 +138,7 @@ class Main(object):
         settings.set_long_property('gtk-button-images', 1, 'Tryton:gui.main')
         settings.set_property('gtk-can-change-accels', True)
 
+        self.sig_toolbar()
         self.sig_mode()
 
         if os.name in ('nt', 'mac') or \
@@ -648,7 +649,7 @@ class Main(object):
 
         checkmenuitem_toolbar = gtk.CheckMenuItem(_('Toolbar'))
         checkmenuitem_toolbar.connect('activate',
-                lambda menuitem: self.sig_toolbar(menuitem.get_active()))
+                lambda menuitem: self.sig_toolbar_change(menuitem.get_active()))
         checkmenuitem_toolbar.set_accel_path('<tryton>/Options/Form/Toolbar')
         menu_form.add(checkmenuitem_toolbar)
         if CONFIG['form.toolbar']:
@@ -953,9 +954,13 @@ class Main(object):
         self.menuitem_shortcut.set_submenu(menu)
         self.menuitem_shortcut.set_sensitive(False)
 
-    def sig_toolbar(self, value):
+    def sig_toolbar_change(self, value):
         CONFIG['form.toolbar'] = value
-        if value:
+        return self.sig_toolbar()
+
+    def sig_toolbar(self):
+        toolbar = CONFIG['form.toolbar']
+        if toolbar:
             self.toolbar.show()
         else:
             self.toolbar.hide()
