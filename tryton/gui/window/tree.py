@@ -134,7 +134,7 @@ class Tree(SignalEvent):
         else:
             self.name = name
 
-        if CONFIG['client.modepda'] and not self.tree_res.toolbar:
+        if CONFIG['client.modepda']:
             self.toolbar_vpaned.hide()
 
         self.treeview_sc.connect('row-activated', self.sc_go)
@@ -171,7 +171,7 @@ class Tree(SignalEvent):
             ids = common.process_exception(exception, self.window, *args)
             if not ids:
                 return
-        if self.tree_res.toolbar:
+        if self.tree_res.toolbar and not CONFIG['client.modepda']:
 
             icon_name = 'icon'
             for child in self.toolbar.get_children():

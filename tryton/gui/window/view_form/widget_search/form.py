@@ -3,6 +3,7 @@ import gtk
 from xml.parsers import expat
 import sys
 import gettext
+from tryton.config import CONFIG
 
 _LIMIT = 20000
 
@@ -79,7 +80,7 @@ class Parse(object):
         self.fields = fields
         self.parent = parent
         self.model = model
-        self.col = 6
+        self.col = CONFIG['client.modepda'] and 1 or 6
         self.focusable = None
         self.add_widget_end = []
         self.container = None

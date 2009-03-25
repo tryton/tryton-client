@@ -412,7 +412,10 @@ class ParserForm(ParserInterface):
         if not tooltips:
             tooltips = gtk.Tooltips()
         container = _container(tooltips)
-        container.new(col=int(attrs.get('col', 4)))
+        if CONFIG['client.modepda']:
+            container.new(col=1)
+        else:
+            container.new(col=int(attrs.get('col', 4)))
         cursor_widget = attrs.get('cursor')
 
         if not self.title:
@@ -482,6 +485,8 @@ class ParserForm(ParserInterface):
                 label.set_use_markup(True)
                 if 'align' in attrs:
                     label.set_alignment(float(attrs['align'] or 0.0), 0.5)
+                if CONFIG['client.modepda']:
+                    label.set_alignment(0.0, 0.5)
                 label.set_angle(int(attrs.get('angle', 0)))
                 expand = False
                 if 'expand' in attrs:
