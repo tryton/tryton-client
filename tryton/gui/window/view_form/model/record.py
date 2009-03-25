@@ -80,7 +80,7 @@ class ModelRecord(SignalEvent):
                                     in ('many2one', 'reference')] + \
                         ['_timestamp'], ctx)
             except Exception, exception:
-                if str(exception[0]) != 'NotLogged':
+                if str(exception[0]) not in ('NotLogged', 'UserError'):
                     log = logging.getLogger('record')
                     log.error('%s' % exception.args[-1])
                 values = [{'id': x} for x in ids]
