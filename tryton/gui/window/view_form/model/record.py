@@ -314,11 +314,14 @@ class ModelRecord(SignalEvent):
                     ['_timestamp'], ctx)
         except Exception, exception:
             common.process_exception(exception, self.window)
-            res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
-                    [x + '.rec_name' for x in self.mgroup.mfields.keys()
-                        if self.mgroup.fields[x]['type'] \
-                                in ('many2one', 'reference')] + \
-                    ['_timestamp'], ctx)
+            try:
+                res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
+                        [x + '.rec_name' for x in self.mgroup.mfields.keys()
+                            if self.mgroup.fields[x]['type'] \
+                                    in ('many2one', 'reference')] + \
+                        ['_timestamp'], ctx)
+            except:
+                return
         if res:
             value = res[0]
             self.read_time = time.time()
