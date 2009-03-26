@@ -1123,6 +1123,12 @@ class Main(object):
             self.request_set()
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
+                if CONFIG['client.lang'] != prefs['language']:
+                    self.set_menubar()
+                    self.set_toolbar_label()
+                    self.shortcut_set()
+                    self.set_statusbar()
+                    self.request_set()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
