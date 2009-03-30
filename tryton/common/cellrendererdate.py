@@ -78,6 +78,7 @@ class CellRendererDate(gtk.GenericCellRenderer):
         if not self.visible:
             return
         editable = DateEntry(self.format, self._date_cb, self._process_cb)
+        editable.set_property('shadow-type', gtk.SHADOW_NONE)
 
         colormap = editable.get_colormap()
         style = editable.get_style()
