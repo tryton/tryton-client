@@ -226,7 +226,7 @@ class Screen(SignalEvent):
     def update_attachment(self, model):
         if model != self.__current_model:
             return False
-        if model:
+        if model and self.signal_connected('attachment-count'):
             attachment_count = model.get_attachment_count()
             self.signal('attachment-count', attachment_count)
         return False
