@@ -1,4 +1,5 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 "Signal event"
 
 
@@ -12,6 +13,9 @@ class SignalEvent(object):
         for fnct, data, key in self.__connects.get(signal, []):
             fnct(self, signal_data, *data)
         return True
+
+    def signal_connected(self, signal):
+        return bool(self.__connects.get(signal))
 
     def signal_connect(self, key, signal, fnct, *data):
         self.__connects.setdefault(signal, [])
