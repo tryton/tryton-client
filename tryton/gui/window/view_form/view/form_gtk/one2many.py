@@ -208,6 +208,7 @@ class Dialog(object):
             model = self.screen.new(context=default_get_ctx)
             modified = True
         if isinstance(model, ModelRecordGroup):
+            self.screen.tree_saves = False
             self.screen.add_view_id(False, 'tree', display=True,
                     context=default_get_ctx)
             self.screen.add_view_id(False, 'form', display=False,
