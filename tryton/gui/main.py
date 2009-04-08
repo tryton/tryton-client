@@ -1181,8 +1181,11 @@ class Main(object):
 
     def refresh_ssl(self):
         if rpc.SECURE:
+            info = ''
+            if hasattr(rpc._SOCK.ssl_sock, 'server'):
+                info = str(rpc._SOCK.ssl_sock.server())
             self.tooltips.set_tip(self.secure_img, _('SSL connection') + \
-                    '\n' + str(rpc._SOCK.ssl_sock.server()))
+                    '\n' + info)
             self.secure_img.show()
         else:
             self.tooltips.set_tip(self.secure_img, '')

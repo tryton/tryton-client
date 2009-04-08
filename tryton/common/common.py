@@ -11,7 +11,11 @@ from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 import time
 import sys
 import xmlrpclib
-import md5
+try:
+    import hashlib
+except ImportError:
+    hashlib = None
+    import md5
 import webbrowser
 import traceback
 import tryton.rpc as rpc
@@ -22,6 +26,10 @@ import thread
 import urllib
 from string import Template
 import shlex
+try:
+    import ssl
+except ImportError:
+    ssl = None
 
 _ = gettext.gettext
 
@@ -523,11 +531,14 @@ def send_bugtracker(msg, parent):
         try:
             msg = msg.encode('ascii', 'replace')
             protocol = 'http'
-            if hasattr(socket, 'ssl'):
+            if ssl or hasattr(socket, 'ssl'):
                 protocol = 'https'
             server = xmlrpclib.Server(('%s://%s:%s@' + CONFIG['roundup.xmlrpc'])
                     % (protocol, user, password), allow_none=True)
-            msg_md5 = md5.new(msg).hexdigest()
+            if hashlib:
+                msg_md5 = hashlib.md5(msg).hexdigest()
+            else:
+                msg_md5 = md5.new(msg).hexdigest()
             # use the last line of the message as title
             title = '[no title]'
             for line in msg.splitlines():

@@ -6,6 +6,10 @@ try:
     import cStringIO as StringIO
 except ImportError:
     import StringIO
+try:
+    import ssl
+except ImportError:
+    ssl = None
 
 DNS_CACHE = {}
 MAX_SIZE = 999999999
@@ -70,14 +74,20 @@ class PySocket:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.settimeout(CONNECT_TIMEOUT)
                 sock.connect((host, int(port)))
-            if hasattr(socket, 'ssl'):
+            if ssl:
+                ssl_sock = ssl.wrap_socket(sock)
+                self.ssl = True
+            elif hasattr(socket, 'ssl'):
                 ssl_sock = socket.ssl(sock)
                 self.ssl = True
         except:
             pass
         self.sock.settimeout(TIMEOUT)
         if self.ssl:
-            self.ssl_sock = socket.ssl(self.sock)
+            if ssl:
+                self.ssl_sock = ssl.wrap_socket(self.sock)
+            elif hasattr(socket, 'ssl'):
+                self.ssl_sock = socket.ssl(self.sock)
         self.host = host
         self.hostname = hostname
         self.port = port
@@ -86,24 +96,20 @@ class PySocket:
 
     def disconnect(self):
         try:
+            sock = self.sock
             if self.ssl:
-                try:
-                    if hasattr(socket, 'SHUT_RDWR'):
-                        self.ssl_sock.sock_shutdown(socket.SHUT_RDWR)
-                    else:
-                        self.ssl_sock.sock_shutdown(2)
-                except:
-                    pass
-                self.ssl_sock.close()
-            else:
-                try:
-                    if hasattr(socket, 'SHUT_RDWR'):
-                        self.sock.shutdown(socket.SHUT_RDWR)
-                    else:
-                        self.sock.shutdown(2)
-                except:
-                    pass
-                self.sock.close()
+                sock = self.ssl_sock
+            try:
+                shutdown_value = 2
+                if hasattr(socket, 'SHUT_RDWR'):
+                    shutdown_value = socket.SHUT_RDWR
+                if hasattr(sock, 'sock_shutdown'):
+                    sock.sock_shutdown(shutdown_value)
+                else:
+                    sock.shutdown(shutdown_value)
+            except:
+                pass
+            sock.close()
         except:
             pass
         self.sock = None
