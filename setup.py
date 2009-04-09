@@ -87,6 +87,7 @@ elif os.name == 'mac' \
             'argv_emulation': True,
             'includes': 'pygtk, gtk, glib, cairo, pango, pangocairo, atk, ' \
                     'gobject, gio, gtk.keysyms',
+            'resources': 'tryton/plugins',
             'plist': {
                 'CFBundleIdentifier': 'org.tryton',
             },
