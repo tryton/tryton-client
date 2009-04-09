@@ -22,11 +22,12 @@ if os.name != 'nt':
     gtk.gdk.threads_init()
 import logging
 
-import version
-import config
-from config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, TRYTON_ICON, get_home_dir
-import translate
-import gui
+from tryton import version
+from tryton import config
+from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
+        TRYTON_ICON, get_home_dir
+from tryton import translate
+from tryton import gui
 import traceback
 import mx.DateTime
 import time
