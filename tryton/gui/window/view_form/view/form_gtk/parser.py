@@ -410,7 +410,7 @@ class ParserForm(ParserInterface):
         attrs = common.node_attributes(root_node)
         on_write = attrs.get('on_write', '')
         if not tooltips:
-            tooltips = gtk.Tooltips()
+            tooltips = common.Tooltips()
         container = _container(tooltips)
         if CONFIG['client.modepda']:
             container.new(col=1)

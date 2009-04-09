@@ -38,7 +38,7 @@ def _create_menu(self, attrs):
     menubar.add(menuitem_title)
     hbox.pack_start(menubar, expand=True, fill=True)
 
-    tooltips = gtk.Tooltips()
+    tooltips = common.Tooltips()
 
     if attrs.get('add_remove'):
 

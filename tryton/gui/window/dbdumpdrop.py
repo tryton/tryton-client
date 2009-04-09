@@ -89,7 +89,7 @@ class DBBackupDrop(object):
         self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.connect("key-press-event", self.event_show_button_ok)
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
         self.dialog.add_button("gtk-cancel", \
                 gtk.RESPONSE_CANCEL)
         self.button_ok = gtk.Button(button_ok_text)
@@ -133,7 +133,7 @@ class DBBackupDrop(object):
         self.tooltips.set_tip(self.entry_server_connection, _("This is the " \
                 "URL of the server. Use server 'localhost' and port '8070' " \
                 "if the server is installed on this computer. " \
-                "Click on 'Change' to change the address."), None)
+                "Click on 'Change' to change the address."))
         table.attach(self.entry_server_connection, 1, 2, 2, 3)
 
         self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
@@ -172,7 +172,7 @@ class DBBackupDrop(object):
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
-                "configuration."), None)
+                "configuration."))
         table.attach(self.entry_serverpasswd, 1, 3, 4, 5)
 
         self.entry_serverpasswd.grab_focus()

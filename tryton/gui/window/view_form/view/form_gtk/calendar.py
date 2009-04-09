@@ -8,7 +8,7 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
         TRYTON_ICON
-from tryton.common import date_widget
+from tryton.common import date_widget, Tooltips
 from tryton.translate import date_format
 import mx.DateTime
 
@@ -41,7 +41,7 @@ class Calendar(WidgetInterface):
         self.widget.pack_start(self.but_open, expand=False, fill=False)
         self.widget.set_focus_chain([self.entry])
 
-        tooltips = gtk.Tooltips()
+        tooltips = Tooltips()
         tooltips.set_tip(self.but_open, _('Open the calendar'))
         tooltips.enable()
 
@@ -176,7 +176,7 @@ class DateTime(WidgetInterface):
         self.widget.pack_start(self.but_open, expand=False, fill=False)
         self.widget.set_focus_chain([self.entry])
 
-        tooltips = gtk.Tooltips()
+        tooltips = Tooltips()
         tooltips.set_tip(self.but_open, _('Open the calendar'))
         tooltips.enable()
 

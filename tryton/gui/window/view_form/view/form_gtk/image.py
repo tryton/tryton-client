@@ -3,7 +3,7 @@ import gtk
 import gettext
 import os
 from base64 import encodestring, decodestring
-from tryton.common import file_selection
+from tryton.common import file_selection, Tooltips
 from tryton.config import PIXMAPS_DIR
 from interface import WidgetInterface
 import urllib
@@ -30,7 +30,7 @@ class Image(WidgetInterface):
         self.event.connect('drag_motion', self.drag_motion)
         self.event.connect('drag_data_received', self.drag_data_received)
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = Tooltips()
 
         self.image = gtk.Image()
         self.event.add(self.image)

@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
+import tryton.common as common
 
 _ = gettext.gettext
 
@@ -18,7 +19,7 @@ class ScreenContainer(object):
         return self.vbox
 
     def add_filter(self, widget, fnct, clear_fnct):
-        tooltips = gtk.Tooltips()
+        tooltips = common.Tooltips()
 
         self.filter_vbox = gtk.VBox(spacing=0)
         self.filter_vbox.set_border_width(0)

@@ -90,7 +90,7 @@ class Main(object):
         if hasattr(gtk, 'accel_map_load'):
             gtk.accel_map_load(os.path.join(get_home_dir(), '.trytonsc'))
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
 
         toolbar = gtk.Toolbar()
         self.toolbar = toolbar

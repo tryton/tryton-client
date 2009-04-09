@@ -68,7 +68,7 @@ class Reference(WidgetInterface):
 
         self.widget.set_focus_chain([self.widget_combo, self.wid_text])
 
-        tooltips = gtk.Tooltips()
+        tooltips = common.Tooltips()
         tooltips.set_tip(self.but_open, _('Search / Open a record'))
         tooltips.set_tip(self.but_new, _('Create a new record'))
         tooltips.enable()

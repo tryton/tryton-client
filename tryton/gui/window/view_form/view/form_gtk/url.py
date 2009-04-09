@@ -3,6 +3,7 @@ import gettext
 import gtk
 from char import Char
 import webbrowser
+import tryton.common as common
 
 
 class URL(Char):
@@ -13,7 +14,7 @@ class URL(Char):
             attrs = {}
         super(URL, self).__init__(window, parent, model, attrs=attrs)
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
         self.button = gtk.Button()
         img = gtk.Image()
         img.set_from_stock('tryton-web-browser', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -34,6 +35,7 @@ class URL(Char):
             self.tooltips.enable()
             self.tooltips.set_tip(self.button, value)
         else:
+            self.tooltips.set_tip(self.button, '')
             self.tooltips.disable()
 
     def _readonly_set(self, value):
@@ -65,6 +67,7 @@ class Email(URL):
             self.tooltips.enable()
             self.tooltips.set_tip(self.button, 'mailto:%s' % value)
         else:
+            self.tooltips.set_tip(self.button, '')
             self.tooltips.disable()
 
 
@@ -82,6 +85,7 @@ class CallTo(URL):
             self.tooltips.enable()
             self.tooltips.set_tip(self.button, 'callto:%s' % value)
         else:
+            self.tooltips.set_tip(self.button, '')
             self.tooltips.disable()
 
 
@@ -99,5 +103,6 @@ class SIP(URL):
             self.tooltips.enable()
             self.tooltips.set_tip(self.button, 'sip:%s' % value)
         else:
+            self.tooltips.set_tip(self.button, '')
             self.tooltips.disable()
 

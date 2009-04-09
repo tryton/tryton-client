@@ -90,7 +90,7 @@ class ParserTree(ParserInterface):
         treeview.set_property('rules-hint', True)
         if not self.title:
             self.title = attrs.get('string', 'Unknown')
-        tooltips = gtk.Tooltips()
+        tooltips = common.Tooltips()
 
         for node in root_node.childNodes:
             node_attrs = node_attributes(node)

@@ -61,7 +61,7 @@ class Action(object):
         self.title = gtk.Label()
         hbox.pack_start(self.title, expand=True, fill=True)
 
-        tooltips = gtk.Tooltips()
+        tooltips = common.Tooltips()
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 

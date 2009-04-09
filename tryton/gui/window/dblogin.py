@@ -19,7 +19,7 @@ class DBLogin(object):
         self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
 
-        tooltips = gtk.Tooltips()
+        tooltips = common.Tooltips()
         button_cancel = gtk.Button(_('_Cancel'))
         img_cancel = gtk.Image()
         img_cancel.set_from_stock('tryton-cancel', gtk.ICON_SIZE_BUTTON)

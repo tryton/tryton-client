@@ -195,7 +195,7 @@ class Many2One(WidgetInterface):
 
         self.widget.set_focus_chain([self.wid_text])
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
         self.tooltips.set_tip(self.but_new, _('Create a new record'))
         self.tooltips.set_tip(self.but_open, _('Open a record'))
         self.tooltips.enable()

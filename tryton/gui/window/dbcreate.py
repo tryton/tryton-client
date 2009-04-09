@@ -30,7 +30,7 @@ class DBCreate(object):
             self.tooltips.set_tip(self.entry_server_connection,_("This is the URL of " \
             "the Tryton server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
-            "change the address."), None)
+            "change the address."))
         else:
             self.entry_serverpasswd.set_sensitive(False)
             self.entry_dbname.set_sensitive(False)
@@ -50,7 +50,7 @@ class DBCreate(object):
                 "3. If there is a firewall between the server and this " \
                 "client, make shure that the server address and port " \
                 "(usually 8070) are not blocked.\n" \
-                "Click on 'Change' to change the address."), None)
+                "Click on 'Change' to change the address."))
         return state
 
     def server_change(self, widget, parent):
@@ -142,7 +142,7 @@ class DBCreate(object):
         self.dialog.set_icon(TRYTON_ICON)
         # This event is needed for controlling the button_create
         self.dialog.connect("key-press-event", self.event_show_button_create)
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
         self.dialog.add_button("gtk-cancel", \
             gtk.RESPONSE_CANCEL)
         self.button_create = gtk.Button(_('C_reate'))
@@ -181,7 +181,7 @@ class DBCreate(object):
         self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
             "the server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
-            "change the address."), None)
+            "change the address."))
         self.button_server_change = gtk.Button(_("C_hange"), stock=None,
              use_underline=True)
         img_button_server_change = gtk.Image()
@@ -190,7 +190,7 @@ class DBCreate(object):
         self.button_server_change.set_image(img_button_server_change)
         table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
-            "server connection..."), None)
+            "server connection..."))
         label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_serverpasswd.set_alignment(1, 0.5)
@@ -203,7 +203,7 @@ class DBCreate(object):
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
             "password of the Tryton server. It doesn't belong to a " \
             "real user. This password is usually defined in the trytond " \
-            "configuration."), None)
+            "configuration."))
         self.entry_serverpasswd.connect("key-press-event", \
             self.event_passwd_clear)
 
@@ -230,7 +230,7 @@ class DBCreate(object):
             "database.\n" \
             "Allowed characters are alphanumerical or _ (underscore)\n" \
             "You need to avoid all accents, space or special characters! " \
-            "Example: tryton"), None)
+            "Example: tryton"))
         handlerid = self.entry_dbname.connect("insert-text", \
             self.entry_insert_text)
         self.entry_dbname.set_data('handlerid', handlerid)
@@ -246,7 +246,7 @@ class DBCreate(object):
         self.tooltips.set_tip(eventbox_language, _("Choose the default " \
             "language that will be installed for this database. You will " \
             "be able to install new languages after installation through " \
-            "the administration menu."), None)
+            "the administration menu."))
         label_adminpasswd = gtk.Label(_("Admin password:"))
         label_adminpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_adminpasswd.set_padding( 3, 3)
@@ -259,7 +259,7 @@ class DBCreate(object):
             "the admin user of the new database. With these credentials you " \
             "will be later able to login into the database:\n" \
             "User name: admin\n" \
-            "Password: <The password you set here>"), None)
+            "Password: <The password you set here>"))
         table.attach(self.entry_adminpasswd, 1, 3, 7, 8)
         self.entry_adminpasswd.connect("key-press-event", \
             self.event_passwd_clear)
@@ -272,7 +272,7 @@ class DBCreate(object):
         self.entry_adminpasswd2.set_visibility(False)
         self.entry_adminpasswd2.set_activates_default(True)
         self.tooltips.set_tip(self.entry_adminpasswd2, _("Type the Admin " \
-            "password again"), None)
+            "password again"))
         table.attach(self.entry_adminpasswd2, 1, 3, 8, 9)
         self.entry_adminpasswd2.connect("key-press-event", \
             self.event_passwd_clear)

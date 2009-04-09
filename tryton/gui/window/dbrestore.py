@@ -69,7 +69,7 @@ class DBRestore(object):
                 | gtk.WIN_POS_CENTER_ON_PARENT)
         vbox = gtk.VBox()
         self.dialog.vbox.pack_start(vbox)
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = common.Tooltips()
         table = gtk.Table(5, 3, False)
         table.set_border_width(9)
         table.set_row_spacings(3)
@@ -90,7 +90,7 @@ class DBRestore(object):
         self.tooltips.set_tip(self.entry_server_url, _("This is the URL of " \
                 "the server. Use server 'localhost' and port '8070' if " \
                 "the server is installed on this computer. Click on " \
-                "'Change' to change the address."), None)
+                "'Change' to change the address."))
         table.attach(self.entry_server_url, 1, 2, 0, 1)
         self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
                 use_underline=True)
@@ -99,7 +99,7 @@ class DBRestore(object):
                 'tryton-preferences-system', gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
-                "server connection..."), None)
+                "server connection..."))
         table.attach(self.button_server_change, 2, 3, 0, 1)
         label_server_password = gtk.Label(_("Tryton Server Password:"))
         label_server_password.set_justify(gtk.JUSTIFY_RIGHT)
@@ -113,7 +113,7 @@ class DBRestore(object):
         self.tooltips.set_tip(self.entry_server_password, _("This is the " \
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
-                "configuration."), None)
+                "configuration."))
         table.attach(self.entry_server_password, 1, 3, 1, 2)
         hseparator = gtk.HSeparator()
         table.attach(hseparator, 0, 3, 2, 3)
@@ -136,7 +136,7 @@ class DBRestore(object):
                 "the database to be restored.\n" \
                 "Allowed characters are alphanumerical or _ (underscore)\n" \
                 "You need to avoid all accents, space or special " \
-                "characters! \nExample: tryton"), None)
+                "characters! \nExample: tryton"))
         table.attach(self.entry_db_name, 1, 3, 4, 5)
         label_db_name = gtk.Label(_("New Database Name:"))
         label_db_name.set_alignment(1, 0.5)

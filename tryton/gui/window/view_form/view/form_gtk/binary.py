@@ -3,7 +3,7 @@ import base64
 import gtk
 import gettext
 import os
-from tryton.common import file_selection, message, warning
+from tryton.common import file_selection, message, warning, Tooltips
 from interface import WidgetInterface
 
 _ = gettext.gettext
@@ -15,7 +15,7 @@ class Binary(WidgetInterface):
     def __init__(self, window, parent, model, attrs=None):
         super(Binary, self).__init__(window, parent, model, attrs)
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = Tooltips()
 
         self.widget = gtk.HBox(spacing=0)
         self.wid_text = gtk.Entry()

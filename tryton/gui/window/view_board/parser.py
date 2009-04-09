@@ -18,7 +18,7 @@ class ParserBoard(object):
 
         attrs = common.node_attributes(root_node)
         if not tooltips:
-            tooltips = gtk.Tooltips()
+            tooltips = common.Tooltips()
 
         container = _container(tooltips)
         container.new(col=int(attrs.get('col', 4)))

@@ -6,7 +6,7 @@ import gettext
 import locale
 from interface import Interface
 from tryton.common import DT_FORMAT, TRYTON_ICON
-from tryton.common import date_widget
+from tryton.common import date_widget, Tooltips
 from tryton.translate import date_format
 import mx.DateTime
 import gobject
@@ -20,7 +20,7 @@ class Calendar(Interface):
         super(Calendar, self).__init__(name, parent, attrs=attrs,
                 context=context)
 
-        tooltips = gtk.Tooltips()
+        tooltips = Tooltips()
         self.widget = gtk.HBox(spacing=3)
 
         self.format = date_format()

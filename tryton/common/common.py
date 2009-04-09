@@ -992,6 +992,25 @@ class RPCProgress(object):
             raise self.exception
         return self.res
 
+
+class Tooltips(object):
+    _tooltips = None
+
+    def set_tip(self, widget, tip_text):
+        if hasattr(widget, 'set_tooltip_text'):
+            return widget.set_tooltip_text(tip_text)
+        if not self._tooltips:
+            self._tooltips = gtk.Tooltips()
+        return self._tooltips.set_tip(widget, tip_text)
+
+    def enable(self):
+        if self._tooltips:
+            self._tooltips.enable()
+
+    def disable(self):
+        if self._tooltips:
+            self._tooltips.disable()
+
 COLOR_SCHEMES = {
     'red': '#cf1d1d',
     'green': '#3fb41b',
