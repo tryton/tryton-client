@@ -78,6 +78,22 @@ if os.name == 'nt':
         }
     }
     args['zipfile'] = None
+elif os.name == 'mac' \
+        or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+    import py2app
+    args['app'] = [os.path.join('tryton', 'client.py')]
+    args['options'] = {
+        'py2app': {
+            'argv_emulation': True,
+            'includes': 'pygtk, gtk, glib, cairo, pango, pangocairo, atk, ' \
+                    'gobject, gio, gtk.keysyms',
+            'plist': {
+                'CFBundleIdentifier': 'org.tryton',
+            },
+            'iconfile': os.path.join('share', 'pixmaps', 'tryton',
+                'tryton.icns'),
+        },
+    }
 
 execfile(os.path.join('tryton', 'version.py'))
 
