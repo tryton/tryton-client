@@ -13,4 +13,4 @@ include share/pixmaps/tryton-icon.png
 include share/pixmaps/tryton/*.png
 include share/pixmaps/tryton/*.svg
 include share/pixmaps/tryton/*.ico
-recursive-include share/locale/ *.mo
+recursive-include share/locale *.mo
