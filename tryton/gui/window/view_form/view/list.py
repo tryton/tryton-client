@@ -13,6 +13,7 @@ import tryton.common as common
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
+import os
 
 _ = gettext.gettext
 
@@ -238,7 +239,10 @@ class ViewList(ParserView):
         selection.set_mode(gtk.SELECTION_MULTIPLE)
         selection.connect('changed', self.__select_changed)
 
-        if self.widget_tree.sequence:
+        if self.widget_tree.sequence \
+                # Disable DnD on mac until it is fully supported
+                and not (os.name == 'mac' \
+                    or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin')):
             self.widget_tree.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
                     [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
                     gtk.gdk.ACTION_MOVE)
