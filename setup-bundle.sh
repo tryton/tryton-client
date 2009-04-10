@@ -7,5 +7,8 @@ for i in dist/tryton.app/Contents/Resources/share/pixmaps/tryton/*.svg; do
 done
 rm -f dist/tryton.app/Contents/Resources/share/pixmaps/tryton/*.svg
 
-cp CHANGELOG COPYRIGHT LICENSE README TODO dist/
+for i in CHANGELOG COPYRIGHT LICENSE README TODO; do
+    cp ${i} dist/${i}.txt
+done
+
 hdiutil create tryton-${VERSION}.dmg -volname "Tryton Client ${VERSION}" -fs HFS+ -srcfolder dist
