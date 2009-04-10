@@ -239,8 +239,8 @@ class ViewList(ParserView):
         selection.set_mode(gtk.SELECTION_MULTIPLE)
         selection.connect('changed', self.__select_changed)
 
+        # Disable DnD on mac until it is fully supported
         if self.widget_tree.sequence \
-                # Disable DnD on mac until it is fully supported
                 and not (os.name == 'mac' \
                     or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin')):
             self.widget_tree.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
