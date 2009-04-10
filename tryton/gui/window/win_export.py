@@ -232,9 +232,9 @@ class WinExport(object):
 
         # Creating the predefined export view
         self.pref_export = gtk.TreeView()
-        self.pref_export.append_column(gtk.TreeViewColumn('Export name',
+        self.pref_export.append_column(gtk.TreeViewColumn(_('Export name'),
             gtk.CellRendererText(), text=2))
-        self.pref_export.append_column(gtk.TreeViewColumn('Exported fields',
+        self.pref_export.append_column(gtk.TreeViewColumn(_('Exported fields'),
             gtk.CellRendererText(), text=3))
         scrolledwindow_exports.add(self.pref_export)
 
