@@ -188,6 +188,8 @@ class DBLogin(object):
                     break
                 i = liststore.iter_next(i)
 
+        # Reshow dialog for gtk-quarks
+        self.dialog.reshow_with_initial_size()
         res = self.dialog.run()
         url_m = re.match('^([\w.:\-\d]+):(\d{1,5})$',
                 self.entry_server.get_text() or '')
