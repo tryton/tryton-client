@@ -50,8 +50,12 @@ class Main(object):
 
         gtk.accel_map_add_entry('<tryton>/File/Connect', gtk.keysyms.O,
                 gtk.gdk.CONTROL_MASK)
+        quit_mask = gtk.gdk.CONTROL_MASK
+        if os.name == 'mac' or \
+                (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+            quit_mask = gtk.gdk.MOD1_MASK
         gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
-                gtk.gdk.CONTROL_MASK)
+                quit_mask)
         gtk.accel_map_add_entry('<tryton>/Form/New', gtk.keysyms.N,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Save', gtk.keysyms.S,
