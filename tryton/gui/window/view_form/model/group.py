@@ -103,6 +103,11 @@ class ModelRecordGroup(SignalEvent):
             modelfield = field.ModelField(fvalue['type'])
             fvalue['name'] = fname
             models.mfields[fname] = modelfield(models, fvalue)
+            if isinstance(models.mfields[fname], field.O2MField) \
+                    and '_datetime' in models._context:
+                models.mfields[fname].context.update({
+                    '_datetime': models._context['_datetime'],
+                    })
 
     def save(self):
         for model in self.models:

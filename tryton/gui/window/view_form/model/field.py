@@ -429,7 +429,8 @@ class O2MField(CharField):
     def create(self, model):
         from group import ModelRecordGroup
         mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
-                parent=model, parent_name=self.attrs.get('relation_field', ''))
+                parent=model, parent_name=self.attrs.get('relation_field', ''),
+                context=self.context)
         mod.signal_connect(mod, 'model-changed', self._model_changed)
         return mod
 
@@ -486,7 +487,8 @@ class O2MField(CharField):
     def set(self, model, value, modified=False):
         from group import ModelRecordGroup
         mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
-                parent=model, parent_name=self.attrs.get('relation_field', ''))
+                parent=model, parent_name=self.attrs.get('relation_field', ''),
+                context=self.context)
         mod.signal_connect(mod, 'model-changed', self._model_changed)
         model.value[self.name] = mod
         #self.internal.signal_connect(self.internal, 'model-changed',
@@ -517,7 +519,8 @@ class O2MField(CharField):
 
         model.value[self.name] = ModelRecordGroup(
                 self.attrs['relation'], fields, model.window, parent=model,
-                parent_name=self.attrs.get('relation_field', ''))
+                parent_name=self.attrs.get('relation_field', ''),
+                context=self.context)
         model.value[self.name].signal_connect(model.value[self.name],
                 'model-changed', self._model_changed)
         mod = None
