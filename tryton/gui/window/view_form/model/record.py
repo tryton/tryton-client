@@ -208,11 +208,13 @@ class ModelRecord(SignalEvent):
             self.set_default(val)
 
     def rec_name(self):
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(self.context_get())
         try:
-            name = self.rpc.read(self.id, ['rec_name'], rpc.CONTEXT)['rec_name']
+            name = self.rpc.read(self.id, ['rec_name'], ctx)['rec_name']
         except Exception, exception:
             common.process_exception(exception, self.window)
-            name = self.rpc.read(self.id, ['rec_name'], rpc.CONTEXT)['rec_name']
+            name = self.rpc.read(self.id, ['rec_name'], ctx)['rec_name']
         return name
 
     def validate_set(self):
