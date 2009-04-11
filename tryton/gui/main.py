@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import os
+import sys
 import gettext
 import urlparse
 import gobject
@@ -25,6 +26,10 @@ import base64
 import tryton.translate as translate
 import tryton.plugins
 import pango
+try:
+    import igemacintegration
+except ImportError:
+    igemacintegration = None
 
 _ = gettext.gettext
 
@@ -50,12 +55,8 @@ class Main(object):
 
         gtk.accel_map_add_entry('<tryton>/File/Connect', gtk.keysyms.O,
                 gtk.gdk.CONTROL_MASK)
-        quit_mask = gtk.gdk.CONTROL_MASK
-        if os.name == 'mac' or \
-                (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
-            quit_mask = gtk.gdk.MOD1_MASK
         gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
-                quit_mask)
+                gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/New', gtk.keysyms.N,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Save', gtk.keysyms.S,
@@ -109,6 +110,14 @@ class Main(object):
         self.menuitem_form = None
         self.menuitem_plugins = None
         self.set_menubar()
+
+        if igemacintegration:
+            self.macmenu = igemacintegration.MacMenu()
+            quit_item = gtk.MenuItem(_('Quit'))
+            quit_item.connect('activate', self.sig_close)
+            self.macmenu.set_quit_menu_item(quit_item)
+            self.macdock = igemacintegration.MacDock()
+            self.macdock.connect('quit-activate', self.sig_close)
 
         self.vbox.pack_start(toolbar, False, True)
 
@@ -1275,6 +1284,7 @@ class Main(object):
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
         gtk.main_quit()
+        sys.exit()
 
     def sig_close(self, widget):
         if common.sur(_("Do you really want to quit?"), parent=self.window):
