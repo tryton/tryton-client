@@ -88,6 +88,7 @@ elif os.name == 'mac' \
             'includes': 'pygtk, gtk, glib, cairo, pango, pangocairo, atk, ' \
                     'gobject, gio, gtk.keysyms',
             'resources': 'tryton/plugins',
+            'frameworks': 'librsvg-2.2.dylib',
             'plist': {
                 'CFBundleIdentifier': 'org.tryton',
             },
