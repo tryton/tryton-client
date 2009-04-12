@@ -14,10 +14,9 @@ import mx.DateTime
 
 mapping = {
     '%y': ('__', '([_ 0-9][_ 0-9])'),
-    '%Y': ('____', '([_ 0-9][_ 0-9][_ 0-9][_ 1-9]|[_ 1-9][_ 0-9][_ 0-9][_ 0-9]|' \
-            '[_ 0-9][_ 1-9][_ 0-9][_ 0-9]|[_ 0-9][_ 0-9][_ 1-9][_ 0-9])'),
-    '%m': ('__', '([_ 0][_ 1-9]|[_ 1][_ 0-2])'),
-    '%d': ('__', '([_ 0][_ 1-9]|[_ 1-2][_ 0-9]|[_ 3][_ 0-1])'),
+    '%Y': ('____', '([_ 0-9][_ 0-9][_ 0-9][_ 0-9])'),
+    '%m': ('__', '([_ 0][_ 0-9]|[_ 1][_ 0-2])'),
+    '%d': ('__', '([_ 0][_ 0-9]|[_ 1-2][_ 0-9]|[_ 3][_ 0-1])'),
     '%H': ('__', '([_ 0-1][_ 0-9]|[_ 2][_ 0-4])'),
     '%M': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
     '%S': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
@@ -87,6 +86,11 @@ class DateEntry(gtk.Entry):
         if self.regex.match(text):
             self.set_text(text)
             gobject.idle_add(self.set_position, pos)
+        else:
+            text = text[:pos] + '0' + text[pos + 1:]
+            if self.regex.match(text):
+                self.set_text(text)
+                gobject.idle_add(self.set_position, pos)
         self.stop_emission('insert-text')
         self.show()
         return
@@ -159,6 +163,7 @@ class DateEntry(gtk.Entry):
             n = len(val)
             val = val.strip()
             val = val.strip('_')
+            val = val.strip('0')
             if not val:
                 continue
             fchar = '0'
