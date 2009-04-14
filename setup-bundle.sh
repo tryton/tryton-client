@@ -29,6 +29,8 @@ for i in CHANGELOG COPYRIGHT LICENSE README TODO; do
     cp ${i} dist/${i}.txt
 done
 
+cp -r doc dist
+
 if [[ -e tryton-${VERSION}.dmg ]]; then
     rm tryton-${VERSION}.dmg
 fi
