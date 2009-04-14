@@ -163,7 +163,7 @@ class DateEntry(gtk.Entry):
             n = len(val)
             val = val.strip()
             val = val.strip('_')
-            val = val.strip('0')
+            val = val.lstrip('0')
             if not val:
                 continue
             fchar = '0'
