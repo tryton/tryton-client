@@ -1,17 +1,16 @@
-# Spanish (Spain) translations for tryton.
-# Copyright (C) 2008 igor@tamarapatino.org
-# Copyright (C) 2009 PEMAS Servicios Profesionales, S.L.
+# Spanish (Colombia) translations for tryton.
+# Copyright (C) 2008- B2CK
 # This file is distributed under the same license as the tryton project.
 # FIRST AUTHOR <igor@tamarapatino.org>, 2008.
-# Carlos Perelló Marín <carlos@pemas.es>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: tryton 1.1.0\n"
+"Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-10-02 18:11+0500\n"
 "PO-Revision-Date: 2009-04-14 23:52+0200\n"
-"Last-Translator: Carlos Perelló Marín <carlos@pemas.es>\n"
+"Last-Translator: Juan Fernando Jaramillo "
+"<juanf.jaramillo@miginternacional.com>\n"
 "Language-Team: es_ES <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +20,7 @@ msgstr ""
 
 #: tryton/config.py:98
 msgid "specify alternate config file"
-msgstr "Especifique un archivo de configuración alternativo"
+msgstr "Especifique un archivo alternativo de configuración"
 
 #: tryton/config.py:101
 msgid "enable basic debugging"
@@ -148,7 +147,7 @@ msgid ""
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 "El mismo error ya había sido reportado por otro usuario.\n"
-"Para mantenerle informado añadimos su usuario  a la lista de "
+"Para mantenerle informad@ adicionamos su usuario  a la lista de "
 "interesados en este asunto"
 
 #: tryton/common/common.py:571
@@ -316,7 +315,7 @@ msgstr "_Leer mis Solicitudes"
 
 #: tryton/gui/main.py:412 tryton/gui/main.py:897
 msgid "_New"
-msgstr "_Nuevo"
+msgstr "_Nuev@"
 
 #: tryton/gui/main.py:420 tryton/gui/main.py:898
 msgid "_Save"
@@ -651,7 +650,7 @@ msgid ""
 "Are you really sure to proceed?"
 msgstr ""
 "Va a eliminiar una base de datos de Tryton.\n"
-"¿Está seguro?"
+"¿Está segur@?"
 
 #: tryton/gui/main.py:1466
 msgid ""
@@ -951,6 +950,7 @@ msgid "Type the Admin password again"
 msgstr "Teclee la clave de Admin de nuevo"
 
 #: tryton/gui/window/dbcreate.py:320
+#, fuzzy
 msgid ""
 "The database name is restricted to alpha-nummerical characters and \"_\" "
 "(underscore). Avoid all accents, space and any other special characters."
@@ -1395,7 +1395,7 @@ msgid ""
 "\n"
 "\n"
 msgstr ""
-"<b>Bienvenido a Tryton</b>\n"
+"<b>Bienvenid@ a Tryton</b>\n"
 "\n"
 "\n"
 
@@ -1438,6 +1438,7 @@ msgstr ""
 "\n"
 "Puede copiar los registros de cualquier lista con Ctrl + C\n"
 "y pegarlas en cualquier aplicación con Ctrl + V\n"
+" "
 
 #: tryton/gui/window/tips.py:39
 msgid "Tips"
@@ -1657,14 +1658,17 @@ msgid "_Email as Attachment"
 msgstr "_Enviar en correo como adjunto"
 
 #: tryton/gui/window/view_form/view/form.py:150
+#, fuzzy
 msgid "You must save this record to be able to use the print button!"
 msgstr "!Debe guardar el registro para poder imprimir!"
 
 #: tryton/gui/window/view_form/view/form.py:153
+#, fuzzy
 msgid "You must save this record to be able to use the action button!"
 msgstr "!Debe guardar este registro para usar el botón de acción!"
 
 #: tryton/gui/window/view_form/view/form.py:168
+#, fuzzy
 msgid "You must select a record to be able to use the relate button !"
 msgstr "!Debe seleccionar un registro para usar el botón de relación !"
 
@@ -1864,7 +1868,7 @@ msgstr "Sin Atributo de Cadena."
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:748
 msgid "You need to save the record before adding translations!"
-msgstr "!Debe guardar el registro antes de añadir traducciones!"
+msgstr "!Debe guardar el registro antes de adicionar traducciones!"
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:761
 msgid "No other language available!"
@@ -1970,6 +1974,7 @@ msgid "contains"
 msgstr "contiene"
 
 #: tryton/gui/window/view_form/widget_search/char.py:24
+#, fuzzy
 msgid "does not contain"
 msgstr "no contiene"
 
@@ -1999,10 +2004,12 @@ msgid "No"
 msgstr "No"
 
 #: tryton/gui/window/view_form/widget_search/form.py:136
+#, fuzzy
 msgid "Limit:"
 msgstr "Límite:"
 
 #: tryton/gui/window/view_form/widget_search/form.py:145
+#, fuzzy
 msgid "Offset:"
 msgstr "Corrimiento:"
 
