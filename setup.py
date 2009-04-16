@@ -138,7 +138,6 @@ setup(name=PACKAGE,
         "egenix-mx-base",
     ],
     extras_require={
-        'SSL': ['pyOpenSSL'],
         'timezone': ['pytz'],
     },
     **args

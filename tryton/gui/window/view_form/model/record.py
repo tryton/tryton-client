@@ -168,12 +168,11 @@ class ModelRecord(SignalEvent):
         self._check_load()
         if self.id < 0:
             value = self.get(get_readonly=True)
+            args = ('model', self.resource, 'create', value, self.context_get())
             try:
-                self.id = self.rpc.create(value, self.context_get())
+                self.id = rpc.execute(*args)
             except Exception, exception:
-                res = common.process_exception(exception, self.window, 'object',
-                        'execute', self.resource, 'create', value,
-                        self.context_get())
+                res = common.process_exception(exception, self.window, *args)
                 if not res:
                     return False
                 self.id = res
