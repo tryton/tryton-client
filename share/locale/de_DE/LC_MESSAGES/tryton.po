@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2009-04-11 11:17+0100\n"
+"PO-Revision-Date: 2009-04-16 17:15+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -64,11 +64,11 @@ msgstr "Kann locale %s nicht setzen"
 msgid "Nothing to print!"
 msgstr "Nichts zu drucken!"
 
-#: tryton/action/main.py:190
+#: tryton/action/main.py:192
 msgid "Select your action"
 msgstr "Aktion wählen"
 
-#: tryton/action/main.py:197
+#: tryton/action/main.py:199
 msgid "No action defined!"
 msgstr "Keine Aktion angegeben!"
 
@@ -95,7 +95,7 @@ msgstr "Ihre Auswahl:"
 
 #: tryton/common/common.py:298
 #: tryton/common/common.py:331
-#: tryton/gui/main.py:1559
+#: tryton/gui/main.py:1569
 #: tryton/gui/window/attachment.py:244
 #: tryton/gui/window/win_export.py:374
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:40
@@ -158,7 +158,7 @@ msgid "Created new bug with ID "
 msgstr "Neuer Fehlerbericht angelegt mit ID "
 
 #: tryton/common/common.py:576
-#: tryton/gui/main.py:1142
+#: tryton/gui/main.py:1151
 msgid ""
 "Connection error!\n"
 "Bad username or password!"
@@ -212,7 +212,7 @@ msgstr "Überschreiben"
 
 #: tryton/common/common.py:788
 #: tryton/common/common.py:799
-#: tryton/gui/main.py:1139
+#: tryton/gui/main.py:1148
 #: tryton/gui/window/tree.py:333
 msgid ""
 "Connection error!\n"
@@ -237,411 +237,415 @@ msgstr ""
 "Bitte warten,\n"
 "dieser Vorgang benötigt etwas Zeit..."
 
-#: tryton/gui/main.py:166
+#: tryton/gui/main.py:116
+msgid "Quit"
+msgstr "Beenden"
+
+#: tryton/gui/main.py:175
 msgid "_File"
 msgstr "_Datei"
 
-#: tryton/gui/main.py:174
+#: tryton/gui/main.py:183
 msgid "_User"
 msgstr "_Benutzer"
 
-#: tryton/gui/main.py:188
+#: tryton/gui/main.py:197
 msgid "For_m"
 msgstr "_Formular"
 
-#: tryton/gui/main.py:202
+#: tryton/gui/main.py:211
 msgid "_Options"
 msgstr "_Einstellungen"
 
-#: tryton/gui/main.py:210
+#: tryton/gui/main.py:219
 msgid "_Plugins"
 msgstr "_Plugins"
 
-#: tryton/gui/main.py:224
+#: tryton/gui/main.py:233
 msgid "_Shortcuts"
 msgstr "_Schnelltasten"
 
-#: tryton/gui/main.py:230
+#: tryton/gui/main.py:239
 msgid "_Help"
 msgstr "_Hilfe"
 
-#: tryton/gui/main.py:261
+#: tryton/gui/main.py:270
 msgid "Requests:"
 msgstr "Anfragen:"
 
-#: tryton/gui/main.py:281
+#: tryton/gui/main.py:290
 msgid "Send a new request"
 msgstr "Eine neue Anfrage senden"
 
-#: tryton/gui/main.py:293
+#: tryton/gui/main.py:302
 msgid "Read my Requests"
 msgstr "Meine Anfragen lesen"
 
-#: tryton/gui/main.py:306
+#: tryton/gui/main.py:315
 msgid "_Connect..."
 msgstr "_Verbinden..."
 
-#: tryton/gui/main.py:314
+#: tryton/gui/main.py:323
 msgid "_Disconnect"
 msgstr "Verbindung _trennen"
 
-#: tryton/gui/main.py:324
+#: tryton/gui/main.py:333
 msgid "Data_base"
 msgstr "_Datenbank"
 
-#: tryton/gui/main.py:335
+#: tryton/gui/main.py:344
 msgid "_New Database..."
 msgstr "_Neue Datenbank..."
 
-#: tryton/gui/main.py:343
+#: tryton/gui/main.py:352
 msgid "_Restore Database..."
 msgstr "Datenbank _wiederherstellen..."
 
-#: tryton/gui/main.py:351
+#: tryton/gui/main.py:360
 msgid "_Backup Database..."
 msgstr "Datenbank _sichern..."
 
-#: tryton/gui/main.py:359
+#: tryton/gui/main.py:368
 msgid "Dro_p Database..."
 msgstr "Datenbank _löschen"
 
-#: tryton/gui/main.py:369
+#: tryton/gui/main.py:378
 msgid "_Quit..."
 msgstr "_Beenden..."
 
-#: tryton/gui/main.py:381
+#: tryton/gui/main.py:390
 msgid "_Preferences..."
 msgstr "_Einstellungen..."
 
-#: tryton/gui/main.py:392
+#: tryton/gui/main.py:401
 msgid "_Send a Request"
 msgstr "Anfrage _senden"
 
-#: tryton/gui/main.py:400
+#: tryton/gui/main.py:409
 msgid "_Read my Requests"
 msgstr "Meine Anfragen _lesen"
 
-#: tryton/gui/main.py:412
-#: tryton/gui/main.py:897
+#: tryton/gui/main.py:421
+#: tryton/gui/main.py:906
 msgid "_New"
 msgstr "_Neu"
 
-#: tryton/gui/main.py:420
-#: tryton/gui/main.py:898
+#: tryton/gui/main.py:429
+#: tryton/gui/main.py:907
 msgid "_Save"
 msgstr "_Speichern"
 
-#: tryton/gui/main.py:428
+#: tryton/gui/main.py:437
 msgid "_Duplicate"
 msgstr "_Duplizieren"
 
-#: tryton/gui/main.py:436
+#: tryton/gui/main.py:445
 #: tryton/gui/window/attachment.py:107
 msgid "_Delete..."
 msgstr "_Löschen..."
 
-#: tryton/gui/main.py:446
+#: tryton/gui/main.py:455
 msgid "_Find..."
 msgstr "_Suchen..."
 
-#: tryton/gui/main.py:454
+#: tryton/gui/main.py:463
 msgid "_Next"
 msgstr "_Nächster"
 
-#: tryton/gui/main.py:462
+#: tryton/gui/main.py:471
 msgid "_Previous"
 msgstr "_Vorheriger"
 
-#: tryton/gui/main.py:470
+#: tryton/gui/main.py:479
 msgid "_Switch View"
 msgstr "_Ansicht wechseln"
 
-#: tryton/gui/main.py:478
+#: tryton/gui/main.py:487
 msgid "_Menu"
 msgstr "_Menü"
 
-#: tryton/gui/main.py:488
+#: tryton/gui/main.py:497
 msgid "_Home"
 msgstr "_Zur Ausgangsposition"
 
-#: tryton/gui/main.py:496
+#: tryton/gui/main.py:505
 msgid "_Close Tab"
 msgstr "Tab schließen"
 
-#: tryton/gui/main.py:504
+#: tryton/gui/main.py:513
 msgid "_Previous Tab"
 msgstr "_Vorheriger Tab"
 
-#: tryton/gui/main.py:509
+#: tryton/gui/main.py:518
 msgid "_Next Tab"
 msgstr "_Nächster Tab"
 
-#: tryton/gui/main.py:516
+#: tryton/gui/main.py:525
 msgid "View _Logs..."
 msgstr "_Protokoll ansehen"
 
-#: tryton/gui/main.py:520
+#: tryton/gui/main.py:529
 msgid "_Go to Record ID..."
 msgstr "_Gehe zu Datensatz Nr..."
 
-#: tryton/gui/main.py:529
+#: tryton/gui/main.py:538
 msgid "_Reload/Undo"
 msgstr "Neu laden/_Rückgängig"
 
-#: tryton/gui/main.py:540
+#: tryton/gui/main.py:549
 msgid "_Actions..."
 msgstr "_Aktionen..."
 
-#: tryton/gui/main.py:549
+#: tryton/gui/main.py:558
 msgid "_Print..."
 msgstr "_Drucken..."
 
-#: tryton/gui/main.py:560
+#: tryton/gui/main.py:569
 msgid "_Export Data..."
 msgstr "Daten _exportieren..."
 
-#: tryton/gui/main.py:569
+#: tryton/gui/main.py:578
 msgid "_Import Data..."
 msgstr "Daten _importieren..."
 
-#: tryton/gui/main.py:579
+#: tryton/gui/main.py:588
 msgid "_Menubar"
 msgstr "_Menüleiste"
 
-#: tryton/gui/main.py:587
+#: tryton/gui/main.py:596
 msgid "_Default"
 msgstr "_Standard"
 
-#: tryton/gui/main.py:596
+#: tryton/gui/main.py:605
 msgid "_Text and Icons"
 msgstr "Text _und Symbole"
 
-#: tryton/gui/main.py:606
+#: tryton/gui/main.py:615
 msgid "_Icons"
 msgstr "_Symbole"
 
-#: tryton/gui/main.py:615
+#: tryton/gui/main.py:624
 msgid "_Text"
 msgstr "_Text"
 
-#: tryton/gui/main.py:623
+#: tryton/gui/main.py:632
 msgid "_Mode"
 msgstr "_Modus"
 
-#: tryton/gui/main.py:631
+#: tryton/gui/main.py:640
 msgid "_Normal"
 msgstr "_Normal"
 
-#: tryton/gui/main.py:639
+#: tryton/gui/main.py:648
 msgid "_PDA"
 msgstr "_PDA"
 
-#: tryton/gui/main.py:646
+#: tryton/gui/main.py:655
 msgid "_Form"
 msgstr "_Formular"
 
-#: tryton/gui/main.py:654
+#: tryton/gui/main.py:663
 msgid "Toolbar"
 msgstr "Werkzeugleiste"
 
-#: tryton/gui/main.py:662
+#: tryton/gui/main.py:671
 msgid "Save Columns Width"
 msgstr "Spaltenbreiten speichern"
 
-#: tryton/gui/main.py:672
+#: tryton/gui/main.py:681
 msgid "Spell Checking"
 msgstr "Rechtschreibkorrektur"
 
-#: tryton/gui/main.py:682
+#: tryton/gui/main.py:691
 msgid "Tabs Position"
 msgstr "Position der Tabs"
 
-#: tryton/gui/main.py:690
+#: tryton/gui/main.py:699
 msgid "Top"
 msgstr "Oben"
 
-#: tryton/gui/main.py:699
+#: tryton/gui/main.py:708
 msgid "Left"
 msgstr "Links"
 
-#: tryton/gui/main.py:708
+#: tryton/gui/main.py:717
 msgid "Right"
 msgstr "Rechts"
 
-#: tryton/gui/main.py:717
+#: tryton/gui/main.py:726
 msgid "Bottom"
 msgstr "Unten"
 
-#: tryton/gui/main.py:725
+#: tryton/gui/main.py:734
 msgid "Tabs Orientation"
 msgstr "Ausrichtung der Tabs"
 
-#: tryton/gui/main.py:733
+#: tryton/gui/main.py:742
 msgid "Horizontal"
 msgstr "Horizontal"
 
-#: tryton/gui/main.py:744
+#: tryton/gui/main.py:753
 msgid "Vertical"
 msgstr "Vertikal"
 
-#: tryton/gui/main.py:754
+#: tryton/gui/main.py:763
 msgid "File _Actions..."
 msgstr "Dateiaktionen..."
 
-#: tryton/gui/main.py:760
+#: tryton/gui/main.py:769
 msgid "_Email..."
 msgstr "_E-Mail..."
 
-#: tryton/gui/main.py:768
+#: tryton/gui/main.py:777
 msgid "_Save Options"
 msgstr "Einstellungen _speichern"
 
-#: tryton/gui/main.py:780
+#: tryton/gui/main.py:789
 msgid "_Execute a Plugin"
 msgstr "_Plugin ausführen"
 
-#: tryton/gui/main.py:793
+#: tryton/gui/main.py:802
 msgid "_Tips..."
 msgstr "_Tipps..."
 
-#: tryton/gui/main.py:801
+#: tryton/gui/main.py:810
 msgid "_Keyboard Shortcuts..."
 msgstr "_Schnelltasten"
 
-#: tryton/gui/main.py:811
+#: tryton/gui/main.py:820
 msgid "_About..."
 msgstr "_Über"
 
-#: tryton/gui/main.py:899
+#: tryton/gui/main.py:908
 msgid "_Delete"
 msgstr "_Löschen"
 
-#: tryton/gui/main.py:900
+#: tryton/gui/main.py:909
 msgid "_Find"
 msgstr "_Suchen"
 
-#: tryton/gui/main.py:901
+#: tryton/gui/main.py:910
 #: tryton/gui/window/tips.py:67
 #: tryton/gui/window/view_board/action.py:93
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:105
 msgid "Previous"
 msgstr "Vorheriger"
 
-#: tryton/gui/main.py:902
+#: tryton/gui/main.py:911
 #: tryton/gui/window/tips.py:74
 #: tryton/gui/window/view_board/action.py:106
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:118
 msgid "Next"
 msgstr "Nächster"
 
-#: tryton/gui/main.py:903
+#: tryton/gui/main.py:912
 #: tryton/gui/window/view_board/action.py:118
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:130
 msgid "Switch"
 msgstr "Ansicht wechseln"
 
-#: tryton/gui/main.py:904
+#: tryton/gui/main.py:913
 msgid "_Reload"
 msgstr "_Neu laden"
 
-#: tryton/gui/main.py:905
-#: tryton/gui/main.py:919
-#: tryton/gui/main.py:1214
-#: tryton/gui/main.py:1300
+#: tryton/gui/main.py:914
+#: tryton/gui/main.py:928
+#: tryton/gui/main.py:1223
+#: tryton/gui/main.py:1310
 msgid "Menu"
 msgstr "Menü"
 
-#: tryton/gui/main.py:906
-#: tryton/gui/main.py:920
+#: tryton/gui/main.py:915
+#: tryton/gui/main.py:929
 msgid "Action"
 msgstr "Aktion"
 
-#: tryton/gui/main.py:907
-#: tryton/gui/main.py:921
+#: tryton/gui/main.py:916
+#: tryton/gui/main.py:930
 #: tryton/gui/window/fileactions.py:32
 msgid "Print"
 msgstr "Drucken"
 
-#: tryton/gui/main.py:908
+#: tryton/gui/main.py:917
 msgid "Attachment(0)"
 msgstr "Anhang(0)"
 
-#: tryton/gui/main.py:911
+#: tryton/gui/main.py:920
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:199
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:73
 #: tryton/gui/window/view_form/view/form_gtk/reference.py:73
 msgid "Create a new record"
 msgstr "Neuen Datensatz erstellen"
 
-#: tryton/gui/main.py:912
+#: tryton/gui/main.py:921
 msgid "Save this record"
 msgstr "Diesen Datensatz speichern"
 
-#: tryton/gui/main.py:913
+#: tryton/gui/main.py:922
 msgid "Delete this record"
 msgstr "Diesen Datensatz löschen"
 
-#: tryton/gui/main.py:914
+#: tryton/gui/main.py:923
 msgid "Find records"
 msgstr "Datensätze suchen"
 
-#: tryton/gui/main.py:915
+#: tryton/gui/main.py:924
 msgid "Previous Record"
 msgstr "Vorheriger Datensatz"
 
-#: tryton/gui/main.py:916
+#: tryton/gui/main.py:925
 msgid "Next Record"
 msgstr "Nächster Datensatz"
 
-#: tryton/gui/main.py:917
+#: tryton/gui/main.py:926
 msgid "Switch view"
 msgstr "Ansicht wechseln"
 
-#: tryton/gui/main.py:918
+#: tryton/gui/main.py:927
 msgid "Reload"
 msgstr "Neu laden"
 
-#: tryton/gui/main.py:922
+#: tryton/gui/main.py:931
 msgid "Add an attachment to the record"
 msgstr "Einen Anhang zum Datensatz hinzufügen"
 
-#: tryton/gui/main.py:1082
+#: tryton/gui/main.py:1091
 #, python-format
 msgid "%s request"
 msgstr " %s Anfrage"
 
-#: tryton/gui/main.py:1084
+#: tryton/gui/main.py:1093
 #, python-format
 msgid "%s requests"
 msgstr "%s Anfragen"
 
-#: tryton/gui/main.py:1086
+#: tryton/gui/main.py:1095
 msgid "No request"
 msgstr "Keine Anfrage"
 
-#: tryton/gui/main.py:1089
+#: tryton/gui/main.py:1098
 #, python-format
 msgid " - %s request sent"
 msgstr "- %s Anfrage gesendet"
 
-#: tryton/gui/main.py:1091
+#: tryton/gui/main.py:1100
 #, python-format
 msgid " - %s requests sent"
 msgstr "- %s Anfragen gesendet"
 
-#: tryton/gui/main.py:1171
+#: tryton/gui/main.py:1180
 msgid "Not logged!"
 msgstr "Nicht angemeldet!"
 
-#: tryton/gui/main.py:1173
+#: tryton/gui/main.py:1182
 msgid "Press Ctrl+O to login"
 msgstr "Login mit Strg+O"
 
-#: tryton/gui/main.py:1191
+#: tryton/gui/main.py:1200
 msgid "SSL connection"
 msgstr "SSL Verbindung"
 
-#: tryton/gui/main.py:1246
+#: tryton/gui/main.py:1255
 msgid ""
 "You can not log into the system!\n"
 "Verify if you have a menu defined on your user."
@@ -649,21 +653,21 @@ msgstr ""
 "Systemanmeldung fehlgeschlagen!\n"
 "Überprüfen Sie bitte, ob für Ihren Benutzernamen ist eine Menüaktion eingestellt ist."
 
-#: tryton/gui/main.py:1280
-#: tryton/gui/main.py:1286
+#: tryton/gui/main.py:1290
+#: tryton/gui/main.py:1296
 msgid "Do you really want to quit?"
 msgstr "Wirklich beenden?"
 
-#: tryton/gui/main.py:1321
+#: tryton/gui/main.py:1331
 msgid "Close Tab"
 msgstr "Tab schließen"
 
-#: tryton/gui/main.py:1353
+#: tryton/gui/main.py:1363
 #, python-format
 msgid "Attachment(%d)"
 msgstr "Anhang(%d)"
 
-#: tryton/gui/main.py:1457
+#: tryton/gui/main.py:1467
 msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
@@ -671,7 +675,7 @@ msgstr ""
 "Sie werden eine Tryton Datenbank löschen.\n"
 "Wirklich fortfahren?"
 
-#: tryton/gui/main.py:1466
+#: tryton/gui/main.py:1476
 msgid ""
 "Wrong Tryton Server Password\n"
 "Please try again."
@@ -679,30 +683,30 @@ msgstr ""
 "Das Passwort für den Tryton Server ist falsch!\n"
 "Bitte geben Sie es noch einmal ein."
 
-#: tryton/gui/main.py:1468
-#: tryton/gui/main.py:1508
-#: tryton/gui/main.py:1546
+#: tryton/gui/main.py:1478
+#: tryton/gui/main.py:1518
+#: tryton/gui/main.py:1556
 #: tryton/gui/window/dbcreate.py:367
 msgid "Access denied!"
 msgstr "Zugang verweigert!"
 
-#: tryton/gui/main.py:1471
+#: tryton/gui/main.py:1481
 msgid "Database drop failed with error message:\n"
 msgstr "Das Löschen der Datenbank ist fehlgeschlagen mit der folgenden Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1473
+#: tryton/gui/main.py:1483
 msgid "Database drop failed!"
 msgstr "Datenbank konnte nicht gelöscht werden!"
 
-#: tryton/gui/main.py:1476
+#: tryton/gui/main.py:1486
 msgid "Database dropped successfully!"
 msgstr "Datenbank erfolgreich gelöscht!"
 
-#: tryton/gui/main.py:1482
+#: tryton/gui/main.py:1492
 msgid "Open Backup File to Restore..."
 msgstr "Backup Datei für Wiederherstellung öffnen..."
 
-#: tryton/gui/main.py:1500
+#: tryton/gui/main.py:1510
 msgid ""
 "It is not possible to restore a password protected database.\n"
 "Backup and restore needed to be proceed manual."
@@ -710,13 +714,13 @@ msgstr ""
 "Es ist nicht möglich eine passwortgeschützte Datenbank wiederherzustellen.\n"
 "Backup und Wiederherstellung müssen in diesem Fall manuell durchgeführt werden."
 
-#: tryton/gui/main.py:1504
-#: tryton/gui/main.py:1542
+#: tryton/gui/main.py:1514
+#: tryton/gui/main.py:1552
 msgid "Database is password protected!"
 msgstr "Datenbank ist passwortgeschützt!"
 
-#: tryton/gui/main.py:1506
-#: tryton/gui/main.py:1544
+#: tryton/gui/main.py:1516
+#: tryton/gui/main.py:1554
 msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
@@ -724,20 +728,20 @@ msgstr ""
 "Falsches Passwort für Tryton Server.\n"
 "Bitte versuchen Sie es noch einmal."
 
-#: tryton/gui/main.py:1511
+#: tryton/gui/main.py:1521
 msgid "Database restore failed with error message:\n"
 msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen mit Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1513
-#: tryton/gui/main.py:1520
+#: tryton/gui/main.py:1523
+#: tryton/gui/main.py:1530
 msgid "Database restore failed!"
 msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen!"
 
-#: tryton/gui/main.py:1517
+#: tryton/gui/main.py:1527
 msgid "Database restored successfully!"
 msgstr "Datenbank wurde erfolgreich wiederhergestellt!"
 
-#: tryton/gui/main.py:1539
+#: tryton/gui/main.py:1549
 msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
@@ -745,15 +749,15 @@ msgstr ""
 "Es ist nicht möglich eine passwortgeschützte Datenbank zu sichern.\n"
 "Backup und Wiederherstellung müssen in diesem Fall manuell durchgeführt werden."
 
-#: tryton/gui/main.py:1549
+#: tryton/gui/main.py:1559
 msgid "Database dump failed with error message:\n"
 msgstr "Die Datenbanksicherung ist fehlgeschlagen mit der Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1551
+#: tryton/gui/main.py:1561
 msgid "Database dump failed!"
 msgstr "Datenbank konnte nicht gesichert werden!"
 
-#: tryton/gui/main.py:1567
+#: tryton/gui/main.py:1577
 msgid "Database backuped successfully!"
 msgstr "Datenbank erfolgreich gesichert!"
 
@@ -1774,11 +1778,11 @@ msgstr "Immer anzuwenden!"
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:84
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:28
 msgid "Set to default value"
-msgstr "Auf Voreinstellung zurücksetzen"
+msgstr "Auf Standardeinstellung zurücksetzen"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:86
 msgid "Set as default"
-msgstr "Als Standard setzen"
+msgstr "Als Standardeinstellung speichern"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:193
 msgid "Invalid field!"
