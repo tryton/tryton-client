@@ -113,6 +113,8 @@ class PySocket:
         except:
             pass
         self.sock = None
+        self.ssl = False
+        self.ssl_sock = None
         self.connected = False
         self.buffer = ''
 
