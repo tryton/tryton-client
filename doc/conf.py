@@ -43,9 +43,9 @@ copyright = '2008, B2CK'
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = '1.1'
+version = ''
 # The full version, including alpha/beta/rc tags.
-release = '1.1.0'
+release = ''
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -85,7 +85,7 @@ html_style = 'default.css'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Tryton 1.1: Client Documentation'
+html_title = 'Tryton 1.2: Client Documentation'
 
 # The name of an image file (within the static path) to place at the top of
 # the sidebar.
