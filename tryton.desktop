@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Version=1.0
 Type=Application
 Name=Tryton
@@ -11,4 +10,3 @@ Exec=tryton
 Icon=tryton-icon
 Terminal=false
 Categories=Office;Finance;
-GenericName=Tryton Client
