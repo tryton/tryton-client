@@ -17,14 +17,22 @@ class Preference(object):
 
     def __init__(self, user, parent):
         self.win = gtk.Dialog(_('Preferences'), parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                    gtk.STOCK_OK, gtk.RESPONSE_OK))
+                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        self.win.set_default_response(gtk.RESPONSE_OK)
         self.win.set_has_separator(False)
         self.win.set_icon(TRYTON_ICON)
         self.parent = parent
+
+        self.accel_group = gtk.AccelGroup()
+        self.win.add_accel_group(self.accel_group)
+
+        self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL,
+                gtk.RESPONSE_CANCEL)
+        self.but_ok = self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
+        self.but_ok.add_accelerator('clicked', self.accel_group,
+                gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+
+        self.win.set_default_response(gtk.RESPONSE_OK)
 
         user = RPCProxy('res.user')
 
