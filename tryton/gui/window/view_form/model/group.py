@@ -94,7 +94,7 @@ class ModelRecordGroup(SignalEvent):
             self.readonly = True
 
     def __repr__(self):
-        return '<ModelRecordGroup %s>' % (self.resource,)
+        return '<ModelRecordGroup %s at %s>' % (self.resource, id(self))
 
     @staticmethod
     def mfields_load(fkeys, models):
