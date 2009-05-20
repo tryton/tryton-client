@@ -136,8 +136,7 @@ class ModelRecord(SignalEvent):
             if (get_readonly or \
                     not mfield.get_state_attrs(self).get('readonly', False)) \
                 and (not get_modifiedonly \
-                    or (mfield.name in self.modified_fields \
-                        or isinstance(mfield, field.O2MField))):
+                   or mfield.name in self.modified_fields):
                 value.append((name, mfield.get(self, check_load=check_load,
                     readonly=get_readonly, modified=get_modifiedonly)))
         value = dict(value)
