@@ -117,7 +117,7 @@ class ModelRecordGroup(SignalEvent):
     def writen(self, ids):
         if isinstance(ids, (int, long)):
             ids = [ids]
-        ids = self.on_write_ids(ids)
+        ids = [x for x in self.on_write_ids(ids) if x not in ids]
         if not ids:
             return
         self.reload(ids)
