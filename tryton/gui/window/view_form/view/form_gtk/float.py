@@ -36,7 +36,9 @@ class Float(Integer):
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
         try:
-            if new_value == '-':
+            decimal_point = locale.localeconv()['decimal_point']
+
+            if new_value in ('-', decimal_point):
                 return
 
             if isinstance(self.digits, str):
@@ -45,8 +47,6 @@ class Float(Integer):
                 digits = self.digits
 
             locale.atof(new_value)
-
-            decimal_point = locale.localeconv()['decimal_point']
 
             new_int = new_value
             new_decimal = ''
