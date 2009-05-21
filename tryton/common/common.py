@@ -1030,3 +1030,19 @@ COLORS = {
 DT_FORMAT = '%Y-%m-%d'
 HM_FORMAT = '%H:%M:%S'
 DHM_FORMAT = DT_FORMAT + ' ' + HM_FORMAT
+
+FLOAT_TIME_CONV = {
+    'M': 672,
+    'w': 168,
+    'd': 24,
+    'h': 1,
+    'm': 1.0/60,
+}
+
+FLOAT_TIME_SEPS = {
+    'M': _('M'),
+    'w': _('w'),
+    'd': _('d'),
+    'h': _('h'),
+    'm': _('m'),
+}

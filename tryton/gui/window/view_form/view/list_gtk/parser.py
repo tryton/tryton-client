@@ -1,7 +1,7 @@
-#This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
+#This file is part of Tryton.  The COPYRIGHT file at the top level of
+#this repository contains the full copyright notices and license terms.
 import locale
 import gtk
-import math
 
 from tryton.rpc import RPCProxy
 from editabletree import EditableTreeView
@@ -30,6 +30,9 @@ from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.action import Action
 from tryton.translate import date_format
 import mx.DateTime
+import gettext
+
+_ = gettext.gettext
 
 def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
@@ -149,7 +152,7 @@ class ParserTree(ParserInterface):
                     'biginteger': 60,
                     'float': 80,
                     'numeric': 80,
-                    'float_time': 80,
+                    'float_time': 100,
                     'date': 90,
                     'datetime': 140,
                     'selection': 90,
@@ -477,23 +480,67 @@ class FloatTime(Char):
 
     def get_textual_value(self, model):
         val = model[self.field_name].get_client(model)
-        value = '%02d:%02d' % (math.floor(abs(val)),
-                round(abs(val) % 1 + 0.01, 2) * 60)
+
+        conv = common.FLOAT_TIME_CONV
+
+        months = int(abs(val) / conv['M'])
+        weeks = int((abs(val) - months * conv['M']) / conv['w'])
+        days = int((abs(val) - months * conv['M'] - weeks * conv['w']) / conv['d'])
+        hours = int(abs(val) - months * conv['M'] - weeks * conv['w'] \
+                - days * conv['d'])
+        mins = round((abs(val) - months * conv['M'] - weeks * conv['w'] \
+                - days * conv['d'] - hours)% 1, 2) / conv['m']
+        value = ''
+        if months:
+            value += ' ' + locale.format('%d' + common.FLOAT_TIME_SEPS['M'],
+                    months, True)
+        if weeks:
+            value += ' ' + locale.format('%d' + common.FLOAT_TIME_SEPS['w'],
+                    weeks, True)
+        if days:
+            value += ' ' + locale.format('%d' + common.FLOAT_TIME_SEPS['d'],
+                    days, True)
+        if hours or mins:
+            value += ' %02d:%02d' % (hours, mins)
+        value = value.strip()
         if val < 0:
             value = '-' + value
         return value
 
     def value_from_text(self, model, text):
         try:
-            if text and ':' in text:
-                # assume <hours>:<minutes>
-                h, m = text.split(':')
-                h = h or 0
-                m = m or 0
-                return round(int(h) + int(m)/60.0, 2)
-            else:
-                # try float in locale notion
-                return locale.atof(text)
+            try:
+                return round(locale.atof(text), 2)
+            except:
+                pass
+            conv = common.FLOAT_TIME_CONV
+            for key in common.FLOAT_TIME_SEPS.keys():
+                text = text.replace(common.FLOAT_TIME_SEPS[key], key + ' ')
+            value = 0
+            for buf in text.split(' '):
+                buf = buf.strip()
+                if ':' in buf:
+                    hour, min = buf.split(':')
+                    value += abs(int(hour or 0))
+                    value += abs(int(min or 0) * conv['m'])
+                    continue
+                elif '-' in buf and not buf.startswith('-'):
+                    hour, min = buf.split('-')
+                    value += abs(int(hour or 0))
+                    value += abs(int(min or 0) * conv['m'])
+                    continue
+                try:
+                    value += abs(locale.atof(buf))
+                    continue
+                except:
+                    pass
+                for sep in conv.keys():
+                    if buf.endswith(sep):
+                        value += abs(locale.atof(buf[:-len(sep)])) * conv[sep]
+                        break
+            if text.startswith('-'):
+                value *= -1
+            return round(value, 2)
         except:
             return 0.0
 
