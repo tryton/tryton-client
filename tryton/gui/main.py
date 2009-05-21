@@ -265,12 +265,6 @@ class Main(object):
             self.sb_username.set_has_resize_grip(False)
             self.status_hbox.pack_start(self.sb_username, True, True)
 
-        if update:
-            self.status_hbox_label.destroy()
-        self.status_hbox_label = gtk.Label(_('Requests:'))
-        self.status_hbox.pack_start(self.status_hbox_label, False, True)
-        self.status_hbox.reorder_child(self.status_hbox_label, 0)
-
         if not update:
             self.sb_requests = gtk.Statusbar()
             self.sb_requests.set_size_request(130, -1)
