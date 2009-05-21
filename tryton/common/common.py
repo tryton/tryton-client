@@ -1032,6 +1032,7 @@ HM_FORMAT = '%H:%M:%S'
 DHM_FORMAT = DT_FORMAT + ' ' + HM_FORMAT
 
 FLOAT_TIME_CONV = {
+    'Y': 8760,
     'M': 672,
     'w': 168,
     'd': 24,
@@ -1040,6 +1041,7 @@ FLOAT_TIME_CONV = {
 }
 
 FLOAT_TIME_SEPS = {
+    'Y': _('Y'),
     'M': _('M'),
     'w': _('w'),
     'd': _('d'),
@@ -1087,15 +1089,24 @@ def text_to_float_time(text):
 def float_time_to_text(val):
     conv = FLOAT_TIME_CONV
 
-    months = int(abs(val) / conv['M'])
-    weeks = int((abs(val) - months * conv['M']) / conv['w'])
-    days = int((abs(val) - months * conv['M'] - weeks * conv['w']) \
-            / conv['d'])
-    hours = int(abs(val) - months * conv['M'] - weeks * conv['w'] \
-            - days * conv['d'])
-    mins = ((abs(val) - months * conv['M'] - weeks * conv['w'] \
-            - days * conv['d'] - hours)% 1 + 0.01) / conv['m']
     value = ''
+    if val < 0:
+        value += '-'
+    val = abs(val)
+    years = int(val / conv['Y'])
+    val = val - years * conv['Y']
+    months = int(val / conv['M'])
+    val = val - months * conv['M']
+    weeks = int(val / conv['w'])
+    val = val - weeks * conv['w']
+    days = int(val / conv['d'])
+    val = val - days * conv['d']
+    hours = int(val)
+    val = val - hours
+    mins = int((val% 1 + 0.01) / conv['m'])
+    if years:
+        value += ' ' + locale.format('%d' + FLOAT_TIME_SEPS['Y'],
+                years, True)
     if months:
         value += ' ' + locale.format('%d' + FLOAT_TIME_SEPS['M'],
                 months, True)
@@ -1108,6 +1119,4 @@ def float_time_to_text(val):
     if hours or mins:
         value += ' %02d:%02d' % (hours, mins)
     value = value.strip()
-    if val < 0:
-        value = '-' + value
     return value
