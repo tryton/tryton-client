@@ -1046,3 +1046,68 @@ FLOAT_TIME_SEPS = {
     'h': _('h'),
     'm': _('m'),
 }
+
+def text_to_float_time(text):
+    try:
+        try:
+            return locale.atof(text)
+        except:
+            pass
+        conv = FLOAT_TIME_CONV
+        for key in FLOAT_TIME_SEPS.keys():
+            text = text.replace(FLOAT_TIME_SEPS[key], key + ' ')
+        value = 0
+        for buf in text.split(' '):
+            buf = buf.strip()
+            if ':' in buf:
+                hour, min = buf.split(':')
+                value += abs(int(hour or 0))
+                value += abs(int(min or 0) * conv['m'])
+                continue
+            elif '-' in buf and not buf.startswith('-'):
+                hour, min = buf.split('-')
+                value += abs(int(hour or 0))
+                value += abs(int(min or 0) * conv['m'])
+                continue
+            try:
+                value += abs(locale.atof(buf))
+                continue
+            except:
+                pass
+            for sep in conv.keys():
+                if buf.endswith(sep):
+                    value += abs(locale.atof(buf[:-len(sep)])) * conv[sep]
+                    break
+        if text.startswith('-'):
+            value *= -1
+        return value
+    except:
+        return 0.0
+
+def float_time_to_text(val):
+    conv = FLOAT_TIME_CONV
+
+    months = int(abs(val) / conv['M'])
+    weeks = int((abs(val) - months * conv['M']) / conv['w'])
+    days = int((abs(val) - months * conv['M'] - weeks * conv['w']) \
+            / conv['d'])
+    hours = int(abs(val) - months * conv['M'] - weeks * conv['w'] \
+            - days * conv['d'])
+    mins = ((abs(val) - months * conv['M'] - weeks * conv['w'] \
+            - days * conv['d'] - hours)% 1 + 0.01) / conv['m']
+    value = ''
+    if months:
+        value += ' ' + locale.format('%d' + FLOAT_TIME_SEPS['M'],
+                months, True)
+    if weeks:
+        value += ' ' + locale.format('%d' + FLOAT_TIME_SEPS['w'],
+                weeks, True)
+    if days:
+        value += ' ' + locale.format('%d' + FLOAT_TIME_SEPS['d'],
+                days, True)
+    if hours or mins:
+        value += ' %02d:%02d' % (hours, mins)
+    value = value.strip()
+    if val < 0:
+        value = '-' + value
+    return value
