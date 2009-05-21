@@ -1,4 +1,4 @@
-* Improve float time widget to handle month, week and day
+* Improve float time widget to handle year, month, week and day
 
 Version 1.2.0 - 2009-04-20
 * Bug fixes (see mercurial logs for details)
