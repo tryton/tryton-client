@@ -70,7 +70,7 @@ class Form(SignalEvent):
         title.set_use_markup(True)
         title.modify_font(pango.FontDescription("14"))
         title.set_label('<b>' + self.name + '</b>')
-        title.set_padding(20, 3)
+        title.set_padding(20, 4)
         title.set_alignment(0.0, 0.5)
         title.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#000000"))
         title.show()
