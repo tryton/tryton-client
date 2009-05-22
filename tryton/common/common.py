@@ -1130,3 +1130,20 @@ def float_time_to_text(val, conv=None):
         value += ' %02d:%02d' % (hours, mins)
     value = value.strip()
     return value
+
+def filter_domain(domain):
+    '''
+    Return the biggest subset of domain with only AND operator
+    '''
+    res = []
+    for arg in domain:
+        if isinstance(arg, basestring):
+            if arg == 'OR':
+                res = []
+                break
+            continue
+        if isinstance(arg, tuple):
+            res.append(arg)
+        elif isinstance(arg, list):
+            res.extend(filter_domain(arg))
+    return res

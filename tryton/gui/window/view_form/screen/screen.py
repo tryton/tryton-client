@@ -10,6 +10,7 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 import gobject
 import tryton.common as common
+import copy
 
 
 class Screen(SignalEvent):
@@ -312,6 +313,31 @@ class Screen(SignalEvent):
                 _parse_fields(node2, fields)
         xml_dom = xml.dom.minidom.parseString(arch)
         _parse_fields(xml_dom, fields)
+
+        for dom in common.filter_domain(self.domain):
+            if '.' in dom[0]:
+                field1, field2 = dom[0].split('.', 2)
+            else:
+                field1, field2 = dom[0], 'id'
+            if field1 in fields:
+                field_dom = fields[field1].setdefault('domain', [])
+                if dom[1] in ('child_of', 'not child_of') \
+                        and field2 == 'id':
+                    dom = copy.copy(dom)
+                    if len(dom) == 4:
+                        field2 = dom[3]
+                        dom = (dom[0], dom[1], dom[2])
+                    else:
+                        field2 = field1
+                if isinstance(field_dom, basestring):
+                    fields[field1]['domain'] = '[' \
+                            + str(tuple([field2] + list(dom[1:]))) \
+                            + ',' + field_dom + ']'
+                else:
+                    fields[field1]['domain'] = [
+                            tuple([field2] + list(dom[1:])),
+                            field_dom]
+
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
                 self.fields_view_tree = {'arch': arch, 'fields': fields}

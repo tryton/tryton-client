@@ -1,3 +1,4 @@
+* Extend fields domain with local domains
 * Improve float time widget to handle year, month, week and day
   and handle float_time attribute for contextual time convertion
 
