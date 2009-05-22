@@ -49,6 +49,20 @@ class Selection(WidgetInterface):
                 except Exception, exception:
                     common.process_exception(exception, self._window)
                     selection = []
+
+            if isinstance(attrs.get('domain'), list):
+                for dom in common.filter_domain(attrs.get('domain', [])):
+                    if dom[1] in ('=', '!='):
+                        todel = []
+                        for i in range(len(selection)):
+                            if (dom[1] == '=' \
+                                    and selection[i][0] != dom[2]) \
+                                    or (dom[1] == '!=' \
+                                    and selection[i][0] == dom[2]):
+                                todel.append(i)
+                        for i in todel[::-1]:
+                            del selection[i]
+
         if attrs.get('sort', True):
             selection.sort(lambda x, y: cmp(x[1], y[1]))
         attrs['selection'] = selection
