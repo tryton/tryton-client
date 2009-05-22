@@ -478,12 +478,20 @@ class Float(Char):
 
 class FloatTime(Char):
 
+    def __init__(self, field_name, model, treeview=None, attrs=None,
+            window=None):
+        super(FloatTime, self).__init__(field_name, model, treeview=treeview,
+                attrs=attrs, window=window)
+        self.conv = None
+        if attrs and attrs.get('float_time'):
+            self.conv = rpc.CONTEXT.get(attrs['float_time'])
+
     def get_textual_value(self, model):
         val = model[self.field_name].get_client(model)
-        return common.float_time_to_text(val)
+        return common.float_time_to_text(val, self.conv)
 
     def value_from_text(self, model, text):
-        return common.text_to_float_time(text)
+        return common.text_to_float_time(text, self.conv)
 
 class M2O(Char):
 

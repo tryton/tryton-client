@@ -3,6 +3,7 @@
 import gtk
 from interface import WidgetInterface
 import tryton.common as common
+import tryton.rpc as rpc
 
 
 class FloatTime(WidgetInterface):
@@ -22,6 +23,10 @@ class FloatTime(WidgetInterface):
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry)
 
+        self.conv = None
+        if attrs and attrs.get('float_time'):
+            self.conv = rpc.CONTEXT.get(attrs['float_time'])
+
     def _color_widget(self):
         return self.entry
 
@@ -32,7 +37,8 @@ class FloatTime(WidgetInterface):
         value = self.entry.get_text()
         if not value:
             return model_field.set_client(model, 0.0)
-        return model_field.set_client(model, common.text_to_float_time(value))
+        return model_field.set_client(model,
+                common.text_to_float_time(value, self.conv))
 
     def display(self, model, model_field):
         super(FloatTime, self).display(model, model_field)
@@ -41,7 +47,7 @@ class FloatTime(WidgetInterface):
             return False
         val = model_field.get(model)
 
-        self.entry.set_text(common.float_time_to_text(val))
+        self.entry.set_text(common.float_time_to_text(val, self.conv))
 
     def display_value(self):
         return self.entry.get_text()

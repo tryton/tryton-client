@@ -1049,13 +1049,18 @@ FLOAT_TIME_SEPS = {
     'm': _('m'),
 }
 
-def text_to_float_time(text):
+def text_to_float_time(text, conv=None):
     try:
         try:
             return locale.atof(text)
         except:
             pass
-        conv = FLOAT_TIME_CONV
+        if conv:
+            tmp_conv = FLOAT_TIME_CONV.copy()
+            tmp_conv.update(conv)
+            conv = tmp_conv
+        else:
+            conv = FLOAT_TIME_CONV
         for key in FLOAT_TIME_SEPS.keys():
             text = text.replace(FLOAT_TIME_SEPS[key], key + ' ')
         value = 0
@@ -1086,8 +1091,13 @@ def text_to_float_time(text):
     except:
         return 0.0
 
-def float_time_to_text(val):
-    conv = FLOAT_TIME_CONV
+def float_time_to_text(val, conv=None):
+    if conv:
+        tmp_conv = FLOAT_TIME_CONV.copy()
+        tmp_conv.update(conv)
+        conv = tmp_conv
+    else:
+        conv = FLOAT_TIME_CONV
 
     value = ''
     if val < 0:
