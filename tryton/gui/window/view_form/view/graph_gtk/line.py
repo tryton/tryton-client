@@ -1,10 +1,11 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms.
 #This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
 from graph import Graph
-from tryton.common import hex2rgb
+from tryton.common import hex2rgb, float_time_to_text
 import locale
 import math
 import cairo
+import tryton.rpc as rpc
 
 
 class Line(Graph):
@@ -134,8 +135,8 @@ class Line(Graph):
 
         highlight = False
         draw_points = []
-        yfields_float_time = [x.get('key', x['name']) for x in self.yfields
-                if x.get('widget')]
+        yfields_float_time = dict([(x.get('key', x['name']), x.get('float_time'))
+            for x in self.yfields if x.get('widget')])
         for point in self.points:
             if point == nearest[0] and nearest[1] < dia / 100:
                 if not point.highlight:
@@ -143,11 +144,11 @@ class Line(Graph):
                     label = keys2txt[point.yname]
                     label += '\n'
                     if point.yname in yfields_float_time:
-                        val = '%02d:%02d' % (math.floor(abs(point.yval)),
-                                round(abs(point.yval) % 1 + 0.01, 2) * 60)
-                        if point.yval < 0:
-                            val = '-' + val
-                        label += val
+                        conv = None
+                        if yfields_float_time[point.yname]:
+                            conv = rpc.CONTEXT.get(
+                                    yfields_float_time[point.yname])
+                        label += float_time_to_text(point.yval, conv)
                     else:
                         label += locale.format('%.2f', point.yval, True)
                     label += '\n'
@@ -206,15 +207,13 @@ class Line(Graph):
         ylabels = super(Line, self).YLabels()
         if len([x.get('key', x['name']) for x in self.yfields
             if x.get('widget')]) == len(self.yfields):
-
-            def format(val):
-                val = locale.atof(val)
-                res = '%02d:%02d' % (math.floor(abs(val)),
-                        round(abs(val) % 1 + 0.01, 2) * 60)
-                if val < 0:
-                    res = '-' + res
-                return res
-            return [(x[0], format(x[1])) for x in ylabels]
+            conv = None
+            float_time = reduce(lambda x, y: x == y and x or False,
+                    [x.get('float_time') for x in self.yfields])
+            if float_time:
+                conv = rpc.CONTEXT.get(float_time)
+            return [(x[0], float_time_to_text(locale.atof(x[1]), conv))
+                    for x in ylabels]
         return ylabels
 
 

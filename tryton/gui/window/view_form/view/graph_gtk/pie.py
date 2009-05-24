@@ -3,8 +3,9 @@
 from graph import Graph, Area
 import math
 import cairo
-from tryton.common import hex2rgb
+from tryton.common import hex2rgb, float_time_to_text
 import locale
+import tryton.rpc as rpc
 
 
 class Pie(Graph):
@@ -135,15 +136,12 @@ class Pie(Graph):
                 if not slice.highlight:
                     slice.highlight = True
                     if self.yfields[0].get('widget') == 'float_time':
-                        val = slice.fraction * self.sum
-                        value = '%02d:%02d' % (math.floor(abs(val)),
-                                round(abs(val) % 1 + 0.01, 2) * 60)
-                        if val < 0:
-                            value = '-' + value
-                        sum = '%02d:%02d' % (math.floor(abs(self.sum)),
-                                round(abs(self.sum) % 1 + 0.01, 2) * 60)
-                        if self.sum < 0:
-                            sum = '-' + sum
+                        conv = None
+                        if self.yfields[0].get('float_time'):
+                            conv = rpc.CONTEXT.get(self.yfields[0]['float_time'])
+                        value = float_time_to_text(slice.fraction * self.sum,
+                                conv)
+                        sum = float_time_to_text(self.sum, conv)
                     else:
                         value = locale.format('%.2f', slice.fraction * self.sum)
                         sum = locale.format('%.2f', self.sum)
