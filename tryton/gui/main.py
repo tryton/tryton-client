@@ -151,7 +151,7 @@ class Main(object):
         settings.set_long_property('gtk-button-images', 1, 'Tryton:gui.main')
         settings.set_property('gtk-can-change-accels', True)
 
-        self.sig_toolbar()
+        self.sig_toolbar_show()
         self.sig_mode()
 
         if os.name in ('nt', 'mac') or \
@@ -579,47 +579,47 @@ class Main(object):
     def _set_menu_options(self):
         menu_options = gtk.Menu()
 
-        menuitem_menubar = gtk.MenuItem(_('_Menubar'))
-        menu_options.add(menuitem_menubar)
+        menuitem_toolbar = gtk.MenuItem(_('_Toolbar'))
+        menu_options.add(menuitem_toolbar)
 
-        menu_menubar = gtk.Menu()
-        menu_menubar.set_accel_group(self.accel_group)
-        menu_menubar.set_accel_path('<tryton>/Options/Menubar')
-        menuitem_menubar.set_submenu(menu_menubar)
+        menu_toolbar = gtk.Menu()
+        menu_toolbar.set_accel_group(self.accel_group)
+        menu_toolbar.set_accel_path('<tryton>/Options/Toolbar')
+        menuitem_toolbar.set_submenu(menu_toolbar)
 
         radiomenuitem_default = gtk.RadioMenuItem(label=_('_Default'))
         radiomenuitem_default.connect('activate',
-                lambda x: self.sig_menubar('default'))
-        radiomenuitem_default.set_accel_path('<tryton>/Options/Menubar/Default')
-        menu_menubar.add(radiomenuitem_default)
+                lambda x: self.sig_toolbar('default'))
+        radiomenuitem_default.set_accel_path('<tryton>/Options/Toolbar/Default')
+        menu_toolbar.add(radiomenuitem_default)
         if (CONFIG['client.toolbar'] or 'both') == 'default':
             radiomenuitem_default.set_active(True)
 
         radiomenuitem_both = gtk.RadioMenuItem(group=radiomenuitem_default,
                 label=_('_Text and Icons'))
         radiomenuitem_both.connect('activate',
-                lambda x: self.sig_menubar('both'))
+                lambda x: self.sig_toolbar('both'))
         radiomenuitem_both.set_accel_path(
-                '<tryton>/Options/Menubar/Text and Icons')
-        menu_menubar.add(radiomenuitem_both)
+                '<tryton>/Options/Toolbar/Text and Icons')
+        menu_toolbar.add(radiomenuitem_both)
         if (CONFIG['client.toolbar'] or 'both') == 'both':
             radiomenuitem_both.set_active(True)
 
         radiomenuitem_icons = gtk.RadioMenuItem(group=radiomenuitem_default,
                 label=_('_Icons'))
         radiomenuitem_icons.connect('activate',
-                lambda x: self.sig_menubar('icons'))
-        radiomenuitem_icons.set_accel_path('<tryton>/Options/Menubar/Icons')
-        menu_menubar.add(radiomenuitem_icons)
+                lambda x: self.sig_toolbar('icons'))
+        radiomenuitem_icons.set_accel_path('<tryton>/Options/Toolbar/Icons')
+        menu_toolbar.add(radiomenuitem_icons)
         if (CONFIG['client.toolbar'] or 'both') == 'icons':
             radiomenuitem_icons.set_active(True)
 
         radiomenuitem_text = gtk.RadioMenuItem(group=radiomenuitem_default,
                 label=_('_Text'))
         radiomenuitem_text.connect('activate',
-                lambda x: self.sig_menubar('text'))
-        radiomenuitem_text.set_accel_path('<tryton>/Options/Menubar/Text')
-        menu_menubar.add(radiomenuitem_text)
+                lambda x: self.sig_toolbar('text'))
+        radiomenuitem_text.set_accel_path('<tryton>/Options/Toolbar/Text')
+        menu_toolbar.add(radiomenuitem_text)
         if (CONFIG['client.toolbar'] or 'both') == 'text':
             radiomenuitem_text.set_active(True)
 
@@ -963,9 +963,9 @@ class Main(object):
 
     def sig_toolbar_change(self, value):
         CONFIG['form.toolbar'] = value
-        return self.sig_toolbar()
+        return self.sig_toolbar_show()
 
-    def sig_toolbar(self):
+    def sig_toolbar_show(self):
         toolbar = CONFIG['form.toolbar']
         if toolbar:
             self.toolbar.show()
@@ -984,7 +984,7 @@ class Main(object):
             self.status_hbox.show()
         return pda_mode
 
-    def sig_menubar(self, option):
+    def sig_toolbar(self, option):
         CONFIG['client.toolbar'] = option
         if option == 'default':
             self.toolbar.set_style(False)
