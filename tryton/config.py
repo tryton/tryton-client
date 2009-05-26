@@ -78,6 +78,7 @@ class ConfigManager(object):
             'client.tree_width': True,
             'client.spellcheck': False,
             'client.lang': locale.getdefaultlocale()[0],
+            'client.language_direction': 'ltr',
             'client.actions': {
                 'odt': {0: find_path(['ooffice', 'ooffice2'], '%s'),
                     1: find_path(['ooffice', 'ooffice2'], '-p %s')},

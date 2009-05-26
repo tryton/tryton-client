@@ -1023,11 +1023,11 @@ class Main(object):
         win = Preference(rpc._USER, self.window)
         if win.run():
             rpc.context_reload()
-            if 'language_direction' in rpc.CONTEXT:
-                translate.set_language_direction(
-                        rpc.CONTEXT['language_direction'])
             prefs = rpc.execute('model', 'res.user',
                     'get_preferences', False, rpc.CONTEXT)
+            if prefs and 'language_direction' in prefs:
+                translate.set_language_direction(prefs['language_direction'])
+                CONFIG['client.language_direction'] = prefs['language_direction']
             sb_id = self.sb_username.get_context_id('message')
             self.sb_username.push(sb_id, prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
@@ -1040,7 +1040,7 @@ class Main(object):
                     self.request_set()
                     self.sig_reload_menu()
                 CONFIG['client.lang'] = prefs['language']
-                CONFIG.save()
+            CONFIG.save()
         self.window.present()
         return True
 
@@ -1124,6 +1124,9 @@ class Main(object):
                         False, rpc.CONTEXT)
             except:
                 prefs = None
+            if prefs and 'language_direction' in prefs:
+                translate.set_language_direction(prefs['language_direction'])
+                CONFIG['client.language_direction'] = prefs['language_direction']
             menu_id = self.sig_win_menu(quiet=False, prefs=prefs)
             if menu_id:
                 self.sig_home_new(quiet=True, except_id=menu_id, prefs=prefs)
