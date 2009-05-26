@@ -5,7 +5,6 @@ import gtk
 import gobject
 from tryton.config import CONFIG
 import time
-import math
 import tryton.rpc as rpc
 from parse import Parse
 import datetime as DT
@@ -134,12 +133,12 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 for obj in res_ids:
                     obj[field] = locale.format('%d', obj[field] or 0, True)
             elif field_type in ('float_time',):
+                conv = None
+                if 'float_time' in self.fields_attrs[field]:
+                    conv = rpc.CONTEXT.get(
+                            self.fields_attrs[field]['float_time'])
                 for obj in res_ids:
-                    val = '%02d:%02d' % (math.floor(abs(obj[field])),
-                            round(abs(obj[field]) % 1 + 0.01, 2) * 60)
-                    if obj[field] < 0:
-                        val = '-' + val
-                    obj[field] = val
+                    obj[field] = common.float_time_to_text(obj[field], conv)
             elif field_type in ('boolean',):
                 for obj in res_ids:
                     obj[field] = bool(obj[field])
