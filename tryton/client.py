@@ -49,6 +49,7 @@ class TrytonClient(object):
 
     def __init__(self):
         logging.basicConfig()
+        translate.set_language_direction(CONFIG['client.language_direction'])
         translate.setlang(CONFIG['client.lang'])
         loglevel = {
                 'DEBUG': logging.DEBUG,
