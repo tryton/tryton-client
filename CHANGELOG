@@ -1,3 +1,4 @@
+* Add 'starts with' and 'ends with' on char search
 * Handle domain with '=' or '!=' as operator on selection
 * Extend fields domain with local domains
 * Improve float time widget to handle year, month, week and day

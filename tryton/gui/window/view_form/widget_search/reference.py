@@ -93,7 +93,7 @@ class Reference(Interface):
         value = self._selection.get(self.entry.child.get_text(), False)
         oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
         if value or oper != 'like':
-            return [(self.name, oper, value + ',')]
+            return [(self.name, oper, value + ',%')]
         else:
             self.entry.child.set_text('')
             return []

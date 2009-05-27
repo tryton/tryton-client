@@ -20,10 +20,13 @@ class Char(Interface):
         cell = gtk.CellRendererText()
         self.combo.pack_start(cell, True)
         self.combo.add_attribute(cell, 'text', 1)
-        for oper in (['ilike', _('contains')],
+        for oper in (
+                ['ilike', _('contains')],
                 ['not ilike', _('does not contain')],
                 ['=', _('equals')],
                 ['!=', _('does not equal')],
+                ['starts', _('starts with')],
+                ['ends', _('ends with')],
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)
@@ -42,6 +45,13 @@ class Char(Interface):
         if value or oper != 'ilike':
             if oper == '=' and not value:
                 value = False
+            if oper in ('ilike', 'not ilike') \
+                    and '%' not in value:
+                return [(self.name, oper, '%' + value + '%')]
+            elif oper == 'starts':
+                return [(self.name, 'ilike', value + '%')]
+            elif oper == 'ends':
+                return [(self.name, 'ilike', '%' + value)]
             return [(self.name, oper, value)]
         else:
             return []
