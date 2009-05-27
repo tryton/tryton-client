@@ -300,8 +300,20 @@ class ViewList(ParserView):
             ('COMPOUND_TEXT', 0, 2),
             ('UTF8_STRING', 0, 3)
         ]
-        clipboard.set_with_data(targets, self.copy_get_func,
-                self.copy_clear_func, self.widget_tree.get_selection())
+        selection = self.widget_tree.get_selection()
+        # Set to clipboard directly if not too much selected rows
+        # to speed up paste
+        # Don't use set_with_data on mac see:
+        # http://bugzilla.gnome.org/show_bug.cgi?id=508601
+        if selection.count_selected_rows() < 100 \
+                or os.name == 'mac' \
+                or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+            data = []
+            selection.selected_foreach(self.copy_foreach, data)
+            clipboard.set_text('\n'.join(data))
+        else:
+            clipboard.set_with_data(targets, self.copy_get_func,
+                    self.copy_clear_func, selection)
 
     def copy_foreach(self, treemodel, path,iter, data):
         model = treemodel.get_value(iter, 0)
