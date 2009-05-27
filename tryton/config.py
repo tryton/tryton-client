@@ -74,7 +74,6 @@ class ConfigManager(object):
             'client.default_path': get_home_dir(),
             'form.toolbar': True,
             'client.form_tab': 'left',
-            'client.form_tab_orientation': 90,
             'client.tree_width': True,
             'client.spellcheck': False,
             'client.lang': locale.getdefaultlocale()[0],

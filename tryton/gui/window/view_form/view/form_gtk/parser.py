@@ -560,10 +560,12 @@ class ParserForm(ParserInterface):
                     dict_widget[widget_name].extend(widgets)
 
             elif node.localName == 'page':
-                if attrs and 'angle' in attrs:
-                    angle = int(attrs['angle'])
+                if CONFIG['client.form_tab'] == 'left':
+                    angle = 90
+                elif CONFIG['client.form_tab'] == 'right':
+                    angle = -90
                 else:
-                    angle = int(CONFIG['client.form_tab_orientation'])
+                    angle = 0
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
                     if 'states' in fields[attrs['name']]:

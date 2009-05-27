@@ -725,35 +725,6 @@ class Main(object):
         if (CONFIG['client.form_tab'] or 'left') == 'bottom':
             radiomenuitem_bottom.set_active(True)
 
-        menuitem_orientation = gtk.MenuItem(_('Tabs Orientation'))
-        menu_form.add(menuitem_orientation)
-
-        menu_orientation = gtk.Menu()
-        menu_orientation.set_accel_group(self.accel_group)
-        menu_orientation.set_accel_path('<tryton>/Options/Tabs Orientation')
-        menuitem_orientation.set_submenu(menu_orientation)
-
-        radiomenuitem_horizontal = gtk.RadioMenuItem(label=_('Horizontal'))
-        radiomenuitem_horizontal.connect('activate',
-                lambda x: CONFIG.__setitem__('client.form_tab_orientation',
-                    0))
-        radiomenuitem_horizontal.set_accel_path(
-                '<tryton>/Options/Tabs Orientation/Horizontal')
-        menu_orientation.add(radiomenuitem_horizontal)
-        if (str(CONFIG['client.form_tab_orientation']) or '0') == '0':
-            radiomenuitem_horizontal.set_active(True)
-
-        radiomenuitem_vertical = gtk.RadioMenuItem(group=radiomenuitem_horizontal,
-                label=_('Vertical'))
-        radiomenuitem_vertical.connect('activate',
-                lambda x: CONFIG.__setitem__('client.form_tab_orientation',
-                    90))
-        radiomenuitem_vertical.set_accel_path(
-                '<tryton>/Options/Tabs Orientation/Vertical')
-        menu_orientation.add(radiomenuitem_vertical)
-        if (str(CONFIG['client.form_tab_orientation']) or '0') == '90':
-            radiomenuitem_vertical.set_active(True)
-
         menuitem_actions = gtk.MenuItem(_('File _Actions...'))
         self.menuitem_actions = menuitem_actions
         menuitem_actions.connect('activate', self.sig_file_actions)
@@ -998,10 +969,6 @@ class Main(object):
     @staticmethod
     def sig_form_tab(option):
         CONFIG['client.form_tab'] = option
-
-    @staticmethod
-    def sig_form_tab_orientation(option):
-        CONFIG['client.form_tab_orientation'] = option
 
     def sig_file_actions(self, widget):
         FileActions(self.window).run()

@@ -125,10 +125,12 @@ class ParserBoard(object):
                 widget, new_widgets = self.parse(node, notebook, tooltips=tooltips)
                 widgets += new_widgets
             elif node.localName == 'page':
-                if attrs and 'angle' in attrs:
-                    angle = int(attrs['angle'])
+                if CONFIG['client.form_tab'] == 'left':
+                    angle = 90
+                elif CONFIG['client.form_tab'] == 'right':
+                    angle = -90
                 else:
-                    angle = int(CONFIG['client.form_tab_orientation'])
+                    angle = 0
                 label = gtk.Label(attrs.get('string','No String Attr.'))
                 label.set_angle(angle)
                 widget, new_widgets = self.parse(node, notebook, tooltips=tooltips)
