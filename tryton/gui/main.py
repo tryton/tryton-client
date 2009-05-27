@@ -148,7 +148,7 @@ class Main(object):
         self.sb_set()
 
         settings = gtk.settings_get_default()
-        settings.set_long_property('gtk-button-images', 1, 'Tryton:gui.main')
+        settings.set_property('gtk-button-images', True)
         settings.set_property('gtk-can-change-accels', True)
 
         self.sig_toolbar_show()
