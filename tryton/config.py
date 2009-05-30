@@ -8,6 +8,7 @@ from version import VERSION
 import logging
 import sys
 import locale
+import gtk
 
 _ = gettext.gettext
 
@@ -187,18 +188,6 @@ if not os.path.isdir(PIXMAPS_DIR):
         PREFIX = os.path.abspath(os.path.normpath(
             os.path.dirname(sys.argv[0])))
         PIXMAPS_DIR = os.path.join(PREFIX, 'share', 'pixmaps', 'tryton')
-
-if os.name == 'nt':
-    sys.path.insert(0, os.path.join(CURRENT_DIR, 'GTK\\bin'))
-    sys.path.insert(0, os.path.join(CURRENT_DIR, 'GTK\\lib'))
-    sys.path.insert(0, os.path.join(CURRENT_DIR))
-    os.environ['PATH'] = os.path.join(CURRENT_DIR, 'GTK\\lib') + ";" + \
-            os.environ['PATH']
-    os.environ['PATH'] = os.path.join(CURRENT_DIR, 'GTK\\bin') + ";" + \
-            os.environ['PATH']
-    os.environ['PATH'] = os.path.join(CURRENT_DIR) + ";" + os.environ['PATH']
-
-import gtk
 
 TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
         os.path.join(PIXMAPS_DIR, '..', 'tryton-icon.png'))

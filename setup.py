@@ -81,7 +81,9 @@ if os.name == 'nt':
 elif os.name == 'mac' \
         or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
     import py2app
-    args['app'] = [os.path.join('tryton', 'client.py')]
+    from modulegraph.find_modules import PY_SUFFIXES
+    PY_SUFFIXES.append('')
+    args['app'] = [os.path.join('bin', 'tryton')]
     args['options'] = {
         'py2app': {
             'argv_emulation': True,
