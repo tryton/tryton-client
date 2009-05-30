@@ -5,9 +5,6 @@
 !ifndef VERSION
     !error "Missing VERSION! Specify it with '/DVERSION=<VERSION>'"
 !endif
-!ifndef GTKDIR
-    !error "Missing GTKDIR! Specify it with '/DGTKDIR=<GTKDIR>'"
-!endif
 
 ;Include Modern UI
 !include "MUI.nsh"
@@ -98,38 +95,8 @@ SectionIn 1 2 RO
     File "TODO"
     File "CHANGELOG"
 
-    SetOutPath "$INSTDIR\GTK\bin"
-    File /r "${GTKDIR}\bin\*"
-
-    SetOutPath "$INSTDIR\GTK\etc"
-    File /r "${GTKDIR}\etc\*"
-
-    SetOutPath "$INSTDIR\GTK\lib"
-    File /r "${GTKDIR}\lib\*"
-
-    SetOutPath "$INSTDIR\GTK\share\gtk-2.0"
-    File /r "${GTKDIR}\share\gtk-2.0\*"
-
-    SetOutPath "$INSTDIR\GTK\share\gtkthemeselector"
-    File /r "${GTKDIR}\share\gtkthemeselector\*"
-
-    SetOutPath "$INSTDIR\GTK\share\locale\de"
-    File /r "${GTKDIR}\share\locale\de\*"
-
-    SetOutPath "$INSTDIR\GTK\share\locale\es"
-    File /r "${GTKDIR}\share\locale\es\*"
-
-    SetOutPath "$INSTDIR\GTK\share\locale\fr"
-    File /r "${GTKDIR}\share\locale\fr\*"
-
-    SetOutPath "$INSTDIR\GTK\share\themes"
-    File /r "${GTKDIR}\share\themes\*"
-
     SetOutPath "$INSTDIR\doc"
     File /r "doc\*"
-
-    SetOutPath "$INSTDIR\plugins"
-    File /r "tryton\plugins\*"
 
     ;Write the installation path into the registry
     WriteRegStr HKCU "Software\tryton-${VERSION}" "" $INSTDIR

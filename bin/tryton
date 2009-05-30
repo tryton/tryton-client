@@ -8,18 +8,6 @@ try:
 except:
     pass
 
-if os.name == 'nt' \
-        and os.path.isdir(os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
-            'GTK')):
-    sys.path.insert(0, os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
-        'GTK\\bin'))
-    sys.path.insert(0, os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
-        'GTK\\lib'))
-    os.environ['PATH'] = os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
-        'GTK\\bin') + ';' + os.environ['PATH']
-    os.environ['PATH'] = os.path.join(os.getcwd(), os.path.dirname(sys.argv[0]),
-        'GTK\\lib') + ';' + os.environ['PATH']
-
 if os.name == 'mac' or \
         (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
     resources = os.path.join(os.path.dirname(sys.argv[0]), '..', 'Resources')

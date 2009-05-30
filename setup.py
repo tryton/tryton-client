@@ -49,31 +49,9 @@ if os.name == 'nt':
                 'encodings',
                 'gtk',
                 'pytz',
-            ],
-            'includes': 'pango,atk,gobject,cairo,pangocairo',
-            'dll_excludes': [
-                'iconv.dll',
-                'intl.dll',
-                'libatk-1.0-0.dll',
-                'libgdk_pixbuf-2.0-0.dll',
-                'libgdk-win32-2.0-0.dll',
-                'libglib-2.0-0.dll',
-                'libgmodule-2.0-0.dll',
-                'libgobject-2.0-0.dll',
-                'libgthread-2.0-0.dll',
-                'libgtk-win32-2.0-0.dll',
-                'libpango-1.0-0.dll',
-                'libpangowin32-1.0-0.dll',
-                'libcairo-2.dll',
-                'libfontconfig-1.dll',
-                'libfreetype-6.dll',
-                'libgdkglext-win32-1.0.0.dll',
-                'libglade-2.0-0.dll',
-                'libgtkglext-win32-1.0-0.dll',
-                'libpangocairo-1.0-0.dll',
-                'libpangoft2-1.0-0.dll',
-                'libxml2.dll',
-                'zlib1.dll',
+                'atk',
+                'pango',
+                'pangocairo',
             ],
         }
     }
@@ -101,7 +79,7 @@ elif os.name == 'mac' \
 
 execfile(os.path.join('tryton', 'version.py'))
 
-setup(name=PACKAGE,
+dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
     author='B2CK',
@@ -144,3 +122,45 @@ setup(name=PACKAGE,
     },
     **args
 )
+
+if os.name == 'nt':
+    def find_gtk_dir():
+        for directory in os.environ['PATH'].split(';'):
+            if not os.path.isdir(directory):
+                continue
+            for file in ('gtk-demo.exe',):
+                if os.path.isfile(os.path.join(directory, file)):
+                    return os.path.dirname(directory)
+        return None
+
+    if 'py2exe' in dist.commands:
+        import shutil
+        gtk_dir = find_gtk_dir()
+
+        dist_dir = dist.command_obj['py2exe'].dist_dir
+
+        if os.path.isdir(os.path.join(dist_dir, 'plugins')):
+            shutil.rmtree(os.path.join(dist_dir, 'plugins'))
+        shutil.copytree(os.path.join(os.path.dirname(__file__), 'tryton', 'plugins'),
+            os.path.join(dist_dir, 'plugins'))
+
+        if os.path.isdir(os.path.join(dist_dir, 'etc')):
+            shutil.rmtree(os.path.join(dist_dir, 'etc'))
+        shutil.copytree(os.path.join(gtk_dir, 'etc'),
+            os.path.join(dist_dir, 'etc'))
+
+        if os.path.isdir(os.path.join(dist_dir, 'lib')):
+            shutil.rmtree(os.path.join(dist_dir, 'lib'))
+        shutil.copytree(os.path.join(gtk_dir, 'lib'),
+            os.path.join(dist_dir, 'lib'))
+
+        for lang in ('de', 'es', 'fr'):
+            if os.path.isdir(os.path.join(dist_dir, 'share', 'locale', lang)):
+                shutil.rmtree(os.path.join(dist_dir, 'share', 'locale', lang))
+            shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
+                os.path.join(dist_dir, 'share', 'locale', lang))
+
+        if os.path.isdir(os.path.join(dist_dir, 'share', 'themes', 'MS-Windows')):
+            shutil.rmtree(os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
+        shutil.copytree(os.path.join(gtk_dir, 'share', 'themes', 'MS-Windows'),
+            os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
