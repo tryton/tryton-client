@@ -133,6 +133,15 @@ if os.name == 'nt':
                     return os.path.dirname(directory)
         return None
 
+    def find_makensis():
+        for directory in os.environ['PATH'].split(';'):
+            if not os.path.isdir(directory):
+                continue
+            path = os.path.join(directory, 'makensis.exe')
+            if os.path.isfile(path):
+                return path
+        return None
+
     if 'py2exe' in dist.commands:
         import shutil
         gtk_dir = find_gtk_dir()
@@ -164,3 +173,13 @@ if os.name == 'nt':
             shutil.rmtree(os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
         shutil.copytree(os.path.join(gtk_dir, 'share', 'themes', 'MS-Windows'),
             os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
+
+        makensis = find_makensis()
+        if makensis:
+            from subprocess import Popen
+            Popen([makensis, "/DVERSION=" + VERSION,
+                str(os.path.join(os.path.dirname(__file__),
+                    'setup.nsi'))]).wait()
+            Popen([makensis, "/DVERSION=" + VERSION,
+                str(os.path.join(os.path.dirname(__file__),
+                    'setup-single.nsi'))]).wait()
