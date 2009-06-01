@@ -80,8 +80,8 @@ class Many2Many(WidgetInterface):
 
         try:
             ids = rpc.execute('model', self.attrs['relation'], 'search',
-                    [('rec_name', 'ilike', value), domain], 0, _LIMIT,
-                    None, context)
+                    [('rec_name', 'ilike', '%' + value + '%'), domain], 0,
+                    _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

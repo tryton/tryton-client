@@ -376,7 +376,8 @@ class Dialog(object):
         try:
             ids = rpc.execute('model', self.attrs['relation'],
                     'search',
-                    [('rec_name', 'ilike', self.wid_text.get_text()), domaini],
+                    [('rec_name', 'ilike',
+                        '%' + self.wid_text.get_text() + '%'), domaini],
                     0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
@@ -602,7 +603,7 @@ class One2Many(WidgetInterface):
         try:
             ids = rpc.execute('model', self.attrs['relation'],
                     'search',
-                    [('rec_name', 'ilike', self.wid_text.get_text()),
+                    [('rec_name', 'ilike', '%' + self.wid_text.get_text() + '%'),
                     ['OR', domain, ('id', 'in', removed_ids)]],
                     0, _LIMIT, None, context)
         except Exception, exception:

@@ -278,9 +278,9 @@ class Many2One(WidgetInterface):
                 try:
                     ids = rpc.execute('model', self.attrs['relation'],
                             'search',
-                            [('rec_name', 'ilike', self.wid_text.get_text()),
-                                domain],
-                            0, _LIMIT, None, context)
+                            [('rec_name', 'ilike',
+                                '%' + self.wid_text.get_text() + '%'),
+                                domain], 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -352,9 +352,9 @@ class Many2One(WidgetInterface):
                 try:
                     ids = rpc.execute('model', self.attrs['relation'],
                             'search',
-                            [('rec_name', 'ilike', self.wid_text.get_text()),
-                                domain],
-                            0, _LIMIT, None, context)
+                            [('rec_name', 'ilike',
+                                '%' + self.wid_text.get_text() +'%'),
+                                domain], 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)

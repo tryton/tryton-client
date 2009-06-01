@@ -169,9 +169,9 @@ class Reference(WidgetInterface):
                 try:
                     ids = rpc.execute('model', model,
                             'search',
-                            [('rec_name', 'ilike', self.wid_text.get_text()),
-                                domain],
-                            0, _LIMIT, None, context)
+                            [('rec_name', 'ilike',
+                                '%' + self.wid_text.get_text() + '%'),
+                                domain], 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True
