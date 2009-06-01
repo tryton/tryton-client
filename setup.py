@@ -183,3 +183,79 @@ if os.name == 'nt':
             Popen([makensis, "/DVERSION=" + VERSION,
                 str(os.path.join(os.path.dirname(__file__),
                     'setup-single.nsi'))]).wait()
+elif os.name == 'mac' \
+        or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+    def find_gtk_dir():
+        for directory in os.environ['PATH'].split(':'):
+            if not os.path.isdir(directory):
+                continue
+            for file in ('gtk-demo',):
+                if os.path.isfile(os.path.join(directory, file)):
+                    return os.path.dirname(directory)
+        return None
+
+    if 'py2app' in dist.commands:
+        import shutil
+        from subprocess import Popen
+        gtk_dir = find_gtk_dir()
+
+        dist_dir = dist.command_obj['py2app'].dist_dir
+
+        pango_dist_dir = os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'lib', 'pango')
+        if os.path.isdir(pango_dist_dir):
+            shutil.rmtree(pango_dist_dir)
+        shutil.copytree(os.path.join(gtk_dir, 'lib', 'pango'), pango_dist_dir)
+
+        Popen(str(os.path.join(gtk_dir, 'bin', 'pango-querymodules')) \
+            + ' | sed -e "s#' + gtk_dir + '#@executable_path/../Resources#" ' \
+            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'pango.modules')),
+            shell=True).wait()
+        Popen('echo -e "[Pango]\nModuleFiles=./pango.modules\n" ' \
+            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'pangorc')),
+            shell=True).wait()
+
+        gtk_2_dist_dir = os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources',
+             'lib', 'gtk-2.0')
+        if os.path.isdir(gtk_2_dist_dir):
+            shutil.rmtree(gtk_2_dist_dir)
+        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0'), gtk_2_dist_dir)
+
+        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'engines'), shell=True).wait()
+        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'immodules'), shell=True).wait()
+        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'printbackends'), shell=True).wait()
+        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, 'include'), shell=True).wait()
+        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, 'modules'), shell=True).wait()
+
+        Popen(str(os.path.join(gtk_dir, 'bin', 'gdk-pixbuf-query-loaders')) \
+            + ' | sed -e "s#' + gtk_dir + '#@executable_path/../Resources#" ' \
+            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'gdk-pixbuf.loaders')),
+            shell=True).wait()
+
+        Popen('for library in ' \
+            + str(os.path.join(gtk_2_dist_dir, '*', 'loaders', '*.so')) + ' ' \
+            + str(os.path.join(pango_dist_dir, '*', 'modules', '*.so')) + '; do ' \
+            + 'libs="`otool -L $library 2>/dev/null | fgrep compatibility | ' \
+                + 'cut -d\( -f1 | grep ' + gtk_dir + ' | sort | uniq`";' \
+            + 'for lib in $libs; do ' \
+                + 'fixed=`echo $lib | sed -e s,' + gtk_dir \
+                    + '/lib,@executable_path/../Frameworks,`;' \
+                + 'install_name_tool -change $lib $fixed $library;' \
+            + 'done;' \
+            + 'done', shell=True).wait()
+
+        for file in ('CHANGELOG', 'COPYRIGHT', 'LICENSE', 'README', 'TODO'):
+            shutil.copyfile(os.path.join(os.path.dirname(__file__), file),
+                os.path.join(dist_dir, file + '.txt'))
+
+        doc_dist_dir = os.path.join(dist_dir, 'doc')
+        if os.path.isdir(doc_dist_dir):
+            shutil.rmtree(doc_dist_dir)
+        shutil.copytree(os.path.join(os.path.dirname(__file__), 'doc'),
+            doc_dist_dir)
+
+        dmg_file = os.path.join(os.path.dirname(__file__),
+            'tryton-' + VERSION + '.dmg')
+        if os.path.isfile(dmg_file):
+            os.remove(dmg_file)
+        Popen('hdiutil create ' + dmg_file + ' -volname "Tryton Client ' + VERSION + '" ' \
+            + '-fs HFS+ -srcfolder ' + dist_dir, shell=True).wait()
