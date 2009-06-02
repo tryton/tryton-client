@@ -377,7 +377,7 @@ class Dialog(object):
             ids = rpc.execute('model', self.attrs['relation'],
                     'search',
                     [('rec_name', 'ilike',
-                        '%' + self.wid_text.get_text() + '%'), domaini],
+                        '%' + self.wid_text.get_text() + '%'), domain],
                     0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
