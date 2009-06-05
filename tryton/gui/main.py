@@ -133,7 +133,6 @@ class Main(object):
         self.vbox.pack_start(self.notebook, True, True)
 
         self.status_hbox = None
-        self.set_statusbar()
 
         self.window.show_all()
 
@@ -141,6 +140,7 @@ class Main(object):
         self.previous_pages = {}
         self.current_page = 0
         self.last_page = 0
+        self.status_bar = ''
 
         if CONFIG['client.modepda']:
             self.radiomenuitem_pda.set_active(True)
@@ -157,7 +157,6 @@ class Main(object):
             pass
 
         self.sig_toolbar_show()
-        self.sig_mode()
 
         if os.name in ('nt', 'mac') or \
                 (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
@@ -174,8 +173,16 @@ class Main(object):
             self.menubar.destroy()
         menubar = gtk.MenuBar()
         self.menubar = menubar
-        self.vbox.pack_start(menubar, False, True)
-        self.vbox.reorder_child(menubar, 0)
+        hbox = gtk.HBox()
+        hbox.pack_start(menubar, True, True)
+        self.connection_img = gtk.Image()
+        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
+        hbox.pack_start(self.connection_img, False, False)
+        self.secure_img = gtk.Image()
+        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
+        hbox.pack_start(self.secure_img, False, False)
+        self.vbox.pack_start(hbox, False, True)
+        self.vbox.reorder_child(hbox, 0)
 
         menuitem_file = gtk.MenuItem(_('_File'))
         menubar.add(menuitem_file)
@@ -250,33 +257,6 @@ class Main(object):
         menu_help.set_accel_path('<tryton>/Help')
 
         self.menubar.show_all()
-
-    def set_statusbar(self):
-        update = True
-        if not self.status_hbox:
-            self.status_hbox = gtk.HBox(spacing=2)
-            update = False
-            self.vbox.pack_end(self.status_hbox, False, True, padding=2)
-
-        if not update:
-            self.sb_servername = gtk.Statusbar()
-            self.sb_servername.set_size_request(150, -1)
-            self.sb_servername.set_has_resize_grip(False)
-            self.status_hbox.pack_start(self.sb_servername, True, True)
-
-        if not update:
-            self.sb_username = gtk.Statusbar()
-            self.sb_username.set_size_request(130, -1)
-            self.sb_username.set_has_resize_grip(False)
-            self.status_hbox.pack_start(self.sb_username, True, True)
-
-        if not update:
-            self.secure_img = gtk.Image()
-            self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
-            self.status_hbox.pack_start(self.secure_img, False, True)
-
-        if not update:
-            self.status_hbox.show_all()
 
     def _set_menu_file(self):
         menu_file = gtk.Menu()
@@ -930,15 +910,7 @@ class Main(object):
 
     def sig_mode_change(self, pda_mode=False):
         CONFIG['client.modepda'] = pda_mode
-        return self.sig_mode()
-
-    def sig_mode(self):
-        pda_mode = CONFIG['client.modepda']
-        if pda_mode:
-            self.status_hbox.hide()
-        else:
-            self.status_hbox.show()
-        return pda_mode
+        return
 
     def sig_toolbar(self, option):
         CONFIG['client.toolbar'] = option
@@ -980,15 +952,13 @@ class Main(object):
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = prefs['language_direction']
-            sb_id = self.sb_username.get_context_id('message')
-            self.sb_username.push(sb_id, prefs.get('status_bar', ''))
+            self.status_bar = prefs.get('status_bar', '')
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
                     self.set_toolbar_label()
                     self.shortcut_set()
-                    self.set_statusbar()
                     self.request_set()
                     self.sig_reload_menu()
                 CONFIG['client.lang'] = prefs['language']
@@ -1082,7 +1052,6 @@ class Main(object):
                     self.set_menubar()
                     self.set_toolbar_label()
                     self.shortcut_set()
-                    self.set_statusbar()
                     self.request_set()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
@@ -1115,10 +1084,10 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
-        sb_id = self.sb_username.get_context_id('message')
-        self.sb_username.push(sb_id, _('Not logged!'))
-        sb_id = self.sb_servername.get_context_id('message')
-        self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
+        self.status_bar = ''
+        self.window.set_title('Tryton')
+        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
+        self.tooltips.set_tip(self.connection_img, '')
         self.shortcut_unset()
         self.toolbutton_menu.set_sensitive(False)
         self.toolbutton_request.set_sensitive(False)
@@ -1140,8 +1109,8 @@ class Main(object):
                     '\n' + info)
             self.secure_img.show()
         else:
-            self.tooltips.set_tip(self.secure_img, '')
             self.secure_img.hide()
+            self.tooltips.set_tip(self.secure_img, '')
 
     def sig_tips(self, *args):
         Tips(self.window)
@@ -1183,11 +1152,11 @@ class Main(object):
                 prefs = common.process_exception(exception, self.window, *args)
                 if not prefs:
                     return False
-        sb_id = self.sb_username.get_context_id('message')
-        self.sb_username.push(sb_id, prefs['status_bar'] or '')
-        sb_id = self.sb_servername.get_context_id('message')
-        self.sb_servername.push(sb_id, '%s@%s:%d/%s' % (rpc._USERNAME,
-            rpc._SOCK.hostname, rpc._SOCK.port, rpc._DATABASE))
+        self.status_bar = prefs.get('status_bar', '')
+        self.connection_img.set_from_stock('tryton-connect', gtk.ICON_SIZE_MENU)
+        self.tooltips.set_tip(self.connection_img, '%s@%s:%d/%s' \
+                % (rpc._USERNAME, rpc._SOCK.hostname, rpc._SOCK.port,
+                    rpc._DATABASE))
         if not prefs[menu_type]:
             if quiet:
                 return False
@@ -1380,6 +1349,8 @@ class Main(object):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
         title = 'Tryton'
+        if self.status_bar:
+            title += ' - ' + self.status_bar
         page = self._wid_get()
         if page:
             title += ' - ' + page.name
