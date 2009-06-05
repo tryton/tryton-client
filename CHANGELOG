@@ -1,4 +1,5 @@
 * Store in config default width and height of main window
+* Added arrow navigation if supported by gtk
 * Add 'starts with' and 'ends with' on char search
 * Handle domain with '=' or '!=' as operator on selection
 * Extend fields domain with local domains
