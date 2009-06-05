@@ -1122,7 +1122,7 @@ class Main(object):
         self.shortcut_unset()
         self.toolbutton_menu.set_sensitive(False)
         self.toolbutton_request.set_sensitive(False)
-        self.toolbutton_request.set_label(_('Requests'))
+        self.toolbutton_request.set_label(_('Request'))
         self.menuitem_user.set_sensitive(False)
         self.menuitem_form.set_sensitive(False)
         self.menuitem_plugins.set_sensitive(False)
