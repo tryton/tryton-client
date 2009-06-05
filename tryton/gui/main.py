@@ -150,6 +150,10 @@ class Main(object):
         settings = gtk.settings_get_default()
         settings.set_property('gtk-button-images', True)
         settings.set_property('gtk-can-change-accels', True)
+        try:
+            settings.set_property('gtk-keynav-cursor-only', True)
+        except TypeError:
+            pass
 
         self.sig_toolbar_show()
         self.sig_mode()
