@@ -271,36 +271,6 @@ class Main(object):
             self.status_hbox.pack_start(self.sb_username, True, True)
 
         if not update:
-            self.sb_requests = gtk.Statusbar()
-            self.sb_requests.set_size_request(130, -1)
-            self.sb_requests.set_has_resize_grip(False)
-            self.status_hbox.pack_start(self.sb_requests, True, True)
-
-        if not update:
-            button_request_new = gtk.Button()
-            self.button_request_new = button_request_new
-            image = gtk.Image()
-            image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
-            button_request_new.set_image(image)
-            button_request_new.set_relief(gtk.RELIEF_NONE)
-            button_request_new.connect('clicked', self.sig_request_new)
-            button_request_new.set_sensitive(False)
-            self.status_hbox.pack_start(button_request_new, False, True)
-        self.tooltips.set_tip(self.button_request_new, _('Send a new request'))
-
-        if not update:
-            button_request_search = gtk.Button()
-            self.button_request_search = button_request_search
-            image = gtk.Image()
-            image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
-            button_request_search.set_image(image)
-            button_request_search.set_relief(gtk.RELIEF_NONE)
-            button_request_search.connect('clicked', self.sig_request_open)
-            button_request_search.set_sensitive(False)
-            self.status_hbox.pack_start(button_request_search, False, True)
-        self.tooltips.set_tip(self.button_request_search, _('Read my Requests'))
-
-        if not update:
             self.secure_img = gtk.Image()
             self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
             self.status_hbox.pack_start(self.secure_img, False, True)
@@ -407,7 +377,7 @@ class Main(object):
 
         imagemenuitem_open_request = gtk.ImageMenuItem(_('_Read my Requests'))
         image = gtk.Image()
-        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
+        image.set_from_stock('tryton-mail-message', gtk.ICON_SIZE_MENU)
         imagemenuitem_open_request.set_image(image)
         imagemenuitem_open_request.connect('activate', self.sig_request_open)
         imagemenuitem_open_request.set_accel_path('<tryton>/User/Read my Requests')
@@ -871,6 +841,14 @@ class Main(object):
         toolbutton_attach.connect('clicked', self._sig_child_call, 'but_attach')
         self.buttons['but_attach'] = toolbutton_attach
 
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        toolbutton_request = gtk.ToolButton('tryton-mail-message')
+        self.toolbutton_request = toolbutton_request
+        self.toolbar.insert(toolbutton_request, -1)
+        toolbutton_request.connect('clicked', self.sig_request_open)
+        self.buttons['but_request'] = toolbutton_request
+
     def set_toolbar_label(self):
         labels = {
             'but_new': _('_New'),
@@ -885,6 +863,7 @@ class Main(object):
             'but_action': _('Action'),
             'but_print': _('Print'),
             'but_attach': _('Attachment(0)'),
+            'but_request': _('Request'),
         }
         tooltips = {
             'but_new': _('Create a new record'),
@@ -899,6 +878,7 @@ class Main(object):
             'but_action': _('Action'),
             'but_print': _('Print'),
             'but_attach': _('Add an attachment to the record'),
+            'but_request': _('Read my Requests'),
         }
         for i in self.buttons:
             self.buttons[i].set_label(labels[i])
@@ -1052,20 +1032,13 @@ class Main(object):
                 ids, ids2 = res
             else:
                 ids, ids2 = rpc.execute('model', 'res.request', 'request_get')
-            if len(ids):
-                if len(ids) == 1:
-                    message = _('%s request') % len(ids)
-                else:
-                    message = _('%s requests') % len(ids)
+            self.buttons['but_request'].set_label(_('Requests (%s/%s)') \
+                    % (len(ids), len(ids2)))
+            if not ids:
+                self.buttons['but_request'].set_stock_id('tryton-mail-message')
             else:
-                message = _('No request')
-            if len(ids2):
-                if len(ids2) == 1:
-                    message += _(' - %s request sent') % len(ids2)
-                else:
-                    message += _(' - %s requests sent') % len(ids2)
-            sb_id = self.sb_requests.get_context_id('message')
-            self.sb_requests.push(sb_id, message)
+                self.buttons['but_request'].set_stock_id(
+                        'tryton-mail-message-new')
             return (ids, ids2)
         except:
             if exception:
@@ -1123,11 +1096,10 @@ class Main(object):
         if not self.menuitem_shortcut.get_property('sensitive'):
             self.shortcut_set()
         self.toolbutton_menu.set_sensitive(True)
+        self.toolbutton_request.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
         self.menuitem_form.set_sensitive(True)
         self.menuitem_plugins.set_sensitive(True)
-        self.button_request_new.set_sensitive(True)
-        self.button_request_search.set_sensitive(True)
         self.notebook.grab_focus()
         return True
 
@@ -1143,19 +1115,17 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
-        sb_id = self.sb_requests.get_context_id('message')
-        self.sb_requests.push(sb_id, '')
         sb_id = self.sb_username.get_context_id('message')
         self.sb_username.push(sb_id, _('Not logged!'))
         sb_id = self.sb_servername.get_context_id('message')
         self.sb_servername.push(sb_id, _('Press Ctrl+O to login'))
         self.shortcut_unset()
         self.toolbutton_menu.set_sensitive(False)
+        self.toolbutton_request.set_sensitive(False)
+        self.toolbutton_request.set_label(_('Requests'))
         self.menuitem_user.set_sensitive(False)
         self.menuitem_form.set_sensitive(False)
         self.menuitem_plugins.set_sensitive(False)
-        self.button_request_new.set_sensitive(False)
-        self.button_request_search.set_sensitive(False)
         if disconnect:
             rpc.logout()
         self.refresh_ssl()
@@ -1324,7 +1294,7 @@ class Main(object):
         if not view:
             view = self._wid_get()
         for i in self.buttons:
-            if i == 'but_menu':
+            if i in ('but_menu', 'but_request'):
                 continue
             if self.buttons[i]:
                 self.buttons[i].set_sensitive(
