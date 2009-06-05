@@ -13,7 +13,7 @@ class WidgetFieldPreference(object):
     """
     Widget for field preferences.
     """
-    def __init__(self, window):
+    def __init__(self, window, reset=False):
         self.parent = window
         self.dialog = gtk.Dialog(
                 title=_("Field Preference"),
@@ -23,7 +23,10 @@ class WidgetFieldPreference(object):
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
 
-        button_ok = gtk.Button(_("Set"))
+        if not reset:
+            button_ok = gtk.Button(_("Set"))
+        else:
+            button_ok = gtk.Button(_("Reset"))
         button_ok.set_flags(gtk.CAN_DEFAULT)
         button_ok.set_flags(gtk.HAS_DEFAULT)
         img_ok = gtk.Image()
@@ -98,6 +101,10 @@ class WidgetFieldPreference(object):
         table.attach(frame_condition, 0, 2, 3, 4)
 
         self.dialog.show_all()
+        if reset:
+            label_default_value.hide()
+            self.entry_default_value.hide()
+
         radio_all_user.grab_focus()
 
     def run(self):

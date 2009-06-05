@@ -1,3 +1,4 @@
+* Add reset default on fields
 * Store in config default width and height of main window
 * Added arrow navigation if supported by gtk
 * Add 'starts with' and 'ends with' on char search

@@ -16,9 +16,9 @@ _ATTRS_BOOLEAN = {
     'readonly': False
 }
 
-def field_pref_set(field, name, model, value, client_value, dependance=None,
-        window=None):
-    dialog = WidgetFieldPreference(window)
+def field_pref_set(field, name, model, value, client_value, dependance,
+        window, reset=False):
+    dialog = WidgetFieldPreference(window, reset=reset)
     if dependance is None:
         dependance = []
     entry = dialog.entry_field_name
@@ -56,13 +56,16 @@ def field_pref_set(field, name, model, value, client_value, dependance=None,
     if radio.get_active():
         user = rpc._USER
     if res == gtk.RESPONSE_OK:
-        ir_default = RPCProxy('ir.default')
+        if reset:
+            method = 'reset_default'
+        else:
+            method = 'set_default'
+        args = ('model', 'ir.default', method, model, field, clause,
+                value, user, rpc.CONTEXT)
         try:
-            ir_default.set_default(model, field, clause, value, user,
-                    rpc.CONTEXT)
+            rpc.execute(*args)
         except Exception, exception:
-            process_exception(exception, window)
-            return False
+            process_exception(exception, window, *args)
         return True
     return False
 
@@ -85,6 +88,8 @@ class WidgetInterface(object):
                 lambda x: self._menu_sig_default_get(), 1),
             (_('Set as default'),
                 lambda x: self._menu_sig_default_set(), 1),
+            (_('Reset default'),
+                lambda x: self._menu_sig_default_set(reset=True), 1),
         ]
         self.widget = None
         self.position = 0
@@ -105,14 +110,33 @@ class WidgetInterface(object):
                 .get('readonly', False):
             return False
         model = self._view.modelfield.parent.resource
+        args = ('model', model, 'default_get', [self.attrs['name']])
         try:
-            res = rpc.execute('model', model, 'default_get',
-                    [self.attrs['name']])
+            res = rpc.execute(*args)
         except Exception, exception:
-            process_exception(exception, self._window)
+            process_exception(exception, self._window, *args)
         self._view.modelfield.set(self._view.model,
                 res.get(self.attrs['name'], False))
         self.display(self._view.model, self._view.modelfield)
+
+    def _menu_sig_default_set(self, reset=False):
+        deps = []
+        for wname, wviews in self._view.view_form.widgets.items():
+            for wview in wviews:
+                if wview.modelfield.attrs.get('change_default', False):
+                    wvalue = wview.modelfield.get(self._view.model)
+                    name = wview.modelfield.attrs.get('string', wname)
+                    value = wview.modelfield.get_client(self._view.model)
+                    deps.append((wname, name, wvalue, value))
+        if not self._view.modelfield.validate(self._view.model):
+            message(_('Invalid field!'), parent=self._window)
+            return
+        value = self._view.modelfield.get_default(self._view.model)
+        client_value = self.display_value()
+        model = self._view.modelfield.parent.resource
+        field_pref_set(self._view.widget_name,
+                self.attrs.get('string', self._view.widget_name), model,
+                value, client_value, deps, self._window, reset=reset)
 
     def sig_activate(self, widget=None):
         # emulate a focus_out so that the onchange is called if needed
@@ -179,25 +203,6 @@ class WidgetInterface(object):
         else:
             self.visible = True
             widget.show()
-
-    def _menu_sig_default_set(self):
-        deps = []
-        for wname, wviews in self._view.view_form.widgets.items():
-            for wview in wviews:
-                if wview.modelfield.attrs.get('change_default', False):
-                    wvalue = wview.modelfield.get(self._view.model)
-                    name = wview.modelfield.attrs.get('string', wname)
-                    value = wview.modelfield.get_client(self._view.model)
-                    deps.append((wname, name, wvalue, value))
-        if not self._view.modelfield.validate(self._view.model):
-            message(_('Invalid field!'), parent=self._window)
-            return
-        value = self._view.modelfield.get_default(self._view.model)
-        client_value = self.display_value()
-        model = self._view.modelfield.parent.resource
-        field_pref_set(self._view.widget_name,
-                self.attrs.get('string', self._view.widget_name), model,
-                value, client_value, deps, window=self._window)
 
     def display_value(self):
         return self._view.modelfield.get_client(self._view.model)
