@@ -1,3 +1,4 @@
+* Store in config default width and height of main window
 * Add 'starts with' and 'ends with' on char search
 * Handle domain with '=' or '!=' as operator on selection
 * Extend fields domain with local domains

@@ -43,7 +43,8 @@ class Main(object):
         super(Main, self).__init__()
 
         self.window = gtk.Window()
-        self.window.set_default_size(900, 750)
+        self.window.set_default_size(int(CONFIG['client.default_width']),
+                int(CONFIG['client.default_height']))
         self.window.set_resizable(True)
         self.window.set_title('Tryton')
         self.window.set_icon(TRYTON_ICON)
@@ -1248,6 +1249,9 @@ class Main(object):
 
     @staticmethod
     def sig_quit(widget=None):
+        width, height = Main.get_main().window.get_size()
+        CONFIG['client.default_width'] = width
+        CONFIG['client.default_height'] = height
         CONFIG.save()
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
