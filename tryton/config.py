@@ -70,6 +70,7 @@ class ConfigManager(object):
             'tip.position': 0,
             'logging.logger': '',
             'logging.level': 'ERROR',
+            'logging.default': 'ERROR',
             'form.toolbar': True,
             'client.default_width': 900,
             'client.default_height': 750,
@@ -101,7 +102,7 @@ class ConfigManager(object):
                 help=_("specify alternate config file"))
         parser.add_option("-v", "--verbose", action="store_true",
                 default=False, dest="verbose",
-                help=_("enable basic debugging"))
+                help=_("logging everything at INFO level"))
         parser.add_option("-d", "--log", dest="log_logger", default='',
                 help=_("specify channels to log"))
         parser.add_option("-l", "--log-level", dest="log_level",
@@ -121,11 +122,11 @@ class ConfigManager(object):
         self.rcfile = opt.config or os.path.join(get_home_dir(), '.tryton')
         self.load()
 
-        self.options['logging.logger'] = opt.log_logger
-        if opt.verbose and opt.log_level == 'ERROR':
-            self.options['logging.level'] = 'INFO'
-        else:
-            self.options['logging.level'] = opt.log_level
+        for arg in ('log_level', 'log_logger'):
+            if getattr(opt, arg):
+                self.options['logging.'+arg[4:]] = getattr(opt, arg)
+        if opt.verbose:
+            self.options['logging.default'] = 'INFO'
 
         for arg in ('login', 'port', 'server'):
             if getattr(opt, arg):

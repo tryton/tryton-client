@@ -41,9 +41,9 @@ class TrytonClient(object):
             if logger:
                 log = logging.getLogger(logger)
                 log.setLevel(loglevel[CONFIG['logging.level'].upper()])
-        if not CONFIG['logging.logger']:
+        if CONFIG['logging.default']:
             logging.getLogger().setLevel(
-                    loglevel[CONFIG['logging.level'].upper()])
+                    loglevel[CONFIG['logging.default'].upper()])
 
         if not hasattr(mx.DateTime, 'strptime'):
             mx.DateTime.strptime = lambda x, y: mx.DateTime.mktime(
