@@ -43,13 +43,15 @@ class Main(object):
         super(Main, self).__init__()
 
         self.window = gtk.Window()
-        self.window.set_default_size(int(CONFIG['client.default_width']),
-                int(CONFIG['client.default_height']))
+        self._width = int(CONFIG['client.default_width'])
+        self._height = int(CONFIG['client.default_height'])
+        self.window.set_default_size(self._width, self._height)
         self.window.set_resizable(True)
         self.window.set_title('Tryton')
         self.window.set_icon(TRYTON_ICON)
         self.window.connect("destroy", Main.sig_quit)
         self.window.connect("delete_event", self.sig_delete)
+        self.window.connect('configure_event', self.sig_configure)
 
         self.accel_group = gtk.AccelGroup()
         self.window.add_accel_group(self.accel_group)
@@ -1193,9 +1195,8 @@ class Main(object):
 
     @staticmethod
     def sig_quit(widget=None):
-        width, height = Main.get_main().window.get_size()
-        CONFIG['client.default_width'] = width
-        CONFIG['client.default_height'] = height
+        CONFIG['client.default_width'] = Main.get_main()._width
+        CONFIG['client.default_height'] = Main.get_main()._height
         CONFIG.save()
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
@@ -1214,6 +1215,13 @@ class Main(object):
                 return True
             return False
         return True
+
+    def sig_configure(self, widget, event):
+        if hasattr(event, 'width') \
+                and hasattr(event, 'height'):
+            self._width =  int(event.width)
+            self._height = int(event.height)
+        return False
 
     def win_add(self, page):
         previous_page_id = self.notebook.get_current_page()
