@@ -116,6 +116,8 @@ class ConfigManager(object):
         opt = parser.parse_args()[0]
 
 
+        if opt.config and not os.path.isfile(opt.config):
+            raise Exception(_('File "%s" not found') % (opt.config,))
         self.rcfile = opt.config or os.path.join(get_home_dir(), '.tryton')
         self.load()
 
@@ -150,26 +152,17 @@ class ConfigManager(object):
         return True
 
     def load(self):
-        try:
-            if not os.path.isfile(self.rcfile):
-                return False
-
-            configparser = ConfigParser.ConfigParser()
-            configparser.read([self.rcfile])
-            for section in configparser.sections():
-                for (name, value) in configparser.items(section):
-                    if value.lower() == 'true':
-                        value = True
-                    elif value.lower() == 'false':
-                        value = False
-                    if section == 'client' and name == 'actions':
-                        value = eval(value)
-                    self.options[section + '.' + name] = value
-        except:
-            logging.getLogger('options').warn(
-                    _('Unable to read config file %s!') % \
-                            (self.rcfile,))
-            return False
+        configparser = ConfigParser.ConfigParser()
+        configparser.read([self.rcfile])
+        for section in configparser.sections():
+            for (name, value) in configparser.items(section):
+                if value.lower() == 'true':
+                    value = True
+                elif value.lower() == 'false':
+                    value = False
+                if section == 'client' and name == 'actions':
+                    value = eval(value)
+                self.options[section + '.' + name] = value
         return True
 
     def __setitem__(self, key, value):
