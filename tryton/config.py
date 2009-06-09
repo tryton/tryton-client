@@ -61,7 +61,7 @@ class ConfigManager(object):
     "Config manager"
 
     def __init__(self):
-        self.options = {
+        self.defaults = {
             'login.login': 'admin',
             'login.server': 'localhost',
             'login.port': '8070',
@@ -97,6 +97,8 @@ class ConfigManager(object):
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }
+        self.config = {}
+        self.options = {}
         parser = optparse.OptionParser(version=("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
@@ -106,7 +108,7 @@ class ConfigManager(object):
         parser.add_option("-d", "--log", dest="log_logger", default='',
                 help=_("specify channels to log"))
         parser.add_option("-l", "--log-level", dest="log_level",
-                default='ERROR', help=_("specify the log level: " \
+                help=_("specify the log level: " \
                         "INFO, DEBUG, WARNING, ERROR, CRITICAL"))
         parser.add_option("-u", "--user", dest="login",
                 help=_("specify the login user"))
@@ -135,15 +137,13 @@ class ConfigManager(object):
     def save(self):
         try:
             configparser = ConfigParser.ConfigParser()
-            for option in self.options.keys():
-                if not len(option.split('.')) == 2:
+            for entry in self.config.keys():
+                if not len(entry.split('.')) == 2:
                     continue
-                section, name = option.split('.')
-                if section in ('logging'):
-                    continue
+                section, name = entry.split('.')
                 if not configparser.has_section(section):
                     configparser.add_section(section)
-                configparser.set(section, name, self.options[option])
+                configparser.set(section, name, self.config[entry])
             configparser.write(file(self.rcfile, 'wb'))
         except:
             logging.getLogger('common.options').warn(
@@ -163,14 +163,16 @@ class ConfigManager(object):
                     value = False
                 if section == 'client' and name == 'actions':
                     value = eval(value)
-                self.options[section + '.' + name] = value
+                self.config[section + '.' + name] = value
         return True
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value, config=True):
         self.options[key] = value
+        if config:
+            self.config[key] = value
 
     def __getitem__(self, key):
-        return self.options[key]
+        return self.options.get(key, self.config.get(key, self.defaults[key]))
 
 CONFIG = ConfigManager()
 CURRENT_DIR = os.path.abspath(os.path.normpath(os.path.join(
