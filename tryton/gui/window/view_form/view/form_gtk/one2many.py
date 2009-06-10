@@ -29,7 +29,7 @@ def _create_menu(self, attrs):
     menuitem_set_to_default.connect('activate',
             lambda *x: self._menu_sig_default_get())
     menu_title.add(menuitem_set_to_default)
-    menuitem_set_default = gtk.MenuItem(_('Set Default'), True)
+    menuitem_set_default = gtk.MenuItem(_('Set as default'), True)
     menuitem_set_default.connect('activate',
             lambda *x: self._menu_sig_default_set())
     menu_title.add(menuitem_set_default)
