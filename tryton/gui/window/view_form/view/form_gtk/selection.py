@@ -128,9 +128,9 @@ class Selection(WidgetInterface):
     def set_value(self, model, model_field):
         model_field.set_client(model, self.value_get())
 
-    def _menu_sig_default_set(self):
+    def _menu_sig_default_set(self, reset=False):
         self.set_value(self._view.model, self._view.modelfield)
-        super(Selection, self)._menu_sig_default_set()
+        super(Selection, self)._menu_sig_default_set(reset=reset)
 
     def display(self, model, model_field):
         child = self.entry.get_child()

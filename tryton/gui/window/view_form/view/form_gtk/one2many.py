@@ -407,7 +407,7 @@ class Dialog(object):
     def _menu_sig_default_get(self):
         pass
 
-    def _menu_sig_default_set(self):
+    def _menu_sig_default_set(self, reset=False):
         pass
 
     def new(self):
