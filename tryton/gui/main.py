@@ -142,7 +142,6 @@ class Main(object):
         self.previous_pages = {}
         self.current_page = 0
         self.last_page = 0
-        self.status_bar = ''
 
         if CONFIG['client.modepda']:
             self.radiomenuitem_pda.set_active(True)
@@ -959,7 +958,10 @@ class Main(object):
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = prefs['language_direction']
-            self.status_bar = prefs.get('status_bar', '')
+            title = 'Tryton'
+            if prefs.get('status_bar'):
+                title += ' - ' + prefs['status_bar']
+            self.window.set_title(title)
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
@@ -1091,7 +1093,6 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
-        self.status_bar = ''
         self.window.set_title('Tryton')
         self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
         self.tooltips.set_tip(self.connection_img, '')
@@ -1159,7 +1160,10 @@ class Main(object):
                 prefs = common.process_exception(exception, self.window, *args)
                 if not prefs:
                     return False
-        self.status_bar = prefs.get('status_bar', '')
+        title = 'Tryton'
+        if prefs.get('status_bar'):
+            title += ' - ' + prefs['status_bar']
+        self.window.set_title(title)
         self.connection_img.set_from_stock('tryton-connect', gtk.ICON_SIZE_MENU)
         self.tooltips.set_tip(self.connection_img, '%s@%s:%d/%s' \
                 % (rpc._USERNAME, rpc._SOCK.hostname, rpc._SOCK.port,
@@ -1361,13 +1365,6 @@ class Main(object):
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
-        title = 'Tryton'
-        if self.status_bar:
-            title += ' - ' + self.status_bar
-        page = self._wid_get()
-        if page:
-            title += ' - ' + page.name
-        self.window.set_title(title)
         self.sb_set()
 
     def sig_db_new(self, widget):
