@@ -114,7 +114,6 @@ class Main(object):
         self.menuitem_plugins = None
 
         self.menubar_hbox = gtk.HBox()
-        self.menubar_hbox = gtk.HBox()
         self.menubar_hbox.show()
         frame = gtk.Frame()
         frame.set_shadow_type(gtk.SHADOW_OUT)
