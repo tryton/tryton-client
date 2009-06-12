@@ -112,6 +112,22 @@ class Main(object):
         self.menuitem_user = None
         self.menuitem_form = None
         self.menuitem_plugins = None
+
+        self.menubar_hbox = gtk.HBox()
+        self.menubar_hbox = gtk.HBox()
+        self.menubar_hbox.show()
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_OUT)
+        hbox2 = gtk.HBox()
+        frame.add(hbox2)
+        self.connection_img = gtk.Image()
+        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
+        hbox2.pack_start(self.connection_img, False, False)
+        self.secure_img = gtk.Image()
+        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
+        hbox2.pack_start(self.secure_img, False, False)
+        self.menubar_hbox.pack_start(frame, False, False)
+        self.vbox.pack_start(self.menubar_hbox, False, True)
         self.set_menubar()
 
         if igemacintegration:
@@ -174,21 +190,8 @@ class Main(object):
             self.menubar.destroy()
         menubar = gtk.MenuBar()
         self.menubar = menubar
-        hbox = gtk.HBox()
-        hbox.pack_start(menubar, True, True)
-        frame = gtk.Frame()
-        frame.set_shadow_type(gtk.SHADOW_OUT)
-        hbox2 = gtk.HBox()
-        frame.add(hbox2)
-        self.connection_img = gtk.Image()
-        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
-        hbox2.pack_start(self.connection_img, False, False)
-        self.secure_img = gtk.Image()
-        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
-        hbox2.pack_start(self.secure_img, False, False)
-        hbox.pack_start(frame, False, False)
-        self.vbox.pack_start(hbox, False, True)
-        self.vbox.reorder_child(hbox, 0)
+        self.menubar_hbox.pack_start(self.menubar, True, True)
+        self.menubar_hbox.reorder_child(self.menubar, 0)
 
         menuitem_file = gtk.MenuItem(_('_File'))
         menubar.add(menuitem_file)
