@@ -33,10 +33,10 @@ def _create_menu(self, attrs):
     menuitem_set_default.connect('activate',
             lambda *x: self._menu_sig_default_set())
     menu_title.add(menuitem_set_default)
-    menutiem_reset_default = gtk.MenuItem(_('Reset default'), True)
-    menutiem_reset_default.connect('activate',
+    menuitem_reset_default = gtk.MenuItem(_('Reset default'), True)
+    menuitem_reset_default.connect('activate',
             lambda *x: self._menu_sig_default_set(reset=True))
-    menu_title.add(menutiem_reset_default)
+    menu_title.add(menuitem_reset_default)
     menuitem_title.set_submenu(menu_title)
 
     menubar.add(menuitem_title)
