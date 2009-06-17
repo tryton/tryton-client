@@ -316,7 +316,7 @@ class Screen(SignalEvent):
 
         for dom in common.filter_domain(self.domain):
             if '.' in dom[0]:
-                field1, field2 = dom[0].split('.', 2)
+                field1, field2 = dom[0].split('.', 1)
             else:
                 field1, field2 = dom[0], 'id'
             if field1 in fields:
