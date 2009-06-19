@@ -477,7 +477,7 @@ class ViewList(ParserView):
         return None
 
     def destroy(self):
-        if CONFIG['client.tree_width']:
+        if CONFIG['client.save_width_height']:
             fields = {}
             last_col = None
             for col in self.widget_tree.get_columns():

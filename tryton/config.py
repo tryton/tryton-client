@@ -77,7 +77,7 @@ class ConfigManager(object):
             'client.modepda': False,
             'client.toolbar': 'default',
             'client.form_tab': 'left',
-            'client.tree_width': True,
+            'client.save_width_height': True,
             'client.spellcheck': False,
             'client.default_path': get_home_dir(),
             'client.lang': locale.getdefaultlocale()[0],

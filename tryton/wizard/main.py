@@ -7,6 +7,7 @@ import thread, time
 from tryton.gui.window.view_form.screen import Screen
 import os
 import pango
+from tryton.config import CONFIG
 
 _ = gettext.gettext
 
@@ -15,8 +16,9 @@ class Dialog(object):
     "Dialog for wizard"
 
     def __init__(self, arch, fields, state, obj_name, parent,
-            context=None):
+            action='', size=(0, 0), context=None):
         self.parent = parent
+        self.action = action
         self.states = []
         default = -1
         self.dia = gtk.Dialog(_('Wizard'), parent,
@@ -96,11 +98,11 @@ class Dialog(object):
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
-        widget_width = min(parent_width - 20, width + 20)
-        widget_height = min(parent_height - 60, height + 25)
-        self.screen.widget.set_size_request(widget_width, widget_height)
+        self.widget_width = max(min(parent_width - 20, width + 20), size[0])
+        self.widget_height = max(min(parent_height - 60, height + 25), size[1])
+        self.dia.set_default_size(self.widget_width,
+                self.widget_height)
         self.screen.widget.show()
-
         self.dia.set_title(self.screen.current_view.title)
         self.dia.show()
         self.screen.new(default=False)
@@ -117,6 +119,17 @@ class Dialog(object):
                     or (res<0) or (self.states[res]=='end'):
                 break
             self.screen.display()
+
+        if CONFIG['client.save_width_height']:
+            width, height = self.dia.get_size()
+            if (width, height) != (self.widget_width, self.widget_height):
+                try:
+                    rpc.execute('model', 'ir.action.wizard_size', 'set_size',
+                            self.action, self.screen.name, width, height,
+                            rpc.CONTEXT)
+                except:
+                    pass
+
         if res < len(self.states) and res >= 0:
             datas.update(self.screen.get())
             self.dia.hide()
@@ -187,7 +200,8 @@ class Wizard(object):
             if res['type'] == 'form':
                 if not dia:
                     dia = Dialog(res['arch'], res['fields'], res['state'],
-                            res['object'], parent, context=ctx)
+                            res['object'], parent, action=action,
+                            size=res['size'], context=ctx)
                     dia.screen.current_model.set(datas['form'])
                 res2 = dia.run(datas['form'])
                 if not res2:

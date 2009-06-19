@@ -625,15 +625,15 @@ class Main(object):
         if CONFIG['form.toolbar']:
             checkmenuitem_toolbar.set_active(True)
 
-        checkmenuitem_tree_width = gtk.CheckMenuItem(_('Save Columns Width'))
-        checkmenuitem_tree_width.connect('activate',
-                lambda menuitem: CONFIG.__setitem__('client.tree_width',
+        checkmenuitem_save_width_height = gtk.CheckMenuItem(_('Save Width/Height'))
+        checkmenuitem_save_width_height.connect('activate',
+                lambda menuitem: CONFIG.__setitem__('client.save_width_height',
                     menuitem.get_active()))
-        checkmenuitem_tree_width.set_accel_path(
-                '<tryton>/Options/Form/Save Columns Width')
-        menu_form.add(checkmenuitem_tree_width)
-        if CONFIG['client.tree_width']:
-            checkmenuitem_tree_width.set_active(True)
+        checkmenuitem_save_width_height.set_accel_path(
+                '<tryton>/Options/Form/Save Width Height')
+        menu_form.add(checkmenuitem_save_width_height)
+        if CONFIG['client.save_width_height']:
+            checkmenuitem_save_width_height.set_active(True)
 
         checkmenuitem_spellcheck = gtk.CheckMenuItem(_('Spell Checking'))
         checkmenuitem_spellcheck.connect('activate',
