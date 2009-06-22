@@ -67,9 +67,13 @@ class FileActions(object):
         "Run the window"
         res = self.win.run()
         if res == gtk.RESPONSE_OK:
+            config = {}
             for extension, _, cmd_open, cmd_print in self.model:
-                CONFIG['client.actions'][extension][0] = cmd_open
-                CONFIG['client.actions'][extension][1] = cmd_print
+                config[extension] = {
+                    0: cmd_open,
+                    1: cmd_print,
+                }
+            CONFIG['client.actions'] = config
             CONFIG.save()
         self.parent.present()
         self.win.destroy()
