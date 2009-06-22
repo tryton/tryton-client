@@ -1,3 +1,4 @@
+* Use the report name to create the temporary file to open it
 * Allow to store wizard size
 * Add reset default on fields
 * Store in config default width and height of main window

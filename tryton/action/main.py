@@ -50,11 +50,12 @@ class Action(object):
             return False
         if not res:
             return False
-        (type, data, print_p) = res
+        (type, data, print_p, name) = res
         if not print_p and direct_print:
             print_p = True
-        (fileno, fp_name) = tempfile.mkstemp('.' + type, 'tryton_')
-        file_d = os.fdopen(fileno, 'wb+')
+        dtemp = tempfile.mkdtemp(prefix='tryton_')
+        fp_name = os.path.join(dtemp, name + '.' + type)
+        file_d = open(fp_name, 'w')
         file_d.write(base64.decodestring(data))
         file_d.close()
         if email_print:
