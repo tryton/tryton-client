@@ -98,8 +98,11 @@ class Dialog(object):
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
-        self.widget_width = max(min(parent_width - 20, width + 20), size[0])
-        self.widget_height = max(min(parent_height - 60, height + 25), size[1])
+        dia_width, dia_height = self.dia.get_size()
+        self.widget_width = max(min(parent_width - 20,
+            max(dia_width, width + 20)), size[0])
+        self.widget_height = max(min(parent_height - 60,
+            height + dia_height + 20), size[1])
         self.dia.set_default_size(self.widget_width,
                 self.widget_height)
         self.screen.widget.show()
