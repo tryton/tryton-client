@@ -281,11 +281,14 @@ class Many2One(WidgetInterface):
                 self.wid_text.grab_focus()
 
                 try:
+                    if self.wid_text.get_text():
+                        dom = [('rec_name', 'ilike',
+                            '%' + self.wid_text.get_text() + '%'),
+                            domain]
+                    else:
+                        dom = domain
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'search',
-                            [('rec_name', 'ilike',
-                                '%' + self.wid_text.get_text() + '%'),
-                                domain], 0, _LIMIT, None, context)
+                            'search', dom, 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)
@@ -355,11 +358,14 @@ class Many2One(WidgetInterface):
                 self.wid_text.grab_focus()
 
                 try:
+                    if self.wid_text.get_text():
+                        dom = [('rec_name', 'ilike',
+                            '%' + self.wid_text.get_text() + '%'),
+                            domain]
+                    else:
+                        dom = domain
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'search',
-                            [('rec_name', 'ilike',
-                                '%' + self.wid_text.get_text() +'%'),
-                                domain], 0, _LIMIT, None, context)
+                            'search', dom, 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self._window)

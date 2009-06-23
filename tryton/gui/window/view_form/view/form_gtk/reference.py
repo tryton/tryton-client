@@ -167,11 +167,14 @@ class Reference(WidgetInterface):
                 context = self._view.modelfield.context_get(self._view.model)
 
                 try:
-                    ids = rpc.execute('model', model,
-                            'search',
-                            [('rec_name', 'ilike',
+                    if self.wid_text.get_text():
+                        dom = [('rec_name', 'ilike',
                                 '%' + self.wid_text.get_text() + '%'),
-                                domain], 0, _LIMIT, None, context)
+                                domain]
+                    else:
+                        dom = domain
+                    ids = rpc.execute('model', model,
+                            'search', dom, 0, _LIMIT, None, context)
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True

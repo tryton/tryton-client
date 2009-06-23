@@ -378,11 +378,13 @@ class Dialog(object):
         context = rpc.CONTEXT.copy()
 
         try:
+            if self.wid_text.get_text():
+                dom = [('rec_name', 'ilike',
+                        '%' + self.wid_text.get_text() + '%'), domain]
+            else:
+                dom = domain
             ids = rpc.execute('model', self.attrs['relation'],
-                    'search',
-                    [('rec_name', 'ilike',
-                        '%' + self.wid_text.get_text() + '%'), domain],
-                    0, _LIMIT, None, context)
+                    'search', dom, 0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False
@@ -605,11 +607,13 @@ class One2Many(WidgetInterface):
         removed_ids = self._view.modelfield.get_removed_ids(self._view.model)
 
         try:
+            if self.wid_text.get_text():
+                dom = [('rec_name', 'ilike', '%' + self.wid_text.get_text() + '%'),
+                    ['OR', domain, ('id', 'in', removed_ids)]]
+            else:
+                dom = ['OR', domain, ('id', 'in', removed_ids)]
             ids = rpc.execute('model', self.attrs['relation'],
-                    'search',
-                    [('rec_name', 'ilike', '%' + self.wid_text.get_text() + '%'),
-                    ['OR', domain, ('id', 'in', removed_ids)]],
-                    0, _LIMIT, None, context)
+                    'search', dom, 0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

@@ -79,9 +79,12 @@ class Many2Many(WidgetInterface):
         value = self.wid_text.get_text()
 
         try:
+            if value:
+                dom = [('rec_name', 'ilike', '%' + value + '%'), domain]
+            else:
+                dom = domain
             ids = rpc.execute('model', self.attrs['relation'], 'search',
-                    [('rec_name', 'ilike', '%' + value + '%'), domain], 0,
-                    _LIMIT, None, context)
+                    dom , 0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

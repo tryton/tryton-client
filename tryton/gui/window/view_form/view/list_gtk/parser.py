@@ -508,8 +508,12 @@ class M2O(Char):
         context = model[self.field_name].context_get(model)
 
         try:
-            ids = rpc_relation.search([('rec_name', 'ilike', '%' + text + '%'),
-                domain], 0, None, None, context)
+            if text:
+                dom = [('rec_name', 'ilike', '%' + text + '%'),
+                        domain]
+            else:
+                dom = domain
+            ids = rpc_relation.search(dom, 0, None, None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return '???'
@@ -532,9 +536,11 @@ class M2O(Char):
             rpc_relation = RPCProxy(relation)
 
             try:
-                ids = rpc_relation.search([
-                    ('rec_name', 'ilike', '%' + text + '%'), domain],
-                        0, None, None, context)
+                if text:
+                    dom = [('rec_name', 'ilike', '%' + text + '%'), domain]
+                else:
+                    dom = domain
+                ids = rpc_relation.search(dom, 0, None, None, context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 return False, False
@@ -627,8 +633,12 @@ class M2M(Char):
         domain = model[self.field_name].domain_get(model)
         context = model[self.field_name].context_get(model)
         try:
-            ids = rpc_relation.search([('rec_name', 'ilike', '%' + text + '%'),
-                domain], 0, _LIMIT, None, context)
+            if text:
+                dom = [('rec_name', 'ilike', '%' + text + '%'),
+                        domain]
+            else:
+                dom = domain
+            ids = rpc_relation.search(dom, 0, _LIMIT, None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return []
