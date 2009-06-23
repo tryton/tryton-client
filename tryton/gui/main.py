@@ -866,7 +866,7 @@ class Main(object):
             'but_action': _('Action'),
             'but_print': _('Print'),
             'but_attach': _('Add an attachment to the record'),
-            'but_request': _('Read my Requests'),
+            'but_request': _('Request'),
         }
         for i in self.buttons:
             self.buttons[i].set_label(labels[i])
@@ -1013,8 +1013,9 @@ class Main(object):
                 ids, ids2 = res
             else:
                 ids, ids2 = rpc.execute('model', 'res.request', 'request_get')
-            self.buttons['but_request'].set_label(_('Requests (%s/%s)') \
-                    % (len(ids), len(ids2)))
+            label = _('Requests (%s/%s)') % (len(ids), len(ids2))
+            self.buttons['but_request'].set_label(label)
+            self.tooltips.set_tip(self.buttons['but_request'], label)
             if not ids:
                 self.buttons['but_request'].set_stock_id('tryton-mail-message')
             else:
