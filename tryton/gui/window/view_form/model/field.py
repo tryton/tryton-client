@@ -41,8 +41,21 @@ class CharField(object):
         model.on_change_with(self.name)
 
     def domain_get(self, model):
-        dom = self.attrs.get('domain', '[]')
-        return model.expr_eval(dom)
+        dom = self.attrs.get('domain', [])
+        def eval_domain(domain):
+            res = []
+            for arg in domain:
+                if isinstance(arg, basestring):
+                    if arg in ('AND', 'OR'):
+                        res.append(arg)
+                    else:
+                        res.append(model.expr_eval(arg))
+                elif isinstance(arg, tuple):
+                    res.append(arg)
+                elif isinstance(arg, list):
+                    res.append(eval_domain(arg))
+            return res
+        return eval_domain(dom)
 
     def context_get(self, model, check_load=True, eval_context=True):
         context = {}
