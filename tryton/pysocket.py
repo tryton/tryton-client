@@ -140,42 +140,54 @@ class PySocket:
 
     def receive(self):
         buf = self.buffer
-        while len(buf) < MAX_LENGHT:
+        L = []
+        size_remaining = MAX_LENGHT
+        while size_remaining:
+            chunk_size = min(size_remaining, 4096)
             if self.ssl:
-                chunk = self.ssl_sock.read(4096)
+                chunk = self.ssl_sock.read(chunk_size)
             else:
-                chunk = self.sock.recv(4096)
+                chunk = self.sock.recv(chunk_size)
             if chunk == '':
                 raise RuntimeError, "socket connection broken"
-            buf += chunk
-            if ' ' in buf:
+            L.append(chunk)
+            size_remaining -= len(chunk)
+            if ' ' in chunk:
                 break
+        if size_remaining < 0:
+            raise RuntimeError, "socket connection broken"
+        buf += ''.join(L)
         size, msg = buf.split(' ', 1)
         size = int(size)
         if size > MAX_SIZE:
             raise RuntimeError, "socket connection broken"
-        if msg == '':
+        if not msg:
+            chunk_size = min(size + 1, 4096)
             if self.ssl:
-                msg = self.ssl_sock.read(4096)
+                msg = self.ssl_sock.read(chunk_size)
             else:
-                msg = self.sock.recv(4096)
+                msg = self.sock.recv(chunk_size)
             if msg == '':
                 raise RuntimeError, "socket connection broken"
-        if msg[0] != "0":
-            exception = buf
-        else:
-            exception = False
-        msg = msg[1:]
-        while len(msg) < size:
+        exception = msg[0] != "0"
+        L = [msg[1:]]
+        size_remaining = size - len(L[0])
+        while size_remaining:
+            chunk_size = min(size_remaining, 4096)
             if self.ssl:
-                chunk = self.ssl_sock.read(size - len(msg))
+                chunk = self.ssl_sock.read(chunk_size)
             else:
-                chunk = self.sock.recv(size - len(msg))
+                chunk = self.sock.recv(chunk_size)
             if chunk == '':
                 raise RuntimeError, "socket connection broken"
-            msg = msg + chunk
-        self.buffer = msg[size:]
-        msg = msg[:size]
+            L.append(chunk)
+            size_remaining -= len(chunk)
+        msg = ''.join(L)
+        if len(msg) > size:
+            self.buffer = msg[size:]
+            msg = msg[:size]
+        else:
+            self.buffer = ''
         msgio = StringIO.StringIO(msg)
         unpickler = cPickle.Unpickler(msgio)
         # cPickle mechanism to import instances (pickle differs here)
