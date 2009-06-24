@@ -10,12 +10,14 @@ try:
     import ssl
 except ImportError:
     ssl = None
+import gzip
 
 DNS_CACHE = {}
 MAX_SIZE = 999999999
 MAX_LENGHT = len(str(MAX_SIZE))
 CONNECT_TIMEOUT = 5
 TIMEOUT = 3600
+GZIP_THRESHOLD = 1400 # common MTU
 
 _ALLOWED_MODULES = {'datetime': ['datetime', 'date'], 'decimal': ['Decimal']}
 
@@ -125,9 +127,20 @@ class PySocket:
 
     def send(self, msg, exception=False, traceback=None):
         msg = cPickle.dumps([msg, traceback], protocol=2)
+        gzip_p = False
+        if len(msg) > GZIP_THRESHOLD:
+            buffer = StringIO.StringIO()
+            output = gzip.GzipFile(mode='wb', fileobj=buffer)
+            output.write(msg)
+            output.close()
+            buffer.seek(0)
+            msg = buffer.getvalue()
+            gzip_p = True
         size = len(msg)
-        msg = str(size) + ' ' + (exception and "1" or "0") + msg
+        msg = str(size) + ' ' + (exception and "1" or "0") \
+                + (gzip_p and "1" or "0") + msg
         size = len(msg)
+
         totalsent = 0
         while totalsent < size:
             if self.ssl:
@@ -161,16 +174,17 @@ class PySocket:
         size = int(size)
         if size > MAX_SIZE:
             raise RuntimeError, "socket connection broken"
-        if not msg:
-            chunk_size = min(size + 1, 4096)
+        while len(msg) < 2:
+            chunk_size = min(size + 2, 4096)
             if self.ssl:
-                msg = self.ssl_sock.read(chunk_size)
+                msg += self.ssl_sock.read(chunk_size)
             else:
-                msg = self.sock.recv(chunk_size)
+                msg += self.sock.recv(chunk_size)
             if msg == '':
                 raise RuntimeError, "socket connection broken"
         exception = msg[0] != "0"
-        L = [msg[1:]]
+        gzip_p = msg[1] != "0"
+        L = [msg[2:]]
         size_remaining = size - len(L[0])
         while size_remaining:
             chunk_size = min(size_remaining, 4096)
@@ -189,6 +203,10 @@ class PySocket:
         else:
             self.buffer = ''
         msgio = StringIO.StringIO(msg)
+        if gzip_p:
+            output = gzip.GzipFile(mode='r', fileobj=msgio)
+            msgio = StringIO.StringIO(output.read(-1))
+            output.close()
         unpickler = cPickle.Unpickler(msgio)
         # cPickle mechanism to import instances (pickle differs here)
         unpickler.find_global = checkfunction
