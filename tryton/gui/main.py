@@ -1006,6 +1006,8 @@ class Main(object):
 
     def request_set(self, exception=False):
         try:
+            if not rpc._USER:
+                return
             if not exception:
                 res = rpc.execute('model', 'res.request', 'request_get')
                 if not res:
