@@ -126,7 +126,9 @@ class Many2Many(WidgetInterface):
             dia = Dialog(self.attrs['relation'], parent=self._view.model,
                     model=self.screen.current_model, attrs=self.attrs,
                     window=self._window, readonly=readonly, domain=domain)
-            res, value = dia.run()
+            res, record = dia.run()
+            if res:
+                record.save()
             dia.destroy()
 
     def _readonly_set(self, value):
