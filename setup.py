@@ -196,7 +196,9 @@ elif os.name == 'mac' \
 
     if 'py2app' in dist.commands:
         import shutil
-        from subprocess import Popen
+        from subprocess import Popen, PIPE
+        from itertools import chain
+        from glob import iglob
         gtk_dir = find_gtk_dir()
 
         dist_dir = dist.command_obj['py2app'].dist_dir
@@ -231,17 +233,20 @@ elif os.name == 'mac' \
             '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'gdk-pixbuf.loaders')),
             shell=True).wait()
 
-        Popen('for library in ' \
-            + str(os.path.join(gtk_2_dist_dir, '*', 'loaders', '*.so')) + ' ' \
-            + str(os.path.join(pango_dist_dir, '*', 'modules', '*.so')) + '; do ' \
-            + 'libs="`otool -L $library 2>/dev/null | fgrep compatibility | ' \
-                + 'cut -d\( -f1 | grep ' + gtk_dir + ' | sort | uniq`";' \
-            + 'for lib in $libs; do ' \
-                + 'fixed=`echo $lib | sed -e s,' + gtk_dir \
-                    + '/lib,@executable_path/../Frameworks,`;' \
-                + 'install_name_tool -change $lib $fixed $library;' \
-            + 'done;' \
-            + 'done', shell=True).wait()
+        # fix pathes within shared libraries
+        for library in chain(
+                iglob(os.path.join(gtk_2_dist_dir,'*','loaders','*.so')),
+                iglob(os.path.join(pango_dist_dir,'*','modules','*.so'))):
+            libs = [lib.split('(')[0].strip()
+                    for lib in Popen(['otool', '-L', library],
+                            stdout=PIPE).communicate()[0].splitlines()
+                    if 'compatibility' in lib]
+            libs = dict(((lib, None) for lib in libs if gtk_dir in lib))
+            for lib in libs.keys():
+                fixed = lib.replace(gtk_dir + '/lib',
+                        '@executable_path/../Frameworks')
+                Popen('install_name_tool -change ' + lib + ' ' + fixed + \
+                        ' ' + library, shell=True).wait()
 
         for file in ('CHANGELOG', 'COPYRIGHT', 'LICENSE', 'README', 'TODO'):
             shutil.copyfile(os.path.join(os.path.dirname(__file__), file),
