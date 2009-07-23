@@ -18,11 +18,14 @@ if os.name == 'nt':
 elif os.name == 'mac' or \
         (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
     resources = os.path.join(os.path.dirname(sys.argv[0]), '..', 'Resources')
+    gtkrc = os.path.join(resources, 'gtkrc')
     pixbuf_loader = os.path.join(resources, 'gdk-pixbuf.loaders')
-    if os.path.isfile(pixbuf_loader):
-        os.environ['GDK_PIXBUF_MODULE_FILE'] = pixbuf_loader
     pangorc = os.path.join(resources, 'pangorc')
-    if os.path.isfile(pangorc):
+    if os.path.isdir(resources):
+        os.environ['GTK2_RC_FILES'] = gtkrc
+        os.environ['GTK_EXE_PREFIX'] = resources
+        os.environ['GTK_DATA_PREFIX'] = resources
+        os.environ['GDK_PIXBUF_MODULE_FILE'] = pixbuf_loader
         os.environ['PANGO_RC_FILE'] = pangorc
 
 import pygtk
