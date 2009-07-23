@@ -94,6 +94,7 @@ class ConfigManager(object):
                     1: find_path(['ooffice', 'ooffice2'], '-p "%s"')},
                 },
             'client.email': '',
+            'client.can_change_accelerators': False,
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }

@@ -1,3 +1,4 @@
+* Add "Change Accelerators" option
 * Use gzip in pysocket
 * Use the report name to create the temporary file to open it
 * Allow to store wizard size
