@@ -200,42 +200,54 @@ elif os.name == 'mac' \
         from itertools import chain
         from glob import iglob
         gtk_dir = find_gtk_dir()
+        gtk_binary_version = Popen(['pkg-config', '--variable=gtk_binary_version',
+            'gtk+-2.0'], stdout=PIPE).stdout.read().strip()
 
         dist_dir = dist.command_obj['py2app'].dist_dir
+        resources_dir = os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources')
+        gtk_2_dist_dir = os.path.join(resources_dir, 'lib', 'gtk-2.0')
+        pango_dist_dir = os.path.join(resources_dir, 'lib', 'pango')
 
-        pango_dist_dir = os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'lib', 'pango')
         if os.path.isdir(pango_dist_dir):
             shutil.rmtree(pango_dist_dir)
         shutil.copytree(os.path.join(gtk_dir, 'lib', 'pango'), pango_dist_dir)
 
-        Popen(str(os.path.join(gtk_dir, 'bin', 'pango-querymodules')) \
-            + ' | sed -e "s#' + gtk_dir + '#@executable_path/../Resources#" ' \
-            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'pango.modules')),
-            shell=True).wait()
-        Popen('echo -e "[Pango]\nModuleFiles=./pango.modules\n" ' \
-            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'pangorc')),
-            shell=True).wait()
+        query_pango = Popen(os.path.join(gtk_dir, 'bin', 'pango-querymodules'),
+                stdout=PIPE).stdout.read()
+        query_pango = query_pango.replace(gtk_dir, '@executable_path/../Resources')
+        pango_modules = open(os.path.join(resources_dir, 'pango.modules'), 'w')
+        pango_modules.write(query_pango)
+        pango_modules.close()
 
-        gtk_2_dist_dir = os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources',
-             'lib', 'gtk-2.0')
-        if os.path.isdir(gtk_2_dist_dir):
-            shutil.rmtree(gtk_2_dist_dir)
-        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0'), gtk_2_dist_dir)
+        pangorc = open(os.path.join(resources_dir, 'pangorc'), 'w')
+        pangorc.write('[Pango]\n')
+        pangorc.write('ModuleFiles=./pango.modules\n')
+        pangorc.close()
 
-        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'engines'), shell=True).wait()
-        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'immodules'), shell=True).wait()
-        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, '*', 'printbackends'), shell=True).wait()
-        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, 'include'), shell=True).wait()
-        Popen('rm -rf ' + os.path.join(gtk_2_dist_dir, 'modules'), shell=True).wait()
+        if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders')):
+            shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders'))
+        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0', gtk_binary_version,
+                'loaders'), os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders'))
+        if not os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines')):
+            os.makedirs(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines'))
+        shutil.copyfile(os.path.join(gtk_dir, 'lib', 'gtk-2.0', gtk_binary_version,
+                'engines', 'libclearlooks.so'), os.path.join(gtk_2_dist_dir,
+                gtk_binary_version, 'engines', 'libclearlooks.so'))
 
-        Popen(str(os.path.join(gtk_dir, 'bin', 'gdk-pixbuf-query-loaders')) \
-            + ' | sed -e "s#' + gtk_dir + '#@executable_path/../Resources#" ' \
-            '>' + str(os.path.join(dist_dir, 'tryton.app', 'Contents', 'Resources', 'gdk-pixbuf.loaders')),
-            shell=True).wait()
+        query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
+                stdout=PIPE).stdout.read()
+        query_loaders = query_loaders.replace(gtk_dir, '@executable_path/../Resources')
+        loaders = open(os.path.join(resources_dir, 'gdk-pixbuf.loaders'), 'w')
+        loaders.write(query_loaders)
+        loaders.close()
+
+        shutil.copy(os.path.join(gtk_dir, 'share', 'themes', 'Clearlooks',
+            'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))
 
         # fix pathes within shared libraries
         for library in chain(
-                iglob(os.path.join(gtk_2_dist_dir,'*','loaders','*.so')),
+                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders', '*.so')),
+                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines', '*.so')),
                 iglob(os.path.join(pango_dist_dir,'*','modules','*.so'))):
             libs = [lib.split('(')[0].strip()
                     for lib in Popen(['otool', '-L', library],
@@ -245,8 +257,8 @@ elif os.name == 'mac' \
             for lib in libs.keys():
                 fixed = lib.replace(gtk_dir + '/lib',
                         '@executable_path/../Frameworks')
-                Popen('install_name_tool -change ' + lib + ' ' + fixed + \
-                        ' ' + library, shell=True).wait()
+                Popen(['install_name_tool', '-change', lib, fixed,
+                    library]).wait()
 
         for file in ('CHANGELOG', 'COPYRIGHT', 'LICENSE', 'README', 'TODO'):
             shutil.copyfile(os.path.join(os.path.dirname(__file__), file),
@@ -256,11 +268,11 @@ elif os.name == 'mac' \
         if os.path.isdir(doc_dist_dir):
             shutil.rmtree(doc_dist_dir)
         shutil.copytree(os.path.join(os.path.dirname(__file__), 'doc'),
-            doc_dist_dir)
+                doc_dist_dir)
 
-        dmg_file = os.path.join(os.path.dirname(__file__),
-            'tryton-' + VERSION + '.dmg')
+        dmg_file = os.path.join(os.path.dirname(__file__), 'tryton-' + VERSION
+                + '.dmg')
         if os.path.isfile(dmg_file):
             os.remove(dmg_file)
-        Popen('hdiutil create ' + dmg_file + ' -volname "Tryton Client ' + VERSION + '" ' \
-            + '-fs HFS+ -srcfolder ' + dist_dir, shell=True).wait()
+        Popen(['hdiutil', 'create', dmg_file, '-volname', '"Tryton Client ' +
+            VERSION + '"', '-fs', 'HFS+', '-srcfolder', dist_dir]).wait()
