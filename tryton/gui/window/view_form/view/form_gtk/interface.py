@@ -116,7 +116,7 @@ class WidgetInterface(object):
         except Exception, exception:
             process_exception(exception, self._window, *args)
         self._view.modelfield.set(self._view.model,
-                res.get(self.attrs['name'], False))
+                res.get(self.attrs['name'], False), modified=True)
         self.display(self._view.model, self._view.modelfield)
 
     def _menu_sig_default_set(self, reset=False):
