@@ -113,20 +113,6 @@ class Main(object):
         self.menuitem_form = None
         self.menuitem_plugins = None
 
-        self.menubar_hbox = gtk.HBox()
-        self.menubar_hbox.show()
-        frame = gtk.Frame()
-        frame.set_shadow_type(gtk.SHADOW_OUT)
-        hbox2 = gtk.HBox()
-        frame.add(hbox2)
-        self.connection_img = gtk.Image()
-        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
-        hbox2.pack_start(self.connection_img, False, False)
-        self.secure_img = gtk.Image()
-        self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
-        hbox2.pack_start(self.secure_img, False, False)
-        self.menubar_hbox.pack_start(frame, False, False)
-        self.vbox.pack_start(self.menubar_hbox, False, True)
         self.set_menubar()
 
         if igemacintegration:
@@ -150,6 +136,7 @@ class Main(object):
         self.vbox.pack_start(self.notebook, True, True)
 
         self.status_hbox = None
+        self.set_statusbar()
 
         self.window.show_all()
 
@@ -190,8 +177,8 @@ class Main(object):
             self.menubar.destroy()
         menubar = gtk.MenuBar()
         self.menubar = menubar
-        self.menubar_hbox.pack_start(self.menubar, True, True)
-        self.menubar_hbox.reorder_child(self.menubar, 0)
+        self.vbox.pack_start(menubar, False, True)
+        self.vbox.reorder_child(menubar, 0)
 
         menuitem_file = gtk.MenuItem(_('_File'))
         menubar.add(menuitem_file)
@@ -266,6 +253,32 @@ class Main(object):
         menu_help.set_accel_path('<tryton>/Help')
 
         self.menubar.show_all()
+
+    def set_statusbar(self):
+        update = True
+        if not self.status_hbox:
+            self.status_hbox = gtk.HBox(spacing=2)
+            update = False
+            self.vbox.pack_end(self.status_hbox, False, True, padding=2)
+
+        if not update:
+            self.sb_username = gtk.Label()
+            self.sb_username.set_alignment(0.0, 0.5)
+            self.status_hbox.pack_start(self.sb_username, True, True, padding=5)
+
+        if not update:
+            self.sb_servername = gtk.Label()
+            self.sb_servername.set_alignment(1.0, 0.5)
+            self.status_hbox.pack_start(self.sb_servername, True, True,
+                    padding=5)
+
+        if not update:
+            self.secure_img = gtk.Image()
+            self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
+            self.status_hbox.pack_start(self.secure_img, False, True, padding=2)
+
+        if not update:
+            self.status_hbox.show_all()
 
     def _set_menu_file(self):
         menu_file = gtk.Menu()
@@ -990,16 +1003,14 @@ class Main(object):
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = prefs['language_direction']
-            title = 'Tryton'
-            if prefs.get('status_bar'):
-                title += ' - ' + prefs['status_bar']
-            self.window.set_title(title)
+            self.sb_username.set_text(prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
                     self.set_toolbar_label()
                     self.shortcut_set()
+                    self.set_statusbar()
                     self.request_set()
                     self.sig_reload_menu()
                 CONFIG['client.lang'] = prefs['language']
@@ -1096,6 +1107,7 @@ class Main(object):
                     self.set_menubar()
                     self.set_toolbar_label()
                     self.shortcut_set()
+                    self.set_statusbar()
                     self.request_set()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
@@ -1128,9 +1140,8 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
-        self.window.set_title('Tryton')
-        self.connection_img.set_from_stock('tryton-disconnect', gtk.ICON_SIZE_MENU)
-        self.tooltips.set_tip(self.connection_img, '')
+        self.sb_username.set_text('')
+        self.sb_servername.set_text('')
         self.shortcut_unset()
         self.toolbutton_menu.set_sensitive(False)
         self.toolbutton_request.set_sensitive(False)
@@ -1195,14 +1206,9 @@ class Main(object):
                 prefs = common.process_exception(exception, self.window, *args)
                 if not prefs:
                     return False
-        title = 'Tryton'
-        if prefs.get('status_bar'):
-            title += ' - ' + prefs['status_bar']
-        self.window.set_title(title)
-        self.connection_img.set_from_stock('tryton-connect', gtk.ICON_SIZE_MENU)
-        self.tooltips.set_tip(self.connection_img, '%s@%s:%d/%s' \
-                % (rpc._USERNAME, rpc._SOCK.hostname, rpc._SOCK.port,
-                    rpc._DATABASE))
+        self.sb_username.set_text(prefs.get('status_bar', ''))
+        self.sb_servername.set_text('%s@%s:%d/%s' % (rpc._USERNAME,
+            rpc._SOCK.hostname, rpc._SOCK.port, rpc._DATABASE))
         if not prefs[menu_type]:
             if quiet:
                 return False
