@@ -91,6 +91,8 @@ class Line(Graph):
             if key2fill[point.yname]:
                 continue
             cr.set_source_rgb(*self.colorScheme[point.yname])
+            cr.move_to(point.x * self.area.w + self.area.x,
+                    point.y * self.area.h + self.area.y)
             cr.arc(point.x * self.area.w + self.area.x,
                     point.y * self.area.h + self.area.y,
                     3, 0, 2 * math.pi)
@@ -105,6 +107,8 @@ class Line(Graph):
             if point.highlight:
                 cr.set_line_width(2)
                 cr.set_source_rgb(*hex2rgb('#000000'))
+                cr.move_to(point.x * self.area.w + self.area.x,
+                        point.y * self.area.h + self.area.y)
                 cr.arc(point.x * self.area.w + self.area.x,
                         point.y * self.area.h + self.area.y,
                         3, 0, 2 * math.pi)
