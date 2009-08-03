@@ -89,9 +89,15 @@ class Form(SignalEvent):
         vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
         vbox.show()
 
+        self.status_label = gtk.Label()
+        self.status_label.set_padding(5, 4)
+        self.status_label.set_alignment(0.0, 0.5)
+        self.status_label.show()
+
         hbox = gtk.HBox()
         hbox.pack_start(title, expand=True, fill=True)
         hbox.pack_start(vbox, expand=False, fill=True, padding=20)
+        hbox.pack_start(self.status_label, expand=False, fill=True)
         hbox.show()
 
         frame = gtk.Frame()
@@ -118,11 +124,6 @@ class Form(SignalEvent):
         self.scrolledwindow.show()
 
         self.widget.pack_start(self.scrolledwindow)
-
-        self.status = gtk.Statusbar()
-        self.status.set_has_resize_grip(False)
-        self.status.show()
-        self.widget.pack_start(self.status, expand=False, fill=True)
 
         self.handlers = {
             'but_new': self.sig_new,
@@ -433,21 +434,13 @@ class Form(SignalEvent):
             self.eb_info.hide()
 
     def _record_message(self, screen, signal_data):
-        if not signal_data[3]:
-            msg = _('No Record Selected!')
-        else:
-            name = '_'
-            if signal_data[0] >= 0:
-                name = str(signal_data[0] + 1)
-            name2 = _('New Record')
-            if signal_data[3] and signal_data[3] > 0:
-                name2 = _('Editing Record (id: ') + str(signal_data[3]) + ')'
-            msg = _('Record: ') + name + ' / ' + str(signal_data[1])
-            if signal_data[1] < signal_data[2]:
-                msg += _(' of ') + str(signal_data[2])
-            msg += ' - ' + name2
-        cid = self.status.get_context_id('message')
-        self.status.push(cid, msg)
+        name = '_'
+        if signal_data[0] >= 0:
+            name = str(signal_data[0] + 1)
+        msg = name + ' / ' + str(signal_data[1])
+        if signal_data[1] < signal_data[2]:
+            msg += _(' of ') + str(signal_data[2])
+        self.status_label.set_text(msg)
         self.message_info('')
 
     def _record_modified(self, screen, signal_data):
