@@ -119,7 +119,7 @@ class WinSearch(object):
         value += self.domain
         try:
             self.ids = rpc.execute('model', self.model_name, 'search', value,
-                    offset, limit, 0, rpc.CONTEXT)
+                    offset, limit, None, rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self.win)
             return False

@@ -76,7 +76,7 @@ class Screen(SignalEvent):
         self.form = form
         self.fields_view_tree = None
         self.exclude_field = exclude_field
-        self.sort = sort or []
+        self.sort = sort
         self.view_to_load = []
 
         if view_type:
