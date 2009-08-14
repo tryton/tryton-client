@@ -144,6 +144,18 @@ def login(username, password, host, port, database):
 def logout():
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
     if _SOCK:
+        try:
+            _SEMAPHORE.acquire()
+            try:
+                args = (_DATABASE, _USER, _SESSION, 'common', 'db', 'logout')
+                logging.getLogger('rpc.request').info(repr(args))
+                _SOCK.send(args)
+                res = _SOCK.receive()
+                logging.getLogger('rpc.result').debug(repr(res))
+            finally:
+                _SEMAPHORE.release()
+        except:
+            pass
         _SOCK.disconnect()
         _SOCK = None
     _USER = 0
