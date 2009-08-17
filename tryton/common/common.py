@@ -402,6 +402,10 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
 def error(title, parent, details):
     log = logging.getLogger('common.message')
     log.error('%s' % details)
+
+    if title == details:
+        title = ''
+
     dialog = gtk.Dialog(_('Error'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
     dialog.set_icon(TRYTON_ICON)
