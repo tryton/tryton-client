@@ -266,18 +266,15 @@ class Main(object):
             self.sb_username.set_alignment(0.0, 0.5)
             self.status_hbox.pack_start(self.sb_username, True, True, padding=5)
 
-        if not update:
             self.sb_servername = gtk.Label()
             self.sb_servername.set_alignment(1.0, 0.5)
             self.status_hbox.pack_start(self.sb_servername, True, True,
                     padding=5)
 
-        if not update:
             self.secure_img = gtk.Image()
             self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
             self.status_hbox.pack_start(self.secure_img, False, True, padding=2)
 
-        if not update:
             self.status_hbox.show_all()
 
     def _set_menu_file(self):
