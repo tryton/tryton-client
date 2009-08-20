@@ -157,10 +157,17 @@ class Action(object):
                     limit=datas['limit'], auto_refresh=datas['auto_refresh'],
                     search_value=search_value)
         elif action['type'] == 'ir.action.wizard':
-            Wizard.execute(action['wiz_name'], datas, window,
+            if action.get('window', False):
+                Window.create_wizard(action['wiz_name'], datas, window,
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
-                    email=action.get('email'), context=context)
+                    email=action.get('email'), name=action.get('name', False),
+                    context=context)
+            else:
+                Wizard.execute(action['wiz_name'], datas, window,
+                        direct_print=action.get('direct_print', False),
+                        email_print=action.get('email_print', False),
+                        email=action.get('email'), context=context)
 
         elif action['type'] == 'ir.action.report':
             Action.exec_report(action['report_name'], datas, window,

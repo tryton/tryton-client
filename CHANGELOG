@@ -1,3 +1,4 @@
+* Allow to run wizard in tabs
 * Add "Change Accelerators" option
 * Use gzip in pysocket
 * Use the report name to create the temporary file to open it
