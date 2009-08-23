@@ -256,7 +256,7 @@ msgstr "_Atajos"
 
 #: tryton/gui/main.py:230
 msgid "_Help"
-msgstr "_Ayuda"
+msgstr "Ay_uda"
 
 #: tryton/gui/main.py:261
 msgid "Requests:"
