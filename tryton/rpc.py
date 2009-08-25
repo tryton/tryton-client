@@ -149,6 +149,7 @@ def logout():
             try:
                 args = (_DATABASE, _USER, _SESSION, 'common', 'db', 'logout')
                 logging.getLogger('rpc.request').info(repr(args))
+                _SOCK.sock.settimeout(pysocket.CONNECT_TIMEOUT)
                 _SOCK.send(args)
                 res = _SOCK.receive()
                 logging.getLogger('rpc.result').debug(repr(res))
