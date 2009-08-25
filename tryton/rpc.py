@@ -143,7 +143,7 @@ def login(username, password, host, port, database):
 
 def logout():
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
-    if _SOCK:
+    if _SOCK and _USER:
         try:
             _SEMAPHORE.acquire()
             try:
