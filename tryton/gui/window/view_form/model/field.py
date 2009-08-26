@@ -427,7 +427,7 @@ class M2MField(CharField):
                     rpc.CONTEXT)
         except:
             return self.get_client(model)
-        return ', '.join([x['rec_name'] for x in result])
+        return ', '.join(x['rec_name'] for x in result)
 
 
 class O2MField(CharField):

@@ -294,8 +294,8 @@ class WinExport(object):
                 export['id'],
                 [f['name'] for f in fields],
                 export['name'],
-                ', '.join([self.fields_data[f['name']]['string'] \
-                        for f in fields]),
+                ', '.join(self.fields_data[f['name']]['string'] \
+                        for f in fields),
                 ))
         self.pref_export.set_model(self.predef_model)
 
@@ -320,7 +320,7 @@ class WinExport(object):
             new_id,
             fields,
             name,
-            ','.join([self.fields_data[f]['string'] for f in fields])))
+            ','.join(self.fields_data[f]['string'] for f in fields)))
         self.pref_export.set_model(self.predef_model)
 
     def remove_predef(self, widget):
