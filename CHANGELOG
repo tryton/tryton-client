@@ -1,3 +1,4 @@
+* Handle required attribute with local domains
 * Allow to run wizard in tabs
 * Add "Change Accelerators" option
 * Use gzip in pysocket

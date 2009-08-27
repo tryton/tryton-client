@@ -337,6 +337,8 @@ class Screen(SignalEvent):
                     fields[field1]['domain'] = [
                             tuple([field2] + list(dom[1:])),
                             field_dom]
+                if dom[1] == '!=' and dom[2] == False:
+                    fields[field1]['required'] = True
 
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
