@@ -100,7 +100,9 @@ class ConfigManager(object):
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }
         self.config = {}
-        self.options = {}
+        self.options = {
+            'login.host': True
+        }
         parser = optparse.OptionParser(version=("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
@@ -174,7 +176,8 @@ class ConfigManager(object):
             self.config[key] = value
 
     def __getitem__(self, key):
-        return self.options.get(key, self.config.get(key, self.defaults[key]))
+        return self.options.get(key, self.config.get(key,
+            self.defaults.get(key)))
 
 CONFIG = ConfigManager()
 CURRENT_DIR = os.path.abspath(os.path.normpath(os.path.join(

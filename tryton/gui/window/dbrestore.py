@@ -75,11 +75,11 @@ class DBRestore(object):
         table.set_row_spacings(3)
         table.set_col_spacings(3)
         vbox.pack_start(table)
-        label_server_url = gtk.Label(_("Server Connection:"))
-        label_server_url.set_size_request(117, -1)
-        label_server_url.set_alignment(1, 0.5)
-        label_server_url.set_padding(3, 3)
-        table.attach(label_server_url, 0, 1, 0, 1)
+        self.label_server_url = gtk.Label(_("Server Connection:"))
+        self.label_server_url.set_size_request(117, -1)
+        self.label_server_url.set_alignment(1, 0.5)
+        self.label_server_url.set_padding(3, 3)
+        table.attach(self.label_server_url, 0, 1, 0, 1, yoptions=gtk.FILL)
         self.entry_server_url = gtk.Entry()
         self.entry_server_url.set_sensitive(False)
         self.entry_server_url.unset_flags(gtk.CAN_FOCUS)
@@ -91,7 +91,7 @@ class DBRestore(object):
                 "the server. Use server 'localhost' and port '8070' if " \
                 "the server is installed on this computer. Click on " \
                 "'Change' to change the address."))
-        table.attach(self.entry_server_url, 1, 2, 0, 1)
+        table.attach(self.entry_server_url, 1, 2, 0, 1, yoptions=gtk.FILL)
         self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
                 use_underline=True)
         img_button_server_change = gtk.Image()
@@ -100,12 +100,12 @@ class DBRestore(object):
         self.button_server_change.set_image(img_button_server_change)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
                 "server connection..."))
-        table.attach(self.button_server_change, 2, 3, 0, 1)
-        label_server_password = gtk.Label(_("Tryton Server Password:"))
-        label_server_password.set_justify(gtk.JUSTIFY_RIGHT)
-        label_server_password.set_alignment(1, 0.5)
-        label_server_password.set_padding(3, 3)
-        table.attach(label_server_password, 0, 1, 1, 2)
+        table.attach(self.button_server_change, 2, 3, 0, 1, yoptions=gtk.FILL)
+        self.label_server_password = gtk.Label(_("Tryton Server Password:"))
+        self.label_server_password.set_justify(gtk.JUSTIFY_RIGHT)
+        self.label_server_password.set_alignment(1, 0.5)
+        self.label_server_password.set_padding(3, 3)
+        table.attach(self.label_server_password, 0, 1, 1, 2, yoptions=gtk.FILL)
         self.entry_server_password = gtk.Entry()
         self.entry_server_password.set_visibility(False)
         self.entry_server_password.set_activates_default(True)
@@ -114,16 +114,16 @@ class DBRestore(object):
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
                 "configuration."))
-        table.attach(self.entry_server_password, 1, 3, 1, 2)
-        hseparator = gtk.HSeparator()
-        table.attach(hseparator, 0, 3, 2, 3)
+        table.attach(self.entry_server_password, 1, 3, 1, 2, yoptions=gtk.FILL)
+        self.hseparator = gtk.HSeparator()
+        table.attach(self.hseparator, 0, 3, 2, 3, yoptions=gtk.FILL)
         label_filename = gtk.Label()
         label_filename.set_markup(_("File to Restore:"))
         label_filename.set_alignment(1, 0.5)
-        table.attach(label_filename, 0, 1, 3, 4)
+        table.attach(label_filename, 0, 1, 3, 4, yoptions=gtk.FILL)
         entry_filename = gtk.Label()
         entry_filename.set_markup("<tt>" + filename + "</tt>")
-        table.attach(entry_filename, 1, 3, 3, 4)
+        table.attach(entry_filename, 1, 3, 3, 4, yoptions=gtk.FILL)
         self.entry_db_name = gtk.Entry()
         self.entry_db_name.set_visibility(True)
         self.entry_db_name.set_activates_default(True)
@@ -137,10 +137,10 @@ class DBRestore(object):
                 "Allowed characters are alphanumerical or _ (underscore)\n" \
                 "You need to avoid all accents, space or special " \
                 "characters! \nExample: tryton"))
-        table.attach(self.entry_db_name, 1, 3, 4, 5)
+        table.attach(self.entry_db_name, 1, 3, 4, 5, yoptions=gtk.FILL)
         label_db_name = gtk.Label(_("New Database Name:"))
         label_db_name.set_alignment(1, 0.5)
-        table.attach(label_db_name, 0, 1, 4, 5)
+        table.attach(label_db_name, 0, 1, 4, 5, yoptions=gtk.FILL)
         # Buttons and events
         self.dialog.connect("key-press-event", \
                 self.event_show_button_restore)
@@ -166,6 +166,15 @@ class DBRestore(object):
         """
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
+
+        if not CONFIG['login.host']:
+            self.label_server_url.hide()
+            self.entry_server_url.hide()
+            self.button_server_change.hide()
+            self.label_server_password.hide()
+            self.entry_server_password.hide()
+            self.hseparator.hide()
+
         url = '%s:%d' % (CONFIG['login.server'], int(CONFIG['login.port']))
         self.entry_server_url.set_text(url)
         while True:

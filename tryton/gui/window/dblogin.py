@@ -70,11 +70,11 @@ class DBLogin(object):
         self.entry_login = gtk.Entry()
         self.entry_login.set_activates_default(True)
         table_main.attach(self.entry_login, 1, 3, 2, 3)
-        label_server = gtk.Label()
-        label_server.set_text(_("Server:"))
-        label_server.set_alignment(1, 0.5)
-        label_server.set_padding(3, 3)
-        table_main.attach(label_server, 0, 1, 0, 1, xoptions=gtk.FILL)
+        self.label_server = gtk.Label()
+        self.label_server.set_text(_("Server:"))
+        self.label_server.set_alignment(1, 0.5)
+        self.label_server.set_padding(3, 3)
+        table_main.attach(self.label_server, 0, 1, 0, 1, xoptions=gtk.FILL)
         label_database = gtk.Label()
         label_database.set_text(_("Database:"))
         label_database.set_alignment(1, 0.5)
@@ -160,6 +160,11 @@ class DBLogin(object):
         self.dialog.show_all()
         self.combo_label.hide()
         self.combo_button.hide()
+
+        if not CONFIG['login.host']:
+            self.label_server.hide()
+            self.entry_server.hide()
+            self.button_server.hide()
 
         host = CONFIG['login.server']
         port = int(CONFIG['login.port'])

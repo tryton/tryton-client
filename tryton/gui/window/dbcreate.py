@@ -162,16 +162,16 @@ class DBCreate(object):
         table.set_row_spacings(3)
         table.set_col_spacings(3)
 
-        label_server_setup = gtk.Label()
-        label_server_setup.set_markup("<b>"+ _("Server Setup:")+ "</b>")
-        label_server_setup.set_justify(gtk.JUSTIFY_LEFT)
-        label_server_setup.set_alignment(0, 1)
-        label_server_setup.set_padding( 9, 5)
-        table.attach(label_server_setup, 0, 3, 0, 1, xoptions=gtk.FILL)
-        label_server = gtk.Label(_("Server connection:"))
-        label_server.set_alignment(1, 0.5)
-        label_server.set_padding(3, 3)
-        table.attach(label_server, 0, 1, 1, 2, xoptions=gtk.FILL)
+        self.label_server_setup = gtk.Label()
+        self.label_server_setup.set_markup("<b>"+ _("Server Setup:")+ "</b>")
+        self.label_server_setup.set_justify(gtk.JUSTIFY_LEFT)
+        self.label_server_setup.set_alignment(0, 1)
+        self.label_server_setup.set_padding( 9, 5)
+        table.attach(self.label_server_setup, 0, 3, 0, 1, xoptions=gtk.FILL)
+        self.label_server = gtk.Label(_("Server connection:"))
+        self.label_server.set_alignment(1, 0.5)
+        self.label_server.set_padding(3, 3)
+        table.attach(self.label_server, 0, 1, 1, 2, xoptions=gtk.FILL)
         self.entry_server_connection = gtk.Entry()
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
@@ -191,15 +191,16 @@ class DBCreate(object):
         table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
             "server connection..."))
-        label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
-        label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
-        label_serverpasswd.set_alignment(1, 0.5)
-        label_serverpasswd.set_padding( 3, 3)
-        table.attach(label_serverpasswd, 0, 1, 2, 3, xoptions=gtk.FILL)
+        self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
+        self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
+        self.label_serverpasswd.set_alignment(1, 0.5)
+        self.label_serverpasswd.set_padding( 3, 3)
+        table.attach(self.label_serverpasswd, 0, 1, 2, 3, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         self.entry_serverpasswd = gtk.Entry()
         self.entry_serverpasswd.set_visibility(False)
         self.entry_serverpasswd.set_activates_default(True)
-        table.attach(self.entry_serverpasswd, 1, 3, 2, 3)
+        table.attach(self.entry_serverpasswd, 1, 3, 2, 3, yoptions=gtk.FILL)
         self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
             "password of the Tryton server. It doesn't belong to a " \
             "real user. This password is usually defined in the trytond " \
@@ -207,25 +208,27 @@ class DBCreate(object):
         self.entry_serverpasswd.connect("key-press-event", \
             self.event_passwd_clear)
 
-        hseparator = gtk.HSeparator()
-        table.attach(hseparator, 0, 3, 3, 4)
+        self.hseparator = gtk.HSeparator()
+        table.attach(self.hseparator, 0, 3, 3, 4, yoptions=gtk.FILL)
 
         label_dbname = gtk.Label()
         label_dbname.set_markup("<b>" + _("New database setup:")  + "</b>")
         label_dbname.set_justify(gtk.JUSTIFY_LEFT)
         label_dbname.set_alignment(0, 1)
         label_dbname.set_padding( 9, 5)
-        table.attach(label_dbname, 0, 3, 4, 5, xoptions=gtk.FILL)
+        table.attach(label_dbname, 0, 3, 4, 5, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         label_dbname = gtk.Label(_("Database name:"))
         label_dbname.set_justify(gtk.JUSTIFY_RIGHT)
         label_dbname.set_padding( 3, 3)
         label_dbname.set_alignment(1, 0.5)
-        table.attach(label_dbname, 0, 1, 5, 6, xoptions=gtk.FILL)
+        table.attach(label_dbname, 0, 1, 5, 6, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         self.entry_dbname = gtk.Entry()
         self.entry_dbname.set_max_length(63)
         self.entry_dbname.set_width_chars(16)
         self.entry_dbname.set_activates_default(True)
-        table.attach(self.entry_dbname, 1, 3, 5, 6)
+        table.attach(self.entry_dbname, 1, 3, 5, 6, yoptions=gtk.FILL)
         self.tooltips.set_tip(self.entry_dbname, _("Choose the name of the new " \
             "database.\n" \
             "Allowed characters are alphanumerical or _ (underscore)\n" \
@@ -238,11 +241,12 @@ class DBCreate(object):
         label_language.set_justify(gtk.JUSTIFY_RIGHT)
         label_language.set_alignment(1, 0.5)
         label_language.set_padding( 3, 3)
-        table.attach(label_language, 0, 1, 6, 7, xoptions=gtk.FILL)
+        table.attach(label_language, 0, 1, 6, 7, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         eventbox_language = gtk.EventBox()
         self.combo_language = gtk.combo_box_new_text()
         eventbox_language.add(self.combo_language)
-        table.attach(eventbox_language, 1, 3, 6, 7)
+        table.attach(eventbox_language, 1, 3, 6, 7, yoptions=gtk.FILL)
         self.tooltips.set_tip(eventbox_language, _("Choose the default " \
             "language that will be installed for this database. You will " \
             "be able to install new languages after installation through " \
@@ -251,7 +255,8 @@ class DBCreate(object):
         label_adminpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_adminpasswd.set_padding( 3, 3)
         label_adminpasswd.set_alignment(1, 0.5)
-        table.attach(label_adminpasswd, 0, 1, 7, 8, xoptions=gtk.FILL)
+        table.attach(label_adminpasswd, 0, 1, 7, 8, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         self.entry_adminpasswd = gtk.Entry()
         self.entry_adminpasswd.set_visibility(False)
         self.entry_adminpasswd.set_activates_default(True)
@@ -260,20 +265,21 @@ class DBCreate(object):
             "will be later able to login into the database:\n" \
             "User name: admin\n" \
             "Password: <The password you set here>"))
-        table.attach(self.entry_adminpasswd, 1, 3, 7, 8)
+        table.attach(self.entry_adminpasswd, 1, 3, 7, 8, yoptions=gtk.FILL)
         self.entry_adminpasswd.connect("key-press-event", \
             self.event_passwd_clear)
         label_adminpasswd2 = gtk.Label(_("Confirm admin password:"))
         label_adminpasswd2.set_justify(gtk.JUSTIFY_RIGHT)
         label_adminpasswd2.set_padding( 3, 3)
         label_adminpasswd2.set_alignment(1, 0.5)
-        table.attach(label_adminpasswd2, 0, 1, 8, 9, xoptions=gtk.FILL)
+        table.attach(label_adminpasswd2, 0, 1, 8, 9, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
         self.entry_adminpasswd2 = gtk.Entry()
         self.entry_adminpasswd2.set_visibility(False)
         self.entry_adminpasswd2.set_activates_default(True)
         self.tooltips.set_tip(self.entry_adminpasswd2, _("Type the Admin " \
             "password again"))
-        table.attach(self.entry_adminpasswd2, 1, 3, 8, 9)
+        table.attach(self.entry_adminpasswd2, 1, 3, 8, 9, yoptions=gtk.FILL)
         self.entry_adminpasswd2.connect("key-press-event", \
             self.event_passwd_clear)
         self.entry_serverpasswd.grab_focus()
@@ -285,6 +291,15 @@ class DBCreate(object):
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
+
+        if not CONFIG['login.host']:
+            self.label_server_setup.hide()
+            self.label_server.hide()
+            self.entry_server_connection.hide()
+            self.button_server_change.hide()
+            self.label_serverpasswd.hide()
+            self.entry_serverpasswd.hide()
+            self.hseparator.hide()
 
         pass_widget = self.entry_serverpasswd
         change_button = self.button_server_change

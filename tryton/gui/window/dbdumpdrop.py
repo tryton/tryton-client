@@ -108,7 +108,7 @@ class DBBackupDrop(object):
         table.set_border_width(10)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
-        self.dialog_vbox.pack_start(table, True, True,0)
+        self.dialog_vbox.pack_start(table, True, False,0)
 
         label_subtitle = gtk.Label()
         label_subtitle.set_markup("<b>"+ label_subtitle_text + "</b>")
@@ -118,12 +118,13 @@ class DBBackupDrop(object):
         table.attach(label_subtitle, 0, 3, 0, 1, xoptions=gtk.FILL)
 
         hseparator = gtk.HSeparator()
-        table.attach(hseparator, 0, 3, 1, 2)
+        table.attach(hseparator, 0, 3, 1, 2, yoptions=gtk.FILL)
 
-        label_server = gtk.Label(_("Server Connection:"))
-        label_server.set_alignment(1, 0.5)
-        label_server.set_padding(3, 3)
-        table.attach(label_server, 0, 1, 2, 3, xoptions=gtk.FILL)
+        self.label_server = gtk.Label(_("Server Connection:"))
+        self.label_server.set_alignment(1, 0.5)
+        self.label_server.set_padding(3, 3)
+        table.attach(self.label_server, 0, 1, 2, 3, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
 
         self.entry_server_connection = gtk.Entry()
         self.entry_server_connection.set_sensitive(False)
@@ -134,7 +135,8 @@ class DBBackupDrop(object):
                 "URL of the server. Use server 'localhost' and port '8070' " \
                 "if the server is installed on this computer. " \
                 "Click on 'Change' to change the address."))
-        table.attach(self.entry_server_connection, 1, 2, 2, 3)
+        table.attach(self.entry_server_connection, 1, 2, 2, 3,
+                yoptions=gtk.FILL)
 
         self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
                 use_underline=True)
@@ -142,14 +144,15 @@ class DBBackupDrop(object):
         img_button_server_change.set_from_stock('tryton-preferences-system', \
                 gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
-        table.attach(self.button_server_change, 2, 3, 2, 3, yoptions=False, \
+        table.attach(self.button_server_change, 2, 3, 2, 3, yoptions=gtk.FILL, \
                 xoptions=gtk.FILL)
 
         self.label_database = gtk.Label()
         self.label_database.set_text(_("Database:"))
         self.label_database.set_alignment(1, 0.5)
         self.label_database.set_padding(3, 3)
-        table.attach(self.label_database, 0, 1, 3, 4, xoptions=gtk.FILL)
+        table.attach(self.label_database, 0, 1, 3, 4, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
 
         vbox_combo = gtk.VBox()
         self.combo_database = gtk.ComboBox()
@@ -158,13 +161,14 @@ class DBBackupDrop(object):
         self.combo_database_label.set_alignment(0, 1)
         vbox_combo.pack_start(self.combo_database, True, True, 0)
         vbox_combo.pack_start(self.combo_database_label, False, False, 0)
-        table.attach(vbox_combo, 1, 3, 3, 4)
+        table.attach(vbox_combo, 1, 3, 3, 4, yoptions=gtk.FILL)
 
         label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_serverpasswd.set_alignment(1, 0.5)
         label_serverpasswd.set_padding( 3, 3)
-        table.attach(label_serverpasswd, 0, 1, 4, 5, xoptions=gtk.FILL)
+        table.attach(label_serverpasswd, 0, 1, 4, 5, xoptions=gtk.FILL,
+                yoptions=gtk.FILL)
 
         self.entry_serverpasswd = gtk.Entry()
         self.entry_serverpasswd.set_visibility(False)
@@ -173,7 +177,7 @@ class DBBackupDrop(object):
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
                 "configuration."))
-        table.attach(self.entry_serverpasswd, 1, 3, 4, 5)
+        table.attach(self.entry_serverpasswd, 1, 3, 4, 5, yoptions=gtk.FILL)
 
         self.entry_serverpasswd.grab_focus()
         self.dialog.vbox.pack_start(self.dialog_vbox)
@@ -182,6 +186,11 @@ class DBBackupDrop(object):
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
+
+        if not CONFIG['login.host']:
+            self.label_server.hide()
+            self.entry_server_connection.hide()
+            self.button_server_change.hide()
 
         pass_widget = self.entry_serverpasswd
         server_widget = self.entry_server_connection
