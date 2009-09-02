@@ -52,7 +52,7 @@ class DBBackupDrop(object):
         event method doesn't check the valid of single entrys.
         """
         if  self.entry_server_connection.get_text() !=  "" \
-                and self.combo_database.get_active() != -1 \
+                and self.combo_database.get_active_text() != "" \
                 and self.entry_serverpasswd.get_text() != "":
             widget.unset_flags(gtk.HAS_DEFAULT)
             self.button_ok.set_sensitive(True)
