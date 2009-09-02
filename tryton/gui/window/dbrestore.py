@@ -145,6 +145,8 @@ class DBRestore(object):
         label_db_update.set_alignment(1, 0.5)
         table.attach(label_db_update, 0, 1, 5, 6, yoptions=gtk.FILL)
         self.check_update = gtk.CheckButton()
+        self.tooltips.set_tip(self.check_update, _('If checked, allow ' \
+                'to restore database from an older version.'))
         self.check_update.set_active(True)
         table.attach(self.check_update, 1, 3, 5, 6, yoptions=gtk.FILL)
         # Buttons and events
