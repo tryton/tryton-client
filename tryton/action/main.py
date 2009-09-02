@@ -55,7 +55,7 @@ class Action(object):
             print_p = True
         dtemp = tempfile.mkdtemp(prefix='tryton_')
         fp_name = os.path.join(dtemp, name.replace(os.sep, '_') + '.' + type)
-        file_d = open(fp_name, 'w')
+        file_d = open(fp_name, 'wb')
         file_d.write(base64.decodestring(data))
         file_d.close()
         if email_print:
