@@ -1455,7 +1455,7 @@ class Main(object):
         if not filename:
             return
         dialog = DBRestore(self.window, filename=filename)
-        url, dbname, passwd = dialog.run(self.window)
+        url, dbname, passwd, update = dialog.run(self.window)
         if dbname:
             file_p = file(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
@@ -1463,7 +1463,7 @@ class Main(object):
             host, port = url.rsplit(':' , 1)
             try:
                 res = rpc.db_exec(host, int(port), 'restore', dbname, passwd, \
-                        data_b64)
+                        data_b64, update)
             except Exception, exception:
                 self.refresh_ssl()
                 if exception[0] == \

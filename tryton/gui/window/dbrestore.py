@@ -70,7 +70,7 @@ class DBRestore(object):
         vbox = gtk.VBox()
         self.dialog.vbox.pack_start(vbox)
         self.tooltips = common.Tooltips()
-        table = gtk.Table(5, 3, False)
+        table = gtk.Table(6, 3, False)
         table.set_border_width(9)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
@@ -141,6 +141,12 @@ class DBRestore(object):
         label_db_name = gtk.Label(_("New Database Name:"))
         label_db_name.set_alignment(1, 0.5)
         table.attach(label_db_name, 0, 1, 4, 5, yoptions=gtk.FILL)
+        label_db_update = gtk.Label(_('Update Database:'))
+        label_db_update.set_alignment(1, 0.5)
+        table.attach(label_db_update, 0, 1, 5, 6, yoptions=gtk.FILL)
+        self.check_update = gtk.CheckButton()
+        self.check_update.set_active(True)
+        table.attach(self.check_update, 1, 3, 5, 6, yoptions=gtk.FILL)
         # Buttons and events
         self.dialog.connect("key-press-event", \
                 self.event_show_button_restore)
@@ -181,6 +187,7 @@ class DBRestore(object):
             database = False
             passwd = False
             url = False
+            update = False
             #TODO: This needs to be unified with the other widgets
             self.button_server_change.connect_after('clicked', \
                     lambda a, b: common.request_server(b, self.dialog), \
@@ -190,6 +197,7 @@ class DBRestore(object):
                 database = self.entry_db_name.get_text()
                 url = self.entry_server_url.get_text()
                 passwd = self.entry_server_password.get_text()
+                update = self.check_update.get_active()
                 break
             else:
                 self.dialog.destroy()
@@ -198,4 +206,4 @@ class DBRestore(object):
         parent.present()
         self.dialog.destroy()
 
-        return url, database, passwd
+        return url, database, passwd, update
