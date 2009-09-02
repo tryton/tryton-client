@@ -1429,8 +1429,10 @@ class Main(object):
                 "database.\nAre you really sure to proceed?"), self.window)
         if sure == "ko" or sure == "cancel":
             return
+        rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'drop',
+            dbname, passwd), self.window)
         try:
-            rpc.db_exec(host, int(port), 'drop', dbname, passwd)
+            rpcprogress.run()
         except Exception, exception:
             self.refresh_ssl()
             if exception[0] == "AccessDenied":
@@ -1461,9 +1463,10 @@ class Main(object):
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
             host, port = url.rsplit(':' , 1)
+            rpcprogress = common.RPCProgress('db_exec', (host, int(port),
+                'restore', dbname, passwd, data_b64, update), self.window)
             try:
-                res = rpc.db_exec(host, int(port), 'restore', dbname, passwd, \
-                        data_b64, update)
+                res = rpcprogress.run()
             except Exception, exception:
                 self.refresh_ssl()
                 if exception[0] == \
@@ -1503,8 +1506,10 @@ class Main(object):
             return
 
         host, port = url.rsplit(':', 1)
+        rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'dump',
+            dbname, passwd), self.window)
         try:
-            dump_b64 = rpc.db_exec(host, int(port), 'dump', dbname, passwd)
+            dump_b64 = rpcprogress.run()
         except Exception, exception:
             if exception[0] == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
