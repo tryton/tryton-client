@@ -163,11 +163,11 @@ class DBBackupDrop(object):
         vbox_combo.pack_start(self.combo_database_label, False, False, 0)
         table.attach(vbox_combo, 1, 3, 3, 4, yoptions=gtk.FILL)
 
-        label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
-        label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
-        label_serverpasswd.set_alignment(1, 0.5)
-        label_serverpasswd.set_padding( 3, 3)
-        table.attach(label_serverpasswd, 0, 1, 4, 5, xoptions=gtk.FILL,
+        self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
+        self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
+        self.label_serverpasswd.set_alignment(1, 0.5)
+        self.label_serverpasswd.set_padding( 3, 3)
+        table.attach(self.label_serverpasswd, 0, 1, 4, 5, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
 
         self.entry_serverpasswd = gtk.Entry()
@@ -191,6 +191,8 @@ class DBBackupDrop(object):
             self.label_server.hide()
             self.entry_server_connection.hide()
             self.button_server_change.hide()
+            self.label_serverpasswd.hide()
+            self.entry_serverpasswd.hide()
 
         pass_widget = self.entry_serverpasswd
         server_widget = self.entry_server_connection
