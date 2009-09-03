@@ -130,7 +130,6 @@ class DBBackupDrop(object):
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
-        self.entry_server_connection.set_text("http://localhost:8070")
         self.tooltips.set_tip(self.entry_server_connection, _("This is the " \
                 "URL of the server. Use server 'localhost' and port '8070' " \
                 "if the server is installed on this computer. " \
