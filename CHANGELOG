@@ -1,3 +1,4 @@
+* Add default filename for database backup
 * Add checkbox on restore to update database
 * Add 'login.host' options to hide server connection
 * Handle required attribute with local domains

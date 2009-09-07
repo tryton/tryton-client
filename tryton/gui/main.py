@@ -26,6 +26,7 @@ import base64
 import tryton.translate as translate
 import tryton.plugins
 import pango
+import time
 try:
     import igemacintegration
 except ImportError:
@@ -1534,7 +1535,8 @@ class Main(object):
 
         filename = common.file_selection(_('Save As...'), \
                 action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window, \
-                preview=False)
+                preview=False,
+                filename=dbname + '-' + time.strftime('%Y%m%d%H%M') + '.dump')
 
         if filename:
             file_ = file(filename, 'wb')
