@@ -4,6 +4,7 @@
 * Add 'login.host' options to hide server connection
 * Handle required attribute with local domains
 * Allow to run wizard in tabs
+* Remove statusbar on form for more space
 * Add "Change Accelerators" option
 * Use gzip in pysocket
 * Use the report name to create the temporary file to open it
