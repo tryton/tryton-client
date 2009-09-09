@@ -267,6 +267,11 @@ class Main(object):
             self.sb_username.set_alignment(0.0, 0.5)
             self.status_hbox.pack_start(self.sb_username, True, True, padding=5)
 
+            self.sb_requests = gtk.Label()
+            self.sb_requests.set_alignment(0.5, 0.5)
+            self.status_hbox.pack_start(self.sb_requests, True, True,
+                    padding=5)
+
             self.sb_servername = gtk.Label()
             self.sb_servername.set_alignment(1.0, 0.5)
             self.status_hbox.pack_start(self.sb_servername, True, True,
@@ -1062,6 +1067,9 @@ class Main(object):
             else:
                 self.buttons['but_request'].set_stock_id(
                         'tryton-mail-message-new')
+            message = _('Waiting requests: %s received - %s sent') % (len(ids),
+                        len(ids2))
+            self.sb_requests.set_text(message)
             return (ids, ids2)
         except:
             if exception:
@@ -1140,6 +1148,7 @@ class Main(object):
                 res = False
         self.sb_username.set_text('')
         self.sb_servername.set_text('')
+        self.sb_requests.set_text('')
         self.shortcut_unset()
         self.toolbutton_menu.set_sensitive(False)
         self.toolbutton_request.set_sensitive(False)
