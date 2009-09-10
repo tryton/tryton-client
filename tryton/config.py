@@ -73,6 +73,7 @@ class ConfigManager(object):
             'logging.level': 'ERROR',
             'logging.default': 'ERROR',
             'form.toolbar': True,
+            'form.statusbar': True,
             'client.default_width': 900,
             'client.default_height': 750,
             'client.modepda': False,

@@ -109,11 +109,13 @@ class Main(object):
         self.vbox = gtk.VBox()
         self.window.add(self.vbox)
 
+        self.status_hbox = None
         self.menubar = None
         self.menuitem_user = None
         self.menuitem_form = None
         self.menuitem_plugins = None
 
+        self.set_statusbar()
         self.set_menubar()
 
         if igemacintegration:
@@ -135,9 +137,6 @@ class Main(object):
         self.notebook.set_scrollable(True)
         self.notebook.connect_after('switch-page', self._sig_page_changt)
         self.vbox.pack_start(self.notebook, True, True)
-
-        self.status_hbox = None
-        self.set_statusbar()
 
         self.window.show_all()
 
@@ -162,6 +161,7 @@ class Main(object):
             pass
 
         self.sig_toolbar_show()
+        self.sig_statusbar_show()
 
         if os.name in ('nt', 'mac') or \
                 (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
@@ -659,6 +659,14 @@ class Main(object):
         if CONFIG['form.toolbar']:
             checkmenuitem_toolbar.set_active(True)
 
+        checkmenuitem_statusbar = gtk.CheckMenuItem(_('Statusbar'))
+        checkmenuitem_statusbar.connect('activate',
+                lambda menuitem: self.sig_statusbar_change(menuitem.get_active()))
+        checkmenuitem_statusbar.set_accel_path('<tryton>/Options/Form/Statusbar')
+        menu_form.add(checkmenuitem_statusbar)
+        if CONFIG['form.statusbar']:
+            checkmenuitem_statusbar.set_active(True)
+
         checkmenuitem_save_width_height = gtk.CheckMenuItem(_('Save Width/Height'))
         checkmenuitem_save_width_height.connect('activate',
                 lambda menuitem: CONFIG.__setitem__('client.save_width_height',
@@ -961,6 +969,17 @@ class Main(object):
             self.toolbar.show()
         else:
             self.toolbar.hide()
+
+    def sig_statusbar_change(self, value):
+        CONFIG['form.statusbar'] = value
+        return self.sig_statusbar_show()
+
+    def sig_statusbar_show(self):
+        statusbar = CONFIG['form.statusbar']
+        if statusbar:
+            self.status_hbox.show()
+        else:
+            self.status_hbox.hide()
 
     def sig_mode_change(self, pda_mode=False):
         CONFIG['client.modepda'] = pda_mode
