@@ -86,13 +86,20 @@ class Preference(object):
         while True:
             if self.win.run() == gtk.RESPONSE_OK:
                 if self.screen.current_model.validate():
-                    val = copy.copy(self.screen.get(get_modifiedonly=True))
+                    vals = copy.copy(self.screen.get(get_modifiedonly=True))
+                    if 'password' in vals:
+                        password = common.ask(_('Current Password:'),
+                                self.win, visibility=False)
+                        if not password:
+                            break
+                    else:
+                        password = False
                     user = RPCProxy('res.user')
                     try:
-                        user.set_preferences(val, rpc.CONTEXT)
+                        user.set_preferences(vals, password, rpc.CONTEXT)
                     except Exception, exception:
                         common.process_exception(exception, self.win)
-                        break
+                        continue
                     res = True
                     break
             else:

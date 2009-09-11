@@ -1,3 +1,4 @@
+* Ask previous password for set_preferences on password change
 * Add "Statusbar" option
 * Add default filename for database backup
 * Add checkbox on restore to update database
