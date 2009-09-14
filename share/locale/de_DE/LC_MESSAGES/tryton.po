@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2009-09-11 18:35+0100\n"
+"PO-Revision-Date: 2009-09-14 14:55+0100\n"
 "Last-Translator: Mathias Behrle <mathias.behrle@gmx.de>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -151,7 +151,7 @@ msgid ""
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 "Der selbe Fehlerbericht wurde bereits von einem anderen Benutzer berichtet.\n"
-"Zu Ihrer information wurde Ihr Benutzername auf der Interessentenliste eingetragen."
+"Zu Ihrer Information wurde Ihr Benutzername auf der Interessentenliste eingetragen."
 
 #: tryton/common/common.py:575
 msgid "Created new bug with ID "
@@ -647,7 +647,7 @@ msgid ""
 "Verify if you have a menu defined on your user."
 msgstr ""
 "Systemanmeldung fehlgeschlagen!\n"
-"Überprüfen Sie bitte, ob für Ihren Benutzernamen ist eine Menüaktion eingestellt ist."
+"Überprüfen Sie bitte, ob für Ihren Benutzernamen eine Menüaktion eingestellt ist."
 
 #: tryton/gui/main.py:1278
 #: tryton/gui/main.py:1284
@@ -726,7 +726,7 @@ msgstr ""
 
 #: tryton/gui/main.py:1514
 msgid "Database restore failed with error message:\n"
-msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen mit Fehlermeldung:\n"
+msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen mit der Fehlermeldung:\n"
 
 #: tryton/gui/main.py:1516
 #: tryton/gui/main.py:1523
@@ -1124,14 +1124,14 @@ msgid "Update Database:"
 msgstr "Datenbank aktualisieren:"
 
 #: tryton/gui/window/dbrestore.py:147
-msgid "If checked, allow to restore database from an older version."
-msgstr "Ermöglicht bei Aktivierung die Wiederherstellung der Datenbank aus einer älteren Version."
+msgid "Check for an automatic database update after restoring a database from a previous Tryton version."
+msgstr "Bei Aktivierung wird nach der Wiederherstellung einer Datenbank, die mit einer früheren Version von Tryton erstellt wurde, eine automatische Aktualisierung der Datenbank durchgeführt."
 
-#: tryton/gui/window/dbrestore.py:156
+#: tryton/gui/window/dbrestore.py:157
 msgid "Restore"
 msgstr "Wiederherstellen"
 
-#: tryton/gui/window/dbrestore.py:164
+#: tryton/gui/window/dbrestore.py:165
 msgid "Restore the database from file."
 msgstr "Datenbank aus Datei wiederherstellen"
 
@@ -2063,4 +2063,10 @@ msgstr "Erweiterten Workflow drucken"
 #: tryton/wizard/main.py:25
 msgid "Wizard"
 msgstr "Wizard"
+
+#~ msgid "If checked, allow to restore database from an older version."
+#~ msgstr ""
+#~ "Ermöglicht bei Aktivierung die "
+#~ "Wiederherstellung der Datenbank aus einer "
+#~ "älteren Version."
 
