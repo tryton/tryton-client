@@ -366,7 +366,7 @@ class ViewList(ParserView):
         if not selection.data:
             return
         model = treeview.get_model()
-        data = eval(selection.data)
+        data = common.safe_eval(selection.data)
         drop_info = treeview.get_dest_row_at_pos(x, y)
         if drop_info:
             path, position = drop_info

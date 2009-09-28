@@ -166,8 +166,6 @@ class ConfigManager(object):
                     value = True
                 elif value.lower() == 'false':
                     value = False
-                if section == 'client' and name == 'actions':
-                    value = eval(value)
                 self.config[section + '.' + name] = value
         return True
 

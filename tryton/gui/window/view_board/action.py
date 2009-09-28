@@ -38,17 +38,19 @@ class Action(object):
 
         self.action.setdefault('domain', '[]')
         self.context = {'active_id': False, 'active_ids': []}
-        self.context.update(eval(self.action.get('context', '{}'),
+        self.context.update(common.safe_eval(self.action.get('context', '{}'),
             self.context.copy()))
 
         eval_ctx = self.context.copy()
         eval_ctx['datetime'] = datetime
-        self.context.update(eval(self.action.get('context', '{}'), eval_ctx))
+        self.context.update(common.safe_eval(self.action.get('context', '{}'),
+            eval_ctx))
 
         domain_ctx = self.context.copy()
         domain_ctx['time'] = time
         domain_ctx['datetime'] = datetime
-        self.domain = eval(self.action['domain'] or '[]', domain_ctx)
+        self.domain = common.safe_eval(self.action['domain'] or '[]',
+                domain_ctx)
 
 
         self.widget = gtk.Frame()

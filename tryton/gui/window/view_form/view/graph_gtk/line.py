@@ -2,7 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 #This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
 from graph import Graph
-from tryton.common import hex2rgb, float_time_to_text
+from tryton.common import hex2rgb, float_time_to_text, safe_eval
 import locale
 import math
 import cairo
@@ -33,7 +33,7 @@ class Line(Graph):
                 if self.xrange == 0:
                     x = 1.0
 
-                if not bool(eval(yfield2attrs[yfield].get('empty', '1'))) \
+                if not bool(safe_eval(yfield2attrs[yfield].get('empty', '1'))) \
                         and yval == 0:
                     continue
 
@@ -48,7 +48,7 @@ class Line(Graph):
         key2fill = {}
         for yfield in self.yfields:
             key2fill[yfield.get('key', yfield['name'])] = \
-                    bool(eval(yfield.get('fill', '0')))
+                    bool(safe_eval(yfield.get('fill', '0')))
 
         def preparePath(key):
             cr.new_path()

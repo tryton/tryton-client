@@ -346,13 +346,13 @@ class ModelRecord(SignalEvent):
         if self.parent and self.parent_name:
             ctx['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
                     check_load)
-        val = eval(dom, ctx)
+        val = common.safe_eval(dom, ctx)
         return val
 
     def on_change(self, fieldname, attr):
         args = {}
         if isinstance(attr, basestring):
-            attr = eval(attr)
+            attr = common.safe_eval(attr)
         for arg in attr:
             try:
                 args[arg] = self.expr_eval(arg)

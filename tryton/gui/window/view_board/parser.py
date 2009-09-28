@@ -86,16 +86,16 @@ class ParserBoard(object):
                 label.set_angle(int(attrs.get('angle', 0)))
                 expand = False
                 if 'expand' in attrs:
-                    expand = bool(eval(attrs['expand']))
+                    expand = bool(common.safe_eval(attrs['expand']))
                 fill = False
                 if 'fill' in attrs:
-                    fill = bool(eval(attrs['fill']))
+                    fill = bool(common.safe_eval(attrs['fill']))
                 xexpand = False
                 if 'xexpand' in attrs:
-                    xexpand = bool(eval(attrs['xexpand']))
+                    xexpand = bool(common.safe_eval(attrs['xexpand']))
                 xfill = True
                 if 'xfill' in attrs:
-                    xfill = bool(eval(attrs['xfill']))
+                    xfill = bool(common.safe_eval(attrs['xfill']))
                 container.wid_add(label,
                         colspan=int(attrs.get('colspan', 1)),
                         expand=expand, help_tip=attrs.get('help', False),

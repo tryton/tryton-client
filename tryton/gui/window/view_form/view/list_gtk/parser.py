@@ -838,7 +838,7 @@ class Button(object):
 
         state_changes = self.attrs.get('states', {})
         if isinstance(state_changes, basestring):
-            state_changes = eval(state_changes)
+            state_changes = common.safe_eval(state_changes)
         if 'invisible' in state_changes:
             if model.expr_eval(state_changes['invisible'], check_load=False):
                 return True

@@ -3,7 +3,7 @@
 #This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
 import gtk
 from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
-        COLOR_SCHEMES
+        COLOR_SCHEMES, safe_eval
 import locale
 import math
 import datetime
@@ -355,7 +355,7 @@ class Graph(gtk.DrawingArea):
                     values['state'] = 'draft'
                     for field in model.mgroup.fields:
                         values[field] = model[field].get(model, check_load=False)
-                    if not eval(yfield['domain'], values):
+                    if not safe_eval(yfield['domain'], values):
                         continue
                 if yfield['name'] == '#':
                     self.datas[x][key] += 1

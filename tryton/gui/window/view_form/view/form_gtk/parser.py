@@ -93,7 +93,7 @@ class Button(object):
         state_changes = self.attrs.get('states', {})
         if isinstance(state_changes, basestring):
             try:
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             except:
                 self.widget.show()
                 self.widget.set_sensitive(True)
@@ -170,7 +170,7 @@ class Label(gtk.Label):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             if 'invisible' in state_changes:
                 if model:
                     if model.expr_eval(state_changes['invisible'],
@@ -201,7 +201,7 @@ class VBox(gtk.VBox):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             if 'invisible' in state_changes:
                 if model:
                     if model.expr_eval(state_changes['invisible'],
@@ -231,7 +231,7 @@ class Image(gtk.Image):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             if 'invisible' in state_changes:
                 if model:
                     if model.expr_eval(state_changes['invisible'],
@@ -262,7 +262,7 @@ class Frame(gtk.Frame):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             if 'invisible' in state_changes:
                 if model:
                     if model.expr_eval(state_changes['invisible'],
@@ -294,7 +294,7 @@ class ScrolledWindow(gtk.ScrolledWindow):
         state_changes = self.attrs.get('states', {})
         try:
             if isinstance(state_changes, basestring):
-                state_changes = eval(state_changes)
+                state_changes = common.safe_eval(state_changes)
             if 'invisible' in state_changes:
                 if model:
                     if model.expr_eval(state_changes['invisible'],
@@ -490,16 +490,16 @@ class ParserForm(ParserInterface):
                 label.set_angle(int(attrs.get('angle', 0)))
                 expand = False
                 if 'expand' in attrs:
-                    expand = bool(eval(attrs['expand']))
+                    expand = bool(common.safe_eval(attrs['expand']))
                 fill = False
                 if 'fill' in attrs:
-                    fill = bool(eval(attrs['fill']))
+                    fill = bool(common.safe_eval(attrs['fill']))
                 xexpand = False
                 if 'xexpand' in attrs:
-                    xexpand = bool(eval(attrs['xexpand']))
+                    xexpand = bool(common.safe_eval(attrs['xexpand']))
                 xfill = True
                 if 'xfill' in attrs:
-                    xfill = bool(eval(attrs['xfill']))
+                    xfill = bool(common.safe_eval(attrs['xfill']))
                 container.wid_add(label,
                         colspan=int(attrs.get('colspan', 1)),
                         expand=expand, help_tip=attrs.get('help', False),
@@ -631,16 +631,16 @@ class ParserForm(ParserInterface):
                 size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
                 expand = WIDGETS_TYPE[ftype][2]
                 if 'expand' in attrs:
-                    expand = bool(eval(attrs['expand']))
+                    expand = bool(common.safe_eval(attrs['expand']))
                 fill = WIDGETS_TYPE[ftype][3]
                 if 'fill' in attrs:
-                    fill = bool(eval(attrs['fill']))
+                    fill = bool(common.safe_eval(attrs['fill']))
                 xexpand = True
                 if 'xexpand' in attrs:
-                    xexpand = bool(eval(attrs['xexpand']))
+                    xexpand = bool(common.safe_eval(attrs['xexpand']))
                 xfill = True
                 if 'xfill' in attrs:
-                    xfill = bool(eval(attrs['xfill']))
+                    xfill = bool(common.safe_eval(attrs['xfill']))
                 hlp = fields[name].get('help', attrs.get('help', False))
                 if attrs.get('height', False) or attrs.get('width', False):
                     widget_act.widget.set_size_request(

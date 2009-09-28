@@ -128,7 +128,8 @@ class Action(object):
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
             eval_ctx['datetime'] = datetime
-            action_ctx = eval(action.get('context') or '{}', eval_ctx)
+            action_ctx = common.safe_eval(action.get('context') or '{}',
+                    eval_ctx)
             ctx.update(action_ctx)
             ctx.update(context)
 
@@ -136,7 +137,7 @@ class Action(object):
             domain_context['context'] = ctx
             domain_context['time'] = time
             domain_context['datetime'] = datetime
-            domain = eval(action['domain'], domain_context)
+            domain = common.safe_eval(action['domain'], domain_context)
 
             if datas.get('domain', False):
                 domain.append(datas['domain'])
@@ -145,7 +146,8 @@ class Action(object):
             search_context['context'] = ctx
             search_context['time'] = time
             search_context['datetime'] = datetime
-            search_value = eval(action['search_value'] or '{}', search_context)
+            search_value = common.safe_eval(action['search_value'] or '{}',
+                    search_context)
 
             name = False
             if action.get('window_name', True):

@@ -2,7 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, safe_eval
 import time
 import datetime
 from decimal import Decimal
@@ -127,7 +127,7 @@ class CharField(object):
         state_changes = self.attrs.get('states', {})
         if isinstance(state_changes, basestring):
             try:
-                state_changes = eval(state_changes)
+                state_changes = safe_eval(state_changes)
             except:
                 return
         for key in states:

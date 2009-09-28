@@ -4,6 +4,7 @@
 import gtk
 import gettext
 from tryton.config import TRYTON_ICON, CONFIG
+from tryton.common import safe_eval
 
 _ = gettext.gettext
 
@@ -39,6 +40,8 @@ class FileActions(object):
             self.treeview.append_column(column)
 
         i = 1
+        if isinstance(CONFIG['client.actions'], basestring):
+            CONFIG['client.actions'] = safe_eval(CONFIG['client.actions'])
         extensions = CONFIG['client.actions'].keys()
         extensions.sort()
         for extension in extensions:
