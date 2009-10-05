@@ -73,11 +73,13 @@ class ModelList(list):
 class ModelRecordGroup(SignalEvent):
 
     def __init__(self, resource, fields, window, ids=None, parent=None,
-            parent_name='', context=None, readonly=False):
+            parent_name='', context=None, readonly=False,
+            parent_datetime_field=None):
         super(ModelRecordGroup, self).__init__()
         self.window = window
         self.parent = parent
         self.parent_name = parent_name
+        self.parent_datetime_field = parent_datetime_field
         self._context = context or {}
         self.resource = resource
         self.rpc = RPCProxy(resource)
@@ -223,6 +225,9 @@ class ModelRecordGroup(SignalEvent):
     def _get_context(self):
         ctx = rpc.CONTEXT.copy()
         ctx.update(self._context)
+        if self.parent_datetime_field:
+            ctx['_datetime'] = self.parent.get_eval(check_load=False)\
+                    [self.parent_datetime_field]
         return ctx
     context = property(_get_context)
 

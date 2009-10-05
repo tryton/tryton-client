@@ -146,7 +146,17 @@ class Many2Many(WidgetInterface):
         ids = []
         if model_field:
             ids = model_field.get_client(model)
-        if ids != self.old:
+        reload = False
+        if self.attrs.get('datetime_field'):
+            datetime_field = model.get_eval(check_load=False)\
+                    [self.attrs['datetime_field']]
+            if self.screen.context.get('_datetime') != datetime_field:
+                self.screen.context['_datetime'] = datetime_field
+                reload = True
+            if self.screen.models.context.get('_datetime') != datetime_field:
+                self.screen.models._context['_datetime'] = datetime_field
+                reload = True
+        if ids != self.old or reload:
             self.screen.clear()
             self.screen.load(ids, set_cursor=False)
             self.old = ids

@@ -579,7 +579,8 @@ class One2Many(WidgetInterface):
                 domain = modelfield.domain_get(self._view.model)
             dia = Dialog(self.attrs['relation'], parent=self._view.model,
                     model=self.screen.current_model, attrs=self.attrs,
-                    window=self._window, readonly=readonly, domain=domain)
+                    window=self._window, readonly=readonly, domain=domain,
+                    model_ctx=self.screen.models.context)
             res, value = dia.run()
             dia.destroy()
 

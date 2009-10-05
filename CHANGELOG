@@ -1,3 +1,4 @@
+* Handle datetime_field in xxx2Many
 * Add new safe_eval
 * Ask previous password for set_preferences on password change
 * Add "Statusbar" option
