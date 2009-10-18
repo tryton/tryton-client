@@ -1199,7 +1199,7 @@ msgstr "archivo %s"
 #: tryton/gui/window/fileactions.py:63
 #, python-format
 msgid "Use \"%s\" as a placeholder for the file name"
-msgstr "Utilice «%s» como referencia al nombre del archivo"
+msgstr "Utilice \"%s\" como referencia al nombre del archivo"
 
 #: tryton/gui/window/form.py:165
 msgid "Go to ID"
