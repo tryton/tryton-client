@@ -158,6 +158,14 @@ if os.name == 'nt':
         shutil.copytree(os.path.join(gtk_dir, 'etc'),
             os.path.join(dist_dir, 'etc'))
 
+        from subprocess import Popen, PIPE
+        query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
+            stdout=PIPE).stdout.read()
+        query_loaders = query_loaders.replace(gtk_dir.replace(os.sep, '/') + '/', '')
+        loaders = open(os.path.join(gtk_dir, 'etc', 'gtk-2.0', 'gdk-pixbuf.loaders'), 'w')
+        loaders.writelines([line + "\n" for line in query_loaders.split(os.linesep)])
+        loaders.close()
+
         if os.path.isdir(os.path.join(dist_dir, 'lib')):
             shutil.rmtree(os.path.join(dist_dir, 'lib'))
         shutil.copytree(os.path.join(gtk_dir, 'lib'),
