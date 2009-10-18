@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: tryton 1.4.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2009-10-17 11:11+0200\n"
-"PO-Revision-Date: 2009-10-18 14:25+0200\n"
+"PO-Revision-Date: 2009-10-18 16:50+0200\n"
 "Last-Translator: Carlos Perelló Marín <carlos@pemas.es>\n"
 "Language-Team: <tryton-es@googlegroups.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -539,7 +539,7 @@ msgstr "Siguiente"
 #: tryton/gui/main.py:890 tryton/gui/window/view_board/action.py:120
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:134
 msgid "Switch"
-msgstr ""
+msgstr "Cambiar vista"
 
 #: tryton/gui/main.py:891
 msgid "_Reload"
@@ -614,7 +614,7 @@ msgstr "Solicitudes (%s/%s)"
 #: tryton/gui/main.py:1089
 #, python-format
 msgid "Waiting requests: %s received - %s sent"
-msgstr "Solicitudes en espera: %s recividas - %s enviadas"
+msgstr "Solicitudes en espera: %s recibidas - %s enviadas"
 
 #: tryton/gui/main.py:1188
 msgid "SSL connection"
@@ -646,7 +646,7 @@ msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
 msgstr ""
-"Va a eliminiar una base de datos de Tryton.\n"
+"Va a eliminar una base de datos de Tryton.\n"
 "¿Está seguro que quiere continuar?"
 
 #: tryton/gui/main.py:1468
@@ -696,7 +696,7 @@ msgid ""
 "Please try again."
 msgstr ""
 "La contraseña del servidor Tryton es incorrecta.\n"
-"Intentelo de nuevo."
+"Inténtelo de nuevo."
 
 #: tryton/gui/main.py:1514
 msgid "Database restore failed with error message:\n"
@@ -728,7 +728,7 @@ msgstr "La extracción de la base de datos falló"
 
 #: tryton/gui/main.py:1573
 msgid "Database backuped successfully!"
-msgstr "La copia de seguridad de la base de datos finalizó correctamentese"
+msgstr "La copia de seguridad de la base de datos finalizó correctamente"
 
 #: tryton/gui/window/attachment.py:25
 msgid "Attachment"
@@ -955,7 +955,7 @@ msgstr ""
 
 #: tryton/gui/window/dbcreate.py:338
 msgid "Wrong characters in database name!"
-msgstr "Ha introducido carácteres incorrectos en el nombre de la base de datos"
+msgstr "Ha introducido caracteres incorrectos en el nombre de la base de datos"
 
 #: tryton/gui/window/dbcreate.py:342
 msgid "The new admin password doesn't match the confirmation field.\n"
@@ -983,7 +983,7 @@ msgid ""
 "Try another database name."
 msgstr ""
 "Ya existe una base de datos con el mismo nombre.\n"
-"Intentelo con otro nombre de base de datos."
+"Inténtelo con otro nombre de base de datos."
 
 #: tryton/gui/window/dbcreate.py:363
 msgid "This database name already exist!"
@@ -1199,7 +1199,7 @@ msgstr "archivo %s"
 #: tryton/gui/window/fileactions.py:63
 #, python-format
 msgid "Use \"%s\" as a placeholder for the file name"
-msgstr "Utilice «%s» como referencia al nombre del archivo"
+msgstr "Utilice \"%s\" como referencia al nombre del archivo"
 
 #: tryton/gui/window/form.py:165
 msgid "Go to ID"
