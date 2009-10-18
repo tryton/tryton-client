@@ -163,6 +163,10 @@ if os.name == 'nt':
         shutil.copytree(os.path.join(gtk_dir, 'lib'),
             os.path.join(dist_dir, 'lib'))
 
+        for file in glob.iglob(os.path.join(gtk_dir, 'bin', '*.dll')):
+            if os.path.isfile(file):
+                shutil.copy(file, dist_dir)
+
         for lang in ('de', 'es', 'fr'):
             if os.path.isdir(os.path.join(dist_dir, 'share', 'locale', lang)):
                 shutil.rmtree(os.path.join(dist_dir, 'share', 'locale', lang))
