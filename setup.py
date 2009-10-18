@@ -128,7 +128,7 @@ if os.name == 'nt':
         for directory in os.environ['PATH'].split(';'):
             if not os.path.isdir(directory):
                 continue
-            for file in ('gtk-demo.exe',):
+            for file in ('gtk-demo.exe', 'gdk-pixbuf-query-loaders.exe'):
                 if os.path.isfile(os.path.join(directory, file)):
                     return os.path.dirname(directory)
         return None
