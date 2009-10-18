@@ -134,7 +134,24 @@ class EditableTreeView(gtk.TreeView):
         store = self.get_model()
         model = store.get_value(store.get_iter(path), 0)
 
-        if event.keyval in self.leaving_events:
+        leaving = False
+        if event.keyval == gtk.keysyms.Right:
+            if isinstance(entry, gtk.Entry):
+                if entry.get_position() >= \
+                        len(entry.get_text().decode('utf-8')) \
+                        and not entry.get_selection_bounds():
+                    leaving = True
+            else:
+                leaving = True
+        elif event.keyval == gtk.keysyms.Left:
+            if isinstance(entry, gtk.Entry):
+                if entry.get_position() <= 0 \
+                        and not entry.get_selection_bounds():
+                    leaving = True
+            else:
+                leaving = True
+
+        if event.keyval in self.leaving_events or leaving:
             if isinstance(entry, gtk.Entry):
                 txt = entry.get_text()
             else:
@@ -160,10 +177,12 @@ class EditableTreeView(gtk.TreeView):
                 obj_id = model.save()
                 if not obj_id:
                     return True
-        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter):
+        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter) \
+                or (event.keyval == gtk.keysyms.Right and leaving):
             new_col = self.__next_column(column)
             self.set_cursor(path, new_col, True)
-        elif event.keyval == gtk.keysyms.ISO_Left_Tab:
+        elif event.keyval == gtk.keysyms.ISO_Left_Tab \
+                or (event.keyval == gtk.keysyms.Left and leaving):
             new_col = self.__prev_column(column)
             self.set_cursor(path, new_col, True)
         elif event.keyval == gtk.keysyms.Up:
