@@ -23,7 +23,7 @@ msgstr "spécifier un fichier de configuration alternatif"
 
 #: tryton/config.py:112
 msgid "logging everything at INFO level"
-msgstr "loggé tout au niveau INFO"
+msgstr "logger tout au niveau INFO"
 
 #: tryton/config.py:114
 msgid "specify channels to log"
@@ -433,7 +433,7 @@ msgstr "_Barre de Menu"
 
 #: tryton/gui/main.py:615
 msgid "Change Accelerators"
-msgstr "Changer laAccélérateurs"
+msgstr "Changer les raccourcis"
 
 #: tryton/gui/main.py:623
 msgid "_Mode"
@@ -697,7 +697,7 @@ msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
 msgstr ""
-"Mauvais Mot de Passe du Serveur Tryton.\n"
+"Mauvais mot de passe du serveur Tryton.\n"
 "Essayez à nouveau."
 
 #: tryton/gui/main.py:1514
@@ -749,15 +749,15 @@ msgstr "Description :"
 
 #: tryton/gui/window/attachment.py:68
 msgid "Save _Text"
-msgstr "Sauvegarder le _Texte"
+msgstr "Sauvegarder le _texte"
 
 #: tryton/gui/window/attachment.py:80
 msgid "Add _File..."
-msgstr "Ajouter un _Fichier..."
+msgstr "Ajouter un _fichier..."
 
 #: tryton/gui/window/attachment.py:90
 msgid "Add _Link..."
-msgstr "Ajouter un _Lien..."
+msgstr "Ajouter un _lien..."
 
 #: tryton/gui/window/attachment.py:99
 msgid "_Save as..."
@@ -1011,7 +1011,7 @@ msgid ""
 "Error message:\n"
 msgstr ""
 "Impossible de créer une base de données pour une raison inconnue.\n"
-"Si une base de données a été créé, elle pourrait être inutilisable. "
+"Si une base de données a été créée, elle pourrait être inutilisable. "
 "Supprimer la ! Vérifiez le message d'erreur pour plus d'information.\n"
 "Message d'erreur :\n"
 
@@ -1374,7 +1374,7 @@ msgstr ""
 "Vous pouvez utiliser les opérateurs spéciaux:\n"
 "* + pour augmenter la date\n"
 "* - pour diminuer la date\n"
-"* = pour choisir une date ou la date courrante\n"
+"* = pour choisir une date ou la date courante\n"
 "\n"
 "Les variables disponibles sont :\n"
 "h pour les heures\n"
@@ -1480,7 +1480,7 @@ msgstr "_Enlever"
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:50
 #: tryton/gui/window/view_form/view/form_gtk/image.py:66
 msgid "Clear"
-msgstr "Éffacer"
+msgstr "Effacer"
 
 #: tryton/gui/window/win_export.py:96
 msgid "Save Export"
@@ -1653,7 +1653,7 @@ msgstr " :"
 #: tryton/gui/window/view_form/view/form.py:122
 #: tryton/gui/window/view_form/view/list.py:215
 msgid "_Direct Print"
-msgstr "Impression _Directe"
+msgstr "Impression _directe"
 
 #: tryton/gui/window/view_form/view/form.py:123
 #: tryton/gui/window/view_form/view/list.py:216
@@ -2064,11 +2064,11 @@ msgstr "Traduire la vue"
 
 #: tryton/plugins/workflow/__init__.py:22
 msgid "Print Workflow"
-msgstr "Imprimer le Workflow"
+msgstr "Imprimer le workflow"
 
 #: tryton/plugins/workflow/__init__.py:23
 msgid "Print Workflow (Complex)"
-msgstr "Imprimer le Workflow (Complet)"
+msgstr "Imprimer le workflow (Complet)"
 
 #: tryton/wizard/main.py:25
 msgid "Wizard"
