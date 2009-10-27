@@ -11,6 +11,7 @@ include tryton.desktop
 include *.nsh
 include doc/*
 include share/pixmaps/tryton-icon.png
+include share/pixmaps/tryton/LICENSE
 include share/pixmaps/tryton/*.png
 include share/pixmaps/tryton/*.svg
 include share/pixmaps/tryton/*.ico
