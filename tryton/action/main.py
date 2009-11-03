@@ -54,7 +54,9 @@ class Action(object):
         if not print_p and direct_print:
             print_p = True
         dtemp = tempfile.mkdtemp(prefix='tryton_')
-        fp_name = os.path.join(dtemp, name.replace(os.sep, '_') + '.' + type)
+        fp_name = os.path.join(dtemp,
+                name.replace(os.sep, '_').replace(os.altsep or os.sep, '_') \
+                        + os.extsep + type)
         file_d = open(fp_name, 'wb')
         file_d.write(base64.decodestring(data))
         file_d.close()
