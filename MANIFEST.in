@@ -10,7 +10,6 @@ include setup-bundle.sh
 include tryton.desktop
 include *.nsh
 include doc/*
-include share/pixmaps/tryton-icon.png
 include share/pixmaps/tryton/LICENSE
 include share/pixmaps/tryton/*.png
 include share/pixmaps/tryton/*.svg

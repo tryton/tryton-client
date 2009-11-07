@@ -89,7 +89,6 @@ dist = setup(name=PACKAGE,
             VERSION.rsplit('.', 1)[0] + '/',
     packages=find_packages(),
     data_files=[
-        ('share/pixmaps', glob.glob('share/pixmaps/tryton-icon.png')),
         ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
                 glob.glob('share/pixmaps/tryton/*.svg')),
         ('share/locale/cs_CZ/LC_MESSAGES', glob.glob('share/locale/cs_CZ/LC_MESSAGES/*.mo')),
