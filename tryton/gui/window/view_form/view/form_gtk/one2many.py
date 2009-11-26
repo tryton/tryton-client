@@ -315,18 +315,17 @@ class Dialog(object):
                 and self.but_add.get_property('sensitive'):
             self._sig_add()
             return False
-        if ((event.keyval in (gtk.keysyms.N, gtk.keysyms.n) \
-                and event.state & gtk.gdk.CONTROL_MASK) \
-                or event.keyval == gtk.keysyms.F3) \
+        if (event.keyval == gtk.keysyms.F3) \
                 and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
             return False
-        if event.keyval == gtk.keysyms.F2:
+        if event.keyval == gtk.keysyms.F2 \
+                and widget == self.screen.widget:
             self._sig_edit(widget)
             return False
-        if (event.keyval in (gtk.keysyms.L, gtk.keysyms.l) \
-                and event.state & gtk.gdk.CONTROL_MASK):
-            self.switch_view(widget)
+        if event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete) \
+                and widget == self.screen.widget:
+            self._sig_remove(widget)
             return False
 
     def switch_view(self, widget):
@@ -483,6 +482,8 @@ class One2Many(WidgetInterface):
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
+        if self.attrs.get('add_remove'):
+            self.wid_text.connect('key_press_event', self.on_keypress)
 
     def grab_focus(self):
         return self.screen.widget.grab_focus()
@@ -493,15 +494,17 @@ class One2Many(WidgetInterface):
                 and self.but_add.get_property('sensitive'):
             self._sig_add()
             return False
-        if ((event.keyval == gtk.keysyms.N \
-                    and event.state & gtk.gdk.CONTROL_MASK \
-                    and event.state & gtk.gdk.SHIFT_MASK) \
-                or event.keyval == gtk.keysyms.F3) \
+        if (event.keyval == gtk.keysyms.F3) \
                 and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
             return False
-        if event.keyval == gtk.keysyms.F2:
+        if event.keyval == gtk.keysyms.F2 \
+                and widget == self.screen.widget:
             self._sig_edit(widget)
+            return False
+        if event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete) \
+                and widget == self.screen.widget:
+            self._sig_remove(widget)
             return False
 
     def destroy(self):

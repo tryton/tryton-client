@@ -1,3 +1,5 @@
+* Use same keyboard shortcut for xxx2many than for other fields
+
 Version 1.4.0 - 2009-10-19
 * Bug fixes (see mercurial logs for details)
 * Handle datetime_field in xxx2Many

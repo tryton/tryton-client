@@ -57,16 +57,33 @@ class Many2Many(WidgetInterface):
 
         self.widget.pack_start(hbox, expand=False, fill=False)
 
+        hbox.set_focus_chain([self.wid_text])
+
         self.screen = Screen(attrs['relation'], self._window,
                 view_type=['tree'], views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate)
 
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
+        self.screen.widget.connect('key_press_event', self.on_keypress)
+        self.wid_text.connect('key_press_event', self.on_keypress)
+
         self.old = None
 
     def grab_focus(self):
         return self.wid_text.grab_focus()
+
+    def on_keypress(self, widget, event):
+        if event.keyval == gtk.keysyms.F3:
+            self._sig_add()
+            return False
+        if event.keyval == gtk.keysyms.F2 \
+                and widget == self.screen.widget:
+            self._sig_edit()
+        if event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete) \
+                and widget == self.screen.widget:
+            self._sig_remove()
+            return False
 
     def destroy(self):
         self.screen.destroy()
@@ -106,8 +123,6 @@ class Many2Many(WidgetInterface):
 
     def _sig_remove(self, *args):
         self.screen.remove()
-        self.screen.display()
-        self.set_value(self._view.model, self._view.modelfield)
 
     def _sig_activate(self, *args):
         self._sig_add()
