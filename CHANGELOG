@@ -1,3 +1,4 @@
+* Next and Previous scroll per page on list and don't loop
 * Add AccelGroup on search windows (CTRL+Return)
 * Use same keyboard shortcut for xxx2many than for other fields
 

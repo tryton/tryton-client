@@ -605,7 +605,17 @@ class Screen(SignalEvent):
         self.current_view.set_cursor(reset_view=False)
         if self.current_model in self.models.models:
             idx = self.models.models.index(self.current_model)
-            idx = (idx+1) % len(self.models.models)
+            inc = 1
+            if self.current_view.view_type == 'tree':
+                start, end = self.current_view.widget_tree.get_visible_range()
+                inc += end[0] - start[0]
+                if inc >= 4 and (end[0] + 1) < len(self.models.models):
+                    inc -= 3
+                vadjustment = self.current_view.widget_tree.get_vadjustment()
+                vadjustment.value = vadjustment.value + vadjustment.page_increment
+            idx = idx + inc
+            if idx >= len(self.models.models):
+                idx = len(self.models.models) - 1
             self.current_model = self.models.models[idx]
         else:
             self.current_model = len(self.models.models) \
@@ -619,9 +629,19 @@ class Screen(SignalEvent):
         self.current_view.set_value()
         self.current_view.set_cursor(reset_view=False)
         if self.current_model in self.models.models:
-            idx = self.models.models.index(self.current_model)-1
+            inc = 1
+            if self.current_view.view_type == 'tree':
+                start, end = self.current_view.widget_tree.get_visible_range()
+                inc += end[0] - start[0]
+                if inc >= 4 and start[0] > 0:
+                    inc -= 3
+                vadjustment = self.current_view.widget_tree.get_vadjustment()
+                if vadjustment.value:
+                    vadjustment.value = vadjustment.value - \
+                            vadjustment.page_increment
+            idx = self.models.models.index(self.current_model) - inc
             if idx < 0:
-                idx = len(self.models.models)-1
+                idx = 0
             self.current_model = self.models.models[idx]
         else:
             self.current_model = len(self.models.models) \
