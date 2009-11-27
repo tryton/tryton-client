@@ -14,33 +14,18 @@ import gtk
 _ = gettext.gettext
 
 def get_home_dir():
-    """
-    Return the closest possible equivalent to a 'home' directory.
-    For Posix systems, this is $HOME, and on NT it's $HOMEDRIVE\$HOMEPATH.
-    Currently only Posix and NT are implemented, a HomeDirError exception is
-    raised for all other OSes.
-    """
+    if os.name == 'nt':
+        return os.path.join(os.environ['HOMEDRIVE'], os.environ['HOMEPATH'])
+    return os.environ['HOME']
 
-    if os.name == 'posix':
-        return os.path.expanduser('~')
-    elif os.name == 'nt':
-        try:
-            return os.path.join(os.environ['HOMEDRIVE'], os.environ['HOMEPATH'])
-        except:
-            try:
-                import _winreg as wreg
-                key = wreg.OpenKey(wreg.HKEY_CURRENT_USER,
-                        "Software\Microsoft\Windows\Current" \
-                                "Version\Explorer\Shell Folders")
-                homedir = wreg.QueryValueEx(key, 'Personal')[0]
-                key.Close()
-                return homedir
-            except:
-                return 'C:\\'
-    elif os.name == 'dos':
-        return 'C:\\'
-    else:
-        return '.'
+def get_config_dir():
+    if os.name == 'nt':
+        return os.path.join(os.environ['APPDATA'], '.config', 'tryton',
+                VERSION.rsplit('.', 1)[0])
+    return os.path.join(os.environ['HOME'], '.config', 'tryton',
+            VERSION.rsplit('.', 1)[0])
+if not os.path.isdir(get_config_dir()):
+    os.makedirs(get_config_dir(), 0700)
 
 def find_path(progs, args):
     if os.name == 'nt':
@@ -126,7 +111,7 @@ class ConfigManager(object):
 
         if opt.config and not os.path.isfile(opt.config):
             raise Exception(_('File "%s" not found') % (opt.config,))
-        self.rcfile = opt.config or os.path.join(get_home_dir(), '.tryton')
+        self.rcfile = opt.config or os.path.join(get_config_dir(), 'tryton.conf')
         self.load()
 
         for arg in ('log_level', 'log_logger'):

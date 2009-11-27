@@ -15,7 +15,7 @@ import logging
 from tryton import version
 from tryton import config
 from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
-        TRYTON_ICON, get_home_dir
+        TRYTON_ICON, get_config_dir
 from tryton import translate
 from tryton import gui
 import traceback
@@ -105,7 +105,7 @@ class TrytonClient(object):
         except KeyboardInterrupt:
             CONFIG.save()
             if hasattr(gtk, 'accel_map_save'):
-                gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
+                gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
 
 if __name__ == "__main__":
     CLIENT = TrytonClient()

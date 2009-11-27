@@ -7,7 +7,8 @@ import urlparse
 import gobject
 import gtk
 import tryton.rpc as rpc
-from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, get_home_dir
+from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \
+        get_config_dir
 import tryton.common as common
 from tryton.action import Action
 from tryton.gui.window import Window
@@ -97,7 +98,7 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
 
         if hasattr(gtk, 'accel_map_load'):
-            gtk.accel_map_load(os.path.join(get_home_dir(), '.trytonsc'))
+            gtk.accel_map_load(os.path.join(get_config_dir(), 'accel.map'))
 
         self.tooltips = common.Tooltips()
 
@@ -1270,7 +1271,7 @@ class Main(object):
         CONFIG['client.default_height'] = Main.get_main()._height
         CONFIG.save()
         if hasattr(gtk, 'accel_map_save'):
-            gtk.accel_map_save(os.path.join(get_home_dir(), '.trytonsc'))
+            gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
         gtk.main_quit()
         sys.exit()
 

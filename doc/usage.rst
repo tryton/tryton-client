@@ -919,8 +919,8 @@ Configuration File
 
 ::
 
-   ~./tryton      # General configuration
-   ~./trytonsc    # Shortcut configuration
+   ~/.config/tryton/x.y/tryton.conf      # General configuration
+   ~/.config/tryton/x.y/accel.map        # Accelerators configuration
 
 :Authors:
   Udo Spallek, Bertrand Chenal, Mattias Behrle, Anne Krings
