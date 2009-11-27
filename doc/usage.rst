@@ -923,7 +923,7 @@ Configuration File
    ~/.config/tryton/x.y/accel.map        # Accelerators configuration
 
 :Authors:
-  Udo Spallek, Bertrand Chenal, Mattias Behrle, Anne Krings
+  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings
 
 :TODO:
   * Search for TODO in this document.
