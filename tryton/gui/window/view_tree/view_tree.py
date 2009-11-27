@@ -353,6 +353,7 @@ class ViewTree(object):
         self.view.set_expander_column(self.view.get_column(1))
         self.view.set_enable_search(False)
         self.view.get_column(0).set_visible(False)
+        self.view.connect('key_press_event', self.on_keypress)
 
         self.ids = ids
         self.view_info = view_info
@@ -364,6 +365,24 @@ class ViewTree(object):
         self.view.show_all()
         self.search = []
         self.next = 0
+
+    def on_keypress(self, widget, event):
+        if event.keyval in (gtk.keysyms.Down, gtk.keysyms.Up):
+            path, column = self.view.get_cursor()
+            if not path:
+                return False
+            store = self.view.get_model()
+            if event.keyval == gtk.keysyms.Down:
+                iter = store.get_iter(path)
+                if path[0] ==  len(store) - 1 \
+                        and not store.iter_next(iter) \
+                        and (not store.iter_has_child(iter) \
+                        or not self.view.row_expanded(path)):
+                    return True
+            elif event.keyval == gtk.keysyms.Up:
+                if path[0] == 0 \
+                        and len(path) == 1:
+                    return True
 
     def reload(self):
         del self.model

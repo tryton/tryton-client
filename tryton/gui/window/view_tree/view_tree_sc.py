@@ -24,6 +24,20 @@ class ViewTreeSC(object):
 
         column = gtk.TreeViewColumn (_('Description'), cell, text=1)
         self.tree.append_column(column)
+        self.tree.connect('key_press_event', self.on_keypress)
+
+    def on_keypress(self, widget, event):
+        if event.keyval in (gtk.keysyms.Down, gtk.keysyms.Up):
+            path, column = self.tree.get_cursor()
+            if not path:
+                return False
+            store = self.tree.get_model()
+            if event.keyval == gtk.keysyms.Down:
+                if path[0] ==  len(store) - 1:
+                    return True
+            elif event.keyval == gtk.keysyms.Up:
+                if path[0] == 0:
+                    return True
 
     def update(self):
         store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING,

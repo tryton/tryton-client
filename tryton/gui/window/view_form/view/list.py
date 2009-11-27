@@ -258,7 +258,7 @@ class ViewList(ParserView):
             self.widget_tree.connect('drag-data-received', self.drag_data_received)
             self.widget_tree.connect('drag-data-delete', self.drag_data_delete)
 
-        self.widget_tree.connect('key_press_event', self.on_keypres)
+        self.widget_tree.connect('key_press_event', self.on_keypress)
 
     def _sig_clicked(self, widget, action, atype):
         return self._action(action, atype)
@@ -287,10 +287,21 @@ class ViewList(ParserView):
         return value
 
 
-    def on_keypres(self, widget, event):
+    def on_keypress(self, widget, event):
         if event.keyval == gtk.keysyms.c and event.state & gtk.gdk.CONTROL_MASK:
             self.on_copy()
             return False
+        if event.keyval in (gtk.keysyms.Down, gtk.keysyms.Up):
+            path, column = self.widget_tree.get_cursor()
+            if not path:
+                return False
+            store = self.widget_tree.get_model()
+            if event.keyval == gtk.keysyms.Down:
+                if path[0] ==  len(store) - 1:
+                    return True
+            elif event.keyval == gtk.keysyms.Up:
+                if path[0] == 0:
+                    return True
 
     def on_copy(self):
         clipboard = self.widget_tree.get_clipboard(gtk.gdk.SELECTION_CLIPBOARD)
