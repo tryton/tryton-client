@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2009-12-11 14:05+0100\n"
+"PO-Revision-Date: 2009-12-12 16:10+0100\n"
 "Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -287,7 +287,7 @@ msgstr "_Plugins"
 
 #: tryton/gui/main.py:243
 msgid "_Shortcuts"
-msgstr "_Favoriten"
+msgstr "Favori_ten"
 
 #: tryton/gui/main.py:249
 msgid "_Help"
@@ -378,7 +378,7 @@ msgstr "_Menü"
 
 #: tryton/gui/main.py:472
 msgid "_Home"
-msgstr "_Zur Ausgangsposition"
+msgstr "Sta_rtseite"
 
 #: tryton/gui/main.py:480
 msgid "_Close Tab"
