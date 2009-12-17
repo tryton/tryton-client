@@ -21,8 +21,6 @@ import tryton.common as common
 import pango
 from tryton.translate import date_format
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
-import mx.DateTime
-import datetime as DT
 
 _ = gettext.gettext
 
@@ -269,25 +267,18 @@ class Form(SignalEvent):
                 if line.get(key, False) \
                         and key in ('create_date', 'write_date'):
                     display_format = date_format() + ' ' + HM_FORMAT
-                    if hasattr(line[key], 'timetuple'):
-                        date = mx.DateTime.DateTime(*(line[key].timetuple()[:6]))
-                    else:
-                        date = mx.DateTime.strptime(str(line[key]), DHM_FORMAT)
+                    date = line[key]
                     if 'timezone' in rpc.CONTEXT:
                         try:
                             import pytz
                             lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                             szone = pytz.timezone(rpc.TIMEZONE)
-                            datetime = DT.datetime(date.year, date.month,
-                                    date.day, date.hour, date.minute,
-                                    int(date.second))
                             sdt = szone.localize(datetime, is_dst=True)
                             ldt = sdt.astimezone(lzone)
-                            date = mx.DateTime.DateTime(*(
-                                ldt.timetuple()[:6]))
+                            date = ldt
                         except:
                             pass
-                    value = date.strftime(display_format)
+                    value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value +'\n'
         message_str += _('Model:') + ' ' + self.model
         message(message_str, self.window)

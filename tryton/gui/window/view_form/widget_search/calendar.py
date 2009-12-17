@@ -1,15 +1,14 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import time
-import datetime as DT
+import datetime
 import gtk
 import gettext
 import locale
 from interface import Interface
 from tryton.common import DT_FORMAT, TRYTON_ICON
-from tryton.common import date_widget, Tooltips
+from tryton.common import date_widget, Tooltips, datetime_strftime
 from tryton.translate import date_format
-import mx.DateTime
 import gobject
 
 _ = gettext.gettext
@@ -99,10 +98,10 @@ class Calendar(Interface):
 
     def _date_get(self, value):
         try:
-            date = mx.DateTime.strptime(value, self.format)
+            date = datetime.date(*time.strptime(value, self.format)[:3])
         except:
             return False
-        return date.strftime(DT_FORMAT)
+        return datetime_strftime(date, DT_FORMAT)
 
     def _value_get(self):
         oper = self.liststore.get_value(self.combo.get_active_iter(), 0)
@@ -136,8 +135,7 @@ class Calendar(Interface):
             if not value:
                 return ''
             try:
-                value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
-                return value.strftime(self.format)
+                return datetime_strftime(value, self.format)
             except:
                 return ''
 
@@ -184,8 +182,8 @@ class Calendar(Interface):
         response = win.run()
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
-            date = mx.DateTime.DateTime(year, month + 1, day)
-            dest.set_text(date.strftime(self.format))
+            date = datetime.date(year, month + 1, day)
+            dest.set_text(datetime_strftime(date, self.format))
         win.destroy()
 
     def clear(self):

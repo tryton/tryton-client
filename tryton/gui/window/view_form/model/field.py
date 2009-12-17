@@ -2,11 +2,11 @@
 #this repository contains the full copyright notices and license terms.
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, safe_eval
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, safe_eval, \
+        datetime_strftime
 import time
 import datetime
 from decimal import Decimal
-import mx.DateTime
 import logging
 
 
@@ -185,9 +185,7 @@ class DateTimeField(CharField):
 
     def set_client(self, model, value, force_change=False):
         if value:
-            date = mx.DateTime.strptime(value, DHM_FORMAT)
-            value = datetime.datetime(date.year, date.month, date.day,
-                    date.hour, date.minute, int(date.second))
+            value = datetime.datetime(*time.strptime(value, DHM_FORMAT)[:6])
         return super(DateTimeField, self).set_client(model, value,
                 force_change=force_change)
 
@@ -195,16 +193,14 @@ class DateTimeField(CharField):
         value = super(DateTimeField, self).get_client(model)
         if not value:
             return False
-        value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
-        return value.strftime(DHM_FORMAT)
+        return datetime_strftime(value, DHM_FORMAT)
 
 
 class DateField(CharField):
 
     def set_client(self, model, value, force_change=False):
         if value:
-            date = mx.DateTime.strptime(value, DT_FORMAT)
-            value = datetime.date(date.year, date.month, date.day)
+            value = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
         return super(DateField, self).set_client(model, value,
                 force_change=force_change)
 
@@ -212,8 +208,7 @@ class DateField(CharField):
         value = super(DateField, self).get_client(model)
         if not value:
             return False
-        value = mx.DateTime.DateTime(*(value.timetuple()[:6]))
-        return value.strftime(DT_FORMAT)
+        return datetime_strftime(value, DT_FORMAT)
 
 
 class FloatField(CharField):

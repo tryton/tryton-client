@@ -3,12 +3,12 @@
 #This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
 import gtk
 from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
-        COLOR_SCHEMES, safe_eval
+        DHM_FORMAT, COLOR_SCHEMES, safe_eval, datetime_strftime
 import locale
 import math
 import datetime
-import mx.DateTime
 import time
+from dateutil.relativedelta import relativedelta
 import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
@@ -363,27 +363,23 @@ class Graph(gtk.DrawingArea):
                     self.datas[x][key] += \
                             float(model[yfield['name']].get(model))
         if isinstance(minx, datetime.datetime):
-            date = mx.DateTime.mktime(time.strptime(str(minx), '%Y-%m-%d %H:%M:%S'))
-            end_date = mx.DateTime.mktime(time.strptime(str(maxx), '%Y-%m-%d %H:%M:%S'))
-            while date <= end_date:
-                key = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
-                self.labels[key] = date.strftime(DT_FORMAT)
-                self.datas.setdefault(key, {})
+            date = minx
+            while date <= maxx:
+                self.labels[date] = datetime_strftime(date, DT_FORMAT)
+                self.datas.setdefault(date, {})
                 for yfield in self.yfields:
-                    self.datas[key].setdefault(
+                    self.datas[date].setdefault(
                             yfield.get('key', yfield['name']), 0.0)
-                date = date + mx.DateTime.RelativeDateTime(days=1)
+                date += relativedelta(days=1)
         elif isinstance(minx, datetime.date):
-            date = mx.DateTime.mktime(time.strptime(str(minx), '%Y-%m-%d'))
-            end_date = mx.DateTime.mktime(time.strptime(str(maxx), '%Y-%m-%d'))
-            while date <= end_date:
-                key = datetime.date(date.year, date.month, date.day)
-                self.labels[key] = date.strftime(DT_FORMAT)
-                self.datas.setdefault(key, {})
+            date = minx
+            while date <= maxx:
+                self.labels[date] = datetime_strftime(date, DT_FORMAT)
+                self.datas.setdefault(date, {})
                 for yfield in self.yfields:
-                    self.datas[key].setdefault(
+                    self.datas[date].setdefault(
                             yfield.get('key', yfield['name']), 0.0)
-                date = date + mx.DateTime.RelativeDateTime(days=1)
+                date += relativedelta(days=1)
 
     def updateArea(self, cr, width, height):
         maxylabel = ''

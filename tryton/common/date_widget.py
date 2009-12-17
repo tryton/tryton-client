@@ -7,10 +7,9 @@ import gtk
 import re
 
 import time
-from mx.DateTime import RelativeDateTime
-from mx.DateTime import DateTime
-from mx.DateTime import now
-import mx.DateTime
+import datetime
+from dateutil.relativedelta import relativedelta
+from datetime_strftime import datetime_strftime
 
 mapping = {
     '%y': ('__', '([_ 0-9][_ 0-9])'),
@@ -145,7 +144,7 @@ class DateEntry(gtk.Entry):
                 format = format.replace('%Y', '00%Y')
             elif dt.year < 1000:
                 format = format.replace('%Y', '0%Y')
-            self.set_text(dt.strftime(format))
+            self.set_text(datetime_strftime(dt, format))
         else:
             if self.is_focus():
                 self.set_text(self.initial_value)
@@ -153,7 +152,7 @@ class DateEntry(gtk.Entry):
                 self.set_text('')
 
     def date_get(self):
-        tt = time.strftime(self.format, time.localtime())
+        tt = datetime_strftime(datetime.datetime.now(), self.format)
         tc = self.get_text()
         if tc == self.initial_value or not tc:
             return False
@@ -180,11 +179,11 @@ class DateEntry(gtk.Entry):
                 tc = tc[:a] + tt[a] + tc[a+1:]
         try:
             self.set_text(tc)
-            return mx.DateTime.strptime(tc, self.format)
+            return datetime.datetime(*time.strptime(tc, self.format)[:6])
         except:
             tc = tt
         self.set_text(tc)
-        return mx.DateTime.strptime(tc, self.format)
+        return datetime.datetime(*time.strptime(tc, self.format)[:6])
 
     def delete_text(self, start, end):
         self._interactive_input = False
@@ -282,36 +281,35 @@ class ComplexEntry(gtk.HBox):
 def compute_date(cmd, dt, format):
     lst = {
         '^=(\d+)d$': lambda dt, r: dt + \
-                RelativeDateTime(day=int(r.group(1))),
+                relativedelta(day=int(r.group(1))),
         '^=(\d+)m$': lambda dt, r: dt + \
-                RelativeDateTime(month=int(r.group(1))),
+                relativedelta(month=int(r.group(1))),
         '^=(\d\d)y$': lambda dt, r: dt + \
-                RelativeDateTime(year=int(str(dt.year)[:-2] + r.group(1))),
+                relativedelta(year=int(str(dt.year)[:-2] + r.group(1))),
         '^=(\d+)y$': lambda dt, r: dt + \
-                RelativeDateTime(year=int(r.group(1))),
+                relativedelta(year=int(r.group(1))),
         '^=(\d+)h$': lambda dt, r: dt + \
-                RelativeDateTime(hour=int(r.group(1))),
+                relativedelta(hour=int(r.group(1))),
         '^([\\+-]\d+)h$': lambda dt, r: dt + \
-                RelativeDateTime(hours=int(r.group(1))),
+                relativedelta(hours=int(r.group(1))),
         '^([\\+-]\d+)w$': lambda dt, r: dt + \
-                RelativeDateTime(weeks=int(r.group(1))),
+                relativedelta(weeks=int(r.group(1))),
         '^([\\+-]\d+)d$': lambda dt, r: dt + \
-                RelativeDateTime(days=int(r.group(1))),
+                relativedelta(days=int(r.group(1))),
         '^([\\+-]\d+)$': lambda dt, r: dt + \
-                RelativeDateTime(days=int(r.group(1))),
+                relativedelta(days=int(r.group(1))),
         '^([\\+-]\d+)m$': lambda dt, r: dt + \
-                RelativeDateTime(months=int(r.group(1))),
+                relativedelta(months=int(r.group(1))),
         '^([\\+-]\d+)y$': lambda dt, r: dt + \
-                RelativeDateTime(years=int(r.group(1))),
-        '^=$': lambda dt,r: now(),
+                relativedelta(years=int(r.group(1))),
+        '^=$': lambda dt,r: datetime.datetime.now(),
         '^-$': lambda dt,r: False
     }
     for r, f in lst.items():
         groups = re.match(r, cmd)
         if groups:
             if not dt:
-                dt = time.strftime(format, time.localtime())
-                dt = mx.DateTime.strptime(dt, format)
+                dt = datetime.datetime.now()
             try:
                 return f(dt, groups)
             except:

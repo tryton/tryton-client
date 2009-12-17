@@ -7,12 +7,11 @@ from tryton.config import CONFIG
 import time
 import tryton.rpc as rpc
 from parse import Parse
-import datetime as DT
+import datetime
 import locale
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+from tryton.common import HM_FORMAT
 import tryton.common as common
 from tryton.translate import date_format
-import mx.DateTime
 
 FIELDS_LIST_TYPE = {
     'boolean': gobject.TYPE_BOOLEAN,
@@ -72,28 +71,24 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 display_format = date_format()
                 for obj in res_ids:
                     if obj[field]:
-                        date = mx.DateTime.strptime(str(obj[field]), DT_FORMAT)
-                        obj[field] = date.strftime(display_format)
+                        obj[field] = common.datetime_strftime(obj[field],
+                                display_format)
             elif field_type in ('datetime',):
                 display_format = date_format() + ' ' + HM_FORMAT
                 for obj in res_ids:
                     if obj[field]:
-                        date = mx.DateTime.strptime(str(obj[field]), DHM_FORMAT)
                         if 'timezone' in rpc.CONTEXT:
                             try:
                                 import pytz
                                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                                 szone = pytz.timezone(rpc.TIMEZONE)
-                                datetime = DT.datetime(date.year, date.month,
-                                        date.day, date.hour, date.minute,
-                                        int(date.second))
-                                sdt = szone.localize(datetime, is_dst=True)
+                                sdt = szone.localize(obj[field], is_dst=True)
                                 ldt = sdt.astimezone(lzone)
-                                date = mx.DateTime.DateTime(*(
-                                    ldt.timetuple()[:6]))
+                                obj[field] = ldt
                             except:
                                 pass
-                        obj[field] = date.strftime(display_format)
+                        obj[field] = common.datetime_strftime(obj[field],
+                                display_format)
             elif field_type in ('many2one',):
                 for obj in res_ids:
                     if obj[field]:

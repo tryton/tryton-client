@@ -1,3 +1,4 @@
+* Remove egenix-mx-base and replace it by python-dateutil
 * Add cache to safe_eval
 * Use versioned configuration directory
 * Next and Previous scroll per page on list and don't loop

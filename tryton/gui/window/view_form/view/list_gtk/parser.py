@@ -16,7 +16,7 @@ from tryton.gui.window.view_form.view.form_gtk.one2many import Dialog \
 from tryton.gui.window.win_search import WinSearch
 
 import tryton.rpc as rpc
-import datetime as DT
+import datetime
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
 import tryton.common as common
@@ -29,7 +29,6 @@ from tryton.common.cellrendererinteger import CellRendererInteger
 from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.action import Action
 from tryton.translate import date_format
-import mx.DateTime
 import gettext
 
 _ = gettext.gettext
@@ -381,17 +380,17 @@ class Date(Char):
         value = model[self.field_name].get_client(model)
         if not value:
             return ''
-        date = mx.DateTime.strptime(value, self.server_format)
-        return date.strftime(self.display_format)
+        date = datetime.date(*time.strptime(value, self.server_format)[:3])
+        return common.datetime_strftime(date, self.display_format)
 
     def value_from_text(self, model, text):
         if not text:
             return False
         try:
-            date = mx.DateTime.strptime(text, self.display_format)
+            date = datetime.date(*time.strptime(test, self.display_format)[:3])
         except:
             return False
-        return date.strftime(self.server_format)
+        return common.datetime_strftime(date, self.server_format)
 
 
 class Datetime(Date):
@@ -407,26 +406,26 @@ class Datetime(Date):
         value = model[self.field_name].get_client(model)
         if not value:
             return ''
-        date = mx.DateTime.strptime(value, self.server_format)
+        date = datetime.datetime(*time.strptime(value,
+            self.server_format)[:6])
         if 'timezone' in rpc.CONTEXT:
             try:
                 import pytz
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
-                datetime = DT.datetime(date.year, date.month, date.day,
-                        date.hour, date.minute, int(date.second))
-                sdt = szone.localize(datetime, is_dst=True)
+                sdt = szone.localize(date, is_dst=True)
                 ldt = sdt.astimezone(lzone)
-                date = mx.DateTime.DateTime(*(ldt.timetuple()[:6]))
+                date = ldt
             except:
                 pass
-        return date.strftime(self.display_format)
+        return common.datetime_strftime(date, self.display_format)
 
     def value_from_text(self, model, text):
         if not text:
             return False
         try:
-            date = mx.DateTime.strptime(text, self.display_format)
+            date = datetime.datetime(*time.strptime(text,
+                self.display_format)[:6])
         except:
             return False
         if 'timezone' in rpc.CONTEXT:
@@ -434,14 +433,12 @@ class Datetime(Date):
                 import pytz
                 lzone = pytz.timezone(rpc.CONTEXT['timezone'])
                 szone = pytz.timezone(rpc.TIMEZONE)
-                datetime = DT.datetime(date.year, date.month, date.day,
-                        date.hour, date.minute, int(date.second))
-                ldt = lzone.localize(datetime, is_dst=True)
+                ldt = lzone.localize(date, is_dst=True)
                 sdt = ldt.astimezone(szone)
-                date = mx.DateTime.DateTime(*(sdt.timetuple()[:6]))
+                date = sdt
             except:
                 pass
-        return date.strftime(self.server_format)
+        return common.datetime_strftime(date, self.server_format)
 
 
 class Float(Char):

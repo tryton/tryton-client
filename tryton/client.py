@@ -19,7 +19,6 @@ from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
 from tryton import translate
 from tryton import gui
 import traceback
-import mx.DateTime
 import time
 import signal
 
@@ -45,10 +44,6 @@ class TrytonClient(object):
         if CONFIG['logging.default']:
             logging.getLogger().setLevel(
                     loglevel[CONFIG['logging.default'].upper()])
-
-        if not hasattr(mx.DateTime, 'strptime'):
-            mx.DateTime.strptime = lambda x, y: mx.DateTime.mktime(
-                    time.strptime(x, y))
 
         factory = gtk.IconFactory()
         factory.add_default()

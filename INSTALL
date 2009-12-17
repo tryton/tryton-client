@@ -7,7 +7,7 @@ Prerequisites
  * Python 2.4 or later (http://www.python.org/)
  * pygtk 2.0 or later (http://www.pygtk.org/)
  * librsvg (http://librsvg.sourceforge.net/)
- * egenix-mx-base (http://www.egenix.com/products/python/mxBase/)
+ * python-dateutil (http://labix.org/python-dateutil)
  * Optional: pytz (http://pytz.sourceforge.net/)
 
 Installation

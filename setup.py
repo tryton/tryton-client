@@ -114,7 +114,7 @@ dist = setup(name=PACKAGE,
     license=LICENSE,
     install_requires=[
 #        "pygtk >= 2.0",
-        "egenix-mx-base",
+        "python-dateutil",
     ],
     extras_require={
         'timezone': ['pytz'],
