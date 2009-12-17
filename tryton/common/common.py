@@ -1186,9 +1186,9 @@ def safe_eval(source, data=None):
     if '__subclasses__' in source:
         raise ValueError('__subclasses__ not allowed')
     if hashlib:
-        key = hashlib.md5(source).hexdigest()
+        key = hashlib.md5(source).digest()
     else:
-        key = md5.new(source).hexdigest()
+        key = md5.new(source).digest()
     c = _SAFE_EVAL_CACHE.get(key)
     if not c:
         c = compile(source, '', 'eval')
