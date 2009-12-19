@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2009-12-12 16:10+0100\n"
+"PO-Revision-Date: 2009-12-19 21:25+0100\n"
 "Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -35,7 +35,7 @@ msgstr "Log-Level angeben: INFO, DEBUG, WARNING, ERROR, CRITICAL"
 
 #: tryton/config.py:104
 msgid "specify the login user"
-msgstr "Benutzername angeben"
+msgstr "Anmeldename angeben"
 
 #: tryton/config.py:106
 msgid "specify the server port"
@@ -96,7 +96,7 @@ msgstr "Ihre Auswahl:"
 #: tryton/common/common.py:299
 #: tryton/common/common.py:334
 #: tryton/gui/main.py:1568
-#: tryton/gui/window/attachment.py:245
+#: tryton/gui/window/attachment.py:246
 #: tryton/gui/window/win_export.py:374
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:41
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:88
@@ -136,7 +136,7 @@ msgstr "Fehler melden"
 
 #: tryton/common/common.py:515
 msgid "User:"
-msgstr "Benutzername:"
+msgstr "Anmeldename:"
 
 #: tryton/common/common.py:523
 #: tryton/common/common.py:812
@@ -164,7 +164,7 @@ msgid ""
 "Bad username or password!"
 msgstr ""
 "Verbindungsfehler!\n"
-"Benutzername oder Passwort fehlerhaft."
+"Anmeldename oder Passwort fehlerhaft."
 
 #: tryton/common/common.py:600
 msgid "Exception:"
@@ -785,50 +785,50 @@ msgstr "_Verknüpfung hinzufügen..."
 msgid "_Save as..."
 msgstr "_Speichern als..."
 
-#: tryton/gui/window/attachment.py:175
-#: tryton/gui/window/attachment.py:187
+#: tryton/gui/window/attachment.py:176
+#: tryton/gui/window/attachment.py:188
 msgid "You must put a text comment to an attachement."
 msgstr "Kommentar für den Anhang fehlt!"
 
-#: tryton/gui/window/attachment.py:176
-#: tryton/gui/window/attachment.py:188
+#: tryton/gui/window/attachment.py:177
+#: tryton/gui/window/attachment.py:189
 msgid "Text not saved!"
 msgstr "Kommentar konnte nicht gesichert werden!"
 
-#: tryton/gui/window/attachment.py:196
+#: tryton/gui/window/attachment.py:197
 msgid "Are you sure you want to remove this attachment?"
 msgstr "Soll der Anhang wirklich entfernt werden?"
 
-#: tryton/gui/window/attachment.py:206
+#: tryton/gui/window/attachment.py:207
 msgid "Select file"
 msgstr "Datei auswählen"
 
-#: tryton/gui/window/attachment.py:227
+#: tryton/gui/window/attachment.py:228
 msgid "Can not open file!"
 msgstr "Kann Datei nicht öffnen!"
 
-#: tryton/gui/window/attachment.py:258
+#: tryton/gui/window/attachment.py:259
 msgid "Can not write file!"
 msgstr "Kann Datei nicht schreiben!"
 
-#: tryton/gui/window/attachment.py:263
+#: tryton/gui/window/attachment.py:264
 #: tryton/gui/window/view_form/view/form_gtk/image.py:89
 msgid "All files"
 msgstr "Alle Dateien"
 
-#: tryton/gui/window/attachment.py:267
+#: tryton/gui/window/attachment.py:268
 #: tryton/gui/window/view_form/view/form_gtk/image.py:93
 msgid "Images"
 msgstr "Bilder"
 
-#: tryton/gui/window/attachment.py:273
+#: tryton/gui/window/attachment.py:274
 #: tryton/gui/window/win_import.py:109
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:73
 #: tryton/gui/window/view_form/view/form_gtk/image.py:99
 msgid "Open..."
 msgstr "Öffnen..."
 
-#: tryton/gui/window/attachment.py:402
+#: tryton/gui/window/attachment.py:403
 msgid "link: "
 msgstr "Verknüpfung: "
 
@@ -851,8 +851,8 @@ msgstr ""
 "Kann nicht mit dem Tryton-Server verbinden!\n"
 "1. Stellen Sie fest, ob der Tryton-Server läuft.\n"
 "2. Finden Sie heraus auf welcher Adresse und unter welchem Port der Server erreichbar ist.\n"
-"3. Wenn sich eine Firewall zwischen dem Tryton-Server und diesem Client befindet, stellen Sie sicher, das die Tryton-Serveradresse und der Port nicht durch die Firewall blockiert werden.\n"
-"Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Tryton- Servers anzupassen."
+"3. Wenn sich eine Firewall zwischen dem Tryton-Server und diesem Client befindet, stellen Sie sicher, dass die Tryton-Serveradresse und der Port nicht durch die Firewall blockiert werden.\n"
+"Wählen Sie den 'Bearbeiten' Knopf, um die Adresse des Tryton-Servers anzupassen."
 
 #: tryton/gui/window/dbcreate.py:137
 msgid "Create new database"
@@ -903,7 +903,7 @@ msgstr "Tryton Server Passwort:"
 #: tryton/gui/window/dbdumpdrop.py:175
 #: tryton/gui/window/dbrestore.py:112
 msgid "This is the password of the Tryton server. It doesn't belong to a real user. This password is usually defined in the trytond configuration."
-msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort gehört nicht zu einem Tryton Benutzer. Das Passwort wird üblicherweise in der Tryton Konfiguration angegeben."
+msgstr "Hier wird das Administrationspasswort für den Tryton Server erwartet. Dieses Passwort ist nicht das Passwort eines Tryton Benutzers, sondern wird üblicherweise in der Konfiguration des Tryton Servers angegeben."
 
 #: tryton/gui/window/dbcreate.py:214
 msgid "New database setup:"
@@ -921,7 +921,8 @@ msgid ""
 msgstr ""
 "Geben Sie hier den Namen der neuen Datenbank ein.\n"
 "Erlaubt sind alle Buchstaben, Zahlen und _ (Unterstrich).\n"
-"Nicht erlaubt sind Umlaute, Akzente, Leezeichen oder 'ß'! Beispielname: tryton"
+"Nicht erlaubt sind Umlaute, Akzente, Leerzeichen oder Sonderzeichen wie 'ß'!\n"
+"Beispielname: tryton"
 
 #: tryton/gui/window/dbcreate.py:239
 msgid "Default language:"
@@ -941,8 +942,8 @@ msgid ""
 "User name: admin\n"
 "Password: <The password you set here>"
 msgstr ""
-"Wählen Sie hier das Passwort des Benutzers mit Administrationsrechten für die neue Datenbank aus. Mit diesem Passwort werden sie sich folgendermaßen in der neuen Datenbank authentifizieren können:\n"
-"Benutzername: admin\n"
+"Wählen Sie hier ein Passwort für den Benutzer mit Administrationsrechten für die neue Datenbank. Mit diesem Passwort werden Sie sich anschließend in der neuen Datenbank anmelden können:\n"
+"Anmeldename: admin\n"
 "Passwort: <Das hier vergebene Passwort>"
 
 #: tryton/gui/window/dbcreate.py:270
@@ -1065,7 +1066,7 @@ msgstr "Datenbank:"
 
 #: tryton/gui/window/dblogin.py:17
 msgid "Login"
-msgstr "Benutzeranmeldung"
+msgstr "Anmeldung"
 
 #: tryton/gui/window/dblogin.py:24
 msgid "_Cancel"
@@ -1089,7 +1090,7 @@ msgstr "Die Verbindung zum Tryton Server konfigurieren"
 
 #: tryton/gui/window/dblogin.py:101
 msgid "User name:"
-msgstr "Benutzername:"
+msgstr "Anmeldename:"
 
 #: tryton/gui/window/dblogin.py:117
 msgid "Incompatible version of the server!"
@@ -1199,79 +1200,79 @@ msgstr "%s Datei: "
 msgid "Use \"%s\" as a placeholder for the file name"
 msgstr "Verwenden Sie \"%s\" als Platzhalter für den Dateinamen"
 
-#: tryton/gui/window/form.py:165
+#: tryton/gui/window/form.py:164
 msgid "Go to ID"
 msgstr "Gehe zu Nr (ID)"
 
-#: tryton/gui/window/form.py:174
+#: tryton/gui/window/form.py:173
 msgid "Go to ID:"
 msgstr "Gehe zu Nr (ID):"
 
-#: tryton/gui/window/form.py:226
-#: tryton/gui/window/form.py:421
+#: tryton/gui/window/form.py:225
+#: tryton/gui/window/form.py:413
 #: tryton/gui/window/tree.py:282
 #: tryton/gui/window/view_form/view/list.py:271
 msgid "No record selected!"
 msgstr "Kein Datensatz ausgewählt!"
 
-#: tryton/gui/window/form.py:246
+#: tryton/gui/window/form.py:245
 msgid "You have to select one record!"
 msgstr "Sie müssen mindestens einen Datensatz auswählen!"
 
-#: tryton/gui/window/form.py:250
+#: tryton/gui/window/form.py:249
 msgid "ID:"
 msgstr "ID:"
 
-#: tryton/gui/window/form.py:251
+#: tryton/gui/window/form.py:250
 msgid "Creation User:"
 msgstr "Erstellt von"
 
-#: tryton/gui/window/form.py:252
+#: tryton/gui/window/form.py:251
 msgid "Creation Date:"
 msgstr "Erstellt am"
 
-#: tryton/gui/window/form.py:253
+#: tryton/gui/window/form.py:252
 msgid "Latest Modification by:"
 msgstr "Zuletzt verändert von"
 
-#: tryton/gui/window/form.py:254
+#: tryton/gui/window/form.py:253
 msgid "Latest Modification Date:"
 msgstr "Zuletzt verändert am"
 
-#: tryton/gui/window/form.py:291
+#: tryton/gui/window/form.py:283
 msgid "Model:"
 msgstr "Modell:"
 
-#: tryton/gui/window/form.py:297
+#: tryton/gui/window/form.py:289
 msgid "Are you sure to remove this record?"
 msgstr "Möchten Sie diesen Datensatz wirklich löschen?"
 
-#: tryton/gui/window/form.py:299
+#: tryton/gui/window/form.py:291
 msgid "Are you sure to remove those records?"
 msgstr "Möchten Sie diese Datensätze wirklich löschen?"
 
-#: tryton/gui/window/form.py:302
+#: tryton/gui/window/form.py:294
 msgid "Records not removed!"
 msgstr "Datensätze nicht gelöscht!"
 
-#: tryton/gui/window/form.py:304
+#: tryton/gui/window/form.py:296
 msgid "Records removed!"
 msgstr "Datensätze gelöscht!"
 
-#: tryton/gui/window/form.py:343
+#: tryton/gui/window/form.py:335
 msgid "Working now on the duplicated record(s)!"
 msgstr "Sie arbeiten nun an dem duplizierten Datensatz!"
 
-#: tryton/gui/window/form.py:348
+#: tryton/gui/window/form.py:340
 msgid "Record saved!"
 msgstr "Datensatz gespeichert!"
 
-#: tryton/gui/window/form.py:351
+#: tryton/gui/window/form.py:343
 msgid "Invalid form!"
 msgstr "Ungültiges Formular!"
 
-#: tryton/gui/window/form.py:370
-#: tryton/gui/window/form.py:465
+#: tryton/gui/window/form.py:362
+#: tryton/gui/window/form.py:457
 msgid ""
 "This record has been modified\n"
 "do you want to save it ?"
@@ -1279,7 +1280,7 @@ msgstr ""
 "Dieser Datensatz wurde geändert.\n"
 "Soll der Datensatz gespeichert werden? "
 
-#: tryton/gui/window/form.py:452
+#: tryton/gui/window/form.py:444
 msgid " of "
 msgstr " von "
 
@@ -1329,7 +1330,7 @@ msgstr "Vorheriges Widget"
 
 #: tryton/gui/window/shortcuts.py:33
 msgid "Relation Entries Shortcuts"
-msgstr "Schnelltasten für verknüpfte Einträge"
+msgstr "Schnelltasten für Einträge in verknüpften Feldern"
 
 #: tryton/gui/window/shortcuts.py:34
 msgid "Create new relation"
@@ -1459,7 +1460,7 @@ msgstr "<b>Alle Felder</b>"
 #: tryton/gui/window/win_export.py:67
 #: tryton/gui/window/win_import.py:45
 msgid "_Add"
-msgstr "_Hiinzufügen"
+msgstr "_Hinzufügen"
 
 #: tryton/gui/window/win_export.py:75
 #: tryton/gui/window/win_import.py:53
@@ -1715,26 +1716,26 @@ msgstr ""
 msgid "bytes"
 msgstr "Byte"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:46
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:181
-#: tryton/gui/window/view_form/widget_search/calendar.py:53
-#: tryton/gui/window/view_form/widget_search/calendar.py:74
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:45
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:180
+#: tryton/gui/window/view_form/widget_search/calendar.py:52
+#: tryton/gui/window/view_form/widget_search/calendar.py:73
 msgid "Open the calendar"
 msgstr "Kalender öffnen"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:113
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:112
 msgid "Date Selection"
 msgstr "Auswahl Datum"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:271
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:266
 msgid "Date Time Selection"
 msgstr "Auswahl Zeit"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:280
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:275
 msgid "Hour:"
 msgstr "Stunde:"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:283
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:278
 msgid "Minute:"
 msgstr "Minute:"
 
@@ -1843,8 +1844,8 @@ msgstr "Ausgewählten Datensatz löschen"
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:311
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:312
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:313
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:203
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:828
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:202
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:825
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -1854,7 +1855,7 @@ msgid "Wrong icon for the button!"
 msgstr "Falsches Icon für diesen Knopf!"
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:89
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:895
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:892
 msgid "Invalid Form, correct red fields!"
 msgstr "Ungültiges Formular, die roten Felder müssen überarbeitet werden!"
 
@@ -1939,33 +1940,33 @@ msgstr "Bild ist zu groß!"
 msgid "Warning; field \"%s\" is required!"
 msgstr "Warnung! Feld \"%s\" ist erforderlich!"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:34
+#: tryton/gui/window/view_form/widget_search/calendar.py:33
 msgid "is"
 msgstr "ist"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:35
+#: tryton/gui/window/view_form/widget_search/calendar.py:34
 #: tryton/gui/window/view_form/widget_search/integer.py:25
 msgid "is between"
 msgstr "ist zwischen"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:36
+#: tryton/gui/window/view_form/widget_search/calendar.py:35
 #: tryton/gui/window/view_form/widget_search/integer.py:26
 msgid "is not between"
 msgstr "ist nicht zwischen"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:37
+#: tryton/gui/window/view_form/widget_search/calendar.py:36
 msgid "is not"
 msgstr "ist nicht"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:49
+#: tryton/gui/window/view_form/widget_search/calendar.py:48
 msgid "Start date"
 msgstr "Von Datum"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:70
+#: tryton/gui/window/view_form/widget_search/calendar.py:69
 msgid "End date"
 msgstr "bis Datum"
 
-#: tryton/gui/window/view_form/widget_search/calendar.py:160
+#: tryton/gui/window/view_form/widget_search/calendar.py:158
 msgid "Date selection"
 msgstr "Auswahl Datum:"
 
