@@ -78,7 +78,7 @@ class WinSearch(object):
             except Exception, exception:
                 view_form = common.process_exception(exception, self.parent, *args)
         self.form = widget_search.Form(view_form['arch'], view_form['fields'],
-                model, parent=self.win)
+                model, parent=self.win, call=(self, self.find))
 
         self.title = _('Search: %s') % self.form.name
         self.title_results = _('Search: %s (%%d result(s))') % \
