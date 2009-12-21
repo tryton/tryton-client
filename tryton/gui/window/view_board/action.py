@@ -140,8 +140,7 @@ class Action(object):
                     view_type=self.action['view_mode'], context=self.context,
                     view_ids=view_ids, domain=self.domain, readonly=True)
             alignment.add(self.screen.widget)
-            self.title.set_text(attrs.get('string',
-                self.screen.current_view.title))
+            name = self.screen.current_view.title
             self.screen.signal_connect(self, 'record-message', self._sig_label)
         elif self.action['view_type'] == 'tree':
             ctx = {}
@@ -162,9 +161,16 @@ class Action(object):
             self.tree = ViewTree(view, [], self._window, True,
                     context=ctx)
             alignment.add(self.tree.widget_get())
-            self.title.set_text(attrs.get('string',
-                self.tree.name))
+            name = self.tree.name
             self.tree.view.connect('key_press_event', self.sig_key_press)
+
+        if attrs.get('string'):
+            self.title.set_text(attrs['string'])
+        elif self.action.get('window_name'):
+            self.title.set_text(self.action['name'])
+        else:
+            self.title.set_text(name)
+
         self.widget.set_size_request(int(attrs.get('width',-1)),
                 int(attrs.get('height', -1)))
         self.display()
