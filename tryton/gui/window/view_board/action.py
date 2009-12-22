@@ -59,81 +59,88 @@ class Action(object):
 
 
         self.widget = gtk.Frame()
-        self.widget.set_border_width(5)
+        self.widget.set_border_width(0)
 
-        hbox = gtk.HBox(homogeneous=False, spacing=5)
-        self.widget.set_label_widget(hbox)
-        self.widget.set_label_align(1, 0.5)
+        vbox = gtk.VBox(homogeneous=False, spacing=0)
+        hbox = gtk.HBox(homogeneous=False, spacing=0)
+        alignment = gtk.Alignment(1.0)
+        alignment.set_padding(0, 0, 0, 0)
+        alignment.add(hbox)
+        vbox.pack_start(alignment, expand=False, fill=True)
+        self.widget.add(vbox)
 
         self.title = gtk.Label()
-        hbox.pack_start(self.title, expand=True, fill=True)
+        self.widget.set_label_widget(self.title)
+        self.widget.set_label_align(0.0, 0.5)
 
         tooltips = common.Tooltips()
 
-        hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
-
         if self.action['view_type'] == 'form':
-            eb_search = gtk.EventBox()
-            tooltips.set_tip(eb_search, _('Search'))
-            eb_search.set_events(gtk.gdk.BUTTON_PRESS)
-            eb_search.connect('button_press_event', self._sig_search)
+            but_search = gtk.Button()
+            tooltips.set_tip(but_search, _('Search'))
+            but_search.connect('clicked', self._sig_search)
             img_search = gtk.Image()
-            img_search.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
+            img_search.set_from_stock('tryton-find',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_search.set_alignment(0.5, 0.5)
-            eb_search.add(img_search)
-            hbox.pack_start(eb_search, expand=False, fill=False)
+            but_search.add(img_search)
+            but_search.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(but_search, expand=False, fill=False)
 
-        eb_open = gtk.EventBox()
-        tooltips.set_tip(eb_open, _('Open'))
-        eb_open.set_events(gtk.gdk.BUTTON_PRESS)
-        eb_open.connect('button_press_event', self._sig_open)
+        but_open = gtk.Button()
+        tooltips.set_tip(but_open, _('Open'))
+        but_open.connect('clicked', self._sig_open)
         img_open = gtk.Image()
-        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_BUTTON)
+        img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_open.set_alignment(0.5, 0.5)
-        eb_open.add(img_open)
-        hbox.pack_start(eb_open, expand=False, fill=False)
+        but_open.add(img_open)
+        but_open.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(but_open, expand=False, fill=False)
 
-        hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
         if self.action['view_type'] == 'form':
-            eb_previous = gtk.EventBox()
-            tooltips.set_tip(eb_previous, _('Previous'))
-            eb_previous.set_events(gtk.gdk.BUTTON_PRESS)
-            eb_previous.connect('button_press_event', self._sig_previous)
+            hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
+            but_previous = gtk.Button()
+            tooltips.set_tip(but_previous, _('Previous'))
+            but_previous.connect('clicked', self._sig_previous)
             img_previous = gtk.Image()
-            img_previous.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_BUTTON)
+            img_previous.set_from_stock('tryton-go-previous',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_previous.set_alignment(0.5, 0.5)
-            eb_previous.add(img_previous)
-            hbox.pack_start(eb_previous, expand=False, fill=False)
+            but_previous.add(img_previous)
+            but_previous.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(but_previous, expand=False, fill=False)
 
             self.label = gtk.Label('(0,0)')
             hbox.pack_start(self.label, expand=False, fill=False)
 
-            eb_next = gtk.EventBox()
-            tooltips.set_tip(eb_next, _('Next'))
-            eb_next.set_events(gtk.gdk.BUTTON_PRESS)
-            eb_next.connect('button_press_event', self._sig_next)
+            but_next = gtk.Button()
+            tooltips.set_tip(but_next, _('Next'))
+            but_next.connect('clicked', self._sig_next)
             img_next = gtk.Image()
-            img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_BUTTON)
+            img_next.set_from_stock('tryton-go-next',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_next.set_alignment(0.5, 0.5)
-            eb_next.add(img_next)
-            hbox.pack_start(eb_next, expand=False, fill=False)
+            but_next.add(img_next)
+            but_next.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(but_next, expand=False, fill=False)
 
             hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-            eb_switch = gtk.EventBox()
-            tooltips.set_tip(eb_switch, _('Switch'))
-            eb_switch.set_events(gtk.gdk.BUTTON_PRESS)
-            eb_switch.connect('button_press_event', self._sig_switch)
+            but_switch = gtk.Button()
+            tooltips.set_tip(but_switch, _('Switch'))
+            but_switch.connect('clicked', self._sig_switch)
             img_switch = gtk.Image()
-            img_switch.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_BUTTON)
+            img_switch.set_from_stock('tryton-fullscreen',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_switch.set_alignment(0.5, 0.5)
-            eb_switch.add(img_switch)
-            hbox.pack_start(eb_switch, expand=False, fill=False)
+            but_switch.add(img_switch)
+            but_switch.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(but_switch, expand=False, fill=False)
 
         alignment = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-        alignment.set_padding(8, 0, 0, 0)
-        self.widget.add(alignment)
+        alignment.set_padding(0, 2, 2, 2)
+        vbox.pack_start(alignment, expand=True, fill=True)
 
         self.widget.show_all()
 
@@ -177,38 +184,34 @@ class Action(object):
                 int(attrs.get('height', -1)))
         self.display()
 
-    def _sig_switch(self, *args):
+    def _sig_switch(self, widget):
         self.screen.switch_view()
 
-    def _sig_search(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            ctx = {}
-            ctx.update(rpc.CONTEXT)
-            ctx.update(self.context)
-            win = WinSearch(self.action['res_model'], domain=self.domain,
-                    context=ctx, parent=self._window)
-            res = win.run()
-            if res:
-                self.screen.clear()
-                self.screen.load(res)
+    def _sig_search(self, widget):
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx.update(self.context)
+        win = WinSearch(self.action['res_model'], domain=self.domain,
+                context=ctx, parent=self._window)
+        res = win.run()
+        if res:
+            self.screen.clear()
+            self.screen.load(res)
 
-    def _sig_open(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            try:
-                action_id = rpc.execute('model', 'ir.action',
-                        'get_action_id', self.act_id, rpc.CONTEXT)
-            except Exception, exception:
-                common.process_exception(exception, self._window)
-            if action_id:
-                Action2.execute(action_id, {}, self._window)
+    def _sig_open(self, widget):
+        try:
+            action_id = rpc.execute('model', 'ir.action',
+                    'get_action_id', self.act_id, rpc.CONTEXT)
+        except Exception, exception:
+            common.process_exception(exception, self._window)
+        if action_id:
+            Action2.execute(action_id, {}, self._window)
 
-    def _sig_previous(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_prev()
+    def _sig_previous(self, widget):
+        self.screen.display_prev()
 
-    def _sig_next(self, widget, event):
-        if event.type == gtk.gdk.BUTTON_PRESS:
-            self.screen.display_next()
+    def _sig_next(self, widget):
+        self.screen.display_next()
 
     def _sig_label(self, screen, signal_data):
         name = '_'
