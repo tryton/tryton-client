@@ -150,10 +150,12 @@ class ModelRecordGroup(SignalEvent):
     def _load_for(self, values):
         if len(values)>10:
             self.models.lock_signal = True
+        id2values = {}
         for value in values:
-            for model in self.models:
-                if model.id == value['id']:
-                    model.set(value)
+            id2values[value['id']] = value
+        for model in self.models:
+            if model.id in id2values:
+                model.set(id2values[model.id])
         if len(values)>10:
             self.models.lock_signal = False
             self.signal('record-cleared')
