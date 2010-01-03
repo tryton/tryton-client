@@ -388,7 +388,7 @@ class Date(Char):
         if not text:
             return False
         try:
-            date = datetime.date(*time.strptime(test, self.display_format)[:3])
+            date = datetime.date(*time.strptime(text, self.display_format)[:3])
         except:
             return False
         return common.datetime_strftime(date, self.server_format)
