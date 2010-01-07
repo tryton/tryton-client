@@ -27,6 +27,7 @@ class TrytonClient(object):
     "Tryton client"
 
     def __init__(self):
+        CONFIG.parse()
         logging.basicConfig()
         translate.set_language_direction(CONFIG['client.language_direction'])
         translate.setlang(CONFIG['client.lang'])

@@ -89,6 +89,8 @@ class ConfigManager(object):
         self.options = {
             'login.host': True
         }
+
+    def parse(self):
         parser = optparse.OptionParser(version=("Tryton %s" % VERSION))
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))

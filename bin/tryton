@@ -26,5 +26,25 @@ if os.name == 'mac' or \
         os.environ['GDK_PIXBUF_MODULE_FILE'] = pixbuf_loader
         os.environ['PANGO_RC_FILE'] = pangorc
 
-import tryton.client
-tryton.client.TrytonClient().run()
+import tryton
+if '--profile' in sys.argv:
+    import profile
+    import pstats
+    import tempfile
+    import os
+    sys.argv.remove('--profile')
+
+    statfile = tempfile.mkstemp(".stat","tryton-")[1]
+    profile.run('tryton.client.TrytonClient().run()', statfile)
+    s = pstats.Stats(statfile)
+    s.strip_dirs().sort_stats('cumulative').print_stats(50)
+    s.strip_dirs().sort_stats('call').print_stats(50)
+    s.strip_dirs().sort_stats('time').print_stats(50)
+    s.strip_dirs().sort_stats('time')
+    s.print_callers(20)
+    s.print_callees(20)
+
+    os.remove(statfile)
+
+else:
+    tryton.client.TrytonClient().run()
