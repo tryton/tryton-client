@@ -1273,7 +1273,6 @@ class Main(object):
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
         gtk.main_quit()
-        sys.exit()
 
     def sig_close(self, widget):
         if common.sur(_("Do you really want to quit?"), parent=self.window):
