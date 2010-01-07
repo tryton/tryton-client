@@ -310,11 +310,6 @@ class Dialog(object):
             self.eb_info.hide()
 
     def on_keypress(self, widget, event):
-        if self.attrs.get('add_remove') \
-                and event.keyval == gtk.keysyms.F3 \
-                and self.but_add.get_property('sensitive'):
-            self._sig_add()
-            return False
         if (event.keyval == gtk.keysyms.F3) \
                 and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
@@ -489,11 +484,6 @@ class One2Many(WidgetInterface):
         return self.screen.widget.grab_focus()
 
     def on_keypress(self, widget, event):
-        if self.attrs.get('add_remove') \
-                and event.keyval == gtk.keysyms.F3 \
-                and self.but_add.get_property('sensitive'):
-            self._sig_add()
-            return False
         if (event.keyval == gtk.keysyms.F3) \
                 and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
