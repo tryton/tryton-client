@@ -68,8 +68,6 @@ class Many2Many(WidgetInterface):
         self.screen.widget.connect('key_press_event', self.on_keypress)
         self.wid_text.connect('key_press_event', self.on_keypress)
 
-        self.old = None
-
     def grab_focus(self):
         return self.wid_text.grab_focus()
 
@@ -114,15 +112,14 @@ class Many2Many(WidgetInterface):
         res_id = None
         if ids:
             res_id = ids[0]
-        self.screen.load(ids)
+        self.screen.load(ids, modified=True)
         self.screen.display(res_id=res_id)
         if self.screen.current_view:
             self.screen.current_view.set_cursor()
         self.wid_text.set_text('')
-        self.set_value(self._view.model, self._view.modelfield)
 
     def _sig_remove(self, *args):
-        self.screen.remove()
+        self.screen.remove(remove=True)
 
     def _sig_activate(self, *args):
         self._sig_add()
@@ -157,32 +154,26 @@ class Many2Many(WidgetInterface):
         self.wid_but_add.set_sensitive(not value)
 
     def display(self, model, model_field):
+        if not model_field:
+            self.screen.current_model = None
+            self.screen.display()
+            return False
         super(Many2Many, self).display(model, model_field)
-        ids = []
-        if model_field:
-            ids = model_field.get_client(model)
-        reload = False
-        if self.attrs.get('datetime_field'):
-            datetime_field = model.get_eval(check_load=False)\
-                    [self.attrs['datetime_field']]
-            if self.screen.context.get('_datetime') != datetime_field:
-                self.screen.context['_datetime'] = datetime_field
-                reload = True
-            if self.screen.models.context.get('_datetime') != datetime_field:
-                self.screen.models._context['_datetime'] = datetime_field
-                reload = True
-        if ids != self.old or reload:
-            self.screen.clear()
-            self.screen.load(ids, set_cursor=False)
-            self.old = ids
+        new_models = model_field.get_client(model)
+        if self.screen.models != new_models:
+            self.screen.models_set(new_models)
         self.screen.display()
         return True
 
     def display_value(self):
-        return self._view.modelfield.rec_name(self._view.model)
+        ids = self._view.modelfield.get_default(self._view.model)
+        try:
+            result = rpc.execute('model', self.attrs['relation'], 'read',
+                    ids, ['rec_name'], rpc.CONTEXT)
+        except:
+            return str(ids)
+        return ', '.join(x['rec_name'] for x in result)
 
     def set_value(self, model, model_field):
-        model_field.set_client(model, [x.id for x in self.screen.models.models])
-
-    def cancel(self):
-        self.old = None
+        self.screen.current_view.set_value()
+        return True

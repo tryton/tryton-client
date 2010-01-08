@@ -615,11 +615,8 @@ class M2M(Char):
         cell.set_property('xalign', 0.5)
 
     def get_textual_value(self, model):
-        value = model[self.field_name].get_client(model)
-        if value:
-            return '(%s)' % len(value)
-        else:
-            return '(0)'
+        return '( ' + str(len(model[self.field_name].\
+                get_client(model).models)) + ' )'
 
     def value_from_text(self, model, text):
         if not text:
@@ -663,7 +660,7 @@ class M2M(Char):
             if ids and len(ids)==1:
                 return True, ids
         else:
-            ids = model[self.field_name].get_client(model)
+            ids = [x.id for x in model[self.field_name].get_client(model)]
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain, parent=self.window)
         found = win.run()

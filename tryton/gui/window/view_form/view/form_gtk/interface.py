@@ -115,7 +115,7 @@ class WidgetInterface(object):
             res = rpc.execute(*args)
         except Exception, exception:
             process_exception(exception, self._window, *args)
-        self._view.modelfield.set(self._view.model,
+        self._view.modelfield.set_default(self._view.model,
                 res.get(self.attrs['name'], False), modified=True)
         self.display(self._view.model, self._view.modelfield)
 

@@ -110,8 +110,8 @@ class CharField(object):
     def get_client(self, model):
         return model.value[self.name] or False
 
-    def set_default(self, model, value):
-        res = self.set(model, value)
+    def set_default(self, model, value, modified=False):
+        res = self.set(model, value, modified=modified)
         return res
 
     def set_on_change(self, model, value):
@@ -371,61 +371,6 @@ class M2OField(CharField):
         return context
 
 
-class M2MField(CharField):
-    '''
-    internal = [id]
-    '''
-
-    def __init__(self, parent, attrs):
-        super(M2MField, self).__init__(parent, attrs)
-
-    def create(self, model):
-        return []
-
-    def get(self, model, check_load=True, readonly=True, modified=False):
-        return [('set', model.value[self.name] or [])]
-
-    def get_eval(self, model, check_load=True):
-        return self.get(model, check_load=check_load, readonly=True,
-                modified=False)[0][1]
-
-    def get_client(self, model):
-        return model.value[self.name] or []
-
-    def set(self, model, value, modified=False):
-        model.value[self.name] = value or []
-        if modified:
-            model.modified = True
-            model.modified_fields.setdefault(self.name)
-
-    def set_client(self, model, value, force_change=False):
-        internal = model.value[self.name]
-        prev_modified = model.modified
-        self.set(model, value, modified=False)
-        if set(internal) != set(value):
-            model.modified = True
-            model.modified_fields.setdefault(self.name)
-            try:
-                self.sig_changed(model)
-            except:
-                model.value[self.name] = internal
-                model.modified = prev_modified
-                return
-            model.signal('record-changed', model)
-
-    def get_default(self, model):
-        return self.get_client(model)
-
-    def rec_name(self, model):
-        rpc2 = RPCProxy(self.attrs['relation'])
-        try:
-            result = rpc2.read(self.get_client(model), ['rec_name'],
-                    rpc.CONTEXT)
-        except:
-            return self.get_client(model)
-        return ', '.join(x['rec_name'] for x in result)
-
-
 class O2MField(CharField):
     '''
     internal = ModelRecordGroup of the related objects
@@ -457,14 +402,15 @@ class O2MField(CharField):
     def get(self, model, check_load=True, readonly=True, modified=False):
         if not model.value[self.name]:
             return []
-        result = []
+        result = [('add', [])]
         for model2 in model.value[self.name].models:
-            if (modified and not model2.is_modified()):
-                continue
             if model2.id > 0:
-                result.append(('write', model2.id,
-                    model2.get(check_load=check_load, get_readonly=readonly,
-                        get_modifiedonly=modified)))
+                values = model2.get(check_load=check_load, get_readonly=readonly,
+                        get_modifiedonly=modified)
+                if model2.is_modified() and values:
+                    result.append(('write', model2.id, values))
+                else:
+                    result[0][1].append(model2.id)
             else:
                 result.append(('create',
                     model2.get(check_load=check_load, get_readonly=readonly)))
@@ -501,19 +447,25 @@ class O2MField(CharField):
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
         mod.signal_connect(mod, 'model-changed', self._model_changed)
+        mod.model_deleted.extend(model.value[self.name].models)
+        mod.model_deleted.extend(model.value[self.name].model_deleted)
+        mod.model_removed.extend(model.value[self.name].model_removed)
         model.value[self.name] = mod
-        #self.internal.signal_connect(self.internal, 'model-changed',
-        #       self._model_changed)
         model.value[self.name].load(value, display=False)
-        #self.internal.signal_connect(self.internal, 'model-changed',
-        #       self._model_changed)
+        if modified:
+            model.modified = True
+            model.modified_fields.setdefault(self.name)
 
     def set_client(self, model, value, force_change=False):
         self.set(model, value)
         model.signal('record-changed', model)
 
-    def set_default(self, model, value):
+    def set_default(self, model, value, modified=False):
         from group import ModelRecordGroup
+
+        if value and len(value) and isinstance(value[0], (int, long)):
+            return self.set(model, value, modified=modified)
+
         fields = {}
         if value and len(value):
             context = self.context_get(model)
@@ -528,23 +480,30 @@ class O2MField(CharField):
             except:
                 return False
 
-        model.value[self.name] = ModelRecordGroup(
+        mod = ModelRecordGroup(
                 self.attrs['relation'], fields, model.window, parent=model,
                 parent_name=self.attrs.get('relation_field', ''),
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
-        model.value[self.name].signal_connect(model.value[self.name],
+        mod.signal_connect(model.value[self.name],
                 'model-changed', self._model_changed)
+        mod.model_deleted.extend(model.value[self.name].models)
+        mod.model_deleted.extend(model.value[self.name].model_deleted)
+        mod.model_removed.extend(model.value[self.name].model_removed)
+        model.value[self.name] = mod
         mod = None
         for record in (value or []):
             mod = model.value[self.name].model_new(default=False)
-            mod.set_default(record)
+            mod.set_default(record, modified=modified)
             model.value[self.name].model_add(mod)
         model.value[self.name].current_model = mod
         #mod.signal('record-changed')
         return True
 
     def set_on_change(self, model, value):
+        if isinstance(value, (list, tuple)):
+            return self.set(model, value, modified=True)
+
         if value and (value.get('add') or value.get('update')):
             context = self.context_get(model)
             rpc2 = RPCProxy(self.attrs['relation'])
@@ -616,6 +575,32 @@ class O2MField(CharField):
 
     def get_removed_ids(self, model):
         return [x.id for x in model.value[self.name].model_removed]
+
+
+class M2MField(O2MField):
+
+    def get_default(self, model):
+        return [x.id for x in model.value[self.name].models
+                if x.id > 0]
+
+    def get_eval(self, model, check_load=True):
+        return [x.id for x in model.value[self.name].models]
+
+    def set(self, model, value, modified=False):
+        from group import ModelRecordGroup
+        mod = ModelRecordGroup(self.attrs['relation'], {}, model.window,
+                parent=model, parent_name=self.attrs.get('relation_field', ''),
+                context=self.context,
+                parent_datetime_field=self.attrs.get('datetime_field'))
+        mod.signal_connect(mod, 'model-changed', self._model_changed)
+        mod.model_removed.extend(model.value[self.name].models)
+        mod.model_deleted.extend(model.value[self.name].model_deleted)
+        mod.model_removed.extend(model.value[self.name].model_removed)
+        model.value[self.name] = mod
+        model.value[self.name].load(value, display=False)
+        if modified:
+            model.modified = True
+            model.modified_fields.setdefault(self.name)
 
 
 class ReferenceField(CharField):
