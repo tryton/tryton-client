@@ -37,12 +37,12 @@ if '--profile' in sys.argv:
     statfile = tempfile.mkstemp(".stat","tryton-")[1]
     profile.run('tryton.client.TrytonClient().run()', statfile)
     s = pstats.Stats(statfile)
-    s.strip_dirs().sort_stats('cumulative').print_stats(50)
-    s.strip_dirs().sort_stats('call').print_stats(50)
-    s.strip_dirs().sort_stats('time').print_stats(50)
-    s.strip_dirs().sort_stats('time')
-    s.print_callers(20)
-    s.print_callees(20)
+    s.sort_stats('cumulative').print_stats()
+    s.sort_stats('call').print_stats()
+    s.sort_stats('time').print_stats()
+    s.sort_stats('time')
+    s.print_callers()
+    s.print_callees()
 
     os.remove(statfile)
 
