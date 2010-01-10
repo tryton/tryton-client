@@ -447,7 +447,8 @@ class O2MField(CharField):
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
         mod.signal_connect(mod, 'model-changed', self._model_changed)
-        mod.model_deleted.extend(model.value[self.name].models)
+        mod.model_deleted.extend(x for x in model.value[self.name].models
+                if x.id > 0)
         mod.model_deleted.extend(model.value[self.name].model_deleted)
         mod.model_removed.extend(model.value[self.name].model_removed)
         model.value[self.name] = mod
@@ -487,7 +488,8 @@ class O2MField(CharField):
                 parent_datetime_field=self.attrs.get('datetime_field'))
         mod.signal_connect(model.value[self.name],
                 'model-changed', self._model_changed)
-        mod.model_deleted.extend(model.value[self.name].models)
+        mod.model_deleted.extend(x for x in model.value[self.name].models
+                if x.id > 0)
         mod.model_deleted.extend(model.value[self.name].model_deleted)
         mod.model_removed.extend(model.value[self.name].model_removed)
         model.value[self.name] = mod
