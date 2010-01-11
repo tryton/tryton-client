@@ -257,6 +257,8 @@ class Frame(gtk.Frame):
     def __init__(self, label=None, attrs=None):
         super(Frame, self).__init__(label=label)
         self.attrs = attrs or {}
+        if not label:
+            self.set_shadow_type(gtk.SHADOW_NONE)
 
     def state_set(self, model):
         state_changes = self.attrs.get('states', {})
@@ -461,22 +463,23 @@ class ParserForm(ParserInterface):
                         fill=int(attrs.get('fill', 0)))
             elif node.localName == 'label':
                 text = attrs.get('string', '')
-                if not text:
-                    if 'name' in attrs and attrs['name'] in fields:
-                        if 'states' in fields[attrs['name']]:
-                            attrs['states'] = fields[attrs['name']]['states']
+                if 'name' in attrs and attrs['name'] in fields:
+                    if 'states' not in attrs \
+                            and 'states' in fields[attrs['name']]:
+                        attrs['states'] = fields[attrs['name']]['states']
+                    if not text:
                         if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
                             text = _(':') + fields[attrs['name']]['string']
                         else:
                             text = fields[attrs['name']]['string'] + _(':')
-                        if 'align' not in attrs:
-                            attrs['align'] = 1.0
-                    else:
-                        for node in node.childNodes:
-                            if node.nodeType == node.TEXT_NODE:
-                                text += node.data
-                            else:
-                                text += node.toxml()
+                    if 'align' not in attrs:
+                        attrs['align'] = 1.0
+                elif not text:
+                    for node in node.childNodes:
+                        if node.nodeType == node.TEXT_NODE:
+                            text += node.data
+                        else:
+                            text += node.toxml()
                 if not text:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
@@ -671,12 +674,9 @@ class ParserForm(ParserInterface):
                 if attrs.get('string'):
                     text = attrs['string']
 
-                if text:
-                    frame = Frame(text, attrs)
-                    frame.add(widget)
-                    button_list.append(frame)
-                else:
-                    frame = widget
+                frame = Frame(text, attrs)
+                frame.add(widget)
+                button_list.append(frame)
                 container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
                         expand=int(attrs.get('expand', 0)),
                         rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
