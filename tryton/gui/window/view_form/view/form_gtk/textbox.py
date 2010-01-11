@@ -35,6 +35,7 @@ class TextBox(WidgetInterface):
         self.scrolledwindow.show_all()
 
         self.widget.pack_start(self.scrolledwindow)
+        self.lang = None
 
     def grab_focus(self):
         return self.textview.grab_focus()
@@ -52,22 +53,26 @@ class TextBox(WidgetInterface):
                 spell = gtkspell.get_from_text_view(self.textview)
             except:
                 pass
-            if spell:
-                spell.detach()
-                del spell
+
             if not value and self.attrs.get('spell') \
                     and CONFIG['client.spellcheck'] \
                     and self._view and self._view.model:
                 language = self._view.model.expr_eval(self.attrs['spell'])
                 try:
-                    spell = gtkspell.Spell(self.textview)
-                    try:
-                        spell.set_language(language)
-                    except:
-                        spell.detach()
-                        del spell
+                    if not spell:
+                        spell = gtkspell.Spell(self.textview)
+                    if self.lang != language:
+                        try:
+                            spell.set_language(language)
+                        except:
+                            spell.detach()
+                            del spell
+                        self.lang = language
                 except:
                     pass
+            elif spell:
+                spell.detach()
+                del spell
 
     def _color_widget(self):
         return self.textview
@@ -95,22 +100,25 @@ class TextBox(WidgetInterface):
                 spell = gtkspell.get_from_text_view(self.textview)
             except:
                 pass
-            if spell:
-                spell.detach()
-                del spell
 
             if self.attrs.get('spell') and CONFIG['client.spellcheck'] \
                     and self._view and self._view.model:
                 language = self._view.model.expr_eval(self.attrs['spell'])
                 try:
-                    spell = gtkspell.Spell(self.textview)
-                    try:
-                        spell.set_language(language)
-                    except:
-                        spell.detach()
-                        del spell
+                    if not spell:
+                        spell = gtkspell.Spell(self.textview)
+                    if self.lang != language:
+                        try:
+                            spell.set_language(language)
+                        except:
+                            spell.detach()
+                            del spell
+                        self.lang = language
                 except:
                     pass
+            elif spell:
+                spell.detach()
+                del spell
 
     def display_value(self):
         lines = (self._view.modelfield.get_client(self._view.model) or '').split('\n')
