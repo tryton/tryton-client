@@ -163,12 +163,15 @@ class DateEntry(gtk.Entry):
             n = len(val)
             val = val.strip()
             val = val.strip('_')
-            val = val.lstrip('0')
+            if n != 4:
+                val = val.lstrip('0')
             if not val:
                 continue
             fchar = '0'
             if n == 4:
                 fchar = '_'
+                if len(val) == 1:
+                    val = '0' + val
             val = (fchar * (n - len(val))) + val
             start = match.start(i + 1)
             end = match.end(i + 1)
