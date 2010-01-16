@@ -5,11 +5,10 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.config import CONFIG
 
-HAS_GTKSPELL = True
 try:
     import gtkspell
 except:
-    HAS_GTKSPELL = False
+    gtkspell = None
 
 
 class TextBox(WidgetInterface):
@@ -47,7 +46,7 @@ class TextBox(WidgetInterface):
             self.widget.set_focus_chain([])
         else:
             self.widget.set_focus_chain([self.textview])
-        if HAS_GTKSPELL:
+        if gtkspell:
             spell = None
             try:
                 spell = gtkspell.get_from_text_view(self.textview)
@@ -94,7 +93,7 @@ class TextBox(WidgetInterface):
         iter_start = buf.get_start_iter()
         buf.insert(iter_start, value)
 
-        if HAS_GTKSPELL:
+        if gtkspell:
             spell = None
             try:
                 spell = gtkspell.get_from_text_view(self.textview)

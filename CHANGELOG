@@ -1,3 +1,4 @@
+* Don't show "Spell Checking" option if gtkspell is not present
 * Use the same internal model for many2many and one2many fields
 * Remove egenix-mx-base and replace it by python-dateutil
 * Add cache to safe_eval

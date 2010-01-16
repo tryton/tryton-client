@@ -32,6 +32,10 @@ try:
     import igemacintegration
 except ImportError:
     igemacintegration = None
+try:
+    import gtkspell
+except:
+    gtkspell = None
 
 _ = gettext.gettext
 
@@ -678,15 +682,16 @@ class Main(object):
         if CONFIG['client.save_width_height']:
             checkmenuitem_save_width_height.set_active(True)
 
-        checkmenuitem_spellcheck = gtk.CheckMenuItem(_('Spell Checking'))
-        checkmenuitem_spellcheck.connect('activate',
-                lambda menuitem: CONFIG.__setitem__('client.spellcheck',
-                    menuitem.get_active()))
-        checkmenuitem_spellcheck.set_accel_path(
-                '<tryton>/Options/Form/Spell Checking')
-        menu_form.add(checkmenuitem_spellcheck)
-        if CONFIG['client.spellcheck']:
-            checkmenuitem_spellcheck.set_active(True)
+        if gtkspell:
+            checkmenuitem_spellcheck = gtk.CheckMenuItem(_('Spell Checking'))
+            checkmenuitem_spellcheck.connect('activate',
+                    lambda menuitem: CONFIG.__setitem__('client.spellcheck',
+                        menuitem.get_active()))
+            checkmenuitem_spellcheck.set_accel_path(
+                    '<tryton>/Options/Form/Spell Checking')
+            menu_form.add(checkmenuitem_spellcheck)
+            if CONFIG['client.spellcheck']:
+                checkmenuitem_spellcheck.set_active(True)
 
         menuitem_tab = gtk.MenuItem(_('Tabs Position'))
         menu_form.add(menuitem_tab)
