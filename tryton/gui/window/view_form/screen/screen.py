@@ -631,14 +631,17 @@ class Screen(SignalEvent):
         if self.current_model in self.models.models:
             inc = 1
             if self.current_view.view_type == 'tree':
-                start, end = self.current_view.widget_tree.get_visible_range()
-                inc += end[0] - start[0]
-                if inc >= 4 and start[0] > 0:
-                    inc -= 3
-                vadjustment = self.current_view.widget_tree.get_vadjustment()
-                if vadjustment.value:
-                    vadjustment.value = vadjustment.value - \
-                            vadjustment.page_increment
+                range = self.current_view.widget_tree.get_visible_range()
+                if range:
+                    start, end = range
+                    inc += end[0] - start[0]
+                    if inc >= 4 and start[0] > 0:
+                        inc -= 3
+                    vadjustment = \
+                            self.current_view.widget_tree.get_vadjustment()
+                    if vadjustment.value:
+                        vadjustment.value = vadjustment.value - \
+                                vadjustment.page_increment
             idx = self.models.models.index(self.current_model) - inc
             if idx < 0:
                 idx = 0
