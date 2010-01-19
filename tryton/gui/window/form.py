@@ -376,7 +376,7 @@ class Form(SignalEvent):
             for model in self.screen.models:
                 if model.id == obj_id:
                     self.screen.current_model = model
-                    self.screen.display()
+                    self.screen.display(set_cursor=True)
                     break
         self.message_info('')
         return True
