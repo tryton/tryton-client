@@ -642,8 +642,8 @@ class ViewList(ParserView):
                 if column.get_visible() and editable:
                     focus_column = column
                     break
-            self.widget_tree.set_cursor(path, focus_column, new)
             self.widget_tree.scroll_to_cell(path, focus_column, use_align=False)
+            self.widget_tree.set_cursor(path, focus_column, new)
 
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
