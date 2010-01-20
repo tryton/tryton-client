@@ -172,10 +172,13 @@ class Image(gtk.Image):
 class Frame(gtk.Frame):
 
     def __init__(self, label=None, attrs=None):
+        if not label: # label must be None to have no label widget
+            label = None
         super(Frame, self).__init__(label=label)
         self.attrs = attrs or {}
         if not label:
             self.set_shadow_type(gtk.SHADOW_NONE)
+        self.set_border_width(0)
 
     def state_set(self, model):
         if model:
