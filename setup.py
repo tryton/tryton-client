@@ -115,6 +115,7 @@ dist = setup(name=PACKAGE,
     install_requires=[
 #        "pygtk >= 2.0",
         "python-dateutil",
+        "simplejson",
     ],
     extras_require={
         'timezone': ['pytz'],

@@ -6,6 +6,7 @@ import tryton.rpc as rpc
 from tryton.wizard import Wizard
 from tryton.common import message, error, selection, file_open, mailto
 from tryton.gui.window import Window
+from tryton.pyson import PYSONDecoder
 import gettext
 import tempfile
 import base64
@@ -129,27 +130,22 @@ class Action(object):
             }
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
-            eval_ctx['datetime'] = datetime
-            action_ctx = common.safe_eval(action.get('context') or '{}',
-                    eval_ctx)
+            action_ctx = PYSONDecoder(eval_ctx).decode(
+                    action.get('pyson_context') or '{}')
             ctx.update(action_ctx)
             ctx.update(context)
 
             domain_context = ctx.copy()
             domain_context['context'] = ctx
-            domain_context['time'] = time
-            domain_context['datetime'] = datetime
-            domain = common.safe_eval(action['domain'], domain_context)
+            domain = PYSONDecoder(domain_context).decode(action['pyson_domain'])
 
             if datas.get('domain', False):
                 domain.append(datas['domain'])
 
             search_context = ctx.copy()
             search_context['context'] = ctx
-            search_context['time'] = time
-            search_context['datetime'] = datetime
-            search_value = common.safe_eval(action['search_value'] or '{}',
-                    search_context)
+            search_value = PYSONDecoder(search_context).decode(
+                    action['pyson_search_value'] or '{}')
 
             name = False
             if action.get('window_name', True):

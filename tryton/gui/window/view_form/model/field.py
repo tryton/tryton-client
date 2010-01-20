@@ -2,8 +2,8 @@
 #this repository contains the full copyright notices and license terms.
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, safe_eval, \
-        datetime_strftime
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime
+from tryton.pyson import PYSONDecoder
 import time
 import datetime
 from decimal import Decimal
@@ -42,30 +42,14 @@ class CharField(object):
         model.on_change_with(self.name)
 
     def domain_get(self, model):
-        dom = self.attrs.get('domain', [])
-        def eval_domain(domain):
-            res = []
-            for arg in domain:
-                if isinstance(arg, basestring):
-                    if arg in ('AND', 'OR'):
-                        res.append(arg)
-                    else:
-                        res.append(model.expr_eval(arg))
-                elif isinstance(arg, tuple):
-                    res.append(arg)
-                elif isinstance(arg, list):
-                    res.append(eval_domain(arg))
-            return res
-        return eval_domain(dom)
+        return model.expr_eval(self.attrs.get('domain', []))
 
     def context_get(self, model, check_load=True, eval_context=True):
         context = {}
         context.update(self.parent.context)
         if eval_context:
-            field_context_str = self.attrs.get('context', '{}') or '{}'
-            field_context = model.expr_eval('dict(%s)' % field_context_str,
-                    check_load=check_load)
-            context.update(field_context)
+            context.update(model.expr_eval(self.attrs.get('context', {}),
+                check_load=check_load))
         return context
 
     def validate(self, model):
@@ -124,40 +108,19 @@ class CharField(object):
         return False
 
     def state_set(self, model, states=('readonly', 'required', 'invisible')):
-        state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            try:
-                state_changes = safe_eval(state_changes)
-            except:
-                return
+        state_changes = model.expr_eval(self.attrs.get('states', {}),
+                check_load=False)
         for key in states:
             if key == 'readonly' and self.attrs.get(key, False):
                 continue
             if key in state_changes:
-                try:
-                    self.get_state_attrs(model)[key] = \
-                            model.expr_eval(state_changes[key],
-                                    check_load=False)
-                except:
-                    log = logging.getLogger('record')
-                    log.error("Unable to eval %s for field %s (record: %s@%s)"% \
-                                  (state_changes[key], self.name, model.id,
-                                   model.resource))
-                    continue
+                self.get_state_attrs(model)[key] = state_changes[key]
             elif key in self.attrs:
                 self.get_state_attrs(model)[key] = self.attrs[key]
         if model.mgroup.readonly:
             self.get_state_attrs(model)['readonly'] = True
         if 'value' in state_changes:
-            try:
-                value = model.expr_eval(state_changes['value'],
-                        check_load=False)
-            except:
-                log = logging.getLogger('record')
-                log.error("Unable to eval %s for field %s (record: %s@%s)"% \
-                              (state_changes['value'], self.name, model.id,
-                               model.resource))
-                return
+            value = state_changes['value']
             if value:
                 self.set(model, value, modified=True)
 
@@ -217,10 +180,7 @@ class FloatField(CharField):
         internal = model.value[self.name]
         prev_modified = model.modified
         self.set(model, value)
-        if isinstance(self.attrs.get('digits'), str):
-            digits = model.expr_eval(self.attrs['digits'])
-        else:
-            digits = self.attrs.get('digits', (12, 2))
+        digits = model.expr_eval(self.attrs.get('digits', (12, 2)))
         if abs(float(internal or 0.0) - float(model.value[self.name] or 0.0)) \
                 >= (10.0**(-int(digits[1]))):
             if not self.get_state_attrs(model).get('readonly', False):
@@ -241,10 +201,7 @@ class NumericField(CharField):
         internal = model.value[self.name]
         prev_modified = model.modified
         self.set(model, value)
-        if isinstance(self.attrs.get('digits'), str):
-            digits = model.expr_eval(self.attrs['digits'])
-        else:
-            digits = self.attrs.get('digits', (12, 2))
+        digits = model.expr_eval(self.attrs.get('digits', (12, 2)))
         if abs((internal or Decimal('0.0')) - (model.value[self.name] or Decimal('0.0'))) \
                 >= Decimal(str(10.0**(-int(digits[1])))):
             if not self.get_state_attrs(model).get('readonly', False):

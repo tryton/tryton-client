@@ -8,6 +8,7 @@ Prerequisites
  * pygtk 2.0 or later (http://www.pygtk.org/)
  * librsvg (http://librsvg.sourceforge.net/)
  * python-dateutil (http://labix.org/python-dateutil)
+ * simplejson (http://undefined.org/python/#simplejson)
  * Optional: pytz (http://pytz.sourceforge.net/)
 
 Installation

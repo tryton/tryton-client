@@ -12,6 +12,7 @@ from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.action import Action
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.pyson import PYSONEncoder
 import pango
 
 _ = gettext.gettext
@@ -477,9 +478,10 @@ class Many2One(WidgetInterface):
             return False
         screen = Screen(self.attrs['relation'], self._window)
         screen.load([obj_id])
-        act['domain'] = str(screen.current_model.expr_eval(act.get('domain', []),
-                check_load=False))
-        act['context'] = str(screen.current_model.expr_eval(
+        encoder = PYSONEncoder()
+        act['domain'] = encoder.encode(screen.current_model.expr_eval(
+            act.get('domain', []), check_load=False))
+        act['context'] = encoder.encode(screen.current_model.expr_eval(
             act.get('context', {}), check_load=False))
         data['model'] = self.model_type
         data['id'] = obj_id

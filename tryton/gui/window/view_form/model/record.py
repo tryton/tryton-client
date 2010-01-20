@@ -5,22 +5,42 @@ import time
 from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
+from tryton.pyson import PYSONDecoder
 import field
 import datetime
 import tryton.common as common
 import logging
 
 
-class EvalEnvironment(object):
+class EvalEnvironment(dict):
 
     def __init__(self, parent, check_load):
+        super(EvalEnvironment, self).__init__()
         self.parent = parent
         self.check_load = check_load
 
-    def __getattr__(self, item):
+    def __getitem__(self, item):
         if item == '_parent_' + self.parent.parent_name and self.parent.parent:
             return EvalEnvironment(self.parent.parent)
         return self.parent.get_eval(check_load=self.check_load)[item]
+
+    def __getattr__(self, item):
+        return self.__getitem__(item)
+
+    def get(self, item, default=None):
+        try:
+            return self.__getattr__(item)
+        except:
+            pass
+        return super(EvalEnvironment, self).get(item, default)
+
+    def __nonzero__(self):
+        return True
+
+    def __str__(self):
+        return str(self.parent)
+
+    __repr__ = __str__
 
 
 class ModelRecord(SignalEvent):
@@ -330,35 +350,43 @@ class ModelRecord(SignalEvent):
             self.set(value)
             self.validate()
 
-    def expr_eval(self, dom, check_load=False):
-        if not isinstance(dom, basestring):
-            return dom
+    def expr_eval(self, expr, check_load=False):
+        if not isinstance(expr, basestring):
+            return expr
         if check_load:
             self._check_load()
         ctx = rpc.CONTEXT.copy()
         for name, mfield in self.mgroup.mfields.items():
             ctx[name] = mfield.get_eval(self, check_load=check_load)
 
-        ctx['current_date'] = datetime.datetime.today()
-        ctx['time'] = time
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
         ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
             ctx['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
                     check_load)
-        val = common.safe_eval(dom, ctx)
+        val = PYSONDecoder(ctx).decode(expr)
         return val
 
+    def _get_on_change_args(self, args):
+        res = {}
+        values = {}
+        for name, mfield in self.mgroup.mfields.items():
+            values[name] = mfield.get_eval(self, check_load=False)
+        if self.parent and self.parent_name:
+            values['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
+                    False)
+        for arg in args:
+            scope = values
+            for i in arg.split('.'):
+                scope = scope.get(i, {})
+            res[arg] = scope or False
+        return res
+
     def on_change(self, fieldname, attr):
-        args = {}
         if isinstance(attr, basestring):
-            attr = common.safe_eval(attr)
-        for arg in attr:
-            try:
-                args[arg] = self.expr_eval(arg)
-            except:
-                args[arg] = False
+            attr = PYSONDecoder().decode(attr)
+        args = self._get_on_change_args(attr)
         ids = [self.id]
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
@@ -404,12 +432,7 @@ class ModelRecord(SignalEvent):
                 continue
             if field_name == fieldname:
                 continue
-            args = {}
-            for arg in on_change_with:
-                try:
-                    args[arg] = self.expr_eval(arg)
-                except:
-                    args[arg] = False
+            args = self._get_on_change_args(on_change_with)
             ids = [self.id]
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())

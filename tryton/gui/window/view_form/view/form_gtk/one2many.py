@@ -517,8 +517,7 @@ class One2Many(WidgetInterface):
     def _sig_new(self, widget):
         self._view.view_form.set_value()
         ctx = self._view.model.expr_eval(self.screen.default_get)
-        ctx.update(self._view.model.expr_eval('dict(%s)' % \
-                self.attrs.get('context', '')))
+        ctx.update(self._view.model.expr_eval(self.attrs.get('context', {})))
         sequence = None
         idx = -1
         if self.screen.current_view.view_type == 'tree':

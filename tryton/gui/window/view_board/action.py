@@ -10,6 +10,7 @@ from tryton.gui.window.win_search import WinSearch
 from tryton.action import Action as Action2
 from tryton.gui.window.view_tree.view_tree import ViewTree
 import tryton.common as common
+from tryton.pyson import PYSONDecoder
 import gettext
 _LIMIT = 2000
 _ = gettext.gettext
@@ -43,19 +44,19 @@ class Action(object):
 
         self.action.setdefault('domain', '[]')
         self.context = {'active_id': False, 'active_ids': []}
-        self.context.update(common.safe_eval(self.action.get('context', '{}'),
-            self.context.copy()))
+        self.context.update(PYSONDecoder(self.context).decode(
+            self.action.get('context', '{}')))
 
         eval_ctx = self.context.copy()
         eval_ctx['datetime'] = datetime
-        self.context.update(common.safe_eval(self.action.get('context', '{}'),
-            eval_ctx))
+        self.context.update(PYSONDecoder(eval_ctx).decode(
+            self.action.get('context', '{}')))
 
         domain_ctx = self.context.copy()
         domain_ctx['time'] = time
         domain_ctx['datetime'] = datetime
-        self.domain = common.safe_eval(self.action['domain'] or '[]',
-                domain_ctx)
+        self.domain = PYSONDecoder(domain_ctx).decode(
+                self.action['domain'] or '[]')
 
 
         self.widget = gtk.Frame()

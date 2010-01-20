@@ -30,6 +30,7 @@ from tryton.common.cellrendererinteger import CellRendererInteger
 from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.action import Action
 from tryton.translate import date_format
+from tryton.pyson import PYSONDecoder
 import gettext
 
 _ = gettext.gettext
@@ -84,12 +85,8 @@ class ParserTree(ParserInterface):
             treeview = gtk.TreeView()
             treeview.cells = {}
         treeview.sequence = attrs.get('sequence', False)
-        treeview.colors = {}
+        treeview.colors = attrs.get('colors', '"black"')
         self.treeview = treeview
-        for color_spec in attrs.get('colors', '').split(';'):
-            if color_spec:
-                colour, test = color_spec.split(':')
-                self.treeview.colors[colour] = test
         treeview.set_property('rules-hint', True)
         if not self.title:
             self.title = attrs.get('string', 'Unknown')
@@ -312,12 +309,7 @@ class Char(object):
         cell.set_property('xalign', align)
 
     def get_color(self, model):
-        to_display = ''
-        for color, expr in self.treeview.colors.items():
-            if model.expr_eval(expr, check_load=False):
-                to_display = str(color)
-                break
-        return to_display or 'black'
+        return model.expr_eval(self.treeview.colors, check_load=False)
 
     def open_remote(self, model, create, changed=False, text=None):
         raise NotImplementedError
@@ -833,15 +825,11 @@ class Button(object):
         store = self.treeview.get_model()
         model = store.get_value(store.get_iter(path), 0)
 
-        state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            state_changes = common.safe_eval(state_changes)
-        if 'invisible' in state_changes:
-            if model.expr_eval(state_changes['invisible'], check_load=False):
-                return True
-        if 'readonly' in state_changes:
-            if model.expr_eval(state_changes['readonly'], check_load=False):
-                return True
+        state_changes = PYSONDecoder().decode(model.expr_eval(
+            self.attrs.get('states', {}), check_load=False))
+        if state_changes.get('invisible') \
+                or state_changes.get('readonly'):
+            return True
 
         self.screen.current_model = model
         obj_id = self.screen.save_current()

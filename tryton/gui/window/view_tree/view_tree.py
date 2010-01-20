@@ -12,6 +12,7 @@ import locale
 from tryton.common import HM_FORMAT
 import tryton.common as common
 from tryton.translate import date_format
+from tryton.pyson import PYSONDecoder
 
 FIELDS_LIST_TYPE = {
     'boolean': gobject.TYPE_BOOLEAN,
@@ -121,7 +122,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                 digits = self.fields_type[field].get('digits', (16, 2))
                 for obj in res_ids:
                     if isinstance(digits, str):
-                        digits = eval(digits, obj)
+                        digits = PYSONDecoder(obj).decode(digits)
                     obj[field] = locale.format('%.' + str(digits[1]) + 'f',
                             round(obj[field] or 0.0, digits[1]), True)
             elif field_type in ('integer',):

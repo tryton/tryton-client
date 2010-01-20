@@ -7,6 +7,7 @@ import tryton.rpc as rpc
 from interface import ParserView
 from tryton.action import Action
 from tryton.config import CONFIG
+from tryton.pyson import PYSONEncoder
 
 _ = gettext.gettext
 
@@ -169,14 +170,15 @@ class ViewForm(ParserView):
                 message(_('You must select a record ' \
                         'to be able to use the relate button !'), self.window)
                 return False
-            if 'domain' in act:
-                act['domain'] = str(
+            encoder = PYSONEncoder()
+            if 'pyson_domain' in act:
+                act['pyson_domain'] = encoder.encode(
                         self.screen.current_model.expr_eval(
-                                act['domain'], check_load=False))
-            if 'context' in act:
-                act['context'] = str(
+                                act['pyson_domain'], check_load=False))
+            if 'pyson_context' in act:
+                act['pyson_context'] = encoder.encode(
                         self.screen.current_model.expr_eval(
-                            act['context'], check_load=False))
+                            act['pyson_context'], check_load=False))
         data = {
             'model': self.screen.name,
             'id': obj_id,

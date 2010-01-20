@@ -90,75 +90,29 @@ class Button(object):
             self.form.screen.display()
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        if isinstance(state_changes, basestring):
-            try:
-                state_changes = common.safe_eval(state_changes)
-            except:
-                self.widget.show()
-                self.widget.set_sensitive(True)
-                return
-        if 'invisible' in state_changes:
-            try:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.widget.hide()
-                    else:
-                        self.widget.show()
-            except:
-                log = logging.getLogger('record')
-                log.error("Unable to eval '%s' for button %s (record: %s@%s)"% \
-                              (state_changes['invisible'],
-                               self.attrs.get('string', _('Unknown')),
-                               model and model.id or _('Unknown'),
-                               model and model.resource or _('Unknown'),
-                               ))
-                self.widget.show()
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.widget.hide()
         else:
             self.widget.show()
-        if 'readonly' in state_changes:
-            try:
-                if model and model.expr_eval(state_changes['readonly'],
-                        check_load=False):
-                    self.widget.set_sensitive(False)
-                else:
-                    self.widget.set_sensitive(True)
-            except:
-                log = logging.getLogger('record')
-                log.error("Unable to eval '%s' for button %s (record: %s@%s)"% \
-                              (state_changes['readonly'],
-                               self.attrs.get('string', _('Unknown')),
-                               model and model.id or _('Unknown'),
-                               model and model.resource or _('Unknown'),
-                               ))
-
-                self.widget.set_sensitive(True)
-        else:
-            self.widget.set_sensitive(True)
+        self.widget.set_sensitive(not state_changes.get('readonly', False))
         if 'icon' in state_changes:
-            try:
-                stock = model and model.expr_eval(
-                    state_changes['icon'], check_load=False)
-                if stock:
-                    try:
-                        icon = gtk.Image()
-                        icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
-                        self.widget.set_image(icon)
-                    except:
-                        log = logging.getLogger('common')
-                        log.warning(_('Wrong icon for the button!'))
-                else:
-                    self.widget.set_image(gtk.Image())
-            except:
-                log = logging.getLogger('record')
-                log.error("Unable to eval '%s' for button %s (record: %s@%s)"% \
-                              (state_changes['icon'],
-                               self.attrs.get('string', _('Unknown')),
-                               model and model.id or _('Unknown'),
-                               model and model.resource or _('Unknown'),
-))
+            stock = state_changes['icon']
+            if stock:
+                try:
+                    icon = gtk.Image()
+                    icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                    self.widget.set_image(icon)
+                except:
+                    log = logging.getLogger('common')
+                    log.warning(_('Wrong icon for the button!'))
+            else:
                 self.widget.set_image(gtk.Image())
+
 
 class Label(gtk.Label):
 
@@ -167,27 +121,14 @@ class Label(gtk.Label):
         self.attrs = attrs or {}
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
-                state_changes = common.safe_eval(state_changes)
-            if 'invisible' in state_changes:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.hide()
-                    else:
-                        self.show()
-            else:
-                self.show()
-        except:
-            log = logging.getLogger('record')
-            log.error("Unable to eval '%s' for label %s (record: %s@%s)"% \
-                          (state_changes['invisible'],
-                           self.attrs.get('string', _('Unknown')),
-                           model and model.id or _('Unknown'),
-                           model and model.resource or _('Unknown'),
-                           ))
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.hide()
+        else:
             self.show()
 
 
@@ -198,28 +139,16 @@ class VBox(gtk.VBox):
         self.attrs = attrs or {}
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
-                state_changes = common.safe_eval(state_changes)
-            if 'invisible' in state_changes:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.hide()
-                    else:
-                        self.show()
-            else:
-                self.show()
-        except:
-            log = logging.getLogger('record')
-            log.error("Unable to eval '%s' for separator %s (record: %s@%s)"% \
-                          (state_changes['invisible'],
-                           self.attrs.get('string', _('Unknown')),
-                           model and model.id or _('Unknown'),
-                           model and model.resource or _('Unknown'),
-                           ))
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.hide()
+        else:
             self.show()
+
 
 class Image(gtk.Image):
 
@@ -228,28 +157,16 @@ class Image(gtk.Image):
         self.attrs = attrs or {}
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
-                state_changes = common.safe_eval(state_changes)
-            if 'invisible' in state_changes:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.hide()
-                    else:
-                        self.show()
-            else:
-                self.show()
-        except:
-            log = logging.getLogger('record')
-            log.error("Unable to eval '%s' for image %s (record: %s@%s)"% \
-                          (state_changes['invisible'],
-                           self.attrs.get('string', _('Unknown')),
-                           model and model.id or _('Unknown'),
-                           model and model.resource or _('Unknown'),
-                           ))
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.hide()
+        else:
             self.show()
+        state_changes = self.attrs.get('states', {})
 
 
 class Frame(gtk.Frame):
@@ -261,27 +178,14 @@ class Frame(gtk.Frame):
             self.set_shadow_type(gtk.SHADOW_NONE)
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
-                state_changes = common.safe_eval(state_changes)
-            if 'invisible' in state_changes:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.hide()
-                    else:
-                        self.show()
-            else:
-                self.show()
-        except:
-            log = logging.getLogger('record')
-            log.error("Unable to eval '%s' for group %s (record: %s@%s)"% \
-                          (state_changes['invisible'],
-                           self.attrs.get('string', _('Unknown')),
-                           model and model.id or _('Unknown'),
-                           model and model.resource or _('Unknown'),
-                           ))
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.hide()
+        else:
             self.show()
 
 
@@ -293,27 +197,14 @@ class ScrolledWindow(gtk.ScrolledWindow):
         self.attrs = attrs or {}
 
     def state_set(self, model):
-        state_changes = self.attrs.get('states', {})
-        try:
-            if isinstance(state_changes, basestring):
-                state_changes = common.safe_eval(state_changes)
-            if 'invisible' in state_changes:
-                if model:
-                    if model.expr_eval(state_changes['invisible'],
-                        check_load=False):
-                        self.hide()
-                    else:
-                        self.show()
-            else:
-                self.show()
-        except:
-            log = logging.getLogger('record')
-            log.error("Unable to eval '%s' for page %s (record: %s@%s)"% \
-                          (state_changes['invisible'],
-                           self.attrs.get('string', _('Unknown')),
-                           model and model.id or _('Unknown'),
-                           model and model.resource or _('Unknown'),
-                           ))
+        if model:
+            state_changes = model.expr_eval(self.attrs.get('states', {}),
+                    check_load=False)
+        else:
+            state_changes = {}
+        if state_changes.get('invisible', False):
+            self.hide()
+        else:
             self.show()
 
 
