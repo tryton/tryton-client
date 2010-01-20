@@ -79,6 +79,10 @@ elif os.name == 'mac' \
 
 execfile(os.path.join('tryton', 'version.py'))
 
+SIMPLEJSON = []
+if sys.version_info < (2, 6):
+    SIMPLEJSON = ['simplejson']
+
 dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
@@ -115,8 +119,7 @@ dist = setup(name=PACKAGE,
     install_requires=[
 #        "pygtk >= 2.0",
         "python-dateutil",
-        "simplejson",
-    ],
+    ] + SIMPLEJSON,
     extras_require={
         'timezone': ['pytz'],
     },

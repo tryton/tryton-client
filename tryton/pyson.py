@@ -1,9 +1,10 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-try:
-    import json
-except ImportError:
+import sys
+if sys.version_info < (2, 6):
     import simplejson as json
+else:
+    import json
 import datetime
 
 
