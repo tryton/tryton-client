@@ -79,19 +79,21 @@ class ModelRecord(SignalEvent):
     def __getitem__(self, name):
         if name not in self._loaded and self.id > 0:
             ids =  [self.id]
-            idx = self.mgroup.models.index(self)
-            length = len(self.mgroup.models)
-            n = 1
-            while len(ids) < 80 and (idx - n >= 0 or idx + n < length) and n < 100:
-                if idx - n >= 0:
-                    model = self.mgroup.models[idx - n]
-                    if name not in model._loaded and model.id > 0:
-                        ids.append(model.id)
-                if idx + n < length:
-                    model = self.mgroup.models[idx + n]
-                    if name not in model._loaded and model.id > 0:
-                        ids.append(model.id)
-                n += 1
+            if self in self.mgroup.models:
+                idx = self.mgroup.models.index(self)
+                length = len(self.mgroup.models)
+                n = 1
+                while len(ids) < 80 and (idx - n >= 0 or \
+                        idx + n < length) and n < 100:
+                    if idx - n >= 0:
+                        model = self.mgroup.models[idx - n]
+                        if name not in model._loaded and model.id > 0:
+                            ids.append(model.id)
+                    if idx + n < length:
+                        model = self.mgroup.models[idx + n]
+                        if name not in model._loaded and model.id > 0:
+                            ids.append(model.id)
+                    n += 1
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
             args = (ids, self.mgroup.mfields.keys() + \
@@ -111,11 +113,17 @@ class ModelRecord(SignalEvent):
                     values = [{'id': x} for x in ids]
             model_set = None
             id2value = dict((value['id'], value) for value in values)
-            for model in self.mgroup.models:
-                value = id2value.get(model.id)
+            if ids != [self.id]:
+                for model in self.mgroup.models:
+                    value = id2value.get(model.id)
+                    if value:
+                        model.set(value, signal=False)
+                        model_set = model
+            else:
+                value = id2value.get(self.id)
                 if value:
-                    model.set(value, signal=False)
-                    model_set = model
+                    self.set(value, signal=False)
+                    model_set = self
             if model_set:
                 model_set.signal('record-changed')
         return self.mgroup.mfields.get(name, False)
