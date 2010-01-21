@@ -122,8 +122,7 @@ class Action(object):
             elif action.get('view_id', False):
                 view_ids = [action['view_id'][0]]
 
-            if not action.get('domain', False):
-                action['domain'] = '[]'
+            action.setdefault('pyson_domain', '[]')
             ctx = {
                 'active_id': datas.get('id',False),
                 'active_ids': datas.get('ids',[]),
