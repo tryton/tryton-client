@@ -364,8 +364,11 @@ class ModelRecord(SignalEvent):
         for arg in args:
             scope = values
             for i in arg.split('.'):
-                scope = scope.get(i, {})
-            res[arg] = scope or False
+                if i not in scope:
+                    scope = False
+                    break
+                scope = scope[i]
+            res[arg] = scope
         return res
 
     def on_change(self, fieldname, attr):
