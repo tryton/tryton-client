@@ -440,7 +440,7 @@ class ParserForm(ParserInterface):
                                 tooltips=tooltips)
                 max_width, max_height = -1, -1
                 window_width, window_height = Main.get_main().window.get_size()
-                for i in range(notebook.get_n_pages()):
+                for i in xrange(notebook.get_n_pages()):
                     width, height = notebook.get_nth_page(i)\
                             .get_child().get_child().size_request()
                     if width > max_width and width < window_width - 50:
@@ -484,7 +484,7 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
 
@@ -556,7 +556,7 @@ class ParserForm(ParserInterface):
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 button_list += buttons
@@ -586,7 +586,7 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
@@ -602,7 +602,7 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
@@ -615,7 +615,7 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 paned.pack1(widget, resize=True, shrink=True)
@@ -627,7 +627,7 @@ class ParserForm(ParserInterface):
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 button_list += buttons
-                for widget_name, widgets in widgets.items():
+                for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 paned.pack2(widget, resize=True, shrink=True)

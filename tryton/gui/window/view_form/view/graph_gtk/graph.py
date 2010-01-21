@@ -166,7 +166,7 @@ class Graph(gtk.DrawingArea):
             base = 1
         else:
             base = 10**int(math.log(self.yrange, 10))
-        for i in range(int(self.yrange / base) + 1):
+        for i in xrange(int(self.yrange / base) + 1):
             val = int(self.minyval / base) * base + i * base
             h = (val - self.minyval) * self.yscale
             label = locale.format('%.2f', val, True)

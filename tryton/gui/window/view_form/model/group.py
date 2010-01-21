@@ -329,7 +329,7 @@ class ModelRecordGroup(SignalEvent):
 
     def add_fields_custom(self, fields, models):
         to_add = []
-        for field_add in fields.keys():
+        for field_add in fields.iterkeys():
             if not field_add in models.fields:
                 models.fields[field_add] = fields[field_add]
                 models.fields[field_add]['name'] = field_add

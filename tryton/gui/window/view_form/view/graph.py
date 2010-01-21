@@ -41,7 +41,7 @@ class ViewGraph(ParserView):
         self.display()
 
     def display(self):
-        for widget in self.widgets.values():
+        for widget in self.widgets.itervalues():
             widget.display(self.screen.models)
         return True
 

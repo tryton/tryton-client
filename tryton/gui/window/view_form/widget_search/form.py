@@ -227,14 +227,14 @@ class Form(object):
         self.focusable = parser.focusable
         self.id = 0
         self.name = parser.title
-        for i in self.widgets.values():
+        for i in self.widgets.itervalues():
             i[0].sig_activate(self.sig_activate)
         self.spin_limit.connect_after('activate', self.sig_activate)
         self.spin_offset.connect_after('activate', self.sig_activate)
 
     def clear(self):
         self.id = 0
-        for i in self.widgets.values():
+        for i in self.widgets.itervalues():
             i[0].clear()
 
     def limit_changed(self, widget):

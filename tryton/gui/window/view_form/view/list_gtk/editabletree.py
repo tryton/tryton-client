@@ -71,7 +71,7 @@ class EditableTreeView(gtk.TreeView):
     def __next_column(self, col):
         cols = self.get_columns()
         current = cols.index(col)
-        for i in range(len(cols)):
+        for i in xrange(len(cols)):
             idx = (current + i + 1) % len(cols)
             if not cols[idx].get_cell_renderers():
                 continue
@@ -90,7 +90,7 @@ class EditableTreeView(gtk.TreeView):
     def __prev_column(self, col):
         cols = self.get_columns()
         current = cols.index(col)
-        for i in range(len(cols)):
+        for i in xrange(len(cols)):
             idx = (current - (i + 1)) % len(cols)
             if not cols[idx].get_cell_renderers():
                 continue

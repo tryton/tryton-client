@@ -693,7 +693,7 @@ class Selection(Char):
             for dom in common.filter_domain(self.attrs.get('domain', [])):
                 if dom[1] in ('=', '!='):
                     todel = []
-                    for i in range(len(selection)):
+                    for i in xrange(len(selection)):
                         if (dom[1] == '=' \
                                 and selection[i][0] != dom[2]) \
                                 or (dom[1] == '!=' \

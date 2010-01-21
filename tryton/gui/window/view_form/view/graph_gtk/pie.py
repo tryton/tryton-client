@@ -67,7 +67,7 @@ class Pie(Graph):
     def updateGraph(self):
 
         self.sum = 0.0
-        for xkey in self.datas.keys():
+        for xkey in self.datas.iterkeys():
             key = self.yfields[0].get('key', self.yfields[0]['name'])
             if self.datas[xkey][key] > 0:
                 self.sum += self.datas[xkey][key]
@@ -75,7 +75,7 @@ class Pie(Graph):
         fraction = angle = 0.0
 
         self.slices = []
-        for xkey in self.datas.keys():
+        for xkey in self.datas.iterkeys():
             key = self.yfields[0].get('key', self.yfields[0]['name'])
             value = self.datas[xkey][key]
             if value > 0:

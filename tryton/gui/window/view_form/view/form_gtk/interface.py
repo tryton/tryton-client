@@ -48,8 +48,8 @@ def field_pref_set(field, name, model, value, client_value, dependance,
     res = dialog.run()
 
     clause = False
-    for val in widgets.keys():
-        if widgets[val].get_active():
+    for val, widget in widgets.iteritems():
+        if widget.get_active():
             clause = val[0] + '=' + str(val[1])
             break
     user = False
@@ -80,7 +80,7 @@ class WidgetInterface(object):
         self._window = window
         self._view = None
         self.attrs = attrs
-        for key, val in _ATTRS_BOOLEAN.items():
+        for key, val in _ATTRS_BOOLEAN.iteritems():
             self.attrs[key] = attrs.get(key, False) not in ('False', '0', False)
         self.default_readonly = self.attrs.get('readonly', False)
         self._menu_entries = [
@@ -115,7 +115,7 @@ class WidgetInterface(object):
 
     def _menu_sig_default_set(self, reset=False):
         deps = []
-        for wname, wviews in self._view.view_form.widgets.items():
+        for wname, wviews in self._view.view_form.widgets.iteritems():
             for wview in wviews:
                 if wview.modelfield.attrs.get('change_default', False):
                     wvalue = wview.modelfield.get(self._view.model)

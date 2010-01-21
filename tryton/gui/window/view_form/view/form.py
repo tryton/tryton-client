@@ -67,9 +67,9 @@ class ViewForm(ParserView):
         for button in self.buttons:
             button.form = self
 
-        self.widgets = dict([(name, [ViewWidget(self, widget, name)
+        self.widgets = dict((name, [ViewWidget(self, widget, name)
             for widget in widgets])
-            for name, widgets in children.items()])
+            for name, widgets in children.iteritems())
 
         vbox = gtk.VBox()
         vp = gtk.Viewport()
@@ -204,14 +204,14 @@ class ViewForm(ParserView):
         del self.buttons
 
     def cancel(self):
-        for widgets in self.widgets.values():
+        for widgets in self.widgets.itervalues():
             for widget in widgets:
                 widget.widget.cancel()
 
     def set_value(self):
         model = self.screen.current_model
         if model:
-            for widgets in self.widgets.values():
+            for widgets in self.widgets.itervalues():
                 for widget in widgets:
                     widget.set_value(model)
 
@@ -227,12 +227,12 @@ class ViewForm(ParserView):
 
     def reset(self):
         model = self.screen.current_model
-        for name, widgets in self.widgets.items():
+        for name, widgets in self.widgets.iteritems():
             for widget in widgets:
                 widget.reset(model)
 
     def signal_record_changed(self, *args):
-        for widgets in self.widgets.values():
+        for widgets in self.widgets.itervalues():
             for widget in widgets:
                 if hasattr(widget.widget, 'screen'):
                     for view in widget.widget.screen.views:
@@ -244,7 +244,7 @@ class ViewForm(ParserView):
             # Force to set mfields in model
             for field in model.mgroup.fields:
                 model[field].get(model, check_load=False)
-        for widgets in self.widgets.values():
+        for widgets in self.widgets.itervalues():
             for widget in widgets:
                 widget.display(model)
         for button in self.buttons:
@@ -258,12 +258,10 @@ class ViewForm(ParserView):
             if self.cursor_widget in self.widgets:
                 self.widgets[self.cursor_widget][0].widget.grab_focus()
         model = self.screen.current_model
-        position = 0
-        for widgets in self.widgets:
-            position += len(widgets)
+        position = reduce(lambda x, y: x + len(y), self.widgets, 0)
         focus_widget = None
         if model:
-            for widgets in self.widgets.values():
+            for widgets in self.widgets.itervalues():
                 for widget in widgets:
                     modelfield = model.mgroup.mfields.get(widget.widget_name, None)
                     if not modelfield:

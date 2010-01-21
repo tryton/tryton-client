@@ -383,7 +383,7 @@ class Screen(SignalEvent):
                 and not (hasattr(self.current_view.widget_tree, 'editable') \
                     and self.current_view.widget_tree.editable)) \
                 or self.current_view.view_type == 'graph'):
-            for i in range(len(self.views)):
+            for i in xrange(len(self.views)):
                 self.switch_view()
                 if self.current_view.view_type == 'form':
                     break

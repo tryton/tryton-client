@@ -243,8 +243,7 @@ class ModelRecord(SignalEvent):
 
     def validate_set(self):
         change = self._check_load()
-        for fname in self.mgroup.mfields:
-            mfield = self.mgroup.mfields[fname]
+        for mfield in self.mgroup.mfields.itervalues():
             change = change or \
                     not mfield.get_state_attrs(self).get('valid', True)
             mfield.get_state_attrs(self)['valid'] = True
@@ -255,8 +254,8 @@ class ModelRecord(SignalEvent):
     def validate(self):
         self._check_load()
         res = True
-        for fname in self.mgroup.mfields:
-            if not self.mgroup.mfields[fname].validate(self):
+        for mfield in self.mgroup.mfields.itervalues():
+            if not mfield.validate(self):
                 res = False
         return res
 
@@ -299,7 +298,7 @@ class ModelRecord(SignalEvent):
 
     def set(self, val, modified=False, signal=True):
         later = {}
-        for fieldname, value in val.items():
+        for fieldname, value in val.iteritems():
             if fieldname == '_timestamp':
                 self._timestamp = value
                 continue
@@ -320,7 +319,7 @@ class ModelRecord(SignalEvent):
                         value = ref_model, (ref_id, ref_id)
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
             self._loaded.add(fieldname)
-        for fieldname, value in later.items():
+        for fieldname, value in later.iteritems():
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
             self._loaded.add(fieldname)
         self.modified = modified
@@ -356,7 +355,7 @@ class ModelRecord(SignalEvent):
     def _get_on_change_args(self, args):
         res = {}
         values = {}
-        for name, mfield in self.mgroup.mfields.items():
+        for name, mfield in self.mgroup.mfields.iteritems():
             values[name] = mfield.get_eval(self, check_load=False)
         if self.parent and self.parent_name:
             values['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
