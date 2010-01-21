@@ -42,21 +42,18 @@ class Action(object):
         if 'view_mode' in attrs:
             self.action['view_mode'] = attrs['view_mode']
 
-        self.action.setdefault('domain', '[]')
+        self.action.setdefault('pyson_domain', '[]')
         self.context = {'active_id': False, 'active_ids': []}
         self.context.update(PYSONDecoder(self.context).decode(
-            self.action.get('context', '{}')))
+            self.action.get('pyson_context', '{}')))
 
         eval_ctx = self.context.copy()
-        eval_ctx['datetime'] = datetime
         self.context.update(PYSONDecoder(eval_ctx).decode(
-            self.action.get('context', '{}')))
+            self.action.get('pyson_context', '{}')))
 
         domain_ctx = self.context.copy()
-        domain_ctx['time'] = time
-        domain_ctx['datetime'] = datetime
         self.domain = PYSONDecoder(domain_ctx).decode(
-                self.action['domain'] or '[]')
+                self.action['pyson_domain'])
 
 
         self.widget = gtk.Frame()
