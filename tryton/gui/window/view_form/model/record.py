@@ -58,7 +58,7 @@ class ModelRecord(SignalEvent):
         self.id = obj_id or ModelRecord.id
         if self.id < 0:
             ModelRecord.id -= 1
-        self._loaded = False
+        self._loaded = set()
         self.parent = parent
         self.parent_name = parent_name
         self.mgroup = group
@@ -77,7 +77,7 @@ class ModelRecord(SignalEvent):
                 self.value[key].model_add(mod)
 
     def __getitem__(self, name):
-        if not self._loaded and self.id > 0:
+        if name not in self._loaded and self.id > 0:
             ids =  [self.id]
             idx = self.mgroup.models.index(self)
             length = len(self.mgroup.models)
@@ -85,35 +85,40 @@ class ModelRecord(SignalEvent):
             while len(ids) < 80 and (idx - n >= 0 or idx + n < length) and n < 100:
                 if idx - n >= 0:
                     model = self.mgroup.models[idx - n]
-                    if not model._loaded:
+                    if name not in model._loaded and model.id > 0:
                         ids.append(model.id)
                 if idx + n < length:
                     model = self.mgroup.models[idx + n]
-                    if not model._loaded:
+                    if name not in model._loaded and model.id > 0:
                         ids.append(model.id)
                 n += 1
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
-            try:
-                values = self.rpc.read(ids, self.mgroup.mfields.keys() + \
+            args = (ids, self.mgroup.mfields.keys() + \
                         [x + '.rec_name' for x in self.mgroup.mfields.keys()
                             if self.mgroup.fields[x]['type'] \
                                     in ('many2one', 'reference')] + \
                         ['_timestamp'], ctx)
+            try:
+                values = self.rpc.read(*args)
             except Exception, exception:
-                if str(exception[0]) not in ('NotLogged', 'UserError'):
+                common.process_exception(exception, self.window)
+                try:
+                    values = self.rpc.read(args)
+                except:
                     log = logging.getLogger('record')
                     log.error('%s' % exception.args[-1])
-                values = [{'id': x} for x in ids]
+                    values = [{'id': x} for x in ids]
             model_set = None
             signal = True
             if len(values) > 10:
                 signal = False
-            for value in values:
-                for model in self.mgroup.models:
-                    if model.id == value['id']:
-                        model.set(value, signal=signal)
-                        model_set = model
+            id2value = dict((value['id'], value) for value in values)
+            for model in self.mgroup.models:
+                value = id2value.get(model.id)
+                if value:
+                    model.set(value, signal=signal)
+                    model_set = model
             if not signal and model_set:
                 model_set.signal('record-changed')
         return self.mgroup.mfields.get(name, False)
@@ -138,13 +143,13 @@ class ModelRecord(SignalEvent):
         return self.mgroup.mfields
 
     def _check_load(self):
-        if not self._loaded:
+        if not self.loaded:
             self.reload()
             return True
         return False
 
     def get_loaded(self):
-        return self._loaded
+        return set(self.mgroup.mfields.keys()) == self._loaded
 
     loaded = property(get_loaded)
 
@@ -175,7 +180,7 @@ class ModelRecord(SignalEvent):
         return value
 
     def cancel(self):
-        self._loaded = False
+        self._loaded.clear()
         self.reload()
 
     def get_timestamp(self):
@@ -210,7 +215,7 @@ class ModelRecord(SignalEvent):
             except Exception, exception:
                 if not common.process_exception(exception, self.window, *args):
                     return False
-        self._loaded = False
+        self._loaded.clear()
         if force_reload:
             self.reload()
         if self.mgroup:
@@ -288,7 +293,7 @@ class ModelRecord(SignalEvent):
                         value = ref_model, (ref_id, ref_id)
             self.mgroup.mfields[fieldname].set_default(self, value,
                     modified=modified)
-        self._loaded = True
+            self._loaded.add(fieldname)
         if signal:
             self.signal('record-changed')
 
@@ -314,9 +319,10 @@ class ModelRecord(SignalEvent):
                     else:
                         value = ref_model, (ref_id, ref_id)
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
+            self._loaded.add(fieldname)
         for fieldname, value in later.items():
             self.mgroup.mfields[fieldname].set(self, value, modified=modified)
-        self._loaded = True
+            self._loaded.add(fieldname)
         self.modified = modified
         if not self.modified:
             self.modified_fields = {}
@@ -326,29 +332,8 @@ class ModelRecord(SignalEvent):
     def reload(self):
         if self.id < 0:
             return
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
-        try:
-            res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
-                    [x + '.rec_name' for x in self.mgroup.mfields.keys()
-                        if self.mgroup.fields[x]['type'] \
-                                in ('many2one', 'reference')] + \
-                    ['_timestamp'], ctx)
-        except Exception, exception:
-            common.process_exception(exception, self.window)
-            try:
-                res = self.rpc.read([self.id], self.mgroup.mfields.keys() + \
-                        [x + '.rec_name' for x in self.mgroup.mfields.keys()
-                            if self.mgroup.fields[x]['type'] \
-                                    in ('many2one', 'reference')] + \
-                        ['_timestamp'], ctx)
-            except:
-                return
-        if res:
-            value = res[0]
-            self.read_time = time.time()
-            self.set(value)
-            self.validate()
+        self['*']
+        self.validate()
 
     def expr_eval(self, expr, check_load=False):
         if not isinstance(expr, basestring):

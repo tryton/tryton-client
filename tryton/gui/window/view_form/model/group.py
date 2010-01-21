@@ -127,13 +127,9 @@ class ModelRecordGroup(SignalEvent):
         return ids
 
     def reload(self, ids):
-        models = []
-        for obj_id in ids:
-            for model in self.models:
-                if model.id == obj_id and not model.modified:
-                    models.append(model)
-        for model in models:
-            model._loaded = False
+        for model in self.models:
+            if model.id in ids and not model.modified:
+                model._loaded.clear()
 
     def on_write_ids(self, ids):
         if not self.on_write:
@@ -150,9 +146,7 @@ class ModelRecordGroup(SignalEvent):
     def _load_for(self, values):
         if len(values)>10:
             self.models.lock_signal = True
-        id2values = {}
-        for value in values:
-            id2values[value['id']] = value
+        id2values = dict((value['id'], value) for value in values)
         for model in self.models:
             if model.id in id2values:
                 model.set(id2values[model.id])
@@ -180,12 +174,12 @@ class ModelRecordGroup(SignalEvent):
             newmods.append(newmod)
             newmod.signal_connect(self, 'record-changed', self._record_changed)
             newmod.signal_connect(self, 'record-modified', self._record_modified)
-            for model in list(self.model_removed):
-                if model.id == id:
-                    self.model_removed.remove(model)
-            for model in list(self.model_deleted):
-                if model.id == id:
-                    self.model_deleted.remove(model)
+        for model in self.model_removed[:]:
+            if model.id in ids:
+                self.model_removed.remove(model)
+        for model in self.model_deleted[:]:
+            if model.id in ids:
+                self.model_deleted.remove(model)
         if len(ids) > 10:
             self.models.lock_signal = False
             self.signal('record-cleared')
@@ -362,8 +356,6 @@ class ModelRecordGroup(SignalEvent):
             if model.id > 0:
                 if model.is_modified():
                     old.append(model.id)
-                elif to_add:
-                    model._loaded = False
             else:
                 new.append(model)
         ctx = context.copy()
