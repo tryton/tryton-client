@@ -42,6 +42,9 @@ class EvalEnvironment(dict):
 
     __repr__ = __str__
 
+    def __contains__(self, item):
+        return item in self.parent.mgroup.mfields
+
 
 class ModelRecord(SignalEvent):
 
