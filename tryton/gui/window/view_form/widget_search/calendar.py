@@ -6,7 +6,7 @@ import gtk
 import gettext
 import locale
 from interface import Interface
-from tryton.common import DT_FORMAT, TRYTON_ICON
+from tryton.common import DT_FORMAT, DHM_FORMAT, TRYTON_ICON
 from tryton.common import date_widget, Tooltips, datetime_strftime
 from tryton.translate import date_format
 import gobject
@@ -101,6 +101,9 @@ class Calendar(Interface):
             date = datetime.date(*time.strptime(value, self.format)[:3])
         except:
             return False
+        if self.attrs.get('type', 'date') == 'datetime':
+            return datetime_strftime(datetime.datetime.combine(date,
+                datetime.time.min), DHM_FORMAT)
         return datetime_strftime(date, DT_FORMAT)
 
     def _value_get(self):
