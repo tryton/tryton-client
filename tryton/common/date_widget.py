@@ -14,12 +14,12 @@ from datetime_strftime import datetime_strftime
 mapping = {
     '%y': ('__', '([_ 0-9][_ 0-9])'),
     '%Y': ('____', '([_ 0-9][_ 0-9][_ 0-9][_ 0-9])'),
-    '%m': ('__', '([_ 0][_ 0-9]|[_ 1][_ 0-2])'),
-    '%d': ('__', '([_ 0][_ 0-9]|[_ 1-2][_ 0-9]|[_ 3][_ 0-1])'),
-    '%H': ('__', '([_ 0-1][_ 0-9]|[_ 2][_ 0-4])'),
-    '%I': ('__', '([_ 0][_ 0-9]|[_ 1][_ 0-2])'),
-    '%M': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
-    '%S': ('__', '([_ 0-5][_ 0-9]|[_ 6][_ 0])'),
+    '%m': ('__', '([_ 0-9][_ 0-9])'),
+    '%d': ('__', '([_ 0-9][_ 0-9])'),
+    '%H': ('__', '([_ 0-9][_ 0-9])'),
+    '%I': ('__', '([_ 0-9][_ 0-9])'),
+    '%M': ('__', '([_ 0-9][_ 0-9])'),
+    '%S': ('__', '([_ 0-9][_ 0-9])'),
     '%p': ('__', '([_ AP][_ M])'),
 }
 
@@ -31,7 +31,7 @@ class DateEntry(gtk.Entry):
 
         self.format = format
         self.regex = self.initial_value = format
-        for key,val in mapping.items():
+        for key, val in mapping.items():
             self.regex = self.regex.replace(key, val[1])
             self.initial_value = self.initial_value.replace(key, val[0])
 
@@ -83,14 +83,9 @@ class DateEntry(gtk.Entry):
                 text = text[:pos] + char + text[pos + 1:]
             pos += 1
 
-        if self.regex.match(text):
+        if self.regex.match(text) and self.test_date(text):
             self.set_text(text)
             gobject.idle_add(self.set_position, pos)
-        else:
-            text = text[:pos] + '0' + text[pos + 1:]
-            if self.regex.match(text):
-                self.set_text(text)
-                gobject.idle_add(self.set_position, pos)
         self.stop_emission('insert-text')
         self.show()
         return
@@ -121,11 +116,11 @@ class DateEntry(gtk.Entry):
             self.set_text(self.initial_value)
 
     def _focus_out(self, editable, event):
-        self.date_get()
         if self.mode_cmd:
             self.mode_cmd = False
-            if self.callback_process: self.callback_process(False, self, event)
-        if self.get_text() == self.initial_value:
+            if self.callback_process:
+                self.callback_process(False, self, event)
+        if self.get_text() == self.initial_value or not self.date_get():
             self.set_text('')
 
     def set_text(self, text):
@@ -151,13 +146,13 @@ class DateEntry(gtk.Entry):
             else:
                 self.set_text('')
 
-    def date_get(self):
-        tt = datetime_strftime(datetime.datetime.now(), self.format)
-        tc = self.get_text()
-        if tc == self.initial_value or not tc:
+    def compute_date(self, text, default=None, year=None):
+        if default is None:
+            default = datetime_strftime(datetime.datetime.now(), self.format)
+        if text == self.initial_value or not text:
             return False
 
-        match = self.regex.match(tc)
+        match = self.regex.match(text)
         for i in range(len(match.groups())):
             val = match.group(i + 1)
             n = len(val)
@@ -172,21 +167,37 @@ class DateEntry(gtk.Entry):
                 fchar = '_'
                 if len(val) == 1:
                     val = '0' + val
+            if year and n == 4 and len(val) != 4:
+                val = year
             val = (fchar * (n - len(val))) + val
             start = match.start(i + 1)
             end = match.end(i + 1)
-            tc = tc[:start] + val + tc[end:]
+            text = text[:start] + val + text[end:]
 
         for a in range(len(self.initial_value)):
-            if self.initial_value[a] == tc[a]:
-                tc = tc[:a] + tt[a] + tc[a+1:]
+            if self.initial_value[a] == text[a]:
+                text = text[:a] + default[a] + text[a+1:]
+        return text
+
+    def test_date(self, text):
+        default = datetime_strftime(datetime.datetime(2000, 1, 1),
+                self.format)
         try:
-            self.set_text(tc)
-            return datetime.datetime(*time.strptime(tc, self.format)[:6])
+            time.strptime(self.compute_date(text, default=default, year='2000'),
+                    self.format)
         except:
-            tc = tt
-        self.set_text(tc)
-        return datetime.datetime(*time.strptime(tc, self.format)[:6])
+            return False
+        return True
+
+    def date_get(self):
+        res = None
+        date = self.compute_date(self.get_text())
+        try:
+            res = datetime.datetime(*time.strptime(date, self.format)[:6])
+        except:
+            return None
+        self.set_text(date)
+        return res
 
     def delete_text(self, start, end):
         self._interactive_input = False
@@ -220,9 +231,10 @@ class DateEntry(gtk.Entry):
                 self.stop_emission("key-press-event")
                 return True
             else:
-                self.date_get()
-                if self.get_text() == self.initial_value:
-                    self.set_text('')
+                if self.get_text() != self.initial_value:
+                    if not self.date_get():
+                        self.stop_emission("key-press-event")
+                        return True
         elif event.keyval in (gtk.keysyms.KP_Add, gtk.keysyms.plus,
                 gtk.keysyms.KP_Subtract, gtk.keysyms.minus,
                 gtk.keysyms.KP_Equal, gtk.keysyms.equal):
@@ -274,7 +286,7 @@ class ComplexEntry(gtk.HBox):
         else:
             if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
                 cmd = self.widget_cmd.get_text()
-                dt = self.widget.date_get()
+                dt = self.widget.date_get() or datetime.datetime.now()
                 res = compute_date(cmd, dt, self.widget.format)
                 if res:
                     self.widget.date_set(res)
@@ -319,19 +331,26 @@ def compute_date(cmd, dt, format):
                 continue
 
 if __name__ == '__main__':
-    import sys
+    win = gtk.Window()
+    win.set_title('gtk.Entry subclass')
+    def cb(window, event):
+        gtk.main_quit()
+    win.connect('delete-event', cb)
+    vbox = gtk.VBox()
+    win.add(vbox)
 
-    def main(args):
-        win = gtk.Window()
-        win.set_title('gtk.Entry subclass')
-        def cb(window, event):
-            gtk.main_quit()
-        win.connect('delete-event', cb)
+    for format in (
+            '%d.%m.%Y %H:%M:%S',
+            '%m/%d/%Y %H:%M:%S',
+            '%d/%m/%Y %H:%M:%S',
+            '%Y-%m-%d %H:%M%S',
+            '%d.%m.%Y',
+            '%m/%d/%Y',
+            '%d/%m/%Y',
+            '%Y-%m-%d',
+            ):
+        widget = ComplexEntry(format)
+        vbox.pack_start(widget, False, False)
 
-        widget = ComplexEntry('%d/%m/%Y %H:%M:%S')
-        win.add(widget)
-
-        win.show_all()
-        gtk.main()
-
-    sys.exit(main(sys.argv))
+    win.show_all()
+    gtk.main()
