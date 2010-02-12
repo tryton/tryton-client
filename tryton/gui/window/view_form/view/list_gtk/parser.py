@@ -554,7 +554,7 @@ class M2O(Char):
                 domain=domain, parent=self.window)
         found = win.run()
         if found:
-            arg = ('model', relation, 'read', found[0], ['rec_name'],
+            args = ('model', relation, 'read', found[0], ['rec_name'],
                     context)
             try:
                 res = rpc.execute(*args)
