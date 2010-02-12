@@ -13,8 +13,9 @@ except:
 
 class TextBox(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(TextBox, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(TextBox, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.widget = gtk.HBox()
         self.scrolledwindow = gtk.ScrolledWindow()
@@ -55,8 +56,8 @@ class TextBox(WidgetInterface):
 
             if not value and self.attrs.get('spell') \
                     and CONFIG['client.spellcheck'] \
-                    and self._view and self._view.model:
-                language = self._view.model.expr_eval(self.attrs['spell'])
+                    and self.record:
+                language = self.record.expr_eval(self.attrs['spell'])
                 try:
                     if not spell:
                         spell = gtkspell.Spell(self.textview)
@@ -76,16 +77,16 @@ class TextBox(WidgetInterface):
     def _color_widget(self):
         return self.textview
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         buf = self.textview.get_buffer()
         iter_start = buf.get_start_iter()
         iter_end = buf.get_end_iter()
         current_text = buf.get_text(iter_start, iter_end, False)
-        model_field.set_client(model, current_text or False)
+        field.set_client(record, current_text or False)
 
-    def display(self, model, model_field):
-        super(TextBox, self).display(model, model_field)
-        value = model_field and model_field.get(model)
+    def display(self, record, field):
+        super(TextBox, self).display(record, field)
+        value = field and field.get(record)
         if not value:
             value = ''
         buf = self.textview.get_buffer()
@@ -101,8 +102,8 @@ class TextBox(WidgetInterface):
                 pass
 
             if self.attrs.get('spell') and CONFIG['client.spellcheck'] \
-                    and self._view and self._view.model:
-                language = self._view.model.expr_eval(self.attrs['spell'])
+                    and self.record:
+                language = self.record.expr_eval(self.attrs['spell'])
                 try:
                     if not spell:
                         spell = gtkspell.Spell(self.textview)
@@ -120,7 +121,7 @@ class TextBox(WidgetInterface):
                 del spell
 
     def display_value(self):
-        lines = (self._view.modelfield.get_client(self._view.model) or '').split('\n')
+        lines = (self.field.get_client(self.record) or '').split('\n')
         if len(lines) > 1:
             return lines[0] + '...'
         else:

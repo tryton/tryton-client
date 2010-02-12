@@ -14,14 +14,10 @@ import os
 _ = gettext.gettext
 
 
-
 class WinExport(object):
     "Window export"
 
-    def __init__(self, model, ids, fields, preload=None, parent=None,
-            context=None):
-        if preload is None:
-            preload = []
+    def __init__(self, model, ids, fields, parent=None, context=None):
         self.dialog = gtk.Dialog(
                 title= _("Export to CSV"),
                 parent=parent,
@@ -187,9 +183,6 @@ class WinExport(object):
         self.model1 = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.model2 = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
 
-        for i in preload:
-            self.model2.set(self.model2.append(), 0, i[1], 1, i[0])
-
         self.fields = {}
 
         def model_populate(fields, prefix_node='', prefix=None,
@@ -278,45 +271,64 @@ class WinExport(object):
         self.model2.clear()
 
     def fill_predefwin(self):
-        ir_export = rpc.RPCProxy('ir.export')
-        ir_export_line = rpc.RPCProxy('ir.export.line')
+        args = ('model', 'ir.export', 'search',
+                [('resource', '=', self.model)], 0, None, None, rpc.CONTEXT)
         try:
-            export_ids = ir_export.search([('resource', '=', self.model)])
+            export_ids = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.parent)
-            return
-        for export in ir_export.read(export_ids):
-            try:
-                fields = ir_export_line.read(export['export_fields'])
-            except Exception, exception:
-                common.process_exception(exception, self.parent)
-                continue
-            self.predef_model.append((
-                export['id'],
-                [f['name'] for f in fields],
+            export_ids = common.process_exception(exception, self.parent,
+                    *args)
+            if not export_ids:
+                return
+        args = ('model', 'ir.export', 'read', export_ids, None, rpc.CONTEXT)
+        try:
+            exports = rpc.execute(*args)
+        except Exception, exception:
+            exports = common.process_exception(exception, self.parent, *args)
+            if not exports:
+                return
+        args = ('model', 'ir.export.line', 'read',
+                [x['export_fields'] for x in exports], None, rpc.CONTEXT)
+        try:
+            lines = rpc.execute(*args)
+        except Exception, exception:
+            lines = common.process_exception(exception, self.parent, *args)
+            if not lines:
+                return
+        id2lines = {}
+        for line in lines:
+            id2lines.setdefault(line['export'], []).append(line)
+        for export in exports:
+            self.predef_model.append((export['id'],
+                [x['name'] for x in id2lines[export['id']]],
                 export['name'],
-                ', '.join(self.fields_data[f['name']]['string'] \
-                        for f in fields),
-                ))
+                ','.join(self.fields_data[x['name']]['string']
+                    for x in id2lines[export['id']])))
         self.pref_export.set_model(self.predef_model)
 
     def add_predef(self, widget):
-        name = common.ask('What is the name of this export?', self.parent)
+        name = common.ask(_('What is the name of this export?'), self.parent)
         if not name:
             return
-        ir_export = rpc.RPCProxy('ir.export')
         iter = self.model2.get_iter_root()
         fields = []
         while iter:
             field_name = self.model2.get_value(iter, 1)
             fields.append(field_name)
             iter = self.model2.iter_next(iter)
+        args = ('model', 'ir.export', 'create', {
+            'name': name,
+            'resource': self.model,
+            'export_fields': [('create', {
+                'name': x,
+                }) for x in fields],
+            }, rpc.CONTEXT)
         try:
-            new_id = ir_export.create({'name' : name, 'resource' : self.model,
-                'export_fields' : [('create', {'name' : f}) for f in fields]})
+            new_id = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.dialog)
-            return
+            new_ids = common.process_exception(exception, self.dialog, *args)
+            if not new_id:
+                return
         self.predef_model.append((
             new_id,
             fields,
@@ -331,13 +343,13 @@ class WinExport(object):
         (model, i) = sel
         if not i:
             return None
-        ir_export = rpc.RPCProxy('ir.export')
         export_id = model.get_value(i, 0)
+        args = ('model', 'ir.export', 'delete', export_id, rpc.CONTEXT)
         try:
-            ir_export.delete(export_id)
+            rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.dialog)
-            return
+            if not common.process_exception(exception, self.dialog, *args):
+                return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
                 del self.predef_model[i]

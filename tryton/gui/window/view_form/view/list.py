@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gobject
 import gtk
-from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 import locale
 from interface import ParserView
@@ -13,6 +12,7 @@ import tryton.common as common
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
+from tryton.pyson import PYSONEncoder
 import os
 
 _ = gettext.gettext
@@ -20,17 +20,16 @@ _ = gettext.gettext
 
 class AdaptModelGroup(gtk.GenericTreeModel):
 
-    def __init__(self, model_group):
+    def __init__(self, group):
         super(AdaptModelGroup, self).__init__()
-        self.model_group = model_group
-        self.models = model_group.models
+        self.group = group
         self.last_sort = None
         self.sort_asc = True
         self.set_property('leak_references', False)
 
     def added(self, modellist, position):
-        if modellist is self.models:
-            model = self.models[position]
+        if modellist is self.group:
+            model = self.group[position]
             self.row_inserted(self.on_get_path(model),
                     self.get_iter(self.on_get_path(model)))
 
@@ -42,26 +41,26 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         self.invalidate_iters()
 
     def append(self, model):
-        self.model_group.model_add(model)
+        self.group.add(model)
 
     def prepend(self, model):
-        self.model_group.model_add(model, 0)
+        self.group.add(model, 0)
 
     def remove(self, iter):
         idx = self.get_path(iter)[0]
-        self.model_group.model_remove(self.models[idx])
+        self.group.remove(self.group[idx])
         self.invalidate_iters()
 
     def move(self, path, position):
         idx = path[0]
-        self.model_group.model_move(self.models[idx], position)
+        self.group.move(self.group[idx], position)
 
     def sort(self, ids):
         ids2pos = {}
         pos = 0
         new_order = []
-        for model in self.models:
-            ids2pos[model.id] = pos
+        for record in self.group:
+            ids2pos[record.id] = pos
             new_order.append(pos)
             pos += 1
         pos = 0
@@ -73,19 +72,19 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 pos += 1
             except:
                 continue
-        self.models.sort(lambda x, y: \
+        self.group.sort(lambda x, y: \
                 cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
         prev = None
-        for model in self.models:
+        for record in self.group:
             if prev:
-                prev.next[id(self.models)] = model
-            prev = model
+                prev.next[id(self.group)] = record
+            prev = record
         if prev:
-            prev.next[id(self.models)] = None
+            prev.next[id(self.group)] = None
         self.rows_reordered(None, None, new_order)
 
     def __len__(self):
-        return len(self.models)
+        return len(self.group)
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
@@ -97,17 +96,17 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         return gobject.TYPE_PYOBJECT
 
     def on_get_path(self, iter):
-        if iter in self.models:
-            return self.models.index(iter)
+        if iter in self.group:
+            return self.group.index(iter)
         else:
             return 0
 
     def on_get_iter(self, path):
         if isinstance(path, tuple):
             path = path[0]
-        if self.models:
-            if path < len(self.models):
-                return self.models[path]
+        if self.group is not None:
+            if path < len(self.group):
+                return self.group[path]
             else:
                 return None
         else:
@@ -119,7 +118,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 
     def on_iter_next(self, node):
         try:
-            return node.next[id(self.models)]
+            return node.next[id(self.group)]
         except IndexError:
             return None
 
@@ -131,11 +130,11 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 
     def on_iter_n_children(self, node):
         if node is None:
-            return len(self.models)
+            return len(self.group)
         return 0
 
     def on_iter_nth_child(self, node, nth):
-        if node is None and self.models:
+        if node is None and self.group is not None:
             return self.on_get_iter(0)
         return None
 
@@ -151,7 +150,6 @@ class ViewList(ParserView):
                 buttons, toolbar, notebooks, cursor_widget)
         self.store = None
         self.view_type = 'tree'
-        self.model_add_new = True
         self.widget = gtk.VBox()
         self.widget_tree = widget
         scroll = gtk.ScrolledWindow()
@@ -272,13 +270,13 @@ class ViewList(ParserView):
             return False
         email = {}
         if action.get('email'):
-            email = self.screen.current_model.expr_eval(action['email'])
+            email = self.screen.current_record.expr_eval(action['email'])
             if not email:
                 email = {}
         email['subject'] = action['name'].replace('_', '')
         act['email'] = email
         data = {
-            'model': self.screen.name,
+            'model': self.screen.model_name,
             'id': obj_id,
             'ids': obj_ids,
         }
@@ -327,13 +325,13 @@ class ViewList(ParserView):
                     self.copy_clear_func, selection)
 
     def copy_foreach(self, treemodel, path,iter, data):
-        model = treemodel.get_value(iter, 0)
+        record = treemodel.get_value(iter, 0)
         values = []
         for col in self.widget_tree.get_columns():
             if not col.get_visible() or not col.name:
                 continue
             cell = self.widget_tree.cells[col.name]
-            values.append('"' + str(cell.get_textual_value(model)) + '"')
+            values.append('"' + str(cell.get_textual_value(record)) + '"')
         data.append('\t'.join(values))
         return
 
@@ -370,9 +368,9 @@ class ViewList(ParserView):
             info, etime):
         treeview.emit_stop_by_name('drag-data-received')
         if treeview.sequence:
-            for model in self.screen.models.models:
-                if model[treeview.sequence].get_state_attrs(
-                        model).get('readonly', False):
+            for record in self.screen.group:
+                if record[treeview.sequence].get_state_attrs(
+                        record).get('readonly', False):
                     return
         if not selection.data:
             return
@@ -389,7 +387,7 @@ class ViewList(ParserView):
                 model.move(data, idx + 1)
         context.drop_finish(False, etime)
         if treeview.sequence:
-            self.screen.models.set_sequence(field=treeview.sequence)
+            self.screen.group.set_sequence(field=treeview.sequence)
 
     def drag_data_delete(self, treeview, context):
         treeview.emit_stop_by_name('drag-data-delete')
@@ -404,18 +402,21 @@ class ViewList(ParserView):
                 model = selection.get_selected_rows()[0]
             if (not path) or not path[0]:
                 return False
-            model = model.models[path[0][0]]
+            record = model.group[path[0][0]]
 
             if hasattr(path[1], '_type') and path[1]._type == 'many2one':
-                value = model[path[1].name].get(model)
-                ir_action_keyword = RPCProxy('ir.action.keyword')
+                value = record[path[1].name].get(record)
+                args = ('model', 'ir.action.keyword', 'get_keyword',
+                        'form_relate',
+                        (self.screen.fields[path[1].name]['relation'], 0),
+                        rpc.CONTEXT)
                 try:
-                    relates = ir_action_keyword.get_keyword('form_relate',
-                            (self.screen.fields[path[1].name]['relation'], 0),
-                            rpc.CONTEXT)
+                    relates = rpc.execute(*args)
                 except Exception, exception:
-                    common.process_exception(exception, self.window)
-                    return False
+                    relates = common.process_exception(exception, self.window,
+                            *args)
+                    if not relates:
+                        return False
                 menu_entries = []
                 menu_entries.append((None, None, None))
                 menu_entries.append((_('Actions'),
@@ -457,11 +458,12 @@ class ViewList(ParserView):
         screen = Screen(self.screen.fields[path[1].name]['relation'],
                 self.window)
         screen.load([value])
-        act['domain'] = str(screen.current_model.expr_eval(act.get('domain', []),
-                check_load=False))
-        act['context'] = str(screen.current_model.expr_eval(act.get('context', {}),
-            check_load=False))
-        data['model'] = self.screen.name
+        encoder = PYSONEncoder()
+        act['domain'] = encoder.encode(screen.current_record.expr_eval(
+            act.get('domain', []), check_load=False))
+        act['context'] = encoder.encode(screen.current_record.expr_eval(
+            act.get('context', {}), check_load=False))
+        data['model'] = self.screen.model_name
         data['id'] = value
         data['ids'] = [value]
         return Action._exec_action(act, self.window, data, context)
@@ -473,19 +475,19 @@ class ViewList(ParserView):
             'ids': [value],
             }, alwaysask=True)
 
-    def signal_record_changed(self, signal, *args):
-        if self.store:
-            if signal == 'record-added':
-                self.store.added(*args)
-            elif signal == 'record-removed':
-                self.store.removed(*args)
+    def group_list_changed(self, group, signal):
+        if self.store is not None:
+            if signal[0] == 'record-added':
+                self.store.added(group, signal[1])
+            elif signal[0] == 'record-removed':
+                self.store.removed(group, signal[1])
         self.update_children()
 
     def cancel(self):
         pass
 
     def __str__(self):
-        return 'ViewList (%s)' % self.screen.resource
+        return 'ViewList (%s)' % self.screen.model_name
 
     def __getitem__(self, name):
         return None
@@ -523,26 +525,26 @@ class ViewList(ParserView):
         self.screen.row_activate()
 
     def __select_changed(self, tree_sel):
-        previous_model = self.screen.current_model
+        previous_record = self.screen.current_record
 
         if tree_sel.get_mode() == gtk.SELECTION_SINGLE:
             model, iter = tree_sel.get_selected()
             if iter:
                 path = model.get_path(iter)[0]
-                self.screen.current_model = model.models[path]
+                self.screen.current_record = model.group[path]
 
         elif tree_sel.get_mode() == gtk.SELECTION_MULTIPLE:
             model, paths = tree_sel.get_selected_rows()
             if paths:
-                self.screen.current_model = model.models[paths[0][0]]
+                self.screen.current_record = model.group[paths[0][0]]
 
         if hasattr(self.widget_tree, 'editable') \
                 and self.widget_tree.editable \
-                and self.screen.tree_saves \
-                and previous_model != self.screen.current_model:
-            if previous_model and \
-                    not (previous_model.validate() and previous_model.save()):
-                self.screen.current_model = previous_model
+                and not self.screen.parent \
+                and previous_record != self.screen.current_record:
+            if previous_record and \
+                    not (previous_record.validate() and previous_record.save()):
+                self.screen.current_record = previous_record
                 self.set_cursor()
                 return True
         self.update_children()
@@ -561,12 +563,12 @@ class ViewList(ParserView):
     def display(self):
         if self.reload \
                 or (not self.widget_tree.get_model()) \
-                    or self.screen.models != \
-                        self.widget_tree.get_model().model_group:
-            self.store = AdaptModelGroup(self.screen.models)
+                    or self.screen.group != \
+                        self.widget_tree.get_model().group:
+            self.store = AdaptModelGroup(self.screen.group)
             self.widget_tree.set_model(self.store)
         self.reload = False
-        if not self.screen.current_model:
+        if not self.screen.current_record:
             # Should find a simpler solution to do something like
             #self.widget.set_cursor(None,None,False)
             if self.store:
@@ -578,12 +580,12 @@ class ViewList(ParserView):
         self.update_children()
 
     def set_state(self):
-        model = self.screen.current_model
-        if model:
-            for field in model.mgroup.fields:
-                modelfield = model.mgroup.mfields.get(field, None)
-                if modelfield:
-                    modelfield.state_set(model)
+        record = self.screen.current_record
+        if record:
+            for field in record.group.fields:
+                field = record.group.fields.get(field, None)
+                if field:
+                    field.state_set(record)
 
     def update_children(self):
         ids = self.sel_ids_get()
@@ -591,23 +593,23 @@ class ViewList(ParserView):
             value = 0.0
             value_selected = 0.0
             loaded = True
-            for model in self.screen.models.models:
-                if not model.loaded:
+            for record in self.screen.group:
+                if not record.loaded:
                     loaded = False
                     break
-                if model.id in ids or not ids:
+                if record.id in ids or not ids:
                     if not value_selected:
-                        value_selected = model.fields_get()[self.children[child][0]]\
-                                .get(model, check_load=False)
+                        value_selected = record.fields_get()[self.children[child][0]]\
+                                .get(record, check_load=False)
                     else:
-                        value_selected += model.fields_get()[self.children[child][0]]\
-                                .get(model, check_load=False)
+                        value_selected += record.fields_get()[self.children[child][0]]\
+                                .get(record, check_load=False)
                 if not value:
-                    value = model.fields_get()[self.children[child][0]]\
-                            .get(model, check_load=False)
+                    value = record.fields_get()[self.children[child][0]]\
+                            .get(record, check_load=False)
                 else:
-                    value += model.fields_get()[self.children[child][0]]\
-                            .get(model, check_load=False)
+                    value += record.fields_get()[self.children[child][0]]\
+                            .get(record, check_load=False)
 
             if loaded:
                 label_str = locale.format('%.' + str(self.children[child][3]) + 'f',
@@ -624,8 +626,8 @@ class ViewList(ParserView):
 
     def set_cursor(self, new=False, reset_view=True):
         self.widget_tree.grab_focus()
-        if self.screen.current_model:
-            path = self.store.on_get_path(self.screen.current_model)
+        if self.screen.current_record:
+            path = self.store.on_get_path(self.screen.current_record)
             focus_column = None
             for column in self.widget_tree.get_columns():
                 renderers = column.get_cell_renderers()
@@ -647,21 +649,21 @@ class ViewList(ParserView):
 
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
-            model = store.on_get_iter(path)
-            if model and model.id > 0:
-                ids.append(model.id)
+            record = store.on_get_iter(path)
+            if record and record.id > 0:
+                ids.append(record.id)
         ids = []
         sel = self.widget_tree.get_selection()
         sel.selected_foreach(_func_sel_get, ids)
         return ids
 
-    def sel_models_get(self):
-        def _func_sel_get(store, path, iter, models):
-            models.append(store.on_get_iter(path))
-        models = []
+    def selected_records(self):
+        def _func_sel_get(store, path, iter, records):
+            records.append(store.on_get_iter(path))
+        records = []
         sel = self.widget_tree.get_selection()
-        sel.selected_foreach(_func_sel_get, models)
-        return models
+        sel.selected_foreach(_func_sel_get, records)
+        return records
 
     def unset_editable(self):
         self.widget_tree.editable = False

@@ -8,8 +8,8 @@ import tryton.rpc as rpc
 
 class FloatTime(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(FloatTime, self).__init__(window, parent, model=model,
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(FloatTime, self).__init__(field_name, model_name, window,
                 attrs=attrs)
 
         self.widget = gtk.HBox()
@@ -33,19 +33,19 @@ class FloatTime(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         value = self.entry.get_text()
         if not value:
-            return model_field.set_client(model, 0.0)
-        return model_field.set_client(model,
+            return field.set_client(record, 0.0)
+        return field.set_client(record,
                 common.text_to_float_time(value, self.conv))
 
-    def display(self, model, model_field):
-        super(FloatTime, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(FloatTime, self).display(record, field)
+        if not field:
             self.entry.set_text('00:00')
             return False
-        val = model_field.get(model)
+        val = field.get(record)
 
         self.entry.set_text(common.float_time_to_text(val, self.conv))
 

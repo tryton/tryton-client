@@ -52,8 +52,7 @@ class Form(SignalEvent):
 
         self.screen = Screen(self.model, self.window, view_type=view_type,
                 context=self.context, view_ids=view_ids, domain=domain,
-                hastoolbar=CONFIG['form.toolbar'], show_search=True,
-                limit=limit, readonly=bool(auto_refresh), form=self,
+                limit=limit, readonly=bool(auto_refresh),
                 search_value=search_value)
         self.screen.signal_connect(self, 'record-message', self._record_message)
         self.screen.signal_connect(self, 'record-modified', self._record_modified)
@@ -227,9 +226,9 @@ class Form(SignalEvent):
         return True
 
     def update_attachment_count(self, reload=False):
-        value = self.screen.current_model
-        if value:
-            attachment_count = value.get_attachment_count(reload=reload)
+        record = self.screen.current_record
+        if record:
+            attachment_count = record.get_attachment_count(reload=reload)
         else:
             attachment_count = 0
         self.signal('attachment-count', attachment_count)
@@ -296,19 +295,21 @@ class Form(SignalEvent):
                 self.message_info(_('Records removed!'), 'green')
 
     def sig_import(self, widget=None):
-        fields = []
         while(self.screen.view_to_load):
             self.screen.load_view_to_load()
-        win = WinImport(self.model, self.screen.fields, fields,
-                parent=self.window)
+        fields = {}
+        for name, field in self.screen.group.fields.iteritems():
+            fields[name] = field.attrs
+        win = WinImport(self.model, fields, parent=self.window)
         win.run()
 
     def sig_save_as(self, widget=None):
-        fields = []
-        while(self.screen.view_to_load):
+        while self.screen.view_to_load:
             self.screen.load_view_to_load()
-        win = WinExport(self.model, self.ids_get(),
-                self.screen.fields, fields, parent=self.window,
+        fields = {}
+        for name, field in self.screen.group.fields.iteritems():
+            fields[name] = field.attrs
+        win = WinExport(self.model, self.ids_get(), fields, parent=self.window,
                 context=self.context)
         win.run()
 
@@ -373,9 +374,9 @@ class Form(SignalEvent):
         else:
             obj_id = self.id_get()
             self.screen.search_filter()
-            for model in self.screen.models:
-                if model.id == obj_id:
-                    self.screen.current_model = model
+            for record in self.screen.group:
+                if record.id == obj_id:
+                    self.screen.current_record = record
                     self.screen.display(set_cursor=True)
                     break
         self.message_info('')
@@ -383,8 +384,8 @@ class Form(SignalEvent):
 
     def sig_action(self, keyword='form_action'):
         ids = self.ids_get()
-        if self.screen.current_model:
-            obj_id = self.screen.current_model.id
+        if self.screen.current_record:
+            obj_id = self.screen.current_record.id
         else:
             obj_id = False
         if self.screen.current_view.view_type == 'form':
@@ -403,7 +404,7 @@ class Form(SignalEvent):
             if 'active_id' in ctx:
                 del ctx['active_id']
             res = Action.exec_keyword(keyword, self.window, {
-                'model': self.screen.resource,
+                'model': self.screen.model_name,
                 'id': obj_id or False,
                 'ids': ids,
                 }, context=ctx, alwaysask=True)

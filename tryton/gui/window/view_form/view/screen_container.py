@@ -15,6 +15,9 @@ class ScreenContainer(object):
         self.vbox.pack_end(self.viewport)
         self.filter_vbox = None
         self.button = None
+        self.alternate_viewport = gtk.Viewport()
+        self.alternate_viewport.set_shadow_type(gtk.SHADOW_NONE)
+        self.alternate_view = False
 
     def widget_get(self):
         return self.vbox
@@ -70,6 +73,15 @@ class ScreenContainer(object):
             self.filter_vbox.hide()
 
     def set(self, widget):
+        if self.alternate_view:
+            if self.alternate_viewport.get_child():
+                self.alternate_viewport.remove(
+                        self.alternate_viewport.get_child())
+            if widget == self.viewport.get_child():
+                self.viewport.remove(self.viewport.get_child())
+            self.alternate_viewport.add(widget)
+            self.alternate_viewport.show_all()
+            return
         if self.viewport.get_child():
             self.viewport.remove(self.viewport.get_child())
         self.viewport.add(widget)

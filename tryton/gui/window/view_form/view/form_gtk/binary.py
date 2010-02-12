@@ -13,8 +13,9 @@ _ = gettext.gettext
 class Binary(WidgetInterface):
     "Binary"
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Binary, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Binary, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.tooltips = Tooltips()
 
@@ -52,8 +53,6 @@ class Binary(WidgetInterface):
 
         self.tooltips.enable()
 
-        self.model_field = None
-
     def _readonly_set(self, value):
         if value:
             self.but_new.hide()
@@ -71,48 +70,47 @@ class Binary(WidgetInterface):
     def sig_new(self, widget=None):
         try:
             filename = file_selection(_('Open...'),
-                    parent=self._window)
-            if filename and self.model_field:
-                self.model_field.set_client(self._view.model,
+                    parent=self.window)
+            if filename and self.field:
+                self.field.set_client(self.record,
                         base64.encodestring(file(filename, 'rb').read()))
                 fname = self.attrs.get('fname_widget', False)
                 if fname:
                     self.parent.value = {fname:os.path.basename(filename)}
-                self.display(self._view.model, self.model_field)
+                self.display(self.record, self.field)
         except Exception, exception:
             warning(_('Error reading the file.\nError message:\n%s') \
-                    % str(exception), self._window, _('Error'))
+                    % str(exception), self.window, _('Error'))
 
     def sig_save_as(self, widget=None):
         try:
             filename = file_selection(_('Save As...'),
-                    parent=self._window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
-            if filename and self.model_field:
+                    parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
+            if filename and self.field:
                 file_p = file(filename,'wb+')
                 file_p.write(base64.decodestring(
-                    self.model_field.get(self._view.model)))
+                    self.field.get(self.record)))
                 file_p.close()
         except Exception, exception:
             warning(_('Error writing the file.\nError message:\n%s') \
-                    % str(exception), self._window, _('Error'))
+                    % str(exception), self.window, _('Error'))
 
     def sig_remove(self, widget=None):
-        if self.model_field:
-            self.model_field.set_client(self._view.model, False)
+        if self.field:
+            self.field.set_client(self.record, False)
             fname = self.attrs.get('fname_widget', False)
             if fname:
                 self.parent.value = {fname:False}
-        self.display(self._view.model, self.model_field)
+        self.display(self.record, self.field)
 
-    def display(self, model, model_field):
-        super(Binary, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(Binary, self).display(record, field)
+        if not field:
             self.wid_text.set_text('')
             self.but_save_as.set_sensitive(False)
             return False
-        self.model_field = model_field
-        self.wid_text.set_text(self._size_get(model_field.get(model)))
-        self.but_save_as.set_sensitive(bool(model_field.get(model)))
+        self.wid_text.set_text(self._size_get(field.get(record)))
+        self.but_save_as.set_sensitive(bool(field.get(record)))
         return True
 
     def display_value(self):
@@ -121,7 +119,7 @@ class Binary(WidgetInterface):
     def _size_get(self, value):
         return value and ('%d ' + _('bytes')) % len(value) or ''
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         return
 
     def _color_widget(self):

@@ -18,8 +18,9 @@ _ = gettext.gettext
 class Calendar(WidgetInterface):
     "Calendar"
 
-    def __init__(self, window, parent=None, model=None, attrs=None):
-        super(Calendar, self).__init__(window, parent, model=model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Calendar, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.format = date_format()
         self.widget = date_widget.ComplexEntry(self.format, spacing=0)
@@ -66,7 +67,7 @@ class Calendar(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
-    def get_value(self, model):
+    def get_value(self, record):
         value = self.entry.get_text()
         if value == '':
             return False
@@ -76,16 +77,16 @@ class Calendar(WidgetInterface):
             return False
         return datetime_strftime(date, DT_FORMAT)
 
-    def set_value(self, model, model_field):
-        model_field.set_client(model, self.get_value(model))
+    def set_value(self, record, field):
+        field.set_client(record, self.get_value(record))
         return True
 
-    def display(self, model, model_field):
-        if not model_field:
+    def display(self, record, field):
+        if not field:
             self.entry.clear()
             return False
-        super(Calendar, self).display(model, model_field)
-        value = model_field.get_client(model)
+        super(Calendar, self).display(record, field)
+        value = field.get_client(record)
         if not value:
             self.entry.clear()
         else:
@@ -109,7 +110,7 @@ class Calendar(WidgetInterface):
         return self.entry.get_text()
 
     def cal_open(self, widget):
-        win = gtk.Dialog(_('Date Selection'), self._window,
+        win = gtk.Dialog(_('Date Selection'), self.window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -127,7 +128,7 @@ class Calendar(WidgetInterface):
         win.show_all()
 
         try:
-            val = self.get_value(self.model)
+            val = self.get_value(self.record)
             if val:
                 cal.select_month(int(val[5:7])-1, int(val[0:4]))
                 cal.select_day(int(val[8:10]))
@@ -147,15 +148,16 @@ class Calendar(WidgetInterface):
                 format = format.replace('%Y', '0%Y')
             self.entry.set_text(datetime_strftime(date, format))
         self._focus_out()
-        self._window.present()
+        self.window.present()
         win.destroy()
 
 
 class DateTime(WidgetInterface):
     "DateTime"
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(DateTime, self).__init__(window, parent, model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(DateTime, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.format = date_format() + ' ' + HM_FORMAT
         self.widget = date_widget.ComplexEntry(self.format, spacing=0)
@@ -201,7 +203,7 @@ class DateTime(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
-    def get_value(self, model, timezone=True):
+    def get_value(self, record, timezone=True):
         value = self.entry.get_text()
         if value == '':
             return False
@@ -221,15 +223,15 @@ class DateTime(WidgetInterface):
                 pass
         return datetime_strftime(date, DHM_FORMAT)
 
-    def set_value(self, model, model_field):
-        model_field.set_client(model, self.get_value(model))
+    def set_value(self, record, field):
+        field.set_client(record, self.get_value(record))
         return True
 
-    def display(self, model, model_field):
-        super(DateTime, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(DateTime, self).display(record, field)
+        if not field:
             return self.show(False)
-        self.show(model_field.get_client(model))
+        self.show(field.get_client(record))
 
     def show(self, dt_val, timezone=True):
         if not dt_val:
@@ -263,7 +265,7 @@ class DateTime(WidgetInterface):
         return self.entry.get_text()
 
     def cal_open(self, widget):
-        win = gtk.Dialog(_('Date Time Selection'), self._window,
+        win = gtk.Dialog(_('Date Time Selection'), self.window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -292,7 +294,7 @@ class DateTime(WidgetInterface):
         win.show_all()
 
         try:
-            val = self.get_value(self.model, timezone=False)
+            val = self.get_value(self.record, timezone=False)
             if val:
                 widget_hour.set_value(int(val[11:13]))
                 widget_minute.set_value(int(val[-5:-3]))
@@ -314,5 +316,5 @@ class DateTime(WidgetInterface):
             value = datetime_strftime(date, DHM_FORMAT)
             self.show(value, timezone=False)
         self._focus_out()
-        self._window.present()
+        self.window.present()
         win.destroy()

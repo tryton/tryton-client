@@ -6,10 +6,8 @@ from interface import WidgetInterface
 class Char(WidgetInterface):
     "Char"
 
-    def __init__(self, window, parent, model, attrs=None):
-        if attrs is None:
-            attrs = {}
-        super(Char, self).__init__(window, parent, model=model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Char, self).__init__(field_name, model_name, window, attrs=attrs)
 
         self.widget = gtk.HBox()
         self.entry = gtk.Entry()
@@ -29,15 +27,15 @@ class Char(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
-    def set_value(self, model, model_field):
-        return model_field.set_client(model, self.entry.get_text() or False)
+    def set_value(self, record, field):
+        return field.set_client(record, self.entry.get_text() or False)
 
-    def display(self, model, model_field):
-        super(Char, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(Char, self).display(record, field)
+        if not field:
             self.entry.set_text('')
             return False
-        self.entry.set_text(model_field.get(model) or '')
+        self.entry.set_text(field.get(record) or '')
 
     def _readonly_set(self, value):
         super(Char, self)._readonly_set(value)
@@ -50,6 +48,6 @@ class Char(WidgetInterface):
 
 class Sha(Char):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Sha, self).__init__(window, parent, model=model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Sha, self).__init__(field_name, model_name, window, attrs=attrs)
         self.entry.set_visibility(False)

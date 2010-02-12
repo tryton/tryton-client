@@ -10,10 +10,8 @@ import tryton.common as common
 class URL(Char):
     "url"
 
-    def __init__(self, window, parent, model, attrs=None):
-        if attrs is None:
-            attrs = {}
-        super(URL, self).__init__(window, parent, model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(URL, self).__init__(field_name, model_name, window, attrs=attrs)
 
         self.tooltips = common.Tooltips()
         self.button = gtk.Button()
@@ -26,8 +24,8 @@ class URL(Char):
         self.widget.pack_start(self.button, expand=False, fill=False)
         self.widget.set_focus_chain([self.entry])
 
-    def display(self, model, model_field):
-        super(URL, self).display(model, model_field)
+    def display(self, record, field):
+        super(URL, self).display(record, field)
         self.set_tooltips()
 
     def set_tooltips(self):

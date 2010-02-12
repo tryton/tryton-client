@@ -3,9 +3,9 @@
 import gtk
 from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
-from one2many import Dialog
 import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
+from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
 import tryton.common as common
 import gettext
@@ -15,8 +15,9 @@ _ = gettext.gettext
 
 class Many2Many(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Many2Many, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Many2Many, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
 
@@ -59,7 +60,7 @@ class Many2Many(WidgetInterface):
 
         hbox.set_focus_chain([self.wid_text])
 
-        self.screen = Screen(attrs['relation'], self._window,
+        self.screen = Screen(attrs['relation'], self.window,
                 view_type=['tree'], views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate)
 
@@ -89,8 +90,8 @@ class Many2Many(WidgetInterface):
         del self.widget
 
     def _sig_add(self, *args):
-        domain = self._view.modelfield.domain_get(self._view.model)
-        context = self._view.modelfield.context_get(self._view.model)
+        domain = self.field.domain_get(self.record)
+        context = self.field.context_get(self.record)
         value = self.wid_text.get_text()
 
         try:
@@ -101,11 +102,11 @@ class Many2Many(WidgetInterface):
             ids = rpc.execute('model', self.attrs['relation'], 'search',
                     dom , 0, _LIMIT, None, context)
         except Exception, exception:
-            common.process_exception(exception, self._window)
+            common.process_exception(exception, self.window)
             return False
         if len(ids) != 1 or not value:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                    context=context, domain=domain, parent=self._window,
+                    context=context, domain=domain, parent=self.window,
                     views_preload=self.attrs.get('views', {}))
             ids = win.run()
 
@@ -129,22 +130,11 @@ class Many2Many(WidgetInterface):
         self._sig_edit()
 
     def _sig_edit(self):
-        if self.screen.current_model:
-            readonly = False
-            domain = []
-            if self._view.modelfield and self._view.model:
-                modelfield = self._view.modelfield
-                model = self._view.model
-                readonly = modelfield.get_state_attrs(model
-                        ).get('readonly', False)
-                domain = modelfield.domain_get(self._view.model)
-            dia = Dialog(self.attrs['relation'], parent=self._view.model,
-                    model=self.screen.current_model, attrs=self.attrs,
-                    window=self._window, readonly=readonly, domain=domain)
-            res, record = dia.run()
-            if res:
-                record.save()
-            dia.destroy()
+        if self.screen.current_record:
+            win = WinForm(self.screen, self.window)
+            if win.run():
+                self.screen.current_record.save()
+            win.destroy()
 
     def _readonly_set(self, value):
         super(Many2Many, self)._readonly_set(value)
@@ -153,20 +143,20 @@ class Many2Many(WidgetInterface):
         self.wid_but_remove.set_sensitive(not value)
         self.wid_but_add.set_sensitive(not value)
 
-    def display(self, model, model_field):
-        if not model_field:
-            self.screen.current_model = None
+    def display(self, record, field):
+        if field is None:
+            self.screen.current_record = None
             self.screen.display()
             return False
-        super(Many2Many, self).display(model, model_field)
-        new_models = model_field.get_client(model)
-        if self.screen.models != new_models:
-            self.screen.models_set(new_models)
+        super(Many2Many, self).display(record, field)
+        new_group = field.get_client(record)
+        if id(self.screen.group) != id(new_group):
+            self.screen.group = new_group
         self.screen.display()
         return True
 
     def display_value(self):
-        ids = self._view.modelfield.get_default(self._view.model)
+        ids = self.field.get_default(self.record)
         try:
             result = rpc.execute('model', self.attrs['relation'], 'read',
                     ids, ['rec_name'], rpc.CONTEXT)
@@ -174,6 +164,6 @@ class Many2Many(WidgetInterface):
             return str(ids)
         return ', '.join(x['rec_name'] for x in result)
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         self.screen.current_view.set_value()
         return True

@@ -1,23 +1,13 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import locale
-import gtk
 
-from tryton.rpc import RPCProxy
 from editabletree import EditableTreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
-
-import time
-
-from tryton.gui.window.view_form.view.form_gtk.many2one import Dialog \
-        as M2ODialog
-from tryton.gui.window.view_form.view.form_gtk.one2many import Dialog \
-        as O2MDialog
 from tryton.gui.window.win_search import WinSearch
+from tryton.gui.window.win_form import WinForm
+from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
-
 import tryton.rpc as rpc
-import datetime
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
 import tryton.common as common
@@ -31,6 +21,10 @@ from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.action import Action
 from tryton.translate import date_format
 from tryton.pyson import PYSONDecoder
+import gtk
+import locale
+import datetime
+import time
 import gettext
 
 _ = gettext.gettext
@@ -60,10 +54,10 @@ def sort_model(column, treeview, screen):
         else:
             column.arrow_show = False
             column.arrow.hide()
-    model = treeview.get_model()
-    if screen.search_count == len(model):
+    store = treeview.get_model()
+    if screen.search_count == len(store):
         ids = screen.search_filter(only_ids=True)
-        model.sort(ids)
+        store.sort(ids)
     else:
         screen.search_filter()
 
@@ -73,7 +67,7 @@ class ParserTree(ParserInterface):
         super(ParserTree, self).__init__(window, parent, attrs, screen)
         self.treeview = None
 
-    def parse(self, model, root_node, fields):
+    def parse(self, model_name, root_node, fields):
         dict_widget = {}
         button_list = []
         attrs = node_attributes(root_node)
@@ -102,11 +96,11 @@ class ParserTree(ParserInterface):
                                 bool(int(node_attrs[boolean_fields]))
                 if fname not in fields:
                     continue
-                fields[fname].update(node_attrs)
-                node_attrs.update(fields[fname])
+                fields[fname].attrs.update(node_attrs)
+                node_attrs.update(fields[fname].attrs)
                 cell = CELLTYPES.get(node_attrs.get('widget',
-                    fields[fname]['type']))(fname, model,
-                    treeview, node_attrs, self.window)
+                    fields[fname].attrs['type']))(fname, model_name,
+                    treeview, self.window, node_attrs)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
 
@@ -122,15 +116,15 @@ class ParserTree(ParserInterface):
                     renderer.connect_after('editing-started', send_keys,
                             treeview)
 
-                col = gtk.TreeViewColumn(fields[fname]['string'], renderer)
+                col = gtk.TreeViewColumn(fields[fname].attrs['string'], renderer)
                 col.name = fname
 
                 hbox = gtk.HBox(False, 2)
-                label = gtk.Label(fields[fname]['string'])
+                label = gtk.Label(fields[fname].attrs['string'])
                 label.show()
-                help = fields[fname]['string']
-                if fields[fname].get('help'):
-                    help += '\n' + fields[fname]['help']
+                help = fields[fname].attrs['string']
+                if fields[fname].attrs.get('help'):
+                    help += '\n' + fields[fname].attrs['help']
                 tooltips.set_tip(label, help)
                 tooltips.enable()
                 arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
@@ -141,7 +135,7 @@ class ParserTree(ParserInterface):
                 hbox.show()
                 col.set_widget(hbox)
 
-                col._type = fields[fname]['type']
+                col._type = fields[fname].attrs['type']
                 col.set_cell_data_func(renderer, cell.setter)
                 col.set_clickable(True)
                 twidth = {
@@ -158,10 +152,10 @@ class ParserTree(ParserInterface):
                     'many2many': 50,
                     'boolean': 20,
                 }
-                if 'width' in fields[fname]:
-                    width = int(fields[fname]['width'])
+                if 'width' in fields[fname].attrs:
+                    width = int(fields[fname].attrs['width'])
                 else:
-                    width = twidth.get(fields[fname]['type'], 100)
+                    width = twidth.get(fields[fname].attrs['type'], 100)
                 col.width = width
                 if width > 0:
                     col.set_fixed_width(width)
@@ -171,30 +165,30 @@ class ParserTree(ParserInterface):
                     col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-                col.set_visible(not fields[fname].get('tree_invisible', False))
+                col.set_visible(not fields[fname].attrs.get('tree_invisible', False))
                 i = treeview.append_column(col)
-                if 'sum' in fields[fname] and fields[fname]['type'] \
+                if 'sum' in fields[fname].attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
                                 'float_time'):
                     label = gtk.Label()
                     label.set_use_markup(True)
-                    label_str = fields[fname]['sum'] + ': '
-                    label_bold = bool(int(fields[fname].get('sum_bold', 0)))
+                    label_str = fields[fname].attrs['sum'] + ': '
+                    label_bold = bool(int(fields[fname].attrs.get('sum_bold', 0)))
                     if label_bold:
                         label.set_markup('<b>%s</b>' % label_str)
                     else:
                         label.set_markup(label_str)
                     label_sum = gtk.Label()
                     label_sum.set_use_markup(True)
-                    if isinstance(fields[fname].get('digits'), str):
+                    if isinstance(fields[fname].attrs.get('digits'), str):
                         digits = 2
                     else:
-                        digits = fields[fname].get('digits', (16, 2))[1]
+                        digits = fields[fname].attrs.get('digits', (16, 2))[1]
                     dict_widget[i] = (fname, label, label_sum, digits,
                             label_bold)
             elif node.localName == 'button':
                 #TODO add shortcut
-                cell = Button(treeview, node_attrs, self.window, self.screen)
+                cell = Button(treeview, self.window, self.screen, node_attrs)
                 button_list.append(cell)
                 renderer = cell.renderer
                 string = node_attrs.get('string', _('Unknown'))
@@ -239,24 +233,24 @@ class ParserTree(ParserInterface):
 
 class Char(object):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Char, self).__init__()
         self.field_name = field_name
-        self.model = model
+        self.model_name = model_name
         self.attrs = attrs or {}
         self.renderer = CellRendererText()
         self.treeview = treeview
         self.window = window
 
     def setter(self, column, cell, store, iter):
-        model = store.get_value(iter, 0)
-        text = self.get_textual_value(model)
+        record = store.get_value(iter, 0)
+        text = self.get_textual_value(record)
 
         if isinstance(cell, CellRendererToggle):
             cell.set_active(bool(text))
         else:
             cell.set_property('text', text)
-            fg_color = self.get_color(model)
+            fg_color = self.get_color(record)
             cell.set_property('foreground', fg_color)
             if fg_color == 'black':
                 cell.set_property('foreground-set', False)
@@ -274,22 +268,22 @@ class Char(object):
                 and self.treeview.editable:
             states = ('readonly', 'required', 'invisible')
 
-        field = model[self.field_name]
-        field.state_set(model, states=states)
-        invisible = field.get_state_attrs(model).get('invisible', False)
+        field = record[self.field_name]
+        field.state_set(record, states=states)
+        invisible = field.get_state_attrs(record).get('invisible', False)
         cell.set_property('visible', not invisible)
 
         if hasattr(self.treeview, 'editable') \
                 and self.treeview.editable:
-            readonly = field.get_state_attrs(model).get('readonly', False)
+            readonly = field.get_state_attrs(record).get('readonly', False)
             if invisible:
                 readonly = True
 
             if not isinstance(cell, CellRendererToggle):
                 bg_color = 'white'
-                if not field.get_state_attrs(model).get('valid', True):
+                if not field.get_state_attrs(record).get('valid', True):
                     bg_color = COLORS.get('invalid', 'white')
-                elif bool(int(field.get_state_attrs(model).get('required', 0))):
+                elif bool(int(field.get_state_attrs(record).get('required', 0))):
                     bg_color = COLORS.get('required', 'white')
                 cell.set_property('background', bg_color)
                 if bg_color == 'white':
@@ -308,50 +302,50 @@ class Char(object):
 
         cell.set_property('xalign', align)
 
-    def get_color(self, model):
-        return model.expr_eval(self.treeview.colors, check_load=False)
+    def get_color(self, record):
+        return record.expr_eval(self.treeview.colors, check_load=False)
 
-    def open_remote(self, model, create, changed=False, text=None):
+    def open_remote(self, record, create, changed=False, text=None):
         raise NotImplementedError
 
-    def get_textual_value(self, model):
-        return model[self.field_name].get_client(model) or ''
+    def get_textual_value(self, record):
+        return record[self.field_name].get_client(record) or ''
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         return text
 
 class Int(Char):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
-        super(Int, self).__init__(field_name, model, treeview=treeview,
-                attrs=attrs, window=window)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Int, self).__init__(field_name, model_name, treeview, window,
+                attrs=attrs)
         self.renderer = CellRendererInteger()
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         return int(text)
 
-    def get_textual_value(self, model):
+    def get_textual_value(self, record):
         return locale.format('%d',
-                model[self.field_name].get_client(model) or 0, True)
+                record[self.field_name].get_client(record) or 0, True)
 
 class Boolean(Int):
 
-    def __init__(self, *args):
-        super(Boolean, self).__init__(*args)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Boolean, self).__init__(field_name, model_name, treeview, window,
+                attrs=attrs)
         self.renderer = CellRendererToggle()
         self.renderer.connect('toggled', self._sig_toggled)
 
-    def get_textual_value(self, model):
-        return model[self.field_name].get_client(model)
+    def get_textual_value(self, record):
+        return record[self.field_name].get_client(record)
 
     def _sig_toggled(self, renderer, path):
         store = self.treeview.get_model()
-        model = store.get_value(store.get_iter(path), 0)
-        field = model[self.field_name]
-        if not field.get_state_attrs(model).get('readonly', False):
-            value = model[self.field_name].get_client(model)
-            model[self.field_name].set_client(model, int(not value))
+        record = store.get_value(store.get_iter(path), 0)
+        field = record[self.field_name]
+        if not field.get_state_attrs(record).get('readonly', False):
+            value = record[self.field_name].get_client(record)
+            record[self.field_name].set_client(record, int(not value))
             self.treeview.set_cursor(path)
         return True
 
@@ -359,24 +353,20 @@ class Boolean(Int):
 class Date(Char):
     server_format = DT_FORMAT
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Date, self).__init__(field_name, model_name, treeview, window,
+                attrs=attrs)
         self.display_format = date_format()
-        self.field_name = field_name
-        self.model = model
-        self.attrs = attrs or {}
         self.renderer = CellRendererDate(self.display_format)
-        self.treeview = treeview
-        self.window = window
 
-    def get_textual_value(self, model):
-        value = model[self.field_name].get_client(model)
+    def get_textual_value(self, record):
+        value = record[self.field_name].get_client(record)
         if not value:
             return ''
         date = datetime.date(*time.strptime(value, self.server_format)[:3])
         return common.datetime_strftime(date, self.display_format)
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         if not text:
             return False
         try:
@@ -389,14 +379,13 @@ class Date(Char):
 class Datetime(Date):
     server_format = DHM_FORMAT
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
-        super(Datetime, self).__init__(field_name, model,
-                treeview=treeview, attrs=attrs, window=window)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Datetime, self).__init__(field_name, model_name, treeview,
+                window, attrs=attrs)
         self.display_format = date_format() + ' ' + HM_FORMAT
 
-    def get_textual_value(self, model):
-        value = model[self.field_name].get_client(model)
+    def get_textual_value(self, record):
+        value = record[self.field_name].get_client(record)
         if not value:
             return ''
         date = datetime.datetime(*time.strptime(value,
@@ -413,7 +402,7 @@ class Datetime(Date):
                 pass
         return common.datetime_strftime(date, self.display_format)
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         if not text:
             return False
         try:
@@ -436,30 +425,29 @@ class Datetime(Date):
 
 class Float(Char):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
-        super(Float, self).__init__(field_name, model, treeview=treeview,
-                attrs=attrs, window=window)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Float, self).__init__(field_name, model_name, treeview, window,
+                attrs=attrs)
         self.renderer = CellRendererFloat()
 
     def setter(self, column, cell, store, iter):
         super(Float, self).setter(column, cell, store, iter)
-        model = store.get_value(iter, 0)
+        record = store.get_value(iter, 0)
         if isinstance(self.attrs.get('digits'), str):
-            digits = model.expr_eval(self.attrs['digits'])
+            digits = record.expr_eval(self.attrs['digits'])
         else:
             digits = self.attrs.get('digits', (16, 2))
         cell.digits = digits
 
-    def get_textual_value(self, model):
+    def get_textual_value(self, record):
         if isinstance(self.attrs.get('digits'), str):
-            digit = model.expr_eval(self.attrs['digits'])[1]
+            digit = record.expr_eval(self.attrs['digits'])[1]
         else:
             digit = self.attrs.get('digits', (16, 2))[1]
         return locale.format('%.'+str(digit)+'f',
-                model[self.field_name].get_client(model) or 0.0, True)
+                record[self.field_name].get_client(record) or 0.0, True)
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         try:
             return locale.atof(text)
         except:
@@ -468,72 +456,71 @@ class Float(Char):
 
 class FloatTime(Char):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
-        super(FloatTime, self).__init__(field_name, model, treeview=treeview,
-                attrs=attrs, window=window)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(FloatTime, self).__init__(field_name, model_name, treeview,
+                window, attrs=attrs)
         self.conv = None
         if attrs and attrs.get('float_time'):
             self.conv = rpc.CONTEXT.get(attrs['float_time'])
 
-    def get_textual_value(self, model):
-        val = model[self.field_name].get_client(model)
+    def get_textual_value(self, record):
+        val = record[self.field_name].get_client(record)
         return common.float_time_to_text(val, self.conv)
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         return common.text_to_float_time(text, self.conv)
 
 class M2O(Char):
 
-    def value_from_text(self, model, text):
-        modelfield = model.mgroup.mfields[self.field_name]
-        if not text and not modelfield.get_state_attrs(
-                model)['required']:
+    def value_from_text(self, record, text):
+        field = record.group.fields[self.field_name]
+        if not text and not field.get_state_attrs(
+                record)['required']:
             return False
 
-        relation = model[self.field_name].attrs['relation']
-        rpc_relation = RPCProxy(relation)
-
-        domain = model[self.field_name].domain_get(model)
-        context = model[self.field_name].context_get(model)
-
+        relation = record[self.field_name].attrs['relation']
+        domain = record[self.field_name].domain_get(record)
+        context = record[self.field_name].context_get(record)
+        if text:
+            dom = [('rec_name', 'ilike', '%' + text + '%'),
+                    domain]
+        else:
+            dom = domain
+        args = ('model', relation, 'search', dom, 0, None, None,
+                context)
         try:
-            if text:
-                dom = [('rec_name', 'ilike', '%' + text + '%'),
-                        domain]
-            else:
-                dom = domain
-            ids = rpc_relation.search(dom, 0, None, None, context)
+            ids = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            return '???'
+            ids = common.process_exception(exception, self.window, *args)
+            if not ids:
+                return '???'
         if len(ids) != 1:
             return self.search_remote(relation, ids,
                              domain=domain, context=context)[0]
         return ids[0]
 
-    def open_remote(self, model, create=True, changed=False, text=None):
-        modelfield = model.mgroup.mfields[self.field_name]
-        relation = modelfield.attrs['relation']
+    def open_remote(self, record, create=True, changed=False, text=None):
+        field = record.group.fields[self.field_name]
+        relation = field.attrs['relation']
 
-        domain = modelfield.domain_get(model)
-        context = modelfield.context_get(model)
+        domain = field.domain_get(record)
+        context = field.context_get(record)
         if create:
             obj_id = None
         elif not changed:
-            obj_id = modelfield.get(model)
+            obj_id = field.get(record)
         else:
-            rpc_relation = RPCProxy(relation)
-
+            if text:
+                dom = [('rec_name', 'ilike', '%' + text + '%'), domain]
+            else:
+                dom = domain
+            args = ('model', relation, 'search', dom, 0, None, None, context)
             try:
-                if text:
-                    dom = [('rec_name', 'ilike', '%' + text + '%'), domain]
-                else:
-                    dom = domain
-                ids = rpc_relation.search(dom, 0, None, None, context)
+                ids = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                return False, False
+                ids = common.process_exception(exception, self.window, *args)
+                if not ids:
+                    return False, False
             if len(ids) == 1:
                 return True, ids[0]
             searched = self.search_remote(relation, ids, domain=domain,
@@ -541,29 +528,41 @@ class M2O(Char):
             if searched[0]:
                 return True, searched
             return False, False
-        dia = M2ODialog(relation, obj_id, domain=domain, context=context,
-                window=self.window)
-        res, value = dia.run()
-        dia.destroy()
-        if res:
+        screen = Screen(relation, self.window, domain=domain, context=context,
+                view_type=['form'])
+        if obj_id:
+            screen.load([obj_id])
+            win = WinForm(screen, self.window)
+        else:
+            win = WinForm(screen, self.window, new=True)
+        value = False
+        while win.run():
+            if screen.save_current():
+                value = (screen.current_record.id,
+                        screen.current_record.rec_name())
+                break
+            else:
+                screen.display()
+        win.destroy()
+        if value:
             return True, value
         else:
             return False, False
 
     def search_remote(self, relation, ids=None, domain=None, context=None):
-        rpc_relation = RPCProxy(relation)
-
         win = WinSearch(relation, sel_multi=False, ids=ids, context=context,
                 domain=domain, parent=self.window)
         found = win.run()
         if found:
+            arg = ('model', relation, 'read', found[0], ['rec_name'],
+                    context)
             try:
-                name = rpc_relation.read(found[0], ['rec_name'],
-                        context)['rec_name']
-                return found[0], name
+                res = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                return False, None
+                res = common.process_exception(exception, self.window, *args)
+                if not res:
+                    return False, None
+            return found[0], res['rec_name']
         else:
             return False, None
 
@@ -579,24 +578,25 @@ class O2M(Char):
         super(O2M, self).setter(column, cell, store, iter)
         cell.set_property('xalign', 0.5)
 
-    def get_textual_value(self, model):
-        return '( ' + str(len(model[self.field_name].\
-                get_client(model).models)) + ' )'
+    def get_textual_value(self, record):
+        return '( ' + str(len(record[self.field_name].\
+                get_client(record))) + ' )'
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         pass
 
-    def open_remote(self, model, create=True, changed=False, text=None):
-        models = model.value[self.field_name]
-        modelfield = model.mgroup.mfields[self.field_name]
-        relation = modelfield.attrs['relation']
-        context = modelfield.context_get(model)
+    def open_remote(self, record, create=True, changed=False, text=None):
+        group = record.value[self.field_name]
+        field = record.group.fields[self.field_name]
+        relation = field.attrs['relation']
+        context = field.context_get(record)
 
-        dia = O2MDialog(relation, parent=model, model=models,
-                attrs=modelfield.attrs, default_get_ctx=context,
-                window=self.window)
-        res, value = dia.run()
-        dia.destroy()
+        screen = Screen(relation, self.window, view_type=['tree', 'form'],
+                exclude_field=field.attrs.get('relation_field'))
+        screen.group = group
+        win = WinForm(screen, self.window, view_type='tree', context=context)
+        win.run()
+        win.destroy()
         return False, False
 
 
@@ -606,53 +606,55 @@ class M2M(Char):
         super(M2M, self).setter(column, cell, store, iter)
         cell.set_property('xalign', 0.5)
 
-    def get_textual_value(self, model):
-        return '( ' + str(len(model[self.field_name].\
-                get_client(model).models)) + ' )'
+    def get_textual_value(self, record):
+        return '( ' + str(len(record[self.field_name].\
+                get_client(record))) + ' )'
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         if not text:
             return []
         if not (text[0] != '('):
-            return model[self.field_name].get(model)
-        relation = model[self.field_name].attrs['relation']
-        rpc_relation = RPCProxy(relation)
-        domain = model[self.field_name].domain_get(model)
-        context = model[self.field_name].context_get(model)
+            return record[self.field_name].get(record)
+        field = record[self.field_name]
+        relation = field.attrs['relation']
+        domain = field.domain_get(record)
+        context = field.context_get(record)
+        if text:
+            dom = [('rec_name', 'ilike', '%' + text + '%'),
+                    domain]
+        else:
+            dom = domain
+        args = ('model', relation, 'search', dom, 0, _LIMIT, None, context)
         try:
-            if text:
-                dom = [('rec_name', 'ilike', '%' + text + '%'),
-                        domain]
-            else:
-                dom = domain
-            ids = rpc_relation.search(dom, 0, _LIMIT, None, context)
+            ids = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            return []
+            ids = common.process_exception(exception, self.window, *args)
+            if ids is False:
+                return []
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain, parent=self.window)
         found = win.run()
         return found or []
 
-    def open_remote(self, model, create=True, changed=False, text=None):
-        modelfield = model[self.field_name]
-        relation = modelfield.attrs['relation']
-
-        rpc_relation = RPCProxy(relation)
-        context = model[self.field_name].context_get(model)
-        domain = model[self.field_name].domain_get(model)
+    def open_remote(self, record, create=True, changed=False, text=None):
+        field = record[self.field_name]
+        relation = field.attrs['relation']
+        context = field.context_get(record)
+        domain = field.domain_get(record)
         if create:
             if text and len(text) and text[0] != '(':
                 domain.append(('name', '=', text))
+            args = ('model', relation, 'search', domain)
             try:
-                ids = rpc_relation.search(domain)
+                ids = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                return False, None
+                ids = common.process_exception(exception, self.window, *args)
+                if ids is False:
+                    return False, None
             if ids and len(ids)==1:
                 return True, ids
         else:
-            ids = [x.id for x in model[self.field_name].get_client(model)]
+            ids = [x.id for x in field.get_client(record)]
         win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
                 domain=domain, parent=self.window)
         found = win.run()
@@ -670,21 +672,22 @@ class Selection(Char):
         selection = self.attrs.get('selection', [])[:]
         self.selection = selection[:]
         if 'relation' in self.attrs:
+            args = ('model', self.attrs['relation'], 'search_read',
+                    self.attrs.get('domain', []), 0, None, None, rpc.CONTEXT,
+                    ['rec_name'])
             try:
-                result = rpc.execute('model',
-                        self.attrs['relation'], 'search_read',
-                        self.attrs.get('domain', []),
-                        0, None, None, rpc.CONTEXT, ['rec_name'])
-                selection = [(x['id'], x['rec_name']) for x in result]
+                result = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                selection = []
+                result = common.process_exception(exception, self.window, *args)
+                if not result:
+                    result = []
+            selection = [(x['id'], x['rec_name']) for x in result]
             self.selection = selection[:]
         else:
             if not isinstance(selection, (list, tuple)):
                 try:
                     selection = rpc.execute('model',
-                            self.model, selection, rpc.CONTEXT)
+                            self.model_name, selection, rpc.CONTEXT)
                 except Exception, exception:
                     common.process_exception(exception, self.window)
                     selection = []
@@ -710,13 +713,13 @@ class Selection(Char):
         self.renderer.set_property('model', selection_data)
         self.renderer.set_property('text-column', 1)
 
-    def get_textual_value(self, model):
-        value = model[self.field_name].get(model)
+    def get_textual_value(self, record):
+        value = record[self.field_name].get(record)
         if isinstance(value, (list, tuple)):
             value = value[0]
         return dict(self.selection).get(value, '')
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         res = False
         for val, txt in self._selection:
             if txt[:len(text)].lower() == text.lower():
@@ -728,16 +731,15 @@ class Selection(Char):
 
 class Reference(Char):
 
-    def __init__(self, field_name, model, treeview=None, attrs=None,
-            window=None):
-        super(Reference, self).__init__(field_name, model, treeview=treeview,
-                attrs=attrs, window=window)
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(Reference, self).__init__(field_name, model_name, treeview,
+                window, attrs=attrs)
         self._selection = {}
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
             try:
                 selection = rpc.execute('model',
-                        model, selection, rpc.CONTEXT)
+                        model_name, selection, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 selection = []
@@ -745,25 +747,30 @@ class Reference(Char):
         for i, j in selection:
             self._selection[i] = str(j)
 
-    def get_textual_value(self, model):
-        value = model[self.field_name].get_client(model)
+    def get_textual_value(self, record):
+        value = record[self.field_name].get_client(record)
         if not value:
             model, (obj_id, name) = '', (0, '')
         else:
             model, (obj_id, name) = value
         if model:
             if not name and obj_id:
+                args = ('model', model, 'read', obj_id, ['rec_name'],
+                        rpc.CONTEXT)
                 try:
-                    name = RPCProxy(model).read(obj_id, ['rec_name'],
-                            rpc.CONTEXT)['rec_name']
+                    res = rpc.execute(*args)
                 except Exception, exception:
-                    common.process_exception(exception, self.window)
+                    res = common.process_exception(exception, self.window,
+                            *args)
+                if not res:
                     name = '???'
+                else:
+                    name = res['rec_name']
             return self._selection.get(model, model) + ',' + name
         else:
             return name
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         pass
 
 
@@ -775,9 +782,10 @@ class ProgressBar(object):
         'top_to_bottom': gtk.PROGRESS_TOP_TO_BOTTOM,
     }
 
-    def __init__(self, field_name, model, treeview=None, attrs=None, window=None):
+    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+        super(ProgressBar, self).__init__()
         self.field_name = field_name
-        self.model = model
+        self.model_name = model_name
         self.attrs = attrs or {}
         self.renderer = gtk.CellRendererProgress()
         orientation = self.orientations.get(self.attrs.get('orientation',
@@ -787,29 +795,29 @@ class ProgressBar(object):
         self.window = window
 
     def setter(self, column, cell, store, iter):
-        model = store.get_value(iter, 0)
-        value = float(self.get_textual_value(model) or 0.0)
+        record = store.get_value(iter, 0)
+        value = float(self.get_textual_value(record) or 0.0)
         cell.set_property('value', value)
         if isinstance(self.attrs.get('digits'), str):
-            digit = model.expr_eval(self.attrs['digits'])[1]
+            digit = record.expr_eval(self.attrs['digits'])[1]
         else:
             digit = self.attrs.get('digits', (16, 2))[1]
         text = locale.format('%.' + str(digit) + 'f', value, True)
         cell.set_property('text', text + '%')
 
-    def open_remote(self, model, create, changed=False, text=None):
+    def open_remote(self, record, create, changed=False, text=None):
         raise NotImplementedError
 
-    def get_textual_value(self, model):
-        return model[self.field_name].get_client(model) or ''
+    def get_textual_value(self, record):
+        return record[self.field_name].get_client(record) or ''
 
-    def value_from_text(self, model, text):
+    def value_from_text(self, record, text):
         return float(text)
 
 
 class Button(object):
 
-    def __init__(self, treeview=None, attrs=None, window=None, screen=None):
+    def __init__(self, treeview, windown, screen, attrs=None):
         super(Button, self).__init__()
         self.attrs = attrs or {}
         self.renderer = CellRendererButton(attrs.get('string', _('Unknown')))
@@ -823,24 +831,24 @@ class Button(object):
         if not path:
             return True
         store = self.treeview.get_model()
-        model = store.get_value(store.get_iter(path), 0)
+        record = store.get_value(store.get_iter(path), 0)
 
-        state_changes = PYSONDecoder().decode(model.expr_eval(
+        state_changes = PYSONDecoder().decode(record.expr_eval(
             self.attrs.get('states', {}), check_load=False))
         if state_changes.get('invisible') \
                 or state_changes.get('readonly'):
             return True
 
-        self.screen.current_model = model
+        self.screen.current_record = record
         obj_id = self.screen.save_current()
         if obj_id:
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm'], self.window):
                 button_type = self.attrs.get('type', 'workflow')
                 ctx = rpc.CONTEXT.copy()
-                ctx.update(model.context_get())
+                ctx.update(record.context_get())
                 if button_type == 'workflow':
-                    args = ('model', self.screen.name,
+                    args = ('model', self.screen.model_name,
                             'workflow_trigger_validate', obj_id,
                             self.attrs['name'], ctx)
                     try:
@@ -848,7 +856,7 @@ class Button(object):
                     except Exception, exception:
                         common.process_exception(exception, self.window, *args)
                 elif button_type == 'object':
-                    args = ('model', self.screen.name,
+                    args = ('model', self.screen.model_name,
                             self.attrs['name'], [obj_id], ctx)
                     try:
                         rpc.execute(*args)
@@ -865,7 +873,7 @@ class Button(object):
                                 self.window, *args)
                     if action_id:
                         Action.execute(action_id, {
-                            'model': self.screen.name,
+                            'model': self.screen.model_name,
                             'id': obj_id,
                             'ids': [obj_id],
                             }, self.window, context=ctx)
@@ -873,9 +881,6 @@ class Button(object):
                     raise Exception('Unallowed button type')
                 self.screen.reload(writen=True)
             else:
-                if self.screen.form:
-                    self.screen.form.message_info(
-                            _('Invalid Form, correct red fields!'))
                 self.screen.display()
 
 CELLTYPES = {

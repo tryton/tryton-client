@@ -168,9 +168,8 @@ def logout():
 
 def context_reload():
     global CONTEXT, TIMEZONE
-    user = RPCProxy('res.user')
     try:
-        context = user.get_preferences(True, {})
+        context = execute('model', 'res.user', 'get_preferences', True, {})
     except:
         return
     CONTEXT = {}
@@ -224,23 +223,3 @@ def execute(*args):
 
 def execute_nonblocking(*args):
     return _execute(False, *args)
-
-class RPCProxy(object):
-
-    def __init__(self, name):
-        self.name = name
-        self.__attrs = {}
-
-    def __getattr__(self, attr):
-        if attr not in self.__attrs:
-            self.__attrs[attr] = RPCFunction(self.name, attr)
-        return self.__attrs[attr]
-
-class RPCFunction(object):
-
-    def __init__(self, name, func_name):
-        self.name = name
-        self.func = func_name
-
-    def __call__(self, *args):
-        return execute('model', self.name, self.func, *args)

@@ -16,8 +16,9 @@ NOIMAGE = file(os.path.join(PIXMAPS_DIR, 'tryton-noimage.png'), 'rb').read()
 
 class Image(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Image, self).__init__(window, parent, model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Image, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.height = int(attrs.get('img_height', 100))
         self.width = int(attrs.get('img_width', 300))
@@ -96,22 +97,22 @@ class Image(WidgetInterface):
         for pat in ("*.png", "*.jpg", "*.gif", "*.tif", "*.xpm"):
             filter_image.add_pattern(pat)
 
-        filename = file_selection(_('Open...'), parent=self._window,
+        filename = file_selection(_('Open...'), parent=self.window,
                 preview=True, filters=[filter_image, filter_all])
         if filename:
-            self._view.modelfield.set_client(self._view.model,
+            self.field.set_client(self.record,
                     encodestring(file(filename, 'rb').read()))
             self.update_img()
 
     def sig_save_as(self, widget):
-        filename = file_selection(_('Save As...'), parent=self._window,
+        filename = file_selection(_('Save As...'), parent=self.window,
                 action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             file(filename, 'wb').write(decodestring(
-                self._view.modelfield.get_client(self._view.model)))
+                self.field.get_client(self.record)))
 
     def sig_remove(self, widget):
-        self._view.modelfield.set_client(self._view.model, False)
+        self.field.set_client(self.record, False)
         self.update_img()
 
     def drag_motion(self, widget, context, x, y, timestamp):
@@ -127,26 +128,26 @@ class Image(WidgetInterface):
         if info == 0:
             uri = selection.get_text().split('\n')[0]
             if uri:
-                self._view.modelfield.set_client(self._view.model,
+                self.field.set_client(self.record,
                         encodestring(urllib.urlopen(uri).read()))
             self.update_img()
         elif info == 1:
             uri = selection.data.split('\r\n')[0]
             if uri:
-                self._view.modelfield.set_client(self._view.model,
+                self.field.set_client(self.record,
                         encodestring(urllib.urlopen(uri).read()))
             self.update_img()
         elif info == 2:
             data = selection.get_pixbuf()
             if data:
-                self._view.modelfield.set_client(self._view.model,
+                self.field.set_client(self.record,
                         encodestring(data))
                 self.update_img()
 
     def update_img(self):
         value = None
-        if self._view:
-            value = self._view.modelfield.get_client(self._view.model)
+        if self.field:
+            value = self.field.get_client(self.record)
         if not value:
             data = NOIMAGE
         else:
@@ -190,8 +191,8 @@ class Image(WidgetInterface):
                 gtk.gdk.INTERP_BILINEAR)
         self.image.set_from_pixbuf(scaled)
 
-    def display(self, model, model_field):
-        if not model_field:
+    def display(self, record, field):
+        if not field:
             return False
-        super(Image, self).display(model, model_field)
+        super(Image, self).display(record, field)
         self.update_img()

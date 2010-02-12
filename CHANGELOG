@@ -1,3 +1,13 @@
+* Refactoring:
+    * Better naming in model
+    * Group extends list
+    * Add an index to Group
+    * New common windows for dialog of many2one, one2many and many2many
+    * one2many and many2many dialog use the same screen than the widget
+    * Reduce the number of option in Screen
+    * Remove RPCProxy to handle logout exception on every server call
+    * Better naming of event signals
+    * Fix on_change detection for many2many for issue1400
 * Add PySON to replace python string evaluation
 * Don't show "Spell Checking" option if gtkspell is not present
 * Use the same internal model for many2many and one2many fields

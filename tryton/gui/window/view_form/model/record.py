@@ -1,15 +1,13 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import re
-import time
-from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
+import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import field
 import datetime
-import tryton.common as common
 import logging
+import time
 
 
 class EvalEnvironment(dict):
@@ -43,96 +41,91 @@ class EvalEnvironment(dict):
     __repr__ = __str__
 
     def __contains__(self, item):
-        return item in self.parent.mgroup.mfields
+        return item in self.parent.group.fields
 
 
-class ModelRecord(SignalEvent):
+class Record(SignalEvent):
 
     id = -1
 
 
-    def __init__(self, resource, obj_id, window, group=None, parent=None,
+    def __init__(self, model_name, obj_id, window, group=None, parent=None,
             parent_name='', new=False):
-        global ID_COUNT
-        super(ModelRecord, self).__init__()
+        super(Record, self).__init__()
         self.window = window
-        self.resource = resource
-        self.rpc = RPCProxy(self.resource)
-        self.id = obj_id or ModelRecord.id
+        self.model_name = model_name
+        self.id = obj_id or Record.id
         if self.id < 0:
-            ModelRecord.id -= 1
+            Record.id -= 1
         self._loaded = set()
         self.parent = parent
         self.parent_name = parent_name
-        self.mgroup = group
+        self.group = group
+        if group is not None:
+            assert model_name == group.model_name
         self.value = {}
         self.state_attrs = {}
         self.__modified = False
         self.modified_fields = {}
         self._timestamp = None
         self.attachment_count = -1
-        self.next = {}
-        for key, val in self.mgroup.mfields.items():
+        self.next = {} # Used in Group list
+        for key, val in self.group.fields.items():
             self.value[key] = val.create(self)
             if (new and val.attrs['type']=='one2many') \
                     and (val.attrs.get('mode','tree,form').startswith('form')):
-                mod = self.value[key].model_new()
-                self.value[key].model_add(mod)
+                record = self.value[key].new()
+                self.value[key].add(record)
 
     def __getitem__(self, name):
         if name not in self._loaded and self.id > 0:
             ids =  [self.id]
-            if self in self.mgroup.models:
-                idx = self.mgroup.models.index(self)
-                length = len(self.mgroup.models)
+            if self in self.group:
+                idx = self.group.index(self)
+                length = len(self.group)
                 n = 1
                 while len(ids) < 80 and (idx - n >= 0 or \
                         idx + n < length) and n < 100:
                     if idx - n >= 0:
-                        model = self.mgroup.models[idx - n]
-                        if name not in model._loaded and model.id > 0:
-                            ids.append(model.id)
+                        record = self.group[idx - n]
+                        if name not in record._loaded and record.id > 0:
+                            ids.append(record.id)
                     if idx + n < length:
-                        model = self.mgroup.models[idx + n]
-                        if name not in model._loaded and model.id > 0:
-                            ids.append(model.id)
+                        record = self.group[idx + n]
+                        if name not in record._loaded and record.id > 0:
+                            ids.append(record.id)
                     n += 1
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
-            args = (ids, self.mgroup.mfields.keys() + \
-                        [x + '.rec_name' for x in self.mgroup.mfields.keys()
-                            if self.mgroup.fields[x]['type'] \
+            args = ('model', self.model_name, 'read',
+                    ids, self.group.fields.keys() + \
+                        [x + '.rec_name' for x in self.group.fields.keys()
+                            if self.group.fields[x].attrs['type'] \
                                     in ('many2one', 'reference')] + \
                         ['_timestamp'], ctx)
             try:
-                values = self.rpc.read(*args)
+                values = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                try:
-                    values = self.rpc.read(args)
-                except:
+                values = common.process_exception(exception, self.window, *args)
+                if not values:
                     log = logging.getLogger('record')
                     log.error('%s' % exception.args[-1])
                     values = [{'id': x} for x in ids]
-            model_set = None
             id2value = dict((value['id'], value) for value in values)
             if ids != [self.id]:
-                for model in self.mgroup.models:
-                    value = id2value.get(model.id)
-                    if value:
-                        model.set(value, signal=False)
-                        model_set = model
+                for id in ids:
+                    record = self.group.get(id)
+                    value = id2value.get(id)
+                    if record and value:
+                        record.set(value, signal=False)
             else:
                 value = id2value.get(self.id)
                 if value:
                     self.set(value, signal=False)
-                    model_set = self
-            if model_set:
-                model_set.signal('record-changed')
-        return self.mgroup.mfields.get(name, False)
+        return self.group.fields.get(name, False)
 
     def __repr__(self):
-        return '<ModelRecord %s@%s>' % (self.id, self.resource)
+        return '<Record %s@%s>' % (self.id, self.model_name)
 
     def get_modified(self):
         return self.__modified
@@ -148,7 +141,7 @@ class ModelRecord(SignalEvent):
         return self.modified
 
     def fields_get(self):
-        return self.mgroup.mfields
+        return self.group.fields
 
     def _check_load(self):
         if not self.loaded:
@@ -157,7 +150,7 @@ class ModelRecord(SignalEvent):
         return False
 
     def get_loaded(self):
-        return set(self.mgroup.mfields.keys()) == self._loaded
+        return set(self.group.fields.keys()) == self._loaded
 
     loaded = property(get_loaded)
 
@@ -166,12 +159,12 @@ class ModelRecord(SignalEvent):
         if check_load:
             self._check_load()
         value = []
-        for name, mfield in self.mgroup.mfields.items():
+        for name, field in self.group.fields.iteritems():
             if (get_readonly or \
-                    not mfield.get_state_attrs(self).get('readonly', False)) \
+                    not field.get_state_attrs(self).get('readonly', False)) \
                 and (not get_modifiedonly \
-                   or mfield.name in self.modified_fields):
-                value.append((name, mfield.get(self, check_load=check_load,
+                   or field.name in self.modified_fields):
+                value.append((name, field.get(self, check_load=check_load,
                     readonly=get_readonly, modified=get_modifiedonly)))
         value = dict(value)
         if includeid:
@@ -182,8 +175,8 @@ class ModelRecord(SignalEvent):
         if check_load:
             self._check_load()
         value = {}
-        for name, mfield in self.mgroup.mfields.items():
-            value[name] = mfield.get_eval(self, check_load=check_load)
+        for name, field in self.group.fields.iteritems():
+            value[name] = field.get_eval(self, check_load=check_load)
         value['id'] = self.id
         return value
 
@@ -192,23 +185,25 @@ class ModelRecord(SignalEvent):
         self.reload()
 
     def get_timestamp(self):
-        result = {self.resource + ',' + str(self.id): self._timestamp}
-        for name, mfield in self.mgroup.mfields.items():
-            result.update(mfield.get_timestamp(self))
+        result = {self.model_name + ',' + str(self.id): self._timestamp}
+        for name, field in self.group.fields.iteritems():
+            result.update(field.get_timestamp(self))
         return result
 
     def save(self, force_reload=True):
         self._check_load()
         if self.id < 0:
             value = self.get(get_readonly=True)
-            args = ('model', self.resource, 'create', value, self.context_get())
+            args = ('model', self.model_name, 'create', value, self.context_get())
             try:
-                self.id = rpc.execute(*args)
+                res = rpc.execute(*args)
             except Exception, exception:
                 res = common.process_exception(exception, self.window, *args)
                 if not res:
                     return False
-                self.id = res
+            old_id = self.id
+            self.id = res
+            self.group.id_changed(old_id)
         else:
             if not self.is_modified():
                 return self.id
@@ -216,7 +211,7 @@ class ModelRecord(SignalEvent):
             context = self.context_get()
             context = context.copy()
             context['_timestamp'] = self.get_timestamp()
-            args = ('model', self.resource, 'write', [self.id], value, context)
+            args = ('model', self.model_name, 'write', [self.id], value, context)
             try:
                 if not rpc.execute(*args):
                     return False
@@ -226,35 +221,41 @@ class ModelRecord(SignalEvent):
         self._loaded.clear()
         if force_reload:
             self.reload()
-        if self.mgroup:
-            self.mgroup.writen(self.id)
+        if self.group:
+            self.group.writen(self.id)
         return self.id
 
     def default_get(self, domain=None, context=None):
-        if len(self.mgroup.fields):
+        if len(self.group.fields):
+            args = ('model', self.model_name, 'default_get',
+                    self.group.fields.keys(), context)
             try:
-                val = self.rpc.default_get(self.mgroup.fields.keys(), context)
+                vals = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                val = self.rpc.default_get(self.mgroup.fields.keys(), context)
-            self.set_default(val)
+                vals = common.process_exception(exception, self.window, *args)
+                if not vals:
+                    return
+            self.set_default(vals)
 
     def rec_name(self):
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
+        args = ('model', self.model_name, 'read', self.id, ['rec_name'], ctx)
         try:
-            name = self.rpc.read(self.id, ['rec_name'], ctx)['rec_name']
+            res = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            name = self.rpc.read(self.id, ['rec_name'], ctx)['rec_name']
-        return name
+            res = common.process_exception(exception, self.window, *args)
+            if not res:
+                return ''
+        return res['rec_name']
 
     def validate_set(self):
-        change = self._check_load()
-        for mfield in self.mgroup.mfields.itervalues():
+        self._check_load()
+        change = False
+        for field in self.group.fields.itervalues():
             change = change or \
-                    not mfield.get_state_attrs(self).get('valid', True)
-            mfield.get_state_attrs(self)['valid'] = True
+                    not field.get_state_attrs(self).get('valid', True)
+            field.get_state_attrs(self)['valid'] = True
         if change:
             self.signal('record-changed')
         return change
@@ -262,43 +263,44 @@ class ModelRecord(SignalEvent):
     def validate(self):
         self._check_load()
         res = True
-        for mfield in self.mgroup.mfields.itervalues():
-            if not mfield.validate(self):
+        for field in self.group.fields.itervalues():
+            if not field.validate(self):
                 res = False
         return res
 
     def _get_invalid_fields(self):
         res = []
-        for fname, mfield in self.mgroup.mfields.items():
-            if not mfield.get_state_attrs(self).get('valid', True):
-                res.append((fname, mfield.attrs['string']))
+        for fname, field in self.group.fields.iteritems():
+            if not field.get_state_attrs(self).get('valid', True):
+                res.append((fname, field.attrs['string']))
         return dict(res)
+
     invalid_fields = property(_get_invalid_fields)
 
     def context_get(self):
-        return self.mgroup.context
+        return self.group.context
 
     def get_default(self):
         self._check_load()
-        value = dict([(name, mfield.get_default(self))
-                      for name, mfield in self.mgroup.mfields.items()])
+        value = dict([(name, field.get_default(self))
+                      for name, field in self.group.fields.iteritems()])
         return value
 
     def set_default(self, val, signal=True, modified=False):
         for fieldname, value in val.items():
-            if fieldname not in self.mgroup.mfields:
+            if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+            if isinstance(self.group.fields[fieldname], field.M2OField):
                 if fieldname + '.rec_name' in val:
                     value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.mgroup.mfields[fieldname], field.ReferenceField):
+            elif isinstance(self.group.fields[fieldname], field.ReferenceField):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
                         value = ref_model, (ref_id, val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
-            self.mgroup.mfields[fieldname].set_default(self, value,
+            self.group.fields[fieldname].set_default(self, value,
                     modified=modified)
             self._loaded.add(fieldname)
         if signal:
@@ -310,25 +312,25 @@ class ModelRecord(SignalEvent):
             if fieldname == '_timestamp':
                 self._timestamp = value
                 continue
-            if fieldname not in self.mgroup.mfields:
+            if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
+            if isinstance(self.group.fields[fieldname], field.O2MField):
                 later[fieldname] = value
                 continue
-            if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+            if isinstance(self.group.fields[fieldname], field.M2OField):
                 if fieldname + '.rec_name' in val:
                     value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.mgroup.mfields[fieldname], field.ReferenceField):
+            elif isinstance(self.group.fields[fieldname], field.ReferenceField):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
                         value = ref_model, (ref_id, val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
-            self.mgroup.mfields[fieldname].set(self, value, modified=modified)
+            self.group.fields[fieldname].set(self, value, modified=modified)
             self._loaded.add(fieldname)
         for fieldname, value in later.iteritems():
-            self.mgroup.mfields[fieldname].set(self, value, modified=modified)
+            self.group.fields[fieldname].set(self, value, modified=modified)
             self._loaded.add(fieldname)
         self.modified = modified
         if not self.modified:
@@ -348,8 +350,8 @@ class ModelRecord(SignalEvent):
         if check_load:
             self._check_load()
         ctx = rpc.CONTEXT.copy()
-        for name, mfield in self.mgroup.mfields.items():
-            ctx[name] = mfield.get_eval(self, check_load=check_load)
+        for name, field in self.group.fields.items():
+            ctx[name] = field.get_eval(self, check_load=check_load)
 
         ctx['context'] = self.context_get()
         ctx['active_id'] = self.id
@@ -363,8 +365,8 @@ class ModelRecord(SignalEvent):
     def _get_on_change_args(self, args):
         res = {}
         values = {}
-        for name, mfield in self.mgroup.mfields.iteritems():
-            values[name] = mfield.get_eval(self, check_load=False)
+        for name, field in self.group.fields.iteritems():
+            values[name] = field.get_eval(self, check_load=False)
         if self.parent and self.parent_name:
             values['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
                     False)
@@ -385,41 +387,41 @@ class ModelRecord(SignalEvent):
         ids = [self.id]
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
+        args = ('model', self.model_name, 'on_change_' + fieldname,
+                ids, args, ctx)
         try:
-            res = getattr(self.rpc, 'on_change_' + fieldname)(ids, args,
-                    ctx)
+            res = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            res = getattr(self.rpc, 'on_change_' + fieldname)(ids, args,
-                    ctx)
-        if res:
-            later = {}
-            for fieldname, value in res.items():
-                if fieldname not in self.mgroup.mfields:
-                    continue
-                if isinstance(self.mgroup.mfields[fieldname], field.O2MField):
-                    later[fieldname] = value
-                    continue
-                if isinstance(self.mgroup.mfields[fieldname], field.M2OField):
+            res = common.process_exception(exception, self.window, *args)
+            if not res:
+                return
+        later = {}
+        for fieldname, value in res.items():
+            if fieldname not in self.group.fields:
+                continue
+            if isinstance(self.group.fields[fieldname], field.O2MField):
+                later[fieldname] = value
+                continue
+            if isinstance(self.group.fields[fieldname], field.M2OField):
+                if fieldname + '.rec_name' in res:
+                    value = (value, res[fieldname + '.rec_name'])
+            elif isinstance(self.group.fields[fieldname],
+                    field.ReferenceField):
+                if value:
+                    ref_mode, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in res:
-                        value = (value, res[fieldname + '.rec_name'])
-                elif isinstance(self.mgroup.mfields[fieldname],
-                        field.ReferenceField):
-                    if value:
-                        ref_mode, ref_id = value.split(',', 1)
-                        if fieldname + '.rec_name' in res:
-                            value = ref_model, (ref_id,
-                                    res[fieldname + '.rec_name'])
-                        else:
-                            value = ref_model, (ref_id, ref_id)
-                self.mgroup.mfields[fieldname].set_on_change(self, value)
-            for fieldname, value in later.items():
-                self.mgroup.mfields[fieldname].set_on_change(self, value)
-            self.signal('record-changed')
+                        value = ref_model, (ref_id,
+                                res[fieldname + '.rec_name'])
+                    else:
+                        value = ref_model, (ref_id, ref_id)
+            self.group.fields[fieldname].set_on_change(self, value)
+        for fieldname, value in later.items():
+            self.group.fields[fieldname].set_on_change(self, value)
+        self.signal('record-changed')
 
     def on_change_with(self, field_name):
-        for fieldname in self.mgroup.mfields:
-            on_change_with = self.mgroup.mfields[fieldname].attrs.get(
+        for fieldname in self.group.fields:
+            on_change_with = self.group.fields[fieldname].attrs.get(
                     'on_change_with')
             if not on_change_with:
                 continue
@@ -431,37 +433,39 @@ class ModelRecord(SignalEvent):
             ids = [self.id]
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
+            args = ('model', self.model_name, 'on_change_with_' + fieldname,
+                    ids, args, ctx)
             try:
-                res = getattr(self.rpc, 'on_change_with_' + fieldname)(ids,
-                        args, ctx)
+                res = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                res = getattr(self.rpc, 'on_change_with_' + fieldname)(ids,
-                        args, ctx)
-            self.mgroup.mfields[fieldname].set_on_change(self, res)
+                res = common.process_exception(exception, self.window, *args)
+                if not res:
+                    return
+            self.group.fields[fieldname].set_on_change(self, res)
 
     def cond_default(self, field_name, value):
-        ir_default = RPCProxy('ir.default')
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
+        args = ('model', 'ir.default', 'get_default', self.model_name,
+                field_name + '=' + str(value), ctx)
         try:
-            self.set_default(ir_default.get_default(self.resource,
-                field_name + '=' + str(value), ctx))
+            res = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, self.window)
-            self.set_default(ir_default.get_default(self.resource,
-                field_name + '=' + str(value), ctx))
+            res = common.process_exception(exception, self.window, *args)
+            if not res:
+                return
+        self.set_default(res)
 
     def get_attachment_count(self, reload=False):
         if self.id < 0:
             return 0
         if self.attachment_count < 0 or reload:
-            ir_attachment = RPCProxy('ir.attachment')
+            args = ('model', 'ir.attachment', 'search_count', [
+                ('res_model', '=', self.model_name),
+                ('res_id', '=', self.id),
+                ])
             try:
-                self.attachment_count = ir_attachment.search_count([
-                    ('res_model', '=', self.resource),
-                    ('res_id', '=', self.id),
-                    ])
+                self.attachment_count = rpc.execute(*args)
             except:
                 return 0
         return self.attachment_count

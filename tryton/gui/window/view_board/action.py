@@ -146,7 +146,9 @@ class Action(object):
             self.screen = Screen(self.action['res_model'], self._window,
                     view_type=self.action['view_mode'], context=self.context,
                     view_ids=view_ids, domain=self.domain, readonly=True)
-            alignment.add(self.screen.widget)
+            self.screen.screen_container.alternate_view = True
+            self.screen.switch_view(view_type=self.action['view_mode'])
+            alignment.add(self.screen.screen_container.alternate_viewport)
             name = self.screen.current_view.title
             self.screen.signal_connect(self, 'record-message', self._sig_label)
         elif self.action['view_type'] == 'tree':

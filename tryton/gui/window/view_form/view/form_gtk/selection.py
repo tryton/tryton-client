@@ -9,8 +9,9 @@ import tryton.common as common
 
 class Selection(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Selection, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Selection, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.ComboBoxEntry()
@@ -40,16 +41,16 @@ class Selection(WidgetInterface):
                         ['rec_name'])
                 selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
-                common.process_exception(exception, self._window)
+                common.process_exception(exception, self.window)
                 selection = []
             self.selection = selection[:]
         else:
             if not isinstance(selection, (list, tuple)):
                 try:
                     selection = rpc.execute('model',
-                            self.model, selection, rpc.CONTEXT)
+                            self.model_name, selection, rpc.CONTEXT)
                 except Exception, exception:
-                    common.process_exception(exception, self._window)
+                    common.process_exception(exception, self.window)
                     selection = []
                 self.selection = selection[:]
 
@@ -123,24 +124,24 @@ class Selection(WidgetInterface):
                     value = val
                     if len(txt) == len(text):
                         break
-        self._view.modelfield.set_client(self._view.model, value, force_change=True)
-        self.display(self._view.model, self._view.modelfield)
+        self.field.set_client(self.record, value, force_change=True)
+        self.display(self.record, self.field)
 
-    def set_value(self, model, model_field):
-        model_field.set_client(model, self.value_get())
+    def set_value(self, record, field):
+        field.set_client(record, self.value_get())
 
     def _menu_sig_default_set(self, reset=False):
-        self.set_value(self._view.model, self._view.modelfield)
+        self.set_value(self.record, self.field)
         super(Selection, self)._menu_sig_default_set(reset=reset)
 
-    def display(self, model, model_field):
+    def display(self, record, field):
         child = self.entry.get_child()
         self.changed = False
-        if not model_field:
+        if not field:
             child.set_text('')
             return False
-        super(Selection, self).display(model, model_field)
-        value = model_field.get(model)
+        super(Selection, self).display(record, field)
+        value = field.get(record)
         if isinstance(value, (list, tuple)):
             value = value[0]
         if not value:

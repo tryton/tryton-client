@@ -1,7 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
-from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 from tryton.common import COLORS, process_exception, message
 from tryton.config import TRYTON_ICON
@@ -16,7 +15,7 @@ _ATTRS_BOOLEAN = {
     'readonly': False
 }
 
-def field_pref_set(field, name, model, value, client_value, dependance,
+def field_pref_set(field, name, model_name, value, client_value, dependance,
         window, reset=False):
     dialog = WidgetFieldPreference(window, reset=reset)
     if dependance is None:
@@ -60,7 +59,7 @@ def field_pref_set(field, name, model, value, client_value, dependance,
             method = 'reset_default'
         else:
             method = 'set_default'
-        args = ('model', 'ir.default', method, model, field, clause,
+        args = ('model', 'ir.default', method, model_name, field, clause,
                 value, user, rpc.CONTEXT)
         try:
             rpc.execute(*args)
@@ -72,14 +71,12 @@ def field_pref_set(field, name, model, value, client_value, dependance,
 
 class WidgetInterface(object):
 
-    def __init__(self, window, parent=None, model=None, attrs=None):
-        if attrs is None:
-            attrs = {}
-        self.parent = parent
-        self.model = model
-        self._window = window
-        self._view = None
-        self.attrs = attrs
+    def __init__(self, field_name, model_name, window, attrs=None):
+        self.field_name = field_name
+        self.model_name = model_name
+        self.window = window
+        self.view = None # Filled by ViewForm
+        self.attrs = attrs or {}
         for key, val in _ATTRS_BOOLEAN.iteritems():
             self.attrs[key] = attrs.get(key, False) not in ('False', '0', False)
         self.default_readonly = self.attrs.get('readonly', False)
@@ -96,41 +93,51 @@ class WidgetInterface(object):
         self.colors = {}
         self.visible = True
 
+    def __get_record(self):
+        return self.view.screen.current_record
+
+    record = property(__get_record)
+
+    def __get_field(self):
+        if self.record:
+            return self.record.group.fields[self.field_name]
+
+    field = property(__get_field)
+
     def destroy(self):
         pass
 
     def _menu_sig_default_get(self):
-        if self._view.modelfield.get_state_attrs(self._view.model)\
-                .get('readonly', False):
+        if self.field.get_state_attrs(self.record).get('readonly', False):
             return False
-        model = self._view.modelfield.parent.resource
-        args = ('model', model, 'default_get', [self.attrs['name']])
+        model_name = self.field.parent.model_name
+        args = ('model', model_name, 'default_get', [self.attrs['name']])
         try:
             res = rpc.execute(*args)
         except Exception, exception:
-            process_exception(exception, self._window, *args)
-        self._view.modelfield.set_default(self._view.model,
+            process_exception(exception, self.window, *args)
+        self.field.set_default(self.record,
                 res.get(self.attrs['name'], False), modified=True)
-        self.display(self._view.model, self._view.modelfield)
+        self.display(self.record, self.field)
 
     def _menu_sig_default_set(self, reset=False):
         deps = []
-        for wname, wviews in self._view.view_form.widgets.iteritems():
+        for wname, wviews in self.view.widgets.iteritems():
             for wview in wviews:
                 if wview.modelfield.attrs.get('change_default', False):
-                    wvalue = wview.modelfield.get(self._view.model)
+                    wvalue = wview.modelfield.get(self.record)
                     name = wview.modelfield.attrs.get('string', wname)
-                    value = wview.modelfield.get_client(self._view.model)
+                    value = wview.modelfield.get_client(self.record)
                     deps.append((wname, name, wvalue, value))
-        if not self._view.modelfield.validate(self._view.model):
-            message(_('Invalid field!'), parent=self._window)
+        if not self.field.validate(self.record):
+            message(_('Invalid field!'), parent=self.window)
             return
-        value = self._view.modelfield.get_default(self._view.model)
+        value = self.field.get_default(self.record)
         client_value = self.display_value()
-        model = self._view.modelfield.parent.resource
-        field_pref_set(self._view.widget_name,
-                self.attrs.get('string', self._view.widget_name), model,
-                value, client_value, deps, self._window, reset=reset)
+        model_name = self.field.parent.model_name
+        field_pref_set(self.field_name,
+                self.attrs.get('string', self.field_name), model_name,
+                value, client_value, deps, self.window, reset=reset)
 
     def sig_activate(self, widget=None):
         # emulate a focus_out so that the onchange is called if needed
@@ -205,7 +212,7 @@ class WidgetInterface(object):
             widget.show()
 
     def display_value(self):
-        return self._view.modelfield.get_client(self._view.model)
+        return self.field.get_client(self.record)
 
     def _menu_open(self, obj, event):
         if event.button == 3:
@@ -243,30 +250,30 @@ class WidgetInterface(object):
         pass
 
     def _focus_out(self):
-        if not self._view.modelfield:
+        if not self.field:
             return False
         if not self.visible:
             return False
-        self.set_value(self._view.model, self._view.modelfield)
+        self.set_value(self.record, self.field)
 
-    def display(self, model, modelfield):
-        if not modelfield:
+    def display(self, record, field):
+        if not field:
             self._readonly_set(self.attrs.get('readonly', False))
             return
-        self._readonly_set(modelfield.get_state_attrs(model).\
+        self._readonly_set(field.get_state_attrs(record).\
                 get('readonly', False))
-        if modelfield.get_state_attrs(model).get('readonly', False):
+        if field.get_state_attrs(record).get('readonly', False):
             self.color_set('readonly')
-        elif not modelfield.get_state_attrs(model).get('valid', True):
+        elif not field.get_state_attrs(record).get('valid', True):
             self.color_set('invalid')
-        elif modelfield.get_state_attrs(model).get('required', False):
+        elif field.get_state_attrs(record).get('required', False):
             self.color_set('required')
         else:
             self.color_set('normal')
-        self.invisible_set(modelfield.get_state_attrs(model).\
+        self.invisible_set(field.get_state_attrs(record).\
                 get('invisible', False))
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         pass
 
     def cancel(self):

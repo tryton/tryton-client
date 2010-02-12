@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from char import Char
 from integer import Integer
 import locale
 
@@ -8,28 +7,29 @@ import locale
 class Float(Integer):
     "Float"
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Float, self).__init__(window, parent, model=model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Float, self).__init__(field_name, model_name, window,
+                attrs=attrs)
         self.digits = attrs.get('digits', (16, 2))
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         try:
             value = locale.atof(self.entry.get_text())
         except:
             value = 0.0
-        return model_field.set_client(model, value)
+        return field.set_client(record, value)
 
-    def display(self, model, model_field):
-        super(Char, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(Float, self).display(record, field)
+        if not field:
             self.entry.set_text('')
             return False
         if isinstance(self.digits, str):
-            digits = self._view.model.expr_eval(self.digits)
+            digits = record.expr_eval(self.digits)
         else:
             digits = self.digits
         self.entry.set_text(locale.format('%.' + str(digits[1]) + 'f',
-            model_field.get(model) or 0.0, True))
+            field.get(record) or 0.0, True))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()
@@ -42,7 +42,7 @@ class Float(Integer):
                 return
 
             if isinstance(self.digits, str):
-                digits = self._view.model.expr_eval(self.digits)
+                digits = self.record.expr_eval(self.digits)
             else:
                 digits = self.digits
 

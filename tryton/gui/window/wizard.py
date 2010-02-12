@@ -175,7 +175,7 @@ class Wizard(SignalEvent):
 
         self.screen = Screen(obj_name, self.window, view_type=[],
                 context=context)
-        self.screen.add_view_custom(arch, fields, display=True)
+        self.screen.add_view(arch, fields, display=True)
         self.screen.widget.show()
 
         title = gtk.Label()

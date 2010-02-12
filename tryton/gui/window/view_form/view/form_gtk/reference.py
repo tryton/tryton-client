@@ -4,10 +4,10 @@ import gtk
 import gobject
 import gettext
 from interface import WidgetInterface
-from many2one import Dialog
 from tryton.gui.window.win_search import WinSearch
+from tryton.gui.window.win_form import WinForm
+from tryton.gui.window.view_form.screen import Screen
 import tryton.rpc as rpc
-from tryton.rpc import RPCProxy
 import tryton.common as common
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
 
@@ -16,10 +16,9 @@ _ = gettext.gettext
 
 class Reference(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        if attrs is None:
-            attrs = {}
-        super(Reference, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Reference, self).__init__(field_name, model_name, window,
+                attrs=attrs)
 
         self.widget = gtk.HBox(spacing=0)
 
@@ -81,9 +80,9 @@ class Reference(WidgetInterface):
         if not isinstance(selection, (list, tuple)):
             try:
                 selection = rpc.execute('model',
-                        self.model, selection, rpc.CONTEXT)
+                        self.model_name, selection, rpc.CONTEXT)
             except Exception, exception:
-                common.process_exception(exception, self._window)
+                common.process_exception(exception, self.window)
                 selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.set_popdown(selection)
@@ -131,7 +130,7 @@ class Reference(WidgetInterface):
     def _color_widget(self):
         return self.wid_text
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         return
 
     def sig_activate(self, widget=None):
@@ -142,7 +141,7 @@ class Reference(WidgetInterface):
             return
         child = self.widget_combo.get_child()
         self.changed = False
-        value = self._view.modelfield.get_client(self._view.model)
+        value = self.field.get_client(self.record)
 
         self.focus_out = False
         if not value:
@@ -155,17 +154,23 @@ class Reference(WidgetInterface):
                 return False
         if model and obj_id:
             if not leave:
-                dia = Dialog(model, obj_id, attrs=self.attrs,
-                        window=self._window)
-                res, value = dia.run()
-                if res:
-                    self._view.modelfield.set_client(self._view.model,
-                            (model, value), force_change=True)
-                dia.destroy()
+                screen = Screen(model, self.window, view_type=['form'])
+                screen.load([obj_id])
+                win = WinForm(screen, self.window)
+                while win.run():
+                    if screen.save_current():
+                        value = (screen.current_record.id,
+                                screen.current_record.rec_name())
+                        self.field(self.record, (model, value),
+                                force_change=True)
+                        break
+                    else:
+                        screen.display()
+                win.destroy()
         elif model:
             if not self._readonly and ( self.wid_text.get_text() or not leave):
-                domain = self._view.modelfield.domain_get(self._view.model)
-                context = self._view.modelfield.context_get(self._view.model)
+                domain = self.field.domain_get(self.record)
+                context = self.field.context_get(self.record)
 
                 try:
                     if self.wid_text.get_text():
@@ -179,40 +184,41 @@ class Reference(WidgetInterface):
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True
-                    common.process_exception(exception, self._window)
+                    common.process_exception(exception, self.window)
                     return False
                 if ids and len(ids) == 1:
-                    self._view.modelfield.set_client(self._view.model,
-                            (model, (ids[0], '')))
-                    self.display(self._view.model, self._view.modelfield)
+                    self.field.set_client(self.record, (model, (ids[0], '')))
+                    self.display(self.record, self.field)
                     self.focus_out = True
                     self.changed = True
                     return True
 
                 win = WinSearch(model, sel_multi=False, ids=ids, context=context,
-                        domain=domain, parent=self._window)
+                        domain=domain, parent=self.window)
                 ids = win.run()
                 if ids:
-                    self._view.modelfield.set_client(self._view.model,
-                            (model, (ids[0], '')))
+                    self.field.set_client(self.record, (model, (ids[0], '')))
         else:
-            self._view.modelfield.set_client(self._view.model,
-                    ('', (name, name)))
+            self.field.set_client(self.record, ('', (name, name)))
         self.focus_out = True
         self.changed = True
-        self.display(self._view.model, self._view.modelfield)
+        self.display(self.record, self.field)
 
     def sig_new(self, *args):
         model = self.get_model()
         if not model:
             return
-        dia = Dialog(model, window=self._window)
-        res, value = dia.run()
-        if res:
-            self._view.modelfield.set_client(self._view.model,
-                    (model, value))
-            self.display(self._view.model, self._view.modelfield)
-        dia.destroy()
+        screen = Screen(model, self.window, view_type=['form'])
+        win = WinForm(screen, self.window, new=True)
+        while win.run():
+            if screen.save_current():
+                value = (screen.current_record.id,
+                        screen.current_record.rec_name())
+                self.field.set_client(self.record, (model, value))
+                break
+            else:
+                screen.display()
+        win.destroy()
 
     def sig_key_press(self, widget, event):
         editable = self.wid_text.get_editable()
@@ -223,7 +229,7 @@ class Reference(WidgetInterface):
             self.sig_focus_out(widget, event)
             return True
         elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
-            if self._view.modelfield.get(self._view.model) or \
+            if self.field.get(self.record) or \
                     not self.wid_text.get_text():
                 return False
             self.sig_focus_out(widget, event, leave=True)
@@ -234,32 +240,30 @@ class Reference(WidgetInterface):
         if not self.changed:
             return
         self.wid_text.set_text('')
-        self._view.modelfield.set_client(self._view.model,
-                (self.get_model(), (0, '')))
+        self.field.set_client(self.record, (self.get_model(), (0, '')))
 
     def sig_changed(self, *args):
         if not self.changed:
             return False
-        val = self._view.modelfield.get_client(self._view.model)
+        val = self.field.get_client(self.record)
         if not val:
             model, (obj_id, name) = '', (0, '')
         else:
             model, (obj_id, name) = val
         if self.get_model() and obj_id:
-            self._view.modelfield.set_client(self._view.model,
-                    (self.get_model(), (0, '')))
-            self.display(self._view.model, self._view.modelfield)
+            self.field.set_client(self.record, (self.get_model(), (0, '')))
+            self.display(self.record, self.field)
         return False
 
-    def display(self, model, model_field):
+    def display(self, record, field):
         child = self.widget_combo.get_child()
         self.changed = False
-        if not model_field:
+        if not field:
             child.set_text('')
             self.changed =True
             return False
-        super(Reference, self).display(model, model_field)
-        value = model_field.get_client(model)
+        super(Reference, self).display(record, field)
+        value = field.get_client(record)
         img = gtk.Image()
         if not value:
             model, (obj_id, name) = '', (0, '')
@@ -268,12 +272,15 @@ class Reference(WidgetInterface):
         if model:
             child.set_text(self._selection2[model])
             if not name and obj_id:
+                args = ('model', model, 'read', obj_id, ['rec_name'],
+                        rpc.CONTEXT)
                 try:
-                    name = RPCProxy(model).read(obj_id, ['rec_name'],
-                            rpc.CONTEXT)['rec_name']
+                    name = rpc.execute(*args)
                 except Exception, exception:
-                    common.process_exception(exception, self._window)
-                    name = '???'
+                    name = common.process_exception(exception, self.window,
+                            *args)
+                    if not name:
+                        name = '???'
             self.wid_text.set_text(name)
             if obj_id:
                 img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)

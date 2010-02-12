@@ -24,7 +24,7 @@ class SignalEvent(object):
         return True
 
     def signal_unconnect(self, key, signal=None):
-        if not signal:
+        if signal is None:
             signal = self.__connects.keys()
         else:
             signal = [signal]

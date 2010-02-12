@@ -8,8 +8,9 @@ _ = gettext.gettext
 
 class CheckBox(WidgetInterface):
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(CheckBox, self).__init__(window, parent, model, attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(CheckBox, self).__init__(field_name, model_name, window,
+                attrs=attrs)
         self.widget = gtk.CheckButton()
         self.widget.connect('focus-in-event', lambda x, y: self._focus_in())
         self.widget.connect('focus-out-event', lambda x, y: self._focus_out())
@@ -20,15 +21,15 @@ class CheckBox(WidgetInterface):
         super(CheckBox, self)._readonly_set(value)
         self.widget.set_sensitive(not value)
 
-    def set_value(self, model, model_field):
-        model_field.set_client(model, int(self.widget.get_active()))
+    def set_value(self, record, field):
+        field.set_client(record, self.widget.get_active())
 
-    def display(self, model, model_field):
-        super(CheckBox, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(CheckBox, self).display(record, field)
+        if not field:
             self.widget.set_active(False)
             return False
-        self.widget.set_active(bool(model_field.get(model)))
+        self.widget.set_active(bool(field.get(record)))
 
     def display_value(self):
         if self.widget.get_active():

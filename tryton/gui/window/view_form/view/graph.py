@@ -10,7 +10,6 @@ class ViewGraph(ParserView):
         super(ViewGraph, self).__init__(window, screen, widget, children,
                 buttons, toolbar, notebooks, cursor_widget)
         self.view_type = 'graph'
-        self.model_add_new = False
         self.widgets = children
 
     def __getitem__(self, name):
@@ -36,9 +35,6 @@ class ViewGraph(ParserView):
 
     def reset(self):
         pass
-
-    def signal_record_changed(self, *args):
-        self.display()
 
     def display(self):
         for widget in self.widgets.itervalues():

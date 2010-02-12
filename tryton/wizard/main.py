@@ -55,7 +55,7 @@ class Dialog(object):
                 val[i] = fields[i]['value']
 
         self.screen = Screen(obj_name, self.dia, view_type=[], context=context)
-        self.screen.add_view_custom(arch, fields, display=True)
+        self.screen.add_view(arch, fields, display=True)
 
         title = gtk.Label()
         title.set_use_markup(True)
@@ -110,7 +110,7 @@ class Dialog(object):
         self.dia.set_title(self.screen.current_view.title)
         self.dia.show()
         self.screen.new(default=False)
-        self.screen.current_model.set(val)
+        self.screen.current_record.set(val)
         self.screen.current_view.set_cursor()
 
     def run(self, datas=None):
@@ -119,7 +119,7 @@ class Dialog(object):
         while True:
             res = self.dia.run()
             self.screen.current_view.set_value()
-            if self.screen.current_model.validate() \
+            if self.screen.current_record.validate() \
                     or (res<0) or (self.states[res]=='end'):
                 break
             self.screen.display()
@@ -206,7 +206,7 @@ class Wizard(object):
                     dia = Dialog(res['arch'], res['fields'], res['state'],
                             res['object'], parent, action=action,
                             size=res['size'], context=ctx)
-                    dia.screen.current_model.set(datas['form'])
+                    dia.screen.current_record.set(datas['form'])
                 res2 = dia.run(datas['form'])
                 if not res2:
                     break

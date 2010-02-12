@@ -354,7 +354,7 @@ class Graph(gtk.DrawingArea):
                 if yfield.get('domain'):
                     values = rpc.CONTEXT.copy()
                     values['state'] = 'draft'
-                    for field in model.mgroup.fields:
+                    for field in model.group.fields:
                         values[field] = model[field].get(model, check_load=False)
                     if not PYSONDecoder(values).decode(yfield['domain']):
                         continue

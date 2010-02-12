@@ -12,49 +12,6 @@ from tryton.pyson import PYSONEncoder
 _ = gettext.gettext
 
 
-class ViewWidget(object):
-
-    def __init__(self, parent, widget, widget_name):
-        self.view_form = parent
-        self.widget = widget
-        self.widget._view = self
-        self.widget_name = widget_name
-
-    def display(self, model):
-        if not model:
-            self.widget.display(model, False)
-            return False
-        modelfield = model.mgroup.mfields.get(self.widget_name, None)
-        if modelfield:
-            modelfield.state_set(model)
-            self.widget.display(model, modelfield)
-        elif isinstance(self.widget, Action):
-            self.widget.display(model, False)
-
-    def reset(self, model):
-        modelfield = None
-        if model:
-            modelfield = model.mgroup.mfields.get(self.widget_name, None)
-            if modelfield and 'valid' in modelfield.get_state_attrs(model):
-                modelfield.get_state_attrs(model)['valid'] = True
-        self.display(model)
-
-    def set_value(self, model):
-        if self.widget_name in model.mgroup.mfields:
-            self.widget.set_value(model, model.mgroup.mfields[self.widget_name])
-
-    def _get_model(self):
-        return self.view_form.screen.current_model
-
-    model = property(_get_model)
-
-    def _get_modelfield(self):
-        if self.model:
-            return self.model.mgroup.mfields[self.widget_name]
-
-    modelfield = property(_get_modelfield)
-
-
 class ViewForm(ParserView):
 
     def __init__(self, window, screen, widget, children=None,
@@ -62,14 +19,14 @@ class ViewForm(ParserView):
         super(ViewForm, self).__init__(window, screen, widget, children,
                 buttons, toolbar, notebooks, cursor_widget)
         self.view_type = 'form'
-        self.model_add_new = False
 
         for button in self.buttons:
             button.form = self
 
-        self.widgets = dict((name, [ViewWidget(self, widget, name)
-            for widget in widgets])
-            for name, widgets in children.iteritems())
+        self.widgets = children
+        for widgets in self.widgets.itervalues():
+            for widget in widgets:
+                widget.view = self
 
         vbox = gtk.VBox()
         vp = gtk.Viewport()
@@ -145,8 +102,8 @@ class ViewForm(ParserView):
         act = action.copy()
         if atype in ('print', 'action'):
             self.screen.save_current()
-            obj_id = self.screen.current_model \
-                    and self.screen.current_model.id
+            obj_id = self.screen.current_record \
+                    and self.screen.current_record.id
             if obj_id < 0:
                 if atype in ('print'):
                     message(_('You must save this record ' \
@@ -157,15 +114,15 @@ class ViewForm(ParserView):
                 return False
             email = {}
             if 'email' in action:
-                email = self.screen.current_model.expr_eval(action['email'])
+                email = self.screen.current_record.expr_eval(action['email'])
                 if not email:
                     email = {}
             email['subject'] = action['name'].replace('_', '')
             act['email'] = email
             self.screen.display()
         if atype == 'relate':
-            obj_id = self.screen.current_model \
-                    and self.screen.current_model.id
+            obj_id = self.screen.current_record \
+                    and self.screen.current_record.id
             if not obj_id:
                 message(_('You must select a record ' \
                         'to be able to use the relate button !'), self.window)
@@ -173,14 +130,14 @@ class ViewForm(ParserView):
             encoder = PYSONEncoder()
             if 'pyson_domain' in act:
                 act['pyson_domain'] = encoder.encode(
-                        self.screen.current_model.expr_eval(
+                        self.screen.current_record.expr_eval(
                                 act['pyson_domain'], check_load=False))
             if 'pyson_context' in act:
                 act['pyson_context'] = encoder.encode(
-                        self.screen.current_model.expr_eval(
+                        self.screen.current_record.expr_eval(
                             act['pyson_context'], check_load=False))
         data = {
-            'model': self.screen.name,
+            'model': self.screen.model_name,
             'id': obj_id,
             'ids': [obj_id],
         }
@@ -206,49 +163,60 @@ class ViewForm(ParserView):
     def cancel(self):
         for widgets in self.widgets.itervalues():
             for widget in widgets:
-                widget.widget.cancel()
+                widget.cancel()
 
     def set_value(self):
-        model = self.screen.current_model
-        if model:
-            for widgets in self.widgets.itervalues():
-                for widget in widgets:
-                    widget.set_value(model)
+        record = self.screen.current_record
+        if record:
+            for name, widgets in self.widgets.iteritems():
+                if name in record.group.fields:
+                    field = record.group.fields[name]
+                    for widget in widgets:
+                        widget.set_value(record, field)
 
     def sel_ids_get(self):
-        if self.screen.current_model:
-            return [self.screen.current_model.id]
+        if self.screen.current_record:
+            return [self.screen.current_record.id]
         return []
 
-    def sel_models_get(self):
-        if self.screen.current_model:
-            return [self.screen.current_model]
+    def selected_records(self):
+        if self.screen.current_record:
+            return [self.screen.current_record]
         return []
 
     def reset(self):
-        model = self.screen.current_model
-        for name, widgets in self.widgets.iteritems():
-            for widget in widgets:
-                widget.reset(model)
+        record = self.screen.current_record
+        if record:
+            for name, widgets in self.widgets.iteritems():
+                field = record.group.fields.get(name)
+                if field and 'valid' in field.get_state_attrs(record):
+                    for widget in widgets:
+                        field.get_state_attrs(record)['valid'] = True
+                        widget.display(record, field)
 
     def signal_record_changed(self, *args):
         for widgets in self.widgets.itervalues():
             for widget in widgets:
-                if hasattr(widget.widget, 'screen'):
-                    for view in widget.widget.screen.views:
+                if hasattr(widget, 'screen'):
+                    for view in widget.screen.views:
                         view.signal_record_changed(*args)
 
     def display(self):
-        model = self.screen.current_model
-        if model:
-            # Force to set mfields in model
-            for field in model.mgroup.fields:
-                model[field].get(model, check_load=False)
-        for widgets in self.widgets.itervalues():
+        record = self.screen.current_record
+        if record:
+            # Force to set fields in record
+            for field in record.group.fields:
+                record[field].get(record, check_load=False)
+        for name, widgets in self.widgets.iteritems():
+            field = None
+            if record:
+                field = record.group.fields.get(name)
+            if field:
+                field.state_set(record)
             for widget in widgets:
-                widget.display(model)
+                widget.display(record, field)
         for button in self.buttons:
-            button.state_set(model)
+            button.state_set(record)
         return True
 
     def set_cursor(self, new=False, reset_view=True):
@@ -256,25 +224,25 @@ class ViewForm(ParserView):
             for notebook in self.notebooks:
                 notebook.set_current_page(0)
             if self.cursor_widget in self.widgets:
-                self.widgets[self.cursor_widget][0].widget.grab_focus()
-        model = self.screen.current_model
+                self.widgets[self.cursor_widget][0].grab_focus()
+        record = self.screen.current_record
         position = reduce(lambda x, y: x + len(y), self.widgets, 0)
         focus_widget = None
-        if model:
-            for widgets in self.widgets.itervalues():
+        if record:
+            for name, widgets in self.widgets.iteritems():
                 for widget in widgets:
-                    modelfield = model.mgroup.mfields.get(widget.widget_name, None)
-                    if not modelfield:
+                    field = record.group.fields.get(name)
+                    if not field:
                         continue
-                    if not modelfield.get_state_attrs(model).get('valid', True):
-                        if widget.widget.position > position:
+                    if not field.get_state_attrs(record).get('valid', True):
+                        if widget.position > position:
                             continue
-                        position = widget.widget.position
+                        position = widget.position
                         focus_widget = widget
         if focus_widget:
             for notebook in self.notebooks:
                 for i in range(notebook.get_n_pages()):
                     child = notebook.get_nth_page(i)
-                    if focus_widget.widget.widget.is_ancestor(child):
+                    if focus_widget.widget.is_ancestor(child):
                         notebook.set_current_page(i)
-            focus_widget.widget.grab_focus()
+            focus_widget.grab_focus()

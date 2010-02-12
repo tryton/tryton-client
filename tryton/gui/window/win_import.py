@@ -14,7 +14,7 @@ _ = gettext.gettext
 class WinImport(object):
     "Window import"
 
-    def __init__(self, model, fields, preload=None, parent=None):
+    def __init__(self, model, fields, parent=None):
         self.dialog = gtk.Dialog(
                 title=_("Import from CSV"), parent=parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
@@ -195,9 +195,6 @@ class WinImport(object):
                 gobject.TYPE_STRING)
         self.model2 = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
 
-        for field in (preload or []):
-            self.model2.set(self.model2.append(), 0, field[1], 1, field[0])
-
         self.fields = {}
         self.fields_invert = {}
 
@@ -207,28 +204,26 @@ class WinImport(object):
             fields_order.sort(lambda x, y: -cmp(fields[x].get('string', ''),
                     fields[y].get('string', '')))
             for field in fields_order:
-                if (fields[field]['type'] not in ('reference',)) \
-                        and (not fields[field].get('readonly', False) \
-                        or not dict(fields[field].get('states', {}).get(
-                                'draft', [('readonly', True)])).get('readonly',
-                                True)):
-                    self.fields_data[prefix_node+field] = fields[field]
-                    st_name = prefix_value+fields[field]['string'] or field
+                if not fields[field].get('readonly', False):
+                    self.fields_data[prefix_node + field] = fields[field]
+                    st_name = prefix_value + fields[field]['string'] or field
                     node = self.model1.insert(prefix, 0, [st_name,
                             prefix_node+field,
                             (fields[field].get('required', False) and \
                             '#ddddff') or 'white'])
                     self.fields[prefix_node+field] = st_name
-                    self.fields_invert[st_name] = prefix_node+field
+                    self.fields_invert[st_name] = prefix_node + field
                     if fields[field]['type'] == 'one2many' and level > 0:
+                        args = ('model', fields[field]['relation'],
+                                'fields_get', None, rpc.CONTEXT)
                         try:
-                            fields2 = rpc.execute('model',
-                                    fields[field]['relation'], 'fields_get',
-                                    None, rpc.CONTEXT)
+                            fields2 = rpc.execute(*args)
                         except Exception, exception:
-                            common.process_exception(exception, self.dialog)
-                            continue
-                        model_populate(fields2, prefix_node+field+'/', node,
+                            fields2 = common.process_exception(exception,
+                                self.dialog, *args)
+                            if not fields2:
+                                continue
+                        model_populate(fields2, prefix_node + field + '/', node,
                                 st_name+'/', level-1)
         model_populate(fields)
 

@@ -7,26 +7,28 @@ import locale
 class Integer(Char):
     "Integer"
 
-    def __init__(self, window, parent, model, attrs=None):
-        super(Integer, self).__init__(window, parent, model=model, attrs=attrs)
+    def __init__(self, field_name, model_name, window, attrs=None):
+        super(Integer, self).__init__(field_name, model_name, window,
+                attrs=attrs)
         self.entry.set_max_length(0)
         self.entry.set_alignment(1.0)
         self.entry.connect('insert_text', self.sig_insert_text)
 
-    def set_value(self, model, model_field):
+    def set_value(self, record, field):
         try:
             value = locale.atoi(self.entry.get_text())
         except:
             value = 0
-        return model_field.set_client(model, value)
+        return field.set_client(record, value)
 
-    def display(self, model, model_field):
-        super(Char, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        # skip Char call because set_text doesn't work with int
+        super(Char, self).display(record, field)
+        if not field:
             self.entry.set_text('')
             return False
         self.entry.set_text(locale.format('%d',
-            model_field.get(model) or 0, True))
+            field.get(record) or 0, True))
 
     def display_value(self):
         return self.entry.get_text()

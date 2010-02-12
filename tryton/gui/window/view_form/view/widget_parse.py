@@ -36,7 +36,7 @@ class WidgetParse(ParserInterface):
                 widget = PARSERS[node.localName](self.window, self.parent,
                         self.attrs, screen)
                 wid, child, buttons, on_write, notebooks, cursor_widget = \
-                        widget.parse(screen.resource, node, fields)
+                        widget.parse(screen.model_name, node, fields)
                 screen.set_on_write(on_write)
                 res = PARSERS2[node.localName](self.window, screen, wid, child,
                         buttons, toolbar, notebooks, cursor_widget)

@@ -40,16 +40,16 @@ class Button(object):
     def button_clicked(self, widget):
         if not self.form:
             return
-        model = self.form.screen.current_model
+        record = self.form.screen.current_record
         obj_id = self.form.screen.save_current()
         if obj_id:
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm'], self.form.window):
                 button_type = self.attrs.get('type', 'workflow')
                 ctx = rpc.CONTEXT.copy()
-                ctx.update(model.context_get())
+                ctx.update(record.context_get())
                 if button_type == 'workflow':
-                    args = ('model', self.form.screen.name,
+                    args = ('model', self.form.screen.model_name,
                             'workflow_trigger_validate', obj_id,
                             self.attrs['name'], ctx)
                     try:
@@ -58,7 +58,7 @@ class Button(object):
                         common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'object':
-                    args = ('model', self.form.screen.name, self.attrs['name'],
+                    args = ('model', self.form.screen.model_name, self.attrs['name'],
                             [obj_id], ctx)
                     try:
                         rpc.execute(*args)
@@ -76,7 +76,7 @@ class Button(object):
                                 *args)
                     if action_id:
                         Action.execute(action_id, {
-                            'model': self.form.screen.name,
+                            'model': self.form.screen.model_name,
                             'id': obj_id,
                             'ids': [obj_id],
                             }, self.form.window, context=ctx)
@@ -84,14 +84,11 @@ class Button(object):
                     raise Exception('Unallowed button type')
                 self.form.screen.reload(writen=True)
         else:
-            if self.form.screen.form:
-                self.form.screen.form.message_info(
-                        _('Invalid Form, correct red fields!'))
             self.form.screen.display()
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -120,9 +117,9 @@ class Label(gtk.Label):
         super(Label, self).__init__(str=str)
         self.attrs = attrs or {}
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -138,9 +135,9 @@ class VBox(gtk.VBox):
         super(VBox, self).__init__(homogeneous, spacing)
         self.attrs = attrs or {}
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -156,9 +153,9 @@ class Image(gtk.Image):
         super(Image, self).__init__()
         self.attrs = attrs or {}
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -180,9 +177,9 @@ class Frame(gtk.Frame):
             self.set_shadow_type(gtk.SHADOW_NONE)
         self.set_border_width(0)
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -199,9 +196,9 @@ class ScrolledWindow(gtk.ScrolledWindow):
                 vadjustment=vadjustment)
         self.attrs = attrs or {}
 
-    def state_set(self, model):
-        if model:
-            state_changes = model.expr_eval(self.attrs.get('states', {}),
+    def state_set(self, record):
+        if record:
+            state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
@@ -298,7 +295,7 @@ class ParserForm(ParserInterface):
                 screen=screen)
         self.widget_id = 0
 
-    def parse(self, model, root_node, fields, notebook=None, paned=None,
+    def parse(self, model_name, root_node, fields, notebook=None, paned=None,
             tooltips=None):
         dict_widget = {}
         button_list = []
@@ -323,7 +320,7 @@ class ParserForm(ParserInterface):
             attrs = common.node_attributes(node)
             if not cursor_widget:
                 if attrs.get('name') and fields.get(attrs['name']) \
-                        and not fields[attrs['name']].get('exclude_field',
+                        and not fields[attrs['name']].attrs.get('exclude_field',
                                 False):
                     cursor_widget = attrs.get('name')
             if node.localName == 'image':
@@ -339,10 +336,10 @@ class ParserForm(ParserInterface):
                 if 'string' in attrs or 'name' in attrs:
                     if not text:
                         if 'name' in attrs and attrs['name'] in fields:
-                            if 'states' in fields[attrs['name']]:
+                            if 'states' in fields[attrs['name']].attrs:
                                 attrs['states'] = \
-                                        fields[attrs['name']]['states']
-                            text = fields[attrs['name']]['string']
+                                        fields[attrs['name']].attrs['states']
+                            text = fields[attrs['name']].attrs['string']
                 vbox = VBox(attrs=attrs)
                 button_list.append(vbox)
                 if text:
@@ -359,13 +356,16 @@ class ParserForm(ParserInterface):
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
                     if 'states' not in attrs \
-                            and 'states' in fields[attrs['name']]:
-                        attrs['states'] = fields[attrs['name']]['states']
+                            and 'states' in fields[attrs['name']].attrs:
+                        attrs['states'] = fields[attrs['name']].attrs['states']
                     if not text:
-                        if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
-                            text = _(':') + fields[attrs['name']]['string']
+                        if gtk.widget_get_default_direction() == \
+                                gtk.TEXT_DIR_RTL:
+                            text = _(':') + \
+                                    fields[attrs['name']].attrs['string']
                         else:
-                            text = fields[attrs['name']]['string'] + _(':')
+                            text = fields[attrs['name']].attrs['string'] + \
+                                    _(':')
                     if 'align' not in attrs:
                         attrs['align'] = 1.0
                 elif not text:
@@ -436,7 +436,7 @@ class ParserForm(ParserInterface):
                 container.wid_add(notebook, colspan=attrs.get('colspan', 4),
                         expand=True, fill=True)
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model, node, fields, notebook,
+                        self.parse(model_name, node, fields, notebook,
                                 tooltips=tooltips)
                 max_width, max_height = -1, -1
                 window_width, window_height = Main.get_main().window.get_size()
@@ -465,11 +465,11 @@ class ParserForm(ParserInterface):
                     angle = 0
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
-                    if 'states' in fields[attrs['name']]:
+                    if 'states' in fields[attrs['name']].attrs:
                         attrs['states'] = \
-                                fields[attrs['name']]['states']
+                                fields[attrs['name']].attrs['states']
                     if not text:
-                        text = fields[attrs['name']]['string']
+                        text = fields[attrs['name']].attrs['string']
                 if not text:
                     text = _('No String Attr.')
                 if '_' not in text:
@@ -478,7 +478,7 @@ class ParserForm(ParserInterface):
                 label.set_angle(angle)
                 label.set_use_underline(True)
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model, node, fields, notebook,
+                        self.parse(model_name, node, fields, notebook,
                                 tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
@@ -509,18 +509,18 @@ class ParserForm(ParserInterface):
                     log = logging.getLogger('view')
                     log.error('Unknown field "%s"' % str(name))
                     continue
-                ftype = attrs.get('widget', fields[name]['type'])
-                fields[name].update(attrs)
-                fields[name]['model'] = model
+                ftype = attrs.get('widget', fields[name].attrs['type'])
+                fields[name].attrs.update(attrs)
+                fields[name].attrs['model'] = model_name
                 if not ftype in WIDGETS_TYPE:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
 
-                fields[name]['name'] = name
+                fields[name].attrs['name'] = name
                 if 'saves' in attrs:
-                    fields[name]['saves'] = attrs['saves']
-                widget_act = WIDGETS_TYPE[ftype][0](self.window, self.parent,
-                        model, fields[name])
+                    fields[name].attrs['saves'] = attrs['saves']
+                widget_act = WIDGETS_TYPE[ftype][0](name, model_name,
+                        self.window, fields[name].attrs)
                 self.widget_id += 1
                 widget_act.position = self.widget_id
                 dict_widget.setdefault(name, [])
@@ -538,21 +538,22 @@ class ParserForm(ParserInterface):
                 xfill = True
                 if 'xfill' in attrs:
                     xfill = bool(common.safe_eval(attrs['xfill']))
-                hlp = fields[name].get('help', attrs.get('help', False))
+                hlp = fields[name].attrs.get('help', attrs.get('help', False))
                 if attrs.get('height', False) or attrs.get('width', False):
                     widget_act.widget.set_size_request(
                             int(attrs.get('width', -1)),
                             int(attrs.get('height', -1)))
                 translate = False
                 if ftype in ('char', 'text'):
-                    translate = fields[name].get('translate', False)
-                container.wid_add(widget_act.widget, fields[name]['string'],
-                        expand, translate=translate, colspan=size, fname=name,
+                    translate = fields[name].attrs.get('translate', False)
+                container.wid_add(widget_act.widget,
+                        fields[name].attrs['string'], expand,
+                        translate=translate, colspan=size, fname=name,
                         help_tip=hlp, fill=fill, xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model, node, fields, tooltips=tooltips)
+                        self.parse(model_name, node, fields, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -562,9 +563,9 @@ class ParserForm(ParserInterface):
                 button_list += buttons
                 text = ''
                 if 'name' in attrs and attrs['name'] in fields:
-                    if 'states' in fields[attrs['name']]:
-                        attrs['states'] = fields[attrs['name']]['states']
-                    text = fields[attrs['name']]['string']
+                    if 'states' in fields[attrs['name']].attrs:
+                        attrs['states'] = fields[attrs['name']].attrs['states']
+                    text = fields[attrs['name']].attrs['string']
                 if attrs.get('string'):
                     text = attrs['string']
 
@@ -580,7 +581,7 @@ class ParserForm(ParserInterface):
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
                         expand=True, fill=True)
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model, node, fields, paned=hpaned,
+                        self.parse(model_name, node, fields, paned=hpaned,
                                 tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
@@ -596,7 +597,7 @@ class ParserForm(ParserInterface):
                 container.wid_add(vpaned, colspan=int(attrs.get('colspan', 4)),
                         expand=True, fill=True)
                 widget, widgets, buttons, spam, notebook_list, cursor_widget2 = \
-                        self.parse(model, node, fields, paned=vpaned,
+                        self.parse(model_name, node, fields, paned=vpaned,
                                 tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
@@ -609,7 +610,7 @@ class ParserForm(ParserInterface):
                     vpaned.set_position(int(attrs['position']))
             elif node.localName == 'child1':
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model, node, fields, paned=paned,
+                        self.parse(model_name, node, fields, paned=paned,
                                 tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
@@ -621,7 +622,7 @@ class ParserForm(ParserInterface):
                 paned.pack1(widget, resize=True, shrink=True)
             elif node.localName == 'child2':
                 widget, widgets, buttons, spam, notebook_list, cursor_widget2 = \
-                        self.parse(model, node, fields, paned=paned,
+                        self.parse(model_name, node, fields, paned=paned,
                                 tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
@@ -632,20 +633,20 @@ class ParserForm(ParserInterface):
                     dict_widget[widget_name].extend(widgets)
                 paned.pack2(widget, resize=True, shrink=True)
         for (button, src, name, widget) in container.trans_box:
-            button.connect('clicked', self.translate, model, name,
+            button.connect('clicked', self.translate, model_name, name,
                     src, widget)
         return container.pop(), dict_widget, button_list, on_write, \
                 notebook_list, cursor_widget
 
-    def translate(self, widget, model, name, src, widget_entry):
-        obj_id = self.screen.current_model.id
+    def translate(self, widget, model_name, name, src, widget_entry):
+        obj_id = self.screen.current_record.id
         if obj_id < 0:
             common.message(
                     _('You need to save the record before adding translations!'),
                     parent=self.window)
             return False
 
-        obj_id = self.screen.current_model.save(force_reload=False)
+        obj_id = self.screen.current_record.save(force_reload=False)
         try:
             lang_ids = rpc.execute('model', 'ir.lang',
                     'search', [('translatable', '=', '1')])
@@ -744,7 +745,7 @@ class ParserForm(ParserInterface):
             context = copy.copy(rpc.CONTEXT)
             context['language'] = lang['code']
             try:
-                val = rpc.execute('model', model,
+                val = rpc.execute('model', model_name,
                         'read', [obj_id], [name], context)
             except Exception, exception:
                 common.process_exception(exception, self.window)
@@ -795,7 +796,7 @@ class ParserForm(ParserInterface):
                     value_set(widget_entry, new_val['value'])
                 context = copy.copy(rpc.CONTEXT)
                 context['language'] = new_val['code']
-                args = ('model', model, 'write', [obj_id],
+                args = ('model', model_name, 'write', [obj_id],
                         {str(name):  new_val['value']}, context)
                 try:
                     rpc.execute(*args)
@@ -805,7 +806,7 @@ class ParserForm(ParserInterface):
             self.window.present()
             win.destroy()
             return
-        self.screen.current_model.reload()
+        self.screen.current_record.reload()
         self.window.present()
         win.destroy()
         return True

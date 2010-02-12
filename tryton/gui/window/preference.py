@@ -3,7 +3,6 @@
 "Preference"
 import gettext
 import gtk
-from tryton.rpc import RPCProxy
 import tryton.rpc as rpc
 import copy
 from tryton.gui.window.view_form.screen import Screen
@@ -35,19 +34,13 @@ class Preference(object):
 
         self.win.set_default_response(gtk.RESPONSE_OK)
 
-        user = RPCProxy('res.user')
-
+        args = ('model', 'res.user', 'get_preferences_fields_view',
+                rpc.CONTEXT)
         try:
-            res = user.get_preferences_fields_view(rpc.CONTEXT)
+            res = rpc.execute(*args)
         except Exception, exception:
-            if not common.process_exception(exception, parent):
-                self.win.destroy()
-                self.win = None
-                return
-            try:
-                res = user.get_preferences_fields_view(rpc.CONTEXT)
-            except Exception, exception:
-                common.process_exception(exception, parent)
+            res = common.process_exception(exception, parent, *args)
+            if not res:
                 self.win.destroy()
                 self.win = None
                 return
@@ -59,15 +52,17 @@ class Preference(object):
         fields = res['fields']
         self.screen = Screen('res.user', self.win, view_type=[])
         self.screen.new(default=False)
-        self.screen.add_view_custom(arch, fields, display=True)
+        self.screen.add_view(arch, fields, display=True)
 
+        args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:
-            preferences = user.get_preferences(False, rpc.CONTEXT)
+            preferences = rpc.execute(*args)
         except Exception, exception:
-            common.process_exception(exception, parent)
-            self.win.destroy()
-            raise
-        self.screen.current_model.set(preferences)
+            preferences = common.process_exception(exception, parent, *args)
+            if not preferences:
+                self.win.destroy()
+                raise
+        self.screen.current_record.set(preferences)
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
@@ -85,7 +80,7 @@ class Preference(object):
         res = False
         while True:
             if self.win.run() == gtk.RESPONSE_OK:
-                if self.screen.current_model.validate():
+                if self.screen.current_record.validate():
                     vals = copy.copy(self.screen.get(get_modifiedonly=True))
                     if 'password' in vals:
                         password = common.ask(_('Current Password:'),
@@ -94,12 +89,14 @@ class Preference(object):
                             break
                     else:
                         password = False
-                    user = RPCProxy('res.user')
+                    args = ('model', 'res.user', 'set_preferences', vals,
+                            password, rpc.CONTEXT)
                     try:
-                        user.set_preferences(vals, password, rpc.CONTEXT)
+                        rpc.execute(*args)
                     except Exception, exception:
-                        common.process_exception(exception, self.win)
-                        continue
+                        if not common.process_exception(exception, self.win,
+                                *args):
+                            continue
                     res = True
                     break
             else:
