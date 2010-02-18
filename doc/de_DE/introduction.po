@@ -1,0 +1,39 @@
+# extracted from introduction.rst
+msgid ""
+msgstr ""
+"Project-Id-Version: Tryton\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-29 23:01+0200\n"
+"PO-Revision-Date: 2009-12-30 12:00+0100\n"
+"Last-Translator: Tobias Paepke <tryton@paepke.net>\n"
+"Language-Team: http://tryton.origo.ethz.ch/forum/8\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.3.0\n"
+"X-Poedit-Language: german\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Country: GERMANY\n"
+
+#: introduction.rst:1
+msgid ""
+"Introduction\n"
+"############"
+msgstr ""
+"Einleitung\n"
+"##########"
+
+#: introduction.rst:4
+msgid ""
+"Tryton is a three-tiers high-level general purpose application platform\n"
+"written in Python and uses PostgreSQL as database engine."
+msgstr "Tryton ist eine Drei-Schichten Anwendungsplattform unter GPL-3 Lizenz, ist in Python geschrieben und verwendet PostgreSQL als Datenbank."
+
+#: introduction.rst:7
+msgid "It is the core base of an Open Source ERP."
+msgstr "Es ist die Basis eines Open Source ERP."
+
+#: introduction.rst:9
+msgid "It provides modularity, scalability and security."
+msgstr "Es bietet Modularität, Skalierbarkeit und Sicherheit."
+
