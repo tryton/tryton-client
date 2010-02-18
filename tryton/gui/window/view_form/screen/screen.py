@@ -236,6 +236,10 @@ class Screen(SignalEvent):
         self.current_view.set_value()
         if self.current_record and self.current_record not in self.group:
             self.current_record = None
+        if self.current_record and not self.current_record.validate():
+            self.current_view.set_cursor()
+            self.current_view.display()
+            return
         for i in xrange(len(self.views) + len(self.view_to_load)):
             if len(self.view_to_load):
                 self.load_view_to_load()

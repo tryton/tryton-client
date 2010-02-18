@@ -1,3 +1,4 @@
+* Validate record before switching view
 * Refactoring:
     * Better naming in model
     * Group extends list
