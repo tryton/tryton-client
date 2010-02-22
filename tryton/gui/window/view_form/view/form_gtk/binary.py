@@ -73,7 +73,7 @@ class Binary(WidgetInterface):
                     parent=self.window)
             if filename and self.field:
                 self.field.set_client(self.record,
-                        base64.encodestring(file(filename, 'rb').read()))
+                        base64.encodestring(open(filename, 'rb').read()))
                 fname = self.attrs.get('fname_widget', False)
                 if fname:
                     self.parent.value = {fname:os.path.basename(filename)}
@@ -87,7 +87,7 @@ class Binary(WidgetInterface):
             filename = file_selection(_('Save As...'),
                     parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
             if filename and self.field:
-                file_p = file(filename,'wb+')
+                file_p = open(filename,'wb+')
                 file_p.write(base64.decodestring(
                     self.field.get(self.record)))
                 file_p.close()

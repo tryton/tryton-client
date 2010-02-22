@@ -1496,7 +1496,7 @@ class Main(object):
         dialog = DBRestore(self.window, filename=filename)
         url, dbname, passwd, update = dialog.run(self.window)
         if dbname:
-            file_p = file(filename, 'rb')
+            file_p = open(filename, 'rb')
             data_b64 = base64.encodestring(file_p.read())
             file_p.close()
             host, port = url.rsplit(':' , 1)
@@ -1575,7 +1575,7 @@ class Main(object):
                 filename=dbname + '-' + time.strftime('%Y%m%d%H%M') + '.dump')
 
         if filename:
-            file_ = file(filename, 'wb')
+            file_ = open(filename, 'wb')
             file_.write(dump)
             file_.close()
             common.message(_("Database backuped successfully!"), \

@@ -136,7 +136,7 @@ class ConfigManager(object):
                 if not configparser.has_section(section):
                     configparser.add_section(section)
                 configparser.set(section, name, self.config[entry])
-            configparser.write(file(self.rcfile, 'wb'))
+            configparser.write(open(self.rcfile, 'wb'))
         except:
             logging.getLogger('common.options').warn(
                     _('Unable to write config file %s!') % \

@@ -299,8 +299,8 @@ def file_open(filename, type, parent, print_p=False):
                 save_name = file_selection(_('Save As...'), parent=parent,
                         action=gtk.FILE_CHOOSER_ACTION_SAVE)
                 if save_name:
-                    file_p = file(filename, 'rb')
-                    save_p = file(save_name, 'wb+')
+                    file_p = open(filename, 'rb')
+                    save_p = open(save_name, 'wb+')
                     save_p.write(file_p.read())
                     save_p.close()
                     file_p.close()
@@ -334,8 +334,8 @@ def file_open(filename, type, parent, print_p=False):
         save_name = file_selection(_('Save As...'), parent=parent,
                 action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if save_name:
-            file_p = file(filename, 'rb')
-            save_p = file(save_name, 'wb+')
+            file_p = open(filename, 'rb')
+            save_p = open(save_name, 'wb+')
             save_p.write(file_p.read())
             save_p.close()
             file_p.close()

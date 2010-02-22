@@ -11,7 +11,7 @@ import urllib
 
 _ = gettext.gettext
 
-NOIMAGE = file(os.path.join(PIXMAPS_DIR, 'tryton-noimage.png'), 'rb').read()
+NOIMAGE = open(os.path.join(PIXMAPS_DIR, 'tryton-noimage.png'), 'rb').read()
 
 
 class Image(WidgetInterface):
@@ -101,14 +101,14 @@ class Image(WidgetInterface):
                 preview=True, filters=[filter_image, filter_all])
         if filename:
             self.field.set_client(self.record,
-                    encodestring(file(filename, 'rb').read()))
+                    encodestring(open(filename, 'rb').read()))
             self.update_img()
 
     def sig_save_as(self, widget):
         filename = file_selection(_('Save As...'), parent=self.window,
                 action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
-            file(filename, 'wb').write(decodestring(
+            open(filename, 'wb').write(decodestring(
                 self.field.get_client(self.record)))
 
     def sig_remove(self, widget):

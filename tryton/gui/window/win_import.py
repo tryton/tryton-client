@@ -245,7 +245,7 @@ class WinImport(object):
 
         self.import_csv_skip.set_value(1)
         try:
-            data = csv.reader(file(fname, 'rb'), quotechar=csvdel,
+            data = csv.reader(open(fname, 'rb'), quotechar=csvdel,
                     delimiter=csvsep)
         except:
             common.warning(_('Error opening CSV file'), self.dialog,
@@ -323,7 +323,7 @@ class WinImport(object):
     def import_csv(self, csv_data, fields, model):
         # TODO: make it works with references
         fname = csv_data['fname']
-        data = list(csv.reader(file(fname, 'rb'), quotechar=csv_data['del'],
+        data = list(csv.reader(open(fname, 'rb'), quotechar=csv_data['del'],
             delimiter=csv_data['sep']))[int(csv_data['skip']):]
         datas = []
 

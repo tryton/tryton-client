@@ -250,10 +250,10 @@ class Attachment(object):
                 return None
             try:
                 if not data['link']:
-                    file(filename, 'wb+').write(
+                    open(filename, 'wb+').write(
                             base64.decodestring(data['datas']))
                 else:
-                    file(filename, 'wb+').write(
+                    open(filename, 'wb+').write(
                             urllib.urlopen(data['link']).read())
             except IOError:
                 common.message(_('Can not write file!'), self.dialog,
@@ -277,7 +277,7 @@ class Attachment(object):
         if not filenames:
             return
         for filename in filenames:
-            value = file(filename, 'rb').read()
+            value = open(filename, 'rb').read()
             name = os.path.basename(filename)
             args = ('model', 'ir.attachment', 'create', {
                         'name': name,
@@ -317,7 +317,7 @@ class Attachment(object):
             if not data['link']:
                 (fileno, file_name) = tempfile.mkstemp(
                         data['name'], 'tryton_')
-                file_p = file(file_name, 'wb+')
+                file_p = open(file_name, 'wb+')
                 if data['datas']:
                     file_p.write(base64.decodestring(data['datas']))
                 file_p.close()

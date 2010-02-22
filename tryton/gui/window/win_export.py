@@ -398,7 +398,7 @@ class WinExport(object):
 
     def export_csv(self, fname, fields, result, write_title=False, popup=True):
         try:
-            file_p = file(fname, 'wb+')
+            file_p = open(fname, 'wb+')
             writer = csv.writer(file_p)
             if write_title:
                 writer.writerow(fields)
