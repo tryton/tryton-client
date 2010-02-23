@@ -5,6 +5,7 @@ import gobject
 from interface import WidgetInterface
 import tryton.rpc as rpc
 import tryton.common as common
+from tryton.pyson import PYSONDecoder
 
 
 class Selection(WidgetInterface):
@@ -33,12 +34,14 @@ class Selection(WidgetInterface):
         self._selection = {}
         selection = attrs.get('selection', [])[:]
         self.selection = selection[:]
+        if not attrs.get('domain'):
+            domain = []
+        else:
+            domain = PYSONDecoder(rpc.CONTEXT).decode(attrs.get('domain'))
         if 'relation' in attrs:
             try:
-                result = rpc.execute('model',
-                        attrs['relation'], 'search_read',
-                        attrs.get('domain', []), 0, None, None, rpc.CONTEXT,
-                        ['rec_name'])
+                result = rpc.execute('model', attrs['relation'], 'search_read',
+                        domain, 0, None, None, rpc.CONTEXT, ['rec_name'])
                 selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, self.window)
@@ -54,7 +57,7 @@ class Selection(WidgetInterface):
                     selection = []
                 self.selection = selection[:]
 
-            for dom in common.filter_domain(attrs.get('domain', [])):
+            for dom in common.filter_domain(domain):
                 if dom[1] in ('=', '!='):
                     todel = []
                     for i in range(len(selection)):
