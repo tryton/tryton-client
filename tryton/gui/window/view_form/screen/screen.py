@@ -307,6 +307,7 @@ class Screen(SignalEvent):
                 if node.localName == 'field':
                     attrs = node_attributes(node)
                     fields[str(attrs['name'])].update(attrs)
+                    return
             for node2 in node.childNodes:
                 _parse_fields(node2, fields)
         xml_dom = xml.dom.minidom.parseString(arch)
