@@ -152,7 +152,7 @@ class ViewForm(ParserView):
     def destroy(self):
         for widget_name in self.widgets.keys():
             for widget in self.widgets[widget_name]:
-                widget.widget.destroy()
+                widget.destroy()
             del self.widgets[widget_name]
         self.widget.destroy()
         del self.widget
