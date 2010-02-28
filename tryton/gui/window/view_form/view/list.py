@@ -510,8 +510,8 @@ class ViewList(ParserView):
 
             if fields:
                 try:
-                    rpc.execute('model', 'ir.ui.view_tree_width',
-                            'set_width', self.screen.name, fields, rpc.CONTEXT)
+                    rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
+                            self.screen.model_name, fields, rpc.CONTEXT)
                 except:
                     pass
         self.widget_tree.destroy()
