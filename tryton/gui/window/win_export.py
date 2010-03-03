@@ -381,8 +381,8 @@ class WinExport(object):
                 fileno, fname = tempfile.mkstemp('.csv', 'tryton_')
                 self.export_csv(fname, fields2, result,
                         self.wid_write_field_names.get_active(), popup=False)
-                common.file_open(fname, 'csv', self.parent)
                 os.close(fileno)
+                common.file_open(fname, 'csv', self.parent)
             else:
                 fname = common.file_selection(_('Save As...'),
                         parent=self.parent,
