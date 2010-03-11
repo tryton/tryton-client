@@ -19,12 +19,14 @@ if os.name == 'mac' or \
     gtkrc = os.path.join(resources, 'gtkrc')
     pixbuf_loader = os.path.join(resources, 'gdk-pixbuf.loaders')
     pangorc = os.path.join(resources, 'pangorc')
+    immodules = os.path.join(resources, 'gtk.immodules')
     if os.path.isdir(resources):
         os.environ['GTK2_RC_FILES'] = gtkrc
         os.environ['GTK_EXE_PREFIX'] = resources
         os.environ['GTK_DATA_PREFIX'] = resources
         os.environ['GDK_PIXBUF_MODULE_FILE'] = pixbuf_loader
         os.environ['PANGO_RC_FILE'] = pangorc
+        os.environ['GTK_IM_MODULE_FILE'] = immodules
 
 import tryton
 if '--profile' in sys.argv:

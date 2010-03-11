@@ -274,13 +274,32 @@ elif os.name == 'mac' \
         loaders.write(query_loaders)
         loaders.close()
 
+        if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules')):
+            shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules'))
+        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0', gtk_binary_version,
+            'immodules'), os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules'))
+
+        query_immodules = Popen(os.path.join(gtk_dir, 'bin', 'gtk-query-immodules-2.0'),
+                stdout=PIPE).stdout.read()
+        query_immodules = query_immodules.replace(gtk_dir, '@executable_path/../Resources')
+        immodules = open(os.path.join(resources_dir, 'gtk.immodules'), 'w')
+        immodules.write(query_immodules)
+        immodules.close()
+
         shutil.copy(os.path.join(gtk_dir, 'share', 'themes', 'Clearlooks',
             'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))
+
+        for lang in ('de', 'es', 'fr'):
+            if os.path.isdir(os.path.join(resources_dir, 'share', 'locale', lang)):
+                shutil.rmtree(os.path.join(resources_dir, 'share', 'locale', lang))
+            shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
+                os.path.join(resources_dir, 'share', 'locale', lang))
 
         # fix pathes within shared libraries
         for library in chain(
                 iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders', '*.so')),
                 iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines', '*.so')),
+                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules', '*.so')),
                 iglob(os.path.join(pango_dist_dir,'*','modules','*.so'))):
             libs = [lib.split('(')[0].strip()
                     for lib in Popen(['otool', '-L', library],
