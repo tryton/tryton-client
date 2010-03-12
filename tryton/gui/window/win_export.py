@@ -173,14 +173,16 @@ class WinExport(object):
         self.view2.set_headers_visible(False)
 
         cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn('Field name', cell, text=0)
+        column = gtk.TreeViewColumn('Field name', cell, text=0,
+                background=2)
         self.view1.append_column(column)
 
         cell = gtk.CellRendererText()
         column = gtk.TreeViewColumn('Field name', cell, text=0)
         self.view2.append_column(column)
 
-        self.model1 = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.model1 = gtk.TreeStore(gobject.TYPE_STRING, gobject.TYPE_STRING,
+                gobject.TYPE_STRING)
         self.model2 = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
 
         self.fields = {}
@@ -199,7 +201,9 @@ class WinExport(object):
                                             field]['string'])
                 st_name = fields[field]['string'] or field
                 node = self.model1.insert(prefix, 0,
-                        [st_name, prefix_node+field])
+                        [st_name, prefix_node+field,
+                        (fields[field].get('required', False) and \
+                                '#ddddff') or 'white'])
                 self.fields[prefix_node+field] = (st_name,
                         fields[field].get('relation', False))
                 if fields[field].get('relation', False) and level>0:
