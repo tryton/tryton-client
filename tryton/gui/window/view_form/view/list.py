@@ -619,10 +619,7 @@ class ViewList(ParserView):
                         value, True)
             else:
                 label_str = '-'
-            if self.children[child][4]:
-                self.children[child][2].set_markup('<b>%s</b>' % label_str)
-            else:
-                self.children[child][2].set_markup(label_str)
+            self.children[child][2].set_text(label_str)
 
     def set_cursor(self, new=False, reset_view=True):
         self.widget_tree.grab_focus()

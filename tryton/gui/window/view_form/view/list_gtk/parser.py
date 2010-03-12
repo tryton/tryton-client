@@ -170,22 +170,13 @@ class ParserTree(ParserInterface):
                 if 'sum' in fields[fname].attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
                                 'float_time'):
-                    label = gtk.Label()
-                    label.set_use_markup(True)
-                    label_str = fields[fname].attrs['sum'] + ': '
-                    label_bold = bool(int(fields[fname].attrs.get('sum_bold', 0)))
-                    if label_bold:
-                        label.set_markup('<b>%s</b>' % label_str)
-                    else:
-                        label.set_markup(label_str)
+                    label = gtk.Label(fields[fname].attrs['sum'] + _(': '))
                     label_sum = gtk.Label()
-                    label_sum.set_use_markup(True)
                     if isinstance(fields[fname].attrs.get('digits'), str):
                         digits = 2
                     else:
                         digits = fields[fname].attrs.get('digits', (16, 2))[1]
-                    dict_widget[i] = (fname, label, label_sum, digits,
-                            label_bold)
+                    dict_widget[i] = (fname, label, label_sum, digits)
             elif node.localName == 'button':
                 #TODO add shortcut
                 cell = Button(treeview, self.window, self.screen, node_attrs)
