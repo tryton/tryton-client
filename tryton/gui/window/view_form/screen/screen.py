@@ -301,16 +301,7 @@ class Screen(SignalEvent):
     def add_view(self, arch, fields, display=False, toolbar=None, context=None):
         if toolbar is None:
             toolbar = {}
-        def _parse_fields(node, fields):
-            if node.nodeType == node.ELEMENT_NODE:
-                if node.localName == 'field':
-                    attrs = node_attributes(node)
-                    fields[str(attrs['name'])].update(attrs)
-                    return
-            for node2 in node.childNodes:
-                _parse_fields(node2, fields)
         xml_dom = xml.dom.minidom.parseString(arch)
-        _parse_fields(xml_dom, fields)
 
         for dom in common.filter_domain(self.domain):
             if '.' in dom[0]:
