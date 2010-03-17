@@ -14,7 +14,7 @@ _ = gettext.gettext
 class WinImport(object):
     "Window import"
 
-    def __init__(self, model, fields, parent=None):
+    def __init__(self, model, parent):
         self.dialog = gtk.Dialog(
                 title=_("Import from CSV"), parent=parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
@@ -175,6 +175,7 @@ class WinImport(object):
 
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.view1.connect('row-expanded', self.on_row_expanded)
         scrolledwindow_fields.add(self.view1)
         self.view2 = gtk.TreeView()
         self.view2.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
@@ -198,39 +199,47 @@ class WinImport(object):
         self.fields = {}
         self.fields_invert = {}
 
-        def model_populate(fields, prefix_node='', prefix=None,
-                prefix_value='', level=2):
-            fields_order = fields.keys()
-            fields_order.sort(lambda x, y: -cmp(fields[x].get('string', ''),
-                    fields[y].get('string', '')))
-            for field in fields_order:
-                if not fields[field].get('readonly', False):
-                    self.fields_data[prefix_node + field] = fields[field]
-                    st_name = prefix_value + fields[field]['string'] or field
-                    node = self.model1.insert(prefix, 0, [st_name,
-                            prefix_node+field,
-                            (fields[field].get('required', False) and \
-                            '#ddddff') or 'white'])
-                    self.fields[prefix_node+field] = st_name
-                    self.fields_invert[st_name] = prefix_node + field
-                    if fields[field]['type'] == 'one2many' and level > 0:
-                        args = ('model', fields[field]['relation'],
-                                'fields_get', None, rpc.CONTEXT)
-                        try:
-                            fields2 = rpc.execute(*args)
-                        except Exception, exception:
-                            fields2 = common.process_exception(exception,
-                                self.dialog, *args)
-                            if not fields2:
-                                continue
-                        model_populate(fields2, prefix_node + field + '/', node,
-                                st_name+'/', level-1)
-        model_populate(fields)
+        self.model_populate(self._get_fields(model))
 
         self.view1.set_model(self.model1)
         self.view2.set_model(self.model2)
         self.view1.show_all()
         self.view2.show_all()
+
+    def model_populate(self, fields, parent_node=None, prefix_field='',
+            prefix_name=''):
+        fields_order = fields.keys()
+        fields_order.sort(lambda x, y: -cmp(fields[x].get('string', ''),
+                fields[y].get('string', '')))
+        for field in fields_order:
+            if not fields[field].get('readonly', False):
+                self.fields_data[prefix_field + field] = fields[field]
+                name = fields[field]['string'] or field
+                node = self.model1.insert(parent_node, 0, [name, prefix_field +
+                    field, (fields[field].get('required', False) and
+                        common.COLORS['required']) or 'white'])
+                name = prefix_name + name
+                self.fields[prefix_field + field] = (name,
+                        fields[field].get('relation'))
+                self.fields_invert[name] = prefix_field + field
+                if fields[field].get('relation'):
+                    self.model1.insert(node, 0, [None, '', 'white'])
+
+    def _get_fields(self, model):
+        args = ('model', model, 'fields_get', None, rpc.CONTEXT)
+        try:
+            return rpc.execute(*args)
+        except Exception, exception:
+            return common.process_exception(exception, self.dialog, *args)
+
+    def on_row_expanded(self, treeview, iter, path):
+        child = self.model1.iter_children(iter)
+        if self.model1.get_value(child, 0) is None:
+            prefix_field = self.model1.get_value(iter, 1)
+            name, model = self.fields[prefix_field]
+            self.model_populate(self._get_fields(model), iter, prefix_field +
+                    '/', name + '/')
+            self.model1.remove(child)
 
     def sig_autodetect(self, widget=None):
         fname = self.import_csv_file.get_filename()
@@ -253,28 +262,38 @@ class WinImport(object):
             return True
         self.sig_unsel_all()
         word = ''
-        try:
-            for line in data:
-                for word in line:
-                    word = word.decode(csvcode)
-                    num = self.model2.append()
-                    try:
-                        self.model2.set(num, 0, word, 1, self.fields_invert[word])
-                    except:
-                        self.model2.remove(num)
-                        raise
-                break
-        except Exception, exception:
-            common.warning(_('Error processing the file at field %s.\n' \
-                    'Error message:\n%s') % (word, repr(exception)),
-                    self.dialog, _('Error'))
+        for line in data:
+            for word in line:
+                word = word.decode(csvcode)
+                if word not in self.fields_invert and word not in self.fields:
+                    iter = self.model1.get_iter_first()
+                    prefix = ''
+                    prefix_name = ''
+                    for parent in word.split('/')[:-1]:
+                        while iter:
+                            if self.model1.get_value(iter, 0) == parent or \
+                                    self.model1.get_value(iter, 1) == \
+                                    (prefix + parent):
+                                self.on_row_expanded(self.view1, iter,
+                                        self.model1.get_path(iter))
+                                break
+                            iter = self.model1.iter_next(iter)
+                        prefix = parent + '/'
+                if word in self.fields_invert:
+                    name = word
+                    field = self.fields_invert[word]
+                elif word in self.fields:
+                    name = self.fields[word][0]
+                    field = word
+                else:
+                    common.warning(
+                            _('Error processing the file at field%s.') %
+                            word, self.dialog, _('Error'))
+                    return True
+                num = self.model2.append()
+                self.model2.set(num, 0, name, 1, field)
+            break
         return True
-
-    def sig_sel_all(self, widget=None):
-        self.model2.clear()
-        for field in self.fields.keys():
-            self.model2.set(self.model2.append(), 0, self.fields[field],
-                    1, field)
 
     def sig_sel(self, widget=None):
         sel = self.view1.get_selection()
@@ -282,8 +301,8 @@ class WinImport(object):
 
     def _sig_sel_add(self, store, path, iter):
         num = self.model2.append()
-        self.model2.set(num, 0, store.get_value(iter, 0), 1,
-                store.get_value(iter,1))
+        name = self.fields[store.get_value(iter, 1)][0]
+        self.model2.set(num, 0, name, 1, store.get_value(iter,1))
 
     def sig_unsel(self, widget=None):
         store, paths = self.view2.get_selection().get_selected_rows()

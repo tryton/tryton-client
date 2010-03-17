@@ -300,7 +300,7 @@ class Form(SignalEvent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinImport(self.model, fields, parent=self.window)
+        win = WinImport(self.model, self.window)
         win.run()
 
     def sig_save_as(self, widget=None):
@@ -309,7 +309,7 @@ class Form(SignalEvent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinExport(self.model, self.ids_get(), fields, parent=self.window,
+        win = WinExport(self.model, self.ids_get(), self.window,
                 context=self.context)
         win.run()
 

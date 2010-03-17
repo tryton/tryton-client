@@ -17,7 +17,7 @@ _ = gettext.gettext
 class WinExport(object):
     "Window export"
 
-    def __init__(self, model, ids, fields, parent=None, context=None):
+    def __init__(self, model, ids, parent, context=None):
         self.dialog = gtk.Dialog(
                 title= _("Export to CSV"),
                 parent=parent,
@@ -165,6 +165,7 @@ class WinExport(object):
 
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.view1.connect('row-expanded', self.on_row_expanded)
         scrolledwindow_all_fields.add(self.view1)
         self.view2 = gtk.TreeView()
         self.view2.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
@@ -187,36 +188,7 @@ class WinExport(object):
 
         self.fields = {}
 
-        def model_populate(fields, prefix_node='', prefix=None,
-                prefix_value='', level=2):
-            fields_order = fields.keys()
-            fields_order.sort(lambda x, y: -cmp(fields[x].get('string', ''),
-                fields[y].get('string', '')))
-            for field in fields_order:
-                self.fields_data[prefix_node+field] = fields[field]
-                if prefix_node:
-                    self.fields_data[prefix_node + field]['string'] = \
-                            '%s%s' % (prefix_value,
-                                    self.fields_data[prefix_node + \
-                                            field]['string'])
-                st_name = fields[field]['string'] or field
-                node = self.model1.insert(prefix, 0,
-                        [st_name, prefix_node+field,
-                        (fields[field].get('required', False) and \
-                                '#ddddff') or 'white'])
-                self.fields[prefix_node+field] = (st_name,
-                        fields[field].get('relation', False))
-                if fields[field].get('relation', False) and level>0:
-                    try:
-                        fields2 = rpc.execute('model',
-                                fields[field]['relation'], 'fields_get', None,
-                                rpc.CONTEXT)
-                    except Exception, exception:
-                        common.process_exception(exception, self.parent)
-                        continue
-                    model_populate(fields2, prefix_node+field+'/', node,
-                            st_name+'/', level-1)
-        model_populate(fields)
+        self.model_populate(self._get_fields(model))
 
         self.view1.set_model(self.model1)
         self.view2.set_model(self.model2)
@@ -229,10 +201,8 @@ class WinExport(object):
 
         # Creating the predefined export view
         self.pref_export = gtk.TreeView()
-        self.pref_export.append_column(gtk.TreeViewColumn(_('Export name'),
+        self.pref_export.append_column(gtk.TreeViewColumn(_('Name'),
             gtk.CellRendererText(), text=2))
-        self.pref_export.append_column(gtk.TreeViewColumn(_('Exported fields'),
-            gtk.CellRendererText(), text=3))
         scrolledwindow_exports.add(self.pref_export)
 
         self.pref_export.connect("row-activated", self.sel_predef)
@@ -241,17 +211,45 @@ class WinExport(object):
         self.predef_model = gtk.ListStore(
                 gobject.TYPE_INT,
                 gobject.TYPE_PYOBJECT,
-                gobject.TYPE_STRING,
                 gobject.TYPE_STRING)
         self.fill_predefwin()
         self.pref_export.show_all()
 
-    def sig_sel_all(self, widget=None):
-        self.model2.clear()
-        for field, relation in self.fields.keys():
-            if not relation:
-                self.model2.set(self.model2.append(), 0, self.fields[field],
-                        1, field)
+    def model_populate(self, fields, parent_node=None, prefix_field='',
+            prefix_name=''):
+        fields_order = fields.keys()
+        fields_order.sort(lambda x, y: -cmp(fields[x].get('string', ''),
+            fields[y].get('string', '')))
+        for field in fields_order:
+            self.fields_data[prefix_field + field] = fields[field]
+            name = fields[field]['string'] or field
+            if prefix_field:
+                self.fields_data[prefix_field + field]['string'] = '%s%s' % \
+                    (prefix_name, self.fields_data[prefix_field +
+                        field]['string'])
+            node = self.model1.insert(parent_node, 0, [name, prefix_field +
+                field, (fields[field].get('required', False) and
+                    common.COLORS['required']) or 'white'])
+            self.fields[prefix_field + field] = (name,
+                    fields[field].get('relation'))
+            if fields[field].get('relation'):
+                self.model1.insert(node, 0, [None, '', 'white'])
+
+    def _get_fields(self, model):
+        args = ('model', model, 'fields_get', None, rpc.CONTEXT)
+        try:
+            return rpc.execute(*args)
+        except Exception, exception:
+            return common.process_exception(exception, self.parent, *args)
+
+    def on_row_expanded(self, treeview, iter, path):
+        child = self.model1.iter_children(iter)
+        if self.model1.get_value(child, 0) is None:
+            prefix_field = self.model1.get_value(iter, 1)
+            name, model = self.fields[prefix_field]
+            self.model_populate(self._get_fields(model), iter, prefix_field +
+                    '/', name + '/')
+            self.model1.remove(child)
 
     def sig_sel(self, widget=None):
         sel = self.view1.get_selection()
@@ -262,8 +260,8 @@ class WinExport(object):
         if relation:
             return
         num = self.model2.append()
-        self.model2.set(num, 0, store.get_value(iter, 0), 1,
-                store.get_value(iter, 1))
+        name = self.fields_data[store.get_value(iter, 1)]['string']
+        self.model2.set(num, 0, name, 1, store.get_value(iter, 1))
 
     def sig_unsel(self, widget=None):
         store, paths = self.view2.get_selection().get_selected_rows()
@@ -292,7 +290,8 @@ class WinExport(object):
             if not exports:
                 return
         args = ('model', 'ir.export.line', 'read',
-                [x['export_fields'] for x in exports], None, rpc.CONTEXT)
+                sum((x['export_fields'] for x in exports), []), None,
+                rpc.CONTEXT)
         try:
             lines = rpc.execute(*args)
         except Exception, exception:
@@ -303,11 +302,10 @@ class WinExport(object):
         for line in lines:
             id2lines.setdefault(line['export'], []).append(line)
         for export in exports:
-            self.predef_model.append((export['id'],
+            self.predef_model.append((
+                export['id'],
                 [x['name'] for x in id2lines[export['id']]],
-                export['name'],
-                ','.join(self.fields_data[x['name']]['string']
-                    for x in id2lines[export['id']])))
+                export['name']))
         self.pref_export.set_model(self.predef_model)
 
     def add_predef(self, widget):
@@ -336,8 +334,7 @@ class WinExport(object):
         self.predef_model.append((
             new_id,
             fields,
-            name,
-            ','.join(self.fields_data[f]['string'] for f in fields)))
+            name))
         self.pref_export.set_model(self.predef_model)
 
     def remove_predef(self, widget):
@@ -363,6 +360,20 @@ class WinExport(object):
     def sel_predef(self, widget, path, column):
         self.model2.clear()
         for field in self.predef_model[path[0]][1]:
+            if field not in self.fields_data:
+                iter = self.model1.get_iter_first()
+                prefix = ''
+                for parent in field.split('/')[:-1]:
+                    while iter:
+                        if self.model1.get_value(iter, 1) == \
+                                (prefix + parent):
+                            self.on_row_expanded(self.view1, iter,
+                                    self.model1.get_path(iter))
+                            break
+                        iter = self.model1.iter_next(iter)
+                    prefix = parent + '/'
+            if field not in self.fields_data:
+                continue
             self.model2.append((self.fields_data[field]['string'], field))
 
     def run(self):
