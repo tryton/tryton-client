@@ -172,6 +172,11 @@ class One2Many(WidgetInterface):
         if self.attrs.get('add_remove'):
             self.wid_text.connect('key_press_event', self.on_keypress)
 
+    def _color_widget(self):
+        if hasattr(self.screen.current_view, 'widget_tree'):
+            return self.screen.current_view.widget_tree
+        return super(One2Many, self)._color_widget()
+
     def grab_focus(self):
         return self.screen.widget.grab_focus()
 
@@ -197,6 +202,7 @@ class One2Many(WidgetInterface):
 
     def switch_view(self, widget):
         self.screen.switch_view()
+        self.color_set(self.color_name)
 
     def _readonly_set(self, value):
         self.but_new.set_sensitive(not value)

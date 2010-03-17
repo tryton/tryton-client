@@ -92,6 +92,7 @@ class WidgetInterface(object):
         self.position = 0
         self.colors = {}
         self.visible = True
+        self.color_name = None
 
     def __get_record(self):
         return self.view.screen.current_record
@@ -156,6 +157,7 @@ class WidgetInterface(object):
         return self.widget.grab_focus()
 
     def color_set(self, name):
+        self.color_name = name
         widget = self._color_widget()
 
         if not self.colors:
@@ -260,9 +262,10 @@ class WidgetInterface(object):
         if not field:
             self._readonly_set(self.attrs.get('readonly', False))
             return
-        self._readonly_set(field.get_state_attrs(record).\
-                get('readonly', False))
-        if field.get_state_attrs(record).get('readonly', False):
+        self._readonly_set(self.attrs.get('readonly',
+            field.get_state_attrs(record).get('readonly', False)))
+        if self.attrs.get('readonly',
+                field.get_state_attrs(record).get('readonly', False)):
             self.color_set('readonly')
         elif not field.get_state_attrs(record).get('valid', True):
             self.color_set('invalid')
