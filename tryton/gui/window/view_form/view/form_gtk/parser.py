@@ -517,8 +517,6 @@ class ParserForm(ParserInterface):
                     continue
 
                 fields[name].attrs['name'] = name
-                if 'saves' in attrs:
-                    fields[name].attrs['saves'] = attrs['saves']
                 widget_act = WIDGETS_TYPE[ftype][0](name, model_name,
                         self.window, fields[name].attrs)
                 self.widget_id += 1
