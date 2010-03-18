@@ -384,11 +384,9 @@ class Record(SignalEvent):
         if isinstance(attr, basestring):
             attr = PYSONDecoder().decode(attr)
         args = self._get_on_change_args(attr)
-        ids = [self.id]
         ctx = rpc.CONTEXT.copy()
         ctx.update(self.context_get())
-        args = ('model', self.model_name, 'on_change_' + fieldname,
-                ids, args, ctx)
+        args = ('model', self.model_name, 'on_change_' + fieldname, args, ctx)
         try:
             res = rpc.execute(*args)
         except Exception, exception:
@@ -430,11 +428,10 @@ class Record(SignalEvent):
             if field_name == fieldname:
                 continue
             args = self._get_on_change_args(on_change_with)
-            ids = [self.id]
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
             args = ('model', self.model_name, 'on_change_with_' + fieldname,
-                    ids, args, ctx)
+                    args, ctx)
             try:
                 res = rpc.execute(*args)
             except Exception, exception:
