@@ -606,7 +606,7 @@ class ParserForm(ParserInterface):
                     dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
                     vpaned.set_position(int(attrs['position']))
-            elif node.localName == 'child1':
+            elif node.localName == 'child':
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
                         self.parse(model_name, node, fields, paned=paned,
                                 tooltips=tooltips)
@@ -617,19 +617,10 @@ class ParserForm(ParserInterface):
                 for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
-                paned.pack1(widget, resize=True, shrink=True)
-            elif node.localName == 'child2':
-                widget, widgets, buttons, spam, notebook_list, cursor_widget2 = \
-                        self.parse(model_name, node, fields, paned=paned,
-                                tooltips=tooltips)
-                if not cursor_widget:
-                    cursor_widget = cursor_widget2
-                notebook_list.extend(notebook_list2)
-                button_list += buttons
-                for widget_name, widgets in widgets.iteritems():
-                    dict_widget.setdefault(widget_name, [])
-                    dict_widget[widget_name].extend(widgets)
-                paned.pack2(widget, resize=True, shrink=True)
+                if not paned.get_child1():
+                    paned.pack1(widget, resize=True, shrink=True)
+                elif not paned.get_child2():
+                    paned.pack2(widget, resize=True, shrink=True)
         for (button, src, name, widget) in container.trans_box:
             button.connect('clicked', self.translate, model_name, name,
                     src, widget)

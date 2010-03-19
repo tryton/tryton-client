@@ -165,14 +165,13 @@ class ParserBoard(object):
                 widgets += new_widgets
                 if 'position' in attrs:
                     vpaned.set_position(int(attrs['position']))
-            elif node.localName == 'child1':
+            elif node.localName == 'child':
                 widget, new_widgets = self.parse(node, paned=paned, tooltips=tooltips)
                 widgets += new_widgets
-                paned.pack1(widget, resize=True, shrink=True)
-            elif node.localName == 'child2':
-                widget, new_widgets = self.parse(node, paned=paned, tooltips=tooltips)
-                widgets += new_widgets
-                paned.pack2(widget, resize=True, shrink=True)
+                if not paned.get_child1():
+                    paned.pack1(widget, resize=True, shrink=True)
+                elif not paned.get_child2():
+                    paned.pack2(widget, resize=True, shrink=True)
             elif node.localName == 'action':
                 name = str(attrs['name'])
                 widget_act = Action(self.window, attrs)
