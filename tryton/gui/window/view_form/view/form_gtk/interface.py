@@ -95,7 +95,8 @@ class WidgetInterface(object):
         self.color_name = None
 
     def __get_record(self):
-        return self.view.screen.current_record
+        if self.view:
+            return self.view.screen.current_record
 
     record = property(__get_record)
 
