@@ -801,18 +801,26 @@ This record has been modified while you were editing it.
 
 def process_exception(exception, parent, *args):
     global _USERNAME, _DATABASE, _SOCK
+    if str(exception.args[0]) == 'BadFingerprint':
+        warning(_('The server fingerprint has changed since last connection!\n'
+            'The application will stop connecting to this server '
+            'until his fingerprint is fixed.'), parent, _('Security risk!'))
+        from tryton.gui.main import Main
+        Main.sig_quit()
+        sys.exit()
     if str(exception.args[0]) == 'NotLogged':
         if not rpc._SOCK:
             message(_('Connection error!\n' \
                     'Unable to connect to the server!'), parent)
             return False
-        host = rpc._SOCK.host
+        hostname = rpc._SOCK.hostname
         port = rpc._SOCK.port
         while True:
             password = ask(_('Password:'), parent, visibility=False)
             if password is None:
                 raise Exception('NotLogged')
-            res = rpc.login(rpc._USERNAME, password, host, port, rpc._DATABASE)
+            res = rpc.login(rpc._USERNAME, password, hostname, port,
+                    rpc._DATABASE)
             from tryton.gui.main import Main
             Main.get_main().refresh_ssl()
             if res == -1:

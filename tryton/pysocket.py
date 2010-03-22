@@ -12,6 +12,12 @@ try:
 except ImportError:
     ssl = None
 import gzip
+try:
+    import hashlib
+except ImportError:
+    hashlib = None
+    import sha
+import os
 
 DNS_CACHE = {}
 MAX_SIZE = 999999999
@@ -32,7 +38,7 @@ def checkfunction(module, klass):
 
 class PySocket:
 
-    def __init__(self, sock=None):
+    def __init__(self, sock=None, fingerprints=None, ca_certs=None):
         self.sock = sock
         self.host = None
         self.hostname = None
@@ -41,6 +47,11 @@ class PySocket:
         self.ssl_sock = None
         self.connected = False
         self.buffer = ''
+        self.fingerprints = fingerprints
+        if os.path.isfile(ca_certs):
+            self.ca_certs = ca_certs
+        else:
+            self.ca_certs = None
 
     def connect(self, host, port=False):
         if not port:
@@ -89,14 +100,38 @@ class PySocket:
         self.sock.settimeout(TIMEOUT)
         if self.ssl:
             if ssl:
-                self.ssl_sock = ssl.wrap_socket(self.sock)
+                self.ssl_sock = ssl.wrap_socket(self.sock,
+                        ca_certs=self.ca_certs, cert_reqs=(self.ca_certs and
+                            ssl.CERT_REQUIRED or ssl.CERT_NONE))
             elif hasattr(socket, 'ssl'):
-                self.ssl_sock = socket.ssl(self.sock)
+                self.ssl_sock = socket.ssl(self.sock, certfile=self.ca_certs)
+            peercert = self.ssl_sock.getpeercert(True)
+            def format_hash(value):
+                return reduce(lambda x, (i, y): x + y.upper() +
+                        ((i % 2 and i + 1 < len(value)) and ':' or ''),
+                        enumerate(value), '')
+            if hashlib:
+                fingerprint = format_hash(hashlib.sha1(peercert).hexdigest())
+            else:
+                fingerprint = format_hash(sha1.new(peercert).hexdigest())
+        else:
+            fingerprint = None
         self.host = host
         self.hostname = hostname
         self.port = port
         self.connected = True
         self.buffer = ''
+        if self.fingerprints is not None:
+            key = (self.hostname, str(self.port))
+            if key in self.fingerprints:
+                if self.fingerprints[key] != fingerprint:
+                    self.disconnect()
+                    import traceback
+                    print traceback.print_stack()
+                    print key
+                    raise Exception('BadFingerprint')
+            elif fingerprint:
+                self.fingerprints[key] = fingerprint
 
     def disconnect(self):
         try:
@@ -123,9 +158,9 @@ class PySocket:
         self.buffer = ''
 
     def reconnect(self):
-        if self.host and self.port:
+        if self.hostname and self.port:
             self.disconnect()
-            self.connect(self.host, self.port)
+            self.connect(self.hostname, self.port)
 
     def send(self, msg, exception=False, traceback=None):
         msg = cPickle.dumps([msg, traceback], protocol=2)

@@ -3,7 +3,10 @@
 import pysocket
 import logging
 import socket
+import os
 from threading import Semaphore
+from tryton.fingerprints import Fingerprints
+from tryton.config import get_config_dir
 
 _SOCK = None
 _USER = 0
@@ -15,6 +18,7 @@ _VIEW_CACHE = {}
 TIMEZONE = 'utc'
 SECURE = False
 _SEMAPHORE = Semaphore()
+_CA_CERTS = os.path.join(get_config_dir(), 'ca_certs')
 
 def db_list(host, port):
     global _SOCK, SECURE
@@ -24,7 +28,8 @@ def db_list(host, port):
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
             if _SOCK is None:
-                _SOCK = pysocket.PySocket()
+                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
+                        ca_certs=_CA_CERTS)
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
             args = (None, None, None, 'common', 'db', 'list')
@@ -55,7 +60,8 @@ def db_exec(host, port, method, *args):
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
             if _SOCK is None:
-                _SOCK= pysocket.PySocket()
+                _SOCK= pysocket.PySocket(fingerprints=Fingerprints(),
+                        ca_certs=_CA_CERTS)
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
             args = (None, None, None, 'common', 'db', method) + args
@@ -85,7 +91,8 @@ def server_version(host, port):
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
             if _SOCK is None:
-                _SOCK = pysocket.PySocket()
+                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
+                        ca_certs=_CA_CERTS)
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
             args = (None, None, None, 'common', None, 'version')
@@ -118,7 +125,8 @@ def login(username, password, host, port, database):
             if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
                 _SOCK.disconnect()
             if _SOCK is None:
-                _SOCK = pysocket.PySocket()
+                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
+                        ca_certs=_CA_CERTS)
             if not _SOCK.connected:
                 _SOCK.connect(host, port)
             args = (database, username, password, 'common', 'db', 'login')

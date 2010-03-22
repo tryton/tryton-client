@@ -920,6 +920,8 @@ Configuration File
 
    ~/.config/tryton/x.y/tryton.conf      # General configuration
    ~/.config/tryton/x.y/accel.map        # Accelerators configuration
+   ~/.config/tryton/x.y/known_hosts      # Fingerprints
+   ~/.config/tryton/x.y/ca_certs         # Certification Authority (http://docs.python.org/library/ssl.html#ssl-certificates)
 
 :Authors:
   Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings

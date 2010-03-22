@@ -1,3 +1,4 @@
+* Add fingerprint and CA check for SSL connection
 * Use lazy load in Import/Export windows
 * Validate record before switching view
 * Refactoring:
