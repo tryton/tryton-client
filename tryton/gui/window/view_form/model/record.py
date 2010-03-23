@@ -458,8 +458,7 @@ class Record(SignalEvent):
             return 0
         if self.attachment_count < 0 or reload:
             args = ('model', 'ir.attachment', 'search_count', [
-                ('res_model', '=', self.model_name),
-                ('res_id', '=', self.id),
+                ('resource', '=', '%s,%s' % (self.model_name, self.id)),
                 ])
             try:
                 self.attachment_count = rpc.execute(*args)
