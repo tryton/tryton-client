@@ -320,14 +320,14 @@ class Tree(SignalEvent):
         model = self.tree_res.view.get_model()
         iter_children = model.iter_children(iter)
         if iter_children and model.get(iter_children, 0)[0] in model.to_reload:
-            host = rpc._SOCK.host
+            hostname = rpc._SOCK.hostname
             port = rpc._SOCK.port
             while True:
                 password = common.ask(_('Password:'), self.window,
                         visibility=False)
                 if password is None:
                     return True
-                res = rpc.login(rpc._USERNAME, password, host, port,
+                res = rpc.login(rpc._USERNAME, password, hostname, port,
                         rpc._DATABASE)
                 if res == -1:
                     common.message(_('Connection error!\n' \
