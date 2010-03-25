@@ -10,11 +10,6 @@ import gettext
 
 _ = gettext.gettext
 
-_ATTRS_BOOLEAN = {
-    'required': False,
-    'readonly': False
-}
-
 def field_pref_set(field, name, model_name, value, client_value, dependance,
         window, reset=False):
     dialog = WidgetFieldPreference(window, reset=reset)
@@ -77,9 +72,8 @@ class WidgetInterface(object):
         self.window = window
         self.view = None # Filled by ViewForm
         self.attrs = attrs or {}
-        for key, val in _ATTRS_BOOLEAN.iteritems():
-            self.attrs[key] = attrs.get(key, False) not in ('False', '0', False)
-        self.default_readonly = self.attrs.get('readonly', False)
+        if 'readonly' in self.attrs:
+            self.attrs['readonly'] = bool(int(self.attrs['readonly']))
         self._menu_entries = [
             (_('Set to default value'),
                 lambda x: self._menu_sig_default_get(), 1),

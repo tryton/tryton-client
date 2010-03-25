@@ -96,8 +96,9 @@ class ParserTree(ParserInterface):
                                 bool(int(node_attrs[boolean_fields]))
                 if fname not in fields:
                     continue
-                fields[fname].attrs.update(node_attrs)
-                node_attrs.update(fields[fname].attrs)
+                for attr_name in ('relation', 'domain', 'selection'):
+                    if attr_name in fields[fname].attrs:
+                        node_attrs[attr_name] = fields[fname].attrs[attr_name]
                 cell = CELLTYPES.get(node_attrs.get('widget',
                     fields[fname].attrs['type']))(fname, model_name,
                     treeview, self.window, node_attrs)
@@ -248,7 +249,10 @@ class Char(object):
             else:
                 cell.set_property('foreground-set', True)
 
-        if self.attrs['type'] in ('float', 'integer', 'biginteger', 'boolean',
+        field = record[self.field_name]
+
+        if self.attrs.get('type', field.attrs.get('type')) in \
+                ('float', 'integer', 'biginteger', 'boolean',
                 'numeric', 'float_time'):
             align = 1
         else:
@@ -259,7 +263,6 @@ class Char(object):
                 and self.treeview.editable:
             states = ('readonly', 'required', 'invisible')
 
-        field = record[self.field_name]
         field.state_set(record, states=states)
         invisible = field.get_state_attrs(record).get('invisible', False)
         cell.set_property('visible', not invisible)
@@ -424,17 +427,19 @@ class Float(Char):
     def setter(self, column, cell, store, iter):
         super(Float, self).setter(column, cell, store, iter)
         record = store.get_value(iter, 0)
-        if isinstance(self.attrs.get('digits'), str):
-            digits = record.expr_eval(self.attrs['digits'])
+        field = record[self.field_name]
+        if isinstance(field.attrs.get('digits'), str):
+            digits = record.expr_eval(field.attrs['digits'])
         else:
-            digits = self.attrs.get('digits', (16, 2))
+            digits = field.attrs.get('digits', (16, 2))
         cell.digits = digits
 
     def get_textual_value(self, record):
-        if isinstance(self.attrs.get('digits'), str):
-            digit = record.expr_eval(self.attrs['digits'])[1]
+        field = record[self.field_name]
+        if isinstance(field.attrs.get('digits'), str):
+            digit = record.expr_eval(field.attrs['digits'])[1]
         else:
-            digit = self.attrs.get('digits', (16, 2))[1]
+            digit = field.attrs.get('digits', (16, 2))[1]
         return locale.format('%.'+str(digit)+'f',
                 record[self.field_name].get_client(record) or 0.0, True)
 

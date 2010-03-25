@@ -503,22 +503,21 @@ class ParserForm(ParserInterface):
 
             elif node.localName == 'field':
                 name = str(attrs['name'])
-                del attrs['name']
                 if name not in fields:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     log = logging.getLogger('view')
                     log.error('Unknown field "%s"' % str(name))
                     continue
                 ftype = attrs.get('widget', fields[name].attrs['type'])
-                fields[name].attrs.update(attrs)
-                fields[name].attrs['model'] = model_name
                 if not ftype in WIDGETS_TYPE:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
+                for attr_name in ('relation', 'domain', 'selection'):
+                    if attr_name in fields[name].attrs:
+                        attrs[attr_name] = fields[name].attrs[attr_name]
 
-                fields[name].attrs['name'] = name
                 widget_act = WIDGETS_TYPE[ftype][0](name, model_name,
-                        self.window, fields[name].attrs)
+                        self.window, attrs)
                 self.widget_id += 1
                 widget_act.position = self.widget_id
                 dict_widget.setdefault(name, [])
