@@ -288,13 +288,6 @@ class Screen(SignalEvent):
                 view = common.process_exception(exception, self.window, *args)
                 if not view:
                     return
-            if self.exclude_field:
-                if self.exclude_field in view['fields']:
-                    view['fields'][self.exclude_field]['states'] = {'invisible': True}
-                    view['fields'][self.exclude_field]['readonly'] = True
-                    view['fields'][self.exclude_field]['invisible'] = True
-                    view['fields'][self.exclude_field]['tree_invisible'] = True
-                    view['fields'][self.exclude_field]['exclude_field'] = True
             return self.add_view(view['arch'], view['fields'], display,
                     toolbar=view.get('toolbar', False), context=context)
 
@@ -337,6 +330,15 @@ class Screen(SignalEvent):
         if self.current_record and (self.current_record not in self.group):
             self.group.append(self.current_record)
         self.group.add_fields(fields, context=context)
+
+        if self.exclude_field:
+            if self.exclude_field in self.group.fields:
+                field = self.group.fields[self.exclude_field]
+                field.attrs['states'] = {'invisible': True}
+                field.attrs['readonly'] = True
+                field.attrs['invisible'] = True
+                field.attrs['tree_invisible'] = True
+                field.attrs['exclude_field'] = True
 
         parser = WidgetParse(parent=self.parent, window=self.window)
         view = parser.parse(self, xml_dom, self.group.fields, toolbar=toolbar)
