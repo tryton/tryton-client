@@ -72,8 +72,9 @@ class WidgetInterface(object):
         self.window = window
         self.view = None # Filled by ViewForm
         self.attrs = attrs or {}
-        if 'readonly' in self.attrs:
-            self.attrs['readonly'] = bool(int(self.attrs['readonly']))
+        for attr_name in ('readonly', 'invisible'):
+            if attr_name in self.attrs:
+                self.attrs[attr_name] = bool(int(self.attrs[attr_name]))
         self._menu_entries = [
             (_('Set to default value'),
                 lambda x: self._menu_sig_default_get(), 1),
@@ -268,8 +269,8 @@ class WidgetInterface(object):
             self.color_set('required')
         else:
             self.color_set('normal')
-        self.invisible_set(field.get_state_attrs(record).\
-                get('invisible', False))
+        self.invisible_set(self.attrs.get('invisible',
+            field.get_state_attrs(record).get('invisible', False)))
 
     def set_value(self, record, field):
         pass
