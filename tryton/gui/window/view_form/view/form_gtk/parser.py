@@ -512,8 +512,10 @@ class ParserForm(ParserInterface):
                 if not ftype in WIDGETS_TYPE:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
-                for attr_name in ('relation', 'domain', 'selection'):
-                    if attr_name in fields[name].attrs:
+                for attr_name in ('relation', 'domain', 'selection',
+                        'relation_field', 'string'):
+                    if attr_name in fields[name].attrs and \
+                            not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
 
                 widget_act = WIDGETS_TYPE[ftype][0](name, model_name,
