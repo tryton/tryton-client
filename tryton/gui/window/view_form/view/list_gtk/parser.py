@@ -153,8 +153,8 @@ class ParserTree(ParserInterface):
                     'many2many': 50,
                     'boolean': 20,
                 }
-                if 'width' in fields[fname].attrs:
-                    width = int(fields[fname].attrs['width'])
+                if 'width' in node_attrs:
+                    width = int(node_attrs['width'])
                 else:
                     width = twidth.get(fields[fname].attrs['type'], 100)
                 col.width = width
@@ -166,12 +166,12 @@ class ParserTree(ParserInterface):
                     col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-                col.set_visible(not fields[fname].attrs.get('tree_invisible', False))
+                col.set_visible(not node_attrs.get('tree_invisible', False))
                 i = treeview.append_column(col)
-                if 'sum' in fields[fname].attrs and fields[fname].attrs['type'] \
+                if 'sum' in node_attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
                                 'float_time'):
-                    label = gtk.Label(fields[fname].attrs['sum'] + _(': '))
+                    label = gtk.Label(node_attrs['sum'] + _(': '))
                     label_sum = gtk.Label()
                     if isinstance(fields[fname].attrs.get('digits'), str):
                         digits = 2
