@@ -214,6 +214,10 @@ class One2Many(WidgetInterface):
 
     def _sig_new(self, widget):
         self.view.set_value()
+        if self.screen.current_record:
+            if not self.screen.current_record.validate():
+                self.screen.display()
+                return
         ctx = {}
         ctx.update(self.record.expr_eval(self.attrs.get('context', {})))
         sequence = None
@@ -244,14 +248,27 @@ class One2Many(WidgetInterface):
     def _sig_edit(self, widget=None):
         self.view.set_value()
         if self.screen.current_record:
+            if not self.screen.current_record.validate():
+                self.screen.display()
+                return
             win = WinForm(self.screen, self.window)
             win.run()
             win.destroy()
 
     def _sig_next(self, widget):
+        self.view.set_value()
+        if self.screen.current_record:
+            if not self.screen.current_record.validate():
+                self.screen.display()
+                return
         self.screen.display_next()
 
     def _sig_previous(self, widget):
+        self.view.set_value()
+        if self.screen.current_record:
+            if not self.screen.current_record.validate():
+                self.screen.display()
+                return
         self.screen.display_prev()
 
     def _sig_remove(self, widget, remove=False):
