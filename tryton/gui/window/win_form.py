@@ -175,6 +175,11 @@ class WinForm(object):
 
         width, height = self.screen.current_view.widget.size_request()
         scroll.set_size_request(width, height + 30)
+        parent_width, parent_height = parent.get_size()
+        win_width, win_height = self.win.get_size()
+        self.widget_width = min(parent_width - 20, max(win_width, width + 20))
+        self.widget_height = min(parent_height - 60, height + win_height + 20)
+        self.win.set_default_size(self.widget_width, self.widget_height)
 
         if view_type == 'tree':
             self.screen.signal_connect(self, 'record-message', self._sig_label)
