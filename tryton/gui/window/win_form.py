@@ -181,6 +181,8 @@ class WinForm(object):
             self.screen.screen_container.alternate_viewport.connect(
                     'key-press-event', self.on_keypress)
 
+        self.win.show()
+
         self.screen.display()
         self.screen.current_view.set_cursor()
 
