@@ -117,6 +117,8 @@ class Selection(WidgetInterface):
             self.entry.popup()
 
     def sig_activate(self, widget, event=None):
+        if not self.field:
+            return
         text = self.entry.child.get_text()
         value = False
         if text:
