@@ -126,9 +126,6 @@ class PySocket:
             if key in self.fingerprints:
                 if self.fingerprints[key] != fingerprint:
                     self.disconnect()
-                    import traceback
-                    print traceback.print_stack()
-                    print key
                     raise Exception('BadFingerprint')
             elif fingerprint:
                 self.fingerprints[key] = fingerprint
