@@ -85,7 +85,7 @@ class Wizard(SignalEvent):
             if res['type'] == 'form':
                 self.update(res['arch'], res['fields'], res['state'],
                             res['object'], context=ctx)
-                self.screen.current_model.set(self.datas['form'])
+                self.screen.current_record.set_default(self.datas['form'])
                 break
             elif res['type'] == 'action':
                 self.state = res['state']
@@ -140,7 +140,7 @@ class Wizard(SignalEvent):
 
     def sig_clicked(self, widget, state):
         self.screen.current_view.set_value()
-        if not self.screen.current_model.validate() \
+        if not self.screen.current_record.validate() \
                 and state != 'end':
             self.screen.display()
             return
@@ -233,5 +233,5 @@ class Wizard(SignalEvent):
         self.widget.pack_start(hbuttonbox, expand=False, fill=True)
 
         self.screen.new(default=False)
-        self.screen.current_model.set(val)
+        self.screen.current_record.set_default(val)
         self.screen.current_view.set_cursor()
