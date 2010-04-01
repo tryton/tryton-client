@@ -143,8 +143,12 @@ class DBLogin(object):
         if not res:
             return False
         host, port = res
-        return DBLogin.refreshlist(widget, db_widget, label, button, host, port,
+        res = DBLogin.refreshlist(widget, db_widget, label, button, host, port,
                 butconnect)
+        if res:
+            CONFIG['login.server'] = host
+            CONFIG['login.port'] = port
+        return res
 
     def db_create(self, widget):
         dia = DBCreate()

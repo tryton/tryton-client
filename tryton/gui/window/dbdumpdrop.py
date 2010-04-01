@@ -41,7 +41,9 @@ class DBBackupDrop(object):
         if not res:
             return None
         host, port = res
-        DBBackupDrop.refreshlist(widget, db_widget, label, host, port)
+        if DBBackupDrop.refreshlist(widget, db_widget, label, host, port):
+            CONFIG['login.server'] = host
+            CONFIG['login.port'] = port
         return (host, port)
 
     def event_show_button_ok(self, widget, event, data=None):

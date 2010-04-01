@@ -70,6 +70,8 @@ class DBCreate(object):
         except:
             self.server_connection_state(False)
             return False
+        CONFIG['login.server'] = host
+        CONFIG['login.port'] = port
         return True
 
     def event_passwd_clear(self, widget, event, data=None):
