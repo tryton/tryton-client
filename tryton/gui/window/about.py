@@ -8,11 +8,12 @@ from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 from tryton.version import VERSION, WEBSITE
 import webbrowser
 
-COPYRIGHT = '''Copyright (C) 2008 B2CK SPRL.
-Copyright (C) 2007-2008 Cédric Krier.
-Copyright (C) 2007-2008 Bertrand Chenal.
-Copyright (C) 2008 virtual things - Preisler & Spallek GbR.
-Copyright (C) 2008 Udo Spallek.
+COPYRIGHT = '''\
+Copyright (C) 2007-2010 Cédric Krier.
+Copyright (C) 2007-2010 Bertrand Chenal.
+Copyright (C) 2008-2010 B2CK SPRL.
+Copyright (C) 2008-2010 Udo Spallek.
+Copyright (C) 2008-2010 virtual things - Preisler & Spallek GbR.
 Copyright (C) 2004-2008 Tiny SPRL.
 '''
 AUTHORS = [
