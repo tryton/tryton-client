@@ -804,7 +804,7 @@ def process_exception(exception, parent, *args):
     if str(exception.args[0]) == 'BadFingerprint':
         warning(_('The server fingerprint has changed since last connection!\n'
             'The application will stop connecting to this server '
-            'until his fingerprint is fixed.'), parent, _('Security risk!'))
+            'until its fingerprint is fixed.'), parent, _('Security risk!'))
         from tryton.gui.main import Main
         Main.sig_quit()
         sys.exit()
