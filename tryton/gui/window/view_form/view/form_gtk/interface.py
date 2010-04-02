@@ -121,10 +121,10 @@ class WidgetInterface(object):
         deps = []
         for wname, wviews in self.view.widgets.iteritems():
             for wview in wviews:
-                if wview.modelfield.attrs.get('change_default', False):
-                    wvalue = wview.modelfield.get(self.record)
-                    name = wview.modelfield.attrs.get('string', wname)
-                    value = wview.modelfield.get_client(self.record)
+                if wview.field.attrs.get('change_default', False):
+                    wvalue = wview.field.get(self.record)
+                    name = wview.field.attrs.get('string', wname)
+                    value = wview.field.get_client(self.record)
                     deps.append((wname, name, wvalue, value))
         if not self.field.validate(self.record):
             message(_('Invalid field!'), parent=self.window)
