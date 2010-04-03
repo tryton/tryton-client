@@ -70,7 +70,9 @@ class Many2Many(WidgetInterface):
         self.wid_text.connect('key_press_event', self.on_keypress)
 
     def _color_widget(self):
-        return self.screen.current_view.widget_tree
+        if hasattr(self.screen.current_view, 'widget_tree'):
+            return self.screen.current_view.widget_tree
+        return super(Many2Many, self)._color_widget()
 
     def grab_focus(self):
         return self.wid_text.grab_focus()
