@@ -59,6 +59,7 @@ class Wizard(SignalEvent):
 
     def process(self):
         from tryton.action import Action
+        res = {}
         while self.state != 'end':
             ctx = self.context.copy()
             ctx.update(rpc.CONTEXT)
@@ -71,8 +72,7 @@ class Wizard(SignalEvent):
                 res = rpcprogress.run()
             except Exception, exception:
                 common.process_exception(exception, self.window)
-                self.end()
-                return
+                break
             if not res:
                 self.end()
                 return

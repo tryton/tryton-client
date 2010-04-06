@@ -136,9 +136,10 @@ class Dialog(object):
 
         if res < len(self.states) and res >= 0:
             datas.update(self.screen.get())
+            defaults = self.screen.current_record.get_default()
             self.dia.hide()
             self.parent.present()
-            return (self.states[res], datas)
+            return (self.states[res], datas, defaults)
         else:
             self.dia.hide()
             self.parent.present()
@@ -175,6 +176,7 @@ class Wizard(object):
             if not wiz_id:
                 return
         dia = None
+        res = {}
         while state != 'end':
             ctx = context.copy()
             ctx.update(rpc.CONTEXT)
@@ -186,7 +188,7 @@ class Wizard(object):
                 res = rpcprogress.run()
             except Exception, exception:
                 common.process_exception(exception, parent)
-                break
+                # Continue by running previous result
             if not res:
                 if dia:
                     res = {'type': 'form'}
@@ -210,7 +212,14 @@ class Wizard(object):
                 res2 = dia.run(datas['form'])
                 if not res2:
                     break
-                (state, new_data) = res2
+                (state, new_data, defaults) = res2
+
+                # Keep default values if exception occurs in execution of
+                # wizard action
+                for i in res['fields']:
+                    if i in defaults:
+                        res['fields'][i]['value'] = defaults[i]
+
                 for data in new_data:
                     if new_data[data] is None:
                         del new_data[data]

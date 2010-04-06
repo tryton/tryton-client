@@ -1,3 +1,4 @@
+* Don't stop wizard execution when exception occurs
 * Use ir.attachment view instead of a custom one
 * Add fingerprint and CA check for SSL connection
 * Use lazy load in Import/Export windows
