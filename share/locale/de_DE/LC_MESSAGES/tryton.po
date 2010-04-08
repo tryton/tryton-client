@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2010-04-03 00:46+0100\n"
+"PO-Revision-Date: 2010-04-08 18:13+0100\n"
 "Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -39,11 +39,11 @@ msgstr "Anmeldename angeben"
 
 #: tryton/config.py:108
 msgid "specify the server port"
-msgstr "Server Port angeben"
+msgstr "Port des Servers angeben"
 
 #: tryton/config.py:110
 msgid "specify the server hostname"
-msgstr "Server Hostname angeben"
+msgstr "Name des Servers angeben"
 
 #: tryton/config.py:115
 #, python-format
@@ -171,7 +171,7 @@ msgstr "Ausnahme: "
 
 #: tryton/common/common.py:643
 msgid "Always ignore this warning."
-msgstr "Diese Warnung immer ignorieren"
+msgstr "Diese Warnung künftig nicht mehr anzeigen"
 
 #: tryton/common/common.py:659
 #: tryton/common/common.py:685
