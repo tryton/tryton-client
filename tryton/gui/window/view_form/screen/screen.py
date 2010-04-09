@@ -237,6 +237,7 @@ class Screen(SignalEvent):
         if self.current_record and self.current_record not in self.group:
             self.current_record = None
         if self.current_record and not self.current_record.validate():
+            self.screen_container.set(self.current_view.widget)
             self.current_view.set_cursor()
             self.current_view.display()
             return
