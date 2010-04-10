@@ -132,7 +132,7 @@ class Graph(gtk.DrawingArea):
     def action_keyword(self, ids, window):
         if not ids:
             return
-        ctx = self.models.context.copy()
+        ctx = self.group.context.copy()
         if 'active_ids' in ctx:
             del ctx['active_ids']
         if 'active_id' in ctx:
@@ -321,21 +321,21 @@ class Graph(gtk.DrawingArea):
         return self.area.x + self.area.w * 0.05, \
                 self.area.y + self.area.h * 0.05
 
-    def display(self, models):
-        self.updateDatas(models)
+    def display(self, group):
+        self.updateDatas(group)
         self.setColorScheme()
         self.updateXY()
         self.updateGraph()
         self.queue_draw()
 
-    def updateDatas(self, models):
+    def updateDatas(self, group):
         self.datas = {}
         self.labels = {}
         self.ids = {}
-        self.models = models
+        self.group = group
         minx = None
         maxx = None
-        for model in models:
+        for model in group:
             x = model[self.xfield['name']].get(model)
             if not minx:
                 minx = x

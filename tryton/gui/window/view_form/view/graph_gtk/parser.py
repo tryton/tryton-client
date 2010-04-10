@@ -131,7 +131,7 @@ class ParserGraph(ParserInterface):
                         continue
                     xfield = common.node_attributes(child)
                     if not xfield.get('string'):
-                        xfield['string'] = fields[xfield['name']]['string']
+                        xfield['string'] = fields[xfield['name']].attrs['string']
                     break
             elif node.localName == 'y':
                 for child in node.childNodes:
@@ -139,7 +139,7 @@ class ParserGraph(ParserInterface):
                         continue
                     yattrs = common.node_attributes(child)
                     if not yattrs.get('string') and yattrs['name'] != '#':
-                        yattrs['string'] = fields[yattrs['name']]['string']
+                        yattrs['string'] = fields[yattrs['name']].attrs['string']
                     yfields.append(yattrs)
 
         widget = GRAPH_TYPE[attrs.get('type', 'vbar')](xfield, yfields, attrs, model)
