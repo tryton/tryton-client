@@ -100,6 +100,7 @@ dist = setup(name=PACKAGE,
         ('share/locale/es_CO/LC_MESSAGES', glob.glob('share/locale/es_CO/LC_MESSAGES/*.mo')),
         ('share/locale/es_ES/LC_MESSAGES', glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
+        ('share/locale/ru_RU/LC_MESSAGES', glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],
     classifiers=[
@@ -196,7 +197,7 @@ if os.name == 'nt':
             if os.path.isfile(file):
                 shutil.copy(file, dist_dir)
 
-        for lang in ('de', 'es', 'fr'):
+        for lang in ('de', 'es', 'fr', 'ru'):
             if os.path.isdir(os.path.join(dist_dir, 'share', 'locale', lang)):
                 shutil.rmtree(os.path.join(dist_dir, 'share', 'locale', lang))
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
@@ -289,7 +290,7 @@ elif os.name == 'mac' \
         shutil.copy(os.path.join(gtk_dir, 'share', 'themes', 'Clearlooks',
             'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))
 
-        for lang in ('de', 'es', 'fr'):
+        for lang in ('de', 'es', 'fr', 'ru'):
             if os.path.isdir(os.path.join(resources_dir, 'share', 'locale', lang)):
                 shutil.rmtree(os.path.join(resources_dir, 'share', 'locale', lang))
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
