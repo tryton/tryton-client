@@ -375,12 +375,16 @@ class Screen(SignalEvent):
                 and not (hasattr(self.current_view.widget_tree, 'editable') \
                     and self.current_view.widget_tree.editable)) \
                 or self.current_view.view_type == 'graph'):
+            prev_current_record = self.current_record
             for i in xrange(len(self.views)):
                 self.switch_view()
                 if self.current_view.view_type == 'form':
                     break
             if self.current_view.view_type != 'form':
                 return None
+            if not prev_current_record and self.current_record:
+                # new already called in switch_view
+                return self.current_record
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
