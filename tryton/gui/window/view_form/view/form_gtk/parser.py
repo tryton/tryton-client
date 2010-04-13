@@ -123,7 +123,7 @@ class Label(gtk.Label):
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', False):
+        if state_changes.get('invisible', self.attrs.get('invisible')):
             self.hide()
         else:
             self.show()
@@ -141,7 +141,7 @@ class VBox(gtk.VBox):
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', False):
+        if state_changes.get('invisible', self.attrs.get('invisible')):
             self.hide()
         else:
             self.show()
@@ -159,7 +159,7 @@ class Image(gtk.Image):
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', False):
+        if state_changes.get('invisible', self.attrs.get('invisible')):
             self.hide()
         else:
             self.show()
@@ -183,7 +183,7 @@ class Frame(gtk.Frame):
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', False):
+        if state_changes.get('invisible', self.attrs.get('invisible')):
             self.hide()
         else:
             self.show()
@@ -202,7 +202,7 @@ class ScrolledWindow(gtk.ScrolledWindow):
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', False):
+        if state_changes.get('invisible', self.attrs.get('invisible')):
             self.hide()
         else:
             self.show()
@@ -335,10 +335,11 @@ class ParserForm(ParserInterface):
                 text = attrs.get('string', '')
                 if 'string' in attrs or 'name' in attrs:
                     if not text:
-                        if 'name' in attrs and attrs['name'] in fields:
-                            if 'states' in fields[attrs['name']].attrs:
-                                attrs['states'] = \
-                                        fields[attrs['name']].attrs['states']
+                        for attr_name in ('states', 'invisible'):
+                            if attr_name in attrs and attrs['name'] in fields:
+                                if attr_name in fields[attrs['name']].attrs:
+                                    attrs[attr_name] = fields[attrs['name']
+                                            ].attrs[attr_name]
                             text = fields[attrs['name']].attrs['string']
                 vbox = VBox(attrs=attrs)
                 button_list.append(vbox)
@@ -355,9 +356,11 @@ class ParserForm(ParserInterface):
             elif node.localName == 'label':
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
-                    if 'states' not in attrs \
-                            and 'states' in fields[attrs['name']].attrs:
-                        attrs['states'] = fields[attrs['name']].attrs['states']
+                    for attr_name in ('states', 'invisible'):
+                        if attr_name not in attrs \
+                                and attr_name in fields[attrs['name']].attrs:
+                            attrs[attr_name] = fields[attrs['name']
+                                    ].attrs[attr_name]
                     if not text:
                         if gtk.widget_get_default_direction() == \
                                 gtk.TEXT_DIR_RTL:
@@ -465,9 +468,10 @@ class ParserForm(ParserInterface):
                     angle = 0
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
-                    if 'states' in fields[attrs['name']].attrs:
-                        attrs['states'] = \
-                                fields[attrs['name']].attrs['states']
+                    for attr_name in ('states', 'invisible'):
+                        if attr_name in fields[attrs['name']].attrs:
+                            attrs[attr_name] = \
+                                    fields[attrs['name']].attrs[attr_name]
                     if not text:
                         text = fields[attrs['name']].attrs['string']
                 if not text:
@@ -513,7 +517,7 @@ class ParserForm(ParserInterface):
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
                 for attr_name in ('relation', 'domain', 'selection',
-                        'relation_field', 'string', 'views'):
+                        'relation_field', 'string', 'views', 'invisible'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
@@ -562,8 +566,10 @@ class ParserForm(ParserInterface):
                 button_list += buttons
                 text = ''
                 if 'name' in attrs and attrs['name'] in fields:
-                    if 'states' in fields[attrs['name']].attrs:
-                        attrs['states'] = fields[attrs['name']].attrs['states']
+                    for attr_name in ('states', 'invisible'):
+                        if attr_name in fields[attrs['name']].attrs:
+                            attrs[attr_name] = fields[attrs['name']
+                                    ].attrs[attr_name]
                     text = fields[attrs['name']].attrs['string']
                 if attrs.get('string'):
                     text = attrs['string']

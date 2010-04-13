@@ -322,11 +322,11 @@ class One2Many(WidgetInterface):
         self.label.set_text(line)
 
     def display(self, record, field):
+        super(One2Many, self).display(record, field)
         if field is None:
             self.screen.current_record = None
             self.screen.display()
             return False
-        super(One2Many, self).display(record, field)
         new_group = field.get_client(record)
         if id(self.screen.group) != id(new_group):
             self.screen.group = new_group

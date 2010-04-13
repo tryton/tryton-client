@@ -280,11 +280,11 @@ class Many2One(WidgetInterface):
 
     def display(self, record, field):
         self.changed = False
+        super(Many2One, self).display(record, field)
         if not field:
             self.wid_text.set_text('')
             self.changed = True
             return False
-        super(Many2One, self).display(record, field)
         prev_res = self.wid_text.get_text()
         res = field.get_client(record)
         self.wid_text.set_text((res and str(res)) or '')

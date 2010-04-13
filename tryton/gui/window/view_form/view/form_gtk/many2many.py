@@ -149,11 +149,11 @@ class Many2Many(WidgetInterface):
         self.wid_but_add.set_sensitive(not value)
 
     def display(self, record, field):
+        super(Many2Many, self).display(record, field)
         if field is None:
             self.screen.current_record = None
             self.screen.display()
             return False
-        super(Many2Many, self).display(record, field)
         new_group = field.get_client(record)
         if id(self.screen.group) != id(new_group):
             self.screen.group = new_group
