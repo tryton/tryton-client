@@ -517,7 +517,8 @@ class ParserForm(ParserInterface):
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
                 for attr_name in ('relation', 'domain', 'selection',
-                        'relation_field', 'string', 'views', 'invisible'):
+                        'relation_field', 'string', 'views', 'invisible',
+                        'add_remove'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
