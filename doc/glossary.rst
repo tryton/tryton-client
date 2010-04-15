@@ -2,6 +2,7 @@ Glossary
 ########
 
 .. glossary::
+   :sorted:
 
    Actions
       An *action* is a function which is triggered by a user intervention.
