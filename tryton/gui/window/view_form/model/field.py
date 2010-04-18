@@ -180,7 +180,7 @@ class FloatField(CharField):
         internal = record.value.get(self.name)
         prev_modified = record.modified
         self.set(record, value)
-        digits = record.expr_eval(self.attrs.get('digits', (12, 2)))
+        digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
         if abs(float(internal or 0.0) - float(record.value[self.name] or 0.0)) \
                 >= (10.0**(-int(digits[1]))):
             if not self.get_state_attrs(record).get('readonly', False):
@@ -201,7 +201,7 @@ class NumericField(CharField):
         internal = record.value.get(self.name)
         prev_modified = record.modified
         self.set(record, value)
-        digits = record.expr_eval(self.attrs.get('digits', (12, 2)))
+        digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
         if abs((internal or Decimal('0.0')) - \
                 (record.value[self.name] or Decimal('0.0'))) \
                 >= Decimal(str(10.0**(-int(digits[1])))):

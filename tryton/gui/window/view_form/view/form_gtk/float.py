@@ -24,6 +24,8 @@ class Float(Integer):
         if not field:
             self.entry.set_text('')
             return False
+        self.digits = self.attrs.get('digits', field.attrs.get('digits',
+            (16, 2)))
         if isinstance(self.digits, str):
             digits = record.expr_eval(self.digits)
         else:

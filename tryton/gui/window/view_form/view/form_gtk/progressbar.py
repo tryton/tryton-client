@@ -17,23 +17,22 @@ class ProgressBar(WidgetInterface):
     def __init__(self, field_name, model_name, window, attrs=None):
         super(ProgressBar, self).__init__(field_name, model_name, window,
                 parent, attrs=attrs)
-        self.digits = attrs.get('digits', (16, 2))
         self.widget = gtk.ProgressBar()
         orientation = self.orientations.get(attrs.get('orientation',
             'left_to_right'), gtk.PROGRESS_LEFT_TO_RIGHT)
         self.widget.set_orientation(orientation)
 
-    def display(self, model, model_field):
-        super(ProgressBar, self).display(model, model_field)
-        if not model_field:
+    def display(self, record, field):
+        super(ProgressBar, self).display(record, field)
+        if not field:
             self.widget.set_text('')
             self.widget.set_fraction(0.0)
             return False
-        value = float(model_field.get(model) or 0.0)
+        value = float(field.get(record) or 0.0)
+        digits = self.attrs.get('digits', field.attrs.get('digits',
+            (16, 2)))
         if isinstance(self.digits, str):
-            digits = self.record.expr_eval(self.digits)
-        else:
-            digits = self.digits
+            digits = record.expr_eval(self.digits)
         self.widget.set_text(locale.format('%.' + str(digits[1]) + 'f',
             value, True))
         self.widget.set_fraction(value / 100.0)
