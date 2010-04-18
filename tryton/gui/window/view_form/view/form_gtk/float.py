@@ -10,7 +10,7 @@ class Float(Integer):
     def __init__(self, field_name, model_name, window, attrs=None):
         super(Float, self).__init__(field_name, model_name, window,
                 attrs=attrs)
-        self.digits = attrs.get('digits', (16, 2))
+        self.digits = (16, 2)
 
     def set_value(self, record, field):
         try:
@@ -24,8 +24,7 @@ class Float(Integer):
         if not field:
             self.entry.set_text('')
             return False
-        self.digits = self.attrs.get('digits', field.attrs.get('digits',
-            (16, 2)))
+        self.digits = field.attrs.get('digits', (16, 2))
         if isinstance(self.digits, str):
             digits = record.expr_eval(self.digits)
         else:
