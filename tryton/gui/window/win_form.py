@@ -188,6 +188,9 @@ class WinForm(object):
 
         self.win.show()
 
+        self.prev_window = self.screen.window
+        self.screen.window = self.win
+
         self.screen.display()
         self.screen.current_view.set_cursor()
 
@@ -312,5 +315,6 @@ class WinForm(object):
             viewport.remove(viewport.get_child())
         self.screen.switch_view(view_type=self.prev_view.view_type)
         self.screen.signal_unconnect(self)
+        self.screen.window = self.prev_window
         self.win.destroy()
         self.parent.present()

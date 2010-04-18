@@ -48,7 +48,7 @@ class Screen(SignalEvent):
         self.view_ids = view_ids
         self.parent = None
         self.parent_name = None
-        self.window = window
+        self.__window = window
         self.__group = None
         self.group = Group(model_name, {}, self.window, context=self.context,
                 readonly=readonly)
@@ -216,6 +216,15 @@ class Screen(SignalEvent):
         return True
 
     current_record = property(__get_current_record, __set_current_record)
+
+    def __get_window(self):
+        return self.__window
+
+    def __set_window(self, window):
+        self.group.window = window
+        self.__window = window
+
+    window = property(__get_window, __set_window)
 
     def update_attachment(self, record):
         if record != self.current_record:

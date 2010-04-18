@@ -14,7 +14,7 @@ class Group(SignalEvent, list):
             parent_datetime_field=None):
         super(Group, self).__init__()
         self.lock_signal = False
-        self.window = window
+        self.__window = window
         self.parent = parent
         self.parent_name = parent_name
         self.parent_datetime_field = parent_datetime_field
@@ -31,6 +31,16 @@ class Group(SignalEvent, list):
         if self._context.get('_datetime'):
             self.readonly = True
         self.__id2record = {}
+
+    def __get_window(self):
+        return self.__window
+
+    def __set_window(self, window):
+        for record in self:
+            record.window = window
+        self.__window = window
+
+    window = property(__get_window, __set_window)
 
     def insert(self, pos, record):
         if pos >= 1:
