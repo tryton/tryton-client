@@ -105,7 +105,8 @@ class ParserTree(ParserInterface):
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
 
-                readonly = not (editable and not node_attrs.get('readonly', False))
+                readonly = not (editable and not node_attrs.get('readonly',
+                    fields[fname].attrs.get('readonly', False)))
                 if isinstance(renderer, CellRendererToggle):
                     renderer.set_property('activatable', not readonly)
                 elif isinstance(renderer,
@@ -162,11 +163,13 @@ class ParserTree(ParserInterface):
                     col.set_fixed_width(width)
                 #XXX doesn't work well when resize columns
                 #col.set_expand(True)
-                if not treeview.sequence and node_attrs.get('sortable', True):
+                if not treeview.sequence \
+                        and fields[fname].attrs.get('sortable', True):
                     col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-                col.set_visible(not node_attrs.get('tree_invisible', False))
+                col.set_visible(not node_attrs.get('tree_invisible',
+                    fields[fname].attrs.get('tree_invisible', False)))
                 i = treeview.append_column(col)
                 if 'sum' in node_attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
