@@ -96,7 +96,8 @@ class ParserTree(ParserInterface):
                                 bool(int(node_attrs[boolean_fields]))
                 if fname not in fields:
                     continue
-                for attr_name in ('relation', 'domain', 'selection'):
+                for attr_name in ('relation', 'domain', 'selection',
+                        'sort'):
                     if attr_name in fields[fname].attrs:
                         node_attrs[attr_name] = fields[fname].attrs[attr_name]
                 cell = CELLTYPES.get(node_attrs.get('widget',
