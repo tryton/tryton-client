@@ -333,14 +333,14 @@ class ParserForm(ParserInterface):
                         fill=int(attrs.get('fill', 0)))
             elif node.localName == 'separator':
                 text = attrs.get('string', '')
-                if 'string' in attrs or 'name' in attrs:
+                if 'name' in attrs:
+                    for attr_name in ('states', 'invisible'):
+                        if attr_name not in attrs and attrs['name'] in fields:
+                            if attr_name in fields[attrs['name']].attrs:
+                                attrs[attr_name] = fields[attrs['name']
+                                        ].attrs[attr_name]
                     if not text:
-                        for attr_name in ('states', 'invisible'):
-                            if attr_name in attrs and attrs['name'] in fields:
-                                if attr_name in fields[attrs['name']].attrs:
-                                    attrs[attr_name] = fields[attrs['name']
-                                            ].attrs[attr_name]
-                            text = fields[attrs['name']].attrs['string']
+                        text = fields[attrs['name']].attrs['string']
                 vbox = VBox(attrs=attrs)
                 button_list.append(vbox)
                 if text:
