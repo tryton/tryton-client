@@ -299,7 +299,7 @@ class WinForm(object):
 
         if res == gtk.RESPONSE_OK:
             return True
-        elif self.but_cancel:
+        elif self.but_cancel.get_label == gtk.STOCK_CANCEL:
             self.screen.remove(delete=True)
         return False
 
