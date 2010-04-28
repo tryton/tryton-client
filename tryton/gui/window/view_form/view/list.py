@@ -407,9 +407,8 @@ class ViewList(ParserView):
             if hasattr(path[1], '_type') and path[1]._type == 'many2one':
                 value = record[path[1].name].get(record)
                 args = ('model', 'ir.action.keyword', 'get_keyword',
-                        'form_relate',
-                        (self.screen.fields[path[1].name]['relation'], 0),
-                        rpc.CONTEXT)
+                        'form_relate', (self.screen.group.fields[
+                            path[1].name].attrs['relation'], 0), rpc.CONTEXT)
                 try:
                     relates = rpc.execute(*args)
                 except Exception, exception:
@@ -455,8 +454,8 @@ class ViewList(ParserView):
                     self.window)
             return False
         from tryton.gui.window.view_form.screen import Screen
-        screen = Screen(self.screen.fields[path[1].name]['relation'],
-                self.window)
+        screen = Screen(self.screen.group.fields[
+            path[1].name].attrs['relation'], self.window)
         screen.load([value])
         encoder = PYSONEncoder()
         act['domain'] = encoder.encode(screen.current_record.expr_eval(
@@ -470,7 +469,8 @@ class ViewList(ParserView):
 
     def click_and_action(self, atype, value, path):
         return Action.exec_keyword(atype, self.window, {
-            'model': self.screen.fields[path[1].name]['relation'],
+            'model': self.screen.group.fields[
+                path[1].name].attrs['relation'],
             'id': value or False,
             'ids': [value],
             }, alwaysask=True)
