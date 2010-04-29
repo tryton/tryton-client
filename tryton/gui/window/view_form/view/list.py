@@ -481,7 +481,7 @@ class ViewList(ParserView):
                 self.store.added(group, signal[1])
             elif signal[0] == 'record-removed':
                 self.store.removed(group, signal[1])
-        self.update_children()
+        self.display()
 
     def cancel(self):
         pass
