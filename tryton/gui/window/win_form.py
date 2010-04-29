@@ -299,7 +299,7 @@ class WinForm(object):
 
         if res == gtk.RESPONSE_OK:
             return True
-        elif res == gtk.RESPONSE_CANCEL or res == gtk.RESPONSE_DELETE_EVENT:
+        elif res == gtk.RESPONSE_CANCEL:
             self.screen.remove(delete=True)
         return False
 
@@ -309,6 +309,10 @@ class WinForm(object):
         self.screen.current_view.set_cursor(new=True)
 
     def destroy(self):
+        if self.screen.current_record and \
+                self.screen.current_record.id < 0 and \
+                not self.screen.current_record.validate():
+            self.screen.remove(delete=True)
         self.screen.screen_container.alternate_view = False
         viewport = self.screen.screen_container.alternate_viewport
         if viewport.get_child():
