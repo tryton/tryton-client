@@ -285,15 +285,15 @@ class Many2One(WidgetInterface):
             self.wid_text.set_text('')
             self.changed = True
             return False
-        prev_res = self.wid_text.get_text()
+        current_stock = img.get_stock()[0]
         res = field.get_client(record)
         self.wid_text.set_text((res and str(res)) or '')
         img = gtk.Image()
-        if res and not prev_res:
+        if res and current_stock != 'tryton-open':
             img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Open a record'))
-        elif not res and prev_res:
+        elif not res and current_stock != 'tryton-find':
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
             self.tooltips.set_tip(self.but_open, _('Search a record'))
