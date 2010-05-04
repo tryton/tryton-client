@@ -1,9 +1,9 @@
 Introduction
 ############
 
-Tryton is a three-tiers high-level general purpose application platform
-written in Python and uses PostgreSQL as database engine.
+Tryton is a Graphical User Interface to the Tryton Framework
+based on GTK__ and Python__.
 
-It is the core base of an Open Source ERP.
+__ http://www.gtk.org
+__ http://www.python.org
 
-It provides modularity, scalability and security.

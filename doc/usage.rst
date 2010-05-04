@@ -105,6 +105,9 @@ with Options > Menubar > Change Accelerators. After the configuration it is
 preferable to disable Change Accelerators, to avoid accidental changes of key
 bindings while navigating the Menu bar with the keyboard.
 
+To remove a key binding simply press the delete button while pointing the
+cursor on the menu item to change.
+
 .. Note:: Usually key bindings are composed with modifier keys.
 
 __ Menu-Help-Keyboard_Shortcuts_
@@ -127,22 +130,26 @@ Tool Bar
 ^^^^^^^^
 The tool bar contains some often used menu functions mapped to icons.
 In addition to the menu bar the tool bar contains a button called
-*Attachment*. The attachment item handles the document management system of
-Tryton which is able to attach files to any arbitrary :term:`model`. The button
-is showing how many attachments are linked to the current view. On click it
-opens the attachment :term:`dialog`. This dialog has the following layout:
+*Attachment*.
 
-* Preview: Show a preview picture of the selected attachment
-* Description: Show and edit free text description for the selected attachment
-* Attachment list: Show and select all attachments for the given resource
+Attachment
+++++++++++
+The attachment item handles the document management system of
+Tryton which is able to attach files to any arbitrary :term:`model`. On click
+it opens the attachments :term:`dialog`. The default dialog shows a list view
+of the attached files and links. 
+
+A single Attachment has the following Options:
+
+* Attachment Name: The name of the attachment.
+* Datas: The attached File. The file size is displayed as text.
+* Link: Link to an external site as URL.
+* Preview tab: Shows a preview picture of the selected attachment.
+* Description tab: Shows and and provides editing of a free text description
+  for the selected attachment.
 * Actions:
 
-  - Save Text: Save the description text to the selected attachment.
-  - Add File...: Add a file as attachment. A file dialog opens.
-  - Add Link...: Add a link to a file as attachment. A file dialog opens.
-  - Save as...: Save the selected attachment to the local file system.
-  - Delete...: Delete the selected attachment.
-  - Close
+  - OK: Closes the Dialog and saves the attachment(s).
 
 
 Tabbed Main Frame
