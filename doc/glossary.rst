@@ -163,6 +163,4 @@ References
 .. [WP-CSV] http://en.wikipedia.org/wiki/Comma-separated_values
 .. [WP-ENCOD] http://en.wikipedia.org/wiki/Character_encoding
 
-:Authors:
-  Udo Spallek, Cédric Krier, Bertrand Chenal, Anne Krings
 

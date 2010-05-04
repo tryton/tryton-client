@@ -38,7 +38,8 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'tryton'
-copyright = '2008, B2CK'
+copyright = u'2008-2010,  Cédric Krier, Bertrand Chenal, Udo Spallek,\
+             Mathias Behrle, Anne Krings, Tobias Paepke'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -142,8 +143,9 @@ htmlhelp_basename = 'trytondoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'tryton.tex', 'tryton Documentation', 'Bertrand Chenal, Cédric Krier',
-   'manual'),
+  ('index', 'tryton.tex', 'tryton Documentation',
+   u'Udo Spallek,  Cédric Krier, Bertrand Chenal, Mathias Behrle, Anne Krings,\
+   Tobias Paepke', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
