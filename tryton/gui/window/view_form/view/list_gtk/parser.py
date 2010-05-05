@@ -55,11 +55,14 @@ def sort_model(column, treeview, screen):
             column.arrow_show = False
             column.arrow.hide()
     store = treeview.get_model()
+    unsaved_records = [x for x in store.group if x.id < 0]
     if screen.search_count == len(store):
         ids = screen.search_filter(only_ids=True)
         store.sort(ids)
     else:
         screen.search_filter()
+    for record in unsaved_records:
+        store.group.append(record)
 
 class ParserTree(ParserInterface):
 
