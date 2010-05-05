@@ -163,6 +163,8 @@ class Screen(SignalEvent):
         self.__group = group
         self.parent = group.parent
         self.parent_name = group.parent_name
+        if self.parent:
+            self.filter_widget = None
         if len(group):
             self.current_record = group[0]
         else:
