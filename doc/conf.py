@@ -40,8 +40,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'tryton'
-copyright = u'2008-2010,  Cédric Krier, Bertrand Chenal, Udo Spallek,\
-             Mathias Behrle, Anne Krings, Tobias Paepke'
+copyright = u'2008-2010,  Anne Krings, Bertrand Chenal, Cédric Krier, \
+             Mathias Behrle, Tobias Paepke, Udo Spallek'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -176,8 +176,8 @@ htmlhelp_basename = 'trytonddoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'tryton.tex', 'tryton Documentation',
-   u'Udo Spallek,  Cédric Krier, Bertrand Chenal, Mathias Behrle, Anne Krings,\
-   Tobias Paepke', 'manual'),
+   u'Anne Krings, Bertrand Chenal, Cédric Krier, Mathias Behrle, Tobias Paepke,\
+   Udo Spallek', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
