@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2010-04-08 18:13+0100\n"
+"PO-Revision-Date: 2010-05-06 18:02+0100\n"
 "Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -456,7 +456,7 @@ msgstr "_Menüleiste"
 
 #: tryton/gui/main.py:620
 msgid "Change Accelerators"
-msgstr "Kurzbefehle ändern"
+msgstr "Schnelltasten ändern"
 
 #: tryton/gui/main.py:628
 msgid "_Mode"
@@ -1575,10 +1575,10 @@ msgstr "Suchen"
 
 #: tryton/gui/window/view_board/parser.py:68
 #: tryton/gui/window/view_board/parser.py:70
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:364
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:368
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:745
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:747
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:367
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:371
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:752
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:754
 #: tryton/gui/window/view_form/widget_search/form.py:123
 msgid ":"
 msgstr ":"
@@ -1605,18 +1605,18 @@ msgstr "Für diese Aktion müssen Sie zuerst diesen Datensatz speichern!"
 msgid "You must select a record to be able to use the relate button !"
 msgstr "Um eine Verknüpfung zu erstellen muss ein Datensatz ausgewählt sein!"
 
-#: tryton/gui/window/view_form/view/list.py:422
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:316
+#: tryton/gui/window/view_form/view/list.py:421
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:314
 msgid "Actions"
 msgstr "Aktionen"
 
-#: tryton/gui/window/view_form/view/list.py:425
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:318
+#: tryton/gui/window/view_form/view/list.py:424
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:316
 msgid "Reports"
 msgstr "Berichte"
 
-#: tryton/gui/window/view_form/view/list.py:454
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:345
+#: tryton/gui/window/view_form/view/list.py:453
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:343
 msgid "You must select a record to use the relation!"
 msgstr "Für diese Verknüpfung müssen Sie zuerst einen Datensatz auswählen!"
 
@@ -1744,11 +1744,11 @@ msgid "Remove"
 msgstr "Entfernen"
 
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:67
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:295
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:294
 msgid "Open a record"
 msgstr "Datensatz öffnen"
 
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:299
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:297
 msgid "Search a record"
 msgstr "Datensatz suchen"
 
@@ -1757,8 +1757,8 @@ msgid "Edit selected record"
 msgstr "Ausgewählten Datensatz bearbeiten"
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:23
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:186
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:819
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:193
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:826
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -1767,19 +1767,19 @@ msgstr "Unbekannt"
 msgid "Wrong icon for the button!"
 msgstr "Falsches Icon für diesen Knopf!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:474
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:478
 msgid "No String Attr."
 msgstr "Kein Zeichen Attr."
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:635
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:642
 msgid "You need to save the record before adding translations!"
 msgstr "Datensatz muss gespeichert werden, bevor eine Übersetzung hinzugefügt werden kann!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:648
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:655
 msgid "No other language available!"
 msgstr "Keine anderen Sprachen verfügbar!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:707
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:714
 msgid "Add Translation"
 msgstr "Übersetzung hinzufügen"
 
@@ -1843,7 +1843,7 @@ msgstr "PNG Bild (*.png)"
 msgid "Image size too large!"
 msgstr "Bild ist zu groß!"
 
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:174
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:181
 msgid ": "
 msgstr ": "
 
