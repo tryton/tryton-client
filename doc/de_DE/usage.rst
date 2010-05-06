@@ -3,13 +3,13 @@
 
 Client Bedienung
 ################
-Dieses Dokument stellt die Konzepte der grafischen Benutzer
-Oberfläche (*Tryton Client*) für die Tryton Anwendungs-Plattform dar.
+Dieses Dokument stellt die Konzepte der grafischen Benutzeroberfläche
+(*Tryton Client*) für die Tryton Anwendungs-Plattform dar.
 
 
 Name
 ****
-tryton - grafischer Benutzeroberfläche der Tryton Anwendungs-Plattform
+tryton - grafische Benutzeroberfläche der Tryton Anwendungs-Plattform
 
 
 Kurzfassung
@@ -42,7 +42,7 @@ Optionen
 -l LOG_LEVEL, --log-level=LOG_LEVEL  Angebe der Protokollebene: INFO,
                                      DEBUG, WARNING, ERROR, CRITICAL
 
--u LOGIN, --user=LOGIN               Angabe des Anmelde-Benutzer
+-u LOGIN, --user=LOGIN               Angabe des Benutzers zur Anmeldung
 
 -p PORT, --port=PORT                 Angabe des Server-Ports
 
@@ -100,15 +100,18 @@ später erklärt.
 Maus- und Tastaturbedienung
 +++++++++++++++++++++++++++
 Die meisten Funktionen des Tryton Client können mit Maus oder Tastatur benutzt werden.
-Für alle Menüpunkte sind `Tastaturkürzel`__ verfügbar. Zusätzlich sind alle Tastaturkürzel
+Für alle Menüpunkte sind `Schnelltasten`__ verfügbar. Zusätzlich sind alle Schnelltasten
 manuell konfigurierbar. Um das Kürzel eines Menüpunkts zu ändern muss man den Mauszeiger
-über dem Menüpunkt positionieren und das neue benutzerdefinierte Tastaturkürzel drücken.
+über dem Menüpunkt positionieren und das neue benutzerdefinierte Schnelltaste drücken.
 Um diese Möglichkeit nutzen zu können muss man unter Einstellungen > Menüleiste > Kurzbefehle ändern aktivieren.
 Nach dem Ändern der Tastaturkürzel sollte man nicht vergessen diese Funktion wieder auszuschalten
-um eine versehentliche Änderung von Tastaturkürzeln zu vermeiden während man in den Menüpunkten
+um eine versehentliche Änderung von Schnelltasten zu vermeiden während man in den Menüpunkten
 navigiert.
 
-.. Note:: Üblicherweise werden Tastaturkürzel mit den Modifikationstasten kombiniert.
+Um das Kürzel eines Menüpunkts zu enfernen muss man den Mauszeiger über dem
+Menüpunkt positionieren und die Enfernen-Taste drücken.
+
+.. Note:: Üblicherweise werden Schnelltasten mit den Modifikationstasten kombiniert.
 
 __ Menu-Help-Keyboard_Shortcuts_
 
@@ -116,8 +119,8 @@ Zusätzlich sind die Menüpunkte erreichbar mit den *Alt*- und *Options*-Tasten.
 Der Benutzer muss die *Alt*- und *Options*-Taste kombiniert mit dem unterstrichenen
 Buchstaben des Menüpunkts drücken. Um in weitere Untermenüs zu navigieren, die *Alt*-
 oder *Options*-Taste loslassen und den unterstrichenen Buchstaben des gewünschten
-Untermenüs drücken. Falls mehrere Menüpunkte mit dem gleichen Tastaturkürzel existieren,
-dieses Tastaturkürzel nochmals ausführen um zum nächsten Menüpunkt zu springen.
+Untermenüs drücken. Falls mehrere Menüpunkte mit dem gleichen Schnelltasten existieren,
+diese Schnelltaste nochmals benutzen um zum nächsten Menüpunkt zu springen.
 
 Die zweite Maustaste  (normalerweise die rechte Maustaste) stellt ein zusätzliches
 Kontextmenü für weitere Sichten und Felder zur Verfügung. In diesem Kontextmenü
@@ -129,26 +132,27 @@ Werkzeugleiste
 ^^^^^^^^^^^^^^
 Die Werkzeugleiste enthält Symbole für oft benutzte Menüfunktionen.
 Zusätzlich zur Menüleiste beinhaltet die Werkzeugleiste den Knopf
-*Dateianhang*. Das Dateianhang-Element stellt das Dokumenten Management System
-von Tryton bereit. Es ist in der Lage Dateien an jedes beliebige :term:`Modell`
-anzuhängen. Der Knopf zeigt wie viele Anhänge
-mit der aktuellen Sicht verknüpft sind. Beim Mausklick öffnet sich der
-:term:`Dialog` Anhang. Dieser Dialog hat folgendes Layout:
+Dateianhang.
 
-* Vorschau: Zeigt eine Vorschaubild des ausgewählten Anhangs
-* Beschreibung: Anzeige und editieren einer freien Text-Beschreibung
-  des ausgewählten Anhangs
-* Anhangs-Liste:  Anzeige und Auswahl aller Anhänge zur ausgewählten Ressource
+Anhänge
++++++++
+Das Dateianhang-Element stellt das Dokumenten Management System von Tryton
+bereit. Es ist in der Lage Dateien an jedes beliebige :term:`Modell`
+anzuhängen. Der Knopf zeigt wie viele Anhänge mit der aktuellen Sicht
+verknüpft sind. Beim Mausklick öffnet sich der :term:`Dialog` Anhang.
+Der Standard-Dialog zeigt eine Liste der angehängten Dateien und Verknüpfungen.
+
+Der einzelne Anhang hat folgende Optionen:
+
+* Name Anhang: Der Name des Anhangs.
+* Daten: Die angehängte Datei. Die Dateigröße wird im Textfeld dargestellt.
+* Verknüpfung: Verknüpfung zu einer externen Seite als URL.
+* Vorschau Tab: Zeigt ein Vorschaubild des ausgewählten Anhangs.
+* Beschreibung Tab: Ermöglicht Anzeige und Bearbeitung einer Beschreibung
+  des ausgewählten Anhangs.
 * Aktionen:
 
-  - Text speichern: Speichert den Text der Beschreibung zum ausgewählten Anhang
-  - Datei hinzufügen...: Fügt eine Datei als Anhang hinzu. Es öffnet sich ein
-    Dateiauswahl-Dialog  - Verweis hinzufügen...: Fügt eine Verknüpfung zu einer Datei als Anhang hinzu.
-    Es öffnet sich ein Dateiauswahl-Dialog
-  - Speichern als...: Speichert den ausgewählte Anhang auf das
-    lokale  Dateisystem
-  - Löschen...: Löscht den ausgewählten Anhang
-  - Schließen: Schließt den Anhang-Dialog
+  - OK: Schliesst den Dialog und speichert den/die Anhänge.
 
 
 Hauptfenster mit Tabs
@@ -182,7 +186,7 @@ Benutzers bereitgestellt. Sobald ein Menüpunkt gedrückt wird öffnet sich
 durch die hinterlegte Aktion eine neuer Tab. Wie das Schaubild
 zeigt ist das *Hauptmenü* in drei Bereiche unterteilt.
 
-Der obere linke Bereich beinhaltet die Obersten bzw. Haupt-Menüpunkte des
+Der obere linke Bereich beinhaltet die obersten bzw. Haupt-Menüpunkte des
 *Hauptmenüs*. Standard Haupt-Menüpunkte sind 'Systemverwaltung' und 'Tryton'.
 
 .. note:: Das *Systemverwaltung*-Menü wird in der Moduldokumentation
@@ -291,12 +295,12 @@ Verbinden...
   des Benutzernamens und Passwortes.
 
   * `Serververbindung`__
-  * Datenbank: Datenbank auf Serverseite zu der die Verbindung aufgebaut werden soll
+  * Datenbank: Datenbank auf Serverseite, zu der die Verbindung aufgebaut werden soll
   * Benutzername: Tryton Benutzername um sich anzumelden
   * Passwort: Tryton Passwort um sich anzumelden
   * Aktionen:
 
-    - Verbinden: Verbindet zum Server mit den bereitgestellten Daten
+    - Verbinden: Verbindet zum Server mit Hilfe der eingegebenen Daten
     - Abbrechen: Bricht den Dialog ab
 
 .. note:: Abhängig von den Servereinstellungen wird der Benutzer nach einer
@@ -317,7 +321,7 @@ Verbindung trennen...
 Datenbank
 +++++++++
 Dieses Untermenü stellt Werkzeuge zur Wartung der Tryton Datenbank bereit.
-Für alle Datenbankoperationen benötigt der Benutzer das Tryton Server Passwort.
+Für alle Datenbankoperationen benötigt der Benutzer das Tryton Server-Passwort.
 
 .. warning:: Falls Sicherheitsbedenken bestehen sollten Sie diese serverbasierten
              Werkzeuge nicht nutzen. Da es in einer Mehrbenutzer-Umgebung immer
@@ -343,7 +347,7 @@ Neue Datenbank
   * Tryton Server Einstellungen:
 
     - `Serververbindung`__
-    - Tryton Server Passwort: Das in der Tryton Server Konfiguration
+    - Tryton Server Passwort: Das in der Tryton Server-Konfiguration
       hinterlegte Server Passwort.
 
   * Datenbank Einstellungen:
@@ -361,8 +365,8 @@ Neue Datenbank
 
 __ File-Server-Connection_
 
-.. note:: Der entsprechende Tryton Datenbank Benutzer (definiert in der Tryton
-   Server Konfiguratin) muss authorisiert werden um die Datenbank zu erstellen.
+.. note:: Der entsprechende Tryton Datenbankbenutzer (definiert in der Tryton
+   Server Konfiguration) muss autorisiert werden um die Datenbank zu erstellen.
 
 .. _Menu-File-Restore_Database:
 
@@ -381,7 +385,7 @@ Datenbank wiederherstellen
   * *Datenbank wiederherstellen* Dialog:
 
     - `Serververbindung`__
-    - Tryton Server Passwort: Das in der Tryton Server Konfiguration
+    - Tryton Server Passwort: Das in der Tryton Server-Konfiguration
       hinterlegte Server Passwort.
     - File to Restore: Show filename and path.
     - New Database Name: Enter a new name for the database to be restored
@@ -424,7 +428,7 @@ Datenbank löschen
 
     - `Serververbindung`__
     - Datenbank: Auswahl der zu löschenden Datenbank
-    - Tryton Server Passwort: Das in der Tryton Server Konfiguration
+    - Tryton Server Passwort: Das in der Tryton Server-Konfiguration
       hinterlegte Server Passwort.
 
   * Bestätigungs Dialog
@@ -449,7 +453,7 @@ __ File-Server-Connection_
   * Port: Port auf dem der Tryton Server lauscht.
 
 .. note:: Falls keine Verbindung zum Tryton Server besteht, sind viele Einträge
-   des Menüs und der Werkzeugleiste deaktiviert
+   des Menüs und der Werkzeugleiste deaktiviert.
 
 
 Benutzer
@@ -462,7 +466,7 @@ und stellt die Verbindung mit dem *Anfrage System* von Tryton bereit.
 Einstellungen ...
   Ein Einstellungsdialog öffnet sich, in dem der aktuelle Benutzer seine
   persönlichen Einstellungen anzeigen und ändern kann. Alle Benutzereigenschaften
-  werden serverseitig gespeichert. Beispielsweise werden beim anmelden an einem
+  werden serverseitig gespeichert. Beispielsweise werden beim Anmelden an einem
   anderen Computer diese Einstellungen wiederhergestellt.
 
   * Name: bürgerlicher Name des Tryton Benutzers.
@@ -531,7 +535,8 @@ Meine Anfragen lesen:
 
     - Verweise
 
-      + Verweise: Der Verweis Typ      + (Ziel): Hängt einen Verweis an die Anfrage an.
+      + Verweise: Der Verweis Typ
+      + (Ziel): Hängt einen Verweis an die Anfrage an.
 
 .. note:: Wenn man von Anfragen spricht, kann man sie sich vorstellen wie
    ein Tryton-internes E-Mail System.
@@ -670,7 +675,7 @@ Gehe zu Datensatz Nr...:
 .. _Menu-Form-Reload_Undo:
 
 Neu laden/Rückgängig:
-  Lädt den Inhalt des aktuellen Tabs neu. Rückgängig machen der Änderungen, falls
+  Lädt den Inhalt des aktuellen Tabs neu. Macht Änderungen rückgängig, falls
   das Speichern des aktuellen Datensatzes fehlschlägt.
 
 .. _Menu-Form-Actions:
@@ -771,7 +776,7 @@ Menüleiste
 .. _Menu-Options-Menubar-Accelerators:
 
 Kurzbefehle ändern:
-  Falls das Kontrollkästchen aktiv ist, können Tastaturkürzel eingestellt werden. Siehe auch
+  Falls das Kontrollkästchen aktiv ist, können Schnelltasten eingestellt werden. Siehe auch
   `Maus- und Tastaturbedienung`_
 
 Modus
@@ -910,7 +915,7 @@ Tipps...:
 .. _Menu-Help-Keyboard_Shortcuts:
 
 Schnelltasten...:
-  Zeigt einen Informationsdialog über die vordefinierten Tastaturkürzel an.
+  Zeigt einen Informations-Dialog über die vordefinierten Schnelltasten an.
 
   * Widgets zur Bearbeitung: Zeigt Schnelltasten für Texteinträge, verknüpfte
     Einträge und Datums/Zeiteinträge
@@ -918,7 +923,7 @@ Schnelltasten...:
 .. _Menu-Help-About:
 
 Über...:
-  Lizenz, Mitwirkende, Authoren von Tryton
+  Lizenz, Mitwirkende, Autoren von Tryton
 
 
 Anhang
@@ -931,8 +936,7 @@ Konfigurations-Dateien
 ::
 
    ~/.config/tryton/x.y/tryton.conf      # Generelle Konfiguration
-   ~/.config/tryton/x.y/accel.map        # Konfiguration der Kurzbefehle
-
-:Authoren:
-  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings
+   ~/.config/tryton/x.y/accel.map        # Konfiguration der Schnelltasten
+   ~/.config/tryton/x.y/known_hosts      # Fingerprints
+   ~/.config/tryton/x.y/ca_certs         # Certification Authority (http://docs.python.org/library/ssl.html#ssl-certificates)
 

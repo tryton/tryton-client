@@ -44,12 +44,13 @@ Glossar
       * :term:`Diagrammansicht`
 
    Diagrammansicht
-      *Graphenansicht* ist eine Art von :term:`Sicht` um Datensätze in einem
-      Diagramm darzustellen. *Graphen Sicht* können Tortendiagramme oder Balkendiagramme sein.
+      *Diagrammansicht* ist eine Art von :term:`Sicht` um Datensätze in einem
+      Diagramm darzustellen. Die *Diagrammansichten* können Tortendiagramme oder
+      Balkendiagramme sein.
 
    Hauptbereich
       Der *Hauptbereich* ist eine großer Teil in der Mitte des
-      :term:`Tryton client`. *Den Tryton client benutzen* bezeichnet hauptsächlich den
+      :term:`Tryton Client`. *Den Tryton Client benutzen* bezeichnet hauptsächlich den
       *Hauptbereich*. Er beinhaltet :term:`Tabs` um die verschiedenen
       :term:`Formulare <Formular>` zu ordnen und darzustellen.
 
@@ -64,13 +65,13 @@ Glossar
       *Module* definiert :term:`Modelle <Modell>`, die Präsentation der Information
       (:term:`Sichten <Sicht>`), Funktionen, :term:`Aktionen` und Voreinstellungen.
       Zusätzlich können *Module* standardisierte Systemdaten wie zum Beispiel die ISO
-      Namen der Länder beeinhalten. *Module* sind in Tryton generisch aufgebaut.
+      Namen der Länder beinhalten. *Module* sind in Tryton generisch aufgebaut.
       Das bedeutet, sie sind so einfach, dass die meisten nur die grundlegende
       Funktionalität bereitzustellen. Spezielle Anpassungen für unterschiedliche
       Anwendungsfälle werden in Zusatzmodulen realisiert.
 
    Plugins
-      Ein *plugin* ist ein Zusatzmodul für den :term:`Tryton client`.
+      Ein *Plugin* ist ein Zusatzmodul für den :term:`Tryton Client`.
 
    Popup
       Ein kleines Fenster, welches sich im Hauptbereich in den Vordergrund stellt.
@@ -89,14 +90,14 @@ Glossar
       * Tabs innerhalb einer :term:`Sicht`.
 
       Der Hauptbereich besteht aus *Tabs*, welche das Hauptmenü und alle
-      Views zu einem dazugehörtigen :term:`Modell` einbetten. Der andere Typ eines
+      Sichten zu einem dazugehörigen :term:`Modell` einbetten. Der andere Typ eines
       *Tabs* wird innerhalb einer :term:`Sicht` benutzt um die
       verschiedene Bereiche des gleichen Modells visuell abzutrennen.
       Diese *Tabs* werden benutzt um die Inhalte eines Modells in verschiedene
       Unterpunkte zu strukturieren.
 
    Drei Schichten
-      Eine *drei Schichten* Anwendungs Plattform wie Tryton, besteht aus drei
+      Eine *Drei-Schichten*-Anwendungs-Plattform wie Tryton, besteht aus drei
       verschiedenen Software Komponenten:
 
       1. Die Speicher- oder Daten-Schicht
@@ -105,37 +106,37 @@ Glossar
 
       Die Speicher-Schicht im Tryton-Plattform wird durch die PostgreSQL
       Datenbank bereitgestellt. Die Logik-Schicht wird durch den
-      :term:`Tryton server` und dessen :term:`Module` zur Verfügung gestellt.
-      Die Präsentations-Schicht ist hauptsächlich durch den :term:`Tryton client`
-      dargestellt. In einer *Drei Schichten* Architektur verbindet sich die
+      :term:`Tryton Server` und dessen :term:`Module` zur Verfügung gestellt.
+      Die Präsentations-Schicht ist hauptsächlich durch den :term:`Tryton Client`
+      dargestellt. In einer *Drei-Schichten*-Architektur verbindet sich die
       Präsentations-Schicht (Client) nie direkt mit der Speicher-Schicht.
       Jede Kommunikation wird durch die Logik-Schicht überwacht.
 
    Baumansicht
       Die *Baumansicht* ist ein :term:`Sicht-Typ <Sicht>`, der mehrere :term:`Datensätze <Datensatz>` gleichzeitig anzeigt.
-      *Baumansichten* können flache Listen oder Tabellen wie auch verschachtelte baum-artige Listen sein.
+      *Baumansichten* können flache Listen oder Tabellen wie auch verschachtelte baumartige Listen sein.
 
    Tryton Server
       Der *Tryton Server* ist die Anwendungs- oder Logik-Schicht in der
       :term:`drei Schichten` Anwendungs-Plattform *Tryton*. Der *Tryton Server*
       verbindet die zugrunde liegende Anwendungslogik der verschiedenen
       :term:`Module` mit den dazugehörigen Datensätzen. Der
-      *Tryton Server* stellt verschiedene Interfaces zur Darstellung der
+      *Tryton Server* stellt verschiedene Schnittstellen zur Darstellung der
       erstellten Informationen bereit:
 
-      * :term:`Tryton client`: (grafisches Benutzer Oberläche GUI)
+      * :term:`Tryton Client`: (grafische Benutzeroberläche GUI)
       * XMLRPC siehe [WP-XMLRPC]_
       * WebDAV siehe [WP-WebDAV]_
       * OpenOffice
 
    Tryton Client
-      Die *Tryton client* Anwendung ist der grafische Benutzer Oberfläche (GUI)
-      des :term:`Tryton servers <Tryton server>`.
+      Die *Tryton client* Anwendung ist der grafische Benutzeroberfläche (GUI)
+      des :term:`Tryton Servers <Tryton server>`.
 
    Sicht
       Eine *Sicht* ist die visuelle Präsentation von :term:`Daten`.
       *Sichten* befinden sich in :term:`Tabs` im :term:`Hauptbereich` des
-      :term:`Tryton client`. Es gibt zwei grundsätzliche Typen von *Sichten* in Tryton:
+      :term:`Tryton Client`. Es gibt zwei grundsätzliche Typen von *Sichten* in Tryton:
 
       1. :term:`Formular`
       2. :term:`Infoseite`
@@ -146,13 +147,14 @@ Glossar
       verschiedenen alternativen Sichten darzustellen.
 
    Widgets
-      Ein *Widget* ist ein visuelles Steuerelement der grafischen Benutzer Oberfläche (GUI).
-      Einige *Widgets* stellen lediglich Informationen dar, Andere erlauben
-      es dem Benutzer Änderungen zu machen. Bespiele von *Widgets* sind Knöpfe,
-      Check-Boxen, Eingabefelder, Auswahllisten, Tabellen, Listen, Bäume, ...
+      Ein *Widget* ist ein visuelles Steuerelement der grafischen
+      Benutzeroberfläche (GUI). Einige *Widgets* stellen lediglich Informationen
+      dar, Andere erlauben es dem Benutzer Änderungen zu machen. Bespiele von
+      *Widgets* sind Knöpfe, Check-Boxen, Eingabefelder, Auswahllisten,
+      Tabellen, Listen, Bäume, ...
 
    Wizards
-      *Wizards* beeinhalten mehrer aufeinanderfolgende Schritte um komplexe
+      *Wizards* beinhalten mehrere aufeinander folgende Schritte um komplexe
       :term:`Aktionen` auszuführen. Ein *Wizard* teilt die Komplexität
       mancher Aktionen in mehrere geführte Schritte auf.
 
@@ -166,6 +168,4 @@ Quellen
 .. [WP-CSV] http://de.wikipedia.org/wiki/CSV_%28Dateiformat%29 
 .. [WP-ENCOD] http://de.wikipedia.org/wiki/Zeichenkodierung
 
-:Autoren:
-  Udo Spallek, Cédric Krier, Bertrand Chenal, Anne Krings
 

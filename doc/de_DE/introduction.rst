@@ -1,8 +1,9 @@
 Einleitung
 ##########
 
-Tryton ist eine Drei-Schichten Anwendungsplattform unter GPL-3 Lizenz, ist in Python geschrieben und verwendet PostgreSQL als Datenbank.
+Tryton ist eine grafische Benutzeroberfläche zur Tryton
+Anwendungs-Plattform basierend auf GTK__ und Python__.
 
-Es ist die Basis eines Open Source ERP.
+__ http://www.gtk.org
+__ http://www.python.org
 
-Es bietet Modularität, Skalierbarkeit und Sicherheit.

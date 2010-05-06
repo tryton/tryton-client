@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tryton\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-29 23:01+0200\n"
-"PO-Revision-Date: 2010-02-12 23:30+0100\n"
+"POT-Creation-Date: 2010-05-04 16:33+0200\n"
+"PO-Revision-Date: 2010-05-06 15:50+0100\n"
 "Last-Translator: Tobias Paepke <tryton@paepke.net>\n"
 "Language-Team: http://tryton.origo.ethz.ch/forum/8\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.3.0\n"
+"X-Generator: Translate Toolkit 1.5.3\n"
 "X-Poedit-Language: german\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-Country: GERMANY\n"
@@ -28,8 +28,8 @@ msgid ""
 msgstr ""
 "Client Bedienung\n"
 "################\n"
-"Dieses Dokument stellt die Konzepte der grafischen Benutzer\n"
-"Oberfläche (*Tryton Client*) für die Tryton Anwendungs-Plattform dar."
+"Dieses Dokument stellt die Konzepte der grafischen Benutzeroberfläche\n"
+"(*Tryton Client*) für die Tryton Anwendungs-Plattform dar."
 
 #: usage.rst:10
 msgid ""
@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Name\n"
 "****\n"
-"tryton - grafischer Benutzeroberfläche der Tryton Anwendungs-Plattform"
+"tryton - grafische Benutzeroberfläche der Tryton Anwendungs-Plattform"
 
 #: usage.rst:15
 msgid ""
@@ -112,7 +112,7 @@ msgstr ""
 
 #: usage.rst:45
 msgid "-u LOGIN, --user=LOGIN               Specify the login user"
-msgstr "-u LOGIN, --user=LOGIN               Angabe des Anmelde-Benutzer"
+msgstr "-u LOGIN, --user=LOGIN               Angabe des Benutzers zur Anmeldung"
 
 #: usage.rst:47
 msgid "-p PORT, --port=PORT                 Specify the server port"
@@ -234,23 +234,31 @@ msgstr ""
 "Maus- und Tastaturbedienung\n"
 "+++++++++++++++++++++++++++\n"
 "Die meisten Funktionen des Tryton Client können mit Maus oder Tastatur benutzt werden.\n"
-"Für alle Menüpunkte sind `Tastaturkürzel`__ verfügbar. Zusätzlich sind alle Tastaturkürzel\n"
+"Für alle Menüpunkte sind `Schnelltasten`__ verfügbar. Zusätzlich sind alle Schnelltasten\n"
 "manuell konfigurierbar. Um das Kürzel eines Menüpunkts zu ändern muss man den Mauszeiger\n"
-"über dem Menüpunkt positionieren und das neue benutzerdefinierte Tastaturkürzel drücken.\n"
+"über dem Menüpunkt positionieren und das neue benutzerdefinierte Schnelltaste drücken.\n"
 "Um diese Möglichkeit nutzen zu können muss man unter Einstellungen > Menüleiste > Kurzbefehle ändern aktivieren.\n"
 "Nach dem Ändern der Tastaturkürzel sollte man nicht vergessen diese Funktion wieder auszuschalten\n"
-"um eine versehentliche Änderung von Tastaturkürzeln zu vermeiden während man in den Menüpunkten\n"
+"um eine versehentliche Änderung von Schnelltasten zu vermeiden während man in den Menüpunkten\n"
 "navigiert."
 
 #: usage.rst:108
-msgid ".. Note:: Usually key bindings are composed with modifier keys."
-msgstr ".. Note:: Üblicherweise werden Tastaturkürzel mit den Modifikationstasten kombiniert."
+msgid ""
+"To remove a key binding simply press the delete button while pointing the\n"
+"cursor on the menu item to change."
+msgstr ""
+"Um das Kürzel eines Menüpunkts zu enfernen muss man den Mauszeiger über dem\n"
+"Menüpunkt positionieren und die Enfernen-Taste drücken."
 
-#: usage.rst:110
+#: usage.rst:111
+msgid ".. Note:: Usually key bindings are composed with modifier keys."
+msgstr ".. Note:: Üblicherweise werden Schnelltasten mit den Modifikationstasten kombiniert."
+
+#: usage.rst:113
 msgid "__ Menu-Help-Keyboard_Shortcuts_"
 msgstr "__ Menu-Help-Keyboard_Shortcuts_"
 
-#: usage.rst:112
+#: usage.rst:115
 msgid ""
 "Additionally the menu bar items are accessible with the *Alt* or *Option* key.\n"
 "The user needs to hold the *Alt* or *Option* key followed by the underlined\n"
@@ -264,10 +272,10 @@ msgstr ""
 "Der Benutzer muss die *Alt*- und *Options*-Taste kombiniert mit dem unterstrichenen\n"
 "Buchstaben des Menüpunkts drücken. Um in weitere Untermenüs zu navigieren, die *Alt*-\n"
 "oder *Options*-Taste loslassen und den unterstrichenen Buchstaben des gewünschten\n"
-"Untermenüs drücken. Falls mehrere Menüpunkte mit dem gleichen Tastaturkürzel existieren,\n"
-"dieses Tastaturkürzel nochmals ausführen um zum nächsten Menüpunkt zu springen."
+"Untermenüs drücken. Falls mehrere Menüpunkte mit dem gleichen Schnelltasten existieren,\n"
+"diese Schnelltaste nochmals benutzen um zum nächsten Menüpunkt zu springen."
 
-#: usage.rst:120
+#: usage.rst:123
 msgid ""
 "The second mouse button (usually right mouse button) provides an additional\n"
 "contextual menu for some views and fields. In this context menu the user finds\n"
@@ -279,59 +287,64 @@ msgstr ""
 "findet der Benutzer :term:`Aktionen` um Inhalte zu kopieren oder einzufügen, Vorgabewerte\n"
 "zu setzen oder um Auswahlen für verschiedene Felder zu erhalten."
 
-#: usage.rst:126
+#: usage.rst:129
 msgid ""
 "Tool Bar\n"
 "^^^^^^^^\n"
 "The tool bar contains some often used menu functions mapped to icons.\n"
 "In addition to the menu bar the tool bar contains a button called\n"
-"*Attachment*. The attachment item handles the document management system of\n"
-"Tryton which is able to attach files to any arbitrary :term:`model`. The button\n"
-"is showing how many attachments are linked to the current view. On click it\n"
-"opens the attachment :term:`dialog`. This dialog has the following layout:"
+"*Attachment*."
 msgstr ""
 "Werkzeugleiste\n"
 "^^^^^^^^^^^^^^\n"
 "Die Werkzeugleiste enthält Symbole für oft benutzte Menüfunktionen.\n"
 "Zusätzlich zur Menüleiste beinhaltet die Werkzeugleiste den Knopf\n"
-"*Dateianhang*. Das Dateianhang-Element stellt das Dokumenten Management System\n"
-"von Tryton bereit. Es ist in der Lage Dateien an jedes beliebige :term:`Modell`\n"
-"anzuhängen. Der Knopf zeigt wie viele Anhänge\n"
-"mit der aktuellen Sicht verknüpft sind. Beim Mausklick öffnet sich der\n"
-":term:`Dialog` Anhang. Dieser Dialog hat folgendes Layout:"
+"Dateianhang."
 
 #: usage.rst:135
 msgid ""
-"* Preview: Show a preview picture of the selected attachment\n"
-"* Description: Show and edit free text description for the selected attachment\n"
-"* Attachment list: Show and select all attachments for the given resource\n"
+"Attachment\n"
+"++++++++++\n"
+"The attachment item handles the document management system of\n"
+"Tryton which is able to attach files to any arbitrary :term:`model`. On click\n"
+"it opens the attachments :term:`dialog`. The default dialog shows a list view\n"
+"of the attached files and links. "
+msgstr ""
+"Anhänge\n"
+"+++++++\n"
+"Das Dateianhang-Element stellt das Dokumenten Management System von Tryton\n"
+"bereit. Es ist in der Lage Dateien an jedes beliebige :term:`Modell`\n"
+"anzuhängen. Der Knopf zeigt wie viele Anhänge mit der aktuellen Sicht\n"
+"verknüpft sind. Beim Mausklick öffnet sich der :term:`Dialog` Anhang.\n"
+"Der Standard-Dialog zeigt eine Liste der angehängten Dateien und Verknüpfungen."
+
+#: usage.rst:142
+msgid "A single Attachment has the following Options:"
+msgstr "Der einzelne Anhang hat folgende Optionen:"
+
+#: usage.rst:144
+msgid ""
+"* Attachment Name: The name of the attachment.\n"
+"* Datas: The attached File. The file size is displayed as text.\n"
+"* Link: Link to an external site as URL.\n"
+"* Preview tab: Shows a preview picture of the selected attachment.\n"
+"* Description tab: Shows and and provides editing of a free text description\n"
+"  for the selected attachment.\n"
 "* Actions:"
 msgstr ""
-"* Vorschau: Zeigt eine Vorschaubild des ausgewählten Anhangs\n"
-"* Beschreibung: Anzeige und editieren einer freien Text-Beschreibung\n"
-"  des ausgewählten Anhangs\n"
-"* Anhangs-Liste:  Anzeige und Auswahl aller Anhänge zur ausgewählten Ressource\n"
+"* Name Anhang: Der Name des Anhangs.\n"
+"* Daten: Die angehängte Datei. Die Dateigröße wird im Textfeld dargestellt.\n"
+"* Verknüpfung: Verknüpfung zu einer externen Seite als URL.\n"
+"* Vorschau Tab: Zeigt ein Vorschaubild des ausgewählten Anhangs.\n"
+"* Beschreibung Tab: Ermöglicht Anzeige und Bearbeitung einer Beschreibung\n"
+"  des ausgewählten Anhangs.\n"
 "* Aktionen:"
 
-#: usage.rst:140
-msgid ""
-"  - Save Text: Save the description text to the selected attachment.\n"
-"  - Add File...: Add a file as attachment. A file dialog opens.\n"
-"  - Add Link...: Add a link to a file as attachment. A file dialog opens.\n"
-"  - Save as...: Save the selected attachment to the local file system.\n"
-"  - Delete...: Delete the selected attachment.\n"
-"  - Close"
-msgstr ""
-"  - Text speichern: Speichert den Text der Beschreibung zum ausgewählten Anhang\n"
-"  - Datei hinzufügen...: Fügt eine Datei als Anhang hinzu. Es öffnet sich ein\n"
-"    Dateiauswahl-Dialog  - Verweis hinzufügen...: Fügt eine Verknüpfung zu einer Datei als Anhang hinzu.\n"
-"    Es öffnet sich ein Dateiauswahl-Dialog\n"
-"  - Speichern als...: Speichert den ausgewählte Anhang auf das\n"
-"    lokale  Dateisystem\n"
-"  - Löschen...: Löscht den ausgewählten Anhang\n"
-"  - Schließen: Schließt den Anhang-Dialog"
+#: usage.rst:152
+msgid "  - OK: Closes the Dialog and saves the attachment(s)."
+msgstr "  - OK: Schliesst den Dialog und speichert den/die Anhänge."
 
-#: usage.rst:148
+#: usage.rst:155
 msgid ""
 "Tabbed Main Frame\n"
 "^^^^^^^^^^^^^^^^^\n"
@@ -347,7 +360,7 @@ msgstr ""
 "Alles innerhalb des *Hauptfensters* hängt von den individuell\n"
 "installierten Modulen ab."
 
-#: usage.rst:155
+#: usage.rst:162
 msgid ""
 "The main frame provides a `tabbed document interface`__ to arrange different\n"
 "views side by side. New :term:`tabs` are opened by special :term:`actions`,\n"
@@ -360,23 +373,23 @@ msgstr ""
 "klicken von Aktionsknöpfen geöffnet. Alle Tabs haben einen Titel, der den Namen der\n"
 "verwendeten Sicht zeigt."
 
-#: usage.rst:160
+#: usage.rst:167
 msgid ":term:`Tabs` can be arranged by Drag and Drop."
 msgstr ":term:`Tabs` können mit Drag and Drop verschoben werden."
 
-#: usage.rst:162
+#: usage.rst:169
 msgid "__ TDI_"
 msgstr "__ TDI_"
 
-#: usage.rst:164
+#: usage.rst:171
 msgid ".. _TDI: http://en.wikipedia.org/wiki/Tabbed_document_interface"
 msgstr ".. _TDI: http://de.wikipedia.org/wiki/Registerkarte"
 
-#: usage.rst:166
+#: usage.rst:173
 msgid ".. Note:: Inside :term:`views` there can be tabs, too."
 msgstr ".. Note:: Innerhalb einer :term:`Sicht` kann es auch Tabs geben."
 
-#: usage.rst:168
+#: usage.rst:175
 msgid ""
 "Main Menu\n"
 "+++++++++\n"
@@ -397,15 +410,15 @@ msgstr ""
 "durch die hinterlegte Aktion eine neuer Tab. Wie das Schaubild\n"
 "zeigt ist das *Hauptmenü* in drei Bereiche unterteilt."
 
-#: usage.rst:177
+#: usage.rst:184
 msgid ""
 "The upper left frame contains the first or top level entries of the *main\n"
 "menu*. Standard top level entries are 'Administration' and 'Tryton'."
 msgstr ""
-"Der obere linke Bereich beinhaltet die Obersten bzw. Haupt-Menüpunkte des\n"
+"Der obere linke Bereich beinhaltet die obersten bzw. Haupt-Menüpunkte des\n"
 "*Hauptmenüs*. Standard Haupt-Menüpunkte sind 'Systemverwaltung' und 'Tryton'."
 
-#: usage.rst:180
+#: usage.rst:187
 msgid ""
 ".. note:: The *administration* menu will be explained in the modules\n"
 "   documentation for the 'IR' module, the *information repository*."
@@ -414,11 +427,11 @@ msgstr ""
 "   des 'IR' Moduls ('information repository' - Informations-Ablage)\n"
 "   dokumentiert. "
 
-#: usage.rst:183
+#: usage.rst:190
 msgid "The top level entry 'Tryton' connects to the website of the Tryton project."
 msgstr "Der Haupt-Menüpunkt 'Tryton' ruft die Webseite des Tryton Projekts auf."
 
-#: usage.rst:185
+#: usage.rst:192
 msgid ""
 "The right frame is showing a :term:`tree view` substructure of menu *items*\n"
 "and *headings*. With the arrow keys it is possible to navigate inside the menu.\n"
@@ -432,11 +445,11 @@ msgstr ""
 "das dazugehörige Menü. Mit den Pfeiltasten Links und Rechts kann man die\n"
 "verschiedenen Ebenen der Baumansicht aus- und einklappen."
 
-#: usage.rst:191
+#: usage.rst:198
 msgid "Figure: Main Menu Tab::"
 msgstr "Schaubild: Hauptmenü Tab::"
 
-#: usage.rst:193
+#: usage.rst:200
 msgid ""
 "       ________________________________________________________\n"
 "      |                      Tryton                       _ o x|\n"
@@ -494,7 +507,7 @@ msgstr ""
 "      | Benutzername Firma   Wartende Anfragen...    login@... |\n"
 "      |________________________________________________________|"
 
-#: usage.rst:222
+#: usage.rst:229
 msgid ""
 "The lower left menu frame shows a user adjustable *shortcuts* menu. This menu\n"
 "is for collecting often used menu items. Using a *shortcut* item will open\n"
@@ -509,7 +522,7 @@ msgstr ""
 "Klick des Plus-Knopfes [+] dem Menü hinzugefügt. Der Minus-Knopf [-] löscht den\n"
 "ausgewählten Favoriten aus dieser Liste."
 
-#: usage.rst:229
+#: usage.rst:236
 msgid ""
 "Home Action\n"
 "+++++++++++\n"
@@ -524,17 +537,17 @@ msgstr ""
 "geöffnet wird sobald der Benutzer die *Startseite* ausführt. Diese Standardaktion\n"
 "wird in den `Einstellungen`__ definiert."
 
-#: usage.rst:235
-msgctxt "usage.rst:235"
+#: usage.rst:242
+msgctxt "usage.rst:242"
 msgid "__ Menu-Form-Home_"
 msgstr "__ Menu-Form-Home_"
 
-#: usage.rst:237
-msgctxt "usage.rst:237"
+#: usage.rst:244
+msgctxt "usage.rst:244"
 msgid "__ Menu-User-Preferences_"
 msgstr "__ Menu-User-Preferences_"
 
-#: usage.rst:240
+#: usage.rst:247
 msgid ""
 "Status bar\n"
 "++++++++++\n"
@@ -546,7 +559,7 @@ msgstr ""
 "Die *Statusleiste* stellt generelle Informationen über den Status\n"
 "des Tryton Client bereit. Sie ist in drei Abschnitte unterteilt."
 
-#: usage.rst:245
+#: usage.rst:252
 msgid ""
 "* On its left side the real name and company name of the users actual company\n"
 "  is shown.\n"
@@ -565,11 +578,11 @@ msgstr ""
 "  es keine Verbindung zu einem Tryton Server besteht. Dieser Bereich wird nach folgendem\n"
 "  Muster erzeugt::"
 
-#: usage.rst:254
+#: usage.rst:261
 msgid "    <user-name>@<tryton-server-address>:<port>/<database-name>"
 msgstr "    <Benutzer-Name>@<Tryton-Server-Adresse>:<Port>/<Datenbank-Name>"
 
-#: usage.rst:256
+#: usage.rst:263
 msgid ""
 "  If the client is connected to the server with an SSL-secured connection, an\n"
 "  additional lock icon appears rightmost some certificate details in a mouse\n"
@@ -579,7 +592,7 @@ msgstr ""
 "  hat erscheint ein zusätzliches Vorhängeschloss-Symbol mit weiteren Zertifikats-\n"
 "  Details sobald sich der Mauszeiger auf diesem Symbol befindet."
 
-#: usage.rst:260
+#: usage.rst:267
 msgid ""
 "The Status bar can be enabled and disabled in the menu at\n"
 "Options > Form > Status bar"
@@ -587,7 +600,7 @@ msgstr ""
 "Die Statusleiste kann aus- und eingeschalten werden über\n"
 "die Menüleiste Einstellungen > Formular > Statusleiste"
 
-#: usage.rst:264
+#: usage.rst:271
 msgid ""
 "Menu Bar Items\n"
 "**************\n"
@@ -605,7 +618,7 @@ msgstr ""
 "Die meisten Dialoge stellen einen *Abbrechen* Knopf bereit um den kompletten\n"
 "Vorgang abzubrechen."
 
-#: usage.rst:273
+#: usage.rst:280
 msgid ""
 "File\n"
 "^^^^\n"
@@ -617,11 +630,11 @@ msgstr ""
 "Das *Datei* Menü stellt Funktionen des Tryton Servers wie\n"
 "Anmelden, Datenbankpflege und zum schließen der Client Anwendung."
 
-#: usage.rst:278
+#: usage.rst:285
 msgid ".. _Menu-File-Connect:"
 msgstr ".. _Menu-File-Connect:"
 
-#: usage.rst:280
+#: usage.rst:287
 msgid ""
 "Connect...\n"
 "  By choosing this menu entry the client will be connected to an available\n"
@@ -632,7 +645,7 @@ msgstr ""
 "  verfügbaren Tryton Server. Ein :term:`Dialog` öffnet sich zur Eingabe\n"
 "  des Benutzernamens und Passwortes."
 
-#: usage.rst:284
+#: usage.rst:291
 msgid ""
 "  * `Server`__\n"
 "  * Database: Database to connect server side\n"
@@ -641,20 +654,20 @@ msgid ""
 "  * Actions:"
 msgstr ""
 "  * `Serververbindung`__\n"
-"  * Datenbank: Datenbank auf Serverseite zu der die Verbindung aufgebaut werden soll\n"
+"  * Datenbank: Datenbank auf Serverseite, zu der die Verbindung aufgebaut werden soll\n"
 "  * Benutzername: Tryton Benutzername um sich anzumelden\n"
 "  * Passwort: Tryton Passwort um sich anzumelden\n"
 "  * Aktionen:"
 
-#: usage.rst:290
+#: usage.rst:297
 msgid ""
 "    - Connect: Connects to the server with the given credentials.\n"
 "    - Cancel"
 msgstr ""
-"    - Verbinden: Verbindet zum Server mit den bereitgestellten Daten\n"
+"    - Verbinden: Verbindet zum Server mit Hilfe der eingegebenen Daten\n"
 "    - Abbrechen: Bricht den Dialog ab"
 
-#: usage.rst:293
+#: usage.rst:300
 msgid ""
 ".. note:: Depending on server configuration for session timeout, the actual\n"
 "   user may be logged out of the current session, and need to login again.\n"
@@ -665,16 +678,16 @@ msgstr ""
 "   wieder anmelden. Die voreingestellte Zeitspanne des automatischen Abmeldens\n"
 "   beträgt 6 Minuten."
 
-#: usage.rst:297
-msgctxt "usage.rst:297"
+#: usage.rst:304
+msgctxt "usage.rst:304"
 msgid "__ File-Server-Connection_"
 msgstr "__ File-Server-Connection_"
 
-#: usage.rst:300
+#: usage.rst:307
 msgid ".. _Menu-File-Disconnect:"
 msgstr ".. _Menu-File-Disconnect:"
 
-#: usage.rst:302
+#: usage.rst:309
 msgid ""
 "Disconnect...\n"
 "  Disconnects the client from an active server connection. In case of unsaved\n"
@@ -686,7 +699,7 @@ msgstr ""
 "  Änderungen in einem offenen Tab existieren, fordert der Tryton Client zum\n"
 "  Speichern der Änderungen auf."
 
-#: usage.rst:307
+#: usage.rst:314
 msgid ""
 "Database\n"
 "++++++++\n"
@@ -696,9 +709,9 @@ msgstr ""
 "Datenbank\n"
 "+++++++++\n"
 "Dieses Untermenü stellt Werkzeuge zur Wartung der Tryton Datenbank bereit.\n"
-"Für alle Datenbankoperationen benötigt der Benutzer das Tryton Server Passwort."
+"Für alle Datenbankoperationen benötigt der Benutzer das Tryton Server-Passwort."
 
-#: usage.rst:312
+#: usage.rst:319
 msgid ""
 ".. warning:: Consider not to use this server-site maintaining functions,\n"
 "             if there are security concerns. Since there are always security\n"
@@ -710,11 +723,11 @@ msgstr ""
 "             Sicherheitsbedenken gibt, ist es besser diese Funktionen auf\n"
 "             Datenbank-Ebene zu verbieten."
 
-#: usage.rst:317
+#: usage.rst:324
 msgid ".. note:: Database names are restricted by some rules:"
 msgstr ".. note:: Datenbank-Namen sind durch folgende Regeln eingeschränkt:"
 
-#: usage.rst:319
+#: usage.rst:326
 msgid ""
 "          * Allowed characters are alpha-nummeric [A-Za-z0-9] and\n"
 "            underscore (_).\n"
@@ -726,7 +739,7 @@ msgstr ""
 "          * Das erste Zeichen muss ein alphabetischer Buchstabe sein.\n"
 "          * Die maximale Länge eines Datenbank-Namens beträgt 64 Zeichen."
 
-#: usage.rst:324
+#: usage.rst:331
 msgid ""
 "          Tryton automatically checks if the given database name follows\n"
 "          the rules."
@@ -734,11 +747,11 @@ msgstr ""
 "          Tryton überprüft automatisch ob der angegebene Namen diesen\n"
 "          Regeln entspricht."
 
-#: usage.rst:327
+#: usage.rst:334
 msgid ".. _Menu-File-New_Database:"
 msgstr ".. _Menu-File-New_Database:"
 
-#: usage.rst:329
+#: usage.rst:336
 msgid ""
 "New Database\n"
 "  Opens a :term:`dialog` for creating a new Tryton database with an initial\n"
@@ -748,25 +761,25 @@ msgstr ""
 "  Öffnet einen :term:`Dialog` um eine neue Tryton Datenbank mit einem ersten\n"
 "  Benutzer \"admin\" zu erstellen."
 
-#: usage.rst:333
+#: usage.rst:340
 msgid "  * Server Setup:"
 msgstr "  * Tryton Server Einstellungen:"
 
-#: usage.rst:335
+#: usage.rst:342
 msgid ""
 "    - `Server Connection`__\n"
 "    - Tryton Server Password: The password given in the Tryton server\n"
 "      configuration."
 msgstr ""
 "    - `Serververbindung`__\n"
-"    - Tryton Server Passwort: Das in der Tryton Server Konfiguration\n"
+"    - Tryton Server Passwort: Das in der Tryton Server-Konfiguration\n"
 "      hinterlegte Server Passwort."
 
-#: usage.rst:339
+#: usage.rst:346
 msgid "  * New Database Setup:"
 msgstr "  * Datenbank Einstellungen:"
 
-#: usage.rst:341
+#: usage.rst:348
 msgid ""
 "    - Database Name: The name of the new database.\n"
 "    - Default Language: The default language of the new database.\n"
@@ -778,12 +791,12 @@ msgstr ""
 "    - Administrator Passwort: Das *admin*-Benutzer Passwort der neuen Datenbank\n"
 "    - Passwort Wiederholung: Erneute Passwort-Eingabe des neuen 'admin'-Benutzers"
 
-#: usage.rst:346
-msgctxt "usage.rst:346"
+#: usage.rst:353
+msgctxt "usage.rst:353"
 msgid "  * Actions:"
 msgstr "  * Aktionen:"
 
-#: usage.rst:348
+#: usage.rst:355
 msgid ""
 "    - Create: Creates the new database with initial user *admin* and the\n"
 "      provided password.\n"
@@ -793,24 +806,24 @@ msgstr ""
 "      und dem angegebenen Passwort\n"
 "    - Abbrechen: Bricht den Dialog ab ohne zu speichern."
 
-#: usage.rst:352
-msgctxt "usage.rst:352"
+#: usage.rst:359
+msgctxt "usage.rst:359"
 msgid "__ File-Server-Connection_"
 msgstr "__ File-Server-Connection_"
 
-#: usage.rst:354
+#: usage.rst:361
 msgid ""
 ".. note:: The appropriate Tryton database user (defined in the Tryton server\n"
 "   configuration) needs to be authorized to create databases for this step."
 msgstr ""
-".. note:: Der entsprechende Tryton Datenbank Benutzer (definiert in der Tryton\n"
-"   Server Konfiguratin) muss authorisiert werden um die Datenbank zu erstellen."
+".. note:: Der entsprechende Tryton Datenbankbenutzer (definiert in der Tryton\n"
+"   Server Konfiguration) muss autorisiert werden um die Datenbank zu erstellen."
 
-#: usage.rst:357
+#: usage.rst:364
 msgid ".. _Menu-File-Restore_Database:"
 msgstr ".. _Menu-File-Restore_Database:"
 
-#: usage.rst:359
+#: usage.rst:366
 msgid ""
 "Restore Database\n"
 "  Opens a :term:`dialog` to restore a previously created database backup\n"
@@ -820,11 +833,11 @@ msgstr ""
 "  Öffnet einen :term:`Dialog` um eine vorher erstelltes Datenbankbackup\n"
 "  aus einer Datei wiederherzustellen."
 
-#: usage.rst:363
+#: usage.rst:370
 msgid "  * File choose menu dialog"
 msgstr "  * *Backup Datei für Wiederherstellung öffnen...* Dialog"
 
-#: usage.rst:365
+#: usage.rst:372
 msgid ""
 "    - Choose a database backup file in the file system to be restored.\n"
 "    - Actions:"
@@ -832,7 +845,7 @@ msgstr ""
 "    - Aus dem Dateisystem eine Datenbankbackup-Datei auswählen\n"
 "    - Aktionen:"
 
-#: usage.rst:368
+#: usage.rst:375
 msgid ""
 "      + Open: Open the chosen backup file.\n"
 "      + Cancel"
@@ -840,11 +853,11 @@ msgstr ""
 "      + Öffnen: Öffnet die ausgewählte Backup-Datei\n"
 "      + Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:371
+#: usage.rst:378
 msgid "  * Restore Database dialog:"
 msgstr "  * *Datenbank wiederherstellen* Dialog:"
 
-#: usage.rst:373
+#: usage.rst:380
 msgid ""
 "    - `Server Connection`__\n"
 "    - Tryton Server Password: The password given in the Tryton server\n"
@@ -860,7 +873,7 @@ msgstr ""
 "    - Name für neue Datenbank: Neuer Name der wiederherzustellenden Datenbank\n"
 "    - Aktionen:"
 
-#: usage.rst:380
+#: usage.rst:387
 msgid ""
 "      + Restore: Proceed database restore.\n"
 "      + Cancel"
@@ -868,16 +881,16 @@ msgstr ""
 "      + Wiederherstellen: Datenbank Wiederherstellung ausführen\n"
 "      + Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:383
-msgctxt "usage.rst:383"
+#: usage.rst:390
+msgctxt "usage.rst:390"
 msgid "__ File-Server-Connection_"
 msgstr "__ File-Server-Connection_"
 
-#: usage.rst:385
+#: usage.rst:392
 msgid ".. _Menu-File-Backup_Database:"
 msgstr ".. _Menu-File-Backup_Database:"
 
-#: usage.rst:387
+#: usage.rst:394
 msgid ""
 "Backup Database\n"
 "  Open a :term:`dialog` to backup an existing database and save it as a file."
@@ -885,11 +898,11 @@ msgstr ""
 "Datenbank sichern\n"
 "  Öffnet einen :term:`Dialog` um eine existierende Datenbank in eine Datei zu sichern."
 
-#: usage.rst:390
+#: usage.rst:397
 msgid "  * `Backup a Database` dialog"
 msgstr "  * `Datenbank sichern` Dialog"
 
-#: usage.rst:392
+#: usage.rst:399
 msgid ""
 "    - `Server connection`__\n"
 "    - Database: Choose the Tryton database to backup.\n"
@@ -903,7 +916,7 @@ msgstr ""
 "      hinterlegte Server Passwort.\n"
 "    - Aktionen:"
 
-#: usage.rst:398
+#: usage.rst:405
 msgid ""
 "      + Backup: Proceed database backup.\n"
 "      + Cancel"
@@ -911,11 +924,11 @@ msgstr ""
 "      + Sichern: Datenbank Sicherung ausführen\n"
 "      + Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:401
+#: usage.rst:408
 msgid "  * `Save Backup File` dialog"
 msgstr "  * `Speichern unter...` Dialog"
 
-#: usage.rst:403
+#: usage.rst:410
 msgid ""
 "    - Choose a filename and location for the created backup file.\n"
 "    - Save the backup file."
@@ -923,16 +936,16 @@ msgstr ""
 "    - Auswahl eines Dateinamens und Ort der erstellten Sicherungs-Datei.\n"
 "    - Speichern der Sicherungs-Datei."
 
-#: usage.rst:406
-msgctxt "usage.rst:406"
+#: usage.rst:413
+msgctxt "usage.rst:413"
 msgid "__ File-Server-Connection_"
 msgstr "__ File-Server-Connection_"
 
-#: usage.rst:408
+#: usage.rst:415
 msgid ".. _Menu-File-Drop_Database:"
 msgstr ".. _Menu-File-Drop_Database:"
 
-#: usage.rst:410
+#: usage.rst:417
 msgid ""
 "Drop Database\n"
 "  Open a :term:`dialog` to delete an existing Tryton database."
@@ -940,11 +953,11 @@ msgstr ""
 "Datenbank löschen\n"
 "  Öffnet einen :term:`Dialog` um eine existierende Tryton Datenbank zu löschen."
 
-#: usage.rst:413
+#: usage.rst:420
 msgid "  * `Delete a Database` dialog"
 msgstr "  * `Datenbank löschen` dialog"
 
-#: usage.rst:415
+#: usage.rst:422
 msgid ""
 "    - `Server Connection`__\n"
 "    - Database: Choose a database to delete.\n"
@@ -953,14 +966,14 @@ msgid ""
 msgstr ""
 "    - `Serververbindung`__\n"
 "    - Datenbank: Auswahl der zu löschenden Datenbank\n"
-"    - Tryton Server Passwort: Das in der Tryton Server Konfiguration\n"
+"    - Tryton Server Passwort: Das in der Tryton Server-Konfiguration\n"
 "      hinterlegte Server Passwort."
 
-#: usage.rst:420
+#: usage.rst:427
 msgid "  * Confirmation Dialog"
 msgstr "  * Bestätigungs Dialog"
 
-#: usage.rst:422
+#: usage.rst:429
 msgid ""
 "    - Yes: Drop the database\n"
 "    - No: Do not drop the database\n"
@@ -970,16 +983,16 @@ msgstr ""
 "    - Nein: Keine Löschung der Datenbank\n"
 "    - Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:426
-msgctxt "usage.rst:426"
+#: usage.rst:433
+msgctxt "usage.rst:433"
 msgid "__ File-Server-Connection_"
 msgstr "__ File-Server-Connection_"
 
-#: usage.rst:428
+#: usage.rst:435
 msgid ".. _File-Server-Connection:"
 msgstr ".. _File-Server-Connection:"
 
-#: usage.rst:430
+#: usage.rst:437
 msgid ""
 "Server (connection) dialog:\n"
 "  This :term:`dialog` is widely used to setup a Tryton server connection.\n"
@@ -994,7 +1007,7 @@ msgstr ""
 "  Server besteht. Der *Bearbeiten* Knopf öffnet den Dialog der Verbinungs\n"
 "  Details:"
 
-#: usage.rst:436
+#: usage.rst:443
 msgid ""
 "  * Server: Network address or IP number of the Tryton server (protocols\n"
 "    are not supported)\n"
@@ -1004,15 +1017,15 @@ msgstr ""
 "    (Protokollangaben sind nicht unterstützt)\n"
 "  * Port: Port auf dem der Tryton Server lauscht."
 
-#: usage.rst:440
+#: usage.rst:447
 msgid ""
 ".. note:: If there is no connection to a Tryton server, many items in menu bar\n"
 "   and tool bar are deactivated."
 msgstr ""
 ".. note:: Falls keine Verbindung zum Tryton Server besteht, sind viele Einträge\n"
-"   des Menüs und der Werkzeugleiste deaktiviert"
+"   des Menüs und der Werkzeugleiste deaktiviert."
 
-#: usage.rst:444
+#: usage.rst:451
 msgid ""
 "User\n"
 "^^^^\n"
@@ -1024,11 +1037,11 @@ msgstr ""
 "Dieser Eintrag der Menüleiste stellt die Eigenschaften des aktuellen Benutzers ein\n"
 "und stellt die Verbindung mit dem *Anfrage System* von Tryton bereit."
 
-#: usage.rst:449
+#: usage.rst:456
 msgid ".. _Menu-User-Preferences:"
 msgstr ".. _Menu-User-Preferences:"
 
-#: usage.rst:451
+#: usage.rst:458
 msgid ""
 "Preferences...\n"
 "  A preference dialog opens, where the actual user can show and edit his\n"
@@ -1039,10 +1052,10 @@ msgstr ""
 "Einstellungen ...\n"
 "  Ein Einstellungsdialog öffnet sich, in dem der aktuelle Benutzer seine\n"
 "  persönlichen Einstellungen anzeigen und ändern kann. Alle Benutzereigenschaften\n"
-"  werden serverseitig gespeichert. Beispielsweise werden beim anmelden an einem\n"
+"  werden serverseitig gespeichert. Beispielsweise werden beim Anmelden an einem\n"
 "  anderen Computer diese Einstellungen wiederhergestellt."
 
-#: usage.rst:457
+#: usage.rst:464
 msgid ""
 "  * Name: Real name of the Tryton user.\n"
 "  * Password: Password of the Tryton user.\n"
@@ -1067,16 +1080,16 @@ msgstr ""
 "  * Zeitzone: Die lokale Zeitzone in der sich der Benutzer befinden.\n"
 "  * Gruppenzugehörigkeit: Definiert die Mitgliedschaften um Zugriffe zu regeln."
 
-#: usage.rst:468
-msgctxt "usage.rst:468"
+#: usage.rst:475
+msgctxt "usage.rst:475"
 msgid "__ Menu-Form-Home_"
 msgstr "__ Menu-Form-Home_"
 
-#: usage.rst:470
+#: usage.rst:477
 msgid ".. _Menu-user-send-a-request:"
 msgstr ".. _Menu-user-send-a-request:"
 
-#: usage.rst:472
+#: usage.rst:479
 msgid ""
 "Send a Request\n"
 "  Opens a tab in :term:`form view` which enables the user to send\n"
@@ -1086,11 +1099,11 @@ msgstr ""
 "  Öffnet einen Tab als :term:`Formularansicht` der dem Benutzer\n"
 "  erlaubt anderen Benutzern der gleichen Datenbank Anfragen zu senden."
 
-#: usage.rst:476
+#: usage.rst:483
 msgid ".. _Menu-user-read-my-request:"
 msgstr ".. _Menu-user-read-my-request:"
 
-#: usage.rst:478
+#: usage.rst:485
 msgid ""
 "Read my Requests\n"
 "  Opens a tab in :term:`tree view` showing all requests related to the\n"
@@ -1100,11 +1113,11 @@ msgstr ""
 "  Öffnet ein Tab als :term:`Baumansicht` der dem aktuellen Benutzer\n"
 "  alle zugehörigen Anfragen zeigt. Anfragen haben folgende Felder und Aktionen:"
 
-#: usage.rst:482
+#: usage.rst:489
 msgid "  * On top"
 msgstr "  * Oben"
 
-#: usage.rst:484
+#: usage.rst:491
 msgid ""
 "    - From: User name of the sender\n"
 "    - To: User name of the request recipient\n"
@@ -1118,7 +1131,7 @@ msgstr ""
 "    - Betreff: Der Betreff der Anfrage\n"
 "    - Dringlichkeit: Eine Priorisierung der Anfrage"
 
-#: usage.rst:490
+#: usage.rst:497
 msgid ""
 "      + High\n"
 "      + Low\n"
@@ -1128,11 +1141,11 @@ msgstr ""
 "      + Niedrig\n"
 "      + Normal"
 
-#: usage.rst:494
+#: usage.rst:501
 msgid "  * *Request* tab"
 msgstr "  * *Anfrage* Tab"
 
-#: usage.rst:496
+#: usage.rst:503
 msgid ""
 "    - Body: The textual part of the request.\n"
 "    - History: The history of past replies to this request."
@@ -1140,7 +1153,7 @@ msgstr ""
 "    - Anfrage: Der Textteil der Anfrage\n"
 "    - Bisherige Anfragen: Die Historie der letzten Antworten zu dieser Anfrage"
 
-#: usage.rst:499
+#: usage.rst:506
 msgid ""
 "      + From: Sender of the past request\n"
 "      + To: Receiver of the past request\n"
@@ -1150,7 +1163,7 @@ msgstr ""
 "      + An: Empfänger der letzten Anfrage\n"
 "      + Zusammenfassung: Zusammenfassung des Anfrage-Textes der letzten Anfrage"
 
-#: usage.rst:503
+#: usage.rst:510
 msgid ""
 "  * Trigger Date: Defines time and date when the request will be sent\n"
 "    automatically.\n"
@@ -1160,7 +1173,7 @@ msgstr ""
 "    zugestellt werden soll.\n"
 "  * Status: Status der Anfrage. Mögliche Stati der Anfrage sind:"
 
-#: usage.rst:507
+#: usage.rst:514
 msgid ""
 "    - Draft: The request is saved in the system, but not posted.\n"
 "    - Waiting: The request is sent without receiving a reply message.\n"
@@ -1172,12 +1185,12 @@ msgstr ""
 "    - Schreibt gerade: Die Nachricht ist gerade in Bearbeitung\n"
 "    - Geschlossen: Die Nachricht wurde geschlossen/erfüllt/beantwortet"
 
-#: usage.rst:512
-msgctxt "usage.rst:512"
+#: usage.rst:519
+msgctxt "usage.rst:519"
 msgid "  * Actions:"
 msgstr "  * Aktionen:"
 
-#: usage.rst:514
+#: usage.rst:521
 msgid ""
 "    - Send: Sends the actual message\n"
 "    - Reply: Replies or answers the actual message\n"
@@ -1187,21 +1200,23 @@ msgstr ""
 "    - Antworten: Erwidert oder beantwortet die aktuelle Nachricht\n"
 "    - Schließen: Schließt die aktuelle Anfrage"
 
-#: usage.rst:518
+#: usage.rst:525
 msgid "  * *References* tab"
 msgstr "  * *Verweise* Tab"
 
-#: usage.rst:520
+#: usage.rst:527
 msgid "    - References"
 msgstr "    - Verweise"
 
-#: usage.rst:522
+#: usage.rst:529
 msgid ""
 "      + Reference: The reference type\n"
 "      + (Target): Defines an reference attached to the request."
-msgstr "      + Verweise: Der Verweis Typ      + (Ziel): Hängt einen Verweis an die Anfrage an."
+msgstr ""
+"      + Verweise: Der Verweis Typ\n"
+"      + (Ziel): Hängt einen Verweis an die Anfrage an."
 
-#: usage.rst:525
+#: usage.rst:532
 msgid ""
 ".. note:: When talking about requests, think of an internal system of\n"
 "   Tryton, which is very similar to email."
@@ -1209,7 +1224,7 @@ msgstr ""
 ".. note:: Wenn man von Anfragen spricht, kann man sie sich vorstellen wie\n"
 "   ein Tryton-internes E-Mail System."
 
-#: usage.rst:529
+#: usage.rst:536
 msgid ""
 "Form\n"
 "^^^^\n"
@@ -1226,11 +1241,11 @@ msgstr ""
 "aktuelle Datensatz für diese Operationen ausgewählt. In der :term:`Baumansicht`\n"
 "werden alle ausgewählten Datensätze benutzt."
 
-#: usage.rst:536
+#: usage.rst:543
 msgid ".. _Menu-Form-New:"
 msgstr ".. _Menu-Form-New:"
 
-#: usage.rst:538
+#: usage.rst:545
 msgid ""
 "New:\n"
 "  Creates a new record."
@@ -1238,11 +1253,11 @@ msgstr ""
 "Neu:\n"
 "  Erstellt einen neuen Datensatz."
 
-#: usage.rst:541
+#: usage.rst:548
 msgid ".. _Menu-Form-Save:"
 msgstr ".. _Menu-Form-Save:"
 
-#: usage.rst:543
+#: usage.rst:550
 msgid ""
 "Save:\n"
 "  Saves the actual record."
@@ -1250,11 +1265,11 @@ msgstr ""
 "Speichern:\n"
 "  Speichert den aktuellen Datensatz"
 
-#: usage.rst:546
+#: usage.rst:553
 msgid ".. _Menu-Form-Duplicate:"
 msgstr ".. _Menu-Form-Duplicate:"
 
-#: usage.rst:548
+#: usage.rst:555
 msgid ""
 "Duplicate:\n"
 "  Duplicates the content of the actual record in a newly created record."
@@ -1262,11 +1277,11 @@ msgstr ""
 "Duplizieren:\n"
 "  Dupliziert den Inhalt des aktuellen Datensatzes in einen neu erstellen Datensatz."
 
-#: usage.rst:551
+#: usage.rst:558
 msgid ".. _Menu-Form-Delete:"
 msgstr ".. _Menu-Form-Delete:"
 
-#: usage.rst:553
+#: usage.rst:560
 msgid ""
 "Delete:\n"
 "  Deletes the selected or actual record."
@@ -1274,15 +1289,15 @@ msgstr ""
 "Löschen:\n"
 "  Löscht den ausgewählten oder aktuellen Datensatz."
 
-#: usage.rst:556
+#: usage.rst:563
 msgid ".. _Menu-Form-Find:"
 msgstr ".. _Menu-Form-Find:"
 
-#: usage.rst:558
+#: usage.rst:565
 msgid ".. _search_widget:"
 msgstr ".. _search_widget:"
 
-#: usage.rst:560
+#: usage.rst:567
 msgid ""
 "Find...:\n"
 "  Opens a :term:`dialog` for finding :term:`fields` with search criteria and\n"
@@ -1292,7 +1307,7 @@ msgstr ""
 "  Öffnet einen :term:`Dialog` um :term:`Felder` anhand Suchkriterien und Operatoren\n"
 "  zu finden."
 
-#: usage.rst:564
+#: usage.rst:571
 msgid ""
 "  * Search criteria: Defines the aspects to seek for.\n"
 "  * General search operators:"
@@ -1300,7 +1315,7 @@ msgstr ""
 "  * Suchkriterien: Definiert nach den zu suchenden Kriterien\n"
 "  * Allgemeine Such-Operatoren:"
 
-#: usage.rst:567
+#: usage.rst:574
 msgid ""
 "    - Equals: Search for results which are exactly the same as the following\n"
 "      term.\n"
@@ -1310,11 +1325,11 @@ msgstr ""
 "    - ist gleich: Sucht nach Ergebnissen, die exakt dem folgenden Ausdruck entsprechen\n"
 "    - ist nicht gleich: Sucht nach Ergebnissen, die nicht exakt dem folgenden Ausdruck entsprechen"
 
-#: usage.rst:572
+#: usage.rst:579
 msgid "  * Additional search operators on numbers, amounts and strings:"
 msgstr "  * Zusätzliche Such-Operatoren für Nummern, Mengen und Zeichenketten:"
 
-#: usage.rst:574
+#: usage.rst:581
 msgid ""
 "    - Contains: Search for results which contain the following term.\n"
 "    - Does Not Contain:  Search for results which do not include the\n"
@@ -1327,11 +1342,11 @@ msgstr ""
 "    - beginnt mit: Sucht nach Ergebnissen, welche mit folgendem Audruck beginnen\n"
 "    - endet mit: Sucht nach Ergebnissen, welche mit folgendem Ausdruck enden"
 
-#: usage.rst:580
+#: usage.rst:587
 msgid "  * Additional search operators for numbers and amounts:"
 msgstr "  * Zusätzliche Such-Operatoren für Nummern und Mengen:"
 
-#: usage.rst:582
+#: usage.rst:589
 msgid ""
 "    - Is Between: Search for results inside a range (from - to).\n"
 "    - Is Not Between: Search for results outside a range (from - to).\n"
@@ -1341,11 +1356,11 @@ msgstr ""
 "    - ist nicht zwischen: Sucht nach Ergebnissen außerhalb einer Reihe (von - bis)\n"
 "    - ist nicht: Gleich wie 'ist unterschiedlich', siehe oben"
 
-#: usage.rst:586
+#: usage.rst:593
 msgid "  * Advanced Search expander opens additional search criteria."
 msgstr "  * Über *Erweiterte Suche* öffnet man weitere Suchmöglichkeiten."
 
-#: usage.rst:588
+#: usage.rst:595
 msgid ""
 "    - Limit: Limits the count of results.\n"
 "    - Offset: Skips a number of results and show only the following."
@@ -1354,12 +1369,12 @@ msgstr ""
 "    - Versatz: Überspringt die angegebene Anzahl an Treffern\n"
 "      und zeigt nur die darauf Folgenden an."
 
-#: usage.rst:591
-msgctxt "usage.rst:591"
+#: usage.rst:598
+msgctxt "usage.rst:598"
 msgid "  * Actions:"
 msgstr "  * Aktionen:"
 
-#: usage.rst:593
+#: usage.rst:600
 msgid ""
 "    - Find: Search for results of the given criteria.\n"
 "    - New: Create a new record (used when search was fruitless, to create\n"
@@ -1373,7 +1388,7 @@ msgstr ""
 "    - OK: Öffnet den ausgewählten Datensatz\n"
 "    - Abbruch: Bricht den Vorgang ab"
 
-#: usage.rst:599
+#: usage.rst:606
 msgid ""
 ".. note:: To search for deactivated records the *Active* search criteria must be\n"
 "        set to *No*."
@@ -1381,11 +1396,11 @@ msgstr ""
 ".. note:: Um nach inaktiven Datensätzen zu suchen muss das *Aktiv* Suchkriterium auf\n"
 "        *Nein* gesetzt werden."
 
-#: usage.rst:602
+#: usage.rst:609
 msgid ".. _Menu-Form-Next:"
 msgstr ".. _Menu-Form-Next:"
 
-#: usage.rst:604
+#: usage.rst:611
 msgid ""
 "Next:\n"
 "  Goes to the next record in a list (sequence)."
@@ -1393,11 +1408,11 @@ msgstr ""
 "Nächster:\n"
 "  Geht zum nächsten Datensatz in der Liste (Reihenfolge)"
 
-#: usage.rst:607
+#: usage.rst:614
 msgid ".. _Menu-Form-Previous:"
 msgstr ".. _Menu-Form-Previous:"
 
-#: usage.rst:609
+#: usage.rst:616
 msgid ""
 "Previous:\n"
 "  Goes to the last record in a list (sequence)."
@@ -1405,11 +1420,11 @@ msgstr ""
 "Vorheriger:\n"
 "  Geht zum vorherigen Datensatz in der Liste (Reihenfolge)."
 
-#: usage.rst:612
+#: usage.rst:619
 msgid ".. _Menu-Form-Switch_View:"
 msgstr ".. _Menu-Form-Switch_View:"
 
-#: usage.rst:614
+#: usage.rst:621
 msgid ""
 "Switch View:\n"
 "  Switches the actual view aspect to:"
@@ -1417,7 +1432,7 @@ msgstr ""
 "Ansicht wechseln:\n"
 "  Wechselt die aktuelle Ansicht nach:"
 
-#: usage.rst:617
+#: usage.rst:624
 msgid ""
 "  * :term:`Form view`\n"
 "  * :term:`Tree view`\n"
@@ -1427,15 +1442,15 @@ msgstr ""
 "  * :term:`Baumansicht`\n"
 "  * :term:`Diagrammansicht`"
 
-#: usage.rst:621
+#: usage.rst:628
 msgid "  Not all views provide all aspects."
 msgstr "  Nicht alle Sichten stellen alle Möglichkeiten bereit."
 
-#: usage.rst:623
+#: usage.rst:630
 msgid ".. _Menu-Form-Menu:"
 msgstr ".. _Menu-Form-Menu:"
 
-#: usage.rst:625
+#: usage.rst:632
 msgid ""
 "Menu:\n"
 "  Activates or reopens the menu tab."
@@ -1443,11 +1458,11 @@ msgstr ""
 "Menü:\n"
 "  Springt zu oder öffnet den Menü-Tab."
 
-#: usage.rst:628
+#: usage.rst:635
 msgid ".. _Menu-Form-Home:"
 msgstr ".. _Menu-Form-Home:"
 
-#: usage.rst:630
+#: usage.rst:637
 msgid ""
 "Home:\n"
 "  Opens a new `home`__ tab."
@@ -1455,16 +1470,16 @@ msgstr ""
 "Zur Startseite:\n"
 "  Öffnet einen neuen `Startseite`__ Tab"
 
-#: usage.rst:633
-msgctxt "usage.rst:633"
+#: usage.rst:640
+msgctxt "usage.rst:640"
 msgid "__ Menu-User-Preferences_"
 msgstr "__ Menu-User-Preferences_"
 
-#: usage.rst:635
+#: usage.rst:642
 msgid ".. _Menu-Form-Close:"
 msgstr ".. _Menu-Form-Close:"
 
-#: usage.rst:637
+#: usage.rst:644
 msgid ""
 "Close Tab:\n"
 "  Closes the current tab. A Request :term:`Dialog` opens in case of unsaved\n"
@@ -1473,11 +1488,11 @@ msgstr ""
 "Tab schließen:\n"
 "  Schließt den aktuellen Tab. Ein :term:`Dialog` erscheint bei ungespeicherten Änderungen."
 
-#: usage.rst:641
+#: usage.rst:648
 msgid ".. _Menu-Form-Previous_Tab:"
 msgstr ".. _Menu-Form-Previous_Tab:"
 
-#: usage.rst:643
+#: usage.rst:650
 msgid ""
 "Previous Tab:\n"
 "  Shows the previous (left) tab of the actual tab."
@@ -1485,11 +1500,11 @@ msgstr ""
 "Vorheriger Tab:\n"
 "  Zeigt den vorherigen (linken) Tab neben dem aktuellen Tab."
 
-#: usage.rst:646
+#: usage.rst:653
 msgid ".. _Menu-Form-Next_Tab:"
 msgstr ".. _Menu-Form-Next_Tab:"
 
-#: usage.rst:648
+#: usage.rst:655
 msgid ""
 "Next Tab:\n"
 "  Shows the next (right) tab of the actual tab."
@@ -1497,11 +1512,11 @@ msgstr ""
 "Nächster Tab:\n"
 "  Zeigt den nächsten (rechten) Tab neben dem aktuellen Tab."
 
-#: usage.rst:651
+#: usage.rst:658
 msgid ".. _Menu-Form-View_Logs:"
 msgstr ".. _Menu-Form-View_Logs:"
 
-#: usage.rst:653
+#: usage.rst:660
 msgid ""
 "View Logs...:\n"
 "  Shows generic information of the current record."
@@ -1509,11 +1524,11 @@ msgstr ""
 "Protokoll ansehen...:\n"
 "  Zeigt generische Informationen des aktuellen Datensatzes."
 
-#: usage.rst:656
+#: usage.rst:663
 msgid ".. _Menu-Form-Go_to_Record_ID:"
 msgstr ".. _Menu-Form-Go_to_Record_ID:"
 
-#: usage.rst:658
+#: usage.rst:665
 msgid ""
 "Go to Record ID...:\n"
 "  Opens specific record id in the current view."
@@ -1521,25 +1536,25 @@ msgstr ""
 "Gehe zu Datensatz Nr...:\n"
 "  Öffnet die angegebene Datensatznummer in der aktuellen Sicht."
 
-#: usage.rst:661
+#: usage.rst:668
 msgid ".. _Menu-Form-Reload_Undo:"
 msgstr ".. _Menu-Form-Reload_Undo:"
 
-#: usage.rst:663
+#: usage.rst:670
 msgid ""
 "Reload/Undo:\n"
 "  Reloads the content of the actual tab. Undoes changes, if save request for\n"
 "  the current record is denied."
 msgstr ""
 "Neu laden/Rückgängig:\n"
-"  Lädt den Inhalt des aktuellen Tabs neu. Rückgängig machen der Änderungen, falls\n"
+"  Lädt den Inhalt des aktuellen Tabs neu. Macht Änderungen rückgängig, falls\n"
 "  das Speichern des aktuellen Datensatzes fehlschlägt."
 
-#: usage.rst:667
+#: usage.rst:674
 msgid ".. _Menu-Form-Actions:"
 msgstr ".. _Menu-Form-Actions:"
 
-#: usage.rst:669
+#: usage.rst:676
 msgid ""
 "Actions...:\n"
 "  Shows all actions for the actual view, model and record."
@@ -1547,11 +1562,11 @@ msgstr ""
 "Aktionen...:\n"
 "  Zeigt alle Aktionen der aktuellen Sicht, des Modells und Datensatzes."
 
-#: usage.rst:672
+#: usage.rst:679
 msgid ".. _Menu-Form-Print:"
 msgstr ".. _Menu-Form-Print:"
 
-#: usage.rst:674
+#: usage.rst:681
 msgid ""
 "Print...:\n"
 "  Shows all print actions for the actual view, model and record."
@@ -1559,11 +1574,11 @@ msgstr ""
 "Drucken...:\n"
 "  Zeigt alle Druckaktionen der aktuellen Sicht, des Modells und Datensatzes."
 
-#: usage.rst:677
+#: usage.rst:684
 msgid ".. _Menu-Form-Export_Data:"
 msgstr ".. _Menu-Form-Export_Data:"
 
-#: usage.rst:679
+#: usage.rst:686
 msgid ""
 "Export Data...:\n"
 "  Export of current/selected records into :term:`CSV`-file or open it in Excel."
@@ -1572,15 +1587,15 @@ msgstr ""
 "  Export des aktuellen oder der ausgewählten Datensätze als :term:`CSV`-Datei oder\n"
 "  öffnet es direkt in Excel."
 
-#: usage.rst:682
+#: usage.rst:689
 msgid "  * Predefined exports"
 msgstr "  * Vordefinierte Exporte"
 
-#: usage.rst:684
+#: usage.rst:691
 msgid "    - Choose preferences of already saved exports."
 msgstr "    - Auswahl von vorher abgespeicherten Exporteigenschaften."
 
-#: usage.rst:686
+#: usage.rst:693
 msgid ""
 "  * All Fields: Fields available from the model.\n"
 "  * Fields to export: Defines the specific fields to export.\n"
@@ -1590,7 +1605,7 @@ msgstr ""
 "  * Zu exportierende Felder: Definition der speziellen, zu exportierenden Felder\n"
 "  * Optionen:"
 
-#: usage.rst:690
+#: usage.rst:697
 msgid ""
 "    - Save: Save export as a CSV file.\n"
 "    - Open: Open export in spread sheet application."
@@ -1598,7 +1613,7 @@ msgstr ""
 "    - Speichern: Speichert den Export als CSV Datei.\n"
 "    - Öffnen: Öffnet den Export in einem Tabellenkalkulations-Programm."
 
-#: usage.rst:693
+#: usage.rst:700
 msgid ""
 "  * Add field names: Add a header row with field names to the export data.\n"
 "  * Actions:"
@@ -1606,7 +1621,7 @@ msgstr ""
 "  * Feldnamen hinzufügen: Fügt eine Kopfzeile mit den Feldnamen zu den exportierten Daten hinzu\n"
 "  * Aktionen:"
 
-#: usage.rst:696
+#: usage.rst:703
 msgid ""
 "    - Add: Adds selected fields to *Fields to export*.\n"
 "    - Remove: Removes selected fields from *Fields to export*.\n"
@@ -1624,11 +1639,11 @@ msgstr ""
 "    - OK: Exportiert die Daten (Aktion hängt von der ausgewählten *Option* ab)\n"
 "    - Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:704
+#: usage.rst:711
 msgid ".. _Menu-Form-Import_Data:"
 msgstr ".. _Menu-Form-Import_Data:"
 
-#: usage.rst:706
+#: usage.rst:713
 msgid ""
 "Import Data...:\n"
 "  Import records from :term:`CSV`-file."
@@ -1636,7 +1651,7 @@ msgstr ""
 "Daten importieren...:\n"
 "  Import von Daten von einer :term:`CSV`-Datei."
 
-#: usage.rst:709
+#: usage.rst:716
 msgid ""
 "  * All Fields: Fields available in the model (required fields are marked up).\n"
 "  * Fields to Import: Exact sequence of all columns in the CSV file.\n"
@@ -1648,7 +1663,7 @@ msgstr ""
 "  * Importdatei: Öffnen :term:`Dialog` um die zu importierende CSV-Datei auszuwählen\n"
 "  * CSV Parameter: Einstellungen der ausgewählten CSV-Datei"
 
-#: usage.rst:714
+#: usage.rst:721
 msgid ""
 "    - Field Separator: Character which separates CSV fields.\n"
 "    - Text Delimiter: Character which encloses text in CSV.\n"
@@ -1662,12 +1677,12 @@ msgstr ""
 "    - Zu überspringende Zeilen: Anzahl zu überspringenden Zeilen wie zum\n"
 "      Beispiel einer Überschrift oder anderen Zeilen."
 
-#: usage.rst:719
-msgctxt "usage.rst:719"
+#: usage.rst:726
+msgctxt "usage.rst:726"
 msgid "  * Actions:"
 msgstr "  * Aktionen:"
 
-#: usage.rst:721
+#: usage.rst:728
 msgid ""
 "    - Add: Adds fields to *Fields to Import*.\n"
 "    - Remove: Deletes fields from *Fields to Import*.\n"
@@ -1682,7 +1697,7 @@ msgstr ""
 "    - OK: Importiert die Daten\n"
 "    - Abbrechen: Bricht den Vorgang ab."
 
-#: usage.rst:729
+#: usage.rst:736
 msgid ""
 "Options\n"
 "^^^^^^^\n"
@@ -1692,7 +1707,7 @@ msgstr ""
 "^^^^^^^^^^^^^\n"
 "Das Einstellungs-Menü konfiguriert viele grafische und kontextabhängige Eigenschaften."
 
-#: usage.rst:734
+#: usage.rst:741
 msgid ""
 "Toolbar\n"
 "+++++++"
@@ -1700,11 +1715,11 @@ msgstr ""
 "Werkzeugleiste\n"
 "++++++++++++++"
 
-#: usage.rst:737
+#: usage.rst:744
 msgid ".. _Menu-Options-Toolbar-Default:"
 msgstr ".. _Menu-Options-Toolbar-Default:"
 
-#: usage.rst:739
+#: usage.rst:746
 msgid ""
 "Default:\n"
 "  Shows labels and icons as defaulted in the GTK configuration."
@@ -1712,11 +1727,11 @@ msgstr ""
 "Standard:\n"
 "  Zeigt Bezeichnung und Symbole wie in der systemweiten GTK-Konfiguration eingestellt."
 
-#: usage.rst:742
+#: usage.rst:749
 msgid ".. _Menu-Options-Toolbar-Text_and_Icons:"
 msgstr ".. _Menu-Options-Toolbar-Text_and_Icons:"
 
-#: usage.rst:744
+#: usage.rst:751
 msgid ""
 "Text and Icons:\n"
 "  Shows labels and icons in the tool bar."
@@ -1724,11 +1739,11 @@ msgstr ""
 "Text und Symbole:\n"
 "  Zeigt Bezeichnungen und Symbole in der Werkzeugleiste an."
 
-#: usage.rst:747
+#: usage.rst:754
 msgid ".. _Menu-Options-Toolbar-Icons:"
 msgstr ".. _Menu-Options-Toolbar-Icons:"
 
-#: usage.rst:749
+#: usage.rst:756
 msgid ""
 "Icons:\n"
 "  Shows icons only in the tool bar."
@@ -1736,11 +1751,11 @@ msgstr ""
 "Symbole:\n"
 "  Zeigt nur Symbole in der Werkzeugleiste an."
 
-#: usage.rst:752
+#: usage.rst:759
 msgid ".. _Menu-Options-Toolbar-Text:"
 msgstr ".. _Menu-Options-Toolbar-Text:"
 
-#: usage.rst:754
+#: usage.rst:761
 msgid ""
 "Text:\n"
 "  Shows labels only in the tool bar."
@@ -1748,7 +1763,7 @@ msgstr ""
 "Text:\n"
 "  Zeigt nur Bezeichnungen in der Werkzeugleiste an."
 
-#: usage.rst:757
+#: usage.rst:764
 msgid ""
 "Menubar\n"
 "+++++++"
@@ -1756,20 +1771,20 @@ msgstr ""
 "Menüleiste\n"
 "++++++++++"
 
-#: usage.rst:760
+#: usage.rst:767
 msgid ".. _Menu-Options-Menubar-Accelerators:"
 msgstr ".. _Menu-Options-Menubar-Accelerators:"
 
-#: usage.rst:762
+#: usage.rst:769
 msgid ""
 "Change Accelerators:\n"
 "  If checked, keyboard shortcuts can be defined. S. a. `mouse and keyboard use`_"
 msgstr ""
 "Kurzbefehle ändern:\n"
-"  Falls das Kontrollkästchen aktiv ist, können Tastaturkürzel eingestellt werden. Siehe auch\n"
+"  Falls das Kontrollkästchen aktiv ist, können Schnelltasten eingestellt werden. Siehe auch\n"
 "  `Maus- und Tastaturbedienung`_"
 
-#: usage.rst:765
+#: usage.rst:772
 msgid ""
 "Mode\n"
 "++++"
@@ -1777,11 +1792,11 @@ msgstr ""
 "Modus\n"
 "+++++"
 
-#: usage.rst:768
+#: usage.rst:775
 msgid ".. _Menu-Options-Mode-Normal:"
 msgstr ".. _Menu-Options-Mode-Normal:"
 
-#: usage.rst:770
+#: usage.rst:777
 msgid ""
 "Normal:\n"
 "  Shows the client in full feature mode."
@@ -1789,11 +1804,11 @@ msgstr ""
 "Normal:\n"
 "  Alle Funktionen des Clients werden angezeigt."
 
-#: usage.rst:773
+#: usage.rst:780
 msgid ".. _Menu-Options-Mode_PDA:"
 msgstr ".. _Menu-Options-Mode_PDA:"
 
-#: usage.rst:775
+#: usage.rst:782
 msgid ""
 "PDA:\n"
 "  Shows the client in a condensed mode. The PDA (Personal Data Assistant) mode\n"
@@ -1803,7 +1818,7 @@ msgstr ""
 "  Der Client wird im abgespeckter Form angezeigt. Der PDA (Persönlicher Daten Assistent) Modus\n"
 "  blendet das Favoriten Menü in der Baumansicht und die Statusleiste aus."
 
-#: usage.rst:779
+#: usage.rst:786
 msgid ""
 "Form\n"
 "++++"
@@ -1811,11 +1826,11 @@ msgstr ""
 "Formular\n"
 "++++++++"
 
-#: usage.rst:782
+#: usage.rst:789
 msgid ".. _Menu-Options-Form-Toolbar:"
 msgstr ".. _Menu-Options-Form-Toolbar:"
 
-#: usage.rst:784
+#: usage.rst:791
 msgid ""
 "Toolbar:\n"
 "  Checkbox to disable/enable the tool bar."
@@ -1823,11 +1838,11 @@ msgstr ""
 "Werkzeugleiste:\n"
 "  Kontrollkästchen um die Werkzeugleiste ein- und auszuschalten."
 
-#: usage.rst:787
+#: usage.rst:794
 msgid ".. _Menu-Options-Form-Statusbar:"
 msgstr ".. _Menu-Options-Form-Statusbar:"
 
-#: usage.rst:789
+#: usage.rst:796
 msgid ""
 "Statusbar:\n"
 "  Checkbox to disable/enable the status bar."
@@ -1835,11 +1850,11 @@ msgstr ""
 "Statusleiste:\n"
 "    Kontrollkästchen um die Statusleiste ein- und auszuschalten."
 
-#: usage.rst:792
+#: usage.rst:799
 msgid ".. _Menu-Options-Form-Save_Columns_Width:"
 msgstr ".. _Menu-Options-Form-Save_Columns_Width:"
 
-#: usage.rst:794
+#: usage.rst:801
 msgid ""
 "Save Width/Height:\n"
 "  Check box to enable saving of manually adjusted widths of columns in lists\n"
@@ -1851,11 +1866,11 @@ msgstr ""
 "  Spalten in Listen und Bäumen. Zusätzlich werden die manuell angepassten\n"
 "  Breiten und Höhen der Dialog- und Popup-Fenster gespeichert."
 
-#: usage.rst:799
+#: usage.rst:806
 msgid ".. _Menu-Options-Form-Spell_Checking:"
 msgstr ".. _Menu-Options-Form-Spell_Checking:"
 
-#: usage.rst:801
+#: usage.rst:808
 msgid ""
 "Spell Checking:\n"
 "  Check box to enable spell checking in fields."
@@ -1863,11 +1878,11 @@ msgstr ""
 "Rechtschreibkorrektur:\n"
 "  Kontrollkästchen um die Rechtschreibkorrektur in Feldern einzuschalten."
 
-#: usage.rst:804
+#: usage.rst:811
 msgid ".. _Menu-Options-Form-Tabs_Position:"
 msgstr ".. _Menu-Options-Form-Tabs_Position:"
 
-#: usage.rst:806
+#: usage.rst:813
 msgid ""
 "Tabs Position\n"
 "  Sets up the position of the :term:`tabs` inside :term:`views`:"
@@ -1875,7 +1890,7 @@ msgstr ""
 "Position der Tabs:\n"
 "  Stellt die Position der :term:`Tabs` innerhalb von :term:`Sichten <Sicht>` ein:"
 
-#: usage.rst:809
+#: usage.rst:816
 msgid ""
 "  * Top\n"
 "  * Left\n"
@@ -1887,11 +1902,11 @@ msgstr ""
 "  * Rechts\n"
 "  * Unten"
 
-#: usage.rst:814
+#: usage.rst:821
 msgid ".. _Menu-Options-File_Actions:"
 msgstr ".. _Menu-Options-File_Actions:"
 
-#: usage.rst:816
+#: usage.rst:823
 msgid ""
 "File Actions...:\n"
 "  Opens a dialog to set up file types for print and open actions.\n"
@@ -1901,11 +1916,11 @@ msgstr ""
 "  Öffnet einen Dialog um zu den Dateitypen die entsprechende Druck und Öffnen-Aktion auszuwählen.\n"
 "  Der Dokumentenname wird mit ``\"%s\"`` als Platzhalter angegeben."
 
-#: usage.rst:820
+#: usage.rst:827
 msgid "  * Provided file types:"
 msgstr "  * Unterstützte Dateitypen:"
 
-#: usage.rst:822
+#: usage.rst:829
 msgid ""
 "    - ODT file: Open Office Writer Document\n"
 "    - PDF file: Adobes(TM) Portable Document Format\n"
@@ -1917,11 +1932,11 @@ msgstr ""
 "    - PNG Datei: Portable Network Graphics Format\n"
 "    - TXT Datei: Reine Text-Datei"
 
-#: usage.rst:827
+#: usage.rst:834
 msgid "  * Provided actions"
 msgstr "  * Unterstützte Aktionen"
 
-#: usage.rst:829
+#: usage.rst:836
 msgid ""
 "    - Open: Setting up program system call which opens the specific file type.\n"
 "    - Print: Setting up program system call printing the specific file type."
@@ -1929,11 +1944,11 @@ msgstr ""
 "    - Öffnen: Das aufzurufende Programm und Parameter welche die angegebene Datei öffnet\n"
 "    - Drucken: Das aufzurufende Programm und Parameter welches die angegebene Datei druckt"
 
-#: usage.rst:832
+#: usage.rst:839
 msgid ".. _Menu-Options-Email:"
 msgstr ".. _Menu-Options-Email:"
 
-#: usage.rst:834
+#: usage.rst:841
 msgid ""
 "Email...:\n"
 "  Open a dialog to set up an email reader."
@@ -1941,7 +1956,7 @@ msgstr ""
 "E-Mail...:\n"
 "  Öffnet einen Dialog um das E-Mail-Programm einzustellen."
 
-#: usage.rst:837
+#: usage.rst:844
 msgid ""
 "  * Command Line: The command line calling the email reader.\n"
 "  * Placeholders:"
@@ -1949,7 +1964,7 @@ msgstr ""
 "  * Kommandozeile: Die Kommandozeile um das E-Mail-Programm aufzurufen\n"
 "  * Platzhalter:"
 
-#: usage.rst:840
+#: usage.rst:847
 msgid ""
 "    - ``${to}``: the destination email address\n"
 "    - ``${cc}``: the carbon copy email address\n"
@@ -1963,11 +1978,11 @@ msgstr ""
 "    - ``${body}``: Der Textteil der E-Mail\n"
 "    - ``${attachment}``: Der Anhang der E-Mail"
 
-#: usage.rst:846
+#: usage.rst:853
 msgid "  * Examples:"
 msgstr "  * Beispiele:"
 
-#: usage.rst:848
+#: usage.rst:855
 msgid ""
 "    - Thunderbird 2 on Linux:\n"
 "      ``thunderbird -compose \"to='${to}',cc='${cc}',subject='${subject}',body='${body}',attachment='file://${attachment}'\"``"
@@ -1975,7 +1990,7 @@ msgstr ""
 "    - Thunderbird 2 unter Linux:\n"
 "      ``thunderbird -compose \"to='${to}',cc='${cc}',subject='${subject}',body='${body}',attachment='file://${attachment}'\"``"
 
-#: usage.rst:851
+#: usage.rst:858
 msgid ""
 "    - Thunderbird 2 on Windows XP SP3:\n"
 "      ``\"C:\\\\Program Files\\\\Mozilla Thunderbird\\\\thunderbird.exe\" -compose to=\"${to}\",cc=\"${cc}\",subject=\"${subject}\",body=\"${body}\",attachment=\"${attachment}\"``"
@@ -1983,15 +1998,15 @@ msgstr ""
 "    - Thunderbird 2 auf Windows XP SP3:\n"
 "      ``\"C:\\\\Programme\\\\Mozilla Thunderbird\\\\thunderbird.exe\" -compose to=\"${to}\",cc=\"${cc}\",subject=\"${subject}\",body=\"${body}\",attachment=\"${attachment}\"``"
 
-#: usage.rst:854
+#: usage.rst:861
 msgid ".. note:: The path of *Program Files* may vary dependent on the localization of your Windows version."
 msgstr ".. note:: Der Pfad von *Programme* unterscheidet sich womöglich erheblich abhängig der Sprache ihrer Windows Version."
 
-#: usage.rst:856
+#: usage.rst:863
 msgid ".. _Menu-Options-Save_Options:"
 msgstr ".. _Menu-Options-Save_Options:"
 
-#: usage.rst:858
+#: usage.rst:865
 msgid ""
 "Save Options:\n"
 "  Saves all the options."
@@ -1999,7 +2014,7 @@ msgstr ""
 "Einstellungen speichern:\n"
 "  Speichert alle Einstellungen."
 
-#: usage.rst:862
+#: usage.rst:869
 msgid ""
 "Plug-ins\n"
 "^^^^^^^^\n"
@@ -2011,7 +2026,7 @@ msgstr ""
 "Plugins sind clientseitige Erweiterungen für Tryton. Es gibt ein paar Plugins,\n"
 "die Tryton im Standard mitbringt."
 
-#: usage.rst:867
+#: usage.rst:874
 msgid ""
 "Execute a Plug-in\n"
 "+++++++++++++++++\n"
@@ -2023,7 +2038,7 @@ msgstr ""
 "Aktuelle Sicht übersetzen:\n"
 "  Erstellt eine Übersetzungstabelle der aktuellen Sicht."
 
-#: usage.rst:872
+#: usage.rst:879
 msgid ""
 "Print Workflow:\n"
 "  Creates a graph which shows the work flow of the current view."
@@ -2031,7 +2046,7 @@ msgstr ""
 "Workflow drucken:\n"
 "  Erstellt ein Schaubild, welches den Workflow der aktuellen Sicht zeigt."
 
-#: usage.rst:875
+#: usage.rst:882
 msgid ""
 "Print Workflow (complex):\n"
 "  Like 'Print Workflow', with additional sub work flows inherited by the\n"
@@ -2041,7 +2056,7 @@ msgstr ""
 "  Wie `Workflow drucken`, allerdings mit zusätzlichen Unter-Workflows welche\n"
 "  von der aktuellen Sicht abhängig sind."
 
-#: usage.rst:880
+#: usage.rst:887
 msgid ""
 "Shortcuts\n"
 "^^^^^^^^^\n"
@@ -2051,7 +2066,7 @@ msgstr ""
 "^^^^^^^^^\n"
 "Eine Sammlung von benutzerdefinierten Favoriten für spezielle Resourcen."
 
-#: usage.rst:885
+#: usage.rst:892
 msgid ""
 "Help\n"
 "^^^^"
@@ -2059,11 +2074,11 @@ msgstr ""
 "Hilfe\n"
 "^^^^^"
 
-#: usage.rst:888
+#: usage.rst:895
 msgid ".. _Menu-Help-Tips:"
 msgstr ".. _Menu-Help-Tips:"
 
-#: usage.rst:890
+#: usage.rst:897
 msgid ""
 "Tips...:\n"
 "  Opens the tips dialog."
@@ -2071,7 +2086,7 @@ msgstr ""
 "Tipps...:\n"
 "  Öffnet den Tipp Dialog."
 
-#: usage.rst:893
+#: usage.rst:900
 msgid ""
 "  * Display a new tip next time: If *checked*, the tips dialog will appear on\n"
 "    start.\n"
@@ -2083,19 +2098,19 @@ msgstr ""
 "  * Vorheriger: Zeigt den letzten Tipp\n"
 "  * Nächster: Zeigt den nächsten Tipp"
 
-#: usage.rst:898
+#: usage.rst:905
 msgid ".. _Menu-Help-Keyboard_Shortcuts:"
 msgstr ".. _Menu-Help-Keyboard_Shortcuts:"
 
-#: usage.rst:900
+#: usage.rst:907
 msgid ""
 "Keyboard Shortcuts...:\n"
 "  Shows the information dialog of the predefined keyboard shortcut map."
 msgstr ""
 "Schnelltasten...:\n"
-"  Zeigt einen Informationsdialog über die vordefinierten Tastaturkürzel an."
+"  Zeigt einen Informations-Dialog über die vordefinierten Schnelltasten an."
 
-#: usage.rst:903
+#: usage.rst:910
 msgid ""
 "  * Edition Widgets: Shows shortcuts working on text entries, relation entries\n"
 "    and date/time entries."
@@ -2103,19 +2118,19 @@ msgstr ""
 "  * Widgets zur Bearbeitung: Zeigt Schnelltasten für Texteinträge, verknüpfte\n"
 "    Einträge und Datums/Zeiteinträge"
 
-#: usage.rst:906
+#: usage.rst:913
 msgid ".. _Menu-Help-About:"
 msgstr ".. _Menu-Help-About:"
 
-#: usage.rst:908
+#: usage.rst:915
 msgid ""
 "About...:\n"
 "  License, Contributors, Authors of Tryton"
 msgstr ""
 "Über...:\n"
-"  Lizenz, Mitwirkende, Authoren von Tryton"
+"  Lizenz, Mitwirkende, Autoren von Tryton"
 
-#: usage.rst:912
+#: usage.rst:919
 msgid ""
 "Appendix\n"
 "********"
@@ -2123,7 +2138,7 @@ msgstr ""
 "Anhang\n"
 "******"
 
-#: usage.rst:916
+#: usage.rst:923
 msgid ""
 "Configuration File\n"
 "^^^^^^^^^^^^^^^^^^"
@@ -2131,27 +2146,81 @@ msgstr ""
 "Konfigurations-Dateien\n"
 "^^^^^^^^^^^^^^^^^^^^^^"
 
-#: usage.rst:919
-msgctxt "usage.rst:919"
+#: usage.rst:926
+msgctxt "usage.rst:926"
 msgid "::"
 msgstr "::"
 
-#: usage.rst:921
+#: usage.rst:928
 msgid ""
 "   ~/.config/tryton/x.y/tryton.conf      # General configuration\n"
-"   ~/.config/tryton/x.y/accel.map        # Accelerators configuration"
+"   ~/.config/tryton/x.y/accel.map        # Accelerators configuration\n"
+"   ~/.config/tryton/x.y/known_hosts      # Fingerprints\n"
+"   ~/.config/tryton/x.y/ca_certs         # Certification Authority (http://docs.python.org/library/ssl.html#ssl-certificates)"
 msgstr ""
 "   ~/.config/tryton/x.y/tryton.conf      # Generelle Konfiguration\n"
-"   ~/.config/tryton/x.y/accel.map        # Konfiguration der Kurzbefehle"
+"   ~/.config/tryton/x.y/accel.map        # Konfiguration der Schnelltasten\n"
+"   ~/.config/tryton/x.y/known_hosts      # Fingerprints\n"
+"   ~/.config/tryton/x.y/ca_certs         # Certification Authority (http://docs.python.org/library/ssl.html#ssl-certificates)"
 
-#: usage.rst:924
-msgid ""
-":Authors:\n"
-"  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings"
-msgstr ""
-":Authoren:\n"
-"  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings"
-
+#~ msgid ""
+#~ "Tool Bar\n"
+#~ "^^^^^^^^\n"
+#~ "The tool bar contains some often used menu functions mapped to icons.\n"
+#~ "In addition to the menu bar the tool bar contains a button called\n"
+#~ "*Attachment*. The attachment item handles the document management system of\n"
+#~ "Tryton which is able to attach files to any arbitrary :term:`model`. The button\n"
+#~ "is showing how many attachments are linked to the current view. On click it\n"
+#~ "opens the attachment :term:`dialog`. This dialog has the following layout:"
+#~ msgstr ""
+#~ "Werkzeugleiste\n"
+#~ "^^^^^^^^^^^^^^\n"
+#~ "Die Werkzeugleiste enthält Symbole für oft benutzte Menüfunktionen.\n"
+#~ "Zusätzlich zur Menüleiste beinhaltet die Werkzeugleiste den Knopf\n"
+#~ "*Dateianhang*. Das Dateianhang-Element stellt das Dokumenten Management System\n"
+#~ "von Tryton bereit. Es ist in der Lage Dateien an jedes beliebige :term:`Modell`\n"
+#~ "anzuhängen. Der Knopf zeigt wie viele Anhänge\n"
+#~ "mit der aktuellen Sicht verknüpft sind. Beim Mausklick öffnet sich der\n"
+#~ ":term:`Dialog` Anhang. Dieser Dialog hat folgendes Layout:"
+#~ msgid ""
+#~ "* Preview: Show a preview picture of the selected attachment\n"
+#~ "* Description: Show and edit free text description for the selected attachment\n"
+#~ "* Attachment list: Show and select all attachments for the given resource\n"
+#~ "* Actions:"
+#~ msgstr ""
+#~ "* Vorschau: Zeigt eine Vorschaubild des ausgewählten Anhangs\n"
+#~ "* Beschreibung: Anzeige und editieren einer freien Text-Beschreibung\n"
+#~ "  des ausgewählten Anhangs\n"
+#~ "* Anhangs-Liste:  Anzeige und Auswahl aller Anhänge zur ausgewählten Ressource\n"
+#~ "* Aktionen:"
+#~ msgid ""
+#~ "  - Save Text: Save the description text to the selected attachment.\n"
+#~ "  - Add File...: Add a file as attachment. A file dialog opens.\n"
+#~ "  - Add Link...: Add a link to a file as attachment. A file dialog opens.\n"
+#~ "  - Save as...: Save the selected attachment to the local file system.\n"
+#~ "  - Delete...: Delete the selected attachment.\n"
+#~ "  - Close"
+#~ msgstr ""
+#~ "  - Text speichern: Speichert den Text der Beschreibung zum ausgewählten Anhang\n"
+#~ "  - Datei hinzufügen...: Fügt eine Datei als Anhang hinzu. Es öffnet sich ein\n"
+#~ "    Dateiauswahl-Dialog  - Verweis hinzufügen...: Fügt eine Verknüpfung zu einer Datei als Anhang hinzu.\n"
+#~ "    Es öffnet sich ein Dateiauswahl-Dialog\n"
+#~ "  - Speichern als...: Speichert den ausgewählte Anhang auf das\n"
+#~ "    lokale  Dateisystem\n"
+#~ "  - Löschen...: Löscht den ausgewählten Anhang\n"
+#~ "  - Schließen: Schließt den Anhang-Dialog"
+#~ msgid ""
+#~ "   ~/.config/tryton/x.y/tryton.conf      # General configuration\n"
+#~ "   ~/.config/tryton/x.y/accel.map        # Accelerators configuration"
+#~ msgstr ""
+#~ "   ~/.config/tryton/x.y/tryton.conf      # Generelle Konfiguration\n"
+#~ "   ~/.config/tryton/x.y/accel.map        # Konfiguration der Kurzbefehle"
+#~ msgid ""
+#~ ":Authors:\n"
+#~ "  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings"
+#~ msgstr ""
+#~ ":Authoren:\n"
+#~ "  Udo Spallek, Bertrand Chenal, Mathias Behrle, Anne Krings"
 #~ msgid ""
 #~ ":TODO: Find a way for translatable illustrations, since SVG is not supported\n"
 #~ "       by many browsers..."

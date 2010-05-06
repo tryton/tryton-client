@@ -4,14 +4,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-29 23:00+0200\n"
+"POT-Creation-Date: 2010-05-06 19:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.3.0\n"
+"X-Generator: Translate Toolkit 1.5.3\n"
 
 #: glossary.rst:1
 msgid ""
@@ -20,10 +20,12 @@ msgid ""
 msgstr ""
 
 #: glossary.rst:4
-msgid ".. glossary::"
+msgid ""
+".. glossary::\n"
+"   :sorted:"
 msgstr ""
 
-#: glossary.rst:6
+#: glossary.rst:7
 msgid ""
 "   Actions\n"
 "      An *action* is a function which is triggered by a user intervention.\n"
@@ -31,7 +33,7 @@ msgid ""
 "      Actions often provide :term:`wizards`."
 msgstr ""
 
-#: glossary.rst:11
+#: glossary.rst:12
 msgid ""
 "   Board\n"
 "      The *board* is a type of :term:`views` able to handle other views. "
@@ -39,25 +41,25 @@ msgid ""
 "      view type is not documented or not used for now."
 msgstr ""
 
-#: glossary.rst:15
+#: glossary.rst:16
 msgid ""
 "   Character Encoding\n"
 "      See [WP-ENCOD]_"
 msgstr ""
 
-#: glossary.rst:18
+#: glossary.rst:19
 msgid ""
 "   CSV\n"
 "      File format for Comma Separated Values. See [WP-CSV]_"
 msgstr ""
 
-#: glossary.rst:21
+#: glossary.rst:22
 msgid ""
 "   Data\n"
 "      *Data* means information content produced by users."
 msgstr ""
 
-#: glossary.rst:25
+#: glossary.rst:26
 msgid ""
 "   Dialog\n"
 "      A *dialog* is a :term:`popup` window, which overlays other windows and\n"
@@ -65,42 +67,42 @@ msgid ""
 "      :term:`actions`."
 msgstr ""
 
-#: glossary.rst:30
+#: glossary.rst:31
 msgid ""
 "   Fields\n"
 "      *Fields* are attributes of a *data object*. *Fields* are\n"
 "      represented as table fields in relational databases."
 msgstr ""
 
-#: glossary.rst:34
+#: glossary.rst:35
 msgid ""
 "   Form View\n"
 "      The *form* is a mode of :term:`views`, which displays single\n"
 "      :term:`records` of data."
 msgstr ""
 
-#: glossary.rst:38
+#: glossary.rst:39
 msgid ""
 "   Form\n"
 "      The *form* is the general type of :term:`views` used in Tryton. The\n"
 "      *form* provides several modes for presenting :term:`data`:"
 msgstr ""
 
-#: glossary.rst:42
+#: glossary.rst:43
 msgid ""
 "      * :term:`Form View`\n"
 "      * :term:`Tree View`\n"
 "      * :term:`Graph View`"
 msgstr ""
 
-#: glossary.rst:46
+#: glossary.rst:47
 msgid ""
 "   Graph View\n"
 "      *Graph view* is a mode of :term:`views` to show sets of data in a\n"
 "      diagram. *Graph views* can be pie-charts or bar-charts."
 msgstr ""
 
-#: glossary.rst:50
+#: glossary.rst:51
 msgid ""
 "   Main Frame\n"
 "      The *main frame* is a huge part arranged in the center of the\n"
@@ -110,7 +112,7 @@ msgid ""
 "      different :term:`views`."
 msgstr ""
 
-#: glossary.rst:56
+#: glossary.rst:57
 msgid ""
 "   Model\n"
 "      A *model* describes how data is represented and accessed. Models\n"
@@ -118,7 +120,7 @@ msgid ""
 "      of interest."
 msgstr ""
 
-#: glossary.rst:61
+#: glossary.rst:62
 msgid ""
 "   Modules\n"
 "      *Modules* are enclosed file packages for the :term:`Tryton server`. A\n"
@@ -131,26 +133,26 @@ msgid ""
 "      desired functionality."
 msgstr ""
 
-#: glossary.rst:70
+#: glossary.rst:71
 msgid ""
 "   Plugins\n"
 "      A *plugin* is an add-on module for the :term:`Tryton client`."
 msgstr ""
 
-#: glossary.rst:73
+#: glossary.rst:74
 msgid ""
 "   Popup\n"
 "      A small window which pops up the main window."
 msgstr ""
 
-#: glossary.rst:76
+#: glossary.rst:77
 msgid ""
 "   Records\n"
 "      A *record* is a singular dataset in a :term:`Model`. *Records* are\n"
 "      represented as lines or *records* in a relational database table."
 msgstr ""
 
-#: glossary.rst:80
+#: glossary.rst:81
 msgid ""
 "   Tabs\n"
 "      *Tabs* are :term:`widgets` to arrange different contents side by side.\n"
@@ -158,13 +160,13 @@ msgid ""
 "      Tryton uses *tabs* in two layer:"
 msgstr ""
 
-#: glossary.rst:85
+#: glossary.rst:86
 msgid ""
 "      * A tabbed :term:`Main Frame`.\n"
 "      * Tabs inside :term:`Views`."
 msgstr ""
 
-#: glossary.rst:88
+#: glossary.rst:89
 msgid ""
 "      The main frame consists of *tabs* that embed the main menu and all "
 "views\n"
@@ -174,7 +176,7 @@ msgid ""
 "      different sub headings."
 msgstr ""
 
-#: glossary.rst:94
+#: glossary.rst:95
 msgid ""
 "   Three-Tiers\n"
 "      A *three-tiers* application framework like Tryton, is build up of "
@@ -182,14 +184,14 @@ msgid ""
 "      different software components:"
 msgstr ""
 
-#: glossary.rst:98
+#: glossary.rst:99
 msgid ""
 "      1. The storage or data tier.\n"
 "      2. The logic or application tier.\n"
 "      3. The presentation tier."
 msgstr ""
 
-#: glossary.rst:102
+#: glossary.rst:103
 msgid ""
 "      The storage tier in the Tryton framework is provided by the PostgreSQL\n"
 "      database engine. The application logic tier is provided by\n"
@@ -201,7 +203,7 @@ msgid ""
 "      storage tier. All communication is controlled by the application tier."
 msgstr ""
 
-#: glossary.rst:109
+#: glossary.rst:110
 msgid ""
 "   Tree View\n"
 "      *Tree view* is a mode of :term:`views` showing sets of :term:`data`.\n"
@@ -209,7 +211,7 @@ msgid ""
 "      lists."
 msgstr ""
 
-#: glossary.rst:114
+#: glossary.rst:115
 msgid ""
 "   Tryton Server\n"
 "      The *Tryton server* is the application or logic tier in the\n"
@@ -220,7 +222,7 @@ msgid ""
 "      generated information:"
 msgstr ""
 
-#: glossary.rst:122
+#: glossary.rst:123
 msgid ""
 "      * :term:`Tryton client`: (graphical user interface GUI)\n"
 "      * XMLRPC see [WP-XMLRPC]_\n"
@@ -228,14 +230,14 @@ msgid ""
 "      * OpenOffice"
 msgstr ""
 
-#: glossary.rst:127
+#: glossary.rst:128
 msgid ""
 "   Tryton Client\n"
 "      The *Tryton client* application is the graphical user interface (GUI)\n"
 "      of the :term:`Tryton server`."
 msgstr ""
 
-#: glossary.rst:131
+#: glossary.rst:132
 msgid ""
 "   Views\n"
 "      A *view* is the visual presentation of :term:`data`.\n"
@@ -244,13 +246,13 @@ msgid ""
 "Tryton:"
 msgstr ""
 
-#: glossary.rst:136
+#: glossary.rst:137
 msgid ""
 "      1. :term:`Form`\n"
 "      2. :term:`Board`"
 msgstr ""
 
-#: glossary.rst:139
+#: glossary.rst:140
 msgid ""
 "      Each of the view types has different modes to show data. *Views*\n"
 "      are built of several :term:`widgets` and provide often additional\n"
@@ -258,7 +260,7 @@ msgid ""
 "      different view modes alternately."
 msgstr ""
 
-#: glossary.rst:144
+#: glossary.rst:145
 msgid ""
 "   Widgets\n"
 "      A *Widget* is a visual element of a graphical user interface (GUI). "
@@ -270,7 +272,7 @@ msgid ""
 "      lists, tables, lists, trees, ..."
 msgstr ""
 
-#: glossary.rst:150
+#: glossary.rst:151
 msgid ""
 "   Wizards\n"
 "      *Wizards* define stateful sequences of interaction to proceed\n"
@@ -279,28 +281,22 @@ msgid ""
 "      into several user guided steps."
 msgstr ""
 
-#: glossary.rst:155
+#: glossary.rst:156
 msgid ""
 "References\n"
 "**********"
 msgstr ""
 
-#: glossary.rst:158
+#: glossary.rst:159
 msgid ".. [WP-XMLRPC] http://en.wikipedia.org/wiki/Xmlrpc"
 msgstr ""
 
-#: glossary.rst:160
+#: glossary.rst:161
 msgid ".. [WP-WebDAV] http://en.wikipedia.org/wiki/Webdav"
 msgstr ""
 
-#: glossary.rst:162
+#: glossary.rst:163
 msgid ""
 ".. [WP-CSV] http://en.wikipedia.org/wiki/Comma-separated_values\n"
 ".. [WP-ENCOD] http://en.wikipedia.org/wiki/Character_encoding"
-msgstr ""
-
-#: glossary.rst:165
-msgid ""
-":Authors:\n"
-"  Udo Spallek, Cédric Krier, Bertrand Chenal, Anne Krings"
 msgstr ""
