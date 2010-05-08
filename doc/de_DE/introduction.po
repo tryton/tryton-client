@@ -39,12 +39,3 @@ msgstr ""
 "__ http://www.gtk.org\n"
 "__ http://www.python.org"
 
-#~ msgid ""
-#~ "Tryton is a three-tiers high-level general purpose application platform\n"
-#~ "written in Python and uses PostgreSQL as database engine."
-#~ msgstr "Tryton ist eine Drei-Schichten Anwendungsplattform unter GPL-3 Lizenz, ist in Python geschrieben und verwendet PostgreSQL als Datenbank."
-#~ msgid "It is the core base of an Open Source ERP."
-#~ msgstr "Es ist die Basis eines Open Source ERP."
-#~ msgid "It provides modularity, scalability and security."
-#~ msgstr "Es bietet Modularität, Skalierbarkeit und Sicherheit."
-

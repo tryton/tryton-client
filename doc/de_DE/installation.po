@@ -102,12 +102,3 @@ msgstr ""
 "Um Tryton ohne Installation zu benutzen kann man ``bin/tryton`` im Verzeichnis\n"
 "des entpackten Archiv aufrufen."
 
-#~ msgid ""
-#~ "Installation\n"
-#~ "############"
-#~ msgstr ""
-#~ "Installation\n"
-#~ "############"
-#~ msgid "see INSTALL file."
-#~ msgstr "Siehe INSTALL Datei."
-
