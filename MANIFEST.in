@@ -10,6 +10,9 @@ include setup-bundle.sh
 include tryton.desktop
 include *.nsh
 include doc/*
+recursive-include doc *.rst
+recursive-include doc *.po
+recursive-include doc *.pot
 include share/pixmaps/tryton/LICENSE
 include share/pixmaps/tryton/*.png
 include share/pixmaps/tryton/*.svg
