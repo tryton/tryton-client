@@ -76,6 +76,9 @@ class CharField(object):
         return self.get(record, check_load=check_load, readonly=True,
                 modified=False)
 
+    def get_on_change_value(self, record, check_load=True):
+        return self.get_eval(record, check_load=check_load)
+
     def set_client(self, record, value, force_change=False):
         internal = record.value.get(self.name, False)
         prev_modified = record.modified
@@ -393,6 +396,9 @@ class O2MField(CharField):
         return result
 
     def get_eval(self, record, check_load=True):
+        return [x.id for x in record.value.get(self.name) or []]
+
+    def get_on_change_value(self, record, check_load=True):
         result = []
         if record.value.get(self.name) is None:
             return []

@@ -366,7 +366,7 @@ class Record(SignalEvent):
         res = {}
         values = {}
         for name, field in self.group.fields.iteritems():
-            values[name] = field.get_eval(self, check_load=False)
+            values[name] = field.get_on_change_value(self, check_load=False)
         if self.parent and self.parent_name:
             values['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
                     False)
