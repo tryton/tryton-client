@@ -161,7 +161,7 @@ class Reference(WidgetInterface):
                     if screen.save_current():
                         value = (screen.current_record.id,
                                 screen.current_record.rec_name())
-                        self.field(self.record, (model, value),
+                        self.field.set_client(self.record, (model, value),
                                 force_change=True)
                         break
                     else:
