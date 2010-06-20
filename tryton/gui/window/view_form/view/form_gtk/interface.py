@@ -256,7 +256,7 @@ class WidgetInterface(object):
 
     def display(self, record, field):
         if not field:
-            self._readonly_set(self.attrs.get('readonly', False))
+            self._readonly_set(self.attrs.get('readonly', True))
             self.invisible_set(self.attrs.get('invisible', False))
             return
         self._readonly_set(self.attrs.get('readonly',
