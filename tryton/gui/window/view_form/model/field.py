@@ -372,8 +372,7 @@ class O2MField(CharField):
                         get_modifiedonly=modified)
                 if record2.is_modified() and values:
                     result.append(('write', record2.id, values))
-                else:
-                    result[0][1].append(record2.id)
+                result[0][1].append(record2.id)
             else:
                 result.append(('create',
                     record2.get(check_load=check_load, get_readonly=readonly)))
