@@ -34,6 +34,10 @@ other known moons. It is also more massive than all the Solar System's
 You can copy records from any list with Ctrl + C
 and paste in any application with Ctrl + V
 '''),
+            _('''<b>Export graphs</b>
+
+You can save any graphs in PNG file with right-click on it.
+'''),
         ]
 
 
