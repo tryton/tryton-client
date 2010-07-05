@@ -101,6 +101,7 @@ dist = setup(name=PACKAGE,
         ('share/locale/es_ES/LC_MESSAGES', glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
         ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
         ('share/locale/ru_RU/LC_MESSAGES', glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
+        ('share/locale/ja_JP/LC_MESSAGES', glob.glob('share/locale/ja_JP/LC_MESSAGES/*.mo')),
     ],
     scripts=['bin/tryton'],
     classifiers=[
