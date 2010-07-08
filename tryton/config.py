@@ -137,7 +137,7 @@ class ConfigManager(object):
                     configparser.add_section(section)
                 configparser.set(section, name, self.config[entry])
             configparser.write(open(self.rcfile, 'wb'))
-        except:
+        except Exception:
             logging.getLogger('common.options').warn(
                     _('Unable to write config file %s!') % \
                             (self.rcfile,))

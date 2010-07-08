@@ -24,7 +24,7 @@ class CellRendererInteger(CellRendererText):
             if new_value == '-':
                 return
             locale.atoi(new_value)
-        except:
+        except Exception:
             entry.stop_emission('insert-text')
 
 gobject.type_register(CellRendererInteger)

@@ -88,7 +88,7 @@ class Screen(SignalEvent):
                         self.fields_view_tree = rpc.execute('model',
                                 self.model_name, 'fields_view_get', False,
                                 'tree', ctx)
-                    except:
+                    except Exception:
                         return
                 self.filter_widget = Form(self.fields_view_tree['arch'],
                         self.fields_view_tree['fields'], self.model_name,
@@ -143,7 +143,7 @@ class Screen(SignalEvent):
                                 self.model_name, 'search_count', values, ctx)
                 else:
                     self.search_count = len(ids)
-        except:
+        except Exception:
             ids = []
         if only_ids:
             return ids
@@ -201,11 +201,11 @@ class Screen(SignalEvent):
         self.__current_record = record
         try:
             offset = int(self.filter_widget.get_offset())
-        except:
+        except Exception:
             offset = 0
         try:
             pos = self.group.index(record)
-        except:
+        except Exception:
             pos = -1
         self.signal('record-message', (pos + offset, len(self.group) + offset,
             self.search_count, record and record.id))

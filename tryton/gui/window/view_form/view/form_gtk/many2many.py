@@ -165,7 +165,7 @@ class Many2Many(WidgetInterface):
         try:
             result = rpc.execute('model', self.attrs['relation'], 'read',
                     ids, ['rec_name'], rpc.CONTEXT)
-        except:
+        except Exception:
             return str(ids)
         return ', '.join(x['rec_name'] for x in result)
 

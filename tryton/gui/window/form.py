@@ -184,7 +184,7 @@ class Form(SignalEvent):
             new_value = value[:position] + new_text + value[position:]
             try:
                 locale.atoi(new_value)
-            except:
+            except Exception:
                 widget.stop_emission('insert-text')
         entry.connect('insert_text', sig_insert_text)
         table.attach(entry, 1, 2, 1, 2)
@@ -275,7 +275,7 @@ class Form(SignalEvent):
                             sdt = szone.localize(datetime, is_dst=True)
                             ldt = sdt.astimezone(lzone)
                             date = ldt
-                        except:
+                        except Exception:
                             pass
                     value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value +'\n'

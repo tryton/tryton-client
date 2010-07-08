@@ -73,7 +73,7 @@ class Calendar(WidgetInterface):
             return False
         try:
             date = datetime.date(*time.strptime(value, self.format)[:3])
-        except:
+        except Exception:
             return False
         return datetime_strftime(date, DT_FORMAT)
 
@@ -209,7 +209,7 @@ class DateTime(WidgetInterface):
             return False
         try:
             date = datetime.datetime(*time.strptime(value, self.format)[:6])
-        except:
+        except Exception:
             return False
         if 'timezone' in rpc.CONTEXT and timezone:
             try:
@@ -219,7 +219,7 @@ class DateTime(WidgetInterface):
                 ldt = lzone.localize(date, is_dst=True)
                 sdt = ldt.astimezone(szone)
                 date = sdt
-            except:
+            except Exception:
                 pass
         return datetime_strftime(date, DHM_FORMAT)
 
@@ -246,7 +246,7 @@ class DateTime(WidgetInterface):
                     sdt = szone.localize(date, is_dst=True)
                     ldt = sdt.astimezone(lzone)
                     date = ldt
-                except:
+                except Exception:
                     pass
             format = self.format
             if date.year < 10:

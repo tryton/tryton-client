@@ -28,7 +28,7 @@ class EvalEnvironment(dict):
     def get(self, item, default=None):
         try:
             return self.__getattr__(item)
-        except:
+        except Exception:
             pass
         return super(EvalEnvironment, self).get(item, default)
 
@@ -462,6 +462,6 @@ class Record(SignalEvent):
                 ])
             try:
                 self.attachment_count = rpc.execute(*args)
-            except:
+            except Exception:
                 return 0
         return self.attachment_count

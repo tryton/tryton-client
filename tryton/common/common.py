@@ -243,7 +243,7 @@ def file_selection(title, filename='', parent=None,
             pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
             img.set_from_pixbuf(pixbuf)
             have_preview = True
-        except:
+        except Exception:
             have_preview = False
         win.set_preview_widget_active(have_preview)
         return
@@ -266,7 +266,7 @@ def file_selection(title, filename='', parent=None,
                 CONFIG['client.default_path'] = \
                         os.path.dirname(filepath)
                 CONFIG.save()
-            except:
+            except Exception:
                 pass
         parent.present()
         win.destroy()
@@ -278,7 +278,7 @@ def file_selection(title, filename='', parent=None,
             try:
                 CONFIG['client.default_path'] = \
                         os.path.dirname(filenames[0])
-            except:
+            except Exception:
                 pass
         parent.present()
         win.destroy()
@@ -291,11 +291,11 @@ def file_open(filename, type, parent, print_p=False):
             operation = 'print'
         try:
             os.startfile(os.path.normpath(filename), operation)
-        except:
+        except Exception:
             # Try without operation, it is not supported on version < 2.5
             try:
                 os.startfile(os.path.normpath(filename))
-            except:
+            except Exception:
                 save_name = file_selection(_('Save As...'), parent=parent,
                         action=gtk.FILE_CHOOSER_ACTION_SAVE)
                 if save_name:
@@ -313,7 +313,7 @@ def file_open(filename, type, parent, print_p=False):
             if not pid:
                 try:
                     os.execv('/usr/bin/open', ['/usr/bin/open', filename])
-                except:
+                except Exception:
                     sys.exit(0)
             time.sleep(0.1)
             sys.exit(0)
@@ -353,7 +353,7 @@ def file_open(filename, type, parent, print_p=False):
         if not pid:
             try:
                 os.execv(prog, args)
-            except:
+            except Exception:
                 sys.exit(0)
         time.sleep(0.1)
         sys.exit(0)
@@ -380,7 +380,7 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
             if not pid:
                 try:
                     os.execv(prog, args)
-                except:
+                except Exception:
                     sys.exit(0)
             time.sleep(0.1)
             sys.exit(0)
@@ -1078,7 +1078,7 @@ def text_to_float_time(text, conv=None):
     try:
         try:
             return locale.atof(text)
-        except:
+        except Exception:
             pass
         if conv:
             tmp_conv = FLOAT_TIME_CONV.copy()
@@ -1104,7 +1104,7 @@ def text_to_float_time(text, conv=None):
             try:
                 value += abs(locale.atof(buf))
                 continue
-            except:
+            except Exception:
                 pass
             for sep in conv.keys():
                 if buf.endswith(sep):
@@ -1113,7 +1113,7 @@ def text_to_float_time(text, conv=None):
         if text.startswith('-'):
             value *= -1
         return value
-    except:
+    except Exception:
         return 0.0
 
 def float_time_to_text(val, conv=None):

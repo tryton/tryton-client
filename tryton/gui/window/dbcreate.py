@@ -67,7 +67,7 @@ class DBCreate(object):
             if self.combo_language and host and port:
                 common.refresh_langlist(self.combo_language, host, port)
             self.server_connection_state(True)
-        except:
+        except Exception:
             self.server_connection_state(False)
             return False
         CONFIG['login.server'] = host
@@ -317,7 +317,7 @@ class DBCreate(object):
         self.combo_language.set_model(liststore)
         try:
             common.refresh_langlist(self.combo_language, host, port)
-        except:
+        except Exception:
             self.button_create.set_sensitive(False)
 
         while True:

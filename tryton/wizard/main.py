@@ -131,7 +131,7 @@ class Dialog(object):
                     rpc.execute('model', 'ir.action.wizard_size', 'set_size',
                             self.action, self.screen.name, width, height,
                             rpc.CONTEXT)
-                except:
+                except Exception:
                     pass
 
         if res < len(self.states) and res >= 0:
@@ -249,5 +249,5 @@ class Wizard(object):
             rpc.execute('wizard', action, 'delete', wiz_id)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
-        except:
+        except Exception:
             pass

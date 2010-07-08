@@ -63,11 +63,11 @@ class Integer(Interface):
     def _value_get(self):
         try:
             value1 = locale.atoi(self.entry1.get_text())
-        except:
+        except Exception:
             value1 = False
         try:
             value2 = locale.atoi(self.entry2.get_text())
-        except:
+        except Exception:
             value2 = False
         return self._get_clause(value1, value2)
 
@@ -132,5 +132,5 @@ class Integer(Interface):
             if new_value == '-':
                 return
             locale.atoi(new_value)
-        except:
+        except Exception:
             widget.stop_emission('insert-text')

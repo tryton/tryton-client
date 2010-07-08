@@ -7,7 +7,7 @@ from tryton.config import CONFIG
 
 try:
     import gtkspell
-except:
+except Exception:
     gtkspell = None
 
 
@@ -51,7 +51,7 @@ class TextBox(WidgetInterface):
             spell = None
             try:
                 spell = gtkspell.get_from_text_view(self.textview)
-            except:
+            except Exception:
                 pass
 
             if not value and self.attrs.get('spell') \
@@ -64,11 +64,11 @@ class TextBox(WidgetInterface):
                     if self.lang != language:
                         try:
                             spell.set_language(language)
-                        except:
+                        except Exception:
                             spell.detach()
                             del spell
                         self.lang = language
-                except:
+                except Exception:
                     pass
             elif spell:
                 spell.detach()
@@ -98,7 +98,7 @@ class TextBox(WidgetInterface):
             spell = None
             try:
                 spell = gtkspell.get_from_text_view(self.textview)
-            except:
+            except Exception:
                 pass
 
             if self.attrs.get('spell') and CONFIG['client.spellcheck'] \
@@ -110,11 +110,11 @@ class TextBox(WidgetInterface):
                     if self.lang != language:
                         try:
                             spell.set_language(language)
-                        except:
+                        except Exception:
                             spell.detach()
                             del spell
                         self.lang = language
-                except:
+                except Exception:
                     pass
             elif spell:
                 spell.detach()

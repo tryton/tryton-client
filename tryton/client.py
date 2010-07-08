@@ -58,7 +58,7 @@ class TrytonClient(object):
             try:
                 pixbuf = gtk.gdk.pixbuf_new_from_file(
                         os.path.join(PIXMAPS_DIR, fname))
-            except:
+            except Exception:
                 continue
             icon_set = gtk.IconSet(pixbuf)
             factory.add(name, icon_set)

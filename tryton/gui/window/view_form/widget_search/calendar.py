@@ -99,7 +99,7 @@ class Calendar(Interface):
     def _date_get(self, value):
         try:
             date = datetime.date(*time.strptime(value, self.format)[:3])
-        except:
+        except Exception:
             return False
         if self.attrs.get('type', 'date') == 'datetime':
             return datetime_strftime(datetime.datetime.combine(date,
@@ -139,7 +139,7 @@ class Calendar(Interface):
                 return ''
             try:
                 return datetime_strftime(value, self.format)
-            except:
+            except Exception:
                 return ''
 
         i = self.liststore.get_iter_root()

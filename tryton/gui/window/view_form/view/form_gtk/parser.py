@@ -104,7 +104,7 @@ class Button(object):
                     icon = gtk.Image()
                     icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                     self.widget.set_image(icon)
-                except:
+                except Exception:
                     log = logging.getLogger('common')
                     log.warning(_('Wrong icon for the button!'))
             else:

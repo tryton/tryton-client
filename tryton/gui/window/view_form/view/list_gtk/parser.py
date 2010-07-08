@@ -372,7 +372,7 @@ class Date(Char):
             return False
         try:
             date = datetime.date(*time.strptime(text, self.display_format)[:3])
-        except:
+        except Exception:
             return False
         return common.datetime_strftime(date, self.server_format)
 
@@ -399,7 +399,7 @@ class Datetime(Date):
                 sdt = szone.localize(date, is_dst=True)
                 ldt = sdt.astimezone(lzone)
                 date = ldt
-            except:
+            except Exception:
                 pass
         return common.datetime_strftime(date, self.display_format)
 
@@ -409,7 +409,7 @@ class Datetime(Date):
         try:
             date = datetime.datetime(*time.strptime(text,
                 self.display_format)[:6])
-        except:
+        except Exception:
             return False
         if 'timezone' in rpc.CONTEXT:
             try:
@@ -419,7 +419,7 @@ class Datetime(Date):
                 ldt = lzone.localize(date, is_dst=True)
                 sdt = ldt.astimezone(szone)
                 date = sdt
-            except:
+            except Exception:
                 pass
         return common.datetime_strftime(date, self.server_format)
 
@@ -453,7 +453,7 @@ class Float(Char):
     def value_from_text(self, record, text):
         try:
             return locale.atof(text)
-        except:
+        except Exception:
             return 0.0
 
 

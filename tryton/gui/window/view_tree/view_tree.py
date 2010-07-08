@@ -86,7 +86,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 sdt = szone.localize(obj[field], is_dst=True)
                                 ldt = sdt.astimezone(lzone)
                                 obj[field] = ldt
-                            except:
+                            except Exception:
                                 pass
                         obj[field] = common.datetime_strftime(obj[field],
                                 display_format)
@@ -105,7 +105,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 0, None, None,
                                 rpc.CONTEXT, ['rec_name'])
                         selection = [(x['id'], x['rec_name']) for x in result]
-                    except:
+                    except Exception:
                         selection = []
                 else:
                     if not isinstance(self.fields_type[field]['selection'],
@@ -115,7 +115,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                     self.view['model'],
                                     self.fields_type[field]['selection'],
                                     rpc.CONTEXT)
-                        except:
+                        except Exception:
                             selection = []
                 self.fields_type[field]['selection'] = selection
             elif field_type in ('float', 'numeric'):
@@ -320,7 +320,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                     return None
                 tree = node[2]
             return (tuple(path), node)
-        except:
+        except Exception:
             return None
 
 class ViewTree(object):

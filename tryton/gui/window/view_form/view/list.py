@@ -70,7 +70,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 if old_pos != pos:
                     new_order[old_pos] = pos
                 pos += 1
-            except:
+            except Exception:
                 continue
         self.group.sort(lambda x, y: \
                 cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
@@ -512,7 +512,7 @@ class ViewList(ParserView):
                 try:
                     rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
                             self.screen.model_name, fields, rpc.CONTEXT)
-                except:
+                except Exception:
                     pass
         self.widget_tree.destroy()
         del self.screen

@@ -19,11 +19,11 @@ class Float(Integer):
     def _value_get(self):
         try:
             value1 = locale.atof(self.entry1.get_text())
-        except:
+        except Exception:
             value1 = False
         try:
             value2 = locale.atof(self.entry2.get_text())
-        except:
+        except Exception:
             value2 = False
         return self._get_clause(value1, value2)
 
@@ -62,5 +62,5 @@ class Float(Integer):
                 return
             if len(str(int(locale.atof(new_value)))) > self.digits[0]:
                 widget.stop_emission('insert-text')
-        except:
+        except Exception:
             widget.stop_emission('insert-text')

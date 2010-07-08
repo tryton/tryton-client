@@ -32,7 +32,7 @@ class CellRendererFloat(CellRendererInteger):
                     or len(new_decimal) > self.digits[1]:
                 entry.stop_emission('insert-text')
 
-        except:
+        except Exception:
             entry.stop_emission('insert-text')
 
 gobject.type_register(CellRendererFloat)

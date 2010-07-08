@@ -92,7 +92,7 @@ You can save any graphs in PNG file with right-click on it.
 
         try:
             self.number = int(CONFIG['tip.position'])
-        except:
+        except Exception:
             self.number = 0
 
         self.tip_set()

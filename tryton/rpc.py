@@ -48,7 +48,7 @@ def db_list(host, port):
             _SEMAPHORE.release()
         logging.getLogger('rpc.result').debug(repr(res))
         return res
-    except:
+    except Exception:
         logging.getLogger('rpc.result').debug(repr(None))
         return None
 
@@ -80,7 +80,7 @@ def db_exec(host, port, method, *args):
             _SEMAPHORE.release()
         logging.getLogger('rpc.result').debug(repr(res))
         return res
-    except:
+    except Exception:
         raise
 
 def server_version(host, port):
@@ -111,7 +111,7 @@ def server_version(host, port):
             _SEMAPHORE.release()
         logging.getLogger('rpc.result').debug(repr(res))
         return res
-    except:
+    except Exception:
         logging.getLogger('rpc.result').debug(repr(None))
         return None
 
@@ -170,7 +170,7 @@ def logout():
                 logging.getLogger('rpc.result').debug(repr(res))
             finally:
                 _SEMAPHORE.release()
-        except:
+        except Exception:
             pass
         _SOCK.disconnect()
         _SOCK = None
@@ -185,7 +185,7 @@ def context_reload():
     global CONTEXT, TIMEZONE
     try:
         context = execute('model', 'res.user', 'get_preferences', True, {})
-    except:
+    except Exception:
         return
     CONTEXT = {}
     for i in context:
@@ -194,7 +194,7 @@ def context_reload():
         if i == 'timezone':
             try:
                 TIMEZONE = execute('common', None, 'timezone_get')
-            except:
+            except Exception:
                 pass
 
 def _execute(blocking, *args):

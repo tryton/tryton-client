@@ -68,7 +68,7 @@ class PySocket:
                         socket.SOCK_STREAM)
                 self.sock.settimeout(CONNECT_TIMEOUT)
                 self.sock.connect((host, int(port)))
-            except:
+            except Exception:
                 self.sock = None
         if self.sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,7 +83,7 @@ class PySocket:
                     sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
                     sock.settimeout(CONNECT_TIMEOUT)
                     sock.connect((host, int(port)))
-                except:
+                except Exception:
                     sock = None
             if sock is None:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,7 +95,7 @@ class PySocket:
             elif hasattr(socket, 'ssl'):
                 ssl_sock = socket.ssl(sock)
                 self.ssl = True
-        except:
+        except Exception:
             pass
         self.sock.settimeout(TIMEOUT)
         if self.ssl:
@@ -143,10 +143,10 @@ class PySocket:
                     sock.sock_shutdown(shutdown_value)
                 else:
                     sock.shutdown(shutdown_value)
-            except:
+            except Exception:
                 pass
             sock.close()
-        except:
+        except Exception:
             pass
         self.sock = None
         self.ssl = False

@@ -34,7 +34,7 @@ except ImportError:
     igemacintegration = None
 try:
     import gtkspell
-except:
+except Exception:
     gtkspell = None
 
 _ = gettext.gettext
@@ -936,7 +936,7 @@ class Main(object):
             try:
                 shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
                         user, 'ir.ui.menu', rpc.CONTEXT)
-            except:
+            except Exception:
                 shortcuts = []
         menu = gtk.Menu()
         for shortcut in shortcuts:
@@ -1096,7 +1096,7 @@ class Main(object):
                         len(ids2))
             self.sb_requests.set_text(message)
             return (ids, ids2)
-        except:
+        except Exception:
             if exception:
                 raise
             return ([], [])
@@ -1123,7 +1123,7 @@ class Main(object):
             try:
                 prefs = rpc.execute('model', 'res.user', 'get_preferences',
                         False, rpc.CONTEXT)
-            except:
+            except Exception:
                 prefs = None
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])

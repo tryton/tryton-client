@@ -129,7 +129,7 @@ class Wizard(SignalEvent):
             rpc.execute('wizard', self.action, 'delete', self.wiz_id)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
-        except:
+        except Exception:
             pass
         Main.get_main()._win_del(self.widget)
 

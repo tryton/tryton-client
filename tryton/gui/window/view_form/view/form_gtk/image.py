@@ -158,7 +158,7 @@ class Image(WidgetInterface):
             try:
                 loader = gtk.gdk.PixbufLoader(ftype)
                 loader.write(data, len(data))
-            except:
+            except Exception:
                 continue
             pixbuf = loader.get_pixbuf()
             if pixbuf:

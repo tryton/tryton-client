@@ -88,7 +88,7 @@ class CharField(object):
             record.modified_fields.setdefault(self.name)
             try:
                 self.sig_changed(record)
-            except:
+            except Exception:
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
@@ -191,7 +191,7 @@ class FloatField(CharField):
                 record.modified_fields.setdefault(self.name)
                 try:
                     self.sig_changed(record)
-                except:
+                except Exception:
                     record.value[self.name] = internal
                     record.modified = prev_modified
                 record.signal('record-changed')
@@ -213,7 +213,7 @@ class NumericField(CharField):
                 record.modified_fields.setdefault(self.name)
                 try:
                     self.sig_changed(record)
-                except:
+                except Exception:
                     record.value[self.name] = internal
                     record.modified = prev_modified
                     return
@@ -240,7 +240,7 @@ class BooleanField(CharField):
             record.modified_fields.setdefault(self.name)
             try:
                 self.sig_changed(record)
-            except:
+            except Exception:
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
@@ -313,7 +313,7 @@ class M2OField(CharField):
             record.modified_fields.setdefault(self.name)
             try:
                 self.sig_changed(record)
-            except:
+            except Exception:
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
@@ -321,7 +321,7 @@ class M2OField(CharField):
         elif force_change:
             try:
                 self.sig_changed(record)
-            except:
+            except Exception:
                 record.value[self.name] = internal
                 return
             record.signal('record-changed')
@@ -603,7 +603,7 @@ class ReferenceField(CharField):
             record.modified_fields.setdefault(self.name)
             try:
                 self.sig_changed(record)
-            except:
+            except Exception:
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return

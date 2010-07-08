@@ -15,7 +15,7 @@ class Float(Integer):
     def set_value(self, record, field):
         try:
             value = locale.atof(self.entry.get_text())
-        except:
+        except Exception:
             value = 0.0
         return field.set_client(record, value)
 
@@ -58,5 +58,5 @@ class Float(Integer):
                     or len(new_decimal) > digits[1]:
                 entry.stop_emission('insert-text')
 
-        except:
+        except Exception:
             entry.stop_emission('insert-text')

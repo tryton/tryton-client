@@ -256,7 +256,7 @@ class WinImport(object):
         try:
             data = csv.reader(open(fname, 'rb'), quotechar=csvdel,
                     delimiter=csvsep)
-        except:
+        except Exception:
             common.warning(_('Error opening CSV file'), self.dialog,
                     _('Error'))
             return True
