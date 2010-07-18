@@ -79,9 +79,13 @@ elif os.name == 'mac' \
 
 execfile(os.path.join('tryton', 'version.py'))
 
+EXTRAS = {
+    'timezone': ['pytz'],
+}
 SIMPLEJSON = []
 if sys.version_info < (2, 6):
     SIMPLEJSON = ['simplejson']
+    EXTRAS['ssl'] = ['ssl']
 
 dist = setup(name=PACKAGE,
     version=VERSION,
@@ -123,9 +127,7 @@ dist = setup(name=PACKAGE,
 #        "pygtk >= 2.0",
         "python-dateutil",
     ] + SIMPLEJSON,
-    extras_require={
-        'timezone': ['pytz'],
-    },
+    extras_require=EXTRAS,
     **args
 )
 
