@@ -678,8 +678,8 @@ class Selection(Char):
         self.selection = selection[:]
         if 'relation' in self.attrs:
             args = ('model', self.attrs['relation'], 'search_read',
-                    self.attrs.get('domain', []), 0, None, None, rpc.CONTEXT,
-                    ['rec_name'])
+                    self.attrs.get('domain', []), 0, None, None, ['rec_name'],
+                    rpc.CONTEXT)
             try:
                 result = rpc.execute(*args)
             except Exception, exception:

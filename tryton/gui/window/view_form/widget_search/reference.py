@@ -42,7 +42,7 @@ class Reference(Interface):
                 result = rpc.execute('model',
                         self.attrs['relation'], 'search_read',
                         self.attrs.get('domain', []),
-                        0, None, None, rpc.CONTEXT, ['rec_name'])
+                        0, None, None, ['rec_name'], rpc.CONTEXT)
                 selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, parent)

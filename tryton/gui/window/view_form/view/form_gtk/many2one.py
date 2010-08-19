@@ -74,8 +74,8 @@ class Many2One(WidgetInterface):
         if attrs.get('completion', False):
             try:
                 result = rpc.execute('model', self.attrs['relation'],
-                        'search_read', [], 0, None, None, rpc.CONTEXT,
-                        ['rec_name'])
+                        'search_read', [], 0, None, None, ['rec_name'],
+                        rpc.CONTEXT)
                 names = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, self.window)

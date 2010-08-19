@@ -167,7 +167,7 @@ class Wizard(object):
         from tryton.action import Action
         if not 'form' in datas:
             datas['form'] = {}
-        args = ('wizard', action, 'create')
+        args = ('wizard', action, 'create', rpc.CONTEXT)
         try:
             wiz_id = rpc.execute(*args)
         except Exception, exception:
@@ -246,7 +246,7 @@ class Wizard(object):
             dia.destroy()
             dia = None
         try:
-            rpc.execute('wizard', action, 'delete', wiz_id)
+            rpc.execute('wizard', action, 'delete', wiz_id, rpc.CONTEXT)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
         except Exception:

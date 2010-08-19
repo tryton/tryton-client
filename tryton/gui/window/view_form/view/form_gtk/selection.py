@@ -41,7 +41,7 @@ class Selection(WidgetInterface):
         if 'relation' in attrs:
             try:
                 result = rpc.execute('model', attrs['relation'], 'search_read',
-                        domain, 0, None, None, rpc.CONTEXT, ['rec_name'])
+                        domain, 0, None, None, ['rec_name'], rpc.CONTEXT)
                 selection = [(x['id'], x['rec_name']) for x in result]
             except Exception, exception:
                 common.process_exception(exception, self.window)

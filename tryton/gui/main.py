@@ -1078,12 +1078,14 @@ class Main(object):
             if not rpc._USER:
                 return
             if not exception:
-                res = rpc.execute('model', 'res.request', 'request_get')
+                res = rpc.execute('model', 'res.request', 'request_get',
+                        rpc.CONTEXT)
                 if not res:
                     return ([], [])
                 ids, ids2 = res
             else:
-                ids, ids2 = rpc.execute('model', 'res.request', 'request_get')
+                ids, ids2 = rpc.execute('model', 'res.request', 'request_get',
+                        rpc.CONTEXT)
             label = _('Requests (%s/%s)') % (len(ids), len(ids2))
             self.buttons['but_request'].set_label(label)
             self.tooltips.set_tip(self.buttons['but_request'], label)

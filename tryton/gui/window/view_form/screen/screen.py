@@ -292,8 +292,9 @@ class Screen(SignalEvent):
             ctx.update(rpc.CONTEXT)
             ctx.update(self.context)
             args = ('model', self.model_name, 'fields_view_get',
-                    view_id, view_type, ctx,
-                    self.parent and False or CONFIG['form.toolbar'])
+                    view_id, view_type,
+                    self.parent and False or CONFIG['form.toolbar'],
+                    ctx)
             try:
                 view = rpc.execute(*args)
             except Exception, exception:

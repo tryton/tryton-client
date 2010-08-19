@@ -103,7 +103,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 'search_read',
                                 self.fields_type[field].get('domain', []),
                                 0, None, None,
-                                rpc.CONTEXT, ['rec_name'])
+                                ['rec_name'], rpc.CONTEXT)
                         selection = [(x['id'], x['rec_name']) for x in result]
                     except Exception:
                         selection = []

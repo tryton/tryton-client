@@ -646,7 +646,8 @@ class ParserForm(ParserInterface):
         obj_id = self.screen.current_record.save(force_reload=False)
         try:
             lang_ids = rpc.execute('model', 'ir.lang',
-                    'search', [('translatable', '=', '1')])
+                    'search', [('translatable', '=', '1')],
+                    rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False
@@ -657,9 +658,11 @@ class ParserForm(ParserInterface):
             return False
         try:
             lang_ids += rpc.execute('model', 'ir.lang',
-                    'search', [('code', '=', 'en_US')])
+                    'search', [('code', '=', 'en_US')],
+                    rpc.CONTEXT)
             langs = rpc.execute('model', 'ir.lang',
-                    'read', lang_ids, ['code', 'name'])
+                    'read', lang_ids, ['code', 'name'],
+                    rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False

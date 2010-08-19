@@ -88,7 +88,7 @@ class Action(object):
             action_type = res['type']
         try:
             res = rpc.execute('model', action_type, 'search_read',
-                    [('action', '=', act_id)], 0, 1, None, ctx, None)
+                    [('action', '=', act_id)], 0, 1, None, None, ctx)
         except Exception, exception:
             common.process_exception(exception, window)
             return
