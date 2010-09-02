@@ -50,7 +50,7 @@ class Record(SignalEvent):
 
 
     def __init__(self, model_name, obj_id, window, group=None, parent=None,
-            parent_name='', new=False):
+            parent_name=''):
         super(Record, self).__init__()
         self.window = window
         self.model_name = model_name
@@ -63,19 +63,13 @@ class Record(SignalEvent):
         self.group = group
         if group is not None:
             assert model_name == group.model_name
-        self.value = {}
         self.state_attrs = {}
         self.__modified = False
         self.modified_fields = {}
         self._timestamp = None
         self.attachment_count = -1
         self.next = {} # Used in Group list
-        for key, val in self.group.fields.items():
-            self.value[key] = val.create(self)
-            if (new and val.attrs['type']=='one2many') \
-                    and (val.attrs.get('mode','tree,form').startswith('form')):
-                record = self.value[key].new()
-                self.value[key].add(record)
+        self.value = {}
 
     def __getitem__(self, name):
         if name not in self._loaded and self.id > 0:

@@ -107,9 +107,6 @@ class CharField(object):
     def get_default(self, record):
         return self.get(record)
 
-    def create(self, record):
-        return False
-
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
         state_changes = record.expr_eval(self.attrs.get('states', {}),
                 check_load=False)
@@ -258,9 +255,6 @@ class M2OField(CharField):
     internal = (id, name)
     '''
 
-    def create(self, record):
-        return (False, '')
-
     def get(self, record, check_load=True, readonly=True, modified=False):
         if record.value.get(self.name):
             if isinstance(record.value[self.name], (int, basestring, long)):
@@ -305,7 +299,7 @@ class M2OField(CharField):
             record.modified_fields.setdefault(self.name)
 
     def set_client(self, record, value, force_change=False):
-        internal = record.value.get(self.name)
+        internal = record.value.get(self.name) or (False, '')
         prev_modified = record.modified
         self.set(record, value)
         if (internal[0] or False) != (record.value[self.name][0] or False):
@@ -344,22 +338,26 @@ class O2MField(CharField):
         super(O2MField, self).__init__(parent, attrs)
         self.context = {}
 
-    def create(self, record):
-        from group import Group
-        group = Group(self.attrs['relation'], {}, record.window,
-                parent=record, parent_name=self.attrs.get('relation_field', ''),
-                context=self.context,
-                parent_datetime_field=self.attrs.get('datetime_field'))
-        group.signal_connect(group, 'group-changed', self._group_changed)
-        return group
-
     def _group_changed(self, group, record):
         record.parent.modified = True
         record.parent.modified_fields.setdefault(self.name)
         self.sig_changed(record.parent)
         record.parent.signal('record-changed')
 
+    def _set_default_value(self, record):
+        if record.value.get(self.name):
+            return
+        from group import Group
+        group = Group(self.attrs['relation'], {}, record.window,
+                parent=record,
+                parent_name=self.attrs.get('relation_field', ''),
+                context=self.context,
+                parent_datetime_field=self.attrs.get('datetime_field'))
+        group.signal_connect(group, 'group-changed', self._group_changed)
+        record.value[self.name] = group
+
     def get_client(self, record):
+        self._set_default_value(record)
         return record.value.get(self.name)
 
     def get(self, record, check_load=True, readonly=True, modified=False):
@@ -458,10 +456,11 @@ class O2MField(CharField):
                 parent_datetime_field=self.attrs.get('datetime_field'))
         group.signal_connect(group,
                 'group-changed', self._group_changed)
-        group.record_deleted.extend(x for x in record.value[self.name]
-                if x.id > 0)
-        group.record_deleted.extend(record.value[self.name].record_deleted)
-        group.record_removed.extend(record.value[self.name].record_removed)
+        if record.value.get(self.name):
+            group.record_deleted.extend(x for x in record.value[self.name]
+                    if x.id > 0)
+            group.record_deleted.extend(record.value[self.name].record_deleted)
+            group.record_removed.extend(record.value[self.name].record_removed)
         record.value[self.name] = group
         for vals in (value or []):
             new_record = record.value[self.name].new(default=False)
@@ -470,6 +469,7 @@ class O2MField(CharField):
         return True
 
     def set_on_change(self, record, value):
+        self._set_default_value(record)
         if isinstance(value, (list, tuple)):
             return self.set(record, value, modified=True)
 
@@ -524,7 +524,7 @@ class O2MField(CharField):
 
     def validate(self, record):
         res = True
-        for record2 in record.value[self.name]:
+        for record2 in record.value[self.name] or []:
             if not record2.loaded:
                 continue
             if not record2.validate():
@@ -538,6 +538,7 @@ class O2MField(CharField):
         return res
 
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
+        self._set_default_value(record)
         super(O2MField, self).state_set(record, states=states)
         if self.get_state_attrs(record).get('readonly', False):
             record.value[self.name].readonly = True

@@ -77,10 +77,9 @@ class Group(SignalEvent, list):
             self.signal('group-list-changed', ('record-removed', idx))
 
     def clear(self):
-        while len(self):
-            self.pop()
-            if not self.lock_signal:
-                self.signal('group-list-changed', ('record-removed', len(self)))
+        del self[:]
+        if not self.lock_signal:
+            self.signal('group-list-changed', ('group-cleared',))
         self.record_removed = []
         self.record_deleted = []
 
@@ -233,7 +232,7 @@ class Group(SignalEvent, list):
 
     def new(self, default=True, domain=None, context=None, signal=True):
         record = Record(self.model_name, None, self.window, group=self,
-                parent=self.parent, parent_name=self.parent_name, new=True)
+                parent=self.parent, parent_name=self.parent_name)
         record.signal_connect(self, 'record-changed', self._record_changed)
         record.signal_connect(self, 'record-modified', self._record_modified)
         if default:
@@ -301,9 +300,6 @@ class Group(SignalEvent, list):
             else:
                 self.fields[name].attrs.update(attr)
         self.load_fields(to_add)
-        for name in to_add:
-            for record in self:
-                record.value[name] = self.fields[name].create(record)
 
         if not len(self):
             return True
