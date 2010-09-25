@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
+import pango
 import gettext
 import os
 import re
@@ -460,6 +461,7 @@ def error(title, parent, details):
     textview.set_buffer(buf)
     textview.set_editable(False)
     textview.set_sensitive(True)
+    textview.modify_font(pango.FontDescription("monospace"))
     box.pack_start(textview, False, False)
 
     viewport.add(box)
