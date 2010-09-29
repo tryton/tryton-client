@@ -239,9 +239,14 @@ class Screen(SignalEvent):
     def destroy(self):
         for view in self.views:
             view.destroy()
-            del view
         self.group.signal_unconnect(self)
-        del self.views
+        self.group.destroy()
+        self.parent = None
+        self.__window = None
+        self.__group = None
+        self.__current_record = None
+        self.screen_container = None
+        self.widget = None
 
     def switch_view(self, view_type=None, default=True, context=None):
         self.current_view.set_value()

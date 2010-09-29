@@ -460,3 +460,11 @@ class Record(SignalEvent):
             except Exception:
                 return 0
         return self.attachment_count
+
+    def destroy(self):
+        super(Record, self).destroy()
+        self.window = None
+        self.parent = None
+        self.group = None
+        self.value = None
+        self.next = None

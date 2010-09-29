@@ -381,7 +381,6 @@ class ViewTree(object):
                     return True
 
     def reload(self):
-        del self.model
         self.model = ViewTreeModel(self.ids, self.view_info, self.fields_order,
                 self.fields, self.fields_attrs, context=self.context,
                 pixbufs=self.pixbufs, treeview=self.view)

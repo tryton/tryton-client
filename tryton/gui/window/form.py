@@ -5,7 +5,6 @@ import gettext
 import gtk
 import gobject
 import locale
-import gc
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
@@ -200,11 +199,10 @@ class Form(SignalEvent):
     def destroy(self):
         self.screen.signal_unconnect(self)
         self.screen.destroy()
-        del self.screen
-        del self.widget
+        self.screen = None
+        self.widget = None
         self.scrolledwindow.destroy()
-        del self.scrolledwindow
-        gc.collect()
+        self.scrolledwindow = None
 
     def sel_ids_get(self):
         return self.screen.sel_ids_get()

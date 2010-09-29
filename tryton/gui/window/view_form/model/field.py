@@ -134,6 +134,9 @@ class CharField(object):
     def get_timestamp(self, record):
         return {}
 
+    def destroy(self):
+        self.parent = None
+
 
 class SelectionField(CharField):
 

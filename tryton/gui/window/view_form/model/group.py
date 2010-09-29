@@ -334,3 +334,17 @@ class Group(SignalEvent, list):
         record = self.__id2record[old_id]
         self.__id2record[record.id] = record
         del self.__id2record[old_id]
+
+    def destroy(self):
+        super(Group, self).destroy()
+        self.__window = None
+        self.parent = None
+        for field in self.fields.itervalues():
+            field.destroy()
+        self.fields = None
+        self.record_removed = None
+        self.record_deleted = None
+        self.__id2record = None
+        for record in self:
+            record.destroy()
+        self[:] = []

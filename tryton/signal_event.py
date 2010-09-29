@@ -36,3 +36,6 @@ class SignalEvent(object):
                 else:
                     i += 1
         return True
+
+    def destroy(self):
+        self.__connects = None

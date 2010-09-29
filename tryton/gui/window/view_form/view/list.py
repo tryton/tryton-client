@@ -490,7 +490,7 @@ class ViewList(ParserView):
         pass
 
     def __str__(self):
-        return 'ViewList (%s)' % self.screen.model_name
+        return 'ViewList (%d)' % id(self)
 
     def __getitem__(self, name):
         return None
@@ -518,9 +518,9 @@ class ViewList(ParserView):
                 except Exception:
                     pass
         self.widget_tree.destroy()
-        del self.screen
-        del self.widget_tree
-        del self.widget
+        self.screen = None
+        self.widget_tree = None
+        self.widget = None
 
     def __sig_switch(self, treeview, path, column):
         if column._type == 'button':
