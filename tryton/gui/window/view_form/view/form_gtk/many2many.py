@@ -151,7 +151,9 @@ class Many2Many(WidgetInterface):
     def display(self, record, field):
         super(Many2Many, self).display(record, field)
         if field is None:
+            self.screen.new_group()
             self.screen.current_record = None
+            self.screen.parent = True
             self.screen.display()
             return False
         new_group = field.get_client(record)

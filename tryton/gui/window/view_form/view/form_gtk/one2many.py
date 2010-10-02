@@ -5,7 +5,6 @@ import gettext
 from tryton.common import TRYTON_ICON, COLOR_SCHEMES
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
-from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.widget_search.form import _LIMIT
@@ -324,7 +323,9 @@ class One2Many(WidgetInterface):
     def display(self, record, field):
         super(One2Many, self).display(record, field)
         if field is None:
+            self.screen.new_group()
             self.screen.current_record = None
+            self.screen.parent = True
             self.screen.display()
             return False
         new_group = field.get_client(record)

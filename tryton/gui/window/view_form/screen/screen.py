@@ -50,8 +50,7 @@ class Screen(SignalEvent):
         self.parent_name = None
         self.__window = window
         self.__group = None
-        self.group = Group(model_name, {}, self.window, context=self.context,
-                readonly=readonly)
+        self.new_group()
         self.__current_record = None
         self.current_record = None
         self.screen_container = ScreenContainer()
@@ -177,6 +176,10 @@ class Screen(SignalEvent):
         self.__group.add_fields(fields)
 
     group = property(__get_group, __set_group)
+
+    def new_group(self, readonly=False):
+        self.group = Group(self.model_name, {}, self.window,
+                context=self.context, readonly=readonly)
 
     def _group_cleared(self, group, signal):
         for view in self.views:
