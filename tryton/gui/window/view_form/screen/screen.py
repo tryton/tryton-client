@@ -608,7 +608,8 @@ class Screen(SignalEvent):
             if self.current_view.view_type == 'calendar' and \
                     len(self.views) > 1:
                 self.switch_view()
-            self.current_view.display()
+            for view in self.views:
+                view.display()
             self.current_view.widget.set_sensitive(
                     bool(self.group \
                             or (self.current_view.view_type != 'form') \
