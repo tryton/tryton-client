@@ -348,7 +348,7 @@ class O2MField(CharField):
         record.parent.signal('record-changed')
 
     def _set_default_value(self, record):
-        if record.value.get(self.name):
+        if record.value.get(self.name) is not None:
             return
         from group import Group
         group = Group(self.attrs['relation'], {}, record.window,
