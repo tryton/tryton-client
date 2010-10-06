@@ -1,6 +1,8 @@
 * Allow to configure search limit
 * Add Previous/Next on list view
 
+* Set non-applicable form controls in one2many view to be insensitive
+
 Version 1.6.0 - 2010-05-08
 * Bug fixes (see mercurial logs for details)
 * Don't stop wizard execution when exception occurs

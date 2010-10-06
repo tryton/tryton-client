@@ -22,6 +22,7 @@ class One2Many(WidgetInterface):
                 attrs=attrs)
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
+        self._readonly = True
 
         hbox = gtk.HBox(homogeneous=False, spacing=0)
         menubar = gtk.MenuBar()
@@ -113,28 +114,28 @@ class One2Many(WidgetInterface):
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-        but_pre = gtk.Button()
-        tooltips.set_tip(but_pre, _('Previous'))
-        but_pre.connect('clicked', self._sig_previous)
+        self.but_pre = gtk.Button()
+        tooltips.set_tip(self.but_pre, _('Previous'))
+        self.but_pre.connect('clicked', self._sig_previous)
         img_pre = gtk.Image()
         img_pre.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_pre.set_alignment(0.5, 0.5)
-        but_pre.add(img_pre)
-        but_pre.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_pre, expand=False, fill=False)
+        self.but_pre.add(img_pre)
+        self.but_pre.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(self.but_pre, expand=False, fill=False)
 
         self.label = gtk.Label('(0,0)')
         hbox.pack_start(self.label, expand=False, fill=False)
 
-        but_next = gtk.Button()
-        tooltips.set_tip(but_next, _('Next'))
-        but_next.connect('clicked', self._sig_next)
+        self.but_next = gtk.Button()
+        tooltips.set_tip(self.but_next, _('Next'))
+        self.but_next.connect('clicked', self._sig_next)
         img_next = gtk.Image()
         img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_next.set_alignment(0.5, 0.5)
-        but_next.add(img_next)
-        but_next.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_next, expand=False, fill=False)
+        self.but_next.add(img_next)
+        self.but_next.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(self.but_next, expand=False, fill=False)
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
@@ -204,6 +205,7 @@ class One2Many(WidgetInterface):
         self.color_set(self.color_name)
 
     def _readonly_set(self, value):
+        self._readonly = value
         self.but_new.set_sensitive(not value)
         self.but_del.set_sensitive(not value)
         if self.attrs.get('add_remove'):
@@ -317,6 +319,25 @@ class One2Many(WidgetInterface):
         name = '_'
         if signal_data[0] >= 0:
             name = str(signal_data[0] + 1)
+            self.but_open.set_sensitive(True)
+            self.but_del.set_sensitive(not self._readonly)
+            if self.attrs.get('add_remove'):
+                self.but_remove.set_sensitive(not self._readonly)
+            if signal_data[0] + 1 < signal_data[1]:
+                self.but_next.set_sensitive(True)
+            else:
+                self.but_next.set_sensitive(False)
+            if signal_data[0] > 0:
+                self.but_pre.set_sensitive(True)
+            else:
+                self.but_pre.set_sensitive(False)
+        else:
+            self.but_open.set_sensitive(False)
+            self.but_del.set_sensitive(False)
+            self.but_next.set_sensitive(False)
+            self.but_pre.set_sensitive(False)
+            if self.attrs.get('add_remove'):
+                self.but_remove.set_sensitive(False)
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
