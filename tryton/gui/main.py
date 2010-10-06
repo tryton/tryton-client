@@ -13,6 +13,7 @@ import tryton.common as common
 from tryton.action import Action
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
+from tryton.gui.window import Limit
 from tryton.gui.window import FileActions
 from tryton.gui.window import Email
 from tryton.gui.window.dblogin import DBLogin
@@ -736,6 +737,12 @@ class Main(object):
         if (CONFIG['client.form_tab'] or 'left') == 'bottom':
             radiomenuitem_bottom.set_active(True)
 
+        menuitem_limit = gtk.MenuItem(_('Search Limit...'))
+        self.menuitem_limit = menuitem_limit
+        menuitem_limit.connect('activate', self.sig_limit)
+        menuitem_limit.set_accel_path('<tryton>/Options/Search Limit')
+        menu_options.add(menuitem_limit)
+
         menuitem_actions = gtk.MenuItem(_('File _Actions...'))
         self.menuitem_actions = menuitem_actions
         menuitem_actions.connect('activate', self.sig_file_actions)
@@ -1005,6 +1012,9 @@ class Main(object):
     @staticmethod
     def sig_form_tab(option):
         CONFIG['client.form_tab'] = option
+
+    def sig_limit(self, widget):
+        Limit(self.window).run()
 
     def sig_file_actions(self, widget):
         FileActions(self.window).run()

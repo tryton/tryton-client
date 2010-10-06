@@ -6,7 +6,7 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
-from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.config import CONFIG
 import tryton.common as common
 import gettext
 
@@ -105,7 +105,7 @@ class Many2Many(WidgetInterface):
             else:
                 dom = domain
             ids = rpc.execute('model', self.attrs['relation'], 'search',
-                    dom , 0, _LIMIT, None, context)
+                    dom , 0, CONFIG['client.limit'], None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False

@@ -12,7 +12,7 @@ from tryton.gui.window.view_tree.view_tree import ViewTree
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import gettext
-_LIMIT = 2000
+from tryton.config import CONFIG
 _ = gettext.gettext
 
 
@@ -227,8 +227,8 @@ class Action(object):
     def display(self):
         try:
             res_ids = rpc.execute('model', self.action['res_model'], 'search',
-                    self.domain, 0, self.action['limit'] or _LIMIT, None,
-                    rpc.CONTEXT)
+                    self.domain, 0, self.action['limit'] or
+                    CONFIG['client.limit'], None, rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self._window)
             return False

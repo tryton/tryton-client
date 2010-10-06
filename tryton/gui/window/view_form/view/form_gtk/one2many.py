@@ -7,7 +7,7 @@ from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
-from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.config import CONFIG
 import tryton.common as common
 import tryton.rpc as rpc
 import pango
@@ -293,8 +293,8 @@ class One2Many(WidgetInterface):
                     ['OR', domain, ('id', 'in', removed_ids)]]
             else:
                 dom = ['OR', domain, ('id', 'in', removed_ids)]
-            ids = rpc.execute('model', self.attrs['relation'],
-                    'search', dom, 0, _LIMIT, None, context)
+            ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
+                    0, CONFIG['client.limit'], None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False

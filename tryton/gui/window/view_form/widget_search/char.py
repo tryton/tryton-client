@@ -10,8 +10,10 @@ _ = gettext.gettext
 
 class Char(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None):
-        super(Char, self).__init__(name, parent, attrs=attrs, context=context)
+    def __init__(self, name, parent, attrs=None, context=None,
+            on_change=None):
+        super(Char, self).__init__(name, parent, attrs=attrs, context=context,
+                on_change=on_change)
 
         self.widget = gtk.HBox()
 
@@ -30,12 +32,14 @@ class Char(Interface):
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)
+        self.combo.connect('changed', self.on_change)
         self.widget.pack_start(self.combo, False, False)
 
         self.entry = gtk.Entry()
         self.entry.set_max_length(int(self.attrs.get('size', 0)))
         self.entry.set_width_chars(5)
         self.entry.set_property('activates_default', True)
+        self.entry.connect('key_press_event', self.on_change)
         self.widget.pack_start(self.entry, True, True)
         self.widget.show_all()
 

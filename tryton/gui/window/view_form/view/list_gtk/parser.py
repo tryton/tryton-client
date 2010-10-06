@@ -6,7 +6,7 @@ from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
-from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.config import CONFIG
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
@@ -630,7 +630,8 @@ class M2M(Char):
                     domain]
         else:
             dom = domain
-        args = ('model', relation, 'search', dom, 0, _LIMIT, None, context)
+        args = ('model', relation, 'search', dom, 0, CONFIG['client.limit'],
+                None, context)
         try:
             ids = rpc.execute(*args)
         except Exception, exception:

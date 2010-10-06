@@ -16,9 +16,10 @@ _ = gettext.gettext
 
 class Calendar(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None):
+    def __init__(self, name, parent, attrs=None, context=None,
+            on_change=None):
         super(Calendar, self).__init__(name, parent, attrs=attrs,
-                context=context)
+                context=context, on_change=on_change)
 
         tooltips = Tooltips()
         self.widget = gtk.HBox(spacing=3)
@@ -39,12 +40,14 @@ class Calendar(Interface):
         self.combo.set_active(0)
         self.widget.pack_start(self.combo, False, False)
         self.combo.connect('changed', self._changed)
+        self.combo.connect('changed', self.on_change)
 
         self.widget1 = date_widget.ComplexEntry(self.format, spacing=3)
         self.widget1.show()
         self.entry1 = self.widget1.widget
         self.entry1.set_property('width-chars', 10)
         self.entry1.set_property('activates_default', True)
+        self.entry1.connect('key_press_event', self.on_change)
         tooltips.set_tip(self.entry1, _('Start date'))
         self.widget.pack_start(self.widget1, expand=False, fill=True)
 
@@ -66,6 +69,7 @@ class Calendar(Interface):
         self.entry2 = self.widget2.widget
         self.entry2.set_property('width-chars', 10)
         self.entry2.set_property('activates_default', True)
+        self.entry2.connect('key_press_event', self.on_change)
         tooltips.set_tip(self.entry2, _('End date'))
         self.widget.pack_start(self.widget2, expand=False, fill=True)
 
@@ -187,6 +191,7 @@ class Calendar(Interface):
             year, month, day = cal.get_date()
             date = datetime.date(year, month + 1, day)
             dest.set_text(datetime_strftime(date, self.format))
+            self.on_change()
         win.destroy()
 
     def clear(self):

@@ -6,8 +6,6 @@ import sys
 import gettext
 from tryton.config import CONFIG
 
-_LIMIT = 20000
-
 _ = gettext.gettext
 
 
@@ -77,7 +75,8 @@ class _container(object):
 
 class Parse(object):
 
-    def __init__(self, parent, fields, model='', context=None):
+    def __init__(self, parent, fields, model='', context=None,
+            on_change=None):
         self.fields = fields
         self.parent = parent
         self.model = model
@@ -93,6 +92,7 @@ class Parse(object):
         self.notebooks = []
         self.dict_widget = {}
         self.context = context or {}
+        self.on_change = on_change
 
     def _psr_start(self, name, attrs):
 
@@ -118,7 +118,8 @@ class Parse(object):
         if ftype not in WIDGETS_TYPE:
             return False
         widget_act = WIDGETS_TYPE[ftype][0](str(attrs['name']), self.parent,
-                attrs=self.fields[attrs['name']], context=self.context)
+                attrs=self.fields[attrs['name']], context=self.context,
+                on_change=self.on_change)
         if 'string' in self.fields[str(attrs['name'])]:
             label = self.fields[str(attrs['name'])]['string'] + _(':')
         else:
@@ -137,8 +138,8 @@ class Parse(object):
         hb_param.pack_start(gtk.Label(_('Limit:')), expand=False, fill=False)
 
         self.spin_limit.set_numeric(False)
-        self.spin_limit.set_adjustment(gtk.Adjustment(value=_LIMIT, lower=1,
-            upper=sys.maxint, step_incr=10, page_incr=100))
+        self.spin_limit.set_adjustment(gtk.Adjustment(value=CONFIG['client.limit'],
+            lower=1, upper=sys.maxint, step_incr=10, page_incr=100))
         self.spin_limit.set_property('visible', True)
 
         hb_param.pack_start(self.spin_limit, expand=False, fill=False)
@@ -147,7 +148,7 @@ class Parse(object):
 
         self.spin_offset.set_numeric(False)
         self.spin_offset.set_adjustment(gtk.Adjustment(value=0, lower=0,
-            upper=sys.maxint, step_incr=_LIMIT, page_incr=100))
+            upper=sys.maxint, step_incr=CONFIG['client.limit'], page_incr=100))
 
         hb_param.pack_start(self.spin_offset, expand=False, fill=False)
 
@@ -206,7 +207,8 @@ class Form(object):
             domain = []
         if context is None:
             context = {}
-        parser = Parse(parent, fields, model=model, context=context)
+        parser = Parse(parent, fields, model=model, context=context,
+                on_change=self.on_change)
         self.parent = parent
         self.fields = fields
         self.model = model
@@ -236,6 +238,18 @@ class Form(object):
         self.id = 0
         for i in self.widgets.itervalues():
             i[0].clear()
+        self.spin_offset.set_value(0)
+
+    def next(self):
+        self.spin_offset.set_value(self.spin_offset.get_value()
+                + self.spin_limit.get_value())
+
+    def prev(self):
+        self.spin_offset.set_value(max(self.spin_offset.get_value()
+                - self.spin_limit.get_value(), 0))
+
+    def on_change(self, *args):
+        self.spin_offset.set_value(0)
 
     def limit_changed(self, widget):
         self.spin_offset.set_increments(step=self.spin_limit.get_value(),
@@ -243,7 +257,7 @@ class Form(object):
 
     def set_limit(self, value):
         if not value:
-            value = _LIMIT
+            value = CONFIG['client.limit']
         return self.spin_limit.set_value(value)
 
     def get_limit(self):

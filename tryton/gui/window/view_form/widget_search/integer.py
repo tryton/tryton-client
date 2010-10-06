@@ -11,9 +11,10 @@ _ = gettext.gettext
 
 class Integer(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None):
+    def __init__(self, name, parent, attrs=None, context=None,
+            on_change=None):
         super(Integer, self).__init__(name, parent, attrs=attrs,
-                context=context)
+                context=context, on_change=on_change)
         self.widget = gtk.HBox(spacing=3)
 
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
@@ -30,6 +31,7 @@ class Integer(Interface):
         self.combo.set_active(0)
         self.widget.pack_start(self.combo, False, False)
         self.combo.connect('changed', self._changed)
+        self.combo.connect('changed', self.on_change)
 
         self.entry1 = gtk.Entry()
         self.entry1.set_max_length(0)
@@ -37,6 +39,7 @@ class Integer(Interface):
         self.entry1.set_activates_default(True)
         self.entry1.set_alignment(1.0)
         self.entry1.connect('insert_text', self.sig_insert_text)
+        self.entry1.connect('key_press_event', self.on_change)
         self.widget.pack_start(self.entry1, expand=True, fill=True)
         self.separator = gtk.Label('-')
         self.widget.pack_start(self.separator, expand=False, fill=False)
@@ -46,6 +49,7 @@ class Integer(Interface):
         self.entry2.set_activates_default(True)
         self.entry2.set_alignment(1.0)
         self.entry2.connect('insert_text', self.sig_insert_text)
+        self.entry2.connect('key_press_event', self.on_change)
         self.widget.pack_start(self.entry2, expand=True, fill=True)
 
         self.widget.show_all()

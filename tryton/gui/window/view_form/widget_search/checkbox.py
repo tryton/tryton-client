@@ -9,14 +9,16 @@ _ = gettext.gettext
 
 class CheckBox(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None):
+    def __init__(self, name, parent, attrs=None, context=None,
+            on_change=None):
         super(CheckBox, self).__init__(name, parent, attrs=attrs,
-                context=context)
+                context=context, on_change=on_change)
 
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(True)
         self.widget.child.set_property('activates_default', True)
         self.widget.child.connect('key_press_event', self.sig_key_press)
+        self.widget.child.connect('key_press_event', self.on_change)
         self.widget.set_focus_chain([self.widget.child])
 
         if self.name != 'active' or \

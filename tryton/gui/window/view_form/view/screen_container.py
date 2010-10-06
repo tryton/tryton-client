@@ -14,7 +14,8 @@ class ScreenContainer(object):
         self.vbox = gtk.VBox(spacing=3)
         self.vbox.pack_end(self.viewport)
         self.filter_vbox = None
-        self.button = None
+        self.but_prev = None
+        self.but_next = None
         self.alternate_viewport = gtk.Viewport()
         self.alternate_viewport.set_shadow_type(gtk.SHADOW_NONE)
         self.alternate_view = False
@@ -22,7 +23,7 @@ class ScreenContainer(object):
     def widget_get(self):
         return self.vbox
 
-    def add_filter(self, widget, fnct, clear_fnct):
+    def add_filter(self, widget, fnct, clear_fnct, prev_fnct, next_fnct):
         tooltips = common.Tooltips()
 
         self.filter_vbox = gtk.VBox(spacing=0)
@@ -31,6 +32,30 @@ class ScreenContainer(object):
         label = gtk.Label(_('Search'))
         label.set_alignment(0.0, 0.5)
         hbox.pack_start(label, expand=True, fill=True)
+
+        but_prev = gtk.Button()
+        self.but_prev = but_prev
+        tooltips.set_tip(but_prev, _('Previous'))
+        but_prev.connect('clicked', prev_fnct)
+        img_prev = gtk.Image()
+        img_prev.set_from_stock('tryton-go-previous',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_prev.set_alignment(0.5, 0.5)
+        but_prev.add(img_prev)
+        but_prev.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(but_prev, expand=False, fill=False)
+
+        but_next = gtk.Button()
+        self.but_next = but_next
+        tooltips.set_tip(but_next, _('Next'))
+        but_next.connect('clicked', next_fnct)
+        img_next = gtk.Image()
+        img_next.set_from_stock('tryton-go-next',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_next.set_alignment(0.5, 0.5)
+        but_next.add(img_next)
+        but_next.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(but_next, expand=False, fill=False)
 
         but_find = gtk.Button()
         tooltips.set_tip(but_find, _('Find'))
@@ -61,6 +86,9 @@ class ScreenContainer(object):
         self.filter_vbox.pack_start(widget, expand=True, fill=True)
 
         self.vbox.pack_start(self.filter_vbox, expand=False, fill=True)
+
+        self.but_next.set_sensitive(False)
+        self.but_prev.set_sensitive(False)
 
         tooltips.enable()
 

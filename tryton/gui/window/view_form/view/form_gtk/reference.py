@@ -9,7 +9,7 @@ from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
 import tryton.rpc as rpc
 import tryton.common as common
-from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.config import CONFIG
 
 _ = gettext.gettext
 
@@ -179,8 +179,8 @@ class Reference(WidgetInterface):
                                 domain]
                     else:
                         dom = domain
-                    ids = rpc.execute('model', model,
-                            'search', dom, 0, _LIMIT, None, context)
+                    ids = rpc.execute('model', model, 'search', dom, 0,
+                            CONFIG['client.limit'], None, context)
                 except Exception, exception:
                     self.focus_out = True
                     self.changed = True

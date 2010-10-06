@@ -11,7 +11,7 @@ from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 import tryton.rpc as rpc
 from tryton.action import Action
-from tryton.gui.window.view_form.widget_search.form import _LIMIT
+from tryton.config import CONFIG
 from tryton.pyson import PYSONEncoder
 import pango
 
@@ -143,7 +143,8 @@ class Many2One(WidgetInterface):
                     else:
                         dom = domain
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'search', dom, 0, _LIMIT, None, context)
+                            'search', dom, 0, CONFIG['client.limit'], None,
+                            context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self.window)
@@ -230,7 +231,8 @@ class Many2One(WidgetInterface):
                     else:
                         dom = domain
                     ids = rpc.execute('model', self.attrs['relation'],
-                            'search', dom, 0, _LIMIT, None, context)
+                            'search', dom, 0, CONFIG['client.limit'], None,
+                            context)
                 except Exception, exception:
                     self.focus_out = True
                     common.process_exception(exception, self.window)

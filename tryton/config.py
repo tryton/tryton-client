@@ -82,6 +82,7 @@ class ConfigManager(object):
                 },
             'client.email': '',
             'client.can_change_accelerators': False,
+            'client.limit': 1000,
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
         }
@@ -153,6 +154,8 @@ class ConfigManager(object):
                     value = True
                 elif value.lower() == 'false':
                     value = False
+                if section == 'client' and name == 'limit':
+                    value = float(value)
                 self.config[section + '.' + name] = value
         return True
 

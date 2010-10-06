@@ -94,12 +94,21 @@ class Screen(SignalEvent):
                         self.window, self.domain, (self, self.search_filter),
                         self.context)
                 self.screen_container.add_filter(self.filter_widget.widget,
-                        self.search_filter, self.search_clear)
+                        self.search_filter, self.search_clear,
+                        self.search_prev, self.search_next)
                 self.filter_widget.set_limit(self.limit)
                 self.filter_widget.value = self.search_value
             self.screen_container.show_filter()
         else:
             self.screen_container.hide_filter()
+
+    def search_prev(self, widget=None):
+        self.filter_widget.prev()
+        self.search_filter()
+
+    def search_next(self, widget=None):
+        self.filter_widget.next()
+        self.search_filter()
 
     def search_clear(self, widget=None):
         self.filter_widget.clear()
@@ -144,6 +153,12 @@ class Screen(SignalEvent):
                     self.search_count = len(ids)
         except Exception:
             ids = []
+        self.screen_container.but_prev.set_sensitive(bool(offset))
+        if (len(ids) == limit
+                and self.search_count > limit + offset):
+            self.screen_container.but_next.set_sensitive(True)
+        else:
+            self.screen_container.but_next.set_sensitive(False)
         if only_ids:
             return ids
         self.clear()

@@ -11,9 +11,10 @@ _ = gettext.gettext
 
 class Selection(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None):
+    def __init__(self, name, parent, attrs=None, context=None,
+            on_change=None):
         super(Selection, self).__init__(name, parent, attrs=attrs,
-                context=context)
+                context=context, on_change=on_change)
 
         self.widget = gtk.HBox()
 
@@ -27,12 +28,14 @@ class Selection(Interface):
                 ):
             self.liststore.append(oper)
         self.combo.set_active(0)
+        self.combo.connect('changed', self.on_change)
         self.widget.pack_start(self.combo, False, False)
 
         self.entry = gtk.combo_box_entry_new_text()
         self.entry.child.set_editable(True)
         self.entry.child.set_property('activates_default', True)
         self.entry.child.connect('key_press_event', self.sig_key_press)
+        self.entry.child.connect('key_press_event', self.on_change)
         self.entry.set_focus_chain([self.entry.child])
         self._selection = {}
         selection = self.attrs.get('selection', [])

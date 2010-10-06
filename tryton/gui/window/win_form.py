@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 from tryton.common import TRYTON_ICON
 import tryton.common as common
+from tryton.config import CONFIG
 import gtk
 import pango
 import gettext
@@ -244,8 +245,8 @@ class WinForm(object):
                         '%' + self.wid_text.get_text() + '%'), domain]
             else:
                 dom = domain
-            ids = rpc.execute('model', self.attrs['relation'],
-                    'search', dom, 0, _LIMIT, None, context)
+            ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
+                    0, CONFIG['client.limit'], None, context)
         except Exception, exception:
             common.process_exception(exception, self.window)
             return False

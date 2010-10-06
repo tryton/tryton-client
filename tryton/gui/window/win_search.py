@@ -61,8 +61,10 @@ class WinSearch(object):
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_NONE)
         viewport.add(self.screen.widget)
+        self.screen.widget.show()
+        viewport.show()
         scrollwindow.add(viewport)
-        scrollwindow.show_all()
+        scrollwindow.show()
         self.view.widget_tree.connect('button_press_event', self.sig_button)
 
         self.model_name = model
