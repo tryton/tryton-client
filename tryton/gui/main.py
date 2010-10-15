@@ -30,9 +30,9 @@ import tryton.plugins
 import pango
 import time
 try:
-    import igemacintegration
+    import gtk_osxapplication
 except ImportError:
-    igemacintegration = None
+    gtk_osxapplication = None
 try:
     import gtkspell
 except Exception:
@@ -62,6 +62,11 @@ class Main(object):
 
         self.accel_group = gtk.AccelGroup()
         self.window.add_accel_group(self.accel_group)
+
+        self.macapp = None
+        if gtk_osxapplication is not None:
+            self.macapp = gtk_osxapplication.OSXApplication()
+            self.macapp.connect("NSApplicationBlockTermination", self.sig_close)
 
         gtk.accel_map_add_entry('<tryton>/File/Connect', gtk.keysyms.O,
                 gtk.gdk.CONTROL_MASK)
@@ -124,13 +129,9 @@ class Main(object):
         self.set_statusbar()
         self.set_menubar()
 
-        if igemacintegration:
-            self.macmenu = igemacintegration.MacMenu()
-            quit_item = gtk.MenuItem(_('Quit'))
-            quit_item.connect('activate', self.sig_close)
-            self.macmenu.set_quit_menu_item(quit_item)
-            self.macdock = igemacintegration.MacDock()
-            self.macdock.connect('quit-activate', self.sig_close)
+        if self.macapp is not None:
+            self.macapp.ready()
+
 
         self.vbox.pack_start(toolbar, False, True)
 
@@ -259,7 +260,19 @@ class Main(object):
         menu_help.set_accel_group(self.accel_group)
         menu_help.set_accel_path('<tryton>/Help')
 
-        self.menubar.show_all()
+        if self.macapp is not None:
+            self.menubar.set_no_show_all(True)
+            self.macapp.set_menu_bar(self.menubar)
+            self.macapp.insert_app_menu_item(self.aboutitem,0)
+            menuitem_file.show_all()
+            menuitem_user.show_all()
+            menuitem_form.show_all()
+            menuitem_options.show_all()
+            menuitem_plugins.show_all()
+            menuitem_shortcut.show_all()
+            menuitem_help.show_all()
+        else:
+            self.menubar.show_all()
 
     def set_statusbar(self):
         update = True
@@ -353,7 +366,6 @@ class Main(object):
         imagemenuitem_db_drop.set_accel_path('<tryton>/File/Database/Drop Database')
         menu_database.add(imagemenuitem_db_drop)
 
-        menu_file.add(gtk.SeparatorMenuItem())
 
         imagemenuitem_close = gtk.ImageMenuItem(_('_Quit...'), self.accel_group)
         image = gtk.Image()
@@ -361,7 +373,9 @@ class Main(object):
         imagemenuitem_close.set_image(image)
         imagemenuitem_close.connect('activate', self.sig_close)
         imagemenuitem_close.set_accel_path('<tryton>/File/Quit')
-        menu_file.add(imagemenuitem_close)
+        if self.macapp is None:
+            menu_file.add(gtk.SeparatorMenuItem())
+            menu_file.add(imagemenuitem_close)
         return menu_file
 
     def _set_menu_user(self):
@@ -798,7 +812,6 @@ class Main(object):
         imagemenuitem_shortcuts.set_accel_path('<tryton>/Help/Keyboard Shortcuts')
         menu_help.add(imagemenuitem_shortcuts)
 
-        menu_help.add(gtk.SeparatorMenuItem())
 
         imagemenuitem_about = gtk.ImageMenuItem(_('_About...'))
         image = gtk.Image()
@@ -806,7 +819,11 @@ class Main(object):
         imagemenuitem_about.set_image(image)
         imagemenuitem_about.connect('activate', self.sig_about)
         imagemenuitem_about.set_accel_path('<tryton>/Help/About')
-        menu_help.add(imagemenuitem_about)
+        self.aboutitem = imagemenuitem_about
+        if self.macapp is None:
+            menu_help.add(gtk.SeparatorMenuItem())
+            menu_help.add(imagemenuitem_about)
+
         return menu_help
 
     def _set_toolbar(self):
@@ -1289,13 +1306,17 @@ class Main(object):
         CONFIG.save()
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
-        gtk.main_quit()
+
+        if gtk.main_level() > 0:
+            gtk.main_quit()
 
     def sig_close(self, widget):
         if common.sur(_("Do you really want to quit?"), parent=self.window):
             if not self.sig_logout(widget):
                 return False
             Main.sig_quit()
+        else:
+            return True
 
     def sig_delete(self, widget, event):
         if common.sur(_("Do you really want to quit?"), parent=self.window):

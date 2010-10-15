@@ -71,6 +71,7 @@ elif os.name == 'mac' \
             'frameworks': 'librsvg-2.2.dylib',
             'plist': {
                 'CFBundleIdentifier': 'org.tryton',
+                'CFBundleName': 'Tryton',
             },
             'iconfile': os.path.join('share', 'pixmaps', 'tryton',
                 'tryton.icns'),
@@ -331,5 +332,5 @@ elif os.name == 'mac' \
                 + '.dmg')
         if os.path.isfile(dmg_file):
             os.remove(dmg_file)
-        Popen(['hdiutil', 'create', dmg_file, '-volname', '"Tryton Client ' +
-            VERSION + '"', '-fs', 'HFS+', '-srcfolder', dist_dir]).wait()
+        Popen(['hdiutil', 'create', dmg_file, '-volname', 'Tryton Client ' +
+            VERSION, '-fs', 'HFS+', '-srcfolder', dist_dir]).wait()

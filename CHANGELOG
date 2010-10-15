@@ -1,3 +1,4 @@
+* More fully integrate GTK menubar for Mac OS
 * Allow to configure search limit
 * Add Previous/Next on list view
 * Set non-applicable form controls in one2many view to be insensitive

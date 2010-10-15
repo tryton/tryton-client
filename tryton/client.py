@@ -8,7 +8,8 @@ import sys
 import pygtk
 pygtk.require('2.0')
 import gtk
-if os.name != 'nt':
+if not (os.name in ('nt', 'mac') or \
+        (hasattr(os, 'uname') and os.uname()[0] == 'Darwin')):
     gtk.gdk.threads_init()
 import logging
 
