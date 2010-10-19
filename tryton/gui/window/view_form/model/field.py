@@ -457,8 +457,6 @@ class O2MField(CharField):
                 parent_name=self.attrs.get('relation_field', ''),
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
-        group.signal_connect(group,
-                'group-changed', self._group_changed)
         if record.value.get(self.name):
             group.record_deleted.extend(x for x in record.value[self.name]
                     if x.id > 0)
@@ -469,6 +467,8 @@ class O2MField(CharField):
             new_record = record.value[self.name].new(default=False)
             new_record.set_default(vals, modified=modified)
             group.add(new_record)
+        group.signal_connect(group,
+                'group-changed', self._group_changed)
         return True
 
     def set_on_change(self, record, value):
