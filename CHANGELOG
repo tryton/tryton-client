@@ -1,3 +1,5 @@
+Version 1.8.0 - 2010-11-01
+* Bug fixes (see mercurial logs for details)
 * More fully integrate GTK menubar for Mac OS
 * Allow to configure search limit
 * Add Previous/Next on list view
