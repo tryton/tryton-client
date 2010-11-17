@@ -120,7 +120,7 @@ class WinImport(object):
         table.set_col_spacings(8)
         expander_csv_import.add(table)
 
-        label_import_csv_sep = gtk.Label(_("Field Separater:"))
+        label_import_csv_sep = gtk.Label(_("Field Separator:"))
         label_import_csv_sep.set_alignment(1, 0.5)
         table.attach(label_import_csv_sep, 0, 1, 0, 1)
         self.import_csv_sep = gtk.Entry()

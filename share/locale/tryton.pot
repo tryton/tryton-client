@@ -1384,7 +1384,7 @@ msgid "CSV Parameters"
 msgstr ""
 
 #: tryton/gui/window/win_import.py:123
-msgid "Field Separater:"
+msgid "Field Separator:"
 msgstr ""
 
 #: tryton/gui/window/win_import.py:132
