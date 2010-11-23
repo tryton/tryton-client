@@ -352,7 +352,8 @@ class WinImport(object):
             datas.append([x.decode(csv_data['combo']).encode('utf-8') \
                     for x in line])
         try:
-            res = rpc.execute('model', model, 'import_data', fields, datas)
+            res = rpc.execute('model', model, 'import_data', fields, datas,
+                    rpc.CONTEXT)
         except Exception, exception:
             common.process_exception(exception, self.dialog)
             return False
