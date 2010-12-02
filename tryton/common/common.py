@@ -454,6 +454,7 @@ def error(title, parent, details):
     label_error.set_markup('<b>' + _('Error: ') + '</b>' + title)
     label_error.set_alignment(0, 0.5)
     label_error.set_padding(-1, 14)
+    label_error.modify_font(pango.FontDescription("monospace"))
     box.pack_start(label_error, False, False)
     textview = gtk.TextView()
     buf = gtk.TextBuffer()
