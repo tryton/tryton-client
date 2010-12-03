@@ -90,7 +90,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
                                 pass
                         obj[field] = common.datetime_strftime(obj[field],
                                 display_format)
-            elif field_type in ('many2one',):
+            elif field_type in ('many2one', 'one2one'):
                 for obj in res_ids:
                     if obj[field]:
                         obj[field] = obj[field + '.rec_name']
@@ -144,7 +144,7 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         tree = []
         fields = self.fields_type.keys()
         for field_name in self.fields_type:
-            if self.fields_type[field_name]['type'] == 'many2one':
+            if self.fields_type[field_name]['type'] in ('many2one', 'one2one'):
                 fields.append(field_name + '.rec_name')
         if self.view.get('field_childs', False):
             res = self._read(ids, fields + [self.view['field_childs']])

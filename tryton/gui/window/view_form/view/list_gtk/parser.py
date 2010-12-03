@@ -572,6 +572,9 @@ class M2O(Char):
         else:
             return False, None
 
+class O2O(M2O):
+    pass
+
 class UnsettableColumn(Exception):
 
     def __init__(self):
@@ -911,4 +914,5 @@ CELLTYPES = {
     'sip': Char,
     'progressbar': ProgressBar,
     'reference': Reference,
+    'one2one': O2O,
 }

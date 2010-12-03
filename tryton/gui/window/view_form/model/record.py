@@ -95,7 +95,7 @@ class Record(SignalEvent):
                     ids, self.group.fields.keys() + \
                         [x + '.rec_name' for x in self.group.fields.keys()
                             if self.group.fields[x].attrs['type'] \
-                                    in ('many2one', 'reference')] + \
+                                    in ('many2one', 'one2one', 'reference')] + \
                         ['_timestamp'], ctx)
             try:
                 values = rpc.execute(*args)

@@ -1,3 +1,5 @@
+* Add One2One field
+
 Version 1.8.0 - 2010-11-01
 * Bug fixes (see mercurial logs for details)
 * More fully integrate GTK menubar for Mac OS

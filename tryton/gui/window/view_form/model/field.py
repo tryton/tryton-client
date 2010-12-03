@@ -332,6 +332,10 @@ class M2OField(CharField):
         return context
 
 
+class O2OField(M2OField):
+    pass
+
+
 class O2MField(CharField):
     '''
     internal = Group of the related objects
@@ -666,4 +670,5 @@ TYPES = {
     'boolean': BooleanField,
     'datetime': DateTimeField,
     'date': DateField,
+    'one2one': O2OField,
 }
