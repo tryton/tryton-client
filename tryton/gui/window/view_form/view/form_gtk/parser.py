@@ -827,6 +827,7 @@ from many2one import Many2One
 from url import Email, URL, CallTo, SIP
 from image import Image as Image2
 from progressbar import ProgressBar
+from one2one import One2One
 
 
 WIDGETS_TYPE = {
@@ -853,4 +854,5 @@ WIDGETS_TYPE = {
     'sip' : (SIP, 1, False, False),
     'image' : (Image2, 1, False, False),
     'progressbar': (ProgressBar, 1, False, False),
+    'one2one': (One2One, 1, False, False),
 }

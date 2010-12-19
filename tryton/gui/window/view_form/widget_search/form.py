@@ -317,4 +317,5 @@ WIDGETS_TYPE = {
     'many2many': (char.Char, 2),
     'callto': (char.Char, 2),
     'sip': (char.Char, 2),
+    'one2one': (char.Char, 2),
 }
