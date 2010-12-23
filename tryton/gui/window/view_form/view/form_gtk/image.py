@@ -154,7 +154,7 @@ class Image(WidgetInterface):
             data = decodestring(value)
 
         pixbuf = None
-        for ftype in ('jpeg', 'gif', 'png', 'bmp'):
+        for ftype in ('jpeg', 'gif', 'png', 'bmp', 'svg'):
             try:
                 loader = gtk.gdk.PixbufLoader(ftype)
                 loader.write(data, len(data))
