@@ -211,7 +211,7 @@ class Wizard(object):
                     dia = Dialog(res['arch'], res['fields'], res['state'],
                             res['object'], parent, action=action,
                             size=res['size'], context=ctx)
-                    dia.screen.current_record.set(datas['form'])
+                    dia.screen.current_record.set_default(datas['form'])
                 res2 = dia.run(datas['form'])
                 if not res2:
                     break
