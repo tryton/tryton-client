@@ -270,7 +270,8 @@ class Screen(SignalEvent):
         self.current_view.set_value()
         if self.current_record and self.current_record not in self.group:
             self.current_record = None
-        if self.current_record and not self.current_record.validate():
+        fields = self.current_view.get_fields()
+        if self.current_record and not self.current_record.validate(fields):
             self.screen_container.set(self.current_view.widget)
             self.current_view.set_cursor()
             self.current_view.display()
@@ -287,7 +288,7 @@ class Screen(SignalEvent):
                 break
         self.screen_container.set(self.current_view.widget)
         if self.current_record:
-            self.current_record.validate_set()
+            self.current_record.validate_set(fields)
         else:
             if self.current_view.view_type == 'form':
                 self.new(default=default, context=context)
@@ -361,6 +362,15 @@ class Screen(SignalEvent):
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
                 self.fields_view_tree = {'arch': arch, 'fields': fields}
+            break
+
+        if node.localName == 'tree':
+            loading = 'eager'
+        else:
+            loading = 'lazy'
+        for field in fields:
+            if field not in self.group.fields:
+                fields[field]['loading'] = loading
 
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
         if self.current_record and (self.current_record not in self.group):
@@ -384,8 +394,9 @@ class Screen(SignalEvent):
         if display:
             self.__current_view = len(self.views) - 1
             self.screen_container.set(self.current_view.widget)
+            fields = self.current_view.get_fields()
             if self.current_record:
-                self.current_record.validate_set()
+                self.current_record.validate_set(fields)
             else:
                 if self.current_view.view_type == 'form':
                     self.new()
@@ -427,7 +438,10 @@ class Screen(SignalEvent):
         record = self.group.new(default, self.domain, ctx)
         self.group.add(record, self.new_model_position())
         self.current_record = record
-        self.current_record.validate_set()
+        fields = None
+        if self.current_view:
+            fields = self.current_view.get_fields()
+        self.current_record.validate_set(fields)
         self.display()
         if self.current_view:
             self.current_view.set_cursor(new=True)
@@ -459,7 +473,8 @@ class Screen(SignalEvent):
             return False
         self.current_view.set_value()
         obj_id = False
-        if self.current_record.validate():
+        fields = self.current_view.get_fields()
+        if self.current_record.validate(fields):
             obj_id = self.current_record.save(force_reload=True)
         else:
             self.current_view.set_cursor()
@@ -468,7 +483,7 @@ class Screen(SignalEvent):
         if self.current_view.view_type == 'tree':
             for record in self.group:
                 if record.is_modified():
-                    if record.validate():
+                    if record.validate(fields):
                         obj_id = record.save(force_reload=True)
                     else:
                         self.current_view.set_cursor()
@@ -656,8 +671,9 @@ class Screen(SignalEvent):
                     and self.group[0]
         self.current_view.set_cursor(reset_view=False)
         if self.current_record:
-            self.current_record.validate_set()
-        self.display()
+            fields = self.current_view.get_fields()
+            self.current_record.validate_set(fields)
+        self.current_view.display()
 
     def display_prev(self):
         self.current_view.set_value()
@@ -685,8 +701,9 @@ class Screen(SignalEvent):
                     and self.group[-1]
         self.current_view.set_cursor(reset_view=False)
         if self.current_record:
-            self.current_record.validate_set()
-        self.display()
+            fields = self.current_view.get_fields()
+            self.current_record.validate_set(fields)
+        self.current_view.display()
 
     def sel_ids_get(self):
         return self.current_view.sel_ids_get()

@@ -258,6 +258,9 @@ class ViewList(ParserView):
 
         self.widget_tree.connect('key_press_event', self.on_keypress)
 
+    def get_fields(self):
+        return [col.name for col in self.widget_tree.get_columns() if col.name]
+
     def _sig_clicked(self, widget, action, atype):
         return self._action(action, atype)
 
@@ -548,7 +551,8 @@ class ViewList(ParserView):
                 and not self.screen.parent \
                 and previous_record != self.screen.current_record:
             if previous_record and \
-                    not (previous_record.validate() and previous_record.save()):
+                    not (previous_record.validate(self.get_fields())
+                            and previous_record.save()):
                 self.screen.current_record = previous_record
                 self.set_cursor()
                 return True

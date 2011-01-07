@@ -158,7 +158,8 @@ class EditableTreeView(gtk.TreeView):
             entry.editing_done_id = entry.connect('editing_done',
                     self.on_editing_done)
         if event.keyval in self.leaving_record_events:
-            if not record.validate():
+            fields = self.cells.keys()
+            if not record.validate(fields):
                 invalid_fields = record.invalid_fields
                 col = None
                 for col in self.get_columns():

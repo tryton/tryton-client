@@ -278,7 +278,8 @@ class WinForm(object):
         if self.but_cancel:
             self.screen.remove(delete=True)
         elif self.screen.current_record and \
-                not self.screen.current_record.validate():
+                not self.screen.current_record.validate(
+                        self.screen.current_view.get_fields()):
             if self.screen.current_view:
                 self.screen.current_view.set_cursor()
             self.screen.current_view.display()
@@ -291,7 +292,8 @@ class WinForm(object):
             self.screen.current_view.set_value()
             end = (res != gtk.RESPONSE_OK) \
                     or (not self.screen.current_record \
-                        or self.screen.current_record.validate())
+                        or self.screen.current_record.validate(
+                            self.screen.current_view.get_fields()))
             if not end:
                 self.screen.current_view.set_cursor()
                 self.screen.display()
@@ -312,7 +314,8 @@ class WinForm(object):
     def destroy(self):
         if self.screen.current_record and \
                 self.screen.current_record.id < 0 and \
-                not self.screen.current_record.validate():
+                not self.screen.current_record.validate(
+                        self.screen.current_view.get_fields()):
             self.screen.remove(delete=True)
         self.screen.screen_container.alternate_view = False
         viewport = self.screen.screen_container.alternate_viewport
