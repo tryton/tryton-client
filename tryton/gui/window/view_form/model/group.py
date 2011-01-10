@@ -163,11 +163,13 @@ class Group(SignalEvent, list):
         new_records = []
         for id in ids:
             new_record = Record(self.model_name, id, self.window,
-                    parent=self.parent, parent_name=self.parent_name, group=self)
+                parent=self.parent, parent_name=self.parent_name, group=self)
             self.append(new_record)
             new_records.append(new_record)
-            new_record.signal_connect(self, 'record-changed', self._record_changed)
-            new_record.signal_connect(self, 'record-modified', self._record_modified)
+            new_record.signal_connect(self, 'record-changed',
+                self._record_changed)
+            new_record.signal_connect(self, 'record-modified',
+                self._record_modified)
         for record in self.record_removed[:]:
             if record.id in ids:
                 self.record_removed.remove(record)
@@ -232,7 +234,7 @@ class Group(SignalEvent, list):
 
     def new(self, default=True, domain=None, context=None, signal=True):
         record = Record(self.model_name, None, self.window, group=self,
-                parent=self.parent, parent_name=self.parent_name)
+            parent=self.parent, parent_name=self.parent_name)
         record.signal_connect(self, 'record-changed', self._record_changed)
         record.signal_connect(self, 'record-modified', self._record_modified)
         if default:

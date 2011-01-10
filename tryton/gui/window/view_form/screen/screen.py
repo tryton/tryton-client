@@ -186,7 +186,8 @@ class Screen(SignalEvent):
         self.__group.signal_connect(self, 'group-cleared', self._group_cleared)
         self.__group.signal_connect(self, 'group-list-changed',
                 self._group_list_changed)
-        self.__group.signal_connect(self, 'record-modified', self._record_modified)
+        self.__group.signal_connect(self, 'record-modified',
+            self._record_modified)
         self.__group.signal_connect(self, 'group-changed', self._group_changed)
         self.__group.add_fields(fields)
 

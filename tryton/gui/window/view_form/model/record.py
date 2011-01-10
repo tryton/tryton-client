@@ -204,7 +204,8 @@ class Record(SignalEvent):
     def save(self, force_reload=True):
         if self.id < 0:
             value = self.get(get_readonly=True)
-            args = ('model', self.model_name, 'create', value, self.context_get())
+            args = ('model', self.model_name, 'create', value,
+                self.context_get())
             try:
                 res = rpc.execute(*args)
             except Exception, exception:
@@ -222,7 +223,8 @@ class Record(SignalEvent):
             context = self.context_get()
             context = context.copy()
             context['_timestamp'] = self.get_timestamp()
-            args = ('model', self.model_name, 'write', [self.id], value, context)
+            args = ('model', self.model_name, 'write', [self.id], value,
+                context)
             try:
                 if not rpc.execute(*args):
                     return False
@@ -318,7 +320,8 @@ class Record(SignalEvent):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                        value = ref_model, (ref_id,
+                            val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
             self.group.fields[fieldname].set_default(self, value,
@@ -345,7 +348,8 @@ class Record(SignalEvent):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                        value = ref_model, (ref_id,
+                            val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
             self.group.fields[fieldname].set(self, value, modified=modified)
