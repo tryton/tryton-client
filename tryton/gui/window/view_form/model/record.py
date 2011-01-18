@@ -98,12 +98,12 @@ class Record(SignalEvent):
                             ids.append(record.id)
                     n += 1
             if loading == 'eager':
-                fields = [name for name, field in self.group.fields.iteritems()
+                fields = [fname for fname, field in self.group.fields.iteritems()
                         if field.attrs.get('loading', 'eager') == 'eager']
             else:
                 fields = self.group.fields.keys()
-            fields.extend(('%s.rec_name' % name for name in fields[:]
-                    if self.group.fields[name].attrs['type']
+            fields.extend(('%s.rec_name' % fname for fname in fields[:]
+                    if self.group.fields[fname].attrs['type']
                     in ('many2one', 'one2one', 'reference')))
             fields.append('_timestamp')
             ctx = rpc.CONTEXT.copy()
