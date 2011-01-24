@@ -127,6 +127,10 @@ class ViewForm(ParserView):
                 message(_('You must select a record ' \
                         'to be able to use the relate button !'), self.window)
                 return False
+            if obj_id < 0:
+                message(_('You must save this record '
+                    'to be able to use the relate button!'), self.window)
+                return False
             encoder = PYSONEncoder()
             if 'pyson_domain' in act:
                 act['pyson_domain'] = encoder.encode(
