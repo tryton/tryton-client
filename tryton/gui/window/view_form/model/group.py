@@ -10,9 +10,12 @@ import tryton.common as common
 class Group(SignalEvent, list):
 
     def __init__(self, model_name, fields, window, ids=None, parent=None,
-            parent_name='', context=None, readonly=False,
+            parent_name='', context=None, domain=None, readonly=False,
             parent_datetime_field=None):
         super(Group, self).__init__()
+        if domain is None:
+            domain = []
+        self.domain = domain
         self.lock_signal = False
         self.__window = window
         self.parent = parent

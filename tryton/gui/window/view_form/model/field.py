@@ -1,7 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime, \
+        domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
+        merge, inverse_leaf, EvalEnvironment
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import time
@@ -41,8 +43,27 @@ class CharField(object):
             record.cond_default(self.attrs['name'], self.get(record))
         record.on_change_with(self.name)
 
+    def domains_get(self, record):
+        screen_domain = domain_inversion(record.group.domain,
+            self.name, EvalEnvironment(record, False))
+        if isinstance(screen_domain, bool) and not screen_domain:
+            screen_domain = [('id', '=', False)]
+        elif isinstance(screen_domain, bool) and screen_domain:
+            screen_domain = []
+        attr_domain = record.expr_eval(self.attrs.get('domain', []))
+        return screen_domain, attr_domain
+
     def domain_get(self, record):
-        return record.expr_eval(self.attrs.get('domain', []))
+        screen_domain, attr_domain = self.domains_get(record)
+        return localize_domain(screen_domain) + attr_domain
+
+    def validation_domains(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        if attr_domain:
+            return screen_domain, screen_domain + unlocalize_domain(attr_domain,
+                self.name)
+        else:
+            return screen_domain, screen_domain
 
     def context_get(self, record, check_load=True, eval_context=True):
         context = {}
@@ -52,13 +73,39 @@ class CharField(object):
                 check_load=check_load))
         return context
 
-    def validate(self, record):
+    def validate(self, record, softvalidation=False):
         res = True
-        if bool(int(self.get_state_attrs(record).get('required') or 0)):
-            if not self.get(record) \
-                    and not bool(int(self.get_state_attrs(record
-                        ).get('readonly') or 0)):
-                res = False
+        inverted_domain, domain = self.validation_domains(record)
+        if not softvalidation:
+            if bool(int(self.get_state_attrs(record).get('required') or 0)):
+                if not self.get(record) \
+                        and not bool(int(self.get_state_attrs(record
+                            ).get('readonly') or 0)):
+                    res = False
+        if isinstance(domain, bool):
+            res = res and domain
+        else:
+            if (isinstance(inverted_domain, list) \
+                and len(inverted_domain) == 1 and inverted_domain[0][1] == '='):
+                # If the inverted domain is so constraint that only one value is
+                # possible we should use it. But we must also pay attention to
+                # the fact that the original domain might be a 'OR' domain and
+                # thus not preventing the modification of fields.
+                leftpart, _, value = inverted_domain[0][:3]
+                setdefault = True
+                if '.' in leftpart:
+                    recordpart, localpart = leftpart.split('.', 1)
+                    original_domain = merge(record.group.admin)
+                    constraintfields = set()
+                    if original_domain[0] == 'AND':
+                        for leaf in localize_domain(original_domain[1:]):
+                            constraintfields.add(leaf[0])
+                    if localpart != 'id' or recordpart not in constraintfields:
+                        setdefault = False
+                if setdefault:
+                    self.set_client(record, value)
+                    self.get_state_attrs(record)['domain_readonly'] = True
+            res = res and eval_domain(domain, EvalEnvironment(record, False))
         self.get_state_attrs(record)['valid'] = res
         return res
 
@@ -92,6 +139,7 @@ class CharField(object):
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
+            record.validate(softvalidation=True)
             record.signal('record-changed')
 
     def get_client(self, record):
@@ -117,7 +165,8 @@ class CharField(object):
                 self.get_state_attrs(record)[key] = state_changes[key]
             elif key in self.attrs:
                 self.get_state_attrs(record)[key] = self.attrs[key]
-        if record.group.readonly:
+        if (record.group.readonly
+            or self.get_state_attrs(record).get('domain_readonly')):
             self.get_state_attrs(record)['readonly'] = True
         if 'value' in state_changes:
             value = state_changes['value']
@@ -194,6 +243,7 @@ class FloatField(CharField):
                 except Exception:
                     record.value[self.name] = internal
                     record.modified = prev_modified
+                record.validate(softvalidation=True)
                 record.signal('record-changed')
 
 
@@ -217,6 +267,7 @@ class NumericField(CharField):
                     record.value[self.name] = internal
                     record.modified = prev_modified
                     return
+                record.validate(softvalidation=True)
                 record.signal('record-changed')
 
 
@@ -244,6 +295,7 @@ class BooleanField(CharField):
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
+            record.validate(softvalidation=True)
             record.signal('record-changed')
 
     def get(self, record, check_load=True, readonly=True, modified=False):
@@ -314,6 +366,7 @@ class M2OField(CharField):
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
+            record.validate(softvalidation=True)
             record.signal('record-changed')
         elif force_change:
             try:
@@ -321,6 +374,7 @@ class M2OField(CharField):
             except Exception:
                 record.value[self.name] = internal
                 return
+            record.validate(softvalidation=True)
             record.signal('record-changed')
 
     def context_get(self, record, check_load=True, eval_context=True):
@@ -330,6 +384,14 @@ class M2OField(CharField):
             context['_datetime'] = record.get_eval(
                     check_load=check_load)[self.attrs.get('datetime_field')]
         return context
+
+    def validation_domains(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return screen_domain, screen_domain
+
+    def domain_get(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return localize_domain(inverse_leaf(screen_domain)) + attr_domain
 
 
 class O2OField(M2OField):
@@ -349,6 +411,7 @@ class O2MField(CharField):
         record.parent.modified = True
         record.parent.modified_fields.setdefault(self.name)
         self.sig_changed(record.parent)
+        record.parent.validate(softvalidation=True)
         record.parent.signal('record-changed')
 
     def _set_default_value(self, record):
@@ -432,9 +495,11 @@ class O2MField(CharField):
     def set_default(self, record, value, modified=False):
         from group import Group
 
+        # value is a list of id
         if value and len(value) and isinstance(value[0], (int, long)):
             return self.set(record, value, modified=modified)
 
+        # value is a list of dict
         fields = {}
         if value and len(value):
             context = self.context_get(record)
@@ -529,9 +594,13 @@ class O2MField(CharField):
         res = [x.get_default() for x in record.value.get(self.name) or []]
         return res
 
-    def validate(self, record):
+    def validation_domains(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return screen_domain, screen_domain
+
+    def validate(self, record, softvalidation=False):
         res = True
-        for record2 in record.value[self.name] or []:
+        for record2 in record.value.get(self.name, []):
             if not record2.loaded:
                 continue
             if not record2.validate():
@@ -539,7 +608,7 @@ class O2MField(CharField):
                     record.value[self.name].remove(record2)
                 else:
                     res = False
-        if not super(O2MField, self).validate(record):
+        if not super(O2MField, self).validate(record, softvalidation):
             res = False
         self.get_state_attrs(record)['valid'] = res
         return res
@@ -554,6 +623,10 @@ class O2MField(CharField):
 
     def get_removed_ids(self, record):
         return [x.id for x in record.value[self.name].record_removed]
+
+    def domain_get(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return localize_domain(inverse_leaf(screen_domain)) + attr_domain
 
 
 class M2MField(O2MField):
@@ -615,6 +688,7 @@ class ReferenceField(CharField):
                 record.value[self.name] = internal
                 record.modified = prev_modified
                 return
+            record.validate(softvalidation=True)
             record.signal('record-changed')
 
     def set(self, record, value, modified=False):
