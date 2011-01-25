@@ -24,7 +24,7 @@ OPERATORS = {
 
 def locale_part(expression):
     if '.' in expression:
-        fieldname, local = expression.split('.')
+        fieldname, local = expression.split('.', 1)
         return local
     return expression
 
