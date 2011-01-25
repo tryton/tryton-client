@@ -95,7 +95,7 @@ class CharField(object):
                 setdefault = True
                 if '.' in leftpart:
                     recordpart, localpart = leftpart.split('.', 1)
-                    original_domain = merge(record.group.admin)
+                    original_domain = merge(record.group.domain)
                     constraintfields = set()
                     if original_domain[0] == 'AND':
                         for leaf in localize_domain(original_domain[1:]):
