@@ -186,15 +186,16 @@ class Screen(SignalEvent):
         self.__group.signal_connect(self, 'group-cleared', self._group_cleared)
         self.__group.signal_connect(self, 'group-list-changed',
                 self._group_list_changed)
-        self.__group.signal_connect(self, 'record-modified', self._record_modified)
+        self.__group.signal_connect(self, 'record-modified',
+            self._record_modified)
         self.__group.signal_connect(self, 'group-changed', self._group_changed)
         self.__group.add_fields(fields)
 
     group = property(__get_group, __set_group)
 
     def new_group(self, readonly=False):
-        self.group = Group(self.model_name, {}, self.window,
-                context=self.context, readonly=readonly)
+        self.group = Group(self.model_name, {}, self.window, domain=self.domain,
+            context=self.context, readonly=readonly)
 
     def _group_cleared(self, group, signal):
         for view in self.views:
@@ -287,11 +288,8 @@ class Screen(SignalEvent):
             elif self.current_view.view_type == view_type:
                 break
         self.screen_container.set(self.current_view.widget)
-        if self.current_record:
-            self.current_record.validate_set(fields)
-        else:
-            if self.current_view.view_type == 'form':
-                self.new(default=default, context=context)
+        if not self.current_record and self.current_view.view_type == 'form':
+            self.new(default=default, context=context)
         self.current_view.cancel()
         self.display(set_cursor=True)
 
@@ -331,34 +329,8 @@ class Screen(SignalEvent):
     def add_view(self, arch, fields, display=False, toolbar=None, context=None):
         if toolbar is None:
             toolbar = {}
+
         xml_dom = xml.dom.minidom.parseString(arch)
-
-        for dom in common.filter_domain(self.domain):
-            if '.' in dom[0]:
-                field1, field2 = dom[0].split('.', 1)
-            else:
-                field1, field2 = dom[0], 'id'
-            if field1 in fields:
-                field_dom = fields[field1].setdefault('domain', [])
-                if dom[1] in ('child_of', 'not child_of') \
-                        and field2 == 'id':
-                    dom = copy.copy(dom)
-                    if len(dom) == 4:
-                        field2 = dom[3]
-                        dom = (dom[0], dom[1], dom[2])
-                    else:
-                        field2 = field1
-                if isinstance(field_dom, basestring):
-                    fields[field1]['domain'] = '[' \
-                            + str(tuple([field2] + list(dom[1:]))) \
-                            + ',' + field_dom + ']'
-                else:
-                    fields[field1]['domain'] = [
-                            tuple([field2] + list(dom[1:])),
-                            field_dom]
-                if dom[1] == '!=' and dom[2] == False:
-                    fields[field1]['required'] = True
-
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
                 self.fields_view_tree = {'arch': arch, 'fields': fields}
@@ -395,11 +367,9 @@ class Screen(SignalEvent):
             self.__current_view = len(self.views) - 1
             self.screen_container.set(self.current_view.widget)
             fields = self.current_view.get_fields()
-            if self.current_record:
-                self.current_record.validate_set(fields)
-            else:
-                if self.current_view.view_type == 'form':
-                    self.new()
+            if (not self.current_record
+                and self.current_view.view_type == 'form'):
+                self.new()
             self.current_view.set_cursor()
             self.current_view.cancel()
             self.display()
@@ -441,7 +411,6 @@ class Screen(SignalEvent):
         fields = None
         if self.current_view:
             fields = self.current_view.get_fields()
-        self.current_record.validate_set(fields)
         self.display()
         if self.current_view:
             self.current_view.set_cursor(new=True)
@@ -670,9 +639,6 @@ class Screen(SignalEvent):
             self.current_record = len(self.group) \
                     and self.group[0]
         self.current_view.set_cursor(reset_view=False)
-        if self.current_record:
-            fields = self.current_view.get_fields()
-            self.current_record.validate_set(fields)
         self.current_view.display()
 
     def display_prev(self):
@@ -700,9 +666,6 @@ class Screen(SignalEvent):
             self.current_record = len(self.group) \
                     and self.group[-1]
         self.current_view.set_cursor(reset_view=False)
-        if self.current_record:
-            fields = self.current_view.get_fields()
-            self.current_record.validate_set(fields)
         self.current_view.display()
 
     def sel_ids_get(self):

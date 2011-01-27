@@ -1,3 +1,4 @@
+* Added domain inversion feature
 * Handle loading attribute on fields
 * Use default format for value in wizard form
 * Add One2One field

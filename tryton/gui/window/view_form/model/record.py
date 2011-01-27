@@ -10,44 +10,9 @@ import logging
 import time
 
 
-class EvalEnvironment(dict):
-
-    def __init__(self, parent, check_load):
-        super(EvalEnvironment, self).__init__()
-        self.parent = parent
-        self.check_load = check_load
-
-    def __getitem__(self, item):
-        if item == '_parent_' + self.parent.parent_name and self.parent.parent:
-            return EvalEnvironment(self.parent.parent, self.check_load)
-        return self.parent.get_eval(check_load=self.check_load)[item]
-
-    def __getattr__(self, item):
-        return self.__getitem__(item)
-
-    def get(self, item, default=None):
-        try:
-            return self.__getattr__(item)
-        except Exception:
-            pass
-        return super(EvalEnvironment, self).get(item, default)
-
-    def __nonzero__(self):
-        return True
-
-    def __str__(self):
-        return str(self.parent)
-
-    __repr__ = __str__
-
-    def __contains__(self, item):
-        return item in self.parent.group.fields
-
-
 class Record(SignalEvent):
 
     id = -1
-
 
     def __init__(self, model_name, obj_id, window, group=None, parent=None,
             parent_name=''):
@@ -204,7 +169,8 @@ class Record(SignalEvent):
     def save(self, force_reload=True):
         if self.id < 0:
             value = self.get(get_readonly=True)
-            args = ('model', self.model_name, 'create', value, self.context_get())
+            args = ('model', self.model_name, 'create', value,
+                self.context_get())
             try:
                 res = rpc.execute(*args)
             except Exception, exception:
@@ -222,7 +188,8 @@ class Record(SignalEvent):
             context = self.context_get()
             context = context.copy()
             context['_timestamp'] = self.get_timestamp()
-            args = ('model', self.model_name, 'write', [self.id], value, context)
+            args = ('model', self.model_name, 'write', [self.id], value,
+                context)
             try:
                 if not rpc.execute(*args):
                     return False
@@ -260,32 +227,16 @@ class Record(SignalEvent):
                 return ''
         return res['rec_name']
 
-    def validate_set(self, fields=None):
-        if isinstance(fields, list) and fields:
-            self._check_load(fields)
-        elif fields is None:
-            self._check_load()
-        change = False
-        for name, field in self.group.fields.iteritems():
-            if fields and name not in fields:
-                continue
-            change = change or \
-                    not field.get_state_attrs(self).get('valid', True)
-            field.get_state_attrs(self)['valid'] = True
-        if change:
-            self.signal('record-changed')
-        return change
-
-    def validate(self, fields=None):
+    def validate(self, fields=None, softvalidation=False):
         if isinstance(fields, list) and fields:
             self._check_load(fields)
         elif fields is None:
             self._check_load()
         res = True
-        for name, field in self.group.fields.iteritems():
-            if fields and name not in fields:
+        for field_name, field in self.group.fields.iteritems():
+            if fields and field_name not in fields:
                 continue
-            if not field.validate(self):
+            if not field.validate(self, softvalidation):
                 res = False
         return res
 
@@ -318,12 +269,14 @@ class Record(SignalEvent):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                        value = ref_model, (ref_id,
+                            val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
             self.group.fields[fieldname].set_default(self, value,
-                    modified=modified)
+                modified=modified)
             self._loaded.add(fieldname)
+        self.validate(softvalidation=True)
         if signal:
             self.signal('record-changed')
 
@@ -345,7 +298,8 @@ class Record(SignalEvent):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id, val[fieldname + '.rec_name'])
+                        value = ref_model, (ref_id,
+                            val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
             self.group.fields[fieldname].set(self, value, modified=modified)
@@ -382,8 +336,8 @@ class Record(SignalEvent):
         ctx['active_id'] = self.id
         ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
-            ctx['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
-                    check_load)
+            ctx['_parent_' + self.parent_name] = \
+                    common.EvalEnvironment(self.parent, check_load)
         val = PYSONDecoder(ctx).decode(expr)
         return val
 
@@ -393,8 +347,8 @@ class Record(SignalEvent):
         for name, field in self.group.fields.iteritems():
             values[name] = field.get_on_change_value(self, check_load=False)
         if self.parent and self.parent_name:
-            values['_parent_' + self.parent_name] = EvalEnvironment(self.parent,
-                    False)
+            values['_parent_' + self.parent_name] = \
+                    common.EvalEnvironment(self.parent, False)
         for arg in args:
             scope = values
             for i in arg.split('.'):
