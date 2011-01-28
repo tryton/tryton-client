@@ -39,7 +39,6 @@ class Record(SignalEvent):
     def __getitem__(self, name):
         if name not in self._loaded and self.id > 0:
             ids =  [self.id]
-            import traceback
             if name == '*':
                 loading = reduce(
                         lambda x, y: 'eager' if x == y == 'eager' else 'lazy',
