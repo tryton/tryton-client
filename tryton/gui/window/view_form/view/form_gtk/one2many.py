@@ -166,6 +166,8 @@ class One2Many(WidgetInterface):
         self.screen.signal_connect(self, 'record-message', self._sig_label)
         menuitem_title.get_child().set_text(attrs.get('string', ''))
 
+        if not isinstance(self.screen.window, gtk.Dialog):
+            self.screen.widget.set_size_request(0, 0)
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)

@@ -64,6 +64,8 @@ class Many2Many(WidgetInterface):
                 view_type=['tree'], views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate)
 
+        if not isinstance(self.screen.window, gtk.Dialog):
+            self.screen.widget.set_size_request(0, 0)
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
