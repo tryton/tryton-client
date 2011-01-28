@@ -80,9 +80,13 @@ class Group(SignalEvent, list):
             self.signal('group-list-changed', ('record-removed', idx))
 
     def clear(self):
+        if not self.lock_signal:
+            for record in self:
+                self.signal('group-list-changed', ('record-removed', 0))
         del self[:]
         if not self.lock_signal:
             self.signal('group-list-changed', ('group-cleared',))
+        self.__id2record = {}
         self.record_removed = []
         self.record_deleted = []
 
