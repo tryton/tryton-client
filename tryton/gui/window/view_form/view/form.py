@@ -35,13 +35,16 @@ class ViewForm(ParserView):
         scroll = gtk.ScrolledWindow()
         scroll.add(vp)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.viewport = gtk.Viewport()
-        self.viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        self.viewport.add(scroll)
+        scroll.set_placement(gtk.CORNER_TOP_LEFT)
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        viewport.add(scroll)
         width, height = self.widget.size_request()
+        if isinstance(self.screen.window, gtk.Dialog):
+            vbox.set_size_request(width or -1, height or -1)
+        vbox.pack_start(viewport, expand=True, fill=True)
+
         self.widget = vbox
-        self.widget.set_size_request(width, height)
-        self.widget.pack_start(self.viewport, expand=True, fill=True)
 
         if toolbar and not CONFIG['client.modepda']:
             hbox = gtk.HBox(homogeneous=False)
