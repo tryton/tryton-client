@@ -13,6 +13,7 @@ from tryton.common import HM_FORMAT
 import tryton.common as common
 from tryton.translate import date_format
 from tryton.pyson import PYSONDecoder
+from tryton.signal_event import SignalEvent
 
 FIELDS_LIST_TYPE = {
     'boolean': gobject.TYPE_BOOLEAN,
@@ -323,11 +324,12 @@ class ViewTreeModel(gtk.GenericTreeModel, gtk.TreeSortable):
         except Exception:
             return None
 
-class ViewTree(object):
+class ViewTree(SignalEvent):
     "View tree"
 
     def __init__(self, view_info, ids, window, sel_multi=False,
             context=None):
+        super(ViewTree, self).__init__()
         self.window = window
         self.view = gtk.TreeView()
         self.view.set_headers_visible(not CONFIG['client.modepda'])
@@ -342,10 +344,12 @@ class ViewTree(object):
         self.name = parse.title
         self.sel_multi = sel_multi
 
+        selection = self.view.get_selection()
         if sel_multi:
-            self.view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+            selection.set_mode(gtk.SELECTION_MULTIPLE)
         else:
-            self.view.get_selection().set_mode(gtk.SELECTION_SINGLE)
+            selection.self.view.get_selection().set_mode(gtk.SELECTION_SINGLE)
+        selection.connect('changed', self.__select_changed)
         self.view.set_expander_column(self.view.get_column(1))
         self.view.set_enable_search(False)
         self.view.get_column(0).set_visible(False)
@@ -413,3 +417,6 @@ class ViewTree(object):
         if not i:
             return None
         return model.get_value(i, col)
+
+    def __select_changed(self, tree_sel):
+        self.signal('select-changed')

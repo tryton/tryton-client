@@ -13,12 +13,14 @@ import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import gettext
 from tryton.config import CONFIG
+from tryton.signal_event import SignalEvent
 _ = gettext.gettext
 
 
-class Action(object):
+class Action(SignalEvent):
 
     def __init__(self, window, attrs=None):
+        super(Action, self).__init__()
         self.act_id = int(attrs['name'])
         self._window = window
         self.screen = None
@@ -51,10 +53,8 @@ class Action(object):
         self.context.update(PYSONDecoder(eval_ctx).decode(
             self.action.get('pyson_context', '{}')))
 
-        domain_ctx = self.context.copy()
-        self.domain = PYSONDecoder(domain_ctx).decode(
-                self.action['pyson_domain'])
-
+        self.domain = []
+        self.update_domain([])
 
         self.widget = gtk.Frame()
         self.widget.set_border_width(0)
@@ -151,6 +151,8 @@ class Action(object):
             alignment.add(self.screen.screen_container.alternate_viewport)
             name = self.screen.current_view.title
             self.screen.signal_connect(self, 'record-message', self._sig_label)
+            self.screen.signal_connect(self, 'record-message',
+                    self._active_changed)
         elif self.action['view_type'] == 'tree':
             ctx = {}
             ctx.update(rpc.CONTEXT)
@@ -172,6 +174,8 @@ class Action(object):
             alignment.add(self.tree.widget_get())
             name = self.tree.name
             self.tree.view.connect('key_press_event', self.sig_key_press)
+            self.tree.signal_connect(self, 'select-changed',
+                    self._active_changed)
 
         if attrs.get('string'):
             self.title.set_text(attrs['string'])
@@ -251,3 +255,28 @@ class Action(object):
                     .get_selected_rows()
             for path in paths:
                 self.tree.view.expand_row(path, False)
+
+    def _active_changed(self, *args):
+        self.signal('active-changed')
+
+    def _get_active(self):
+        if self.screen:
+            return common.EvalEnvironment(self.screen.current_record, False)
+        elif self.tree:
+            return {'id': self.tree.sel_id_get()}
+
+    active = property(_get_active)
+
+    def update_domain(self, actions):
+        domain_ctx = self.context.copy()
+        for action in actions:
+            if action.active:
+                domain_ctx['_active_%s' % action.act_id] = action.active
+        new_domain = PYSONDecoder(domain_ctx).decode(
+                self.action['pyson_domain'])
+        if self.domain == new_domain:
+            return
+        del self.domain[:]
+        self.domain.extend(new_domain)
+        if self.screen:
+            self.screen.search_filter()
