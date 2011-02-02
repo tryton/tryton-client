@@ -44,7 +44,7 @@ class Record(SignalEvent):
                         lambda x, y: 'eager' if x == y == 'eager' else 'lazy',
                         (field.attrs.get('loading', 'eager')
                             for field in self.group.fields.itervalues()),
-                        [])
+                        'eager')
             else:
                 loading = self.group.fields[name].attrs.get('loading', 'eager')
             if self in self.group and loading == 'eager':
