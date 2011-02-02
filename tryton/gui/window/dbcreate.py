@@ -357,8 +357,13 @@ class DBCreate(object):
                         and langreal \
                         and passwd \
                         and admin_passwd.get_text():
-                    if rpc.db_exec(url_m.group(1), int(url_m.group(2)),
-                             'db_exist', dbname):
+                    try:
+                        exist = rpc.db_exec(url_m.group(1),
+                                int(url_m.group(2)), 'db_exist', dbname)
+                    except Exception, exception:
+                        common.process_exception(exception, self.dialog)
+                        continue
+                    if exist:
                          common.warning(_("A database with the same name " \
                              "already exists.\n" \
                              "Try another database name."), self.dialog,
