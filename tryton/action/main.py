@@ -25,13 +25,13 @@ class Action(object):
             context = {}
         if email is None:
             email = {}
-        datas = data.copy()
-        ids = datas['ids']
-        del datas['ids']
+        data = data.copy()
+        ids = data['ids']
+        del data['ids']
         ctx = rpc.CONTEXT.copy()
         ctx.update(context)
         if not ids:
-            args = ('model', datas['model'], 'search', [], 0, None, None, ctx)
+            args = ('model', data['model'], 'search', [], 0, None, None, ctx)
             try:
                 ids = rpc.execute(*args)
             except Exception, exception:
@@ -41,8 +41,8 @@ class Action(object):
             if ids == []:
                 message(_('Nothing to print!'), window)
                 return False
-            datas['id'] = ids[0]
-        args = ('report', name, 'execute', ids, datas, ctx)
+            data['id'] = ids[0]
+        args = ('report', name, 'execute', ids, data, ctx)
         rpcprogress = common.RPCProgress('execute', args, window)
         try:
             res = rpcprogress.run()
@@ -70,7 +70,7 @@ class Action(object):
         return True
 
     @staticmethod
-    def execute(act_id, datas, window, action_type=None, context=None):
+    def execute(act_id, data, window, action_type=None, context=None):
         if context is None:
             context = {}
         ctx = rpc.CONTEXT.copy()
@@ -92,40 +92,32 @@ class Action(object):
         except Exception, exception:
             common.process_exception(exception, window)
             return
-        Action._exec_action(res, window, datas)
+        Action._exec_action(res, window, data)
 
     @staticmethod
-    def _exec_action(action, window, datas=None, context=None):
+    def _exec_action(action, window, data=None, context=None):
         if context is None:
             context = {}
-        if datas is None:
-            datas = {}
+        if data is None:
+            data = {}
+        else:
+            data = data.copy()
         if 'type' not in (action or {}):
             return
 
         if action['type'] == 'ir.action.act_window':
-            for key in (
-                    'res_id',
-                    'res_model',
-                    'view_type',
-                    'limit',
-                    'auto_refresh',
-                    'search_value',
-                    ):
-                datas[key] = action.get(key, datas.get(key, None))
-
             view_ids = False
-            datas['view_mode'] = None
+            view_mode = None
             if action.get('views', []):
                 view_ids = [x[0] for x in action['views']]
-                datas['view_mode'] = [x[1] for x in action['views']]
+                view_mode = [x[1] for x in action['views']]
             elif action.get('view_id', False):
                 view_ids = [action['view_id'][0]]
 
             action.setdefault('pyson_domain', '[]')
             ctx = {
-                'active_id': datas.get('id',False),
-                'active_ids': datas.get('ids',[]),
+                'active_id': data.get('id', False),
+                'active_ids': data.get('ids', []),
             }
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
@@ -138,9 +130,6 @@ class Action(object):
             domain_context['context'] = ctx
             domain = PYSONDecoder(domain_context).decode(action['pyson_domain'])
 
-            if datas.get('domain', False):
-                domain.append(datas['domain'])
-
             search_context = ctx.copy()
             search_context['context'] = ctx
             search_value = PYSONDecoder(search_context).decode(
@@ -150,26 +139,29 @@ class Action(object):
             if action.get('window_name', True):
                 name = action.get('name', False)
 
-            Window.create(view_ids, datas['res_model'], datas['res_id'], domain,
-                    action['view_type'], window, action_ctx,
-                    datas['view_mode'], name=name,
-                    limit=datas['limit'], auto_refresh=datas['auto_refresh'],
+            res_model = action.get('res_model', data.get('res_model'))
+            res_id = action.get('res_id', data.get('res_id'))
+
+            Window.create(view_ids, res_model, res_id, domain,
+                    action['view_type'], window, action_ctx, view_mode,
+                    name=name, limit=action.get('limit'),
+                    auto_refresh=action.get('auto_refresh'),
                     search_value=search_value)
         elif action['type'] == 'ir.action.wizard':
             if action.get('window', False):
-                Window.create_wizard(action['wiz_name'], datas, window,
+                Window.create_wizard(action['wiz_name'], data, window,
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
                     email=action.get('email'), name=action.get('name', False),
                     context=context)
             else:
-                Wizard.execute(action['wiz_name'], datas, window,
+                Wizard.execute(action['wiz_name'], data, window,
                         direct_print=action.get('direct_print', False),
                         email_print=action.get('email_print', False),
                         email=action.get('email'), context=context)
 
         elif action['type'] == 'ir.action.report':
-            Action.exec_report(action['report_name'], datas, window,
+            Action.exec_report(action['report_name'], data, window,
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
                     email=action.get('email'), context=context)

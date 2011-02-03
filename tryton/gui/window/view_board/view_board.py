@@ -2,8 +2,9 @@
 #this repository contains the full copyright notices and license terms.
 'View board'
 
-from parser import ParserBoard
 import xml.dom.minidom
+from parser import ParserBoard
+from tryton.gui.window.view_board.action import Action
 
 class ViewBoard(object):
     'View board'
@@ -18,7 +19,12 @@ class ViewBoard(object):
                 continue
             self.widget, self.widgets = parser.parse(node)
             break
+        self.actions = [x for x in self.widgets if isinstance(x, Action)]
+        for action in self.actions:
+            action.signal_connect(self, 'active-changed',
+                    self._active_changed)
         self.widget.show_all()
+        self._active_changed(None)
 
     def widget_get(self):
         return self.widget
@@ -26,3 +32,9 @@ class ViewBoard(object):
     def reload(self):
         for widget in self.widgets:
             widget.display()
+
+    def _active_changed(self, event_action, *args):
+        for action in self.actions:
+            if action == event_action:
+                continue
+            action.update_domain(self.actions)

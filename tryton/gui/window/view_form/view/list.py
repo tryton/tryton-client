@@ -150,16 +150,25 @@ class ViewList(ParserView):
                 buttons, toolbar, notebooks, cursor_widget)
         self.store = None
         self.view_type = 'tree'
-        self.widget = gtk.VBox()
-        self.widget_tree = widget
+
+        vbox = gtk.VBox()
         scroll = gtk.ScrolledWindow()
-        scroll.add(self.widget_tree)
+        scroll.add(self.widget)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_placement(gtk.CORNER_TOP_LEFT)
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         viewport.add(scroll)
-        self.widget.pack_start(viewport, expand=True, fill=True)
+        width, height = self.widget.size_request()
+        self.widget_tree = self.widget
+
+        if isinstance(self.screen.window, gtk.Dialog):
+            vbox.set_size_request(width or -1, height or -1)
+        vbox.pack_start(viewport, expand=True, fill=True)
+
         self.widget_tree.screen = screen
+
+        self.widget = vbox
         self.reload = False
         self.children = children
 

@@ -190,20 +190,8 @@ class Tree(SignalEvent):
                 ids.index(y['id'])))
             radiotb = None
             for res in results:
-                radiotb = gtk.RadioToolButton(group=radiotb)
-                radiotb.set_label_widget(gtk.Label(res['name']))
-
-                icon = gtk.Image()
-                try:
-                    icon.set_from_stock(res[icon_name],
-                            gtk.ICON_SIZE_BUTTON)
-                except Exception:
-                    pass
-
-                hbox = gtk.HBox(spacing=6)
-                hbox.pack_start(icon)
-                hbox.pack_start(gtk.Label(res['name']))
-                radiotb.set_icon_widget(hbox)
+                radiotb = gtk.RadioToolButton(radiotb, res[icon_name])
+                radiotb.set_label(res['name'])
                 radiotb.show_all()
                 radiotb.set_data('id', res['id'])
                 radiotb.connect('clicked', self.menu_main_clicked)
