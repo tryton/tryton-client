@@ -85,6 +85,8 @@ class CharField(object):
                     res = False
         if isinstance(domain, bool):
             res = res and domain
+        elif domain == [('id', '=', False)]:
+            res = False
         else:
             if (isinstance(inverted_domain, list) \
                 and len(inverted_domain) == 1 and inverted_domain[0][1] == '='):
