@@ -75,6 +75,7 @@ class CharField(object):
 
     def validate(self, record, softvalidation=False):
         res = True
+        self.get_state_attrs(record)['domain_readonly'] = False
         inverted_domain, domain = self.validation_domains(record)
         if not softvalidation:
             if bool(int(self.get_state_attrs(record).get('required') or 0)):
