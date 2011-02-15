@@ -90,9 +90,11 @@ class ConfigManager(object):
         self.options = {
             'login.host': True
         }
+        self.arguments = []
 
     def parse(self):
-        parser = optparse.OptionParser(version=("Tryton %s" % VERSION))
+        parser = optparse.OptionParser(version=("Tryton %s" % VERSION),
+                usage="Usage: %prog [options] [url]")
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
         parser.add_option("-v", "--verbose", action="store_true",
@@ -109,8 +111,10 @@ class ConfigManager(object):
                 help=_("specify the server port"))
         parser.add_option("-s", "--server", dest="server",
                 help=_("specify the server hostname"))
-        opt = parser.parse_args()[0]
+        opt, self.arguments = parser.parse_args()
 
+        if len(self.arguments) > 1:
+            raise Exception(_('Too much arguments'))
 
         if opt.config and not os.path.isfile(opt.config):
             raise Exception(_('File "%s" not found') % (opt.config,))
