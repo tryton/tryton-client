@@ -10,6 +10,7 @@ pygtk.require('2.0')
 import gtk
 gtk.gdk.threads_init()
 import logging
+from urlparse import urlparse
 
 from tryton import version
 from tryton import config
@@ -17,6 +18,7 @@ from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
         TRYTON_ICON, get_config_dir
 from tryton import translate
 from tryton import gui
+from tryton.ipc import Client as IPCClient
 import traceback
 import time
 import signal
@@ -27,6 +29,19 @@ class TrytonClient(object):
 
     def __init__(self):
         CONFIG.parse()
+        if CONFIG.arguments:
+            url, = CONFIG.arguments
+            urlp = urlparse(url)
+            if urlp.scheme == 'tryton':
+                urlp = urlparse('http' + url[6:])
+                hostname, port = (urlp.netloc.split(':', 1)
+                        + [CONFIG.defaults['login.port']])[:2]
+                database, _ = (urlp.path[1:].split('/', 1) + [None])[:2]
+                if IPCClient(hostname, port, database).write(url):
+                    sys.exit(0)
+                CONFIG['login.server'] = hostname
+                CONFIG['login.port'] = port
+                CONFIG['login.db'] = database
         logging.basicConfig()
         translate.set_language_direction(CONFIG['client.language_direction'])
         translate.setlang(CONFIG['client.lang'])
