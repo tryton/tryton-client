@@ -43,7 +43,9 @@ class CellRendererCombo(gtk.GenericCellRenderer):
         self.visible = True
 
     def set_sensitive(self, value):
-        return self._renderer.set_sensitive(value)
+        if hasattr(self._renderer, 'set_sensitive'):
+            return self._renderer.set_sensitive(value)
+        return self._renderer.set_property('sensitive', value)
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
