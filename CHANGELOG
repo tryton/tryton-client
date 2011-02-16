@@ -1,3 +1,4 @@
+* Added additional gtk.Entry for filename on BinaryField
 * Add communication between boards
 * Added domain inversion feature
 * Handle loading attribute on fields

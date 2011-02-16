@@ -20,6 +20,7 @@ class Image(WidgetInterface):
         super(Image, self).__init__(field_name, model_name, window,
                 attrs=attrs)
 
+        self.filename = attrs.get('filename')
         self.height = int(attrs.get('img_height', 100))
         self.width = int(attrs.get('img_width', 300))
 
@@ -102,6 +103,9 @@ class Image(WidgetInterface):
         if filename:
             self.field.set_client(self.record,
                     encodestring(open(filename, 'rb').read()))
+            if self.filename and self.record:
+                name_wid = self.record.group.fields[self.filename]
+                name_wid.set_client(self.record, os.path.basename(filename))
             self.update_img()
 
     def sig_save_as(self, widget):
