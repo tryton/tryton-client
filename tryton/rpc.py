@@ -7,6 +7,7 @@ import os
 from threading import Semaphore
 from tryton.fingerprints import Fingerprints
 from tryton.config import get_config_dir
+from tryton.ipc import Server as IPCServer
 
 _SOCK = None
 _USER = None
@@ -154,10 +155,13 @@ def login(username, password, host, port, database):
     _DATABASE = database
     SECURE = _SOCK.ssl
     context_reload()
+    IPCServer(host, port, database).run()
     return 1
 
 def logout():
     global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
+    if IPCServer.instance:
+        IPCServer.instance.stop()
     if _SOCK and _USER:
         try:
             _SEMAPHORE.acquire()

@@ -22,6 +22,8 @@ class CellRendererDate(gtk.GenericCellRenderer):
                 'Editable', 0, 10, 0, gobject.PARAM_READWRITE),
             'visible': (gobject.TYPE_INT, 'Visible',
                 'Visible', 0, 10, 0, gobject.PARAM_READWRITE),
+            'strikethrough': (gobject.TYPE_BOOLEAN, 'Strikethrough',
+                'Strikethrough', False, gobject.PARAM_WRITABLE),
     }
 
     def __init__(self, format):
@@ -35,6 +37,9 @@ class CellRendererDate(gtk.GenericCellRenderer):
         self.text = self._renderer.get_property('text')
         self.editable = self._renderer.get_property('editable')
         self.visible = True
+
+    def set_sensitive(self, value):
+        return self._renderer.set_sensitive(value)
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)

@@ -213,7 +213,11 @@ class ViewForm(ParserView):
         record = self.screen.current_record
         if record:
             # Force to set fields in record
-            for field in record.group.fields:
+            # Get first the lazy one to reduce number of requests
+            fields = [(name, field.attrs.get('loading', 'eager'))
+                    for name, field in record.group.fields.iteritems()]
+            fields.sort(lambda x, y: cmp(y[1], x[1]))
+            for field, _ in fields:
                 record[field].get(record, check_load=False)
         for name, widgets in self.widgets.iteritems():
             field = None

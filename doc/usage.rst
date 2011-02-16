@@ -17,7 +17,7 @@ Synopsis
 
 ::
 
-  tryton [options]
+  tryton [options] [url]
 
 After startup, there raises the `login dialog`__ and optionally a
 `tips dialog`__.
@@ -47,6 +47,30 @@ Options
 -p PORT, --port=PORT                 Specify the server port
 
 -s SERVER, --server=SERVER           Specify the server hostname
+
+URL
+***
+
+When an url is passed, the client will try to find already running client that
+could handle it and send to this one to open the url. If it doesn't find one
+then it will start the GUI and open the url itself.
+
+The url schemes are:
+
+    `tryton://<hostname>[:<port>]/<database>/model/<model name>[/<id>][;parameters]`
+
+    `tryton://<hostname>[:<port>]/<database>/wizard/<wizard name>[;parameters]`
+
+    `tryton://<hostname>[:<port>]/<database>/report/<report name>[;parameters]`
+
+
+where `parameters` are the corresponding fields of actions encoded in
+`JSON`_.
+
+.. _JSON: http://en.wikipedia.org/wiki/Json
+.. Note:: `model` is for `act_window`
+.. Note:: `report` must have at least a data parameter with `ids`, `id` and
+    `model name`
 
 
 Overview

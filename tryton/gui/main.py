@@ -3,14 +3,21 @@
 import os
 import sys
 import gettext
-import urlparse
+from urlparse import urlparse
+import urllib
 import gobject
 import gtk
+if sys.version_info < (2, 6):
+    import simplejson as json
+else:
+    import json
+import webbrowser
 import tryton.rpc as rpc
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \
         get_config_dir
 import tryton.common as common
 from tryton.action import Action
+from tryton.wizard import Wizard
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
 from tryton.gui.window import Limit
@@ -1186,6 +1193,9 @@ class Main(object):
         self.menuitem_form.set_sensitive(True)
         self.menuitem_plugins.set_sensitive(True)
         self.notebook.grab_focus()
+        if CONFIG.arguments:
+            url = CONFIG.arguments.pop()
+            self.open_url(url)
         return True
 
     def sig_logout(self, widget, disconnect=True):
@@ -1616,3 +1626,121 @@ class Main(object):
         else:
             rpc.logout()
             Main.get_main().refresh_ssl()
+
+    def _open_url(self, url):
+        url = urllib.unquote(url)
+        urlp = urlparse(url)
+        if not urlp.scheme == 'tryton':
+            return
+        urlp = urlparse('http' + url[6:])
+        hostname, port = (urlp.netloc.split(':', 1)
+                + [CONFIG.defaults['login.port']])[:2]
+        database, path = (urlp.path[1:].split('/', 1) + [None])[:2]
+        if (not path or
+                hostname != rpc._SOCK.hostname or
+                int(port) != rpc._SOCK.port or
+                database != rpc._DATABASE):
+            return
+        type_, path = (path.split('/', 1) + [''])[:2]
+        params = {}
+        if urlp.params:
+            try:
+                params = dict(param.split('=', 1)
+                        for param in urlp.params.split('&'))
+            except Exception:
+                return
+
+        def open_model(path):
+            model, path = (path.split('/', 1) + [''])[:2]
+            if not model:
+                return
+            res_id = False
+            mode = None
+            view_type = params.get('view_type', 'form')
+            try:
+                view_ids = json.loads(params.get('views', 'false'))
+                limit = json.loads(params.get('limit', 'null'))
+                auto_refresh = json.loads(params.get('auto_refresh', 'false'))
+                name = json.loads(params.get('window_name', 'false'))
+                search_value = json.loads(params.get('search_value', '{}'))
+                domain = json.loads(params.get('domain', '[]'))
+                context = json.loads(params.get('context', '{}'))
+            except ValueError:
+                return
+            if path:
+                try:
+                    res_id = int(path)
+                except ValueError:
+                    return
+                mode = ['form', 'tree']
+            try:
+                Window.create(view_ids, model, res_id=res_id, domain=domain,
+                        view_type=view_type, window=self.window,
+                        context=context, mode=mode, name=name, limit=limit,
+                        auto_refresh=auto_refresh, search_value=search_value)
+            except Exception:
+                return
+
+        def open_wizard(wizard):
+            if not wizard:
+                return
+            try:
+                data = json.loads(params.get('data', '{}'))
+                direct_print = json.loads(params.get('direct_print', 'false'))
+                email_print = json.loads(params.get('email_print', 'false'))
+                email = json.loads(params.get('email', 'null'))
+                name = json.loads(params.get('name', 'false'))
+                window = json.loads(params.get('window', 'false'))
+                context = json.loads(params.get('context', '{}'))
+            except ValueError:
+                return
+            try:
+                if window:
+                    Window.create_wizard(wizard, data, self.window,
+                            direct_print=direct_print, email_print=email_print,
+                            email=email, name=name, context=context)
+                else:
+                    Wizard.execute(wizard, data, self.window,
+                            direct_print=direct_print, email_print=email_print,
+                            email=email, context=context)
+            except Exception:
+                return
+
+        def open_report(report):
+            if not report:
+                return
+            try:
+                data = json.loads(params.get('data'))
+                direct_print = json.loads(params.get('direct_print', 'false'))
+                email_print = json.loads(params.get('email_print', 'false'))
+                email = json.loads(params.get('email', 'null'))
+                name = json.loads(params.get('name', 'false'))
+                context = json.loads(params.get('context', '{}'))
+            except ValueError:
+                return
+            try:
+                Action.exec_report(report, data, self.window,
+                        direct_print=direct_print, email_print=email_print,
+                        email=email, context=context)
+            except Exception:
+                return
+
+        def open_url():
+            try:
+                url = json.loads(params.get('url', 'false'))
+            except ValueError:
+                return
+            if url:
+                webbrowser.open(url, new=2)
+
+        if type_ == 'model':
+            open_model(path)
+        elif type_ == 'wizard':
+            open_wizard(path)
+        elif type_ == 'report':
+            open_report(path)
+        elif type_ == 'url':
+            open_url()
+
+    def open_url(self, url):
+        gobject.idle_add(self._open_url, url)

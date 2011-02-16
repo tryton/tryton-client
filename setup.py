@@ -88,9 +88,13 @@ if sys.version_info < (2, 6):
     SIMPLEJSON = ['simplejson']
     EXTRAS['ssl'] = ['ssl']
 
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
+    long_description=read('README'),
     author='B2CK',
     author_email='info@b2ck.com',
     url=WEBSITE,

@@ -24,17 +24,22 @@ class Shortcuts(object):
         self.dialog.vbox.pack_start(notebook)
 
         shortcuts = [
-                (_('Text Entries Shortcuts'),),
-                ('<Ctrl> + X', _('Cut selected text')),
-                ('<Ctrl> + C', _('Copy selected text')),
-                ('<Ctrl> + V', _('Paste copied text')),
-                ('<Tab>', _('Next widget')),
-                ('<Shift> + <Tab>', _('Previous widget')),
-                (_('Relation Entries Shortcuts'),),
-                ('<F3>', _('Create new relation')),
-                ('<F2>', _('Open/Search relation')),
-                (_('Date/Datetime Entries Shortcuts'),),
-                (_('''You can use special operators:
+            (_('Text Entries Shortcuts'),),
+            ('<Ctrl> + X', _('Cut selected text')),
+            ('<Ctrl> + C', _('Copy selected text')),
+            ('<Ctrl> + V', _('Paste copied text')),
+            ('<Tab>', _('Next widget')),
+            ('<Shift> + <Tab>', _('Previous widget')),
+            (_('Relation Entries Shortcuts'),),
+            ('<F3>', _('Create new relation')),
+            ('<F2>', _('Open/Search relation')),
+            (_('List Entries Shortcuts'),),
+            ('<F3>', _('Create new line')),
+            ('<F2>', _('Open relation')),
+            ('<Del>', _('Mark line for deletion')),
+            ('<Ins>', _('Unmark line for deletion')),
+            (_('Date/Datetime Entries Shortcuts'),),
+            (_('''You can use special operators:
 * + to increase the date
 * - to decrease the date or clear
 * = to set the date or the current date
@@ -49,8 +54,8 @@ y for years
 Examples:
 "+21d" increase of 21 days the date
 "=11m" set the date to the 11th month of the year
-"-2w" decrease of 2 weeks the date'''),)
-                ]
+"-2w" decrease of 2 weeks the date'''),),
+        ]
         notebook.append_page(self._fill_table(shortcuts),
                 gtk.Label(_('Edition Widgets')))
 

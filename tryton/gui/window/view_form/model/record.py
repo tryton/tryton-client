@@ -44,7 +44,7 @@ class Record(SignalEvent):
                         lambda x, y: 'eager' if x == y == 'eager' else 'lazy',
                         (field.attrs.get('loading', 'eager')
                             for field in self.group.fields.itervalues()),
-                        [])
+                        'eager')
             else:
                 loading = self.group.fields[name].attrs.get('loading', 'eager')
             if self in self.group and loading == 'eager':
@@ -105,6 +105,25 @@ class Record(SignalEvent):
             self.signal('record-modified')
 
     modified = property(get_modified, set_modified)
+
+    def get_removed(self):
+        if self.group is not None:
+            return self in self.group.record_removed
+        return False
+
+    removed = property(get_removed)
+
+    def get_deleted(self):
+        if self.group is not None:
+            return self in self.group.record_deleted
+        return False
+
+    deleted = property(get_deleted)
+
+    def get_readonly(self):
+        return self.deleted or self.removed
+
+    readonly = property(get_readonly)
 
     def is_modified(self):
         return self.modified
@@ -385,7 +404,7 @@ class Record(SignalEvent):
             elif isinstance(self.group.fields[fieldname],
                     field.ReferenceField):
                 if value:
-                    ref_mode, ref_id = value.split(',', 1)
+                    ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in res:
                         value = ref_model, (ref_id,
                                 res[fieldname + '.rec_name'])

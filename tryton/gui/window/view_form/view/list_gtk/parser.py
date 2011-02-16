@@ -250,6 +250,10 @@ class Char(object):
         if isinstance(cell, CellRendererToggle):
             cell.set_active(bool(text))
         else:
+            cell.set_sensitive(not (record.deleted or record.removed))
+            if isinstance(cell,
+                (CellRendererText, CellRendererDate, CellRendererCombo)):
+                cell.set_property('strikethrough', record.deleted)
             cell.set_property('text', text)
             fg_color = self.get_color(record)
             cell.set_property('foreground', fg_color)
@@ -293,7 +297,8 @@ class Char(object):
                     cell.set_property('background-set', False)
                 else:
                     cell.set_property('background-set', True)
-                    cell.set_property('foreground-set', True)
+                    cell.set_property('foreground-set',
+                        not (record.deleted or record.removed))
 
             if isinstance(cell, CellRendererToggle):
                 cell.set_property('activatable', not readonly)
@@ -681,10 +686,13 @@ class Selection(Char):
         selection_data = gtk.ListStore(str, str)
         selection = self.attrs.get('selection', [])[:]
         self.selection = selection[:]
+        if not self.attrs.get('domain'):
+            domain = []
+        else:
+            domain = PYSONDecoder(rpc.CONTEXT).decode(self.attrs['domain'])
         if 'relation' in self.attrs:
             args = ('model', self.attrs['relation'], 'search_read',
-                    self.attrs.get('domain', []), 0, None, None, ['rec_name'],
-                    rpc.CONTEXT)
+                    domain, 0, None, None, ['rec_name'], rpc.CONTEXT)
             try:
                 result = rpc.execute(*args)
             except Exception, exception:
@@ -703,7 +711,7 @@ class Selection(Char):
                     selection = []
                 self.selection = selection[:]
 
-            for dom in common.filter_domain(self.attrs.get('domain', [])):
+            for dom in common.filter_domain(domain):
                 if dom[1] in ('=', '!='):
                     todel = []
                     for i in xrange(len(selection)):

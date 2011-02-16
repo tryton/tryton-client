@@ -34,12 +34,16 @@ def is_leaf(expression):
         and isinstance(expression[1], basestring)
         and expression[1] in OPERATORS)
 
-def eval_leaf(part, context):
+def eval_leaf(part, context, boolop=operator.and_):
     field, operand, value = part[:3]
     if '.' in field:
         # In the case where the leaf concerns a m2o then having a value in the
         # evaluation context is deemed suffisant
         return bool(context.get(field.split('.')[0]))
+    if operand == '=' and not context[field] and boolop == operator.and_:
+        # We should consider that other domain inversion will set a correct
+        # value to this field
+        return True
     return OPERATORS[operand](context[field], value)
 
 def inverse_leaf(domain):
@@ -58,7 +62,7 @@ def inverse_leaf(domain):
 def eval_domain(domain, context, boolop=operator.and_):
     "compute domain boolean value according to the context"
     if is_leaf(domain):
-        return eval_leaf(domain, context)
+        return eval_leaf(domain, context, boolop=boolop)
     elif not domain and boolop is operator.and_:
         return True
     elif not domain and boolop is operator.or_:
@@ -171,7 +175,8 @@ class And(object):
             else:
                 field, _, _ = part
                 if (field not in context
-                    or field in context and eval_leaf(part, context)):
+                    or field in context
+                    and eval_leaf(part, context, operator.and_)):
                     result.append(True)
                 else:
                     return False
@@ -213,9 +218,11 @@ class Or(And):
             else:
                 field, _, _ = part
                 field = self.base(field)
-                if field in context and eval_leaf(part, context):
+                if (field in context
+                        and eval_leaf(part, context, operator.or_)):
                     return True
-                elif field in context and not eval_leaf(part, context):
+                elif (field in context
+                        and not eval_leaf(part, context, operator.or_)):
                     result.append(False)
 
         result = filter(lambda e: e is not False, result)
@@ -247,6 +254,7 @@ def test_and_inversion():
     domain = [['x', '=', 3], ['y', '=', 5]]
     assert domain_inversion(domain, 'z') == True
     assert domain_inversion(domain, 'z', {'x': 2, 'y': 7}) == True
+    assert domain_inversion(domain, 'x', {'y': False}) == [['x', '=', 3]]
 
     domain = [['x.id', '>', 5], ['y', '<', 3]]
     assert domain_inversion(domain, 'y') == [['y', '<', 3]]
@@ -262,6 +270,9 @@ def test_or_inversion():
     assert domain_inversion(domain, 'x', {'y': 7, 'z': 'b'}) == True
     assert domain_inversion(domain, 'x', {'z': 'abc'}) == True
     assert domain_inversion(domain, 'x', {'y': 4, 'z': 'abc'}) == True
+
+    domain = ['OR', ['x', '=', 3], ['y', '=', 5]]
+    assert domain_inversion(domain, 'x', {'y': False}) == [['x', '=', 3]]
 
     domain = ['OR', ['x', '=', 3], ['y', '>', 5]]
     assert domain_inversion(domain, 'z') == True
