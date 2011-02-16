@@ -106,6 +106,25 @@ class Record(SignalEvent):
 
     modified = property(get_modified, set_modified)
 
+    def get_removed(self):
+        if self.group is not None:
+            return self in self.group.record_removed
+        return False
+
+    removed = property(get_removed)
+
+    def get_deleted(self):
+        if self.group is not None:
+            return self in self.group.record_deleted
+        return False
+
+    deleted = property(get_deleted)
+
+    def get_readonly(self):
+        return self.deleted or self.removed
+
+    readonly = property(get_readonly)
+
     def is_modified(self):
         return self.modified
 

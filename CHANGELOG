@@ -1,3 +1,4 @@
+* Display deleted lines in One2Many and Many2Many
 * Handle URL
 * Add communication between boards
 * Added domain inversion feature

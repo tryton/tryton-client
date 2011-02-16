@@ -504,6 +504,10 @@ class Screen(SignalEvent):
         self.display()
         self.request_set()
 
+    def unremove(self):
+        if self.current_record in self.group:
+            self.group.unremove(self.current_record)
+
     def remove(self, delete=False, remove=False):
         res = False
         reload_ids = []

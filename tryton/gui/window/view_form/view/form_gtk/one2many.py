@@ -104,13 +104,23 @@ class One2Many(WidgetInterface):
 
         self.but_del = gtk.Button()
         tooltips.set_tip(self.but_del, _('Delete selected record'))
-        self.but_del.connect('clicked', self._sig_remove)
+        self.but_del.connect('clicked', self._sig_remove, False)
         img_del = gtk.Image()
         img_del.set_from_stock('tryton-delete', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_del.set_alignment(0.5, 0.5)
         self.but_del.add(img_del)
         self.but_del.set_relief(gtk.RELIEF_NONE)
         hbox.pack_start(self.but_del, expand=False, fill=False)
+
+        self.but_undel = gtk.Button()
+        tooltips.set_tip(self.but_undel, _('Undelete selected record'))
+        self.but_undel.connect('clicked', self._sig_undelete)
+        img_undel = gtk.Image()
+        img_undel.set_from_stock('tryton-undo', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_undel.set_alignment(0.5, 0.5)
+        self.but_undel.add(img_undel)
+        self.but_undel.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(self.but_undel, expand=False, fill=False)
 
         hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
@@ -195,6 +205,9 @@ class One2Many(WidgetInterface):
                 and widget == self.screen.widget:
             self._sig_remove(widget)
             return False
+        if event.keyval == gtk.keysyms.Insert and widget == self.screen.widget:
+            self._sig_undelete(widget)
+            return False
 
     def destroy(self):
         self.screen.destroy()
@@ -205,6 +218,15 @@ class One2Many(WidgetInterface):
     def switch_view(self, widget):
         self.screen.switch_view()
         self.color_set(self.color_name)
+
+    def color_set(self, name):
+        super(One2Many, self).color_set(name)
+        widget = self._color_widget()
+        # if the style to apply is different from readonly then insensitive
+        # cellrenderers should use the default insensitive color
+        if name != 'readonly':
+            widget.modify_text(gtk.STATE_INSENSITIVE,
+                    self.colors['text_color_insensitive'])
 
     def _readonly_set(self, value):
         self._readonly = value
@@ -231,12 +253,6 @@ class One2Many(WidgetInterface):
             self.screen.new(context=ctx)
             self.screen.current_view.widget.set_sensitive(True)
         else:
-            readonly = False
-            domain = []
-            if self.field and self.record:
-                readonly = self.field.get_state_attrs(self.record
-                        ).get('readonly', False)
-                domain = self.field.domain_get(self.record)
             win = WinForm(self.screen, self.window, new=True,
                     context=ctx)
             while True:
@@ -250,8 +266,9 @@ class One2Many(WidgetInterface):
 
     def _sig_edit(self, widget=None):
         self.view.set_value()
-        if self.screen.current_record:
-            if not self.screen.current_record.validate():
+        record = self.screen.current_record
+        if record:
+            if not record.validate():
                 self.screen.display()
                 return
             win = WinForm(self.screen, self.window)
@@ -276,6 +293,9 @@ class One2Many(WidgetInterface):
 
     def _sig_remove(self, widget, remove=False):
         self.screen.remove(remove=remove)
+
+    def _sig_undelete(self, button):
+        self.screen.unremove()
 
     def _sig_activate(self, *args):
         self._sig_add()
@@ -333,9 +353,12 @@ class One2Many(WidgetInterface):
                 self.but_pre.set_sensitive(True)
             else:
                 self.but_pre.set_sensitive(False)
+            self.but_del.set_sensitive(True)
+            self.but_undel.set_sensitive(True)
         else:
             self.but_open.set_sensitive(False)
             self.but_del.set_sensitive(False)
+            self.but_undel.set_sensitive(False)
             self.but_next.set_sensitive(False)
             self.but_pre.set_sensitive(False)
             if self.attrs.get('add_remove'):

@@ -179,7 +179,7 @@ class CharField(object):
     def get_state_attrs(self, record):
         if self.name not in record.state_attrs:
             record.state_attrs[self.name] = self.attrs.copy()
-        if record.group.readonly:
+        if record.group.readonly or record.readonly:
             record.state_attrs[self.name]['readonly'] = True
         return record.state_attrs[self.name]
 
@@ -449,10 +449,10 @@ class O2MField(CharField):
                     record2.get(check_load=check_load, get_readonly=readonly)))
         if record.value[self.name].record_removed:
             result.append(('unlink', [x.id for x in \
-                    record.value[self.name].record_removed]))
+                record.value[self.name].record_removed]))
         if record.value[self.name].record_deleted:
             result.append(('delete', [x.id for x in \
-                    record.value[self.name].record_deleted]))
+                record.value[self.name].record_deleted]))
         return result
 
     def get_timestamp(self, record):
@@ -473,7 +473,8 @@ class O2MField(CharField):
         if record.value.get(self.name) is None:
             return []
         for record2 in record.value[self.name]:
-            result.append(record2.get_eval(check_load=check_load))
+            if not (record2.deleted or record2.removed):
+                result.append(record2.get_eval(check_load=check_load))
         return result
 
     def set(self, record, value, modified=False):
@@ -531,7 +532,7 @@ class O2MField(CharField):
                 parent_datetime_field=self.attrs.get('datetime_field'))
         if record.value.get(self.name):
             group.record_deleted.extend(x for x in record.value[self.name]
-                    if x.id > 0)
+                if x.id > 0)
             group.record_deleted.extend(record.value[self.name].record_deleted)
             group.record_removed.extend(record.value[self.name].record_removed)
         record.value[self.name] = group

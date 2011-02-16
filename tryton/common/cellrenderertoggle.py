@@ -27,6 +27,9 @@ class CellRendererToggle(gtk.GenericCellRenderer):
         self.activatable = self._renderer.get_property('activatable')
         self.visible = True
 
+    def set_sensitive(self, value):
+        return self._renderer.set_sensitive(value)
+
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
         if pspec.name == 'visible':

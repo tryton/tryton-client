@@ -29,6 +29,8 @@ class CellRendererCombo(gtk.GenericCellRenderer):
                 gobject.PARAM_READWRITE),
             'text-column': (gobject.TYPE_INT, 'Text Column',
                 'Text Column', 0, 10, 0, gobject.PARAM_READWRITE),
+            'strikethrough': (gobject.TYPE_BOOLEAN, 'Strikethrough',
+                'Strikethrough', False, gobject.PARAM_WRITABLE),
     }
 
     def __init__(self):
@@ -39,6 +41,9 @@ class CellRendererCombo(gtk.GenericCellRenderer):
         self.text = self._renderer.get_property('text')
         self.editable = self._renderer.get_property('editable')
         self.visible = True
+
+    def set_sensitive(self, value):
+        return self._renderer.set_sensitive(value)
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)

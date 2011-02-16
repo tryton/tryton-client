@@ -96,6 +96,15 @@ class Many2Many(WidgetInterface):
         self.widget.destroy()
         del self.widget
 
+    def color_set(self, name):
+        super(Many2Many, self).color_set(name)
+        widget = self._color_widget()
+        # if the style to apply is different from readonly then insensitive
+        # cellrenderers should use the default insensitive color
+        if name != 'readonly':
+            widget.modify_text(gtk.STATE_INSENSITIVE,
+                    self.colors['text_color_insensitive'])
+
     def _sig_add(self, *args):
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
