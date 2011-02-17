@@ -9,6 +9,12 @@ from interface import WidgetInterface
 
 _ = gettext.gettext
 
+def humanize(size):
+    for x in ('bytes', 'KB', 'MB', 'GB', 'TB', 'PB'):
+        if size < 1000:
+            return '%3.1f%s' % (size, x)
+        size /= 1000.0
+
 
 class Binary(WidgetInterface):
     "Binary"
@@ -17,12 +23,26 @@ class Binary(WidgetInterface):
         super(Binary, self).__init__(field_name, model_name, window,
                 attrs=attrs)
 
+        self.filename = attrs.get('filename')
+        self.filename_visible = attrs.get('filename_visible')
+
         self.tooltips = Tooltips()
 
         self.widget = gtk.HBox(spacing=0)
-        self.wid_text = gtk.Entry()
-        self.wid_text.set_property('activates_default', True)
-        self.widget.pack_start(self.wid_text, expand=True, fill=True)
+        if self.filename and self.filename_visible:
+            self.wid_text = gtk.Entry()
+            self.wid_text.set_property('activates_default', True)
+            self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
+            self.wid_text.connect('focus-out-event', lambda x, y: self._focus_out())
+            self.wid_text.connect_after('key_press_event', self.sig_key_press)
+            self.wid_size = gtk.Entry()
+            self.wid_size.set_width_chars(11)
+            self.wid_size.props.sensitive = False
+            self.widget.pack_start(self.wid_text, expand=True, fill=True)
+        else:
+            self.wid_text = None
+        self.widget.pack_start(self.wid_size, expand=not self.filename,
+            fill=True)
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
@@ -35,7 +55,8 @@ class Binary(WidgetInterface):
 
         self.but_save_as = gtk.Button()
         img_save_as = gtk.Image()
-        img_save_as.set_from_stock('tryton-save-as', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_save_as.set_from_stock('tryton-save-as',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_save_as.set_image(img_save_as)
         self.but_save_as.set_relief(gtk.RELIEF_NONE)
         self.but_save_as.connect('clicked', self.sig_save_as)
@@ -61,11 +82,17 @@ class Binary(WidgetInterface):
         else:
             self.but_new.show()
             self.but_remove.show()
-            self.widget.set_focus_chain([self.but_new, self.but_save_as,
-                self.but_remove])
+            if self.wid_text:
+                focus_chain = [self.wid_text]
+            else:
+                focus_chain = [self.but_new, self.but_save_as, self.but_remove]
+            self.widget.set_focus_chain(focus_chain)
 
     def grab_focus(self):
-        return self.wid_text.grab_focus()
+        if self.wid_text:
+            return self.wid_text.grab_focus()
+        else:
+            return self.wid_size.grab_focus()
 
     def sig_new(self, widget=None):
         try:
@@ -74,9 +101,9 @@ class Binary(WidgetInterface):
             if filename and self.field:
                 self.field.set_client(self.record,
                         base64.encodestring(open(filename, 'rb').read()))
-                fname = self.attrs.get('fname_widget', False)
-                if fname:
-                    self.parent.value = {fname:os.path.basename(filename)}
+                if self.filename and self.filename_visible and self.record:
+                    name_wid = self.record.group.fields[self.filename]
+                    name_wid.set_client(self.record, os.path.basename(filename))
                 self.display(self.record, self.field)
         except Exception, exception:
             warning(_('Error reading the file.\nError message:\n%s') \
@@ -98,29 +125,47 @@ class Binary(WidgetInterface):
     def sig_remove(self, widget=None):
         if self.field:
             self.field.set_client(self.record, False)
-            fname = self.attrs.get('fname_widget', False)
-            if fname:
-                self.parent.value = {fname:False}
         self.display(self.record, self.field)
+
+    def sig_key_press(self, widget, event, *args):
+        editable = self.wid_text and self.wid_text.get_editable()
+        if event.keyval == gtk.keysyms.F3 and editable:
+            self.sig_new(widget)
+            return True
+        elif event.keyval == gtk.keysyms.F2:
+            self.sig_save_as(widget)
+            return True
+        return False
 
     def display(self, record, field):
         super(Binary, self).display(record, field)
         if not field:
-            self.wid_text.set_text('')
+            if self.wid_text:
+                self.wid_text.set_text('')
+            self.wid_size.set_text('')
             self.but_save_as.set_sensitive(False)
             return False
-        self.wid_text.set_text(self._size_get(field.get(record)))
+        if self.wid_text:
+            name_wid = record.group.fields[self.filename]
+            self.wid_text.set_text(name_wid.get(record) or '')
+        self.wid_size.set_text(humanize(len(field.get(record) or [])))
         self.but_save_as.set_sensitive(bool(field.get(record)))
         return True
 
     def display_value(self):
-        return self.wid_text.get_text()
-
-    def _size_get(self, value):
-        return value and ('%d ' + _('bytes')) % len(value) or ''
+        if self.wid_text:
+            return self.wid_text.get_text()
+        else:
+            return ''
 
     def set_value(self, record, field):
+        if self.wid_text:
+            name_wid = self.record.group.fields[self.filename]
+            name_wid.set_client(self.record, self.wid_text.get_text() or False)
         return
 
     def _color_widget(self):
-        return self.wid_text
+        if self.wid_text:
+            return self.wid_text
+        else:
+            return self.wid_size

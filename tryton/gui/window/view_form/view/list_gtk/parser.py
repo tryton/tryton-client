@@ -250,6 +250,10 @@ class Char(object):
         if isinstance(cell, CellRendererToggle):
             cell.set_active(bool(text))
         else:
+            cell.set_sensitive(not (record.deleted or record.removed))
+            if isinstance(cell,
+                (CellRendererText, CellRendererDate, CellRendererCombo)):
+                cell.set_property('strikethrough', record.deleted)
             cell.set_property('text', text)
             fg_color = self.get_color(record)
             cell.set_property('foreground', fg_color)
@@ -293,7 +297,8 @@ class Char(object):
                     cell.set_property('background-set', False)
                 else:
                     cell.set_property('background-set', True)
-                    cell.set_property('foreground-set', True)
+                    cell.set_property('foreground-set',
+                        not (record.deleted or record.removed))
 
             if isinstance(cell, CellRendererToggle):
                 cell.set_property('activatable', not readonly)

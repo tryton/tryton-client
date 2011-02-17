@@ -27,8 +27,7 @@ class Group(SignalEvent, list):
         self.load_fields(fields)
         self.current_idx = None
         self.load(ids)
-        self.record_removed = []
-        self.record_deleted = []
+        self.record_deleted, self.record_removed = [], []
         self.on_write = set()
         self.readonly = readonly
         if self._context.get('_datetime'):
@@ -87,8 +86,7 @@ class Group(SignalEvent, list):
         if not self.lock_signal:
             self.signal('group-list-changed', ('group-cleared',))
         self.__id2record = {}
-        self.record_removed = []
-        self.record_deleted = []
+        self.record_removed, self.record_deleted = [], []
 
     def move(self, record, pos):
         self.lock_signal = True
@@ -159,9 +157,16 @@ class Group(SignalEvent, list):
     def load(self, ids, display=True, modified=False):
         if not ids:
             return True
+        # Work with sets to compute intersection and set difference
+        set_records = set(self.get(x) for x in ids)
+        for record in set_records & set(self.record_removed):
+            self.record_removed.remove(record)
+        for record in set_records & set(self.record_deleted):
+            self.record_deleted.remove(record)
 
-        old_ids = [x.id for x in self]
-        ids = [x for x in ids if x not in old_ids]
+        set_records -= set(x for x in self)
+        # return on the list form in order to preserver ordering
+        ids = [x for x in ids if self.get(x) in set_records]
         if not ids:
             return True
 
@@ -177,12 +182,6 @@ class Group(SignalEvent, list):
                 self._record_changed)
             new_record.signal_connect(self, 'record-modified',
                 self._record_modified)
-        for record in self.record_removed[:]:
-            if record.id in ids:
-                self.record_removed.remove(record)
-        for record in self.record_deleted[:]:
-            if record.id in ids:
-                self.record_deleted.remove(record)
         if self.lock_signal:
             self.lock_signal = False
             self.signal('group-cleared')
@@ -253,18 +252,31 @@ class Group(SignalEvent, list):
             self.signal('group-changed', record)
         return record
 
+    def unremove(self, record, signal=True):
+        if record in self.record_removed:
+            self.record_removed.remove(record)
+        if record in self.record_deleted:
+            self.record_deleted.remove(record)
+        if signal:
+            record.signal('record-changed', record.parent)
+
     def remove(self, record, remove=False, modified=True, signal=True):
         idx = self.index(record)
         if self[idx].id > 0:
             if remove:
+                if self[idx] in self.record_deleted:
+                    self.record_deleted.remove(self[idx])
                 self.record_removed.append(self[idx])
             else:
+                if self[idx] in self.record_removed:
+                    self.record_removed.remove(self[idx])
                 self.record_deleted.append(self[idx])
         if record.parent:
             record.parent.modified = True
         if modified:
             record.modified = True
-        self._remove(self[idx])
+        if not record.parent or self[idx].id <= 0:
+            self._remove(self[idx])
 
         if len(self):
             self.current_idx = min(idx, len(self) - 1)
@@ -351,8 +363,7 @@ class Group(SignalEvent, list):
         for field in self.fields.itervalues():
             field.destroy()
         self.fields = {}
-        self.record_removed = None
-        self.record_deleted = None
+        self.record_deleted, self.record_removed = [], []
         self.__id2record = None
         for record in self:
             record.destroy()

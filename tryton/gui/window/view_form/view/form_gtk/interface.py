@@ -167,6 +167,7 @@ class WidgetInterface(object):
                 'fg_color_normal': style.fg[gtk.STATE_NORMAL],
                 'fg_color_insensitive': style.fg[gtk.STATE_INSENSITIVE],
                 'text_color_normal': style.text[gtk.STATE_NORMAL],
+                'text_color_insensitive': style.text[gtk.STATE_INSENSITIVE],
             }
 
         if COLORS.get(name):
