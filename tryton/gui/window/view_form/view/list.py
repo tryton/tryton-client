@@ -159,10 +159,10 @@ class ViewList(ParserView):
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         viewport.add(scroll)
-        width, height = self.widget.size_request()
         self.widget_tree = self.widget
 
         if isinstance(self.screen.window, gtk.Dialog):
+            width, height = self.widget_tree.size_request()
             vbox.set_size_request(width or -1, height or -1)
         vbox.pack_start(viewport, expand=True, fill=True)
 
