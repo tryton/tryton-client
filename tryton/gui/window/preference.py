@@ -52,7 +52,7 @@ class Preference(object):
         fields = res['fields']
         self.screen = Screen('res.user', self.win, view_type=[])
         self.screen.new(default=False)
-        self.screen.add_view(arch, fields, display=True)
+        self.screen.add_view(arch, fields)
 
         args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:
@@ -63,6 +63,9 @@ class Preference(object):
                 self.win.destroy()
                 raise
         self.screen.current_record.set(preferences)
+        self.screen.current_record.validate(softvalidation=True)
+        self.screen.screen_container.set(self.screen.current_view.widget)
+        self.screen.display(set_cursor=True)
 
         width, height = self.screen.screen_container.size_get()
         parent_width, parent_height = parent.get_size()
