@@ -59,6 +59,8 @@ class Main(object):
         self.window = gtk.Window()
         self._width = int(CONFIG['client.default_width'])
         self._height = int(CONFIG['client.default_height'])
+        if CONFIG['client.maximize']:
+            self.window.maximize()
         self.window.set_default_size(self._width, self._height)
         self.window.set_resizable(True)
         self.window.set_title('Tryton')
@@ -66,6 +68,7 @@ class Main(object):
         self.window.connect("destroy", Main.sig_quit)
         self.window.connect("delete_event", self.sig_delete)
         self.window.connect('configure_event', self.sig_configure)
+        self.window.connect('window_state_event', self.sig_window_state)
 
         self.accel_group = gtk.AccelGroup()
         self.window.add_accel_group(self.accel_group)
@@ -1340,6 +1343,11 @@ class Main(object):
                 and hasattr(event, 'height'):
             self._width =  int(event.width)
             self._height = int(event.height)
+        return False
+    
+    def sig_window_state(self, widget, event):
+        CONFIG['client.maximize'] = (event.new_window_state == 
+                gtk.gdk.WINDOW_STATE_MAXIMIZED)
         return False
 
     def win_add(self, page):

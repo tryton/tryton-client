@@ -64,6 +64,7 @@ class ConfigManager(object):
             'client.modepda': False,
             'client.toolbar': 'default',
             'client.form_tab': 'left',
+            'client.maximize': False,
             'client.save_width_height': True,
             'client.spellcheck': False,
             'client.default_path': get_home_dir(),
