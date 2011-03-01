@@ -143,10 +143,11 @@ class Action(object):
             res_id = action.get('res_id', data.get('res_id'))
 
             Window.create(view_ids, res_model, res_id, domain,
-                    action['view_type'], window, action_ctx, view_mode,
-                    name=name, limit=action.get('limit'),
-                    auto_refresh=action.get('auto_refresh'),
-                    search_value=search_value)
+                action['view_type'], window, action_ctx, view_mode,
+                name=name, limit=action.get('limit'),
+                auto_refresh=action.get('auto_refresh'),
+                search_value=search_value,
+                icon=(action.get('icon.rec_name') or ''))
         elif action['type'] == 'ir.action.wizard':
             if action.get('window', False):
                 Window.create_wizard(action['wiz_name'], data, window,

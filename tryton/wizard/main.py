@@ -35,6 +35,7 @@ class Dialog(object):
             but = gtk.Button(i[1])
             but.show()
             if len(i) >= 3:
+                common.ICONFACTORY.register_icon(i[2])
                 icon = gtk.Image()
                 icon.set_from_stock(i[2], gtk.ICON_SIZE_BUTTON)
                 but.set_image(icon)

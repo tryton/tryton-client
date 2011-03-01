@@ -32,6 +32,7 @@ class ParserBoard(object):
                 continue
             attrs = common.node_attributes(node)
             if node.localName == 'image':
+                common.ICONFACTORY.register_icon(attrs['name'])
                 icon = gtk.Image()
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
                 container.wid_add(icon, colspan=int(attrs.get('colspan', 1)),

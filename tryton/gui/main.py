@@ -1164,6 +1164,7 @@ class Main(object):
                         False, rpc.CONTEXT)
             except Exception:
                 prefs = None
+            common.ICONFACTORY.load_icons()
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = prefs['language_direction']
@@ -1255,8 +1256,10 @@ class Main(object):
             if self.pages[page].model == 'ir.ui.menu':
                 self.pages[page].sig_reload()
                 hbox = self.notebook.get_tab_label(self.pages[page].widget)
-                label = hbox.get_children()[0]
-                label.set_text(_('Menu'))
+                for child in hbox.get_children():
+                    if isinstance(child, gtk.Label):
+                        child.set_text(_('Menu'))
+                        break
                 res = True
         return res
 
@@ -1355,7 +1358,16 @@ class Main(object):
         previous_widget = self.notebook.get_nth_page(previous_page_id)
         self.previous_pages[page] = previous_widget
         self.pages.append(page)
-        hbox = gtk.HBox()
+        hbox = gtk.HBox(spacing=3)
+        icon_w, icon_h = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        if page.icon is not None:
+            common.ICONFACTORY.register_icon(page.icon)
+            image = gtk.Image()
+            image.set_from_stock(page.icon, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            hbox.pack_start(image, expand=False, fill=False)
+            noise_size = 2 * icon_w + 3
+        else:
+            noise_size = icon_w + 3
         name = page.name
         if page.model == 'ir.ui.menu':
             name = _('Menu')
@@ -1366,8 +1378,7 @@ class Main(object):
         hbox.pack_start(label, expand=True, fill=True)
         layout = label.get_layout()
         w, h = layout.get_size()
-        icon_w, icon_h = gtk.icon_size_lookup(gtk.ICON_SIZE_SMALL_TOOLBAR)
-        if (w / pango.SCALE) > 120 - icon_w:
+        if (w / pango.SCALE) > 120 - noise_size:
             label2 = gtk.Label('...')
             self.tooltips.set_tip(label2, page.name)
             hbox.pack_start(label2, expand=False, fill=False)

@@ -14,6 +14,7 @@ from urlparse import urlparse
 
 from tryton import version
 from tryton import config
+import tryton.common as common
 from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
         TRYTON_ICON, get_config_dir
 from tryton import translate
@@ -60,22 +61,7 @@ class TrytonClient(object):
             logging.getLogger().setLevel(
                     loglevel[CONFIG['logging.default'].upper()])
 
-        factory = gtk.IconFactory()
-        factory.add_default()
-
-        for fname in os.listdir(PIXMAPS_DIR):
-            name = os.path.splitext(fname)[0]
-            if not name.startswith('tryton-'):
-                continue
-            if not os.path.isfile(os.path.join(PIXMAPS_DIR, fname)):
-                continue
-            try:
-                pixbuf = gtk.gdk.pixbuf_new_from_file(
-                        os.path.join(PIXMAPS_DIR, fname))
-            except Exception:
-                continue
-            icon_set = gtk.IconSet(pixbuf)
-            factory.add(name, icon_set)
+        common.ICONFACTORY.load_client_icons()
 
     def run(self):
         main = gui.Main()

@@ -1,3 +1,4 @@
+* Added possibility to use server-side icons
 * Added additional gtk.Entry for filename on BinaryField
 * Display deleted lines in One2Many and Many2Many
 * Handle URL

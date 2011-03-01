@@ -28,6 +28,7 @@ class Button(object):
         if attrs.get('icon', False):
             try:
                 stock = attrs['icon']
+                common.ICONFACTORY.register_icon(stock)
                 icon = gtk.Image()
                 icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.widget.set_image(icon)
@@ -101,6 +102,7 @@ class Button(object):
             stock = state_changes['icon']
             if stock:
                 try:
+                    common.ICONFACTORY.register_icon(stock)
                     icon = gtk.Image()
                     icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                     self.widget.set_image(icon)
@@ -324,6 +326,7 @@ class ParserForm(ParserInterface):
                                 False):
                     cursor_widget = attrs.get('name')
             if node.localName == 'image':
+                common.ICONFACTORY.register_icon(attrs['name'])
                 icon = Image(attrs)
                 button_list.append(icon)
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
@@ -462,10 +465,19 @@ class ParserForm(ParserInterface):
             elif node.localName == 'page':
                 if CONFIG['client.form_tab'] == 'left':
                     angle = 90
+                    tab_box  = gtk.VBox(spacing=3)
+                    image_pos, image_rotate = ('end',
+                        gtk.gdk.PIXBUF_ROTATE_COUNTERCLOCKWISE)
                 elif CONFIG['client.form_tab'] == 'right':
                     angle = -90
+                    tab_box, image_pos = gtk.VBox(spacing=3)
+                    image_pos, image_rotate = ('start',
+                        gtk.gdk.PIXBUF_ROTATE_CLOCKWISE)
                 else:
                     angle = 0
+                    tab_box = gtk.HBox(spacing=3)
+                    image_pos, image_rotate = ('start',
+                        gtk.gdk.PIXBUF_ROTATE_NONE)
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
                     for attr_name in ('states', 'invisible'):
@@ -478,9 +490,22 @@ class ParserForm(ParserInterface):
                     text = _('No String Attr.')
                 if '_' not in text:
                     text = '_' + text
-                label = gtk.Label(text)
-                label.set_angle(angle)
-                label.set_use_underline(True)
+                tab_label = gtk.Label(text)
+                tab_label.set_angle(angle)
+                tab_label.set_use_underline(True)
+                tab_box.pack_start(tab_label)
+                if 'icon' in attrs:
+                    common.ICONFACTORY.register_icon(attrs['icon'])
+                    pixbuf = tab_box.render_icon(attrs['icon'],
+                        gtk.ICON_SIZE_SMALL_TOOLBAR)
+                    pixbuf = pixbuf.rotate_simple(image_rotate)
+                    icon = gtk.Image()
+                    icon.set_from_pixbuf(pixbuf)
+                    if image_pos == 'end':
+                        tab_box.pack_end(icon)
+                    else:
+                        tab_box.pack_start(icon)
+                tab_box.show_all()
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
                         self.parse(model_name, node, fields, notebook,
                                 tooltips=tooltips)
@@ -503,7 +528,7 @@ class ParserForm(ParserInterface):
                 scrolledwindow.add(viewport)
 
                 button_list.append(scrolledwindow)
-                notebook.append_page(scrolledwindow, label)
+                notebook.append_page(scrolledwindow, tab_box)
 
             elif node.localName == 'field':
                 name = str(attrs['name'])

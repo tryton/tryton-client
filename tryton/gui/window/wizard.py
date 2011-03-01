@@ -42,8 +42,8 @@ class Wizard(SignalEvent):
         self.action = action
         self.datas = datas
         self.state = state
-        self.direct_print = direct_print
-        self.email_print = email_print
+        self.direct_print = False
+        self.email_print = False
         self.email = email
         self.context = context
         if not 'form' in datas:
@@ -163,6 +163,7 @@ class Wizard(SignalEvent):
             but.connect('clicked', self.sig_clicked, i[0])
             self.states[i[0]] = but
             if len(i) >= 3:
+                common.ICONFACTORY.register_icon(i[2])
                 icon = gtk.Image()
                 icon.set_from_stock(i[2], gtk.ICON_SIZE_BUTTON)
                 but.set_image(icon)

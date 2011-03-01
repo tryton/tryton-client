@@ -199,10 +199,14 @@ class ViewList(ParserView):
                     continue
 
                 for tool in toolbar[icontype]:
-                    iconstock = {
-                        'print': 'tryton-print',
-                        'action': 'tryton-executable',
-                    }.get(icontype)
+                    if not tool['icon.rec_name']:
+                        iconstock = {
+                            'print': 'tryton-print',
+                            'action': 'tryton-executable',
+                        }.get(icontype)
+                    else:
+                        iconstock = tool['icon.rec_name']
+                    common.ICONFACTORY.register_icon(iconstock)
 
                     if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
                         tbutton = gtk.MenuToolButton(iconstock)

@@ -1,5 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
+
 import gtk
 import gobject
 import pango
@@ -22,6 +24,7 @@ import traceback
 import tryton.rpc as rpc
 import locale
 import socket
+import tempfile
 from tryton.version import VERSION
 import thread
 import urllib
@@ -35,6 +38,75 @@ import dis
 from threading import Lock
 
 _ = gettext.gettext
+
+
+class TrytonIconFactory(gtk.IconFactory):
+
+    batchnum = 10
+    _tryton_icons = []
+    _name2id = {}
+    _loaded_icons = set()
+
+    def load_client_icons(self):
+        for fname in os.listdir(PIXMAPS_DIR):
+            name = os.path.splitext(fname)[0]
+            if not name.startswith('tryton-'):
+                continue
+            if not os.path.isfile(os.path.join(PIXMAPS_DIR, fname)):
+                continue
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(
+                        os.path.join(PIXMAPS_DIR, fname))
+            except Exception:
+                continue
+            icon_set = gtk.IconSet(pixbuf)
+            self.add(name, icon_set)
+            self._loaded_icons.add(name)
+
+    def load_icons(self):
+        self._name2id.clear()
+        self._loaded_icons.clear()
+        del self._tryton_icons[:]
+
+        try:
+            icons = rpc.execute('model', 'ir.ui.icon', 'list_icons',
+                rpc.CONTEXT)
+        except Exception:
+            icons = []
+        for icon_id, icon_name in icons:
+            self._tryton_icons.append((icon_id, icon_name))
+            self._name2id[icon_name] = icon_id
+
+    def register_icon(self, iconname):
+        if (iconname in self._loaded_icons
+            or iconname not in self._name2id):
+            return
+        icon_ref = (self._name2id[iconname], iconname)
+        idx = self._tryton_icons.index(icon_ref)
+        to_load = slice(max(0, idx-self.batchnum/2), idx+self.batchnum/2)
+        ids = [e[0] for e in self._tryton_icons[to_load]]
+        try:
+            icons = rpc.execute('model', 'ir.ui.icon', 'read', ids,
+                ['name', 'icon'], rpc.CONTEXT)
+        except Exception:
+            icons = []
+        for icon in icons:
+            # svg file cannot be loaded from data into a pixbuf
+            svgfile = tempfile.NamedTemporaryFile(delete=False)
+            try:
+                with svgfile:
+                    svgfile.write(icon['icon'])
+                pixbuf = gtk.gdk.pixbuf_new_from_file(svgfile.name)
+            except Exception:
+                continue
+            iconset = gtk.IconSet(pixbuf)
+            self.add(icon['name'], iconset)
+            self._tryton_icons.remove((icon['id'], icon['name']))
+            del self._name2id[icon['name']]
+            self._loaded_icons.add(icon['name'])
+
+ICONFACTORY = TrytonIconFactory()
+ICONFACTORY.add_default()
 
 def find_in_path(name):
     if os.name == "nt":

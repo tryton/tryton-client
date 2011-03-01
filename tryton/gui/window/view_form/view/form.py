@@ -4,6 +4,7 @@ import gtk
 import gettext
 from tryton.common import message, TRYTON_ICON
 import tryton.rpc as rpc
+import tryton.common as common
 from interface import ParserView
 from tryton.action import Action
 from tryton.config import CONFIG
@@ -59,11 +60,15 @@ class ViewForm(ParserView):
                     continue
 
                 for tool in toolbar[icontype]:
-                    iconstock = {
-                        'print': 'tryton-print',
-                        'action': 'tryton-executable',
-                        'relate': 'tryton-go-jump',
-                    }.get(icontype)
+                    if not tool['icon.rec_name']:
+                        iconstock = {
+                            'print': 'tryton-print',
+                            'action': 'tryton-executable',
+                            'relate': 'tryton-go-jump',
+                        }.get(icontype)
+                    else:
+                        iconstock = tool['icon.rec_name']
+                    common.ICONFACTORY.register_icon(iconstock)
 
                     if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
                         tbutton = gtk.MenuToolButton(iconstock)

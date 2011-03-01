@@ -172,15 +172,13 @@ class Tree(SignalEvent):
             if not ids:
                 return
         if self.tree_res.toolbar and not CONFIG['client.modepda']:
-
-            icon_name = 'icon'
             for child in self.toolbar.get_children():
                 self.toolbar.remove(child)
             ctx = {}
             ctx.update(rpc.CONTEXT)
             try:
                 args = ('model', self.view['model'], 'read', ids,
-                        ['name', icon_name], ctx)
+                        ['name', 'icon'], ctx)
                 results = rpc.execute(*args)
             except Exception, exception:
                 results = common.process_exception(exception, self.window, *args)
@@ -190,7 +188,8 @@ class Tree(SignalEvent):
                 ids.index(y['id'])))
             radiotb = None
             for res in results:
-                radiotb = gtk.RadioToolButton(radiotb, res[icon_name])
+                common.ICONFACTORY.register_icon(res['icon'])
+                radiotb = gtk.RadioToolButton(radiotb, res['icon'])
                 radiotb.set_label(res['name'])
                 radiotb.show_all()
                 radiotb.set_data('id', res['id'])
