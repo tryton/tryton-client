@@ -113,7 +113,10 @@ class FIFOServer(IPCServer):
         fifo = os.fdopen(os.open(self.filename, os.O_RDONLY|os.O_NONBLOCK))
         data = ''
         while self.running:
-            rlist, _, _ = select.select([fifo], [], [], 1)
+            try:
+                rlist, _, _ = select.select([fifo], [], [], 1)
+            except select.error:
+                continue
             if rlist:
                 try:
                     data += fifo.readline()
