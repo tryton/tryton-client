@@ -29,15 +29,15 @@ class Binary(WidgetInterface):
         self.tooltips = Tooltips()
 
         self.widget = gtk.HBox(spacing=0)
+        self.wid_size = gtk.Entry()
+        self.wid_size.set_width_chars(11)
+        self.wid_size.props.sensitive = False
         if self.filename and self.filename_visible:
             self.wid_text = gtk.Entry()
             self.wid_text.set_property('activates_default', True)
             self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
             self.wid_text.connect('focus-out-event', lambda x, y: self._focus_out())
             self.wid_text.connect_after('key_press_event', self.sig_key_press)
-            self.wid_size = gtk.Entry()
-            self.wid_size.set_width_chars(11)
-            self.wid_size.props.sensitive = False
             self.widget.pack_start(self.wid_text, expand=True, fill=True)
         else:
             self.wid_text = None
