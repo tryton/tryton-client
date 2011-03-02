@@ -1347,9 +1347,9 @@ class Main(object):
             self._width =  int(event.width)
             self._height = int(event.height)
         return False
-    
+
     def sig_window_state(self, widget, event):
-        CONFIG['client.maximize'] = (event.new_window_state == 
+        CONFIG['client.maximize'] = (event.new_window_state ==
                 gtk.gdk.WINDOW_STATE_MAXIMIZED)
         return False
 
