@@ -45,6 +45,7 @@ class TrytonIconFactory(gtk.IconFactory):
     batchnum = 10
     _tryton_icons = []
     _name2id = {}
+    _locale_icons = set()
     _loaded_icons = set()
 
     def load_client_icons(self):
@@ -61,11 +62,12 @@ class TrytonIconFactory(gtk.IconFactory):
                 continue
             icon_set = gtk.IconSet(pixbuf)
             self.add(name, icon_set)
-            self._loaded_icons.add(name)
+            self._locale_icons.add(name)
 
-    def load_icons(self):
-        self._name2id.clear()
-        self._loaded_icons.clear()
+    def load_icons(self, refresh=False):
+        if not refresh:
+            self._name2id.clear()
+            self._loaded_icons.clear()
         del self._tryton_icons[:]
 
         try:
@@ -74,13 +76,18 @@ class TrytonIconFactory(gtk.IconFactory):
         except Exception:
             icons = []
         for icon_id, icon_name in icons:
+            if refresh and icon_name in self._loaded_icons:
+                continue
             self._tryton_icons.append((icon_id, icon_name))
             self._name2id[icon_name] = icon_id
 
     def register_icon(self, iconname):
-        if (iconname in self._loaded_icons
-            or iconname not in self._name2id):
+        # iconname might be '' when page do not define icon
+        if (not iconname
+                or iconname in (self._loaded_icons | self._locale_icons)):
             return
+        if iconname not in self._name2id:
+            self.load_icons(refresh=True)
         icon_ref = (self._name2id[iconname], iconname)
         idx = self._tryton_icons.index(icon_ref)
         to_load = slice(max(0, idx-self.batchnum/2), idx+self.batchnum/2)
