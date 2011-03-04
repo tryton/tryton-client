@@ -99,11 +99,11 @@ class TrytonIconFactory(gtk.IconFactory):
             icons = []
         for icon in icons:
             # svg file cannot be loaded from data into a pixbuf
-            svgfile = tempfile.NamedTemporaryFile()
-            with svgfile:
+            fileno, path = tempfile.mkstemp()
+            with os.fdopen(fileno, 'w') as svgfile:
                 svgfile.write(icon['icon'])
-                svgfile.flush()
-                pixbuf = gtk.gdk.pixbuf_new_from_file(svgfile.name)
+            pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+            os.remove(path)
             iconset = gtk.IconSet(pixbuf)
             self.add(icon['name'], iconset)
             self._tryton_icons.remove((icon['id'], icon['name']))
