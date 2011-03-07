@@ -24,7 +24,6 @@ class Binary(WidgetInterface):
                 attrs=attrs)
 
         self.filename = attrs.get('filename')
-        self.filename_visible = attrs.get('filename_visible')
 
         self.tooltips = Tooltips()
 
@@ -32,7 +31,7 @@ class Binary(WidgetInterface):
         self.wid_size = gtk.Entry()
         self.wid_size.set_width_chars(11)
         self.wid_size.props.sensitive = False
-        if self.filename and self.filename_visible:
+        if self.filename and attrs.get('filename_visible'):
             self.wid_text = gtk.Entry()
             self.wid_text.set_property('activates_default', True)
             self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
@@ -101,7 +100,7 @@ class Binary(WidgetInterface):
             if filename and self.field:
                 self.field.set_client(self.record,
                         base64.encodestring(open(filename, 'rb').read()))
-                if self.filename and self.filename_visible and self.record:
+                if self.filename and self.record:
                     name_wid = self.record.group.fields[self.filename]
                     name_wid.set_client(self.record, os.path.basename(filename))
                 self.display(self.record, self.field)
