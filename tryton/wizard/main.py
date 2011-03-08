@@ -188,11 +188,13 @@ class Wizard(object):
                 res = rpcprogress.run()
                 exception = None
             except Exception, exception:
-                common.process_exception(exception, parent)
-                # Continue by running previous result except if access to
-                # wizard is denied
-                if exception.args[0] == 'AccessDenied':
-                    break
+                if common.process_exception(exception, parent):
+                    continue
+                else:
+                    # Continue by running previous result except if access to
+                    # wizard is denied
+                    if exception.args[0] == 'AccessDenied':
+                        break
             if not res:
                 if dia:
                     res = {'type': 'form'}
