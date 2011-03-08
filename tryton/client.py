@@ -66,10 +66,10 @@ class TrytonClient(object):
     def run(self):
         main = gui.Main()
 
-        signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(0))
-        signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(0))
+        signal.signal(signal.SIGINT, lambda signum, frame: main.sig_quit())
+        signal.signal(signal.SIGTERM, lambda signum, frame: main.sig_quit())
         if hasattr(signal, 'SIGQUIT'):
-            signal.signal(signal.SIGQUIT, lambda signum, frame: sys.exit(0))
+            signal.signal(signal.SIGQUIT, lambda signum, frame: main.sig_quit())
 
         def excepthook(exctyp, value, tb):
             import common

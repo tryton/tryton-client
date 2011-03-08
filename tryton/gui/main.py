@@ -1318,6 +1318,7 @@ class Main(object):
 
     @staticmethod
     def sig_quit(widget=None):
+        rpc.logout()
         CONFIG['client.default_width'] = Main.get_main()._width
         CONFIG['client.default_height'] = Main.get_main()._height
         CONFIG.save()
