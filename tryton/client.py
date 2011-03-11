@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
 """
 %prog [options]
 """
@@ -8,9 +9,11 @@ import sys
 import pygtk
 pygtk.require('2.0')
 import gtk
-gtk.gdk.threads_init()
+import gobject
+gobject.threads_init()
 import logging
 from urlparse import urlparse
+import threading
 
 from tryton import version
 from tryton import config
@@ -24,6 +27,20 @@ import traceback
 import time
 import signal
 
+if not hasattr(gtk.gdk, 'lock'):
+    class _Lock(object):
+        __enter__ = gtk.gdk.threads_enter
+        def __exit__(*ignored):
+            gtk.gdk.threads_leave()
+
+    gtk.gdk.lock = _Lock()
+
+if sys.platform == 'win32':
+    class Dialog(gtk.Dialog):
+        def run(self):
+            with gtk.gdk.lock:
+                return super(Dialog, self).run()
+    gtk.Dialog = Dialog
 
 class TrytonClient(object):
     "Tryton client"
@@ -61,10 +78,19 @@ class TrytonClient(object):
             logging.getLogger().setLevel(
                     loglevel[CONFIG['logging.default'].upper()])
 
+        self.quit_client = (threading.Event()
+            if sys.platform == 'win32' else None)
         common.ICONFACTORY.load_client_icons()
 
+    def quit_mainloop(self):
+        if sys.platform == 'win32':
+            self.quit_client.set()
+        else:
+            if gtk.main_level() > 0:
+                gtk.main_quit()
+
     def run(self):
-        main = gui.Main()
+        main = gui.Main(self)
 
         signal.signal(signal.SIGINT, lambda signum, frame: main.sig_quit())
         signal.signal(signal.SIGTERM, lambda signum, frame: main.sig_quit())
@@ -96,8 +122,20 @@ class TrytonClient(object):
         #except ImportError:
         #    pass
 
+        if sys.platform == 'win32':
+            # http://faq.pygtk.org/index.py?req=show&file=faq21.003.htp
+            def sleeper():
+                time.sleep(.001)
+                return 1
+            gobject.timeout_add(400, sleeper)
+
         try:
-            gtk.main()
+            if sys.platform == 'win32':
+                while not self.quit_client.isSet():
+                    with gtk.gdk.lock:
+                            running = gtk.main_iteration(True)
+            else:
+                gtk.main()
         except KeyboardInterrupt:
             CONFIG.save()
             if hasattr(gtk, 'accel_map_save'):

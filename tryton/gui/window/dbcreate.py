@@ -1,5 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
+
 import gtk
 import gobject
 import gettext
@@ -110,17 +112,10 @@ class DBCreate(object):
     def entry_insert_text(self, entry, new_text, new_text_length, position):
         """
         This event method checks each text input for the PostgreSQL
-        database name. It allows the following rules: 
+        database name. It allows the following rules:
         - Allowed characters are alpha-nummeric [A-Za-z0-9] and underscore (_)
         - First character must be a letter
         """
-        def _move_cursor(entry, pos):
-            """
-            Helper function for entry_insert_text. It is used to position
-            the cursor for right and wron inputs correctly.
-            """
-            entry.set_position(pos)
-            return False
 
         if (new_text.isalnum() or new_text == '_' ):
             _hid = entry.get_data('handlerid')
@@ -128,7 +123,12 @@ class DBCreate(object):
             _pos = entry.get_position()
             _pos = entry.insert_text(new_text, _pos)
             entry.handler_unblock(_hid)
-            gobject.idle_add(_move_cursor, entry, _pos)
+
+            def _move_cursor():
+                with gtk.gdk.lock:
+                    entry.set_position(_pos)
+                    return False
+            gobject.idle_add(_move_cursor)
         entry.stop_emission("insert-text")
 
     def __init__(self, sig_login=None):

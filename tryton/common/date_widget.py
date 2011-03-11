@@ -1,6 +1,8 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 "Date Widget"
+from __future__ import with_statement
+
 import gobject
 import pango
 import gtk
@@ -53,7 +55,14 @@ class DateEntry(gtk.Entry):
 
         self._interactive_input = True
         self.mode_cmd = False
-        gobject.idle_add(self.set_position, 0)
+        self.idle_set_position(0)
+
+    def idle_set_position(self, value):
+        def idle_func():
+            with gtk.gdk.lock:
+                self.set_position(value)
+                return False
+        gobject.idle_add(idle_func)
 
     def _on_insert_text(self, editable, value, length, position):
         if not self._interactive_input:
@@ -85,7 +94,7 @@ class DateEntry(gtk.Entry):
 
         if self.regex.match(text) and self.test_date(text):
             self.set_text(text)
-            gobject.idle_add(self.set_position, pos)
+            self.idle_set_position(pos)
         self.stop_emission('insert-text')
         self.show()
         return
@@ -107,7 +116,7 @@ class DateEntry(gtk.Entry):
         text = self.get_text()
         text = text[:start] + self.initial_value[start:end] + text[end:]
         self.set_text(text)
-        gobject.idle_add(self.set_position, start)
+        self.idle_set_position(start)
         self.stop_emission('delete-text')
         return
 

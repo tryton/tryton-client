@@ -1,5 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
+
 import os
 import sys
 import gettext
@@ -36,6 +38,7 @@ import tryton.translate as translate
 import tryton.plugins
 import pango
 import time
+import threading
 try:
     import gtk_osxapplication
 except ImportError:
@@ -52,9 +55,11 @@ _MAIN = []
 
 class Main(object):
     window = None
+    tryton_client = None
 
-    def __init__(self):
+    def __init__(self, tryton_client):
         super(Main, self).__init__()
+        Main.tryton_client = tryton_client
 
         self.window = gtk.Window()
         self._width = int(CONFIG['client.default_width'])
@@ -1316,8 +1321,8 @@ class Main(object):
                 }
         tryton.plugins.execute(datas, self.window)
 
-    @staticmethod
-    def sig_quit(widget=None):
+    @classmethod
+    def sig_quit(cls, widget=None):
         rpc.logout()
         CONFIG['client.default_width'] = Main.get_main()._width
         CONFIG['client.default_height'] = Main.get_main()._height
@@ -1325,8 +1330,7 @@ class Main(object):
         if hasattr(gtk, 'accel_map_save'):
             gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
 
-        if gtk.main_level() > 0:
-            gtk.main_quit()
+        cls.tryton_client.quit_mainloop()
 
     def sig_close(self, widget):
         if common.sur(_("Do you really want to quit?"), parent=self.window):
@@ -1764,4 +1768,8 @@ class Main(object):
             open_url()
 
     def open_url(self, url):
-        gobject.idle_add(self._open_url, url)
+        def idle_open_url():
+            with gtk.gdk.lock:
+                self._open_url(url)
+                return False
+        gobject.idle_add(idle_open_url)

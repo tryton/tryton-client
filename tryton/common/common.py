@@ -1096,9 +1096,11 @@ class RPCProgress(object):
                     win.set_transient_for(self.parent)
                     win.set_modal(True)
                     win.show_all()
-                progressbar.pulse()
-            while gtk.events_pending():
-                gtk.main_iteration()
+                with gtk.gdk.lock:
+                    progressbar.pulse()
+            with gtk.gdk.lock:
+                while gtk.events_pending():
+                    gtk.main_iteration()
         if win:
             win.destroy()
             while gtk.events_pending():
