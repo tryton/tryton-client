@@ -21,6 +21,7 @@ except ImportError:
     import md5
 import webbrowser
 import traceback
+import threading
 import tryton.rpc as rpc
 import locale
 import socket
@@ -35,7 +36,7 @@ try:
 except ImportError:
     ssl = None
 import dis
-from threading import Lock
+from threading import Lock, Semaphore
 
 _ = gettext.gettext
 
@@ -126,7 +127,11 @@ def find_in_path(name):
             return val
     return name
 
-def refresh_dblist(db_widget, host, port, dbtoload=None):
+def false_call(function, *args):
+    function(*args)
+    return None
+
+def refresh_dblist(host, port):
     '''
     Return the number of database available
         or None if it is impossible to connect
@@ -137,22 +142,7 @@ def refresh_dblist(db_widget, host, port, dbtoload=None):
     if hasattr(version, 'split'):
         if version.split('.')[:2] != VERSION.split('.')[:2]:
             return -1
-    if not dbtoload:
-        dbtoload = CONFIG['login.db']
-    index = 0
-    liststore = db_widget.get_model()
-    liststore.clear()
-    result = rpc.db_list(host, port)
-    from tryton.gui.main import Main
-    Main.get_main().refresh_ssl()
-    if result is None:
-        return None
-    for db_num, dbname in enumerate(result):
-        liststore.append([dbname])
-        if dbname == dbtoload:
-            index = db_num
-    db_widget.set_active(index)
-    return len(liststore)
+    return rpc.db_list(host, port)
 
 def refresh_langlist(lang_widget, host, port):
     liststore = lang_widget.get_model()
@@ -1028,6 +1018,65 @@ def generateColorscheme(masterColor, keys, light=0.06):
     r, g, b = hex2rgb(COLOR_SCHEMES.get(masterColor, masterColor))
     return dict([(key, lighten(r, g, b, light * i))
         for i, key in enumerate(keys)])
+
+
+class DBProgress(object):
+
+    def __init__(self, host, port):
+        self.dbs, self.createdb = None, None
+        self.host, self.port = host, port
+        self.updated = threading.Event()
+        self.db_info = None
+
+    def start(self):
+        key = (self.host, self.port)
+        try:
+            dbs = refresh_dblist(self.host, self.port)
+            createdb = True
+        except Exception, exception:
+            if exception[0] == 'AccessDenied':
+                dbs, createdb = [], False
+            else:
+                raise
+        self.db_info = (dbs, createdb)
+        self.updated.set()
+
+    def update(self, combo, progressbar, dbname=''):
+        key = (self.host, self.port)
+        self.db_info = None
+        thread = threading.Thread(target=self.start).start()
+
+        i = 0
+        while not self.updated.isSet():
+            i += 1
+            time.sleep(0.1)
+            if i >= 10:
+                progressbar.show()
+                progressbar.pulse()
+            while gtk.events_pending():
+                gtk.main_iteration()
+        progressbar.hide()
+        dbs, createdb = self.db_info
+
+        if dbs is None:
+            return None, False
+        elif dbs == -1:
+            return -1, False
+
+        from tryton.gui.main import Main
+        Main.get_main().refresh_ssl()
+        liststore = combo.get_model()
+        liststore.clear()
+        index = -1
+        for db_num, db_name in enumerate(dbs):
+            liststore.append([db_name])
+            if db_name == dbname:
+                index = db_num
+        if index == -1:
+            index = 0
+        combo.set_active(index)
+
+        return len(dbs), createdb
 
 
 class RPCProgress(object):

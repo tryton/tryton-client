@@ -1,5 +1,7 @@
 # This file is part of Tryton.  The COPYRIGHT file at the top level of this
 # repository contains the full copyright notices and license terms.
+import threading
+
 import gtk
 import gettext
 import tryton.common as common
@@ -13,19 +15,22 @@ class DBBackupDrop(object):
     Widget for database backup and drop.
     """
     @staticmethod
-    def refreshlist(widget, db_widget, label, host, port):
-        res = common.refresh_dblist(db_widget, host, port)
-        if res is None or res == -1:
-            if res is None:
+    def refreshlist(widget, db_widget, label, db_progress, host, port):
+        db_widget.hide()
+        label.hide()
+        dbprogress = common.DBProgress(host, port)
+        dbs, createdb = dbprogress.update(db_widget, db_progress)
+        if dbs is None or dbs == -1:
+            if dbs is None:
                 label.set_label('<b>' + \
                         _('Could not connect to server!') + '</b>')
             else:
                 label.set_label('<b>' + \
-                        _('This client version is not compatible with the server!') +\
-                        '</b>')
+                    _('This client version is not compatible with the server!')
+                    + '</b>')
             db_widget.hide()
             label.show()
-        elif res == 0:
+        elif dbs == 0:
             label.set_label('<b>' + \
                     _('No database found, you must create one!') + '</b>')
             db_widget.hide()
@@ -33,17 +38,17 @@ class DBBackupDrop(object):
         else:
             label.hide()
             db_widget.show()
-        return res
+        return dbs
 
     @staticmethod
-    def refreshlist_ask(widget, server_widget, db_widget, label, parent=None):
+    def refreshlist_ask(widget, server_widget, db_widget, label, db_progress,
+            parent=None):
         res = common.request_server(server_widget, parent)
         if not res:
             return None
         host, port = res
-        if DBBackupDrop.refreshlist(widget, db_widget, label, host, port):
-            CONFIG['login.server'] = host
-            CONFIG['login.port'] = port
+        DBBackupDrop.refreshlist(widget, db_widget, label, db_progress, host,
+            port)
         return (host, port)
 
     def event_show_button_ok(self, widget, event, data=None):
@@ -157,11 +162,18 @@ class DBBackupDrop(object):
 
         vbox_combo = gtk.VBox()
         self.combo_database = gtk.ComboBox()
+        self.db_progressbar = gtk.ProgressBar()
         self.combo_database_label = gtk.Label()
         self.combo_database_label.set_use_markup(True)
         self.combo_database_label.set_alignment(0, 1)
-        vbox_combo.pack_start(self.combo_database, True, True, 0)
-        vbox_combo.pack_start(self.combo_database_label, False, False, 0)
+        vbox_combo.pack_start(self.combo_database, True, True)
+        vbox_combo.pack_start(self.combo_database_label, False, False)
+        vbox_combo.pack_start(self.db_progressbar, True, True)
+        width, height = 0, 0
+        for child in vbox_combo.get_children():
+            cwidth, cheight = child.size_request()
+            width, height = max(width, cwidth), max(height, cheight)
+        vbox_combo.set_size_request(width, height)
         table.attach(vbox_combo, 1, 3, 3, 4, yoptions=gtk.FILL)
 
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
@@ -188,33 +200,24 @@ class DBBackupDrop(object):
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
 
-        if not CONFIG['login.host']:
-            self.label_server.hide()
-            self.entry_server_connection.hide()
-            self.button_server_change.hide()
-            self.label_serverpasswd.hide()
-            self.entry_serverpasswd.hide()
-
         pass_widget = self.entry_serverpasswd
         server_widget = self.entry_server_connection
         db_widget = self.combo_database
+        db_progress = self.db_progressbar
         label = self.combo_database_label
 
-        host = CONFIG['login.server']
-        port = int(CONFIG['login.port'])
-        url = '%s:%d' % (host, port)
-        server_widget.set_text(url)
+        server_widget.set_text('')
 
         liststore = gtk.ListStore(str)
         db_widget.set_model(liststore)
         cell = gtk.CellRendererText()
         db_widget.pack_start(cell, True)
         db_widget.add_attribute(cell, 'text', 0)
-        res = self.refreshlist(None, db_widget, label, host, port)
+        res = self.refreshlist(None, db_widget, label, db_progress, '', '')
 
         change_button = self.button_server_change
         change_button.connect_after('clicked', DBBackupDrop.refreshlist_ask, \
-                server_widget, db_widget, label, self.dialog)
+                server_widget, db_widget, label, db_progress, self.dialog)
 
         while True:
             database = False

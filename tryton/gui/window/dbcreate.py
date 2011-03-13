@@ -1,13 +1,14 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 from __future__ import with_statement
-
+import ConfigParser
+import os
 import gtk
 import gobject
 import gettext
 import re
 import tryton.common as common
-from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
+from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, get_config_dir
 import tryton.rpc as rpc
 
 _ = gettext.gettext
@@ -72,8 +73,6 @@ class DBCreate(object):
         except Exception:
             self.server_connection_state(False)
             return False
-        CONFIG['login.server'] = host
-        CONFIG['login.port'] = port
         return True
 
     def event_passwd_clear(self, widget, event, data=None):
@@ -131,10 +130,11 @@ class DBCreate(object):
             gobject.idle_add(_move_cursor)
         entry.stop_emission("insert-text")
 
-    def __init__(self, sig_login=None):
-        """
-        This method defines the complete GUI.
-        """
+    def __init__(self, host=None, port=None, sig_login=None):
+        self.host = host
+        self.port = port
+
+        # GTK Stuffs
         self.dialog = gtk.Dialog(
             title= _("Create new database"),
             flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
@@ -178,7 +178,6 @@ class DBCreate(object):
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
-        table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
             "the server. Use server 'localhost' and port '8070' if " \
             "the server is installed on this computer. Click on 'Change' to " \
@@ -192,6 +191,10 @@ class DBCreate(object):
         table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
             "server connection..."))
+        self.button_server_change.set_sensitive(not bool(self.host
+            and self.port))
+
+        table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         self.label_serverpasswd.set_alignment(1, 0.5)
@@ -293,30 +296,22 @@ class DBCreate(object):
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
 
-        if not CONFIG['login.host']:
-            self.label_server_setup.hide()
-            self.label_server.hide()
-            self.entry_server_connection.hide()
-            self.button_server_change.hide()
-            self.label_serverpasswd.hide()
-            self.entry_serverpasswd.hide()
-            self.hseparator.hide()
-
         pass_widget = self.entry_serverpasswd
         change_button = self.button_server_change
         admin_passwd = self.entry_adminpasswd
         admin_passwd2 = self.entry_adminpasswd2
-
         change_button.connect_after('clicked', self.server_change, self.dialog)
-        host = CONFIG['login.server']
-        port = int(CONFIG['login.port'])
-        url = '%s:%d' % (host, port)
+
+        if self.host and self.port:
+            url = '%s:%d' % (self.host, self.port)
+        else:
+            url = ''
         self.entry_server_connection.set_text(url)
 
         liststore = gtk.ListStore(str, str)
         self.combo_language.set_model(liststore)
         try:
-            common.refresh_langlist(self.combo_language, host, port)
+            common.refresh_langlist(self.combo_language, self.host, self.port)
         except Exception:
             self.button_create.set_sensitive(False)
 
@@ -372,9 +367,8 @@ class DBCreate(object):
                          self.entry_dbname.grab_focus()
                          continue
                     else: # Everything runs fine, break the block here
-                        CONFIG['login.server'] = host = url_m.group(1)
-                        CONFIG['login.port'] = port = url_m.group(2)
-                        CONFIG["login.login"] = "admin"
+                        host = url_m.group(1)
+                        port = url_m.group(2)
                         try:
                             rpcprogress = common.RPCProgress('db_exec',
                                     (host, int(port), 'create', dbname, passwd,
@@ -409,10 +403,27 @@ class DBCreate(object):
                         parent.present()
                         self.dialog.destroy()
                         if self.sig_login:
-                            self.sig_login(dbname=dbname)
+                            profile_cfg = os.path.join(get_config_dir(),
+                                'profiles.cfg')
+                            profiles = ConfigParser.SafeConfigParser()
+                            if os.path.exists(profile_cfg):
+                                profiles.read(profile_cfg)
+                            i, profile_name = 0, dbname
+                            while profile_name in profiles.sections():
+                                i += 1
+                                profile_name = '%s_%s' % (dbname, i)
+                            profiles.add_section(profile_name)
+                            profiles.set(profile_name, 'host', host)
+                            profiles.set(profile_name, 'port', port)
+                            profiles.set(profile_name, 'database', dbname)
+                            profiles.set(profile_name, 'username', '')
+                            with open(profile_cfg, 'wb') as configfile:
+                                profiles.write(configfile)
+                            self.sig_login(profile_name=profile_name)
                         break
 
             break
         parent.present()
         self.dialog.destroy()
+        return dbname
 

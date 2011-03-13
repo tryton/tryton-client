@@ -173,16 +173,7 @@ class DBRestore(object):
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
 
-        if not CONFIG['login.host']:
-            self.label_server_url.hide()
-            self.entry_server_url.hide()
-            self.button_server_change.hide()
-            self.label_server_password.hide()
-            self.entry_server_password.hide()
-            self.hseparator.hide()
-
-        url = '%s:%d' % (CONFIG['login.server'], int(CONFIG['login.port']))
-        self.entry_server_url.set_text(url)
+        self.entry_server_url.set_text('')
         while True:
             database = False
             passwd = False

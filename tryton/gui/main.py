@@ -1145,13 +1145,13 @@ class Main(object):
                 raise
             return ([], [])
 
-    def sig_login(self, widget=None, dbname=False, res=None):
+    def sig_login(self, widget=None, profile_name=False, res=None):
         if not self.sig_logout(widget, disconnect=False):
             return
         if not res:
             try:
                 dblogin = DBLogin(self.window)
-                res = dblogin.run(dbname, self.window)
+                res = dblogin.run(profile_name, self.window)
             except Exception, exception:
                 if exception.args == ('QueryCanceled',):
                     return False
@@ -1513,7 +1513,7 @@ class Main(object):
     def sig_db_new(self, widget):
         if not self.sig_logout(widget):
             return False
-        dia = DBCreate(self.sig_login)
+        dia = DBCreate(sig_login=self.sig_login)
         res = dia.run(self.window)
         if res:
             CONFIG.save()

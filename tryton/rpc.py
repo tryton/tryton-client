@@ -49,9 +49,12 @@ def db_list(host, port):
             _SEMAPHORE.release()
         logging.getLogger('rpc.result').debug(repr(res))
         return res
-    except Exception:
-        logging.getLogger('rpc.result').debug(repr(None))
-        return None
+    except Exception, exception:
+        if exception[0] == 'AccessDenied':
+            raise
+        else:
+            logging.getLogger('rpc.result').debug(repr(None))
+            return None
 
 def db_exec(host, port, method, *args):
     global _SOCK, SECURE

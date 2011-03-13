@@ -1,3 +1,4 @@
+* Added a connection manager à la gajim
 * Fix warning in wizards
 * Added possibility to use server-side icons
 * Added additional gtk.Entry for filename on BinaryField
