@@ -349,7 +349,7 @@ def test_simplify():
     domain = ['OR', [['x', '=', 3]], [['y', '=', 5]]]
     assert simplify(domain) == ['OR', [['x', '=', 3]], [['y', '=', 5]]]
     domain = ['OR', ['x', '=', 3], ['AND', ['y', '=', 5]]]
-    assert simplify(domain) == ['OR', ['x', '=', 3], ['y', '=', 5]]
+    assert simplify(domain) == ['OR', ['x', '=', 3], [['y', '=', 5]]]
 
 def test_merge():
     domain = [['x', '=', 6], ['y', '=', 7]]
