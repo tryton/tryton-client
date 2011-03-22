@@ -121,8 +121,9 @@ class ViewForm(ParserView):
                         'to be able to use the action button!'), self.window)
                 return False
             email = {}
-            if 'email' in action:
-                email = self.screen.current_record.expr_eval(action['email'])
+            if 'pyson_email' in action:
+                email = self.screen.current_record.expr_eval(
+                    action['pyson_email'])
                 if not email:
                     email = {}
             email['subject'] = action['name'].replace('_', '')
