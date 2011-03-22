@@ -157,23 +157,14 @@ class Group(SignalEvent, list):
     def load(self, ids, display=True, modified=False):
         if not ids:
             return True
-        # Work with sets to compute intersection and set difference
-        set_records = set(self.get(x) for x in ids)
-        for record in set_records & set(self.record_removed):
-            self.record_removed.remove(record)
-        for record in set_records & set(self.record_deleted):
-            self.record_deleted.remove(record)
-
-        set_records -= set(x for x in self)
-        # return on the list form in order to preserver ordering
-        ids = [x for x in ids if self.get(x) in set_records]
-        if not ids:
-            return True
 
         if len(ids) > 1:
             self.lock_signal = True
+
         new_records = []
         for id in ids:
+            if self.get(id):
+                continue
             new_record = Record(self.model_name, id, self.window,
                 parent=self.parent, parent_name=self.parent_name, group=self)
             self.append(new_record)
@@ -182,6 +173,15 @@ class Group(SignalEvent, list):
                 self._record_changed)
             new_record.signal_connect(self, 'record-modified',
                 self._record_modified)
+
+        # Remove previously removed or deleted records
+        for record in self.record_removed[:]:
+            if record.id in ids:
+                self.record_removed.remove(record)
+        for record in self.record_deleted[:]:
+            if record.id in ids:
+                self.record_deleted.remove(record)
+
         if self.lock_signal:
             self.lock_signal = False
             self.signal('group-cleared')

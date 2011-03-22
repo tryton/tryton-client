@@ -285,8 +285,8 @@ class ViewList(ParserView):
             message(_('No record selected!'), self.window)
             return False
         email = {}
-        if action.get('email'):
-            email = self.screen.current_record.expr_eval(action['email'])
+        if action.get('pyson_email'):
+            email = self.screen.current_record.expr_eval(action['pyson_email'])
             if not email:
                 email = {}
         email['subject'] = action['name'].replace('_', '')
