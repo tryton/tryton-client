@@ -1105,11 +1105,12 @@ class RPCProgress(object):
     def run(self):
         thread.start_new_thread(self.start, ())
 
+        watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+        self.parent.window.set_cursor(watch)
         i = 0
         win = None
         progressbar = None
         while (not self.res) and (not self.error):
-            time.sleep(0.1)
             i += 1
             if i > 10:
                 if not win or not progressbar:
@@ -1146,11 +1147,14 @@ class RPCProgress(object):
                     win.set_transient_for(self.parent)
                     win.set_modal(True)
                     win.show_all()
+                    win.window.set_cursor(watch)
                 with gtk.gdk.lock:
                     progressbar.pulse()
             with gtk.gdk.lock:
                 while gtk.events_pending():
                     gtk.main_iteration()
+            time.sleep(0.1)
+        self.parent.window.set_cursor(None)
         if win:
             win.destroy()
             while gtk.events_pending():
