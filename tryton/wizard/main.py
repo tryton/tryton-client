@@ -25,8 +25,9 @@ class Dialog(object):
         self.dia = gtk.Dialog(_('Wizard'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        if hasattr(self.dia, 'set_deletable') and os.name != 'nt':
+        if hasattr(self.dia, 'set_deletable'):
             self.dia.set_deletable(False)
+        self.dia.connect('close', self.close)
 
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
@@ -144,6 +145,10 @@ class Dialog(object):
             self.dia.hide()
             self.parent.present()
             return False
+
+    def close(self, widget, event=None):
+        widget.emit_stop_by_name('close')
+        return True
 
     def destroy(self):
         self.dia.destroy()
