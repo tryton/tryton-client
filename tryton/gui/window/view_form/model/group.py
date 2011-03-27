@@ -234,7 +234,7 @@ class Group(SignalEvent, list):
             if record[field]:
                 if index >= record[field].get(record):
                     index += 1
-                    record[field].set(record, index, modified=True)
+                    record[field].set_client(record, index)
                 else:
                     index = record[field].get(record)
 
