@@ -32,47 +32,50 @@ class Selection(WidgetInterface):
         self.widget.set_focus_chain([child])
 
         self._selection = {}
-        selection = attrs.get('selection', [])[:]
-        self.selection = selection[:]
-        if not attrs.get('domain'):
-            domain = []
-        else:
-            domain = PYSONDecoder(rpc.CONTEXT).decode(attrs.get('domain'))
-        if 'relation' in attrs:
+        self.selection = attrs.get('selection', [])[:]
+        self.attrs = attrs
+        self._last_domain = None
+        self.init_selection()
+
+    def init_selection(self):
+        selection = self.attrs.get('selection', [])[:]
+        if not isinstance(selection, (list, tuple)):
             try:
-                result = rpc.execute('model', attrs['relation'], 'search_read',
-                        domain, 0, None, None, ['rec_name'], rpc.CONTEXT)
-                selection = [(x['id'], x['rec_name']) for x in result]
+                selection = rpc.execute('model',
+                        self.model_name, selection, rpc.CONTEXT)
             except Exception, exception:
                 common.process_exception(exception, self.window)
                 selection = []
-            self.selection = selection[:]
-        else:
-            if not isinstance(selection, (list, tuple)):
-                try:
-                    selection = rpc.execute('model',
-                            self.model_name, selection, rpc.CONTEXT)
-                except Exception, exception:
-                    common.process_exception(exception, self.window)
-                    selection = []
-                self.selection = selection[:]
-
-            for dom in common.filter_domain(domain):
-                if dom[1] in ('=', '!='):
-                    todel = []
-                    for i in range(len(selection)):
-                        if (dom[1] == '=' \
-                                and selection[i][0] != dom[2]) \
-                                or (dom[1] == '!=' \
-                                and selection[i][0] == dom[2]):
-                            todel.append(i)
-                    for i in todel[::-1]:
-                        del selection[i]
-
-        if attrs.get('sort', True):
+        self.selection = selection[:]
+        if self.attrs.get('sort', True):
             selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.set_popdown(selection)
-        self.last_key = (None, 0)
+
+    def update_selection(self, record):
+        if not self.field:
+            return
+        if 'relation' not in self.attrs:
+            return
+
+        domain = self.field.domain_get(record)
+        if domain == self._last_domain:
+            return
+
+        args = ('model', self.attrs['relation'], 'search_read', domain, 0, None,
+            None, ['rec_name'], rpc.CONTEXT)
+        try:
+            result = rpc.execute(*args)
+        except Exception, exception:
+            result = common.process_exception(exception, self.window, args)
+        if isinstance(result, list):
+            selection = [(x['id'], x['rec_name']) for x in result]
+            selection.append((False, ''))
+            self._last_domain = domain
+        else:
+            selection = []
+            self._last_domain = None
+        self.selection = selection[:]
+        self.set_popdown(selection)
 
     def grab_focus(self):
         return self.entry.grab_focus()
@@ -140,6 +143,7 @@ class Selection(WidgetInterface):
         super(Selection, self)._menu_sig_default_set(reset=reset)
 
     def display(self, record, field):
+        self.update_selection(record)
         child = self.entry.get_child()
         self.changed = False
         if not field:
@@ -168,6 +172,8 @@ class Selection(WidgetInterface):
                         child.set_text(long_text)
                         found = True
                         break
+            if not found:
+                child.set_text('')
         self.changed = True
 
     def display_value(self):

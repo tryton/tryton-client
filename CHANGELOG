@@ -1,3 +1,5 @@
+* Selection widget used for many2one dynamically change their content following
+  the domain specification
 * Added a connection manager à la gajim
 * Fix warning in wizards
 * Added possibility to use server-side icons

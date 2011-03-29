@@ -22,7 +22,9 @@ OPERATORS = {
     'not child_of': lambda a, b: True,
 }
 
-def locale_part(expression):
+def locale_part(expression, field_name):
+    if expression == field_name:
+        return 'id'
     if '.' in expression:
         fieldname, local = expression.split('.', 1)
         return local
@@ -75,14 +77,14 @@ def eval_domain(domain, context, boolop=operator.and_):
         return boolop(eval_domain(domain[0], context),
             eval_domain(domain[1:], context, boolop))
 
-def localize_domain(domain):
+def localize_domain(domain, field_name=None):
     "returns only locale part of domain. eg: langage.code -> code"
     if domain in ('AND', 'OR', True, False):
         return domain
     elif is_leaf(domain):
-        return [locale_part(domain[0])] + domain[1:]
+        return [locale_part(domain[0], field_name)] + domain[1:]
     else:
-        return [localize_domain(part) for part in domain]
+        return [localize_domain(part, field_name) for part in domain]
 
 def unlocalize_domain(domain, fieldname):
     if domain in ('AND', 'OR', True, False):

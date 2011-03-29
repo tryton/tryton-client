@@ -394,7 +394,7 @@ class M2OField(CharField):
 
     def domain_get(self, record):
         screen_domain, attr_domain = self.domains_get(record)
-        return localize_domain(inverse_leaf(screen_domain)) + attr_domain
+        return localize_domain(inverse_leaf(screen_domain), self.name) + attr_domain
 
 
 class O2OField(M2OField):
