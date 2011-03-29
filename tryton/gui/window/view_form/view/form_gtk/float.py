@@ -1,7 +1,8 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from integer import Integer
+import gtk
 import locale
+from integer import Integer
 
 
 class Float(Integer):
@@ -11,6 +12,7 @@ class Float(Integer):
         super(Float, self).__init__(field_name, model_name, window,
                 attrs=attrs)
         self.digits = (16, 2)
+        self.entry.connect('key-press-event', self.key_press_event)
 
     def set_value(self, record, field):
         try:
@@ -31,6 +33,12 @@ class Float(Integer):
             digits = self.digits
         self.entry.set_text(locale.format('%.' + str(digits[1]) + 'f',
             field.get(record) or 0.0, True))
+
+    def key_press_event(self, widget, event):
+        for name in ('KP_Decimal', 'KP_Separator'):
+            if event.keyval == gtk.gdk.keyval_from_name(name):
+                event.keyval = int(gtk.gdk.unicode_to_keyval(
+                    ord(locale.localeconv()['decimal_point'])))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()

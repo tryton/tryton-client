@@ -1,8 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import gtk
 import gobject
-from cellrendererinteger import CellRendererInteger
 import locale
+from cellrendererinteger import CellRendererInteger
 
 
 class CellRendererFloat(CellRendererInteger):
@@ -10,6 +11,19 @@ class CellRendererFloat(CellRendererInteger):
     def __init__(self):
         super(CellRendererFloat, self).__init__()
         self.digits = (16, 2)
+
+    def on_start_editing(self, event, widget, path, background_area,
+            cell_area, flags):
+        editable = super(CellRendererInteger, self).on_start_editing(event,
+            widget, path, background_area, cell_area, flags)
+        editable.connect('key-press-event', self.key_press_event)
+        return editable
+
+    def key_press_event(self, widget, event):
+        for name in ('KP_Decimal', 'KP_Separator'):
+            if event.keyval == gtk.gdk.keyval_from_name(name):
+                event.keyval = int(gtk.gdk.unicode_to_keyval(
+                    ord(locale.localeconv()['decimal_point'])))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()
