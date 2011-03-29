@@ -58,7 +58,7 @@ class TrytonIconFactory(gtk.IconFactory):
                 continue
             try:
                 pixbuf = gtk.gdk.pixbuf_new_from_file(
-                        os.path.join(PIXMAPS_DIR, fname))
+                        os.path.join(PIXMAPS_DIR, fname).encode('utf-8'))
             except Exception:
                 continue
             icon_set = gtk.IconSet(pixbuf)
@@ -103,7 +103,7 @@ class TrytonIconFactory(gtk.IconFactory):
             fileno, path = tempfile.mkstemp()
             with os.fdopen(fileno, 'w') as svgfile:
                 svgfile.write(icon['icon'])
-            pixbuf = gtk.gdk.pixbuf_new_from_file(path)
+            pixbuf = gtk.gdk.pixbuf_new_from_file(path.encode('utf-8'))
             os.remove(path)
             iconset = gtk.IconSet(pixbuf)
             self.add(icon['name'], iconset)
@@ -309,7 +309,8 @@ def file_selection(title, filename='', parent=None,
     def update_preview_cb(win, img):
         filename = win.get_preview_filename()
         try:
-            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
+            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename.encode('utf-8'),
+                    128, 128)
             img.set_from_pixbuf(pixbuf)
             have_preview = True
         except Exception:
@@ -519,7 +520,7 @@ def error(title, parent, details):
 
     box = gtk.VBox()
     label_error = gtk.Label()
-    label_error.set_markup('<b>' + _('Error: ') + '</b>' + title)
+    label_error.set_markup('<b>' + _('Error: ') + '</b>' + to_xml(title))
     label_error.set_alignment(0, 0.5)
     label_error.set_padding(-1, 14)
     label_error.modify_font(pango.FontDescription("monospace"))
@@ -1104,11 +1105,12 @@ class RPCProgress(object):
     def run(self):
         thread.start_new_thread(self.start, ())
 
+        watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+        self.parent.window.set_cursor(watch)
         i = 0
         win = None
         progressbar = None
         while (not self.res) and (not self.error):
-            time.sleep(0.1)
             i += 1
             if i > 10:
                 if not win or not progressbar:
@@ -1145,11 +1147,14 @@ class RPCProgress(object):
                     win.set_transient_for(self.parent)
                     win.set_modal(True)
                     win.show_all()
+                    win.window.set_cursor(watch)
                 with gtk.gdk.lock:
                     progressbar.pulse()
             with gtk.gdk.lock:
                 while gtk.events_pending():
                     gtk.main_iteration()
+            time.sleep(0.1)
+        self.parent.window.set_cursor(None)
         if win:
             win.destroy()
             while gtk.events_pending():

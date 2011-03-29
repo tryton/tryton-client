@@ -19,6 +19,8 @@ class IPCServer(object):
     instance = None
 
     def __init__(self, hostname, port, database):
+        if Server.instance:
+            Server.instance.stop()
         self.hostname = hostname
         self.port = port
         self.database = database

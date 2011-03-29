@@ -389,6 +389,8 @@ class DBLogin(object):
         self.combo_profile.add_attribute(cell, 'sensitive', 1)
         self.combo_profile.set_model(self.profile_store)
         self.combo_profile.connect('changed', self.profile_changed)
+        self.combo_profile.connect('move-active', self.profile_move_active)
+        self.move_active = False
         self.profile_label = gtk.Label(_(u'Profile:'))
         self.profile_label.set_justify(gtk.JUSTIFY_RIGHT)
         self.profile_label.set_alignment(1, 0.5)
@@ -456,10 +458,16 @@ class DBLogin(object):
             username = ''
         if username:
             self.entry_login.set_text(username)
-            self.entry_password.grab_focus()
+            focus_widget = self.entry_password
         else:
             self.entry_login.set_text('')
-            self.entry_login.grab_focus()
+            focus_widget = self.entry_login
+        if not self.move_active:
+            focus_widget.grab_focus()
+        self.move_active = False
+
+    def profile_move_active(self, combobox, scrolltype):
+        self.move_active = True
 
     def run(self, profile_name, parent):
         if not profile_name:

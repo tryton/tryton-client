@@ -1,10 +1,12 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
 import base64
 import gtk
 import gettext
 import os
-from tryton.common import file_selection, message, warning, Tooltips
+import tempfile
+from tryton.common import file_selection, message, warning, Tooltips, file_open
 from interface import WidgetInterface
 
 _ = gettext.gettext
@@ -45,12 +47,24 @@ class Binary(WidgetInterface):
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
-        img_new.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_new.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
-        self.tooltips.set_tip(self.but_new, _('Select a File'))
+        self.tooltips.set_tip(self.but_new, _('Select a File...'))
         self.widget.pack_start(self.but_new, expand=False, fill=False)
+
+        if self.filename:
+            self.but_open = gtk.Button()
+            img_open = gtk.Image()
+            img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            self.but_open.set_image(img_open)
+            self.but_open.set_relief(gtk.RELIEF_NONE)
+            self.but_open.connect('clicked', self.sig_open)
+            self.tooltips.set_tip(self.but_open, _('Open...'))
+            self.widget.pack_start(self.but_open, expand=False, fill=False)
+        else:
+            self.but_open = None
 
         self.but_save_as = gtk.Button()
         img_save_as = gtk.Image()
@@ -73,6 +87,10 @@ class Binary(WidgetInterface):
 
         self.tooltips.enable()
 
+    @property
+    def filename_field(self):
+        return self.record.group.fields.get(self.filename)
+
     def _readonly_set(self, value):
         if value:
             self.but_new.hide()
@@ -83,6 +101,9 @@ class Binary(WidgetInterface):
             self.but_remove.show()
             if self.wid_text:
                 focus_chain = [self.wid_text]
+            elif self.filename:
+                focus_chain = [self.but_new, self.but_open, self.but_save_as,
+                        self.but_remove]
             else:
                 focus_chain = [self.but_new, self.but_save_as, self.but_remove]
             self.widget.set_focus_chain(focus_chain)
@@ -94,36 +115,42 @@ class Binary(WidgetInterface):
             return self.wid_size.grab_focus()
 
     def sig_new(self, widget=None):
-        try:
-            filename = file_selection(_('Open...'),
-                    parent=self.window)
-            if filename and self.field:
-                self.field.set_client(self.record,
-                        base64.encodestring(open(filename, 'rb').read()))
-                if self.filename and self.record:
-                    name_wid = self.record.group.fields[self.filename]
-                    name_wid.set_client(self.record, os.path.basename(filename))
-                self.display(self.record, self.field)
-        except Exception, exception:
-            warning(_('Error reading the file.\nError message:\n%s') \
-                    % str(exception), self.window, _('Error'))
+        filename = file_selection(_('Open...'),
+                parent=self.window)
+        if filename and self.field:
+            self.field.set_client(self.record,
+                    base64.encodestring(open(filename, 'rb').read()))
+            if self.filename_field:
+                self.filename_field.set_client(self.record,
+                        os.path.basename(filename))
+            self.display(self.record, self.field)
+
+    def sig_open(self, widget=None):
+        if not self.filename_field:
+            return
+        dtemp = tempfile.mkdtemp(prefix='tryton_')
+        filename = self.filename_field.get(self.record).replace(
+                os.sep, '_').replace(os.altsep or os.sep, '_')
+        file_path = os.path.join(dtemp, filename)
+        with open(file_path, 'wb') as fp:
+            fp.write(base64.decodestring(self.field.get(self.record)))
+        root, type_ = os.path.splitext(filename)
+        if type_:
+            type_ = type_[1:]
+        file_open(file_path, type_, self.window)
 
     def sig_save_as(self, widget=None):
-        try:
-            filename = file_selection(_('Save As...'),
-                    parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
-            if filename and self.field:
-                file_p = open(filename,'wb+')
-                file_p.write(base64.decodestring(
-                    self.field.get(self.record)))
-                file_p.close()
-        except Exception, exception:
-            warning(_('Error writing the file.\nError message:\n%s') \
-                    % str(exception), self.window, _('Error'))
+        filename = ''
+        if self.filename_field:
+            filename = self.filename_field.get(self.record)
+        filename = file_selection(_('Save As...'), filename=filename,
+                parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
+        if filename:
+            with open(filename,'wb') as fp:
+                fp.write(base64.decodestring(self.field.get(self.record)))
 
     def sig_remove(self, widget=None):
-        if self.field:
-            self.field.set_client(self.record, False)
+        self.field.set_client(self.record, False)
         self.display(self.record, self.field)
 
     def sig_key_press(self, widget, event, *args):
@@ -132,7 +159,10 @@ class Binary(WidgetInterface):
             self.sig_new(widget)
             return True
         elif event.keyval == gtk.keysyms.F2:
-            self.sig_save_as(widget)
+            if self.filename:
+                self.sig_open(widget)
+            else:
+                self.sig_save_as(widget)
             return True
         return False
 
@@ -142,12 +172,15 @@ class Binary(WidgetInterface):
             if self.wid_text:
                 self.wid_text.set_text('')
             self.wid_size.set_text('')
+            if self.but_open:
+                self.but_open.set_sensitive(False)
             self.but_save_as.set_sensitive(False)
             return False
         if self.wid_text:
-            name_wid = record.group.fields[self.filename]
-            self.wid_text.set_text(name_wid.get(record) or '')
+            self.wid_text.set_text(self.filename_field.get(record) or '')
         self.wid_size.set_text(humanize(len(field.get(record) or [])))
+        if self.but_open:
+            self.but_open.set_sensitive(bool(field.get(record)))
         self.but_save_as.set_sensitive(bool(field.get(record)))
         return True
 
@@ -159,8 +192,8 @@ class Binary(WidgetInterface):
 
     def set_value(self, record, field):
         if self.wid_text:
-            name_wid = self.record.group.fields[self.filename]
-            name_wid.set_client(self.record, self.wid_text.get_text() or False)
+            self.filename_field.set_client(self.record,
+                    self.wid_text.get_text() or False)
         return
 
     def _color_widget(self):

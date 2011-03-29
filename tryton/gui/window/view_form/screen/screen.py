@@ -20,7 +20,7 @@ class Screen(SignalEvent):
     def __init__(self, model_name, window, view_ids=None, view_type=None,
             context=None, views_preload=None, domain=None, row_activate=None,
             limit=None, readonly=False, exclude_field=None, sort=None,
-            search_value=None):
+            search_value=None, alternate_view=False):
         if view_ids is None:
             view_ids = []
         if view_type is None:
@@ -54,6 +54,7 @@ class Screen(SignalEvent):
         self.__current_record = None
         self.current_record = None
         self.screen_container = ScreenContainer()
+        self.screen_container.alternate_view = alternate_view
         self.filter_widget = None
         self.widget = self.screen_container.widget_get()
         self.__current_view = 0

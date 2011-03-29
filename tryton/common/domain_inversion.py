@@ -351,7 +351,7 @@ def test_simplify():
     domain = ['OR', [['x', '=', 3]], [['y', '=', 5]]]
     assert simplify(domain) == ['OR', [['x', '=', 3]], [['y', '=', 5]]]
     domain = ['OR', ['x', '=', 3], ['AND', ['y', '=', 5]]]
-    assert simplify(domain) == ['OR', ['x', '=', 3], ['y', '=', 5]]
+    assert simplify(domain) == ['OR', ['x', '=', 3], [['y', '=', 5]]]
 
 def test_merge():
     domain = [['x', '=', 6], ['y', '=', 7]]
@@ -405,6 +405,17 @@ def test_evaldomain():
     assert not eval_domain(domain, {'x': 5})
     assert not eval_domain(domain, {'x': 11})
 
+def test_localize():
+    domain = [['x', '=', 5]]
+    assert localize_domain(domain) == [['x', '=', 5]]
+
+    domain = [['x', '=', 5], ['x.code', '=', 7]]
+    assert localize_domain(domain, 'x') == [['id', '=', 5], ['code', '=', 7]]
+
+    domain = ['OR', ['AND', ['x', '>', 7], ['x', '<', 15]], ['x.code', '=', 8]]
+    assert localize_domain(domain, 'x') == \
+            ['OR', ['AND', ['id', '>', 7], ['id', '<', 15]], ['code', '=', 8]]
+
 if __name__ == '__main__':
     test_simple_inversion()
     test_and_inversion()
@@ -416,3 +427,4 @@ if __name__ == '__main__':
     test_parse()
     test_simplify()
     test_evaldomain()
+    test_localize()
