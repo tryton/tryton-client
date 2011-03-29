@@ -1,7 +1,12 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import gettext
+
 import gtk
 from interface import WidgetInterface
+from tryton.common import Tooltips
+
+_ = gettext.gettext
 
 class Char(WidgetInterface):
     "Char"
@@ -50,4 +55,21 @@ class Sha(Char):
 
     def __init__(self, field_name, model_name, window, attrs=None):
         super(Sha, self).__init__(field_name, model_name, window, attrs=attrs)
-        self.entry.set_visibility(False)
+        self.entry.props.visibility = False
+
+        self.visibility_checkbox = gtk.CheckButton()
+        self.visibility_checkbox.connect('toggled', self.toggle_visibility)
+        Tooltips().set_tip(self.visibility_checkbox, _('Show plain text'))
+        self.widget.pack_start(self.visibility_checkbox, expand=False)
+
+    def _readonly_set(self, value):
+        super(Char, self)._readonly_set(value)
+        self.entry.set_editable(not value)
+        self.visibility_checkbox.props.visible = not value
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.entry, self.visibility_checkbox])
+
+    def toggle_visibility(self, button):
+        self.entry.props.visibility = not self.entry.props.visibility
