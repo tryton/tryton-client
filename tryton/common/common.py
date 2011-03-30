@@ -127,10 +127,6 @@ def find_in_path(name):
             return val
     return name
 
-def false_call(function, *args):
-    function(*args)
-    return None
-
 def refresh_dblist(host, port):
     '''
     Return the number of database available
