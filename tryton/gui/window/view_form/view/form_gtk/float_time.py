@@ -17,7 +17,6 @@ class FloatTime(WidgetInterface):
         self.entry.set_alignment(1.0)
         self.entry.set_property('activates_default', True)
 
-        self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())

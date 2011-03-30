@@ -21,35 +21,17 @@ class One2Many(WidgetInterface):
         super(One2Many, self).__init__(field_name, model_name, window,
                 attrs=attrs)
 
-        self.widget = gtk.VBox(homogeneous=False, spacing=5)
+        self.widget = gtk.VBox(homogeneous=False, spacing=2)
         self._readonly = True
 
         hbox = gtk.HBox(homogeneous=False, spacing=0)
-        menubar = gtk.MenuBar()
-        if hasattr(menubar, 'set_pack_direction') and \
-                hasattr(menubar, 'set_child_pack_direction'):
-            menubar.set_pack_direction(gtk.PACK_DIRECTION_LTR)
-            menubar.set_child_pack_direction(gtk.PACK_DIRECTION_LTR)
+        hbox.set_border_width(2)
 
-        menuitem_title = gtk.ImageMenuItem(stock_id='tryton-preferences')
+        label = gtk.Label(attrs.get('string', ''))
+        label.set_alignment(0.0, 0.5)
+        hbox.pack_start(label, expand=True, fill=True)
 
-        menu_title = gtk.Menu()
-        menuitem_set_to_default = gtk.MenuItem(_('Set to default value'), True)
-        menuitem_set_to_default.connect('activate',
-                lambda *x: self._menu_sig_default_get())
-        menu_title.add(menuitem_set_to_default)
-        menuitem_set_default = gtk.MenuItem(_('Set as default'), True)
-        menuitem_set_default.connect('activate',
-                lambda *x: self._menu_sig_default_set())
-        menu_title.add(menuitem_set_default)
-        menuitem_reset_default = gtk.MenuItem(_('Reset default'), True)
-        menuitem_reset_default.connect('activate',
-                lambda *x: self._menu_sig_default_set(reset=True))
-        menu_title.add(menuitem_reset_default)
-        menuitem_title.set_submenu(menu_title)
-
-        menubar.add(menuitem_title)
-        hbox.pack_start(menubar, expand=True, fill=True)
+        hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
         tooltips = common.Tooltips()
 
@@ -166,7 +148,10 @@ class One2Many(WidgetInterface):
 
         tooltips.enable()
 
-        self.widget.pack_start(hbox, expand=False, fill=True)
+        frame = gtk.Frame()
+        frame.add(hbox)
+        frame.set_shadow_type(gtk.SHADOW_OUT)
+        self.widget.pack_start(frame, expand=False, fill=True)
 
         self.screen = Screen(attrs['relation'], self.window,
                 view_type=attrs.get('mode', 'tree,form').split(','),
@@ -174,7 +159,6 @@ class One2Many(WidgetInterface):
                 row_activate=self._on_activate,
                 exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
-        menuitem_title.get_child().set_text(attrs.get('string', ''))
 
         if not isinstance(self.screen.window, gtk.Dialog):
             self.screen.widget.set_size_request(0, 0)

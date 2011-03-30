@@ -1,3 +1,4 @@
+* Remove generic default value on right-click
 * Made numpad locale aware
 * Selection widget used for many2one dynamically change their content following
   the domain specification

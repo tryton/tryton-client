@@ -146,8 +146,7 @@ next one.
 
 The second mouse button (usually right mouse button) provides an additional
 contextual menu for some views and fields. In this context menu the user finds
-:term:`actions` to copy and paste contents or setting up default values or
-selections for several fields.
+:term:`actions` to copy and paste contents or selections for several fields.
 
 
 Tool Bar

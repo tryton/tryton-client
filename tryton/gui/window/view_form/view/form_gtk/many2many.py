@@ -25,7 +25,6 @@ class Many2Many(WidgetInterface):
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('width_chars', 13)
         self.wid_text.connect('activate', self._sig_activate)
-        self.wid_text.connect('button_press_event', self._menu_open)
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
         hbox.pack_start(gtk.VSeparator(), padding=2, expand=False, fill=False)

@@ -26,7 +26,6 @@ class TextBox(WidgetInterface):
 
         self.textview = gtk.TextView()
         self.textview.set_wrap_mode(gtk.WRAP_WORD)
-        self.textview.connect('populate-popup', self._populate_popup)
         #TODO better tab solution
         self.textview.set_accepts_tab(False)
         self.textview.connect('focus-in-event', lambda x, y: self._focus_in())

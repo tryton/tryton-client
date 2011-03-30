@@ -20,7 +20,6 @@ class Char(WidgetInterface):
         self.entry.set_max_length(int(attrs.get('size', 0)))
         self.entry.set_width_chars(5)
 
-        self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())

@@ -27,7 +27,6 @@ class Calendar(WidgetInterface):
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
-        self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
@@ -164,7 +163,6 @@ class DateTime(WidgetInterface):
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
-        self.entry.connect('populate-popup', self._populate_popup)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
 

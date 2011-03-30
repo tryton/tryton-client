@@ -23,7 +23,6 @@ class Selection(WidgetInterface):
 
         child.connect('changed', self.sig_changed)
         self.changed = True
-        child.connect('button_press_event', self._menu_open)
         child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)

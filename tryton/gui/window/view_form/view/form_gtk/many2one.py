@@ -310,7 +310,6 @@ class Many2One(WidgetInterface):
                 return False
         menu_entries = []
         menu_entries.append((None, None, None))
-        menu_entries += self._menu_entries
         menu_entries.append((None, None, None))
         menu_entries.append((_('Actions'),
             lambda x: self.click_and_action('form_action'),0))

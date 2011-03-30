@@ -438,19 +438,6 @@ class Record(SignalEvent):
                     return
             self.group.fields[fieldname].set_on_change(self, res)
 
-    def cond_default(self, field_name, value):
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
-        args = ('model', 'ir.default', 'get_default', self.model_name,
-                field_name + '=' + str(value), ctx)
-        try:
-            res = rpc.execute(*args)
-        except Exception, exception:
-            res = common.process_exception(exception, self.window, *args)
-            if not res:
-                return
-        self.set_default(res)
-
     def get_attachment_count(self, reload=False):
         if self.id < 0:
             return 0

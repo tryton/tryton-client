@@ -14,7 +14,6 @@ class CheckBox(WidgetInterface):
         self.widget = gtk.CheckButton()
         self.widget.connect('focus-in-event', lambda x, y: self._focus_in())
         self.widget.connect('focus-out-event', lambda x, y: self._focus_out())
-        self.widget.connect('button_press_event', self._menu_open)
         self.widget.connect_after('toggled', self.sig_activate)
 
     def _readonly_set(self, value):
