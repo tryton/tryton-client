@@ -2,11 +2,13 @@
 #this repository contains the full copyright notices and license terms.
 import gettext
 
+import gobject
 import gtk
 from interface import WidgetInterface
 from tryton.common import Tooltips
 
 _ = gettext.gettext
+
 
 class Char(WidgetInterface):
     "Char"
@@ -15,12 +17,25 @@ class Char(WidgetInterface):
         super(Char, self).__init__(field_name, model_name, window, attrs=attrs)
 
         self.widget = gtk.HBox()
-        self.entry = gtk.Entry()
-        self.entry.set_property('activates_default', True)
-        self.entry.set_max_length(int(attrs.get('size', 0)))
-        self.entry.set_width_chars(5)
+        self.autocomplete = bool(attrs.get('autocomplete'))
+        if self.autocomplete:
+            self.entry = gtk.ComboBoxEntry()
+            self.entry_store = gtk.ListStore(gobject.TYPE_STRING)
+            self.entry.set_model(self.entry_store)
+            self.entry.set_text_column(0)
+            completion = gtk.EntryCompletion()
+            completion.set_model(self.entry_store)
+            completion.set_text_column(0)
+            self.entry.get_child().set_completion(completion)
+        else:
+            self.entry = gtk.Entry()
+            self.entry.set_property('activates_default', True)
+            self.entry.set_max_length(int(attrs.get('size', 0)))
+            self.entry.set_width_chars(5)
 
-        self.entry.connect('activate', self.sig_activate)
+            self.entry.connect('populate-popup', self._populate_popup)
+            self.entry.connect('activate', self.sig_activate)
+
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry)
@@ -32,18 +47,46 @@ class Char(WidgetInterface):
         return self.entry.grab_focus()
 
     def set_value(self, record, field):
-        return field.set_client(record, self.entry.get_text() or False)
+        entry = self.entry.get_child() if self.autocomplete else self.entry
+        value = entry.get_text() or False
+        return field.set_client(record, value)
 
     def display(self, record, field):
         super(Char, self).display(record, field)
+        if record and self.autocomplete:
+            autocompletion = record.autocompletion.get(self.field_name, [])
+            current = [elem[0] for elem in self.entry_store]
+            if autocompletion != current:
+                self.entry_store.clear()
+                for row in autocompletion:
+                    self.entry_store.append((row,))
+        elif self.autocomplete:
+            self.entry_store.clear()
         if not field:
-            self.entry.set_text('')
-            return False
-        self.entry.set_text(field.get(record) or '')
+            value = ''
+        else:
+            value = field.get(record) or ''
+        self.display_value(value)
+
+    def display_value(self, value):
+        if not self.autocomplete:
+            self.entry.set_text(value)
+            return
+        for idx, row in enumerate(self.entry_store):
+            if row[0] == value:
+                self.entry.set_active(idx)
+                return
+        else:
+            self.entry.get_child().set_text(value)
 
     def _readonly_set(self, value):
+        sensitivity = {True: gtk.SENSITIVITY_OFF, False: gtk.SENSITIVITY_AUTO}
         super(Char, self)._readonly_set(value)
-        self.entry.set_editable(not value)
+        if self.autocomplete:
+            self.entry.get_child().set_editable(not value)
+            self.entry.set_button_sensitivity(sensitivity[value])
+        else:
+            self.entry.set_editable(not value)
         if value:
             self.widget.set_focus_chain([])
         else:

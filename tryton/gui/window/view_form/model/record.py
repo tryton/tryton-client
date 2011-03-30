@@ -35,6 +35,7 @@ class Record(SignalEvent):
         self.attachment_count = -1
         self.next = {} # Used in Group list
         self.value = {}
+        self.autocompletion = {}
 
     def __getitem__(self, name):
         if name not in self._loaded and self.id > 0:
@@ -233,6 +234,10 @@ class Record(SignalEvent):
                 if not vals:
                     return
             self.set_default(vals)
+        for fieldname, fieldinfo in self.group.fields.iteritems():
+            if not fieldinfo.attrs.get('autocomplete'):
+                continue
+            self.do_autocomplete(fieldname)
 
     def rec_name(self):
         ctx = rpc.CONTEXT.copy()
@@ -437,6 +442,43 @@ class Record(SignalEvent):
                 if not res:
                     return
             self.group.fields[fieldname].set_on_change(self, res)
+
+    def autocomplete_with(self, field_name):
+        for fieldname, fieldinfo in self.group.fields.iteritems():
+            autocomplete = fieldinfo.attrs.get('autocomplete', [])
+            if field_name not in autocomplete:
+                continue
+            self.do_autocomplete(fieldname)
+
+    def do_autocomplete(self, fieldname):
+        self.autocompletion[fieldname] = []
+        autocomplete = self.group.fields[fieldname].attrs['autocomplete']
+        args = self._get_on_change_args(autocomplete)
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(self.context_get())
+        args = ('model', self.model_name, 'autocomplete_' + fieldname, args,
+            ctx)
+        try:
+            res = rpc.execute(*args)
+        except Exception, exception:
+            res = common.process_exception(exception, self.window, *args)
+            if not res:
+                # ensure res is a list
+                res = []
+        self.autocompletion[fieldname] = res
+
+    def cond_default(self, field_name, value):
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(self.context_get())
+        args = ('model', 'ir.default', 'get_default', self.model_name,
+                field_name + '=' + str(value), ctx)
+        try:
+            res = rpc.execute(*args)
+        except Exception, exception:
+            res = common.process_exception(exception, self.window, *args)
+            if not res:
+                return
+        self.set_default(res)
 
     def get_attachment_count(self, reload=False):
         if self.id < 0:
