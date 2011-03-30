@@ -40,6 +40,7 @@ class CharField(object):
         if self.attrs.get('on_change', False):
             record.on_change(self.name, self.attrs['on_change'])
         record.on_change_with(self.name)
+        record.autocomplete_with(self.name)
 
     def domains_get(self, record):
         screen_domain = domain_inversion(record.group.domain,
