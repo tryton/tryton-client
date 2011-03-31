@@ -470,7 +470,7 @@ class ParserForm(ParserInterface):
                         gtk.gdk.PIXBUF_ROTATE_COUNTERCLOCKWISE)
                 elif CONFIG['client.form_tab'] == 'right':
                     angle = -90
-                    tab_box, image_pos = gtk.VBox(spacing=3)
+                    tab_box = gtk.VBox(spacing=3)
                     image_pos, image_rotate = ('start',
                         gtk.gdk.PIXBUF_ROTATE_CLOCKWISE)
                 else:
