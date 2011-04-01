@@ -216,6 +216,7 @@ class One2Many(WidgetInterface):
         self._readonly = value
         self.but_new.set_sensitive(not value)
         self.but_del.set_sensitive(not value)
+        self.but_undel.set_sensitive(not value)
         if self.attrs.get('add_remove'):
             self.wid_text.set_sensitive(not value)
             self.but_add.set_sensitive(not value)
@@ -337,8 +338,8 @@ class One2Many(WidgetInterface):
                 self.but_pre.set_sensitive(True)
             else:
                 self.but_pre.set_sensitive(False)
-            self.but_del.set_sensitive(True)
-            self.but_undel.set_sensitive(True)
+            self.but_del.set_sensitive(not self._readonly)
+            self.but_undel.set_sensitive(not self._readonly)
         else:
             self.but_open.set_sensitive(False)
             self.but_del.set_sensitive(False)
