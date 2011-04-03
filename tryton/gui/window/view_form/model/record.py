@@ -14,22 +14,18 @@ class Record(SignalEvent):
 
     id = -1
 
-    def __init__(self, model_name, obj_id, window, group=None, parent=None,
-            parent_name=''):
+    def __init__(self, model_name, obj_id, window, group=None):
         super(Record, self).__init__()
-        self.window = window
+        self.__window = window
         self.model_name = model_name
         self.id = obj_id or Record.id
         if self.id < 0:
             Record.id -= 1
         self._loaded = set()
-        self.parent = parent
-        self.parent_name = parent_name
         self.group = group
         if group is not None:
             assert model_name == group.model_name
         self.state_attrs = {}
-        self.__modified = False
         self.modified_fields = {}
         self._timestamp = None
         self.attachment_count = -1
@@ -37,7 +33,7 @@ class Record(SignalEvent):
         self.value = {}
         self.autocompletion = {}
 
-    def __getitem__(self, name):
+    def __getitem__(self, name, raise_exception=False):
         if name not in self._loaded and self.id > 0:
             ids =  [self.id]
             if name == '*':
@@ -68,6 +64,7 @@ class Record(SignalEvent):
                         if field.attrs.get('loading', 'eager') == 'eager']
             else:
                 fields = self.group.fields.keys()
+            fields = [fname for fname in fields if fname not in self._loaded]
             fields.extend(('%s.rec_name' % fname for fname in fields[:]
                     if self.group.fields[fname].attrs['type']
                     in ('many2one', 'one2one', 'reference')))
@@ -78,6 +75,8 @@ class Record(SignalEvent):
             try:
                 values = rpc.execute(*args)
             except Exception, exception:
+                if raise_exception:
+                    raise
                 values = common.process_exception(exception, self.window, *args)
                 if not values:
                     values = [{'id': x} for x in ids]
@@ -95,17 +94,67 @@ class Record(SignalEvent):
         return self.group.fields.get(name, False)
 
     def __repr__(self):
-        return '<Record %s@%s>' % (self.id, self.model_name)
+        return '<Record %s@%s at %s>' % (self.id, self.model_name, id(self))
 
-    def get_modified(self):
-        return self.__modified
+    @property
+    def modified(self):
+        return bool(self.modified_fields)
+
+    @property
+    def parent(self):
+        return self.group.parent
+
+    @property
+    def parent_name(self):
+        return self.group.parent_name
 
     def set_modified(self, value):
-        self.__modified = value
         if value:
             self.signal('record-modified')
 
-    modified = property(get_modified, set_modified)
+    def children_group(self, field_name, check_load=True):
+        if not field_name:
+            return []
+        if check_load:
+            self._check_load([field_name])
+        group = self.value.get(field_name)
+        if group is False or group is None:
+            return []
+
+        if id(group.fields) != id(self.group.fields):
+            self.group.fields.update(group.fields)
+            group.fields = self.group.fields
+        group.on_write = self.group.on_write
+        group.readonly = self.group.readonly
+        if group.window != self.window:
+            group.window = self.window
+        return group
+
+    def get_path(self, group):
+        path = []
+        i = self
+        child_name = ''
+        while i:
+            path.append((child_name, i.id))
+            if i.group is group:
+                break
+            child_name = i.group.child_name
+            i = i.parent
+        path.reverse()
+        return tuple(path)
+
+    def _get_window(self):
+        return self.__window
+
+    def _set_window(self, window):
+        self.__window = window
+        for fieldname, value in self.value.iteritems():
+            if fieldname not in self.group.fields:
+                continue
+            if isinstance(self.group.fields[fieldname], field.O2MField):
+                value.window = window
+
+    window = property(_get_window, _set_window)
 
     def get_removed(self):
         if self.group is not None:
@@ -125,9 +174,6 @@ class Record(SignalEvent):
         return self.deleted or self.removed
 
     readonly = property(get_readonly)
-
-    def is_modified(self):
-        return self.modified
 
     def fields_get(self):
         return self.group.fields
@@ -187,40 +233,48 @@ class Record(SignalEvent):
         return result
 
     def save(self, force_reload=True):
-        if self.id < 0:
-            value = self.get(get_readonly=True)
-            args = ('model', self.model_name, 'create', value,
-                self.context_get())
-            try:
-                res = rpc.execute(*args)
-            except Exception, exception:
-                res = common.process_exception(exception, self.window, *args)
-                if not res:
-                    return False
-            old_id = self.id
-            self.id = res
-            self.group.id_changed(old_id)
-        else:
-            if not self.is_modified():
-                return self.id
-            self._check_load()
-            value = self.get(get_readonly=True, get_modifiedonly=True)
-            context = self.context_get()
-            context = context.copy()
-            context['_timestamp'] = self.get_timestamp()
-            args = ('model', self.model_name, 'write', [self.id], value,
-                context)
-            try:
-                if not rpc.execute(*args):
-                    return False
-            except Exception, exception:
-                if not common.process_exception(exception, self.window, *args):
-                    return False
-        self._loaded.clear()
-        if force_reload:
-            self.reload()
-        if self.group:
-            self.group.writen(self.id)
+        if self.id < 0 or self.modified:
+            if self.id < 0:
+                value = self.get(get_readonly=True)
+                args = ('model', self.model_name, 'create', value,
+                    self.context_get())
+                try:
+                    res = rpc.execute(*args)
+                except Exception, exception:
+                    res = common.process_exception(exception, self.window,
+                            *args)
+                    if not res:
+                        return False
+                old_id = self.id
+                self.id = res
+                self.group.id_changed(old_id)
+            elif self.modified:
+                self._check_load()
+                value = self.get(get_readonly=True, get_modifiedonly=True,
+                        check_load=False)
+                if value:
+                    context = self.context_get()
+                    context = context.copy()
+                    context['_timestamp'] = self.get_timestamp()
+                    args = ('model', self.model_name, 'write', [self.id],
+                            value, context)
+                    try:
+                        if not rpc.execute(*args):
+                            return False
+                    except Exception, exception:
+                        res = common.process_exception(exception, self.window,
+                                *args)
+                        if not res:
+                            return False
+            self._loaded.clear()
+            self.modified_fields = {}
+            if force_reload:
+                self.reload()
+            if self.group:
+                self.group.written(self.id)
+        if self.parent:
+            self.parent.modified_fields.pop(self.group.child_name, None)
+            self.parent.save(force_reload=force_reload)
         return self.id
 
     def default_get(self, domain=None, context=None):
@@ -233,6 +287,8 @@ class Record(SignalEvent):
                 vals = common.process_exception(exception, self.window, *args)
                 if not vals:
                     return
+            if self.parent_name in self.group.fields and self.parent:
+                vals[self.parent_name] = self.parent.id
             self.set_default(vals)
         for fieldname, fieldinfo in self.group.fields.iteritems():
             if not fieldinfo.attrs.get('autocomplete'):
@@ -331,9 +387,6 @@ class Record(SignalEvent):
         for fieldname, value in later.iteritems():
             self.group.fields[fieldname].set(self, value, modified=modified)
             self._loaded.add(fieldname)
-        self.modified = modified
-        if not self.modified:
-            self.modified_fields = {}
         if signal:
             self.signal('record-changed')
 
@@ -496,7 +549,6 @@ class Record(SignalEvent):
     def destroy(self):
         super(Record, self).destroy()
         self.window = None
-        self.parent = None
         self.group = None
         self.value = None
         self.next = None

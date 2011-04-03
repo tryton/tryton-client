@@ -6,9 +6,10 @@ from interface import ParserView
 class ViewGraph(ParserView):
 
     def __init__(self, window, screen, widget, children=None,
-            buttons=None, toolbar=None, notebooks=None, cursor_widget=None):
+            buttons=None, toolbar=None, notebooks=None, cursor_widget=None,
+            children_field=None):
         super(ViewGraph, self).__init__(window, screen, widget, children,
-                buttons, toolbar, notebooks, cursor_widget)
+                buttons, toolbar, notebooks, cursor_widget, children_field)
         self.view_type = 'graph'
         self.widgets = children
 

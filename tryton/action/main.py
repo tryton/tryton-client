@@ -142,12 +142,12 @@ class Action(object):
             res_model = action.get('res_model', data.get('res_model'))
             res_id = action.get('res_id', data.get('res_id'))
 
-            Window.create(view_ids, res_model, res_id, domain,
-                action['view_type'], window, action_ctx, view_mode,
-                name=name, limit=action.get('limit'),
-                auto_refresh=action.get('auto_refresh'),
-                search_value=search_value,
-                icon=(action.get('icon.rec_name') or ''))
+            Window.create(view_ids, res_model, res_id, domain, window,
+                    action_ctx, view_mode, name=name,
+                    limit=action.get('limit'),
+                    auto_refresh=action.get('auto_refresh'),
+                    search_value=search_value,
+                    icon=(action.get('icon.rec_name') or ''))
         elif action['type'] == 'ir.action.wizard':
             if action.get('window', False):
                 Window.create_wizard(action['wiz_name'], data, window,
@@ -160,6 +160,9 @@ class Action(object):
                         direct_print=action.get('direct_print', False),
                         email_print=action.get('email_print', False),
                         email=action.get('email'), context=context)
+            if action['wiz_name'] == 'ir.ui.view_sc.add':
+                from tryton.gui.main import Main
+                Main.get_main().shortcut_set()
 
         elif action['type'] == 'ir.action.report':
             Action.exec_report(action['report_name'], data, window,

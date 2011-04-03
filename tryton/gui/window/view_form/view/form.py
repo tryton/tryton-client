@@ -16,9 +16,10 @@ _ = gettext.gettext
 class ViewForm(ParserView):
 
     def __init__(self, window, screen, widget, children=None,
-            buttons=None, toolbar=None, notebooks=None, cursor_widget=''):
+            buttons=None, toolbar=None, notebooks=None, cursor_widget='',
+            children_field=None):
         super(ViewForm, self).__init__(window, screen, widget, children,
-                buttons, toolbar, notebooks, cursor_widget)
+                buttons, toolbar, notebooks, cursor_widget, children_field)
         self.view_type = 'form'
 
         for button in self.buttons:
@@ -157,7 +158,7 @@ class ViewForm(ParserView):
         value = Action._exec_action(act, self.window, data, {})
         if atype in ('print', 'action'):
             if self.screen:
-                self.screen.reload(writen=True)
+                self.screen.reload(written=True)
         return value
 
     def __getitem__(self, name):

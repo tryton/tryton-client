@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import copy
 import tryton.rpc as rpc
 from record import Record
 from field import Field, O2MField
@@ -10,8 +11,8 @@ import tryton.common as common
 class Group(SignalEvent, list):
 
     def __init__(self, model_name, fields, window, ids=None, parent=None,
-            parent_name='', context=None, domain=None, readonly=False,
-            parent_datetime_field=None):
+            parent_name='', child_name='', context=None, domain=None,
+            readonly=False, parent_datetime_field=None):
         super(Group, self).__init__()
         if domain is None:
             domain = []
@@ -20,6 +21,7 @@ class Group(SignalEvent, list):
         self.__window = window
         self.parent = parent
         self.parent_name = parent_name
+        self.child_name = child_name
         self.parent_datetime_field = parent_datetime_field
         self._context = context or {}
         self.model_name = model_name
@@ -33,6 +35,7 @@ class Group(SignalEvent, list):
         if self._context.get('_datetime'):
             self.readonly = True
         self.__id2record = {}
+        self.__field_childs = None
 
     def __get_window(self):
         return self.__window
@@ -45,6 +48,7 @@ class Group(SignalEvent, list):
     window = property(__get_window, __set_window)
 
     def insert(self, pos, record):
+        assert record.group is self
         if pos >= 1:
             self.__getitem__(pos - 1).next[id(self)] = record
         if pos < self.__len__():
@@ -54,16 +58,17 @@ class Group(SignalEvent, list):
         super(Group, self).insert(pos, record)
         self.__id2record[record.id] = record
         if not self.lock_signal:
-            self.signal('group-list-changed', ('record-added', pos))
+            self.signal('group-list-changed', ('record-added', record))
 
     def append(self, record):
+        assert record.group is self
         if self.__len__() >= 1:
             self.__getitem__(self.__len__() - 1).next[id(self)] = record
         record.next[id(self)] = None
         super(Group, self).append(record)
         self.__id2record[record.id] = record
         if not self.lock_signal:
-            self.signal('group-list-changed', ('record-added', -1))
+            self.signal('group-list-changed', ('record-added', record))
 
     def _remove(self, record):
         idx = self.index(record)
@@ -73,24 +78,23 @@ class Group(SignalEvent, list):
                         self.__getitem__(idx + 1)
             else:
                 self.__getitem__(idx - 1).next[id(self)] = None
+        if not self.lock_signal:
+            self.signal('group-list-changed', ('record-removed', record))
         super(Group, self).remove(record)
         del self.__id2record[record.id]
-        if not self.lock_signal:
-            self.signal('group-list-changed', ('record-removed', idx))
 
     def clear(self):
         if not self.lock_signal:
-            for record in self:
-                self.signal('group-list-changed', ('record-removed', 0))
-        del self[:]
+            for record in self[:]:
+                self.signal('group-list-changed', ('record-removed', record))
+                self.pop(0)
         if not self.lock_signal:
             self.signal('group-list-changed', ('group-cleared',))
         self.__id2record = {}
         self.record_removed, self.record_deleted = [], []
 
     def move(self, record, pos):
-        self.lock_signal = True
-        if self.__len__() > pos:
+        if self.__len__() > pos >= 0:
             idx = self.index(record)
             self._remove(record)
             if pos > idx:
@@ -99,7 +103,6 @@ class Group(SignalEvent, list):
         else:
             self._remove(record)
             self.append(record)
-        self.lock_signal = False
 
     def __setitem__(self, i, value):
         super(Group, self).__setitem__(i, value)
@@ -113,7 +116,7 @@ class Group(SignalEvent, list):
         for name, attr in fields.iteritems():
             field = Field(attr['type'])
             attr['name'] = name
-            self.fields[name] = field(self, attr)
+            self.fields[name] = field(attr)
             if isinstance(self.fields[name], O2MField) \
                     and '_datetime' in self._context:
                 self.fields[name].context.update({
@@ -121,17 +124,26 @@ class Group(SignalEvent, list):
                     })
 
     def save(self):
+        saved = []
         for record in self:
-            saved = record.save()
-            self.writen(saved)
+            saved.append(record.save())
+        return saved
 
-    def writen(self, ids):
+    @property
+    def root_group(self):
+        root = self
+        parent = self.parent
+        while parent:
+            root = parent.group
+        return root
+
+    def written(self, ids):
         if isinstance(ids, (int, long)):
             ids = [ids]
         ids = [x for x in self.on_write_ids(ids) or [] if x not in ids]
         if not ids:
             return
-        self.reload(ids)
+        self.root_group.reload(ids)
         return ids
 
     def reload(self, ids):
@@ -154,7 +166,7 @@ class Group(SignalEvent, list):
                 res += res2
         return list({}.fromkeys(res))
 
-    def load(self, ids, display=True, modified=False):
+    def load(self, ids, display=True, modified=False, id2record=None):
         if not ids:
             return True
 
@@ -166,7 +178,7 @@ class Group(SignalEvent, list):
             if self.get(id):
                 continue
             new_record = Record(self.model_name, id, self.window,
-                parent=self.parent, parent_name=self.parent_name, group=self)
+                group=self)
             self.append(new_record)
             new_records.append(new_record)
             new_record.signal_connect(self, 'record-changed',
@@ -206,26 +218,21 @@ class Group(SignalEvent, list):
     context = property(_get_context)
 
     def add(self, record, position=-1, modified=True):
-        if not record.group is self:
-            fields = {}
-            for i in record.group.fields:
-                fields[record.group.fields[i].attrs['name']] = \
-                        record.group.fields[i].attrs
-            self.add_fields(fields)
+        if record.group is not self:
+            record.signal_unconnect(record.group)
             record.group = self
-
+            record.window = self.window
+            record.signal_connect(self, 'record-changed', self._record_changed)
+            record.signal_connect(self, 'record-modified', self._record_modified)
         if position == -1:
             self.append(record)
         else:
             self.insert(position, record)
         self.current_idx = position
-        record.parent = self.parent
-        record.parent_name = self.parent_name
-        record.window = self.window
         if modified:
-            record.modified = True
-        record.signal_connect(self, 'record-changed', self._record_changed)
-        record.signal_connect(self, 'record-modified', self._record_modified)
+            record.modified_fields.setdefault('id')
+            record.signal('record-modified')
+        self.signal('group-changed', record)
         return record
 
     def set_sequence(self, field='sequence'):
@@ -238,9 +245,9 @@ class Group(SignalEvent, list):
                 else:
                     index = record[field].get(record)
 
-    def new(self, default=True, domain=None, context=None, signal=True):
-        record = Record(self.model_name, None, self.window, group=self,
-            parent=self.parent, parent_name=self.parent_name)
+    def new(self, default=True, domain=None, context=None, signal=True,
+            obj_id=None):
+        record = Record(self.model_name, obj_id, self.window, group=self)
         record.signal_connect(self, 'record-changed', self._record_changed)
         record.signal_connect(self, 'record-modified', self._record_modified)
         if default:
@@ -260,7 +267,8 @@ class Group(SignalEvent, list):
         if signal:
             record.signal('record-changed', record.parent)
 
-    def remove(self, record, remove=False, modified=True, signal=True):
+    def remove(self, record, remove=False, modified=True, signal=True,
+            force_remove=False):
         idx = self.index(record)
         if self[idx].id > 0:
             if remove:
@@ -272,10 +280,12 @@ class Group(SignalEvent, list):
                     self.record_removed.remove(self[idx])
                 self.record_deleted.append(self[idx])
         if record.parent:
-            record.parent.modified = True
+            record.parent.modified_fields.setdefault('id')
+            record.parent.signal('record-modified')
         if modified:
-            record.modified = True
-        if not record.parent or self[idx].id <= 0:
+            record.modified_fields.setdefault('id')
+            record.signal('record-modified')
+        if not record.parent or self[idx].id <= 0 or force_remove:
             self._remove(self[idx])
 
         if len(self):
@@ -360,11 +370,25 @@ class Group(SignalEvent, list):
         super(Group, self).destroy()
         self.__window = None
         self.parent = None
-        for field in self.fields.itervalues():
-            field.destroy()
         self.fields = {}
         self.record_deleted, self.record_removed = [], []
         self.__id2record = None
         for record in self:
             record.destroy()
         self[:] = []
+
+    def get_by_path(self, path):
+        'return record by path'
+        group = self
+        record = None
+        for child_name, id_ in path:
+            record = group.get(id_)
+            if not record:
+                return None
+            if not child_name:
+                continue
+            record[child_name]
+            group = record.value.get(child_name)
+            if not isinstance(group, Group):
+                return None
+        return record

@@ -60,7 +60,7 @@ class Many2Many(WidgetInterface):
         hbox.set_focus_chain([self.wid_text])
 
         self.screen = Screen(attrs['relation'], self.window,
-                view_type=['tree'], views_preload=attrs.get('views', {}),
+                mode=['tree'], views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate)
 
         if not isinstance(self.screen.window, gtk.Dialog):

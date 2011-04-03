@@ -37,10 +37,10 @@ class Preference(object):
         args = ('model', 'res.user', 'get_preferences_fields_view',
                 rpc.CONTEXT)
         try:
-            res = rpc.execute(*args)
+            view = rpc.execute(*args)
         except Exception, exception:
-            res = common.process_exception(exception, parent, *args)
-            if not res:
+            view = common.process_exception(exception, parent, *args)
+            if not view:
                 self.win.destroy()
                 self.win = None
                 return
@@ -48,11 +48,9 @@ class Preference(object):
         title = gtk.Label(_('Edit User Preferences'))
         title.show()
         self.win.vbox.pack_start(title, expand=False, fill=True)
-        arch = res['arch']
-        fields = res['fields']
-        self.screen = Screen('res.user', self.win, view_type=[])
+        self.screen = Screen('res.user', self.win, mode=[])
         self.screen.new(default=False)
-        self.screen.add_view(arch, fields)
+        self.screen.add_view(view)
 
         args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:

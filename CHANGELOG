@@ -1,3 +1,6 @@
+* New UI layout
+* Add DnD on tree view
+* Merge tree and list views
 * Remove generic default value on right-click
 * Made numpad locale aware
 * Selection widget used for many2one dynamically change their content following

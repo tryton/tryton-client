@@ -16,7 +16,7 @@ _ = gettext.gettext
 class Dialog(object):
     "Dialog for wizard"
 
-    def __init__(self, arch, fields, state, obj_name, parent,
+    def __init__(self, view, state, obj_name, parent,
             action='', size=(0, 0), context=None):
         self.parent = parent
         self.action = action
@@ -52,12 +52,13 @@ class Dialog(object):
             self.states.append(i[0])
 
         val = {}
+        fields = view['fields']
         for i in fields:
             if 'value' in fields[i]:
                 val[i] = fields[i]['value']
 
-        self.screen = Screen(obj_name, self.dia, view_type=[], context=context)
-        self.screen.add_view(arch, fields, display=True)
+        self.screen = Screen(obj_name, self.dia, mode=[], context=context)
+        self.screen.add_view(view, display=True)
 
         title = gtk.Label()
         title.set_use_markup(True)
@@ -216,9 +217,8 @@ class Wizard(object):
                 datas['form'] = {}
             if res['type'] == 'form':
                 if not dia:
-                    dia = Dialog(res['arch'], res['fields'], res['state'],
-                            res['object'], parent, action=action,
-                            size=res['size'], context=ctx)
+                    dia = Dialog(res, res['state'], res['object'], parent,
+                            action=action, size=res['size'], context=ctx)
                     dia.screen.current_record.set_default(datas['form'])
                 res2 = dia.run(datas['form'])
                 if not res2:

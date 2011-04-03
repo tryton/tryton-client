@@ -83,8 +83,7 @@ class Wizard(SignalEvent):
             elif res['type'] == 'form':
                 self.datas['form'] = {}
             if res['type'] == 'form':
-                self.update(res['arch'], res['fields'], res['state'],
-                            res['object'], context=ctx)
+                self.update(res, res['state'], res['object'], context=ctx)
                 self.screen.current_record.set_default(self.datas['form'])
                 break
             elif res['type'] == 'action':
@@ -148,7 +147,7 @@ class Wizard(SignalEvent):
         self.state = state
         self.process()
 
-    def update(self, arch, fields, state, obj_name, context=None):
+    def update(self, view, state, obj_name, context=None):
         self.model = obj_name
 
         hbuttonbox = gtk.HButtonBox()
@@ -170,13 +169,13 @@ class Wizard(SignalEvent):
             hbuttonbox.pack_start(but)
 
         val = {}
+        fields = view['fields']
         for i in fields:
             if 'value' in fields[i]:
                 val[i] = fields[i]['value']
 
-        self.screen = Screen(obj_name, self.window, view_type=[],
-                context=context)
-        self.screen.add_view(arch, fields, display=True)
+        self.screen = Screen(obj_name, self.window, mode=[], context=context)
+        self.screen.add_view(view, display=True)
         self.screen.widget.show()
 
         title = gtk.Label()

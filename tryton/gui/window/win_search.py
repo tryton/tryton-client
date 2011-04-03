@@ -48,7 +48,7 @@ class WinSearch(object):
         self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
         self.screen = Screen(model, self.win, domain=domain,
-                view_type=['tree'], context=context,
+                mode=['tree'], context=context,
                 views_preload=views_preload, row_activate=self.sig_activate)
         self.view = self.screen.current_view
         self.view.unset_editable()
@@ -104,7 +104,7 @@ class WinSearch(object):
             elif button == gtk.RESPONSE_ACCEPT:
                 res = None
                 screen = Screen(self.model_name, self.win, domain=self.domain,
-                        context=self.context, view_type=['form'])
+                        context=self.context, mode=['form'])
                 win = WinForm(screen, self.win, new=True)
                 while win.run():
                     if screen.save_current():

@@ -154,7 +154,7 @@ class One2Many(WidgetInterface):
         self.widget.pack_start(frame, expand=False, fill=True)
 
         self.screen = Screen(attrs['relation'], self.window,
-                view_type=attrs.get('mode', 'tree,form').split(','),
+                mode=attrs.get('mode', 'tree,form').split(','),
                 views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate,
                 exclude_field=attrs.get('relation_field', None))
@@ -324,17 +324,17 @@ class One2Many(WidgetInterface):
 
     def _sig_label(self, screen, signal_data):
         name = '_'
-        if signal_data[0] >= 0:
-            name = str(signal_data[0] + 1)
+        if signal_data[0] >= 1:
+            name = str(signal_data[0])
             self.but_open.set_sensitive(True)
             self.but_del.set_sensitive(not self._readonly)
             if self.attrs.get('add_remove'):
                 self.but_remove.set_sensitive(not self._readonly)
-            if signal_data[0] + 1 < signal_data[1]:
+            if signal_data[0] < signal_data[1]:
                 self.but_next.set_sensitive(True)
             else:
                 self.but_next.set_sensitive(False)
-            if signal_data[0] > 0:
+            if signal_data[0] > 1:
                 self.but_pre.set_sensitive(True)
             else:
                 self.but_pre.set_sensitive(False)
@@ -381,7 +381,7 @@ class One2Many(WidgetInterface):
 
     def set_value(self, record, field):
         self.screen.current_view.set_value()
-        if self.screen.is_modified():
-            record.modified = True
+        if self.screen.modified(): # TODO check if required
             record.modified_fields.setdefault(field.name)
+            record.signal('record-modified')
         return True

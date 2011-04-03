@@ -66,8 +66,10 @@ def sort_model(column, treeview, screen):
 
 class ParserTree(ParserInterface):
 
-    def __init__(self, window, parent=None, attrs=None, screen=None):
-        super(ParserTree, self).__init__(window, parent, attrs, screen)
+    def __init__(self, window, parent=None, attrs=None, screen=None,
+            children_field=None):
+        super(ParserTree, self).__init__(window, parent, attrs, screen,
+            children_field=children_field)
         self.treeview = None
 
     def parse(self, model_name, root_node, fields):
@@ -83,6 +85,7 @@ class ParserTree(ParserInterface):
             treeview.cells = {}
         treeview.sequence = attrs.get('sequence', False)
         treeview.colors = attrs.get('colors', '"black"')
+        treeview.keyword_open = attrs.get('keyword_open', False)
         self.treeview = treeview
         treeview.set_property('rules-hint', True)
         if not self.title:
@@ -124,7 +127,22 @@ class ParserTree(ParserInterface):
                     renderer.connect_after('editing-started', send_keys,
                             treeview)
 
-                col = gtk.TreeViewColumn(fields[fname].attrs['string'], renderer)
+                col = gtk.TreeViewColumn(fields[fname].attrs['string'])
+
+                if 'icon' in node_attrs:
+                    render_pixbuf = gtk.CellRendererPixbuf()
+                    col.pack_start(render_pixbuf, expand=False)
+                    icon = node_attrs['icon']
+                    def setter(column, cell, store, iter):
+                        record = store.get_value(iter, 0)
+                        value = record[icon].get_client(record) or ''
+                        common.ICONFACTORY.register_icon(value)
+                        pixbuf = treeview.render_icon(stock_id=value,
+                                size=gtk.ICON_SIZE_BUTTON, detail=None)
+                        cell.set_property('pixbuf', pixbuf)
+                    col.set_cell_data_func(render_pixbuf, setter)
+
+                col.pack_start(renderer, expand=False)
                 col.name = fname
 
                 hbox = gtk.HBox(False, 2)
@@ -169,13 +187,16 @@ class ParserTree(ParserInterface):
                     col.set_fixed_width(width)
                 #XXX doesn't work well when resize columns
                 #col.set_expand(True)
-                if not treeview.sequence \
-                        and fields[fname].attrs.get('sortable', True):
+                if (not treeview.sequence
+                        and not self.children_field
+                        and fields[fname].attrs.get('sortable', True)):
                     col.connect('clicked', sort_model, treeview, self.screen)
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 col.set_visible(not node_attrs.get('tree_invisible',
                     fields[fname].attrs.get('tree_invisible', False)))
+                if fname == self.screen.exclude_field:
+                    col.set_visible(False)
                 i = treeview.append_column(col)
                 if 'sum' in node_attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
@@ -317,6 +338,8 @@ class Char(object):
         raise NotImplementedError
 
     def get_textual_value(self, record):
+        if not record:
+            return ''
         return record[self.field_name].get_client(record) or ''
 
     def value_from_text(self, record, text):
@@ -540,7 +563,7 @@ class M2O(Char):
                 return True, searched
             return False, False
         screen = Screen(relation, self.window, domain=domain, context=context,
-                view_type=['form'])
+                mode=['form'])
         if obj_id:
             screen.load([obj_id])
             win = WinForm(screen, self.window)
@@ -605,7 +628,7 @@ class O2M(Char):
         relation = field.attrs['relation']
         context = field.context_get(record)
 
-        screen = Screen(relation, self.window, view_type=['tree', 'form'],
+        screen = Screen(relation, self.window, mode=['tree', 'form'],
                 exclude_field=field.attrs.get('relation_field'))
         screen.group = group
         win = WinForm(screen, self.window, view_type='tree', context=context)
@@ -897,7 +920,7 @@ class Button(object):
                             }, self.window, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
-                self.screen.reload(writen=True)
+                self.screen.reload(written=True)
             else:
                 self.screen.display()
 

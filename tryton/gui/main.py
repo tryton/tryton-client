@@ -87,6 +87,13 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
                 gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/User/Menu Reload', gtk.keysyms.T,
+                gtk.gdk.MOD1_MASK)
+        gtk.accel_map_add_entry('<tryton>/User/Menu Toggle', gtk.keysyms.T,
+                gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/User/Home', gtk.keysyms.H,
+                gtk.gdk.CONTROL_MASK)
+
         gtk.accel_map_add_entry('<tryton>/Form/New', gtk.keysyms.N,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Save', gtk.keysyms.S,
@@ -102,10 +109,6 @@ class Main(object):
         gtk.accel_map_add_entry('<tryton>/Form/Previous', gtk.keysyms.Page_Up,
                 0)
         gtk.accel_map_add_entry('<tryton>/Form/Switch View', gtk.keysyms.L,
-                gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/Form/Menu', gtk.keysyms.T,
-                gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/Form/Home', gtk.keysyms.H,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Close', gtk.keysyms.W,
                 gtk.gdk.CONTROL_MASK)
@@ -131,6 +134,7 @@ class Main(object):
         self.toolbar = toolbar
         toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
         toolbar.set_style(gtk.TOOLBAR_BOTH)
+        self.toolbar_menu = None
 
         self.vbox = gtk.VBox()
         self.window.add(self.vbox)
@@ -138,7 +142,6 @@ class Main(object):
         self.status_hbox = None
         self.menubar = None
         self.menuitem_user = None
-        self.menuitem_form = None
         self.menuitem_plugins = None
 
         self.set_statusbar()
@@ -147,18 +150,20 @@ class Main(object):
         if self.macapp is not None:
             self.macapp.ready()
 
-
-        self.vbox.pack_start(toolbar, False, True)
-
         self.buttons = {}
         self._set_toolbar()
         self.set_toolbar_label()
+
+        self.pane = gtk.HPaned()
+        self.menu_screen = None
+        self.vbox.pack_start(self.pane, True, True)
 
         self.notebook = gtk.Notebook()
         self.notebook.popup_enable()
         self.notebook.set_scrollable(True)
         self.notebook.connect_after('switch-page', self._sig_page_changt)
-        self.vbox.pack_start(self.notebook, True, True)
+
+        self.pane.add2(self.notebook)
 
         self.window.show_all()
 
@@ -225,20 +230,6 @@ class Main(object):
         menu_user.set_accel_group(self.accel_group)
         menu_user.set_accel_path('<tryton>/User')
 
-        menuitem_form = gtk.MenuItem(_('For_m'))
-        if self.menuitem_form:
-            menuitem_form.set_sensitive(
-                    self.menuitem_form.get_property('sensitive'))
-        else:
-            menuitem_form.set_sensitive(False)
-        self.menuitem_form = menuitem_form
-        menubar.add(menuitem_form)
-
-        menu_form = self._set_menu_form()
-        menuitem_form.set_submenu(menu_form)
-        menu_form.set_accel_group(self.accel_group)
-        menu_form.set_accel_path('<tryton>/Form')
-
         menuitem_options = gtk.MenuItem(_('_Options'))
         menubar.add(menuitem_options)
 
@@ -281,7 +272,6 @@ class Main(object):
             self.macapp.insert_app_menu_item(self.aboutitem,0)
             menuitem_file.show_all()
             menuitem_user.show_all()
-            menuitem_form.show_all()
             menuitem_options.show_all()
             menuitem_plugins.show_all()
             menuitem_shortcut.show_all()
@@ -407,6 +397,31 @@ class Main(object):
 
         menu_user.add(gtk.SeparatorMenuItem())
 
+        imagemenuitem_menu = gtk.ImageMenuItem(_('_Menu Reload'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-start-here', gtk.ICON_SIZE_MENU)
+        imagemenuitem_menu.set_image(image)
+        imagemenuitem_menu.connect('activate', self.sig_win_menu)
+        imagemenuitem_menu.set_accel_path('<tryton>/User/Menu Reload')
+        menu_user.add(imagemenuitem_menu)
+
+        imagemenuitem_menu_toggle = gtk.ImageMenuItem(_('_Menu Toggle'),
+                self.accel_group)
+        imagemenuitem_menu_toggle.connect('activate', lambda *a: self.menu_toggle())
+        imagemenuitem_menu_toggle.set_accel_path('<tryton>/User/Menu Toggle')
+        menu_user.add(imagemenuitem_menu_toggle)
+
+
+        imagemenuitem_home = gtk.ImageMenuItem(_('_Home'), self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('tryton-go-home', gtk.ICON_SIZE_MENU)
+        imagemenuitem_home.set_image(image)
+        imagemenuitem_home.connect('activate', self.sig_home_new)
+        imagemenuitem_home.set_accel_path('<tryton>/User/Home')
+        menu_user.add(imagemenuitem_home)
+
+        menu_user.add(gtk.SeparatorMenuItem())
+
         imagemenuitem_send_request = gtk.ImageMenuItem(_('_Send a Request'))
         image = gtk.Image()
         image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
@@ -493,23 +508,7 @@ class Main(object):
         imagemenuitem_switch.set_accel_path('<tryton>/Form/Switch View')
         menu_form.add(imagemenuitem_switch)
 
-        imagemenuitem_menu = gtk.ImageMenuItem(_('_Menu'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-start-here', gtk.ICON_SIZE_MENU)
-        imagemenuitem_menu.set_image(image)
-        imagemenuitem_menu.connect('activate', self.sig_win_menu)
-        imagemenuitem_menu.set_accel_path('<tryton>/Form/Menu')
-        menu_form.add(imagemenuitem_menu)
-
         menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_home = gtk.ImageMenuItem(_('_Home'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-go-home', gtk.ICON_SIZE_MENU)
-        imagemenuitem_home.set_image(image)
-        imagemenuitem_home.connect('activate', self.sig_home_new)
-        imagemenuitem_home.set_accel_path('<tryton>/Form/Home')
-        menu_form.add(imagemenuitem_home)
 
         imagemenuitem_close = gtk.ImageMenuItem(_('_Close Tab'), self.accel_group)
         image = gtk.Image()
@@ -589,6 +588,10 @@ class Main(object):
                 'but_import')
         menuitem_import.set_accel_path('<tryton>/Form/Import Data')
         menu_form.add(menuitem_import)
+
+        menu_form.set_accel_group(self.accel_group)
+        menu_form.set_accel_path('<tryton>/Form')
+        menu_form.show_all()
         return menu_form
 
     def _set_menu_options(self):
@@ -891,12 +894,6 @@ class Main(object):
         toolbutton_reload.connect('clicked', self._sig_child_call, 'but_reload')
         self.buttons['but_reload'] = toolbutton_reload
 
-        toolbutton_menu = gtk.ToolButton('tryton-start-here')
-        self.toolbutton_menu = toolbutton_menu
-        self.toolbar.insert(toolbutton_menu, -1)
-        toolbutton_menu.connect('clicked', self.sig_win_menu)
-        self.buttons['but_menu'] = toolbutton_menu
-
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         toolbutton_action = gtk.ToolButton('tryton-executable')
@@ -916,13 +913,18 @@ class Main(object):
         toolbutton_attach.connect('clicked', self._sig_child_call, 'but_attach')
         self.buttons['but_attach'] = toolbutton_attach
 
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+        self.menutoolbutton = None
+        if hasattr(gtk, 'MenuToolButton'):
+            self.menutoolbutton = gtk.MenuToolButton(None, None)
+            # Remove the button to keep only the toggle
+            hbox, = self.menutoolbutton.get_children()
+            button, toggle = hbox.get_children()
+            hbox.remove(button)
+            self.toolbar.insert(self.menutoolbutton, -1)
+            menu = self._set_menu_form()
+            self.menutoolbutton.set_menu(menu)
+            self.toolbar_menu = menu
 
-        toolbutton_request = gtk.ToolButton('tryton-mail-message')
-        self.toolbutton_request = toolbutton_request
-        self.toolbar.insert(toolbutton_request, -1)
-        toolbutton_request.connect('clicked', self.sig_request_open)
-        self.buttons['but_request'] = toolbutton_request
 
     def set_toolbar_label(self):
         labels = {
@@ -934,11 +936,9 @@ class Main(object):
             'but_next': _('Next'),
             'but_switch': _('Switch'),
             'but_reload': _('_Reload'),
-            'but_menu': _('Menu'),
             'but_action': _('Action'),
             'but_print': _('Print'),
             'but_attach': _('Attachment(0)'),
-            'but_request': _('Request'),
         }
         tooltips = {
             'but_new': _('Create a new record'),
@@ -949,15 +949,17 @@ class Main(object):
             'but_next': _('Next Record'),
             'but_switch': _('Switch view'),
             'but_reload': _('Reload'),
-            'but_menu': _('Menu'),
             'but_action': _('Action'),
             'but_print': _('Print'),
             'but_attach': _('Add an attachment to the record'),
-            'but_request': _('Request'),
         }
         for i in self.buttons:
             self.buttons[i].set_label(labels[i])
             self.tooltips.set_tip(self.buttons[i], tooltips[i])
+        if self.toolbar_menu and self.menutoolbutton:
+            self.toolbar_menu.destroy()
+            menu = self._set_menu_form()
+            self.menutoolbutton.set_menu(menu)
 
     @staticmethod
     def get_main():
@@ -970,6 +972,34 @@ class Main(object):
                 'id': action,
                 'ids': [action],
                 })
+
+        def _add_shortcut(widget):
+            ids = self.menu_screen.sel_ids_get()
+            if not ids:
+                return
+            try:
+                values = rpc.execute('model', self.menu_screen.model_name,
+                        'read', ids, ['rec_name'], rpc.CONTEXT)
+            except Exception, exception:
+                common.process_exception(exception, self.window)
+                return
+            try:
+                for value in values:
+                    rpc.execute('model', 'ir.ui.view_sc', 'create', {
+                        'name': value['rec_name'],
+                        'res_id': value['id'],
+                        'user_id': rpc._USER,
+                        'resource': self.menu_screen.model_name,
+                        }, rpc.CONTEXT)
+            except Exception, exception:
+                common.process_exception(exception, self.window)
+            self.shortcut_set()
+
+        def _manage_shortcut(widget):
+            Window.create(False, 'ir.ui.view_sc', False,
+                    domain=[('user_id', '=', rpc._USER)],
+                    window=self.window, mode=['tree', 'form'])
+
         if shortcuts is None:
             user = rpc._USER
             try:
@@ -982,6 +1012,13 @@ class Main(object):
             menuitem = gtk.MenuItem(shortcut['name'])
             menuitem.connect('activate', _action_shortcut, shortcut['res_id'])
             menu.add(menuitem)
+        menu.add(gtk.MenuItem())
+        add_shortcut = gtk.MenuItem(_('Add Shortcut'))
+        add_shortcut.connect('activate', _add_shortcut)
+        menu.add(add_shortcut)
+        manage_shortcut = gtk.MenuItem(_('Manage Shortcut'))
+        manage_shortcut.connect('activate', _manage_shortcut)
+        menu.add(manage_shortcut)
         menu.show_all()
         self.menuitem_shortcut.set_submenu(menu)
         self.menuitem_shortcut.set_sensitive(True)
@@ -1082,22 +1119,22 @@ class Main(object):
                     self.shortcut_set()
                     self.set_statusbar()
                     self.request_set()
-                    self.sig_reload_menu()
+                    self.sig_win_menu()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         self.window.present()
         return True
 
     def sig_win_close(self, widget):
-        self._sig_child_call(widget, 'but_close')
+        self._sig_remove_book(widget,
+                self.notebook.get_nth_page(self.notebook.get_current_page()))
 
     def sig_request_new(self, widget):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
-        return Window.create(None, 'res.request', False, [
-            ], 'form', mode=['form', 'tree'], window=self.window,
-            context=ctx)
+        return Window.create(None, 'res.request', False, [ ],
+                mode=['form', 'tree'], window=self.window, context=ctx)
 
     def sig_request_open(self, widget):
         ctx = {}
@@ -1111,9 +1148,8 @@ class Main(object):
             else:
                 raise
         ids = ids1 + ids2
-        return Window.create(False, 'res.request', ids, [
-            ], 'form', mode=['tree', 'form'], window=self.window,
-            context=ctx)
+        return Window.create(False, 'res.request', ids, [ ],
+                mode=['tree', 'form'], window=self.window, context=ctx)
 
     def request_set(self, exception=False):
         try:
@@ -1129,13 +1165,6 @@ class Main(object):
                 ids, ids2 = rpc.execute('model', 'res.request', 'request_get',
                         rpc.CONTEXT)
             label = _('Requests (%s/%s)') % (len(ids), len(ids2))
-            self.buttons['but_request'].set_label(label)
-            self.tooltips.set_tip(self.buttons['but_request'], label)
-            if not ids:
-                self.buttons['but_request'].set_stock_id('tryton-mail-message')
-            else:
-                self.buttons['but_request'].set_stock_id(
-                        'tryton-mail-message-new')
             message = _('Waiting requests: %s received - %s sent') % (len(ids),
                         len(ids2))
             self.sb_requests.set_text(message)
@@ -1197,12 +1226,9 @@ class Main(object):
             return self.sig_login()
         if not self.menuitem_shortcut.get_property('sensitive'):
             self.shortcut_set()
-        self.toolbutton_menu.set_sensitive(True)
-        self.toolbutton_request.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
-        self.menuitem_form.set_sensitive(True)
+        #self.menuitem_form.set_sensitive(True)
         self.menuitem_plugins.set_sensitive(True)
-        self.notebook.grab_focus()
         if CONFIG.arguments:
             url = CONFIG.arguments.pop()
             self.open_url(url)
@@ -1211,7 +1237,7 @@ class Main(object):
     def sig_logout(self, widget, disconnect=True):
         res = True
         while res:
-            wid = self._wid_get()
+            wid = self.get_page()
             if wid:
                 if 'but_close' in wid.handlers:
                     res = wid.handlers['but_close']()
@@ -1220,15 +1246,19 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
+        if self.pane.get_child1():
+            self.pane.remove(self.pane.get_child1())
+            if self.pane.get_position():
+                CONFIG['menu.pane'] = self.pane.get_position()
+        if self.menu_screen:
+            self.menu_screen.destroy()
+            self.menu_screen = None
         self.sb_username.set_text('')
         self.sb_servername.set_text('')
         self.sb_requests.set_text('')
         self.shortcut_unset()
-        self.toolbutton_menu.set_sensitive(False)
-        self.toolbutton_request.set_sensitive(False)
-        self.toolbutton_request.set_label(_('Request'))
         self.menuitem_user.set_sensitive(False)
-        self.menuitem_form.set_sensitive(False)
+        #self.menuitem_form.set_sensitive(False)
         self.menuitem_plugins.set_sensitive(False)
         if disconnect:
             rpc.logout()
@@ -1256,25 +1286,32 @@ class Main(object):
     def sig_shortcuts(self, widget):
         Shortcuts(self.window).run()
 
-    def sig_reload_menu(self):
-        res = False
-        for page in range(len(self.pages)):
-            if self.pages[page].model == 'ir.ui.menu':
-                self.pages[page].sig_reload()
-                hbox = self.notebook.get_tab_label(self.pages[page].widget)
-                for child in hbox.get_children():
-                    if isinstance(child, gtk.Label):
-                        child.set_text(_('Menu'))
-                        break
-                res = True
-        return res
+    def menu_toggle(self, nohide=False):
+        has_focus = True
+        if (self.menu_screen
+                and self.menu_screen.current_view.view_type == 'tree'):
+            try:
+                has_focus = self.menu_screen.current_view.widget_tree.has_focus()
+            except AttributeError:
+                has_focus = (self.menu_screen.current_view.widget_tree.flags()
+                        & gtk.HAS_FOCUS)
+        if self.pane.get_position() and has_focus:
+            CONFIG['menu.pane'] = self.pane.get_position()
+            if not nohide:
+                self.pane.set_position(0)
+                self.notebook.grab_focus()
+        else:
+            self.pane.set_position(int(CONFIG['menu.pane']))
+            if self.menu_screen:
+                self.menu_screen.current_view.set_cursor()
 
     def sig_win_menu(self, widget=None, quiet=True, prefs=None):
-        for page in range(len(self.pages)):
-            if self.pages[page].model == 'ir.ui.menu':
-                page_num = self.notebook.page_num(self.pages[page].widget)
-                self.notebook.set_current_page(page_num)
-                return True
+        if self.pane.get_child1():
+            self.pane.remove(self.pane.get_child1())
+            if self.pane.get_position():
+                CONFIG['menu.pane'] = self.pane.get_position()
+        self.menu_screen = None
+        self.menu_toggle(nohide=True)
         res = self.sig_win_new(widget, menu_type='menu', quiet=quiet,
                 prefs=prefs)
         return res
@@ -1360,6 +1397,16 @@ class Main(object):
         return False
 
     def win_add(self, page):
+        if page.model == 'ir.ui.menu' and not self.pane.get_child1():
+            screen = page.screen
+            screen.screen_container.alternate_view = True
+            screen.switch_view(view_type=screen.current_view.view_type)
+            self.pane.pack1(screen.screen_container.alternate_viewport)
+            self.menu_screen = screen
+            screen.display(set_cursor=True)
+            return
+        elif page.model == 'ir.ui.menu':
+            self.sig_win_menu()
         previous_page_id = self.notebook.get_current_page()
         previous_widget = self.notebook.get_nth_page(previous_page_id)
         self.previous_pages[page] = previous_widget
@@ -1375,8 +1422,6 @@ class Main(object):
         else:
             noise_size = icon_w + 3
         name = page.name
-        if page.model == 'ir.ui.menu':
-            name = _('Menu')
         label = gtk.Label(name)
         self.tooltips.set_tip(label, page.name)
         self.tooltips.enable()
@@ -1418,10 +1463,8 @@ class Main(object):
 
     def sb_set(self, view=None):
         if not view:
-            view = self._wid_get()
+            view = self.get_page()
         for i in self.buttons:
-            if i in ('but_menu', 'but_request'):
-                continue
             if self.buttons[i]:
                 self.buttons[i].set_sensitive(
                         bool(view and (i in view.handlers)))
@@ -1484,10 +1527,13 @@ class Main(object):
             del page
 
             self.notebook.set_current_page(next_page_id)
+        if not self.pages and self.menu_screen:
+            self.menu_screen.current_view.set_cursor()
         return self.notebook.get_current_page() != -1
 
-    def _wid_get(self):
-        page_id = self.notebook.get_current_page()
+    def get_page(self, page_id=None):
+        if page_id is None:
+            page_id = self.notebook.get_current_page()
         if page_id == -1:
             return None
         page_widget = self.notebook.get_nth_page(page_id)
@@ -1497,7 +1543,7 @@ class Main(object):
         return None
 
     def _sig_child_call(self, widget, button_name):
-        wid = self._wid_get()
+        wid = self.get_page()
         if wid:
             res = True
             if button_name in wid.handlers:
@@ -1508,6 +1554,14 @@ class Main(object):
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
+
+        current_form = self.get_page(self.current_page)
+        parent = self.toolbar.get_parent()
+        if parent:
+            parent.remove(self.toolbar)
+        current_form.toolbar_box.add(self.toolbar)
+        current_form.toolbar_box.show_all()
+
         self.sb_set()
 
     def sig_db_new(self, widget):
@@ -1681,7 +1735,6 @@ class Main(object):
                 return
             res_id = False
             mode = None
-            view_type = params.get('view_type', 'form')
             try:
                 view_ids = json.loads(params.get('views', 'false'))
                 limit = json.loads(params.get('limit', 'null'))
@@ -1700,9 +1753,9 @@ class Main(object):
                 mode = ['form', 'tree']
             try:
                 Window.create(view_ids, model, res_id=res_id, domain=domain,
-                        view_type=view_type, window=self.window,
-                        context=context, mode=mode, name=name, limit=limit,
-                        auto_refresh=auto_refresh, search_value=search_value)
+                        window=self.window, context=context, mode=mode,
+                        name=name, limit=limit, auto_refresh=auto_refresh,
+                        search_value=search_value)
             except Exception:
                 return
 

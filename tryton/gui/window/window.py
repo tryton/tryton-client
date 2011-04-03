@@ -7,35 +7,22 @@ from preference import *
 class Window(object):
 
     @staticmethod
-    def create(view_ids, model, res_id=False, domain=None,
-            view_type='form', window=None, context=None, mode=None, name=False,
-            limit=None, auto_refresh=False, search_value=None, icon=None):
+    def create(view_ids, model, res_id=False, domain=None, window=None,
+            context=None, mode=None, name=False, limit=None,
+            auto_refresh=False, search_value=None, icon=None):
         from tryton.gui import Main
         if context is None:
             context = {}
-        if view_type not in ('form', 'tree', 'board'):
-            import logging
-            log = logging.getLogger('view')
-            log.error('unknown view type: '+view_type)
-            del log
-            return
 
-        if view_type == 'form':
+        if model:
             from form import Form
-            win = Form(model, window, res_id, domain, view_type=mode,
-                    view_ids = (view_ids or []), context=context, name=name,
+            win = Form(model, window, res_id, domain, mode=mode,
+                    view_ids=(view_ids or []), context=context, name=name,
                     limit=limit, auto_refresh=auto_refresh,
                     search_value=search_value)
-        elif view_type == 'tree':
-            if model == 'ir.ui.menu':
-                if Main.get_main().sig_reload_menu():
-                    return
-            from tree import Tree
-            win = Tree(model, window, res_id, view_ids and view_ids[0] or None,
-                    domain, context, name=name)
-        elif view_type == 'board':
+        else:
             from board import Board
-            win = Board(window, view_ids and view_ids[0] or None,
+            win = Board(model, window, view_ids and view_ids[0] or None,
                     context=context, name=name, auto_refresh=auto_refresh)
         win.icon = icon
         Main.get_main().win_add(win)

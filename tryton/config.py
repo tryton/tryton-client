@@ -86,6 +86,7 @@ class ConfigManager(object):
             'client.limit': 1000,
             'roundup.url': 'http://bugs.tryton.org/roundup/',
             'roundup.xmlrpc': 'roundup-xmlrpc.tryton.org',
+            'menu.pane': 200,
         }
         self.config = {}
         self.options = {

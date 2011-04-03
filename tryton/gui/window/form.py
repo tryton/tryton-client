@@ -27,13 +27,13 @@ _ = gettext.gettext
 class Form(SignalEvent):
     "Form"
 
-    def __init__(self, model, window, res_id=False, domain=None, view_type=None,
+    def __init__(self, model, window, res_id=False, domain=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False, search_value=None):
         super(Form, self).__init__()
 
-        if not view_type:
-            view_type = ['tree', 'form']
+        if not mode:
+            mode = ['tree', 'form']
         if domain is None:
             domain = []
         if view_ids is None:
@@ -49,7 +49,7 @@ class Form(SignalEvent):
         self.widget = gtk.VBox(spacing=3)
         self.widget.show()
 
-        self.screen = Screen(self.model, self.window, view_type=view_type,
+        self.screen = Screen(self.model, self.window, mode=mode,
                 context=self.context, view_ids=view_ids, domain=domain,
                 limit=limit, readonly=bool(auto_refresh),
                 search_value=search_value)
@@ -109,6 +109,9 @@ class Form(SignalEvent):
         eb.show()
 
         self.widget.pack_start(eb, expand=False, fill=True, padding=3)
+
+        self.toolbar_box = gtk.HBox()
+        self.widget.pack_start(self.toolbar_box, False, True)
 
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_NONE)
@@ -198,12 +201,15 @@ class Form(SignalEvent):
         self.window.present()
 
     def destroy(self):
+        if self.toolbar_box.get_children():
+            toolbar = self.toolbar_box.get_children()[0]
+            self.toolbar_box.remove(toolbar)
         self.screen.signal_unconnect(self)
         self.screen.destroy()
         self.screen = None
         self.widget = None
-        self.scrolledwindow.destroy()
-        self.scrolledwindow = None
+        #self.scrolledwindow.destroy()
+        #self.scrolledwindow = None
 
     def sel_ids_get(self):
         return self.screen.sel_ids_get()
@@ -361,7 +367,7 @@ class Form(SignalEvent):
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
             return False
-        if test_modified and self.screen.is_modified():
+        if test_modified and self.screen.modified():
             res = sur_3b(_('This record has been modified\n' \
                     'do you want to save it ?'), self.window)
             if res == 'ok':
@@ -441,7 +447,7 @@ class Form(SignalEvent):
     def _record_message(self, screen, signal_data):
         name = '_'
         if signal_data[0] >= 0:
-            name = str(signal_data[0] + 1)
+            name = str(signal_data[0])
         msg = name + ' / ' + str(signal_data[1])
         if signal_data[1] < signal_data[2]:
             msg += _(' of ') + str(signal_data[2])
@@ -455,7 +461,7 @@ class Form(SignalEvent):
         self.signal('attachment-count', signal_data)
 
     def modified_save(self, reload=True):
-        if self.screen.is_modified():
+        if self.screen.modified():
             value = sur_3b(
                     _('This record has been modified\n' \
                             'do you want to save it ?'),

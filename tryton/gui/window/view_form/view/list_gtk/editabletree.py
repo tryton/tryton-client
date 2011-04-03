@@ -72,7 +72,7 @@ class EditableTreeView(gtk.TreeView):
             idx = (current + i + 1) % len(cols)
             if not cols[idx].get_cell_renderers():
                 continue
-            renderer = cols[idx].get_cell_renderers()[0]
+            renderer = cols[idx].get_cell_renderers()[-1]
             if isinstance(renderer, CellRendererToggle):
                 editable = renderer.get_property('activatable')
             elif isinstance(renderer,
@@ -91,7 +91,7 @@ class EditableTreeView(gtk.TreeView):
             idx = (current - (i + 1)) % len(cols)
             if not cols[idx].get_cell_renderers():
                 continue
-            renderer = cols[idx].get_cell_renderers()[0]
+            renderer = cols[idx].get_cell_renderers()[-1]
             if isinstance(renderer, CellRendererToggle):
                 editable = renderer.get_property('activatable')
             elif isinstance(renderer,
@@ -192,7 +192,7 @@ class EditableTreeView(gtk.TreeView):
         elif event.keyval in (gtk.keysyms.Return,):
             col = None
             for column in self.get_columns():
-                renderer = column.get_cell_renderers()[0]
+                renderer = column.get_cell_renderers()[-1]
                 if isinstance(renderer, CellRendererToggle):
                     editable = renderer.get_property('activatable')
                 elif isinstance(renderer,
@@ -243,7 +243,6 @@ class EditableTreeView(gtk.TreeView):
                 entry.set_max_length(int(field.attrs.get('size', 0)))
             # store in the record the entry widget to get the value in set_value
             field.editabletree_entry = entry
-            record.modified = True
             record.modified_fields.setdefault(column.name)
             return False
 

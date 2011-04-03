@@ -201,16 +201,16 @@ class Parse(object):
 
 class Form(object):
 
-    def __init__(self, xml, fields, model=None, parent=None, domain=None,
+    def __init__(self, view, model=None, parent=None, domain=None,
             call=None, context=None):
         if domain is None:
             domain = []
         if context is None:
             context = {}
-        parser = Parse(parent, fields, model=model, context=context,
+        parser = Parse(parent, view['fields'], model=model, context=context,
                 on_change=self.on_change)
         self.parent = parent
-        self.fields = fields
+        self.fields = view['fields']
         self.model = model
         self.parser = parser
         self.call = call
@@ -219,7 +219,7 @@ class Form(object):
         width = 640
         if self.parent:
             width = self.parent.size_request()[0]
-        (self.widgets, self.widget) = parser.parse(xml, width)
+        (self.widgets, self.widget) = parser.parse(view['arch'], width)
         self.widget.show()
         self.spin_limit = parser.spin_limit
         self.spin_limit.connect('value-changed', self.limit_changed)

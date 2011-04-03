@@ -268,7 +268,7 @@ class WinForm(object):
     def _sig_label(self, screen, signal_data):
         name = '_'
         if signal_data[0] >= 0:
-            name = str(signal_data[0] + 1)
+            name = str(signal_data[0])
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
@@ -303,7 +303,7 @@ class WinForm(object):
         if res == gtk.RESPONSE_OK:
             return True
         elif res == gtk.RESPONSE_CANCEL:
-            self.screen.remove(delete=True)
+            self.screen.remove()
         return False
 
     def new(self):

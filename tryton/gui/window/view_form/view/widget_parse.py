@@ -27,19 +27,21 @@ PARSERS2 = {
 
 class WidgetParse(ParserInterface):
 
-    def parse(self, screen, root_node, fields, toolbar=None):
+    def parse(self, screen, root_node, fields, toolbar=None,
+            children_field=None):
         widget = None
         for node in root_node.childNodes:
             if not node.nodeType == node.ELEMENT_NODE:
                 continue
             if node.localName in PARSERS:
                 widget = PARSERS[node.localName](self.window, self.parent,
-                        self.attrs, screen)
+                        self.attrs, screen, children_field)
                 wid, child, buttons, on_write, notebooks, cursor_widget = \
                         widget.parse(screen.model_name, node, fields)
                 screen.set_on_write(on_write)
                 res = PARSERS2[node.localName](self.window, screen, wid, child,
-                        buttons, toolbar, notebooks, cursor_widget)
+                        buttons, toolbar, notebooks, cursor_widget,
+                        children_field)
                 res.title = widget.title
                 widget = res
                 break

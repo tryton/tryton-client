@@ -147,7 +147,7 @@ class Many2One(WidgetInterface):
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
         return Screen(self.attrs['relation'], self.window, domain=domain,
-                context=context, view_type=['form'],
+                context=context, mode=['form'],
                 views_preload=self.attrs.get('views', {}))
 
     def sig_new(self, *args):

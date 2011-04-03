@@ -1,6 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 "Screen"
+import gobject
+import copy
+import xml.dom.minidom
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
@@ -9,22 +12,19 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
-import gobject
-import copy
-import xml.dom.minidom
 
 
 class Screen(SignalEvent):
     "Screen"
 
-    def __init__(self, model_name, window, view_ids=None, view_type=None,
+    def __init__(self, model_name, window, view_ids=None, mode=None,
             context=None, views_preload=None, domain=None, row_activate=None,
             limit=None, readonly=False, exclude_field=None, sort=None,
             search_value=None, alternate_view=False):
         if view_ids is None:
             view_ids = []
-        if view_type is None:
-            view_type = ['tree', 'form']
+        if mode is None:
+            mode = ['tree', 'form']
         if context is None:
             context = {}
         if views_preload is None:
@@ -34,10 +34,10 @@ class Screen(SignalEvent):
 
         super(Screen, self).__init__()
 
+        self.readonly = readonly
         self.search_count = 0
         if not row_activate:
-            # TODO change for a function that switch to form view
-            self.row_activate = self.switch_view
+            self.row_activate = self.default_row_activate
         else:
             self.row_activate = row_activate
         self.domain = domain
@@ -65,12 +65,12 @@ class Screen(SignalEvent):
         self.sort = sort
         self.view_to_load = []
 
-        if view_type:
-            self.view_to_load = view_type[1:]
+        if mode:
+            self.view_to_load = mode[1:]
             view_id = False
             if view_ids:
                 view_id = view_ids.pop(0)
-            view = self.add_view_id(view_id, view_type[0])
+            view = self.add_view_id(view_id, mode[0])
             self.screen_container.set(view.widget)
         self.display()
 
@@ -90,10 +90,9 @@ class Screen(SignalEvent):
                                 'tree', ctx)
                     except Exception:
                         return
-                self.filter_widget = Form(self.fields_view_tree['arch'],
-                        self.fields_view_tree['fields'], self.model_name,
-                        self.window, self.domain, (self, self.search_filter),
-                        self.context)
+                self.filter_widget = Form(self.fields_view_tree,
+                        self.model_name, self.window, self.domain,
+                        (self, self.search_filter), self.context)
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear,
                         self.search_prev, self.search_next)
@@ -194,9 +193,9 @@ class Screen(SignalEvent):
 
     group = property(__get_group, __set_group)
 
-    def new_group(self, readonly=False):
+    def new_group(self):
         self.group = Group(self.model_name, {}, self.window, domain=self.domain,
-            context=self.context, readonly=readonly)
+            context=self.context, readonly=self.readonly)
 
     def _group_cleared(self, group, signal):
         for view in self.views:
@@ -224,10 +223,16 @@ class Screen(SignalEvent):
         except Exception:
             offset = 0
         try:
-            pos = self.group.index(record)
-        except Exception:
-            pos = -1
-        self.signal('record-message', (pos + offset, len(self.group) + offset,
+            pos = self.group.index(record) + offset + 1
+        except ValueError:
+            pos = []
+            i = record
+            while i:
+                pos.append(i.group.index(i) + 1)
+                i = i.parent
+            pos.reverse()
+            pos = tuple(pos)
+        self.signal('record-message', (pos or 0, len(self.group) + offset,
             self.search_count, record and record.id))
         attachment_count = 0
         if record and record.attachment_count > 0:
@@ -268,9 +273,25 @@ class Screen(SignalEvent):
         self.screen_container = None
         self.widget = None
 
+    def default_row_activate(self):
+        from tryton.action import Action
+        if (self.current_view.view_type == 'tree' and
+                self.current_view.widget_tree.keyword_open):
+            return Action.exec_keyword('tree_open', self.window, {
+                'model': self.model_name,
+                'id': self.id_get(),
+                'ids': self.ids_get(),
+                }, context=self.context.copy(), warning=False)
+        else:
+            self.switch_view(view_type='form')
+            return True
+
     def switch_view(self, view_type=None, default=True, context=None):
+        if self.modified():
+            return
         self.current_view.set_value()
-        if self.current_record and self.current_record not in self.group:
+        if (self.current_record and
+                self.current_record not in self.current_record.group):
             self.current_record = None
         fields = self.current_view.get_fields()
         if self.current_record and not self.current_record.validate(fields):
@@ -283,7 +304,8 @@ class Screen(SignalEvent):
                 self.load_view_to_load()
                 self.__current_view = len(self.views) - 1
             else:
-                self.__current_view = (self.__current_view + 1) % len(self.views)
+                self.__current_view = ((self.__current_view + 1)
+                        % len(self.views))
             if not view_type:
                 break
             elif self.current_view.view_type == view_type:
@@ -306,10 +328,7 @@ class Screen(SignalEvent):
 
     def add_view_id(self, view_id, view_type, display=False, context=None):
         if view_type in self.views_preload:
-            return self.add_view(self.views_preload[view_type]['arch'],
-                    self.views_preload[view_type]['fields'], display,
-                    toolbar=self.views_preload[view_type].get('toolbar', False),
-                    context=context)
+            view = self.views_preload[view_type]
         else:
             ctx = {}
             ctx.update(rpc.CONTEXT)
@@ -324,17 +343,19 @@ class Screen(SignalEvent):
                 view = common.process_exception(exception, self.window, *args)
                 if not view:
                     return
-            return self.add_view(view['arch'], view['fields'], display,
-                    toolbar=view.get('toolbar', False), context=context)
+        return self.add_view(view, display, toolbar=view.get('toolbar', False),
+                context=context)
 
-    def add_view(self, arch, fields, display=False, toolbar=None, context=None):
+    def add_view(self, view, display=False, toolbar=None, context=None):
         if toolbar is None:
             toolbar = {}
+        arch = view['arch']
+        fields = view['fields']
 
         xml_dom = xml.dom.minidom.parseString(arch)
         for node in xml_dom.childNodes:
             if node.localName == 'tree':
-                self.fields_view_tree = {'arch': arch, 'fields': fields}
+                self.fields_view_tree = view
             break
 
         if node.localName == 'tree':
@@ -345,22 +366,14 @@ class Screen(SignalEvent):
             if field not in self.group.fields:
                 fields[field]['loading'] = loading
 
+        children_field = view.get('field_childs')
+
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
-        if self.current_record and (self.current_record not in self.group):
-            self.group.append(self.current_record)
         self.group.add_fields(fields, context=context)
 
-        if self.exclude_field:
-            if self.exclude_field in self.group.fields:
-                field = self.group.fields[self.exclude_field]
-                field.attrs['states'] = {'invisible': True}
-                field.attrs['readonly'] = True
-                field.attrs['invisible'] = True
-                field.attrs['tree_invisible'] = True
-                field.attrs['exclude_field'] = True
-
         parser = WidgetParse(parent=self.parent, window=self.window)
-        view = parser.parse(self, xml_dom, self.group.fields, toolbar=toolbar)
+        view = parser.parse(self, xml_dom, self.group.fields, toolbar=toolbar,
+                children_field=children_field)
 
         self.views.append(view)
 
@@ -406,8 +419,12 @@ class Screen(SignalEvent):
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
         ctx.update(context)
-        record = self.group.new(default, self.domain, ctx)
-        self.group.add(record, self.new_model_position())
+        if self.current_record:
+            group = self.current_record.group
+        else:
+            group = self.group
+        record = group.new(default, self.domain, ctx)
+        group.add(record, self.new_model_position())
         self.current_record = record
         fields = None
         if self.current_view:
@@ -440,31 +457,27 @@ class Screen(SignalEvent):
 
     def save_current(self):
         if not self.current_record:
-            return False
+            if self.current_view == 'tree' and len(self.group):
+                self.current_record = self.group[0]
+            else:
+                return True
         self.current_view.set_value()
         obj_id = False
         fields = self.current_view.get_fields()
-        if self.current_record.validate(fields):
+        path = self.current_record.get_path(self.group)
+        if self.current_view.view_type == 'tree':
+            self.group.save()
+            obj_id = self.current_record.id
+        elif self.current_record.validate(fields):
             obj_id = self.current_record.save(force_reload=True)
         else:
             self.current_view.set_cursor()
             self.current_view.display()
             return False
-        if self.current_view.view_type == 'tree':
-            for record in self.group:
-                if record.is_modified():
-                    if record.validate(fields):
-                        obj_id = record.save(force_reload=True)
-                    else:
-                        self.current_view.set_cursor()
-                        self.current_record = record
-                        self.current_view.set_cursor()
-                        self.display()
-                        return False
-            self.current_view.set_cursor()
+        if path:
+            path = path[:-1] + ((path[-1][0], obj_id),)
+        self.current_record = self.group.get_by_path(path)
         self.display()
-        if self.current_record not in self.group:
-            self.group.add(self.current_record, modified=False)
         self.request_set()
         return obj_id
 
@@ -484,22 +497,22 @@ class Screen(SignalEvent):
                 includeid=includeid, check_load=check_load,
                 get_modifiedonly=get_modifiedonly)
 
-    def is_modified(self):
+    def modified(self):
         self.current_view.set_value()
         res = False
         if self.current_view.view_type != 'tree':
-            res = self.current_record and self.current_record.is_modified()
+            res = self.current_record and self.current_record.modified
         else:
             for record in self.group:
-                if record.is_modified():
+                if record.modified:
                     res = True
         return res
 
-    def reload(self, writen=False):
+    def reload(self, written=False):
         ids = self.sel_ids_get()
         self.group.reload(ids)
-        if writen:
-            self.group.writen(ids)
+        if written:
+            self.group.written(ids)
         if self.parent:
             self.parent.reload()
         self.display()
@@ -532,35 +545,43 @@ class Screen(SignalEvent):
                 if not res:
                     return False
             self.current_view.set_cursor()
-            if self.current_record in self.group:
-                idx = self.group.index(self.current_record)
-                self.group.remove(self.current_record, remove=remove)
-                if self.group:
-                    idx = min(idx, len(self.group) - 1)
-                    self.current_record = self.group[idx]
-                else:
-                    self.current_record = None
+            record = self.current_record
+            idx = record.group.index(record)
+            record.group.remove(record, remove=remove)
+
+            if delete:
+                if (record.parent and
+                        record.parent.model_name == record.model_name):
+                    record.parent.save()
+
+            if record.group:
+                idx = min(idx, len(record.group) - 1)
+                self.current_record = record.group[idx]
+            elif (record.parent and
+                    record.parent.model_name == record.model_name):
+                self.current_record = record.parent
+            else:
+                self.current_record = None
             if reload_ids:
-                self.group.reload(reload_ids)
+                self.group.root_group.reload(reload_ids)
             self.display()
             res = True
         if self.current_view.view_type == 'tree':
-            ids = self.current_view.sel_ids_get()
-            if delete and ids:
+            records = self.current_view.selected_records()
+            if delete and records:
                 context = {}
                 context.update(rpc.CONTEXT)
                 context.update(self.context)
                 context['_timestamp'] = {}
-                for record_id in ids:
-                    record = self.group.get(record_id)
+                for record in records:
                     context['_timestamp'].update(record.get_timestamp())
-                reload_ids = self.group.on_write_ids(ids)
+                reload_ids = self.group.on_write_ids([x.id for x in records])
                 if reload_ids:
-                    for record_id in ids:
-                        if record_id in reload_ids:
-                            reload_ids.remove(record_id)
-                args = ('model', self.model_name, 'delete', ids,
-                        context)
+                    for record in records:
+                        if record.id in reload_ids:
+                            reload_ids.remove(record.id)
+                args = ('model', self.model_name, 'delete',
+                        [x.id for x in records], context)
                 try:
                     res = rpc.execute(*args)
                 except Exception, exception:
@@ -568,24 +589,34 @@ class Screen(SignalEvent):
                             *args)
                 if not res:
                     return False
-            sel_records = self.current_view.selected_records()
-            if not sel_records:
+            if not records:
                 return True
-            idx = self.group.index(sel_records[0])
-            for record in sel_records:
+            path = self.current_view.store.on_get_path(records[0])
+            for record in records:
                 # set current model to None to prevent __select_changed
                 # to save the previous_model as it can be already deleted.
                 self.current_record = None
-                self.group.remove(record, remove=remove, signal=False)
+                record.group.remove(record, remove=remove, signal=False)
+
             # send record-changed only once
             record.signal('record-changed')
-            if self.group:
-                idx = min(idx, len(self.group) - 1)
-                self.current_record = self.group[idx]
+
+            if delete:
+                for record in records:
+                    if record.parent:
+                        record.parent.save()
+
+            if path[-1] > 0:
+                path = path[:-1] + (path[-1] - 1,)
             else:
-                self.current_record = None
+                path = path[:-1]
+            if path:
+                iter_ = self.current_view.store.get_iter(path)
+                self.current_record = self.current_view.store.get_value(iter_, 0)
+            elif len(self.group):
+                self.current_record = self.group[0]
             if reload_ids:
-                self.group.reload(reload_ids)
+                self.group.root_group.reload(reload_ids)
             self.current_view.set_cursor()
             self.display()
             res = True
@@ -624,54 +655,78 @@ class Screen(SignalEvent):
                 self.current_view.set_cursor(reset_view=False)
 
     def display_next(self):
-        self.current_view.set_value()
-        self.current_view.set_cursor(reset_view=False)
-        if self.current_record in self.group:
-            idx = self.group.index(self.current_record)
-            inc = 1
-            if self.current_view.view_type == 'tree':
-                start, end = self.current_view.widget_tree.get_visible_range()
-                inc += end[0] - start[0]
-                if inc >= 4 and (end[0] + 1) < len(self.group):
-                    inc -= 3
-                vadjustment = self.current_view.widget_tree.get_vadjustment()
-                vadjustment.value = vadjustment.value + vadjustment.page_increment
-            idx = idx + inc
-            if idx >= len(self.group):
-                idx = len(self.group) - 1
-            self.current_record = self.group[idx]
+        view = self.current_view
+        view.set_value()
+        view.set_cursor(reset_view=False)
+        if view.view_type == 'tree':
+            start, end = view.widget_tree.get_visible_range()
+            vadjustment = view.widget_tree.get_vadjustment()
+            vadjustment.value = vadjustment.value + vadjustment.page_increment
+            store = view.store
+            iter_ = store.get_iter(end)
+            self.current_record = store.get_value(iter_, 0)
+        elif self.current_record.group:
+            group = self.current_record.group
+            record = self.current_record
+            while group:
+                children = record.children_group(view.children_field)
+                if children:
+                    record = children[0]
+                    break
+                idx = group.index(record) + 1
+                if idx < len(group):
+                    record = group[idx]
+                    break
+                parent = record.parent
+                if not parent:
+                    break
+                next = parent.next.get(id(parent.group))
+                while not next:
+                    parent = parent.parent
+                    if not parent:
+                        break
+                    next = parent.next.get(id(parent.group))
+                if not next:
+                    break
+                record = next
+                break
+            self.current_record = record
         else:
-            self.current_record = len(self.group) \
-                    and self.group[0]
-        self.current_view.set_cursor(reset_view=False)
-        self.current_view.display()
+            self.current_record = len(self.group) and self.group[0]
+        view.set_cursor(reset_view=False)
+        view.display()
 
     def display_prev(self):
-        self.current_view.set_value()
-        self.current_view.set_cursor(reset_view=False)
-        if self.current_record in self.group:
-            inc = 1
-            if self.current_view.view_type == 'tree':
-                range = self.current_view.widget_tree.get_visible_range()
-                if range:
-                    start, end = range
-                    inc += end[0] - start[0]
-                    if inc >= 4 and start[0] > 0:
-                        inc -= 3
-                    vadjustment = \
-                            self.current_view.widget_tree.get_vadjustment()
-                    if vadjustment.value:
-                        vadjustment.value = vadjustment.value - \
-                                vadjustment.page_increment
-            idx = self.group.index(self.current_record) - inc
-            if idx < 0:
-                idx = 0
-            self.current_record = self.group[idx]
+        view = self.current_view
+        view.set_value()
+        view.set_cursor(reset_view=False)
+        if view.view_type == 'tree':
+            start, end = view.widget_tree.get_visible_range()
+            vadjustment = view.widget_tree.get_vadjustment()
+            vadjustment.value = vadjustment.value - vadjustment.page_increment
+            store = view.store
+            iter_ = store.get_iter(start)
+            self.current_record = store.get_value(iter_, 0)
+        elif self.current_record.group:
+            group = self.current_record.group
+            record = self.current_record
+            idx = group.index(record) - 1
+            if idx >= 0:
+                record = group[idx]
+                children = True
+                while children:
+                    children = record.children_group(view.children_field)
+                    if children:
+                        record = children[-1]
+            else:
+                parent = record.parent
+                if parent:
+                    record = parent
+            self.current_record = record
         else:
-            self.current_record = len(self.group) \
-                    and self.group[-1]
-        self.current_view.set_cursor(reset_view=False)
-        self.current_view.display()
+            self.current_record = len(self.group) and self.group[-1]
+        view.set_cursor(reset_view=False)
+        view.display()
 
     def sel_ids_get(self):
         return self.current_view.sel_ids_get()

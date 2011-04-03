@@ -15,7 +15,7 @@ class Attachment(object):
     def run(self):
         screen = Screen('ir.attachment', self.parent, domain=[
             ('resource', '=', self.resource),
-            ], view_type=['tree', 'form'], context={
+            ], mode=['tree', 'form'], context={
                 'resource': self.resource,
             }, exclude_field='resource')
         screen.search_filter()

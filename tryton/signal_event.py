@@ -31,7 +31,7 @@ class SignalEvent(object):
         for sig in signal:
             i = 0
             while i < len(self.__connects[sig]):
-                if self.__connects[sig][i][2] == key:
+                if self.__connects[sig][i][2] is key:
                     del self.__connects[sig][i]
                 else:
                     i += 1

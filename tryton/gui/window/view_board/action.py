@@ -8,7 +8,6 @@ import time
 import datetime
 from tryton.gui.window.win_search import WinSearch
 from tryton.action import Action as Action2
-from tryton.gui.window.view_tree.view_tree import ViewTree
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import gettext
@@ -46,6 +45,7 @@ class Action(SignalEvent):
 
         self.action.setdefault('pyson_domain', '[]')
         self.context = {'active_id': False, 'active_ids': []}
+        self.context.update(rpc.CONTEXT)
         self.context.update(PYSONDecoder(self.context).decode(
             self.action.get('pyson_context', '{}')))
 
@@ -73,7 +73,7 @@ class Action(SignalEvent):
 
         tooltips = common.Tooltips()
 
-        if self.action['view_type'] == 'form':
+        if self.action['res_model']:
             but_search = gtk.Button()
             tooltips.set_tip(but_search, _('Search'))
             but_search.connect('clicked', self._sig_search)
@@ -96,7 +96,7 @@ class Action(SignalEvent):
         hbox.pack_start(but_open, expand=False, fill=False)
 
 
-        if self.action['view_type'] == 'form':
+        if self.action['res_model']:
             hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
             but_previous = gtk.Button()
             tooltips.set_tip(but_previous, _('Previous'))
@@ -140,40 +140,19 @@ class Action(SignalEvent):
         alignment.set_padding(0, 2, 2, 2)
         vbox.pack_start(alignment, expand=True, fill=True)
 
+        hbox.set_focus_chain([])
+
         self.widget.show_all()
 
-        if self.action['view_type'] == 'form':
+        if self.action['res_model']:
             self.screen = Screen(self.action['res_model'],
-                self._window, view_type=self.action['view_mode'],
+                self._window, mode=self.action['view_mode'],
                 context=self.context, view_ids=view_ids,
                 domain=self.domain, readonly=True, alternate_view=True)
             alignment.add(self.screen.screen_container.alternate_viewport)
             name = self.screen.current_view.title
             self.screen.signal_connect(self, 'record-message', self._sig_label)
             self.screen.signal_connect(self, 'record-message',
-                    self._active_changed)
-        elif self.action['view_type'] == 'tree':
-            ctx = {}
-            ctx.update(rpc.CONTEXT)
-            ctx.update(self.context)
-            try:
-                view_base = rpc.execute('model', 'ir.ui.view', 'read',
-                        view_ids[0], ['model', 'type'], ctx)
-            except Exception, exception:
-                common.process_exception(exception, self._window)
-                raise
-            try:
-                view = rpc.execute('model', view_base['model'],
-                        'fields_view_get', view_ids[0], view_base['type'], ctx)
-            except Exception, exception:
-                common.process_exception(exception, self._window)
-                raise
-            self.tree = ViewTree(view, [], self._window, True,
-                    context=ctx)
-            alignment.add(self.tree.widget_get())
-            name = self.tree.name
-            self.tree.view.connect('key_press_event', self.sig_key_press)
-            self.tree.signal_connect(self, 'select-changed',
                     self._active_changed)
 
         if attrs.get('string'):
@@ -219,7 +198,7 @@ class Action(SignalEvent):
     def _sig_label(self, screen, signal_data):
         name = '_'
         if signal_data[0] >= 0:
-            name = str(signal_data[0] + 1)
+            name = str(signal_data[0])
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
@@ -268,6 +247,7 @@ class Action(SignalEvent):
 
     def update_domain(self, actions):
         domain_ctx = self.context.copy()
+        domain_ctx['context'] = domain_ctx
         for action in actions:
             if action.active:
                 domain_ctx['_active_%s' % action.act_id] = action.active

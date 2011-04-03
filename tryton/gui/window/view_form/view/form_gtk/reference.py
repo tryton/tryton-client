@@ -153,7 +153,7 @@ class Reference(WidgetInterface):
                 return False
         if model and obj_id:
             if not leave:
-                screen = Screen(model, self.window, view_type=['form'])
+                screen = Screen(model, self.window, mode=['form'])
                 screen.load([obj_id])
                 win = WinForm(screen, self.window)
                 while win.run():
@@ -207,7 +207,7 @@ class Reference(WidgetInterface):
         model = self.get_model()
         if not model:
             return
-        screen = Screen(model, self.window, view_type=['form'])
+        screen = Screen(model, self.window, mode=['form'])
         win = WinForm(screen, self.window, new=True)
         while win.run():
             if screen.save_current():
