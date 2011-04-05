@@ -287,7 +287,7 @@ class Screen(SignalEvent):
             return True
 
     def switch_view(self, view_type=None, default=True, context=None):
-        if self.modified():
+        if not self.parent and self.modified():
             return
         self.current_view.set_value()
         if (self.current_record and
