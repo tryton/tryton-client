@@ -142,7 +142,7 @@ class ParserTree(ParserInterface):
                         cell.set_property('pixbuf', pixbuf)
                     col.set_cell_data_func(render_pixbuf, setter)
 
-                col.pack_start(renderer, expand=False)
+                col.pack_start(renderer, expand=True)
                 col.name = fname
 
                 hbox = gtk.HBox(False, 2)
