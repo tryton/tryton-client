@@ -58,8 +58,7 @@ class TrytonIconFactory(gtk.IconFactory):
                 continue
             try:
                 pixbuf = gtk.gdk.pixbuf_new_from_file(
-                        os.path.join(PIXMAPS_DIR, fname).decode(
-                        sys.getfilesystemencoding()))
+                        os.path.join(PIXMAPS_DIR, fname).decode('utf-8'))
             except Exception:
                 continue
             icon_set = gtk.IconSet(pixbuf)
@@ -105,7 +104,7 @@ class TrytonIconFactory(gtk.IconFactory):
             with os.fdopen(fileno, 'w') as svgfile:
                 svgfile.write(icon['icon'])
             pixbuf = gtk.gdk.pixbuf_new_from_file(path.decode(
-                sys.getfilesystemencoding()))
+                sys.getfilesystemencoding().encode('utf-8')))
             os.remove(path)
             iconset = gtk.IconSet(pixbuf)
             self.add(icon['name'], iconset)
@@ -308,7 +307,7 @@ def file_selection(title, filename='', parent=None,
         filename = win.get_preview_filename()
         try:
             pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename.decode(
-                sys.getfilesystemencoding()), 128, 128)
+                sys.getfilesystemencoding().encode('utf-8')), 128, 128)
             img.set_from_pixbuf(pixbuf)
             have_preview = True
         except Exception:
