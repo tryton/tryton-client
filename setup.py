@@ -52,6 +52,7 @@ if os.name == 'nt':
                 'atk',
                 'pango',
                 'pangocairo',
+                'gio',
             ],
         }
     }
