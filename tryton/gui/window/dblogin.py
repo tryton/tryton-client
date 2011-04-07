@@ -229,6 +229,7 @@ class DBListEditor(object):
 
     def check_edit_cancel(self, editable, event, renderer, path):
         renderer.emit('edited', path, editable.get_text())
+        return False
 
     def edit_started(self, renderer, editable, path):
         if isinstance(editable, gtk.Entry):
