@@ -206,18 +206,17 @@ class DBListEditor(object):
             selection = treeview.get_selection()
             selection.select_iter(self.old_profile['iter'])
             return
-        self.clear_entries()
         fields = ('host', 'port', 'database', 'username')
         for field in fields:
             entry = getattr(self, '%s_entry' % field)
             try:
                 entry_value = self.profiles.get(self.current_profile['name'],
                     field)
-                entry.set_text(entry_value)
-                if field == 'database':
-                    self.current_database = entry_value
             except ConfigParser.NoOptionError:
-                pass
+                entry_value = ''
+            entry.set_text(entry_value)
+            if field == 'database':
+                self.current_database = entry_value
 
         self.display_dbwidget(None, None, self.current_database)
 
