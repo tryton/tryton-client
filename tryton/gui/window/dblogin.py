@@ -368,6 +368,14 @@ class DBLogin(object):
         tooltips.set_tip(self.button_connect, _('Connect the Tryton server'))
         self.dialog.add_action_widget(self.button_connect, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
+        alignment = gtk.Alignment(yalign=0, yscale=0, xscale=1)
+        self.table_main = gtk.Table(3, 3, False)
+        self.table_main.set_border_width(0)
+        self.table_main.set_row_spacings(3)
+        self.table_main.set_col_spacings(3)
+        alignment.add(self.table_main)
+        self.dialog.vbox.pack_start(alignment, True, True, 0)
+
         image = gtk.Image()
         image.set_from_file(os.path.join(PIXMAPS_DIR,
             'tryton.png').decode('utf-8'))
@@ -375,12 +383,8 @@ class DBLogin(object):
         ebox = gtk.EventBox()
         ebox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#1b2019"))
         ebox.add(image)
-        self.dialog.vbox.pack_start(ebox)
-        self.table_main = gtk.Table(3, 3, False)
-        self.table_main.set_border_width(10)
-        self.table_main.set_row_spacings(3)
-        self.table_main.set_col_spacings(3)
-        self.dialog.vbox.pack_start(self.table_main, True, True, 0)
+        self.table_main.attach(ebox, 0, 3, 0, 1, ypadding=2)
+
         self.profile_store = gtk.ListStore(gobject.TYPE_STRING,
             gobject.TYPE_BOOLEAN)
         self.combo_profile = gtk.ComboBox()
@@ -398,30 +402,50 @@ class DBLogin(object):
         self.profile_label.set_padding(3, 3)
         self.profile_button = gtk.Button(_('_Manage profiles'))
         self.profile_button.connect('clicked', self.profile_manage)
-        self.table_main.attach(self.profile_label, 0, 1, 0, 1,
+        self.table_main.attach(self.profile_label, 0, 1, 1, 2,
             xoptions=gtk.FILL)
-        self.table_main.attach(self.combo_profile, 1, 2, 0, 1)
-        self.table_main.attach(self.profile_button, 2, 3, 0, 1,
+        self.table_main.attach(self.combo_profile, 1, 2, 1, 2)
+        self.table_main.attach(self.profile_button, 2, 3, 1, 2,
             xoptions=gtk.FILL)
         image = gtk.Image()
         image.set_from_stock('gtk-edit', gtk.ICON_SIZE_BUTTON)
         self.profile_button.set_image(image)
+        self.expander = gtk.Expander(_('Host / Database information'))
+        self.expander.connect('notify::expanded', self.expand_hostspec)
+        self.table_main.attach(self.expander, 0, 3, 3, 4)
+        self.label_host = gtk.Label(_('Host:'))
+        self.label_host.set_justify(gtk.JUSTIFY_RIGHT)
+        self.label_host.set_alignment(1, 0.5)
+        self.label_host.set_padding(3, 3)
+        self.entry_host = gtk.Entry()
+        self.entry_host.connect_after('focus-out-event', self.clear_profile_combo)
+        self.table_main.attach(self.label_host, 0, 1, 4, 5, xoptions=gtk.FILL)
+        self.table_main.attach(self.entry_host, 1, 3, 4, 5)
+        self.label_database = gtk.Label(_('Database:'))
+        self.label_database.set_justify(gtk.JUSTIFY_RIGHT)
+        self.label_database.set_alignment(1, 0.5)
+        self.label_database.set_padding(3, 3)
+        self.entry_database = gtk.Entry()
+        self.entry_database.connect_after('focus-out-event', self.clear_profile_combo)
+        self.table_main.attach(self.label_database, 0, 1, 5, 6,
+            xoptions=gtk.FILL)
+        self.table_main.attach(self.entry_database, 1, 3, 5, 6)
         self.entry_password = gtk.Entry()
         self.entry_password.set_visibility(False)
         self.entry_password.set_activates_default(True)
-        self.table_main.attach(self.entry_password, 1, 3, 3, 4)
+        self.table_main.attach(self.entry_password, 1, 3, 7, 8)
         self.entry_login = gtk.Entry()
         self.entry_login.set_activates_default(True)
-        self.table_main.attach(self.entry_login, 1, 3, 2, 3)
+        self.table_main.attach(self.entry_login, 1, 3, 6, 7)
         label_password = gtk.Label(str = _("Password:"))
         label_password.set_justify(gtk.JUSTIFY_RIGHT)
         label_password.set_alignment(1, 0.5)
         label_password.set_padding(3, 3)
-        self.table_main.attach(label_password, 0, 1, 3, 4, xoptions=gtk.FILL)
+        self.table_main.attach(label_password, 0, 1, 7, 8, xoptions=gtk.FILL)
         label_username = gtk.Label(str = _("User name:"))
         label_username.set_alignment(1, 0.5)
         label_username.set_padding(3, 3)
-        self.table_main.attach(label_username, 0, 1, 2, 3, xoptions=gtk.FILL)
+        self.table_main.attach(label_username, 0, 1, 6, 7, xoptions=gtk.FILL)
         self.entry_password.grab_focus()
 
         # Profile informations
@@ -457,6 +481,10 @@ class DBLogin(object):
             username = self.profiles.get(profile, 'username')
         except ConfigParser.NoOptionError:
             username = ''
+        host = self.profiles.get(profile, 'host')
+        port = self.profiles.get(profile, 'port')
+        self.entry_host.set_text('%s:%s' % (host, port))
+        self.entry_database.set_text(self.profiles.get(profile, 'database'))
         if username:
             self.entry_login.set_text(username)
             focus_widget = self.entry_password
@@ -470,6 +498,27 @@ class DBLogin(object):
     def profile_move_active(self, combobox, scrolltype):
         self.move_active = True
 
+    def clear_profile_combo(self, entry, event):
+        host_entry = self.entry_host.get_text()
+        host, port = host_entry.split(':', 1) if ':' in host_entry else ('', '')
+        database = self.entry_database.get_text().strip()
+        for idx, profile_info in enumerate(self.profile_store):
+            profile = profile_info[0]
+            if (host == self.profiles.get(profile, 'host')
+                    and port == self.profiles.get(profile, 'port')
+                    and database == self.profiles.get(profile, 'database')):
+                break
+        else:
+            idx = -1
+        self.combo_profile.set_active(idx)
+
+    def expand_hostspec(self, expander, *args):
+        visibility = expander.props.expanded
+        self.entry_host.props.visible = visibility
+        self.label_host.props.visible = visibility
+        self.entry_database.props.visible = visibility
+        self.label_database.props.visible = visibility
+
     def run(self, profile_name, parent):
         if not profile_name:
             selected_profile = CONFIG['login.profile']
@@ -478,14 +527,32 @@ class DBLogin(object):
                 selected_profile = 'demo%s.tryton.org' % short_version
         else:
             selected_profile = profile_name
-        for idx, row in enumerate(self.profile_store):
-            if row[0] == selected_profile:
-                self.combo_profile.set_active(idx)
+        can_use_profile = True
+        for (configname, sectionname) in (('login.server', 'host'),
+                ('login.port', 'port'), ('login.db', 'database')):
+            if (self.profiles.get(selected_profile, sectionname) != \
+                    CONFIG[configname]):
+                can_use_profile = False
                 break
+
+        if can_use_profile:
+            for idx, row in enumerate(self.profile_store):
+                if row[0] == selected_profile:
+                    self.combo_profile.set_active(idx)
+                    break
+        else:
+            self.combo_profile.set_active(-1)
+            self.entry_host.set_text('%s:%s' % (CONFIG['login.server'],
+                CONFIG['login.port']))
+            db = CONFIG['login.db'] if CONFIG['login.db'] else ''
+            self.entry_database.set_text(db)
         self.dialog.show_all()
 
         # Reshow dialog for gtk-quarks
         self.dialog.reshow_with_initial_size()
+        self.expander.set_expanded(CONFIG['login.expanded'])
+        # The previous action did not called expand_hostspec
+        self.expand_hostspec(self.expander)
 
         res, result = None, ('', '', '', '', '')
         while not (res in (gtk.RESPONSE_CANCEL, gtk.RESPONSE_DELETE_EVENT)
@@ -495,14 +562,14 @@ class DBLogin(object):
             if active_profile != -1:
                 profile = self.profile_store[active_profile][0]
                 CONFIG['login.profile'] = profile
-                try:
-                    result = (self.entry_login.get_text(),
-                        self.entry_password.get_text(),
-                        self.profiles.get(profile, 'host'),
-                        int(self.profiles.get(profile, 'port')),
-                        self.profiles.get(profile, 'database'))
-                except ConfigParser.NoOptionError, e:
-                    pass
+            host, port = self.entry_host.get_text().split(':', 1)
+            database = self.entry_database.get_text()
+            CONFIG['login.server'] = host
+            CONFIG['login.port'] = port
+            CONFIG['login.db'] = database
+            CONFIG['login.expanded'] = self.expander.props.expanded
+            result = (self.entry_login.get_text(),
+                self.entry_password.get_text(), host, int(port), database)
 
         if res != gtk.RESPONSE_OK:
             parent.present()

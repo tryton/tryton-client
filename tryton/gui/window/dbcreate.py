@@ -191,8 +191,6 @@ class DBCreate(object):
         table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
         self.tooltips.set_tip(self.button_server_change, _("Setup the " \
             "server connection..."))
-        self.button_server_change.set_sensitive(not bool(self.host
-            and self.port))
 
         table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))

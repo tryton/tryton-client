@@ -60,6 +60,7 @@ class TrytonClient(object):
                 CONFIG['login.server'] = hostname
                 CONFIG['login.port'] = port
                 CONFIG['login.db'] = database
+                CONFIG['login.expanded'] = True
         logging.basicConfig()
         translate.set_language_direction(CONFIG['client.language_direction'])
         translate.setlang(CONFIG['client.lang'])

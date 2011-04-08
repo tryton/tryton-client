@@ -52,6 +52,7 @@ class ConfigManager(object):
             'login.server': 'localhost',
             'login.port': '8070',
             'login.db': False,
+            'login.expanded': False,
             'tip.autostart': False,
             'tip.position': 0,
             'logging.logger': '',

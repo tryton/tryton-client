@@ -1567,7 +1567,8 @@ class Main(object):
     def sig_db_new(self, widget):
         if not self.sig_logout(widget):
             return False
-        dia = DBCreate(sig_login=self.sig_login)
+        dia = DBCreate(CONFIG['login.server'], int(CONFIG['login.port']),
+            sig_login=self.sig_login)
         res = dia.run(self.window)
         if res:
             CONFIG.save()

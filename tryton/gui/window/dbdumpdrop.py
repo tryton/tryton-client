@@ -202,18 +202,17 @@ class DBBackupDrop(object):
 
         pass_widget = self.entry_serverpasswd
         server_widget = self.entry_server_connection
+        server_widget.set_text('%(login.server)s:%(login.port)s' % CONFIG)
         db_widget = self.combo_database
         db_progress = self.db_progressbar
         label = self.combo_database_label
-
-        server_widget.set_text('')
-
         liststore = gtk.ListStore(str)
         db_widget.set_model(liststore)
         cell = gtk.CellRendererText()
         db_widget.pack_start(cell, True)
         db_widget.add_attribute(cell, 'text', 0)
-        res = self.refreshlist(None, db_widget, label, db_progress, '', '')
+        res = self.refreshlist(None, db_widget, label, db_progress,
+            CONFIG['login.server'], CONFIG['login.port'])
 
         change_button = self.button_server_change
         change_button.connect_after('clicked', DBBackupDrop.refreshlist_ask, \
