@@ -509,7 +509,7 @@ class MessageDialog(UniqueDialog):
     def build_dialog(self, message, parent, msg_type):
         dialog = gtk.MessageDialog(parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT, msg_type,
-            gtk.BUTTONS_OK, msg)
+            gtk.BUTTONS_OK, message)
         return dialog
 
     def __call__(self, message, parent, msg_type=gtk.MESSAGE_INFO):
