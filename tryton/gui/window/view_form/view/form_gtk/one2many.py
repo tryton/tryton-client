@@ -239,12 +239,8 @@ class One2Many(WidgetInterface):
             self.screen.current_view.widget.set_sensitive(True)
         else:
             win = WinForm(self.screen, self.window, new=True,
-                    context=ctx)
-            while True:
-                if win.run():
-                    win.new()
-                else:
-                    break
+                many=True, context=ctx)
+            win.run()
             win.destroy()
         if sequence:
             self.screen.group.set_sequence(field=sequence)

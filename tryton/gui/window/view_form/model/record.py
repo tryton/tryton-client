@@ -224,7 +224,6 @@ class Record(SignalEvent):
 
     def cancel(self):
         self._loaded.clear()
-        self.reload()
 
     def get_timestamp(self):
         result = {self.model_name + ',' + str(self.id): self._timestamp}

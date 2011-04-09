@@ -14,7 +14,7 @@ class WinForm(object):
     "Form window"
 
     def __init__(self, screen, parent, view_type='form', new=False,
-            context=None):
+            many=False, context=None):
 
         self.parent = parent
         self.screen = screen
@@ -33,7 +33,6 @@ class WinForm(object):
             self.screen.new(context=self.context)
         self.win = gtk.Dialog(_('Link'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.win.connect('close', self._sig_close)
         self.win.set_property('default-width', 760)
         self.win.set_property('default-height', 500)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
@@ -44,16 +43,32 @@ class WinForm(object):
         self.win.add_accel_group(self.accel_group)
 
         self.but_cancel = None
+        self.but_ok = None
+        self.but_new = None
         if new:
             icon_cancel = gtk.STOCK_CANCEL
             self.but_cancel = self.win.add_button(icon_cancel,
                     gtk.RESPONSE_CANCEL)
 
-        self.but_ok = self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-        self.but_ok.add_accelerator('clicked', self.accel_group,
-                gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        self.but_ok = self.win.add_button(gtk.STOCK_OK,
+            gtk.RESPONSE_OK)
+        if new and many:
+            self.but_ok.add_accelerator('clicked',
+                self.accel_group, gtk.keysyms.Return,
+                gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK,
+                gtk.ACCEL_VISIBLE)
 
-        self.win.set_default_response(gtk.RESPONSE_OK)
+            self.but_new = self.win.add_button(gtk.STOCK_NEW,
+                gtk.RESPONSE_ACCEPT)
+            self.but_new.add_accelerator('clicked', self.accel_group,
+                gtk.keysyms.Return, gtk.gdk.CONTROL_MASK,
+                gtk.ACCEL_VISIBLE)
+            self.win.set_default_response(gtk.RESPONSE_ACCEPT)
+        else:
+            self.but_ok.add_accelerator('clicked', self.accel_group,
+                gtk.keysyms.Return, gtk.gdk.CONTROL_MASK,
+                gtk.ACCEL_VISIBLE)
+            self.win.set_default_response(gtk.RESPONSE_OK)
 
         self.win.set_title(self.screen.current_view.title)
 
@@ -272,39 +287,30 @@ class WinForm(object):
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
-    def _sig_close(self, widget):
-        if self.screen.current_view:
-            self.screen.current_view.set_value()
-        if self.but_cancel:
-            self.screen.remove(delete=True)
-        elif self.screen.current_record and \
-                not self.screen.current_record.validate(
-                        self.screen.current_view.get_fields()):
-            if self.screen.current_view:
-                self.screen.current_view.set_cursor()
-            self.screen.current_view.display()
-            widget.emit_stop_by_name('close')
-
     def run(self):
-        end = False
-        while not end:
-            res = self.win.run()
+        validate = False
+        cancel_responses = (gtk.RESPONSE_CANCEL, gtk.RESPONSE_DELETE_EVENT)
+        while not validate:
+            response = self.win.run()
             self.screen.current_view.set_value()
-            end = (res != gtk.RESPONSE_OK) \
-                    or (not self.screen.current_record \
-                        or self.screen.current_record.validate(
-                            self.screen.current_view.get_fields()))
-            if not end:
+            if (response in cancel_responses
+                    or self.screen.current_record is None):
+                break
+            validate = self.screen.current_record.validate(
+                self.screen.current_view.get_fields())
+            if not validate:
                 self.screen.current_view.set_cursor()
                 self.screen.display()
-            if self.but_cancel:
-                self.but_cancel.set_label(gtk.STOCK_CLOSE)
-
-        if res == gtk.RESPONSE_OK:
-            return True
-        elif res == gtk.RESPONSE_CANCEL:
-            self.screen.remove()
-        return False
+                continue
+            if response == gtk.RESPONSE_ACCEPT:
+                self.new()
+                validate = False
+        if (self.but_cancel
+                and self.screen.current_record
+                and response in cancel_responses):
+            self.screen.group.remove(self.screen.current_record, remove=True)
+            return False
+        return response not in cancel_responses
 
     def new(self):
         self.screen.new(context=self.context)
@@ -312,11 +318,6 @@ class WinForm(object):
         self.screen.current_view.set_cursor(new=True)
 
     def destroy(self):
-        if self.screen.current_record and \
-                self.screen.current_record.id < 0 and \
-                not self.screen.current_record.validate(
-                        self.screen.current_view.get_fields()):
-            self.screen.remove(delete=True)
         self.screen.screen_container.alternate_view = False
         viewport = self.screen.screen_container.alternate_viewport
         if viewport.get_child():

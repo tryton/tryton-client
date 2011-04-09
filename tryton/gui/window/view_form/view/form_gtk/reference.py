@@ -156,15 +156,12 @@ class Reference(WidgetInterface):
                 screen = Screen(model, self.window, mode=['form'])
                 screen.load([obj_id])
                 win = WinForm(screen, self.window)
-                while win.run():
+                if win.run():
                     if screen.save_current():
                         value = (screen.current_record.id,
                                 screen.current_record.rec_name())
                         self.field.set_client(self.record, (model, value),
                                 force_change=True)
-                        break
-                    else:
-                        screen.display()
                 win.destroy()
         elif model:
             if not self._readonly and ( self.wid_text.get_text() or not leave):
@@ -209,14 +206,11 @@ class Reference(WidgetInterface):
             return
         screen = Screen(model, self.window, mode=['form'])
         win = WinForm(screen, self.window, new=True)
-        while win.run():
+        if win.run():
             if screen.save_current():
                 value = (screen.current_record.id,
                         screen.current_record.rec_name())
                 self.field.set_client(self.record, (model, value))
-                break
-            else:
-                screen.display()
         win.destroy()
 
     def sig_key_press(self, widget, event):
