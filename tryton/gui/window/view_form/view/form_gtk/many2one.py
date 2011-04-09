@@ -154,14 +154,11 @@ class Many2One(WidgetInterface):
         self.focus_out = False
         screen = self.get_screen()
         win = WinForm(screen, self.window, new=True)
-        while win.run():
+        if win.run():
             if screen.save_current():
                 value = (screen.current_record.id,
                         screen.current_record.rec_name())
                 self.field.set_client(self.record, value)
-                break
-            else:
-                screen.display()
         win.destroy()
         self.focus_out = True
 

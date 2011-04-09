@@ -106,12 +106,9 @@ class WinSearch(object):
                 screen = Screen(self.model_name, self.win, domain=self.domain,
                         context=self.context, mode=['form'])
                 win = WinForm(screen, self.win, new=True)
-                while win.run():
+                if win.run():
                     if screen.save_current():
                         res = [screen.current_record.id]
-                        break
-                    else:
-                        screen.display()
                 win.destroy()
                 end = True
             else:

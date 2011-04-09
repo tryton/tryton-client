@@ -149,6 +149,8 @@ class Many2Many(WidgetInterface):
             win = WinForm(self.screen, self.window)
             if win.run():
                 self.screen.current_record.save()
+            else:
+                self.screen.current_record.cancel()
             win.destroy()
 
     def _readonly_set(self, value):

@@ -570,13 +570,10 @@ class M2O(Char):
         else:
             win = WinForm(screen, self.window, new=True)
         value = False
-        while win.run():
+        if win.run():
             if screen.save_current():
                 value = (screen.current_record.id,
                         screen.current_record.rec_name())
-                break
-            else:
-                screen.display()
         win.destroy()
         if value:
             return True, value
