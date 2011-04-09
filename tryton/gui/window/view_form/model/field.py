@@ -199,7 +199,7 @@ class SelectionField(CharField):
 class DateTimeField(CharField):
 
     def set_client(self, record, value, force_change=False):
-        if value:
+        if value and not isinstance(value, datetime.datetime):
             value = datetime.datetime(*time.strptime(value, DHM_FORMAT)[:6])
         return super(DateTimeField, self).set_client(record, value,
                 force_change=force_change)
@@ -214,7 +214,7 @@ class DateTimeField(CharField):
 class DateField(CharField):
 
     def set_client(self, record, value, force_change=False):
-        if value:
+        if value and not isinstance(value, datetime.date):
             value = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
         return super(DateField, self).set_client(record, value,
                 force_change=force_change)
