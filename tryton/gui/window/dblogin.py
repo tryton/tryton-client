@@ -527,13 +527,14 @@ class DBLogin(object):
                 selected_profile = 'demo%s.tryton.org' % short_version
         else:
             selected_profile = profile_name
-        can_use_profile = True
-        for (configname, sectionname) in (('login.server', 'host'),
-                ('login.port', 'port'), ('login.db', 'database')):
-            if (self.profiles.get(selected_profile, sectionname) != \
-                    CONFIG[configname]):
-                can_use_profile = False
-                break
+        can_use_profile = self.profiles.has_section(selected_profile)
+        if can_use_profile:
+            for (configname, sectionname) in (('login.server', 'host'),
+                    ('login.port', 'port'), ('login.db', 'database')):
+                if (self.profiles.get(selected_profile, sectionname) != \
+                        CONFIG[configname]):
+                    can_use_profile = False
+                    break
 
         if can_use_profile:
             for idx, row in enumerate(self.profile_store):
