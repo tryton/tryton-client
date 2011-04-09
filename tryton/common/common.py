@@ -643,11 +643,22 @@ class AskDialog(UniqueDialog):
         return win
 
     def __call__(self, question, parent, visibility=True):
-        response = super(AskDialog, self).__call__(question, parent, visibility)
+        if self.running:
+            return
+
+        dialog = self.build_dialog(question, parent,
+            visibility=visibility)
+        dialog.set_icon(TRYTON_ICON)
+        self.running = True
+        dialog.show_all()
+        response = dialog.run()
+        result = None
         if response == gtk.RESPONSE_OK:
-            return self.entry.get_text()
-        else:
-            return None
+            result = self.entry.get_text()
+        parent.present()
+        dialog.destroy()
+        self.running = False
+        return result
 
 ask = AskDialog()
 
