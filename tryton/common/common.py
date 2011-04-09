@@ -611,7 +611,7 @@ class Sur3BDialog(ConfirmationDialog):
         return dialog
 
     def __call__(self, message, parent):
-        response = super(SurDialog, self).__call__(message, parent)
+        response = super(Sur3BDialog, self).__call__(message, parent)
         return self.response_mapping.get(response, 'cancel')
 
 sur_3b = Sur3BDialog()
