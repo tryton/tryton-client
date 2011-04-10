@@ -12,6 +12,12 @@ except Exception:
 if os.name == 'nt' and hasattr(sys, "frozen"):
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
+    etc = os.path.join(os.path.dirname(sys.executable), 'etc')
+    os.environ['GTK2_RC_FILES'] = os.path.join(etc, 'gtk-2.0', 'gtkrc')
+    os.environ['GDK_PIXBUF_MODULE_FILE'] = os.path.join(etc, 'gtk-2.0',
+        'gdk-pixbuf.loaders')
+    os.environ['GTK_IM_MODULE_FILE'] = os.path.join(etc, 'gtk-2.0',
+        'gtk.immodules')
 
 if os.name == 'mac' or \
         (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):

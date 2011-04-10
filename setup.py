@@ -7,6 +7,9 @@ import os
 import glob
 import sys
 
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 args = {}
 
 try:
@@ -28,14 +31,29 @@ try:
 except ImportError:
         pass
 
+data_files=[
+    ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
+        glob.glob('share/pixmaps/tryton/*.svg')),
+    ('share/locale/bg_BG/LC_MESSAGES',
+        glob.glob('share/locale/bg_BG/LC_MESSAGES/*.mo')),
+    ('share/locale/cs_CZ/LC_MESSAGES',
+        glob.glob('share/locale/cs_CZ/LC_MESSAGES/*.mo')),
+    ('share/locale/de_DE/LC_MESSAGES',
+        glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
+    ('share/locale/es_CO/LC_MESSAGES',
+        glob.glob('share/locale/es_CO/LC_MESSAGES/*.mo')),
+    ('share/locale/es_ES/LC_MESSAGES',
+        glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
+    ('share/locale/fr_FR/LC_MESSAGES',
+        glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
+    ('share/locale/ru_RU/LC_MESSAGES',
+        glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
+    ('share/locale/ja_JP/LC_MESSAGES',
+        glob.glob('share/locale/ja_JP/LC_MESSAGES/*.mo')),
+]
+
 if os.name == 'nt':
     import py2exe
-    origIsSystemDLL = py2exe.build_exe.isSystemDLL
-    def isSystemDLL(pathname):
-        if os.path.basename(pathname).lower() in ("msvcp71.dll", "dwmapi.dll"):
-            return 0
-        return origIsSystemDLL(pathname)
-    py2exe.build_exe.isSystemDLL = isSystemDLL
 
     args['windows'] = [{
         'script': os.path.join('bin', 'tryton'),
@@ -57,6 +75,15 @@ if os.name == 'nt':
         }
     }
     args['zipfile'] = 'library.zip'
+
+    if sys.version_info < (2, 6):
+        data_files.append(('', ['msvcp71.dll']))
+    else:
+        data_files.append(('', ['msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll']))
+        manifest = read('Microsoft.VC90.CRT.manifest')
+        args['windows'][0]['other_resources'] = [(24, 1, manifest)]
+
+
 elif os.name == 'mac' \
         or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
     import py2app
@@ -89,9 +116,6 @@ if sys.version_info < (2, 6):
     SIMPLEJSON = ['simplejson']
     EXTRAS['ssl'] = ['ssl']
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
 dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
@@ -102,18 +126,7 @@ dist = setup(name=PACKAGE,
     download_url="http://downloads.tryton.org/" + \
             VERSION.rsplit('.', 1)[0] + '/',
     packages=find_packages(),
-    data_files=[
-        ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
-                glob.glob('share/pixmaps/tryton/*.svg')),
-        ('share/locale/bg_BG/LC_MESSAGES', glob.glob('share/locale/bg_BG/LC_MESSAGES/*.mo')),
-        ('share/locale/cs_CZ/LC_MESSAGES', glob.glob('share/locale/cs_CZ/LC_MESSAGES/*.mo')),
-        ('share/locale/de_DE/LC_MESSAGES', glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
-        ('share/locale/es_CO/LC_MESSAGES', glob.glob('share/locale/es_CO/LC_MESSAGES/*.mo')),
-        ('share/locale/es_ES/LC_MESSAGES', glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
-        ('share/locale/fr_FR/LC_MESSAGES', glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
-        ('share/locale/ru_RU/LC_MESSAGES', glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
-        ('share/locale/ja_JP/LC_MESSAGES', glob.glob('share/locale/ja_JP/LC_MESSAGES/*.mo')),
-    ],
+    data_files=data_files,
     scripts=['bin/tryton'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
