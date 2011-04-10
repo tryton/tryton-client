@@ -224,8 +224,10 @@ class One2Many(WidgetInterface):
 
     def _sig_new(self, widget):
         self.view.set_value()
-        if self.screen.current_record:
-            if not self.screen.current_record.validate():
+        record = self.screen.current_record
+        if record:
+            fields = self.screen.current_view.get_fields()
+            if not record.validate(fields):
                 self.screen.display()
                 return
         ctx = {}
@@ -249,7 +251,8 @@ class One2Many(WidgetInterface):
         self.view.set_value()
         record = self.screen.current_record
         if record:
-            if not record.validate():
+            fields = self.screen.current_view.get_fields()
+            if not record.validate(fields):
                 self.screen.display()
                 return
             win = WinForm(self.screen, self.window)
@@ -258,16 +261,20 @@ class One2Many(WidgetInterface):
 
     def _sig_next(self, widget):
         self.view.set_value()
-        if self.screen.current_record:
-            if not self.screen.current_record.validate():
+        record = self.screen.current_record
+        if record:
+            fields = self.screen.current_view.get_fields()
+            if not record.validate(fields):
                 self.screen.display()
                 return
         self.screen.display_next()
 
     def _sig_previous(self, widget):
         self.view.set_value()
-        if self.screen.current_record:
-            if not self.screen.current_record.validate():
+        record = self.screen.current_record
+        if record:
+            fields = self.screen.current_view.get_fields()
+            if not record.validate(fields):
                 self.screen.display()
                 return
         self.screen.display_prev()
