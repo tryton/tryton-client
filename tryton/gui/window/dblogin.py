@@ -446,7 +446,6 @@ class DBLogin(object):
         label_username.set_alignment(1, 0.5)
         label_username.set_padding(3, 3)
         self.table_main.attach(label_username, 0, 1, 6, 7, xoptions=gtk.FILL)
-        self.entry_password.grab_focus()
 
         # Profile informations
         self.profile_cfg = os.path.join(get_config_dir(), 'profiles.cfg')
@@ -547,7 +546,13 @@ class DBLogin(object):
                 CONFIG['login.port']))
             db = CONFIG['login.db'] if CONFIG['login.db'] else ''
             self.entry_database.set_text(db)
+            self.entry_login.set_text(CONFIG['login.login'])
         self.dialog.show_all()
+
+        if not self.entry_login.get_text():
+            self.entry_login.grab_focus()
+        else:
+            self.entry_password.grab_focus()
 
         # Reshow dialog for gtk-quarks
         self.dialog.reshow_with_initial_size()
@@ -565,10 +570,12 @@ class DBLogin(object):
                 CONFIG['login.profile'] = profile
             host, port = self.entry_host.get_text().split(':', 1)
             database = self.entry_database.get_text()
+            login = self.entry_login.get_text()
             CONFIG['login.server'] = host
             CONFIG['login.port'] = port
             CONFIG['login.db'] = database
             CONFIG['login.expanded'] = self.expander.props.expanded
+            CONFIG['login.login'] = login
             result = (self.entry_login.get_text(),
                 self.entry_password.get_text(), host, int(port), database)
 
