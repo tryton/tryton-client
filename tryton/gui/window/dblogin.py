@@ -32,8 +32,6 @@ class DBListEditor(object):
         self.parent = parent
         self.dialog = gtk.Dialog(title=_(u'Profile Editor'), parent=parent,
             flags=gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.cancel_button = self.dialog.add_button(gtk.STOCK_CANCEL,
-            gtk.RESPONSE_CANCEL)
         self.ok_button = self.dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(True)
@@ -287,7 +285,6 @@ class DBListEditor(object):
         self.add_button.set_sensitive(False)
         self.remove_button.set_sensitive(False)
         self.ok_button.set_sensitive(False)
-        self.cancel_button.set_sensitive(False)
         self.cell.set_property('editable', False)
         self.updating_db = True
         dbs, createdb = dbprogress.update(self.database_combo,
@@ -315,7 +312,6 @@ class DBListEditor(object):
         self.add_button.set_sensitive(True)
         self.remove_button.set_sensitive(True)
         self.ok_button.set_sensitive(True)
-        self.cancel_button.set_sensitive(True)
         self.cell.set_property('editable', True)
 
     def db_create(self, button):
