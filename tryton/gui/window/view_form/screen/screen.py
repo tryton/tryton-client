@@ -596,7 +596,8 @@ class Screen(SignalEvent):
                 # set current model to None to prevent __select_changed
                 # to save the previous_model as it can be already deleted.
                 self.current_record = None
-                record.group.remove(record, remove=remove, signal=False)
+                record.group.remove(record, remove=remove, signal=False,
+                    force_remove=True)
 
             # send record-changed only once
             record.signal('record-changed')
