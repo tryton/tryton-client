@@ -280,7 +280,7 @@ class Screen(SignalEvent):
             return Action.exec_keyword('tree_open', self.window, {
                 'model': self.model_name,
                 'id': self.id_get(),
-                'ids': self.ids_get(),
+                'ids': [self.id_get()],
                 }, context=self.context.copy(), warning=False)
         else:
             self.switch_view(view_type='form')
