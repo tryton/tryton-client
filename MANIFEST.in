@@ -9,6 +9,7 @@ include setup-single.nsi
 include setup-bundle.sh
 include tryton.desktop
 include *.nsh
+include Microsoft.VC90.CRT.manifest
 include doc/*
 recursive-include doc *.rst
 recursive-include doc *.po
