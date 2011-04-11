@@ -27,15 +27,17 @@ class Char(WidgetInterface):
             completion.set_model(self.entry_store)
             completion.set_text_column(0)
             self.entry.get_child().set_completion(completion)
+            focus_entry = self.entry.get_child()
         else:
             self.entry = gtk.Entry()
             self.entry.set_property('activates_default', True)
             self.entry.set_max_length(int(attrs.get('size', 0)))
             self.entry.set_width_chars(5)
             self.entry.connect('activate', self.sig_activate)
+            focus_entry = self.entry
 
-        self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
-        self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
+        focus_entry.connect('focus-in-event', lambda x, y: self._focus_in())
+        focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry)
 
     def _color_widget(self):
