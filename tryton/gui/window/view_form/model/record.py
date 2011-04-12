@@ -126,6 +126,7 @@ class Record(SignalEvent):
             group.fields = self.group.fields
         group.on_write = self.group.on_write
         group.readonly = self.group.readonly
+        group._context.update(self.group._context)
         if group.window != self.window:
             group.window = self.window
         return group
