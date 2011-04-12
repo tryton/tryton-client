@@ -564,7 +564,8 @@ class DBLogin(object):
             if active_profile != -1:
                 profile = self.profile_store[active_profile][0]
                 CONFIG['login.profile'] = profile
-            host, port = self.entry_host.get_text().split(':', 1)
+            host, port = (self.entry_host.get_text().split(':', 1)
+                + ['8070'])[:2]
             database = self.entry_database.get_text()
             login = self.entry_login.get_text()
             CONFIG['login.server'] = host
