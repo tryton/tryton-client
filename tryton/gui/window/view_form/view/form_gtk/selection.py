@@ -131,7 +131,9 @@ class Selection(WidgetInterface):
                     value = val
                     if len(txt) == len(text):
                         break
-        self.field.set_client(self.record, value, force_change=True)
+        if 'relation' in self.attrs:
+            value = (value, text)
+        self.field.set_client(self.record, value)
         self.display(self.record, self.field)
 
     def set_value(self, record, field):
