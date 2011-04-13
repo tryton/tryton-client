@@ -203,12 +203,16 @@ class Record(SignalEvent):
             self._check_load()
         value = []
         for name, field in self.group.fields.iteritems():
-            if (get_readonly or \
-                    not field.get_state_attrs(self).get('readonly', False)) \
-                and (not get_modifiedonly \
-                   or field.name in self.modified_fields):
-                value.append((name, field.get(self, check_load=check_load,
-                    readonly=get_readonly, modified=get_modifiedonly)))
+            if field.attrs.get('readonly'):
+                continue
+            if (field.get_state_attrs(self).get('readonly', False)
+                    and not get_readonly):
+                continue
+            if (field.name not in self.modified_fields
+                    and get_modifiedonly):
+                continue
+            value.append((name, field.get(self, check_load=check_load,
+                readonly=get_readonly, modified=get_modifiedonly)))
         value = dict(value)
         if includeid:
             value['id'] = self.id
