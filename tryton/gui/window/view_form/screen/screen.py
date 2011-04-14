@@ -474,7 +474,7 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             self.current_view.display()
             return False
-        if path:
+        if path and obj_id:
             path = path[:-1] + ((path[-1][0], obj_id),)
         self.current_record = self.group.get_by_path(path)
         self.display()
