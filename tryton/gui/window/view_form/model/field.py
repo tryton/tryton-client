@@ -642,7 +642,8 @@ class O2MField(CharField):
                 if record2 is not None:
                     to_remove.append(record2)
         for record2 in to_remove:
-            record.value[self.name].remove(record2, signal=False)
+            record.value[self.name].remove(record2, signal=False,
+                force_remove=True)
 
         if value and value.get('add') or value.get('update', []):
             record.value[self.name].add_fields(fields, signal=False)
