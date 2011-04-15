@@ -153,7 +153,8 @@ class CharField(object):
         return res
 
     def set_on_change(self, record, value):
-        return self.set(record, value, modified=True)
+        record.modified_fields.setdefault(self.name)
+        return self.set(record, value, modified=False)
 
     def get_default(self, record):
         return self.get(record)
@@ -435,7 +436,12 @@ class O2MField(CharField):
 
     def __init__(self, attrs):
         super(O2MField, self).__init__(attrs)
+        self.in_on_change = False
         self.context = {}
+
+    def sig_changed(self, record):
+        if not self.in_on_change:
+            return super(O2MField, self).sig_changed(record)
 
     def _group_changed(self, group, record):
         if not record.parent:
@@ -445,7 +451,6 @@ class O2MField(CharField):
         self.sig_changed(record.parent)
         record.parent.validate(softvalidation=True)
         record.parent.signal('record-changed')
-        record.parent.group.signal('group-changed', record.parent)
 
     def _group_list_changed(self, group, signal):
         group.parent.group.signal('group-list-changed', signal)

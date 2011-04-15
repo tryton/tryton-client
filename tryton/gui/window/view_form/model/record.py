@@ -386,11 +386,15 @@ class Record(SignalEvent):
                             val[fieldname + '.rec_name'])
                     else:
                         value = ref_model, (ref_id, ref_id)
-            self.group.fields[fieldname].set(self, value, modified=modified)
+            self.group.fields[fieldname].set(self, value, modified=False)
             self._loaded.add(fieldname)
         for fieldname, value in later.iteritems():
-            self.group.fields[fieldname].set(self, value, modified=modified)
+            self.group.fields[fieldname].set(self, value, modified=False)
             self._loaded.add(fieldname)
+        if modified:
+            self.modified_fields.update(dict((x, None) for x in val))
+            self.signal('record-modified')
+            self.signal('record-changed')
         if signal:
             self.signal('record-changed')
 
@@ -474,8 +478,13 @@ class Record(SignalEvent):
                         value = ref_model, (ref_id, ref_id)
             self.group.fields[fieldname].set_on_change(self, value)
         for fieldname, value in later.items():
-            self.group.fields[fieldname].set_on_change(self, value)
-        self.signal('record-changed')
+            # on change recursion checking is done only for x2many
+            field_x2many = self.group.fields[fieldname]
+            try:
+                field_x2many.in_on_change = True
+                field_x2many.set_on_change(self, value)
+            finally:
+                field_x2many.in_on_change = False
 
     def on_change_with(self, field_name):
         for fieldname in self.group.fields:
