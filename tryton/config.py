@@ -47,11 +47,15 @@ class ConfigManager(object):
     "Config manager"
 
     def __init__(self):
+        short_version = '.'.join(VERSION.split('.', 2)[:2])
+        demo_server = 'demo%s.tryton.org' % short_version
+        demo_database = 'demo%s' % short_version
         self.defaults = {
-            'login.login': 'admin',
-            'login.server': 'localhost',
+            'login.profile': demo_server,
+            'login.login': 'demo',
+            'login.server': demo_server,
             'login.port': '8070',
-            'login.db': False,
+            'login.db': demo_database,
             'login.expanded': False,
             'tip.autostart': False,
             'tip.position': 0,

@@ -141,16 +141,22 @@ class DBListEditor(object):
         self.dialog.set_default_size(640, 350)
         self.dialog.set_default_response(gtk.RESPONSE_ACCEPT)
 
-    def run(self):
+    def run(self, profile_name):
         self.dialog.show_all()
         self.clear_entries()
         model = self.profile_tree.get_model()
         if model:
-            self.profile_tree.get_selection().select_path((0,))
+            for i, row in enumerate(model):
+                if row[0] == profile_name:
+                    break
+            else:
+                i = 0
+            self.profile_tree.get_selection().select_path((i,))
             self.profile_selected(self.profile_tree)
         self.dialog.run()
         self.parent.present()
         self.dialog.destroy()
+        return self.current_profile['name']
 
     def _current_profile(self):
         model, selection = self.profile_tree.get_selection().get_selected()
@@ -463,9 +469,19 @@ class DBLogin(object):
 
     def profile_manage(self, widget):
         dia = DBListEditor(self.dialog, self.profile_store, self.profiles)
-        dia.run()
+        active_profile = self.combo_profile.get_active()
+        profile_name = None
+        if active_profile != -1:
+            profile_name = self.profile_store[active_profile][0]
+        profile_name = dia.run(profile_name)
         with open(self.profile_cfg, 'wb') as configfile:
             self.profiles.write(configfile)
+
+        for idx, row in enumerate(self.profile_store):
+            if row[0] == profile_name:
+                self.combo_profile.set_active(idx)
+                self.profile_changed(self.combo_profile)
+                break
 
     def profile_changed(self, combobox):
         position = combobox.get_active()
@@ -514,26 +530,20 @@ class DBLogin(object):
         self.entry_database.props.visible = visibility
         self.label_database.props.visible = visibility
 
-    def run(self, profile_name, parent):
-        if not profile_name:
-            selected_profile = CONFIG['login.profile']
-            if not selected_profile:
-                short_version = '.'.join(VERSION.split('.', 2)[:2])
-                selected_profile = 'demo%s.tryton.org' % short_version
-        else:
-            selected_profile = profile_name
-        can_use_profile = self.profiles.has_section(selected_profile)
+    def run(self, parent):
+        profile_name = CONFIG['login.profile']
+        can_use_profile = self.profiles.has_section(profile_name)
         if can_use_profile:
             for (configname, sectionname) in (('login.server', 'host'),
                     ('login.port', 'port'), ('login.db', 'database')):
-                if (self.profiles.get(selected_profile, sectionname) != \
+                if (self.profiles.get(profile_name, sectionname) != \
                         CONFIG[configname]):
                     can_use_profile = False
                     break
 
         if can_use_profile:
             for idx, row in enumerate(self.profile_store):
-                if row[0] == selected_profile:
+                if row[0] == profile_name:
                     self.combo_profile.set_active(idx)
                     break
         else:

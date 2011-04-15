@@ -1174,13 +1174,13 @@ class Main(object):
                 raise
             return ([], [])
 
-    def sig_login(self, widget=None, profile_name=False, res=None):
+    def sig_login(self, widget=None, res=None):
         if not self.sig_logout(widget, disconnect=False):
             return
         if not res:
             try:
                 dblogin = DBLogin(self.window)
-                res = dblogin.run(profile_name, self.window)
+                res = dblogin.run(self.window)
             except Exception, exception:
                 if exception.args == ('QueryCanceled',):
                     return False

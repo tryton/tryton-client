@@ -1,14 +1,12 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 from __future__ import with_statement
-import ConfigParser
-import os
 import gtk
 import gobject
 import gettext
 import re
 import tryton.common as common
-from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, get_config_dir
+from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
 import tryton.rpc as rpc
 
 _ = gettext.gettext
@@ -401,23 +399,11 @@ class DBCreate(object):
                         parent.present()
                         self.dialog.destroy()
                         if self.sig_login:
-                            profile_cfg = os.path.join(get_config_dir(),
-                                'profiles.cfg')
-                            profiles = ConfigParser.SafeConfigParser()
-                            if os.path.exists(profile_cfg):
-                                profiles.read(profile_cfg)
-                            i, profile_name = 0, dbname
-                            while profile_name in profiles.sections():
-                                i += 1
-                                profile_name = '%s_%s' % (dbname, i)
-                            profiles.add_section(profile_name)
-                            profiles.set(profile_name, 'host', host)
-                            profiles.set(profile_name, 'port', port)
-                            profiles.set(profile_name, 'database', dbname)
-                            profiles.set(profile_name, 'username', '')
-                            with open(profile_cfg, 'wb') as configfile:
-                                profiles.write(configfile)
-                            self.sig_login(profile_name=profile_name)
+                            CONFIG['login.server'] = host
+                            CONFIG['login.port'] = port
+                            CONFIG['login.db'] = dbname
+                            CONFIG['login.login'] = 'admin'
+                            self.sig_login()
                         break
 
             break
