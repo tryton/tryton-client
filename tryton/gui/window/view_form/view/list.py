@@ -560,6 +560,8 @@ class ViewList(ParserView):
         def check_recursion(from_, to):
             if not from_ or not to:
                 return True
+            if from_ == to:
+                return False
             length = min(len(from_), len(to))
             if len(from_) < len(to) and from_[:length] == to[:length]:
                 return False
