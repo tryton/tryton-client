@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2011-04-13 21:15+0100\n"
+"PO-Revision-Date: 2011-04-15 13:43+0100\n"
 "Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -1340,7 +1340,7 @@ msgstr "Verknüpften Eintrag suchen/öffnen"
 
 #: tryton/gui/window/shortcuts.py:36
 msgid "List Entries Shortcuts"
-msgstr "Favoritenliste anzeigen"
+msgstr "Schnelltasten für Einträge in Listenfelder"
 
 #: tryton/gui/window/shortcuts.py:37
 msgid "Create new line"
@@ -1348,7 +1348,7 @@ msgstr "Neue Zeile erstellen"
 
 #: tryton/gui/window/shortcuts.py:38
 msgid "Open relation"
-msgstr "Verknüpfung öffnen"
+msgstr "Verknüpften Eintrag suchen/öffnen"
 
 #: tryton/gui/window/shortcuts.py:39
 msgid "Mark line for deletion"
