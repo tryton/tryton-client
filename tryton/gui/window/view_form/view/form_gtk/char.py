@@ -41,6 +41,8 @@ class Char(WidgetInterface):
         self.widget.pack_start(self.entry)
 
     def _color_widget(self):
+        if self.autocomplete:
+            return self.entry.get_child()
         return self.entry
 
     def grab_focus(self):
