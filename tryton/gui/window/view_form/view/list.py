@@ -349,16 +349,15 @@ class ViewList(ParserView):
         if screen.readonly:
             dnd = False
         if dnd:
-            self.widget_tree.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
-                    [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
-                    gtk.gdk.ACTION_MOVE)
             self.widget_tree.drag_source_set(gtk.gdk.BUTTON1_MASK | gtk.gdk.BUTTON3_MASK,
                     [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
                     gtk.gdk.ACTION_MOVE)
-            self.widget_tree.enable_model_drag_dest(
+            self.widget_tree.drag_dest_set(gtk.DEST_DEFAULT_ALL,
                     [('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),],
                     gtk.gdk.ACTION_MOVE)
 
+            self.widget_tree.connect('drag-begin', self.drag_begin)
+            self.widget_tree.connect('drag-motion', self.drag_motion)
             self.widget_tree.connect('drag-drop', self.drag_drop)
             self.widget_tree.connect("drag-data-get", self.drag_data_get)
             self.widget_tree.connect('drag-data-received', self.drag_data_received)
@@ -503,6 +502,22 @@ class ViewList(ParserView):
         del selection
         return
 
+    def drag_begin(self, treeview, context):
+        return True
+
+    def drag_motion(self, treeview, context, x, y, time):
+        try:
+            treeview.set_drag_dest_row(*treeview.get_dest_row_at_pos(x, y))
+        except TypeError:
+            treeview.set_drag_dest_row(len(treeview.get_model()) - 1,
+                gtk.TREE_VIEW_DROP_AFTER)
+        if context.get_source_widget() == treeview:
+            kind = gtk.gdk.ACTION_MOVE
+        else:
+            kind = gtk.gdk.ACTION_COPY
+        context.drag_status(kind, time)
+        return True
+
     def drag_drop(self, treeview, context, x, y, time):
         treeview.emit_stop_by_name('drag-drop')
         treeview.drag_get_data(context, context.targets[-1], time)
@@ -521,6 +536,7 @@ class ViewList(ParserView):
             return
         data = str(data[0])
         selection.set(selection.target, 8, data)
+        return True
 
     def drag_data_received(self, treeview, context, x, y, selection,
             info, etime):
@@ -566,6 +582,7 @@ class ViewList(ParserView):
         context.drop_finish(False, etime)
         if treeview.sequence:
             record.group.set_sequence(field=treeview.sequence)
+        return True
 
     def drag_data_delete(self, treeview, context):
         treeview.emit_stop_by_name('drag-data-delete')
