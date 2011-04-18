@@ -32,12 +32,12 @@ class WinSearch(object):
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
 
-        self.but_find = self.win.add_button(gtk.STOCK_FIND, gtk.RESPONSE_APPLY)
-        self.but_new = self.win.add_button(gtk.STOCK_NEW, gtk.RESPONSE_ACCEPT)
         self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.but_find = self.win.add_button(gtk.STOCK_FIND, gtk.RESPONSE_APPLY)
         self.but_ok = self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.but_ok.add_accelerator('clicked', self.accel_group,
                 gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+        self.but_new = self.win.add_button(gtk.STOCK_NEW, gtk.RESPONSE_ACCEPT)
 
         hbox = gtk.HBox()
         hbox.show()
