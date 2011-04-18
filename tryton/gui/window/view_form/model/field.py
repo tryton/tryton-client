@@ -73,6 +73,8 @@ class CharField(object):
         return context
 
     def validate(self, record, softvalidation=False):
+        if self.attrs.get('readonly'):
+            return True
         res = True
         self.get_state_attrs(record)['domain_readonly'] = False
         inverted_domain, domain = self.validation_domains(record)
@@ -670,6 +672,8 @@ class O2MField(CharField):
         return screen_domain, screen_domain
 
     def validate(self, record, softvalidation=False):
+        if self.attrs.get('readonly'):
+            return True
         res = True
         for record2 in record.value.get(self.name, []):
             if not record2.loaded:
