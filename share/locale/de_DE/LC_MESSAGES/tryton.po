@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2008-07-03 23:50+0200\n"
-"PO-Revision-Date: 2011-04-15 13:43+0100\n"
-"Last-Translator: Mathias Behrle <mathiasb@mbsolutions.selfip.biz>\n"
+"PO-Revision-Date: 2011-04-19 15:56+0100\n"
+"Last-Translator: Mathias Behrle <mbehrle@m9s.biz>\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr "Ihre Auswahl:"
 
 #: tryton/common/common.py:366
 #: tryton/common/common.py:401
-#: tryton/gui/main.py:1695
+#: tryton/gui/main.py:1697
 #: tryton/gui/window/win_export.py:402
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:76
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:146
@@ -661,21 +661,21 @@ msgstr ""
 "Systemanmeldung fehlgeschlagen!\n"
 "Überprüfen Sie bitte, ob für Ihren Benutzernamen eine Menüaktion eingestellt ist."
 
-#: tryton/gui/main.py:1373
-#: tryton/gui/main.py:1381
+#: tryton/gui/main.py:1375
+#: tryton/gui/main.py:1383
 msgid "Do you really want to quit?"
 msgstr "Wirklich beenden?"
 
-#: tryton/gui/main.py:1444
+#: tryton/gui/main.py:1446
 msgid "Close Tab"
 msgstr "Tab schließen"
 
-#: tryton/gui/main.py:1477
+#: tryton/gui/main.py:1479
 #, python-format
 msgid "Attachment(%d)"
 msgstr "Anhänge(%d)"
 
-#: tryton/gui/main.py:1588
+#: tryton/gui/main.py:1590
 msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
@@ -683,7 +683,7 @@ msgstr ""
 "Sie werden eine Tryton Datenbank löschen.\n"
 "Wirklich fortfahren?"
 
-#: tryton/gui/main.py:1599
+#: tryton/gui/main.py:1601
 msgid ""
 "Wrong Tryton Server Password\n"
 "Please try again."
@@ -691,30 +691,30 @@ msgstr ""
 "Das Passwort für den Tryton Server ist falsch!\n"
 "Bitte geben Sie es noch einmal ein."
 
-#: tryton/gui/main.py:1601
-#: tryton/gui/main.py:1642
-#: tryton/gui/main.py:1682
+#: tryton/gui/main.py:1603
+#: tryton/gui/main.py:1644
+#: tryton/gui/main.py:1684
 #: tryton/gui/window/dbcreate.py:378
 msgid "Access denied!"
 msgstr "Zugang verweigert!"
 
-#: tryton/gui/main.py:1604
+#: tryton/gui/main.py:1606
 msgid "Database drop failed with error message:\n"
 msgstr "Das Löschen der Datenbank ist fehlgeschlagen mit der folgenden Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1606
+#: tryton/gui/main.py:1608
 msgid "Database drop failed!"
 msgstr "Datenbank konnte nicht gelöscht werden!"
 
-#: tryton/gui/main.py:1609
+#: tryton/gui/main.py:1611
 msgid "Database dropped successfully!"
 msgstr "Datenbank erfolgreich gelöscht!"
 
-#: tryton/gui/main.py:1615
+#: tryton/gui/main.py:1617
 msgid "Open Backup File to Restore..."
 msgstr "Backup Datei für Wiederherstellung öffnen..."
 
-#: tryton/gui/main.py:1634
+#: tryton/gui/main.py:1636
 msgid ""
 "It is not possible to restore a password protected database.\n"
 "Backup and restore needed to be proceed manual."
@@ -722,13 +722,13 @@ msgstr ""
 "Es ist nicht möglich eine passwortgeschützte Datenbank wiederherzustellen.\n"
 "Backup und Wiederherstellung müssen in diesem Fall manuell durchgeführt werden."
 
-#: tryton/gui/main.py:1638
-#: tryton/gui/main.py:1678
+#: tryton/gui/main.py:1640
+#: tryton/gui/main.py:1680
 msgid "Database is password protected!"
 msgstr "Datenbank ist passwortgeschützt!"
 
-#: tryton/gui/main.py:1640
-#: tryton/gui/main.py:1680
+#: tryton/gui/main.py:1642
+#: tryton/gui/main.py:1682
 msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
@@ -736,20 +736,20 @@ msgstr ""
 "Falsches Passwort für Tryton Server.\n"
 "Bitte versuchen Sie es noch einmal."
 
-#: tryton/gui/main.py:1645
+#: tryton/gui/main.py:1647
 msgid "Database restore failed with error message:\n"
 msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen mit der Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1647
-#: tryton/gui/main.py:1654
+#: tryton/gui/main.py:1649
+#: tryton/gui/main.py:1656
 msgid "Database restore failed!"
 msgstr "Wiederherstellung der Datenbank ist fehlgeschlagen!"
 
-#: tryton/gui/main.py:1651
+#: tryton/gui/main.py:1653
 msgid "Database restored successfully!"
 msgstr "Datenbank wurde erfolgreich wiederhergestellt!"
 
-#: tryton/gui/main.py:1675
+#: tryton/gui/main.py:1677
 msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
@@ -757,15 +757,15 @@ msgstr ""
 "Es ist nicht möglich eine passwortgeschützte Datenbank zu sichern.\n"
 "Backup und Wiederherstellung müssen in diesem Fall manuell durchgeführt werden."
 
-#: tryton/gui/main.py:1685
+#: tryton/gui/main.py:1687
 msgid "Database dump failed with error message:\n"
 msgstr "Die Datenbanksicherung ist fehlgeschlagen mit der Fehlermeldung:\n"
 
-#: tryton/gui/main.py:1687
+#: tryton/gui/main.py:1689
 msgid "Database dump failed!"
 msgstr "Datenbank konnte nicht gesichert werden!"
 
-#: tryton/gui/main.py:1704
+#: tryton/gui/main.py:1706
 msgid "Database backuped successfully!"
 msgstr "Datenbank erfolgreich gesichert!"
 
@@ -895,7 +895,7 @@ msgstr "Die erlaubten Zeichen des Datenbanknamens sind auf Buchstaben, Zahlen un
 
 #: tryton/gui/window/dbcreate.py:331
 msgid "Wrong characters in database name!"
-msgstr "Unerlaubte Zeichen im Datenbank Namen!"
+msgstr "Unerlaubte Zeichen im Namen für die Datenbank!"
 
 #: tryton/gui/window/dbcreate.py:335
 msgid "The new admin password doesn't match the confirmation field.\n"
@@ -1028,7 +1028,7 @@ msgstr "Erstellen"
 
 #: tryton/gui/window/dblogin.py:111
 msgid "Fetching databases list"
-msgstr "Datenbankliste abfragen"
+msgstr "Datenbankliste wird abgefragt..."
 
 #: tryton/gui/window/dblogin.py:129
 msgid "Username:"
@@ -1196,7 +1196,7 @@ msgstr "Gehe zu Nr (ID):"
 
 #: tryton/gui/window/form.py:229
 #: tryton/gui/window/form.py:422
-#: tryton/gui/window/view_form/view/list.py:382
+#: tryton/gui/window/view_form/view/list.py:381
 msgid "No record selected!"
 msgstr "Kein Datensatz ausgewählt!"
 
@@ -1686,17 +1686,17 @@ msgstr "Um eine Verknüpfung zu erstellen muss ein Datensatz ausgewählt sein!"
 msgid "You must save this record to be able to use the relate button!"
 msgstr "Der Datensatz muss gespeichert werden, bevor der Verknüpfungsbutton benutzt werden kann!"
 
-#: tryton/gui/window/view_form/view/list.py:599
+#: tryton/gui/window/view_form/view/list.py:618
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:278
 msgid "Actions"
 msgstr "Aktionen"
 
-#: tryton/gui/window/view_form/view/list.py:602
+#: tryton/gui/window/view_form/view/list.py:621
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:280
 msgid "Reports"
 msgstr "Berichte"
 
-#: tryton/gui/window/view_form/view/list.py:631
+#: tryton/gui/window/view_form/view/list.py:650
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:307
 msgid "You must select a record to use the relation!"
 msgstr "Für diese Verknüpfung müssen Sie zuerst einen Datensatz auswählen!"
@@ -1732,7 +1732,7 @@ msgstr "Stunde:"
 msgid "Minute:"
 msgstr "Minute:"
 
-#: tryton/gui/window/view_form/view/form_gtk/char.py:104
+#: tryton/gui/window/view_form/view/form_gtk/char.py:106
 msgid "Show plain text"
 msgstr "Klartext anzeigen"
 
