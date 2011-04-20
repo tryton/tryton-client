@@ -126,7 +126,7 @@ class Group(SignalEvent, list):
     def save(self):
         saved = []
         for record in self:
-            saved.append(record.save())
+            saved.append(record.save(force_reload=False))
         return saved
 
     @property
