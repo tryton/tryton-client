@@ -548,7 +548,8 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             record = self.current_record
             idx = record.group.index(record)
-            record.group.remove(record, remove=remove)
+            record.group.remove(record, remove=remove,
+                force_remove=force_remove)
 
             if delete:
                 if (record.parent and
