@@ -35,7 +35,9 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         self.__removed = None # XXX dirty hack to allow update of has_child
 
     def added(self, group, record):
-        if group is self.group:
+        if (group is self.group
+                and (record.group is self.group
+                    or record.group.child_name == self.children_field)):
             path = self.on_get_path(record)
             iter_ = self.get_iter(path)
             self.row_inserted(path, iter_)
@@ -51,7 +53,9 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         pass
 
     def removed(self, group, record):
-        if group is self.group:
+        if (group is self.group
+                and (record.group is self.group
+                    or record.group.child_name == self.children_field)):
             path = self.on_get_path(record)
             self.row_deleted(path)
             if (record.parent and
