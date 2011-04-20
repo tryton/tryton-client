@@ -519,10 +519,11 @@ class Screen(SignalEvent):
         self.request_set()
 
     def unremove(self):
-        if self.current_record in self.group:
-            self.group.unremove(self.current_record)
+        records = self.current_view.selected_records()
+        for record in records:
+            self.group.unremove(record)
 
-    def remove(self, delete=False, remove=False):
+    def remove(self, delete=False, remove=False, force_remove=False):
         res = False
         reload_ids = []
         if self.current_view.view_type == 'form' and self.current_record:
@@ -597,7 +598,7 @@ class Screen(SignalEvent):
                 # to save the previous_model as it can be already deleted.
                 self.current_record = None
                 record.group.remove(record, remove=remove, signal=False,
-                    force_remove=True)
+                    force_remove=force_remove)
 
             # send record-changed only once
             record.signal('record-changed')
