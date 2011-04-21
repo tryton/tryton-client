@@ -82,6 +82,11 @@ def localize_domain(domain, field_name=None):
     if domain in ('AND', 'OR', True, False):
         return domain
     elif is_leaf(domain):
+        if 'child_of' in domain[1]:
+            if len(domain) == 3:
+                return domain
+            else:
+                return [domain[3]] + domain[1:-1]
         return [locale_part(domain[0], field_name)] + domain[1:]
     else:
         return [localize_domain(part, field_name) for part in domain]
@@ -415,6 +420,12 @@ def test_localize():
     domain = ['OR', ['AND', ['x', '>', 7], ['x', '<', 15]], ['x.code', '=', 8]]
     assert localize_domain(domain, 'x') == \
             ['OR', ['AND', ['id', '>', 7], ['id', '<', 15]], ['code', '=', 8]]
+
+    domain = [['x', 'child_of', [1]]]
+    assert localize_domain(domain, 'x') == [['x', 'child_of', [1]]]
+
+    domain = [['x', 'child_of', [1], 'y']]
+    assert localize_domain(domain, 'x') == [['y', 'child_of', [1]]]
 
 if __name__ == '__main__':
     test_simple_inversion()
