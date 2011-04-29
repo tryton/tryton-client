@@ -180,7 +180,8 @@ class ConfigManager(object):
             self.defaults.get(key)))
 
 CONFIG = ConfigManager()
-if os.name == 'nt' and hasattr(sys, 'frozen'):
+if (os.name == 'nt' and hasattr(sys, 'frozen')
+        and os.path.basename(sys.executable) == 'tryton.exe'):
     CURRENT_DIR = os.path.dirname(unicode(sys.executable,
         sys.getfilesystemencoding()))
 else:
