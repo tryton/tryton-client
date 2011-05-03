@@ -535,10 +535,18 @@ warning = WarningDialog()
 
 class UserWarningDialog(WarningDialog):
 
+    def __init__(self):
+        super(UserWarningDialog, self).__init__()
+        self.always = False
+
+    def _set_always(self, toggle):
+        self.always = toggle.get_active()
+
     def build_dialog(self, message, parent, title):
         dialog = super(UserWarningDialog, self).build_dialog(message, parent,
             title)
         check = gtk.CheckButton(_('Always ignore this warning.'))
+        check.connect_after('toggled', self._set_always)
         alignment = gtk.Alignment(1, 0.5)
         alignment.add(check)
         dialog.vbox.pack_end(alignment, True, False)
@@ -548,7 +556,7 @@ class UserWarningDialog(WarningDialog):
         response = super(UserWarningDialog, self).__call__(message, parent,
             title)
         if response == gtk.RESPONSE_OK:
-            if always:
+            if self.always:
                 return 'always'
             return 'ok'
         return 'cancel'
