@@ -228,6 +228,12 @@ class Group(SignalEvent, list):
             self.append(record)
         else:
             self.insert(position, record)
+        for record_rm in self.record_removed:
+            if record_rm.id == record.id:
+                self.record_removed.remove(record)
+        for record_del in self.record_deleted:
+            if record_del.id == record.id:
+                self.record_deleted.remove(record)
         self.current_idx = position
         if modified:
             record.modified_fields.setdefault('id')

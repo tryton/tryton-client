@@ -84,9 +84,18 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         group = record_pos.group
         pos = group.index(record_pos) + offset
         if group is not record.group:
+            prev_group = record.group
             record.group.remove(record, remove=True, force_remove=True)
+            # Don't remove record from previous group
+            # as the new parent will change the parent
+            # This prevents concurrency conflict
+            record.group.record_removed.remove(record)
             group.add(record)
-            record.modified_fields.setdefault(record.parent_name or 'id')
+            if not record.parent_name:
+                record.modified_fields.setdefault(prev_group.parent_name)
+                record.value[prev_group.parent_name] = False
+            else:
+                record.modified_fields.setdefault(record.parent_name)
         group.move(record, pos)
 
     def move_before(self, record, path):
