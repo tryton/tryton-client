@@ -177,15 +177,15 @@ class PySocket:
                 + (gzip_p and "1" or "0") + msg
         size = len(msg)
 
-        totalsent = 0
-        while totalsent < size:
-            if self.ssl:
+        if self.ssl:
+            totalsent = 0
+            while totalsent < size:
                 sent = self.ssl_sock.write(msg[totalsent:])
-            else:
-                sent = self.sock.send(msg[totalsent:])
-            if sent == 0:
-                raise RuntimeError, "socket connection broken"
-            totalsent = totalsent + sent
+                if sent == 0:
+                    raise RuntimeError, "socket connection broken"
+                totalsent = totalsent + sent
+        else:
+            self.sock.sendall(msg)
 
     def receive(self):
         buf = self.buffer
