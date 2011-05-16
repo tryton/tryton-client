@@ -749,6 +749,8 @@ class ViewList(ParserView):
             if model and iter_:
                 record = model.get_value(iter_, 0)
                 self.screen.current_record = record
+            else:
+                self.screen.current_record = None
 
         elif tree_sel.get_mode() == gtk.SELECTION_MULTIPLE:
             model, paths = tree_sel.get_selected_rows()
@@ -756,6 +758,8 @@ class ViewList(ParserView):
                 iter_ = model.get_iter(paths[0])
                 record = model.get_value(iter_, 0)
                 self.screen.current_record = record
+            else:
+                self.screen.current_record = None
 
         if hasattr(self.widget_tree, 'editable') \
                 and self.widget_tree.editable \
