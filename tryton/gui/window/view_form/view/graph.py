@@ -44,3 +44,6 @@ class ViewGraph(ParserView):
 
     def set_cursor(self, new=False, reset_view=True):
         pass
+
+    def get_fields(self):
+        return []
