@@ -434,7 +434,7 @@ class Record(SignalEvent):
             values[name] = field.get_on_change_value(self, check_load=False)
         if self.parent and self.parent_name:
             values['_parent_' + self.parent_name] = \
-                    common.EvalEnvironment(self.parent, False)
+                    common.EvalEnvironment(self.parent, False, 'on_change')
         for arg in args:
             scope = values
             for i in arg.split('.'):

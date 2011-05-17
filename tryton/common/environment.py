@@ -4,15 +4,20 @@
 
 class EvalEnvironment(dict):
 
-    def __init__(self, parent, check_load):
+    def __init__(self, parent, check_load, eval_type='eval'):
         super(EvalEnvironment, self).__init__()
         self.parent = parent
         self.check_load = check_load
+        assert eval_type in ('eval', 'on_change')
+        self.eval_type = eval_type
 
     def __getitem__(self, item):
         if item == '_parent_' + self.parent.parent_name and self.parent.parent:
             return EvalEnvironment(self.parent.parent, self.check_load)
-        return self.parent.get_eval(check_load=self.check_load)[item]
+        if self.eval_type == 'eval':
+            return self.parent.get_eval(check_load=self.check_load)[item]
+        else:
+            return self.parent._get_on_change_args([item])[item]
 
     def __getattr__(self, item):
         return self.__getitem__(item)
