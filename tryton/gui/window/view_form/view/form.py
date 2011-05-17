@@ -43,6 +43,12 @@ class ViewForm(ParserView):
         viewport.add(scroll)
         if isinstance(self.screen.window, gtk.Dialog):
             width, height = self.widget.size_request()
+            if self.screen.window:
+                parent = self.screen.window.get_transient_for()
+                if parent:
+                    parent_width, parent_height = parent.get_size()
+                    width = min(parent_width - 40, width)
+                    height = min(parent_height - 80, height)
             vbox.set_size_request(width or -1, height or -1)
         vbox.pack_start(viewport, expand=True, fill=True)
 

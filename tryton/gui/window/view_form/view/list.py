@@ -84,9 +84,18 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         group = record_pos.group
         pos = group.index(record_pos) + offset
         if group is not record.group:
+            prev_group = record.group
             record.group.remove(record, remove=True, force_remove=True)
+            # Don't remove record from previous group
+            # as the new parent will change the parent
+            # This prevents concurrency conflict
+            record.group.record_removed.remove(record)
             group.add(record)
-            record.modified_fields.setdefault(record.parent_name or 'id')
+            if not record.parent_name:
+                record.modified_fields.setdefault(prev_group.parent_name)
+                record.value[prev_group.parent_name] = False
+            else:
+                record.modified_fields.setdefault(record.parent_name)
         group.move(record, pos)
 
     def move_before(self, record, path):
@@ -740,6 +749,8 @@ class ViewList(ParserView):
             if model and iter_:
                 record = model.get_value(iter_, 0)
                 self.screen.current_record = record
+            else:
+                self.screen.current_record = None
 
         elif tree_sel.get_mode() == gtk.SELECTION_MULTIPLE:
             model, paths = tree_sel.get_selected_rows()
@@ -747,6 +758,8 @@ class ViewList(ParserView):
                 iter_ = model.get_iter(paths[0])
                 record = model.get_value(iter_, 0)
                 self.screen.current_record = record
+            else:
+                self.screen.current_record = None
 
         if hasattr(self.widget_tree, 'editable') \
                 and self.widget_tree.editable \
