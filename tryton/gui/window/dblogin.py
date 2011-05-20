@@ -142,8 +142,8 @@ class DBListEditor(object):
         self.dialog.set_default_response(gtk.RESPONSE_ACCEPT)
 
     def run(self, profile_name):
+        self.clear_entries()  # must be done before show_all for windows
         self.dialog.show_all()
-        self.clear_entries()
         model = self.profile_tree.get_model()
         if model:
             for i, row in enumerate(model):
