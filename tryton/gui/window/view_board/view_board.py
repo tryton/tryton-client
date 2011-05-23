@@ -11,9 +11,10 @@ class ViewBoard(object):
 
     def __init__(self, arch, window, context=None):
         self.window = window
+        self.context = context
 
         xml_dom = xml.dom.minidom.parseString(arch)
-        parser = ParserBoard(window)
+        parser = ParserBoard(window, context)
         for node in xml_dom.childNodes:
             if not node.nodeType == node.ELEMENT_NODE:
                 continue

@@ -18,12 +18,12 @@ _ = gettext.gettext
 
 class Action(SignalEvent):
 
-    def __init__(self, window, attrs=None):
+    def __init__(self, window, attrs=None, context=None):
         super(Action, self).__init__()
         self.act_id = int(attrs['name'])
         self._window = window
         self.screen = None
-        self.tree = None
+        self.context = context or {}
 
         try:
             self.action = rpc.execute('model', 'ir.action.act_window', 'read',
@@ -44,7 +44,7 @@ class Action(SignalEvent):
             self.action['view_mode'] = attrs['view_mode']
 
         self.action.setdefault('pyson_domain', '[]')
-        self.context = {'active_id': False, 'active_ids': []}
+        self.context.update({'active_id': False, 'active_ids': []})
         self.context.update(rpc.CONTEXT)
         self.context.update(PYSONDecoder(self.context).decode(
             self.action.get('pyson_context', '{}')))
@@ -217,22 +217,7 @@ class Action(SignalEvent):
         if self.screen:
             self.screen.clear()
             self.screen.load(res_ids)
-        elif self.tree:
-            self.tree.ids = res_ids
-            self.tree.reload()
         return True
-
-    def sig_key_press(self, widget, event):
-        if event.keyval == gtk.keysyms.Left:
-            model, paths = self.tree.view.get_selection()\
-                    .get_selected_rows()
-            for path in paths:
-                self.tree.view.collapse_row(path)
-        elif event.keyval == gtk.keysyms.Right:
-            model, paths = self.tree.view.get_selection()\
-                    .get_selected_rows()
-            for path in paths:
-                self.tree.view.expand_row(path, False)
 
     def _active_changed(self, *args):
         self.signal('active-changed')
@@ -240,8 +225,6 @@ class Action(SignalEvent):
     def _get_active(self):
         if self.screen:
             return common.EvalEnvironment(self.screen.current_record, False)
-        elif self.tree:
-            return {'id': self.tree.sel_id_get()}
 
     active = property(_get_active)
 
