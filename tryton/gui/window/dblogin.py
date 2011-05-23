@@ -421,6 +421,7 @@ class DBLogin(object):
         self.label_host.set_padding(3, 3)
         self.entry_host = gtk.Entry()
         self.entry_host.connect_after('focus-out-event', self.clear_profile_combo)
+        self.entry_host.set_activates_default(True)
         self.table_main.attach(self.label_host, 0, 1, 4, 5, xoptions=gtk.FILL)
         self.table_main.attach(self.entry_host, 1, 3, 4, 5)
         self.label_database = gtk.Label(_('Database:'))
@@ -429,6 +430,7 @@ class DBLogin(object):
         self.label_database.set_padding(3, 3)
         self.entry_database = gtk.Entry()
         self.entry_database.connect_after('focus-out-event', self.clear_profile_combo)
+        self.entry_database.set_activates_default(True)
         self.table_main.attach(self.label_database, 0, 1, 5, 6,
             xoptions=gtk.FILL)
         self.table_main.attach(self.entry_database, 1, 3, 5, 6)
