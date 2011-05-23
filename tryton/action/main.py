@@ -154,7 +154,7 @@ class Action(object):
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
                     email=action.get('email'), name=action.get('name', False),
-                    context=context)
+                    context=context, icon=(action.get('icon.rec_name') or ''))
             else:
                 Wizard.execute(action['wiz_name'], data, window,
                         direct_print=action.get('direct_print', False),

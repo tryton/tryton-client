@@ -16,6 +16,8 @@ class Wizard(SignalEvent):
         super(Wizard, self).__init__()
         self.window = window
         self.widget = gtk.VBox(spacing=3)
+        self.toolbar_box = gtk.HBox()
+        self.widget.pack_start(self.toolbar_box, False, True)
         self.widget.show()
         self.name = name or ''
         self.model = ''
@@ -117,6 +119,9 @@ class Wizard(SignalEvent):
             self.end()
 
     def destroy(self):
+        if self.toolbar_box.get_children():
+            toolbar = self.toolbar_box.get_children()[0]
+            self.toolbar_box.remove(toolbar)
         if hasattr(self, 'screen'):
             self.screen.signal_unconnect(self)
             self.screen.destroy()
@@ -125,7 +130,8 @@ class Wizard(SignalEvent):
 
     def end(self):
         try:
-            rpc.execute('wizard', self.action, 'delete', self.wiz_id)
+            rpc.execute('wizard', self.action, 'delete', self.wiz_id,
+                rpc.CONTEXT)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
         except Exception:
@@ -216,6 +222,8 @@ class Wizard(SignalEvent):
         eb.show()
 
         self.widget.pack_start(eb, expand=False, fill=True, padding=3)
+
+        self.widget.pack_start(self.toolbar_box, False, True)
 
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_NONE)
