@@ -29,10 +29,12 @@ class Window(object):
 
     @staticmethod
     def create_wizard(action, datas, parent, state='init', direct_print=False,
-            email_print=False, email=None, name=False, context=None):
+            email_print=False, email=None, name=False, context=None,
+            icon=None):
         from tryton.gui import Main
         from wizard import Wizard
         win = Wizard(parent, name=name)
+        win.icon = icon
         Main.get_main().win_add(win)
         win.run(action, datas, state=state, direct_print=direct_print,
                 email_print=email_print, email=email, context=context)
