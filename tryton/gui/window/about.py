@@ -9,11 +9,13 @@ from tryton.version import VERSION, WEBSITE
 import webbrowser
 
 COPYRIGHT = '''\
-Copyright (C) 2007-2010 Cédric Krier.
-Copyright (C) 2007-2010 Bertrand Chenal.
-Copyright (C) 2008-2010 B2CK SPRL.
-Copyright (C) 2008-2010 Udo Spallek.
-Copyright (C) 2008-2010 virtual things - Preisler & Spallek GbR.
+Copyright (C) 2010-2011 Nicolas Évrard.
+Copyright (C) 2007-2011 Cédric Krier.
+Copyright (C) 2007-2011 Bertrand Chenal.
+Copyright (C) 2008-2011 B2CK SPRL.
+Copyright (C) 2008-2011 Udo Spallek.
+Copyright (C) 2008-2011 virtual things - Preisler & Spallek GbR.
+Copyright (C) 2007-2009 Lorenzo Gil Sanchez.
 Copyright (C) 2004-2008 Tiny SPRL.
 '''
 AUTHORS = [
@@ -22,7 +24,8 @@ AUTHORS = [
         'Franz Wiesinger',
         'Hartmut Goebel',
         'Korbinian Preisler <info@virtual-things.biz>',
-        'Mathias Behrle',
+        'Mathias Behrle <info@m9s.biz>',
+        'Nicolas Évrard <nicolas.evrard@b2ck.com>',
         'Sednacom <contact@sednacom.fr>',
         'Udo Spallek <info@virtual-things.biz>',
         ]
