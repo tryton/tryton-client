@@ -85,6 +85,7 @@ class DBListEditor(object):
         self.port_entry = gtk.Entry()
         self.port_entry.connect('focus-out-event', self.display_dbwidget)
         self.port_entry.connect('changed', self.update_profiles, 'port')
+        self.port_entry.connect('insert_text', self.insert_text_port)
         self.port_entry.set_activates_default(True)
         table.attach(port, 0, 1, 2, 3, yoptions=False, xoptions=gtk.FILL)
         table.attach(self.port_entry, 1, 2, 2, 3, yoptions=False)
@@ -344,6 +345,15 @@ class DBListEditor(object):
             self.profiles.set(self.current_profile['name'], 'database', dbname)
             self.validate_profile(self.current_profile['name'])
 
+    def insert_text_port(self, entry, new_text, new_text_length, position):
+        value = entry.get_text()
+        position = entry.get_position()
+        new_value = value[:position] + new_text + value[position:]
+        try:
+            int(new_value)
+        except ValueError:
+            entry.stop_emission('insert-text')
+
 
 class DBLogin(object):
     def __init__(self, parent):
@@ -576,6 +586,10 @@ class DBLogin(object):
                 CONFIG['login.profile'] = profile
             host, port = (self.entry_host.get_text().split(':', 1)
                 + ['8070'])[:2]
+            try:
+                port = int(port)
+            except ValueError:
+                continue
             database = self.entry_database.get_text()
             login = self.entry_login.get_text()
             CONFIG['login.server'] = host
@@ -584,7 +598,7 @@ class DBLogin(object):
             CONFIG['login.expanded'] = self.expander.props.expanded
             CONFIG['login.login'] = login
             result = (self.entry_login.get_text(),
-                self.entry_password.get_text(), host, int(port), database)
+                self.entry_password.get_text(), host, port, database)
 
         if res != gtk.RESPONSE_OK:
             parent.present()
