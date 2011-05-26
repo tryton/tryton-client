@@ -321,6 +321,8 @@ class Record(SignalEvent):
         for field_name, field in self.group.fields.iteritems():
             if fields and field_name not in fields:
                 continue
+            if field.get_state_attrs(self).get('readonly', False):
+                continue
             if not field.validate(self, softvalidation):
                 res = False
         return res
