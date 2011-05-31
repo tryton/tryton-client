@@ -5,7 +5,6 @@ from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
         merge, inverse_leaf, EvalEnvironment
 import tryton.common as common
-from tryton.pyson import PYSONDecoder
 import time
 import datetime
 from decimal import Decimal
