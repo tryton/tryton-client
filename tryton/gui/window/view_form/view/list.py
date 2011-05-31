@@ -818,23 +818,22 @@ class ViewList(ParserView):
             value = 0.0
             value_selected = 0.0
             loaded = True
+            child_fieldname = self.children[child][0]
             for record in self.screen.group:
                 if not record.loaded:
                     loaded = False
                     break
+                field_value = record.fields_get()[child_fieldname].get(record,
+                    check_load=False)
                 if record.id in ids or not ids:
                     if not value_selected:
-                        value_selected = record.fields_get()[self.children[child][0]]\
-                                .get(record, check_load=False)
+                        value_selected = field_value
                     else:
-                        value_selected += record.fields_get()[self.children[child][0]]\
-                                .get(record, check_load=False)
+                        value_selected += field_value
                 if not value:
-                    value = record.fields_get()[self.children[child][0]]\
-                            .get(record, check_load=False)
+                    value = field_value
                 else:
-                    value += record.fields_get()[self.children[child][0]]\
-                            .get(record, check_load=False)
+                    value += field_value
 
             if loaded:
                 label_str = locale.format('%.' + str(self.children[child][3]) + 'f',
