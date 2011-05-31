@@ -5,7 +5,6 @@ import gobject
 from interface import WidgetInterface
 import tryton.rpc as rpc
 import tryton.common as common
-from tryton.pyson import PYSONDecoder
 
 
 class Selection(WidgetInterface):
