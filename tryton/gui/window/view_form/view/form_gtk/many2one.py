@@ -150,7 +150,8 @@ class Many2One(WidgetInterface):
         context = self.field.context_get(self.record)
         return Screen(self.attrs['relation'], self.window, domain=domain,
                 context=context, mode=['form'],
-                views_preload=self.attrs.get('views', {}))
+                views_preload=self.attrs.get('views', {}),
+                readonly=self._readonly)
 
     def sig_new(self, *args):
         self.focus_out = False
