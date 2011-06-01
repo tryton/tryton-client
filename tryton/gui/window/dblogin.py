@@ -526,6 +526,8 @@ class DBLogin(object):
         host, port = host_entry.split(':', 1) if ':' in host_entry else ('', '')
         database = self.entry_database.get_text().strip()
         for idx, profile_info in enumerate(self.profile_store):
+            if not profile_info[1]:
+                continue
             profile = profile_info[0]
             if (host == self.profiles.get(profile, 'host')
                     and port == self.profiles.get(profile, 'port')
