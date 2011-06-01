@@ -820,7 +820,7 @@ class ViewList(ParserView):
             loaded = True
             child_fieldname = self.children[child][0]
             for record in self.screen.group:
-                if not record.loaded:
+                if not record.get_loaded([child_fieldname]):
                     loaded = False
                     break
                 field_value = record.fields_get()[child_fieldname].get(record,
