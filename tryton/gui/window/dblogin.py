@@ -490,7 +490,7 @@ class DBLogin(object):
             self.profiles.write(configfile)
 
         for idx, row in enumerate(self.profile_store):
-            if row[0] == profile_name:
+            if row[0] == profile_name and row[1]:
                 self.combo_profile.set_active(idx)
                 self.profile_changed(self.combo_profile)
                 break
