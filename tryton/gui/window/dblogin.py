@@ -490,7 +490,7 @@ class DBLogin(object):
             self.profiles.write(configfile)
 
         for idx, row in enumerate(self.profile_store):
-            if row[0] == profile_name:
+            if row[0] == profile_name and row[1]:
                 self.combo_profile.set_active(idx)
                 self.profile_changed(self.combo_profile)
                 break
@@ -526,6 +526,8 @@ class DBLogin(object):
         host, port = host_entry.split(':', 1) if ':' in host_entry else ('', '')
         database = self.entry_database.get_text().strip()
         for idx, profile_info in enumerate(self.profile_store):
+            if not profile_info[1]:
+                continue
             profile = profile_info[0]
             if (host == self.profiles.get(profile, 'host')
                     and port == self.profiles.get(profile, 'port')
