@@ -121,6 +121,7 @@ class Action(object):
             }
             ctx.update(rpc.CONTEXT)
             eval_ctx = ctx.copy()
+            eval_ctx['_user'] = rpc._USER
             action_ctx = PYSONDecoder(eval_ctx).decode(
                     action.get('pyson_context') or '{}')
             ctx.update(action_ctx)
@@ -128,10 +129,12 @@ class Action(object):
 
             domain_context = ctx.copy()
             domain_context['context'] = ctx
+            domain_context['_user'] = rpc._USER
             domain = PYSONDecoder(domain_context).decode(action['pyson_domain'])
 
             search_context = ctx.copy()
             search_context['context'] = ctx
+            search_context['_user'] = rpc._USER
             search_value = PYSONDecoder(search_context).decode(
                     action['pyson_search_value'] or '{}')
 

@@ -46,6 +46,7 @@ class Action(SignalEvent):
         self.action.setdefault('pyson_domain', '[]')
         self.context.update({'active_id': False, 'active_ids': []})
         self.context.update(rpc.CONTEXT)
+        self.context['_user'] = rpc._USER
         self.context.update(PYSONDecoder(self.context).decode(
             self.action.get('pyson_context', '{}')))
 
@@ -231,6 +232,7 @@ class Action(SignalEvent):
     def update_domain(self, actions):
         domain_ctx = self.context.copy()
         domain_ctx['context'] = domain_ctx
+        domain_ctx['_user'] = rpc._USER
         for action in actions:
             if action.active:
                 domain_ctx['_active_%s' % action.act_id] = action.active

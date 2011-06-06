@@ -710,7 +710,10 @@ class Selection(Char):
         if not self.attrs.get('domain'):
             domain = []
         else:
-            domain = PYSONDecoder(rpc.CONTEXT).decode(self.attrs['domain'])
+            context = rpc.CONTEXT.copy()
+            context['context'] = context.copy()
+            context['_user'] = rpc._USER
+            domain = PYSONDecoder(context).decode(self.attrs['domain'])
         if 'relation' in self.attrs:
             args = ('model', self.attrs['relation'], 'search_read',
                     domain, 0, None, None, ['rec_name'], rpc.CONTEXT)

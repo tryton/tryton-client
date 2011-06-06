@@ -352,11 +352,13 @@ class Graph(gtk.DrawingArea):
                 key = yfield.get('key', yfield['name'])
                 self.datas[x].setdefault(key, 0.0)
                 if yfield.get('domain'):
-                    values = rpc.CONTEXT.copy()
-                    values['state'] = 'draft'
+                    context = rpc.CONTEXT.copy()
+                    context['context'] = context.copy()
+                    context['_user'] = rpc._USER
                     for field in model.group.fields:
-                        values[field] = model[field].get(model, check_load=False)
-                    if not PYSONDecoder(values).decode(yfield['domain']):
+                        context[field] = model[field].get(model,
+                            check_load=False)
+                    if not PYSONDecoder(context).decode(yfield['domain']):
                         continue
                 if yfield['name'] == '#':
                     self.datas[x][key] += 1
