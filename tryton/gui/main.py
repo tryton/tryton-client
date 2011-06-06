@@ -87,8 +87,9 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
                 gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/User/Menu Reload', gtk.keysyms.T,
-                gtk.gdk.MOD1_MASK)
+        if os.name != 'mac':
+            gtk.accel_map_add_entry('<tryton>/User/Menu Reload', gtk.keysyms.T,
+                    gtk.gdk.MOD1_MASK)
         gtk.accel_map_add_entry('<tryton>/User/Menu Toggle', gtk.keysyms.T,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/User/Home', gtk.keysyms.H,
