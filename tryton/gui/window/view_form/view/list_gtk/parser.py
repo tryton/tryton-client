@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 
+import gobject
 from editabletree import EditableTreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
@@ -704,71 +705,88 @@ class Selection(Char):
     def __init__(self, *args):
         super(Selection, self).__init__(*args)
         self.renderer = CellRendererCombo()
-        selection_data = gtk.ListStore(str, str)
+        self.renderer.connect('editing-started', self.editing_started)
+        self._last_domain = None
+        self._domain_cache = {}
         selection = self.attrs.get('selection', [])[:]
-        self.selection = selection[:]
-        if not self.attrs.get('domain'):
-            domain = []
-        else:
-            context = rpc.CONTEXT.copy()
-            context['context'] = context.copy()
-            context['_user'] = rpc._USER
-            domain = PYSONDecoder(context).decode(self.attrs['domain'])
-        if 'relation' in self.attrs:
-            args = ('model', self.attrs['relation'], 'search_read',
-                    domain, 0, None, None, ['rec_name'], rpc.CONTEXT)
+        if not isinstance(selection, (list, tuple)):
             try:
-                result = rpc.execute(*args)
+                selection = rpc.execute('model',
+                        self.model_name, selection, rpc.CONTEXT)
             except Exception, exception:
-                result = common.process_exception(exception, self.window, *args)
-                if not result:
-                    result = []
-            selection = [(x['id'], x['rec_name']) for x in result]
-            self.selection = selection[:]
-        else:
-            if not isinstance(selection, (list, tuple)):
-                try:
-                    selection = rpc.execute('model',
-                            self.model_name, selection, rpc.CONTEXT)
-                except Exception, exception:
-                    common.process_exception(exception, self.window)
-                    selection = []
-                self.selection = selection[:]
-
-            for dom in common.filter_domain(domain):
-                if dom[1] in ('=', '!='):
-                    todel = []
-                    for i in xrange(len(selection)):
-                        if (dom[1] == '=' \
-                                and selection[i][0] != dom[2]) \
-                                or (dom[1] == '!=' \
-                                and selection[i][0] == dom[2]):
-                            todel.append(i)
-                    for i in todel[::-1]:
-                        del selection[i]
-
+                common.process_exception(exception, self.window)
+                selection = []
+        self.selection = selection[:]
         if self.attrs.get('sort', True):
             selection.sort(lambda x, y: cmp(x[1], y[1]))
-        self._selection = selection
-        for i in selection:
-            selection_data.append(i)
-        self.renderer.set_property('model', selection_data)
-        self.renderer.set_property('text-column', 1)
+        self.renderer.set_property('model', self.get_model(selection))
+        self.renderer.set_property('text-column', 0)
+
+    def get_model(self, selection):
+        model = gtk.ListStore(gobject.TYPE_STRING)
+        self._selection = {}
+        lst = []
+        for (value, name) in selection:
+            name = str(name)
+            lst.append(name)
+            self._selection[name] = value
+            i = model.append()
+            model.set(i, 0, name)
+        return model
 
     def get_textual_value(self, record):
+        self.update_selection(record)
         value = record[self.field_name].get(record)
         if isinstance(value, (list, tuple)):
             value = value[0]
         return dict(self.selection).get(value, '')
 
     def value_from_text(self, record, text):
-        res = False
-        for val, txt in self._selection:
-            if txt[:len(text)].lower() == text.lower():
-                if len(txt) == len(text):
-                    return val
-                res = val
-        return res
+        return self._selection.get(text, False), text
+
+    def editing_started(self, cell, editable, path):
+        store = self.treeview.get_model()
+        record = store.get_value(store.get_iter(path), 0)
+        self.update_selection(record)
+        model = self.get_model(self.selection)
+        editable.set_model(model)
+        editable.set_text_column(0)
+        completion = gtk.EntryCompletion()
+        #Only available in PyGTK 2.6 and above.
+        if hasattr(completion, 'set_inline_selection'):
+            completion.set_inline_selection(True)
+        completion.set_model(model)
+        editable.get_child().set_completion(completion)
+        completion.set_text_column(0)
+        return False
+
+    def update_selection(self, record):
+        if 'relation' not in self.attrs:
+            return
+        field = record[self.field_name]
+        domain = field.domain_get(record)
+        if str(domain) in self._domain_cache:
+            self.selection = self._domain_cache[str(domain)]
+            self._last_domain = domain
+        if domain != self._last_domain:
+            args = ('model', self.attrs['relation'], 'search_read', domain,
+                0, None, None, ['rec_name'], rpc.CONTEXT)
+            try:
+                result = rpc.execute(*args)
+            except Exception, exception:
+                result = common.process_exception(exception, self.window, *args)
+
+            if isinstance(result, list):
+                selection = [(x['id'], x['rec_name']) for x in result]
+                selection.append((False, ''))
+                self._last_domain = domain
+                self._domain_cache[str(domain)] = selection
+            else:
+                selection = []
+                self._last_domain = None
+        else:
+            selection = self.selection
+        self.selection = selection[:]
 
 
 class Reference(Char):
