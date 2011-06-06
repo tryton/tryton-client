@@ -128,6 +128,10 @@ def find_in_path(name):
             return val
     return name
 
+def test_server_version(host, port):
+    version = rpc.server_version(host, port)
+    return version.split('.')[:2] == VERSION.split('.')[:2]
+
 def refresh_dblist(host, port):
     '''
     Return the number of database available
@@ -135,10 +139,8 @@ def refresh_dblist(host, port):
         or -1 if the server version doesn't match the client version
     '''
     rpc.logout()
-    version = rpc.server_version(host, port)
-    if hasattr(version, 'split'):
-        if version.split('.')[:2] != VERSION.split('.')[:2]:
-            return -1
+    if not test_server_version(host, port):
+        return -1
     return rpc.db_list(host, port)
 
 def refresh_langlist(lang_widget, host, port):

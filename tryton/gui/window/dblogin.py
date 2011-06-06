@@ -594,6 +594,8 @@ class DBLogin(object):
                 port = int(port)
             except ValueError:
                 continue
+            if not common.test_server_version(host, port):
+                continue
             database = self.entry_database.get_text()
             login = self.entry_login.get_text()
             CONFIG['login.server'] = host
