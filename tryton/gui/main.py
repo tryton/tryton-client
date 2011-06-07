@@ -1103,6 +1103,8 @@ class Main(object):
         self.notebook.set_current_page(page - 1)
 
     def sig_user_preferences(self, widget):
+        if not self.close_pages():
+            return False
         win = Preference(rpc._USER, self.window)
         if win.run():
             rpc.context_reload()
@@ -1124,6 +1126,7 @@ class Main(object):
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         self.window.present()
+        self.sig_win_menu()
         return True
 
     def sig_win_close(self, widget):
@@ -1193,6 +1196,7 @@ class Main(object):
         except Exception, exception:
             common.process_exception(exception, self.window)
             return
+        rpc.context_reload()
         self.refresh_ssl()
         if log_response > 0:
             try:
@@ -1235,7 +1239,13 @@ class Main(object):
             self.open_url(url)
         return True
 
-    def sig_logout(self, widget, disconnect=True):
+    def close_pages(self):
+        if self.notebook.get_n_pages():
+            if not common.sur(
+                    _('The following action requires to close all tabs.\n'
+                    'Do you want to continue?'),
+                    parent=self.window):
+                return False
         res = True
         while res:
             wid = self.get_page()
@@ -1254,6 +1264,11 @@ class Main(object):
         if self.menu_screen:
             self.menu_screen.destroy()
             self.menu_screen = None
+        return True
+
+    def sig_logout(self, widget, disconnect=True):
+        if not self.close_pages():
+            return False
         self.sb_username.set_text('')
         self.sb_servername.set_text('')
         self.sb_requests.set_text('')
@@ -1373,12 +1388,9 @@ class Main(object):
         cls.tryton_client.quit_mainloop()
 
     def sig_close(self, widget):
-        if common.sur(_("Do you really want to quit?"), parent=self.window):
-            if not self.sig_logout(widget):
-                return False
-            Main.sig_quit()
-        else:
-            return True
+        if not self.sig_logout(widget):
+            return False
+        Main.sig_quit()
 
     def sig_delete(self, widget, event):
         if common.sur(_("Do you really want to quit?"), parent=self.window):

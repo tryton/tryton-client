@@ -157,7 +157,6 @@ def login(username, password, host, port, database):
     _SESSION = res[1]
     _DATABASE = database
     SECURE = _SOCK.ssl
-    context_reload()
     IPCServer(host, port, database).run()
     return 1
 
