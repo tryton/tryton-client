@@ -2,6 +2,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 
+from __future__ import with_statement
 from setuptools import setup, find_packages
 import os
 import glob
@@ -212,9 +213,12 @@ if os.name == 'nt':
         query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
             stdout=PIPE).stdout.read()
         query_loaders = query_loaders.replace(gtk_dir.replace(os.sep, '/') + '/', '')
-        loaders = open(os.path.join(dist_dir, 'etc', 'gtk-2.0', 'gdk-pixbuf.loaders'), 'w')
-        loaders.writelines([line + "\n" for line in query_loaders.split(os.linesep)])
-        loaders.close()
+
+        loaders_path = os.path.join(dist_dir, 'etc', 'gtk-2.0',
+                'gdk-pixbuf.loaders')
+        with open(loaders_path, 'w') as loaders:
+            loaders.writelines([line + "\n" for line in
+                    query_loaders.split(os.linesep)])
 
         if os.path.isdir(os.path.join(dist_dir, 'lib')):
             shutil.rmtree(os.path.join(dist_dir, 'lib'))
@@ -277,14 +281,13 @@ elif os.name == 'mac' \
         query_pango = Popen(os.path.join(gtk_dir, 'bin', 'pango-querymodules'),
                 stdout=PIPE).stdout.read()
         query_pango = query_pango.replace(gtk_dir, '@executable_path/../Resources')
-        pango_modules = open(os.path.join(resources_dir, 'pango.modules'), 'w')
-        pango_modules.write(query_pango)
-        pango_modules.close()
+        pango_modules_path = os.path.join(resources_dir, 'pango.modules')
+        with open(pango_modules_path, 'w') as pango_modules:
+            pango_modules.write(query_pango)
 
-        pangorc = open(os.path.join(resources_dir, 'pangorc'), 'w')
-        pangorc.write('[Pango]\n')
-        pangorc.write('ModuleFiles=./pango.modules\n')
-        pangorc.close()
+        with open(os.path.join(resources_dir, 'pangorc'), 'w') as pangorc:
+            pangorc.write('[Pango]\n')
+            pangorc.write('ModuleFiles=./pango.modules\n')
 
         if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders')):
             shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'loaders'))
@@ -299,9 +302,10 @@ elif os.name == 'mac' \
         query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
                 stdout=PIPE).stdout.read()
         query_loaders = query_loaders.replace(gtk_dir, '@executable_path/../Resources')
-        loaders = open(os.path.join(resources_dir, 'gdk-pixbuf.loaders'), 'w')
-        loaders.write(query_loaders)
-        loaders.close()
+
+        loaders_path = os.path.join(resources_dir, 'gdk-pixbuf.loaders')
+        with open(loaders_path, 'w') as loaders:
+            loaders.write(query_loaders)
 
         if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules')):
             shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules'))
@@ -311,9 +315,10 @@ elif os.name == 'mac' \
         query_immodules = Popen(os.path.join(gtk_dir, 'bin', 'gtk-query-immodules-2.0'),
                 stdout=PIPE).stdout.read()
         query_immodules = query_immodules.replace(gtk_dir, '@executable_path/../Resources')
-        immodules = open(os.path.join(resources_dir, 'gtk.immodules'), 'w')
-        immodules.write(query_immodules)
-        immodules.close()
+
+        immodules_path = os.path.join(resources_dir, 'gtk.immodules')
+        with open(immodules_path, 'w') as immodules:
+            immodules.write(query_immodules)
 
         shutil.copy(os.path.join(gtk_dir, 'share', 'themes', 'Clearlooks',
             'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))

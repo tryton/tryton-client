@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
 import time
 import datetime
 import tryton.rpc as rpc
@@ -58,9 +59,8 @@ class Action(object):
         fp_name = os.path.join(dtemp,
                 name.replace(os.sep, '_').replace(os.altsep or os.sep, '_') \
                         + os.extsep + type)
-        file_d = open(fp_name, 'wb')
-        file_d.write(base64.decodestring(data))
-        file_d.close()
+        with open(fp_name, 'wb') as file_d:
+            file_d.write(base64.decodestring(data))
         if email_print:
             mailto(to=email.get('to'), cc=email.get('cc'),
                     subject=email.get('subject'), body=email.get('body'),
