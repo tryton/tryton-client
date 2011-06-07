@@ -50,6 +50,7 @@ class ConfigManager(object):
         short_version = '.'.join(VERSION.split('.', 2)[:2])
         demo_server = 'demo%s.tryton.org' % short_version
         demo_database = 'demo%s' % short_version
+        form_tab = 'left' if os.name != 'nt' else 'top'
         self.defaults = {
             'login.profile': demo_server,
             'login.login': 'demo',
@@ -68,7 +69,7 @@ class ConfigManager(object):
             'client.default_height': 750,
             'client.modepda': False,
             'client.toolbar': 'default',
-            'client.form_tab': 'left',
+            'client.form_tab': form_tab,
             'client.maximize': False,
             'client.save_width_height': True,
             'client.spellcheck': False,
