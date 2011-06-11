@@ -48,6 +48,8 @@ data_files=[
         glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
     ('share/locale/ru_RU/LC_MESSAGES',
         glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
+    ('share/locale/sl_SI/LC_MESSAGES',
+        glob.glob('share/locale/sl_SI/LC_MESSAGES/*.mo')),
     ('share/locale/ja_JP/LC_MESSAGES',
         glob.glob('share/locale/ja_JP/LC_MESSAGES/*.mo')),
 ]
