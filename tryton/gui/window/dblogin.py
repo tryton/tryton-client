@@ -505,6 +505,8 @@ class DBLogin(object):
         except ConfigParser.NoOptionError:
             username = ''
         host = self.profiles.get(profile, 'host')
+        if ':' in host:
+            host = '[%s]' % host
         port = self.profiles.get(profile, 'port')
         self.entry_host.set_text('%s:%s' % (host, port))
         self.entry_database.set_text(self.profiles.get(profile, 'database'))
@@ -522,8 +524,13 @@ class DBLogin(object):
         self.move_active = True
 
     def clear_profile_combo(self, entry, event):
-        host_entry = self.entry_host.get_text()
-        host, port = host_entry.split(':', 1) if ':' in host_entry else ('', '')
+        netloc = self.entry_host.get_text()
+        host = self.get_hostname(netloc)
+        try:
+            port = str(self.get_port(netloc))
+        except ValueError:
+            host = ''
+            port = ''
         database = self.entry_database.get_text().strip()
         for idx, profile_info in enumerate(self.profile_store):
             if not profile_info[1]:
@@ -544,6 +551,21 @@ class DBLogin(object):
         self.entry_database.props.visible = visibility
         self.label_database.props.visible = visibility
 
+    def get_hostname(self, netloc):
+        if '[' in netloc and ']' in netloc:
+            return netloc.split(']')[0][1:]
+        elif ':' in netloc:
+            return netloc.split(':')[0]
+        else:
+            return netloc
+
+    def get_port(self, netloc):
+        netloc = netloc.split(']')[-1]
+        if ':' in netloc:
+            return int(netloc.split(':')[1])
+        else:
+            return 8070
+
     def run(self, parent):
         profile_name = CONFIG['login.profile']
         can_use_profile = self.profiles.has_section(profile_name)
@@ -562,7 +584,11 @@ class DBLogin(object):
                     break
         else:
             self.combo_profile.set_active(-1)
-            self.entry_host.set_text('%s:%s' % (CONFIG['login.server'],
+            if ':' in CONFIG['login.server']:
+                host = '[%s]' % CONFIG['login.server']
+            else:
+                host = CONFIG['login.server']
+            self.entry_host.set_text('%s:%s' % (host,
                 CONFIG['login.port']))
             db = CONFIG['login.db'] if CONFIG['login.db'] else ''
             self.entry_database.set_text(db)
@@ -588,12 +614,16 @@ class DBLogin(object):
             if active_profile != -1:
                 profile = self.profile_store[active_profile][0]
                 CONFIG['login.profile'] = profile
-            host, port = (self.entry_host.get_text().split(':', 1)
-                + ['8070'])[:2]
+            netloc = self.entry_host.get_text()
+            host = self.get_hostname(netloc)
             try:
-                port = int(port)
+                port = self.get_port(netloc)
             except ValueError:
                 continue
+            if ':' in host:
+                hostname = '[%s]' % host
+            else:
+                hostname = host
             if not common.test_server_version(host, port):
                 continue
             database = self.entry_database.get_text()
