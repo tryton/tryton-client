@@ -130,6 +130,8 @@ def find_in_path(name):
 
 def test_server_version(host, port):
     version = rpc.server_version(host, port)
+    if not version:
+        return False
     return version.split('.')[:2] == VERSION.split('.')[:2]
 
 def refresh_dblist(host, port):
