@@ -8,6 +8,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.config import CONFIG
+from tryton.exceptions import TrytonServerError
 import tryton.common as common
 import tryton.rpc as rpc
 import pango
@@ -307,7 +308,7 @@ class One2Many(WidgetInterface):
                 dom = ['OR', domain, ('id', 'in', removed_ids)]
             ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
                     0, CONFIG['client.limit'], None, context)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return False
         if len(ids) != 1:

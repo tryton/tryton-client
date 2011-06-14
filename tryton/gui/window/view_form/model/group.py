@@ -6,6 +6,7 @@ from record import Record
 from field import Field, O2MField
 from tryton.signal_event import SignalEvent
 import tryton.common as common
+from tryton.exceptions import TrytonServerError
 
 
 class Group(SignalEvent, list):
@@ -159,7 +160,7 @@ class Group(SignalEvent, list):
             args = ('model', self.model_name, fnct, ids, self.context)
             try:
                 res += rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 res2 = common.process_exception(exception, self.window, *args)
                 if not res2:
                     return False
@@ -352,7 +353,7 @@ class Group(SignalEvent, list):
             args = ('model', self.model_name, 'default_get', to_add.keys(), ctx)
             try:
                 values = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 values = common.process_exception(exception, self.window, *args)
                 if not values:
                     return False

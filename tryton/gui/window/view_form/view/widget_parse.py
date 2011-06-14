@@ -9,6 +9,7 @@ from form import ViewForm
 from list import ViewList
 from graph import ViewGraph
 #from calendar import ViewCalendar
+from tryton.exceptions import TrytonError
 
 PARSERS = {
     'form': form_gtk.ParserForm,
@@ -46,5 +47,5 @@ class WidgetParse(ParserInterface):
                 widget = res
                 break
             else:
-                raise Exception('Unknow view mode: %s' % node.localName)
+                raise TrytonError('Unknow view mode: %s' % node.localName)
         return widget

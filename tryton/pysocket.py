@@ -19,6 +19,8 @@ except ImportError:
     import sha
 import os
 
+from tryton.exceptions import TrytonError, TrytonServerError
+
 DNS_CACHE = {}
 MAX_SIZE = 999999999
 MAX_LENGHT = len(str(MAX_SIZE))
@@ -68,7 +70,7 @@ class PySocket:
                         socket.SOCK_STREAM)
                 self.sock.settimeout(CONNECT_TIMEOUT)
                 self.sock.connect((host, int(port)))
-            except Exception:
+            except socket.error:
                 self.sock = None
         if self.sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,7 +85,7 @@ class PySocket:
                     sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
                     sock.settimeout(CONNECT_TIMEOUT)
                     sock.connect((host, int(port)))
-                except Exception:
+                except socket.error:
                     sock = None
             if sock is None:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,7 +97,7 @@ class PySocket:
             elif hasattr(socket, 'ssl'):
                 ssl_sock = socket.ssl(sock)
                 self.ssl = True
-        except Exception:
+        except socket.error:
             pass
         self.sock.settimeout(TIMEOUT)
         fingerprint = None
@@ -108,7 +110,7 @@ class PySocket:
                 self.ssl_sock = socket.ssl(self.sock, certfile=self.ca_certs)
             try:
                 peercert = self.ssl_sock.getpeercert(True)
-            except Exception:
+            except socket.error:
                 peercert = None
             def format_hash(value):
                 return reduce(lambda x, (i, y): x + y.upper() +
@@ -128,7 +130,7 @@ class PySocket:
             if key in self.fingerprints:
                 if self.fingerprints[key] != fingerprint:
                     self.disconnect()
-                    raise Exception('BadFingerprint')
+                    raise TrytonError('BadFingerprint')
             elif fingerprint:
                 self.fingerprints[key] = fingerprint
 
@@ -145,10 +147,10 @@ class PySocket:
                     sock.sock_shutdown(shutdown_value)
                 else:
                     sock.shutdown(shutdown_value)
-            except Exception:
+            except socket.error:
                 pass
             sock.close()
-        except Exception:
+        except socket.error:
             pass
         self.sock = None
         self.ssl = False
@@ -182,7 +184,7 @@ class PySocket:
             while totalsent < size:
                 sent = self.ssl_sock.write(msg[totalsent:])
                 if sent == 0:
-                    raise RuntimeError, "socket connection broken"
+                    raise RuntimeError("socket connection broken")
                 totalsent = totalsent + sent
         else:
             self.sock.sendall(msg)
@@ -198,18 +200,18 @@ class PySocket:
             else:
                 chunk = self.sock.recv(chunk_size)
             if chunk == '':
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
             L.append(chunk)
             size_remaining -= len(chunk)
             if ' ' in chunk:
                 break
         if size_remaining < 0:
-            raise RuntimeError, "socket connection broken"
+            raise RuntimeError("socket connection broken")
         buf += ''.join(L)
         size, msg = buf.split(' ', 1)
         size = int(size)
         if size > MAX_SIZE:
-            raise RuntimeError, "socket connection broken"
+            raise RuntimeError("socket connection broken")
         while len(msg) < 2:
             chunk_size = min(size + 2, 4096)
             if self.ssl:
@@ -217,7 +219,7 @@ class PySocket:
             else:
                 msg += self.sock.recv(chunk_size)
             if msg == '':
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
         exception = msg[0] != "0"
         gzip_p = msg[1] != "0"
         L = [msg[2:]]
@@ -229,7 +231,7 @@ class PySocket:
             else:
                 chunk = self.sock.recv(chunk_size)
             if chunk == '':
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
             L.append(chunk)
             size_remaining -= len(chunk)
         msg = ''.join(L)
@@ -248,6 +250,6 @@ class PySocket:
         unpickler.find_global = checkfunction
         res = unpickler.load()
         if exception:
-            raise Exception(*(list(res[0]) + [res[1]]))
+            raise TrytonServerError(*(list(res[0]) + [res[1]]))
         else:
             return res[0]

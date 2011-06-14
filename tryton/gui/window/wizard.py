@@ -7,6 +7,7 @@ import tryton.rpc as rpc
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui import Main
+from tryton.exceptions import TrytonServerError
 
 
 class Wizard(SignalEvent):
@@ -53,7 +54,7 @@ class Wizard(SignalEvent):
         args = ('wizard', action, 'create', rpc.CONTEXT)
         try:
             self.wiz_id = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             self.wiz_id = common.process_exception(exception, self.window, *args)
             if not self.wiz_id:
                 return
@@ -72,7 +73,7 @@ class Wizard(SignalEvent):
                 self.window)
             try:
                 res = rpcprogress.run()
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 break
             if not res:
@@ -134,7 +135,7 @@ class Wizard(SignalEvent):
                 rpc.CONTEXT)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
-        except Exception:
+        except TrytonServerError:
             pass
         Main.get_main()._win_del(self.widget)
 

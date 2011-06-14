@@ -7,6 +7,7 @@ from tryton.signal_event import SignalEvent
 import tryton.rpc as rpc
 from tryton.gui.window.view_board import ViewBoard
 import tryton.common as common
+from tryton.exceptions import TrytonServerError
 
 
 class Board(SignalEvent):
@@ -19,7 +20,7 @@ class Board(SignalEvent):
         try:
             view = rpc.execute('model', 'ir.ui.view', 'read',
                     view_id, ['arch'], context)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, window)
             raise
 

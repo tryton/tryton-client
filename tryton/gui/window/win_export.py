@@ -5,6 +5,7 @@ import gobject
 import gettext
 import tryton.common as common
 import tryton.rpc as rpc
+from tryton.exceptions import TrytonServerError
 import types
 from tryton.config import TRYTON_ICON
 import csv
@@ -239,7 +240,7 @@ class WinExport(object):
         args = ('model', model, 'fields_get', None, rpc.CONTEXT)
         try:
             return rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             return common.process_exception(exception, self.parent, *args)
 
     def on_row_expanded(self, treeview, iter, path):
@@ -277,7 +278,7 @@ class WinExport(object):
                 [('resource', '=', self.model)], 0, None, None, rpc.CONTEXT)
         try:
             export_ids = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             export_ids = common.process_exception(exception, self.parent,
                     *args)
             if not export_ids:
@@ -285,7 +286,7 @@ class WinExport(object):
         args = ('model', 'ir.export', 'read', export_ids, None, rpc.CONTEXT)
         try:
             exports = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             exports = common.process_exception(exception, self.parent, *args)
             if not exports:
                 return
@@ -294,7 +295,7 @@ class WinExport(object):
                 rpc.CONTEXT)
         try:
             lines = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             lines = common.process_exception(exception, self.parent, *args)
             if not lines:
                 return
@@ -327,7 +328,7 @@ class WinExport(object):
             }, rpc.CONTEXT)
         try:
             new_id = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             new_ids = common.process_exception(exception, self.dialog, *args)
             if not new_id:
                 return
@@ -348,7 +349,7 @@ class WinExport(object):
         args = ('model', 'ir.export', 'delete', export_id, rpc.CONTEXT)
         try:
             rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             if not common.process_exception(exception, self.dialog, *args):
                 return
         for i in range(len(self.predef_model)):
@@ -434,7 +435,7 @@ class WinExport(object):
                     common.message(_('%d records saved!') % len(result),
                             self.parent)
             return True
-        except Exception, exception:
+        except IOError, exception:
             common.warning(_("Operation failed!\nError message:\n%s") \
                      % (exception[0],), self.parent, _('Error'))
             return False
@@ -447,7 +448,7 @@ class WinExport(object):
         try:
             datas = rpc.execute('model', model,
                     'export_data', ids, fields, ctx)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.dialog)
             return []
         return datas

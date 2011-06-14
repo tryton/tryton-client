@@ -4,6 +4,7 @@ from __future__ import with_statement
 
 import gtk
 import gobject
+import glib
 import pango
 import gettext
 import os
@@ -37,6 +38,12 @@ except ImportError:
     ssl = None
 import dis
 from threading import Lock, Semaphore
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
+from tryton.exceptions import TrytonServerError, TrytonError
 
 _ = gettext.gettext
 
@@ -59,7 +66,7 @@ class TrytonIconFactory(gtk.IconFactory):
             try:
                 pixbuf = gtk.gdk.pixbuf_new_from_file(
                         os.path.join(PIXMAPS_DIR, fname).decode('utf-8'))
-            except Exception:
+            except IOError:
                 continue
             icon_set = gtk.IconSet(pixbuf)
             self.add(name, icon_set)
@@ -74,7 +81,7 @@ class TrytonIconFactory(gtk.IconFactory):
         try:
             icons = rpc.execute('model', 'ir.ui.icon', 'list_icons',
                 rpc.CONTEXT)
-        except Exception:
+        except TrytonServerError:
             icons = []
         for icon_id, icon_name in icons:
             if refresh and icon_name in self._loaded_icons:
@@ -96,7 +103,7 @@ class TrytonIconFactory(gtk.IconFactory):
         try:
             icons = rpc.execute('model', 'ir.ui.icon', 'read', ids,
                 ['name', 'icon'], rpc.CONTEXT)
-        except Exception:
+        except TrytonServerError:
             icons = []
         for icon in icons:
             # svg file cannot be loaded from data into a pixbuf
@@ -314,7 +321,7 @@ def file_selection(title, filename='', parent=None,
                 sys.getfilesystemencoding().encode('utf-8')), 128, 128)
             img.set_from_pixbuf(pixbuf)
             have_preview = True
-        except Exception:
+        except (IOError, glib.GError):
             have_preview = False
         win.set_preview_widget_active(have_preview)
         return
@@ -337,7 +344,7 @@ def file_selection(title, filename='', parent=None,
                 CONFIG['client.default_path'] = \
                         os.path.dirname(filepath)
                 CONFIG.save()
-            except Exception:
+            except IOError:
                 pass
         parent.present()
         win.destroy()
@@ -349,7 +356,7 @@ def file_selection(title, filename='', parent=None,
             try:
                 CONFIG['client.default_path'] = \
                         os.path.dirname(filenames[0])
-            except Exception:
+            except IOError:
                 pass
         parent.present()
         win.destroy()
@@ -361,20 +368,19 @@ def file_open(filename, type, parent, print_p=False):
         if print_p:
             operation = 'print'
         try:
-            os.startfile(os.path.normpath(filename), operation)
-        except Exception:
-            # Try without operation, it is not supported on version < 2.5
-            try:
+            if sys.version_info[:2] >= (2, 5):
+                os.startfile(os.path.normpath(filename), operation)
+            else:
                 os.startfile(os.path.normpath(filename))
-            except Exception:
-                save_name = file_selection(_('Save As...'), parent=parent,
-                        action=gtk.FILE_CHOOSER_ACTION_SAVE)
-                if save_name:
-                    file_p = open(filename, 'rb')
-                    save_p = open(save_name, 'wb+')
-                    save_p.write(file_p.read())
-                    save_p.close()
-                    file_p.close()
+        except WindowsError:
+            save_name = file_selection(_('Save As...'), parent=parent,
+                    action=gtk.FILE_CHOOSER_ACTION_SAVE)
+            if save_name:
+                file_p = open(filename, 'rb')
+                save_p = open(save_name, 'wb+')
+                save_p.write(file_p.read())
+                save_p.close()
+                file_p.close()
         return
     elif os.name == 'mac' or \
             (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
@@ -384,7 +390,7 @@ def file_open(filename, type, parent, print_p=False):
             if not pid:
                 try:
                     os.execv('/usr/bin/open', ['/usr/bin/open', filename])
-                except Exception:
+                except OSError:
                     sys.exit(0)
             time.sleep(0.1)
             sys.exit(0)
@@ -424,7 +430,7 @@ def file_open(filename, type, parent, print_p=False):
         if not pid:
             try:
                 os.execv(prog, args)
-            except Exception:
+            except OSError:
                 sys.exit(0)
         time.sleep(0.1)
         sys.exit(0)
@@ -451,7 +457,7 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
             if not pid:
                 try:
                     os.execv(prog, args)
-                except Exception:
+                except OSError:
                     sys.exit(0)
             time.sleep(0.1)
             sys.exit(0)
@@ -909,11 +915,12 @@ def send_bugtracker(msg, parent):
                 message(_('Created new bug with ID ') + \
                         'issue%s' % issue_id, parent)
             webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
-        except Exception, exception:
-            if hasattr(exception, 'faultString') \
-                    and 'roundup.cgi.exceptions.Unauthorised' in exception.faultString:
-                message(_('Connection error!\n' \
-                        'Bad username or password!'), parent)
+        except (socket.error, xmlrpclib.Fault), exception:
+            if (isinstance(exception, xmlrpclib.Fault)
+                    and 'roundup.cgi.exceptions.Unauthorised' in
+                    exception.faultString):
+                message(_('Connection error!\nBad username or password!'),
+                    parent)
                 return send_bugtracker(msg, parent)
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
@@ -928,99 +935,105 @@ PLOCK = Lock()
 
 def process_exception(exception, parent, *args):
     global _USERNAME, _DATABASE, _SOCK
-    if str(exception.args[0]) == 'BadFingerprint':
-        warning(_('The server fingerprint has changed since last connection!\n'
-            'The application will stop connecting to this server '
-            'until its fingerprint is fixed.'), parent, _('Security risk!'))
-        from tryton.gui.main import Main
-        Main.sig_quit()
-        sys.exit()
-    if str(exception.args[0]) == 'NotLogged':
-        if not rpc._SOCK:
-            message(_('Connection error!\n' \
-                    'Unable to connect to the server!'), parent)
-            return False
-        if not PLOCK.acquire(False):
-            return False
-        hostname = rpc._SOCK.hostname
-        port = rpc._SOCK.port
-        try:
-            while True:
-                password = ask(_('Password:'), parent, visibility=False)
-                if password is None:
-                    raise Exception('NotLogged')
-                res = rpc.login(rpc._USERNAME, password, hostname, port,
-                        rpc._DATABASE)
-                from tryton.gui.main import Main
-                Main.get_main().refresh_ssl()
-                if res == -1:
-                    message(_('Connection error!\n' \
-                            'Unable to connect to the server!'), parent)
-                    return False
-                if res < 0:
-                    continue
+
+    if isinstance(exception, TrytonError):
+        if exception.ex_type == 'BadFingerprint':
+            warning(_('The server fingerprint has changed since last'
+                ' connection!\nThe application will stop connecting to this'
+                ' server until its fingerprint is fixed.'),
+                parent, _('Security risk!'))
+            from tryton.gui.main import Main
+            Main.sig_quit()
+            sys.exit()
+        elif exception.ex_type == 'NotLogged':
+            if not rpc._SOCK:
+                message(_('Connection error!\n' \
+                        'Unable to connect to the server!'), parent)
+                return False
+    elif isinstance(exception, TrytonServerError):
+        if exception.ex_type == 'UserWarning':
+            msg = ''
+            if len(exception.args) > 4:
+                msg = exception.args[3]
+            res = userwarning(str(msg), parent, str(exception.args[2]))
+            if res in ('always', 'ok'):
+                args2 = ('model', 'res.user.warning', 'create', {
+                        'user': rpc._USER,
+                        'name': exception.args[1],
+                        'always': (res == 'always'),
+                        }, rpc.CONTEXT)
+                try:
+                    rpc.execute(*args2)
+                except TrytonServerError, exception:
+                    process_exception(exception, parent, *args2)
                 if args:
                     try:
                         return rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         return process_exception(exception, parent, *args)
                 return True
-        finally:
-            PLOCK.release()
-
-    if exception.args[0] == 'ConcurrencyException':
-        if len(args) >= 6:
-            if concurrency(args[1], args[3][0], args[5], parent):
-                if '_timestamp' in args[5]:
-                    del args[5]['_timestamp']
-                try:
-                    return rpc.execute(*args)
-                except Exception, exception:
-                    return process_exception(exception, parent, *args)
             return False
-        else:
-            message(_('Concurrency Exception'), parent,
-                    msg_type=gtk.MESSAGE_ERROR)
+        elif exception.ex_type == 'UserError':
+            msg = ''
+            if len(exception.args) > 3:
+                msg = exception.args[2]
+            warning(str(msg), parent, str(exception.args[1]))
             return False
-
-    if exception.args[0] == 'UserWarning':
-        msg = ''
-        if len(exception.args) > 4:
-            msg = exception.args[3]
-        res = userwarning(str(msg), parent, str(exception.args[2]))
-        if res in ('always', 'ok'):
-            args2 = ('model', 'res.user.warning', 'create', {
-                    'user': rpc._USER,
-                    'name': exception.args[1],
-                    'always': (res == 'always'),
-                    }, rpc.CONTEXT)
+        elif exception.ex_type == 'ConcurrencyException':
+            if len(args) >= 6:
+                if concurrency(args[1], args[3][0], args[5], parent):
+                    if '_timestamp' in args[5]:
+                        del args[5]['_timestamp']
+                    try:
+                        return rpc.execute(*args)
+                    except TrytonServerError, exception:
+                        return process_exception(exception, parent, *args)
+                return False
+            else:
+                message(_('Concurrency Exception'), parent,
+                        msg_type=gtk.MESSAGE_ERROR)
+                return False
+        elif exception.ex_type == 'NotLogged':
+            if not PLOCK.acquire(False):
+                return False
+            hostname = rpc._SOCK.hostname
+            port = rpc._SOCK.port
             try:
-                rpc.execute(*args2)
-            except Exception, exception:
-                process_exception(exception, parent, *args2)
-            if args:
-                try:
-                    return rpc.execute(*args)
-                except Exception, exception:
-                    return process_exception(exception, parent, *args)
-            return True
-        return False
-
-    if exception.args[0] == 'UserError':
-        msg = ''
-        if len(exception.args) > 3:
-            msg = exception.args[2]
-        warning(str(msg), parent, str(exception.args[1]))
-        return False
-
-    if isinstance(exception, socket.error):
+                while True:
+                    password = ask(_('Password:'), parent, visibility=False)
+                    if password is None:
+                        continue
+                    res = rpc.login(rpc._USERNAME, password, hostname, port,
+                            rpc._DATABASE)
+                    from tryton.gui.main import Main
+                    Main.get_main().refresh_ssl()
+                    if res == -1:
+                        message(_('Connection error!\n' \
+                                'Unable to connect to the server!'), parent)
+                        return False
+                    if res < 0:
+                        continue
+                    if args:
+                        try:
+                            return rpc.execute(*args)
+                        except TrytonServerError, exception:
+                            return process_exception(exception, parent, *args)
+                    return True
+            finally:
+                PLOCK.release()
+    elif isinstance(exception, socket.error):
         msg = ''
         if len(exception.args) > 2:
             msg = exception.args[1]
         warning(msg, parent, _('Network Error!'))
         return False
 
-    error(str(exception.args[0]), parent, str(exception.args[-1]))
+    if isinstance(exception, TrytonServerError):
+        error_title, error_detail = exception.ex_type, exception.traceback
+    else:
+        error_title = str(exception)
+        error_detail = traceback.format_exc()
+    error(error_title, parent, error_detail)
     return False
 
 def node_attributes(node):
@@ -1087,7 +1100,7 @@ class DBProgress(object):
         try:
             dbs = refresh_dblist(self.host, self.port)
             createdb = True
-        except Exception, exception:
+        except TrytonServerError, exception:
             if exception[0] == 'AccessDenied':
                 dbs, createdb = [], False
             else:
@@ -1146,7 +1159,7 @@ class RPCProgress(object):
     def start(self):
         try:
             self.res = getattr(rpc, self.method)(*self.args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             self.error = True
             self.res = False
             self.exception = exception
@@ -1275,7 +1288,7 @@ def text_to_float_time(text, conv=None):
     try:
         try:
             return locale.atof(text)
-        except Exception:
+        except ValueError:
             pass
         if conv:
             tmp_conv = FLOAT_TIME_CONV.copy()
@@ -1301,7 +1314,7 @@ def text_to_float_time(text, conv=None):
             try:
                 value += abs(locale.atof(buf))
                 continue
-            except Exception:
+            except ValueError:
                 pass
             for sep in conv.keys():
                 if buf.endswith(sep):
@@ -1310,7 +1323,7 @@ def text_to_float_time(text, conv=None):
         if text.startswith('-'):
             value *= -1
         return value
-    except Exception:
+    except ValueError:
         return 0.0
 
 def float_time_to_text(val, conv=None):
@@ -1418,3 +1431,12 @@ def safe_eval(source, data=None):
         'bool': bool,
         'dict': dict,
         }}, data)
+
+def timezoned_date(date):
+    if pytz and rpc.CONTEXT.get('timezone'):
+        lzone = pytz.timezone(rpc.CONTEXT['timezone'])
+        szone = pytz.timezone(rpc.TIMEZONE)
+        sdt = szone.localize(date, is_dst=True)
+        ldt = sdt.astimezone(lzone)
+        date = ldt
+    return date

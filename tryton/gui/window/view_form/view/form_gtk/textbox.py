@@ -7,7 +7,7 @@ from tryton.config import CONFIG
 
 try:
     import gtkspell
-except Exception:
+except ImportError:
     gtkspell = None
 
 

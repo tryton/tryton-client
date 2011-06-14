@@ -16,6 +16,7 @@ import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, get_config_dir
 import tryton.rpc as rpc
 from tryton.gui.window.dbcreate import DBCreate
+from tryton.exceptions import TrytonError
 
 _ = gettext.gettext
 
@@ -642,7 +643,7 @@ class DBLogin(object):
             rpc.logout()
             from tryton.gui.main import Main
             Main.get_main().refresh_ssl()
-            raise Exception('QueryCanceled')
+            raise TrytonError('QueryCanceled')
         parent.present()
         self.dialog.destroy()
         return result

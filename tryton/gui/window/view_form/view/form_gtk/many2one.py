@@ -13,6 +13,7 @@ import tryton.rpc as rpc
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.pyson import PYSONEncoder
+from tryton.exceptions import TrytonServerError
 import pango
 
 _ = gettext.gettext
@@ -113,7 +114,7 @@ class Many2One(WidgetInterface):
                     ids = rpc.execute('model', self.attrs['relation'],
                             'search', dom, 0, CONFIG['client.limit'], None,
                             context)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     self.focus_out = True
                     common.process_exception(exception, self.window)
                     self.changed = True
@@ -199,7 +200,7 @@ class Many2One(WidgetInterface):
                     ids = rpc.execute('model', self.attrs['relation'],
                             'search', dom, 0, CONFIG['client.limit'], None,
                             context)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     self.focus_out = True
                     common.process_exception(exception, self.window)
                     self.changed = True
@@ -271,7 +272,7 @@ class Many2One(WidgetInterface):
                 'form_relate', (self.attrs['relation'], 0), rpc.CONTEXT)
         try:
             relates = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             relates = common.process_exception(exception, self.window)
             if not relates:
                 return False

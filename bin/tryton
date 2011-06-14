@@ -5,7 +5,7 @@ try:
         '..', '..', 'tryton')))
     if os.path.isdir(DIR):
         sys.path.insert(0, os.path.dirname(DIR))
-except Exception:
+except NameError:
     pass
 
 # True only if running as a py2exe app

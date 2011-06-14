@@ -79,7 +79,7 @@ def save(widget, graph, window):
                 CONFIG['client.default_path'] = \
                        os.path.dirname(filepath)
                 CONFIG.save()
-            except Exception:
+            except IOError:
                 pass
         if response == gtk.RESPONSE_OK:
             if width and height and filename:

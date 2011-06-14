@@ -9,6 +9,7 @@ from tryton.gui.window.view_form.screen import Screen
 import os
 import pango
 from tryton.config import CONFIG
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -134,7 +135,7 @@ class Dialog(object):
                     rpc.execute('model', 'ir.action.wizard_size', 'set_size',
                             self.action, self.screen.model_name, width, height,
                             rpc.CONTEXT)
-                except Exception:
+                except TrytonServerError:
                     pass
 
         if res < len(self.states) and res >= 0:
@@ -177,7 +178,7 @@ class Wizard(object):
         args = ('wizard', action, 'create', rpc.CONTEXT)
         try:
             wiz_id = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             wiz_id = common.process_exception(exception, parent, *args)
             if not wiz_id:
                 return
@@ -193,7 +194,7 @@ class Wizard(object):
             try:
                 res = rpcprogress.run()
                 exception = None
-            except Exception, exception:
+            except TrytonServerError, exception:
                 if common.process_exception(exception, parent):
                     continue
                 else:
@@ -257,5 +258,5 @@ class Wizard(object):
             rpc.execute('wizard', action, 'delete', wiz_id, rpc.CONTEXT)
             #XXX to remove when company displayed in status bar
             rpc.context_reload()
-        except Exception:
+        except TrytonServerError:
             pass

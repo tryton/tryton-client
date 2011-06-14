@@ -7,6 +7,7 @@ import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.config import CONFIG
+from tryton.exceptions import TrytonServerError
 import tryton.common as common
 import gettext
 
@@ -116,7 +117,7 @@ class Many2Many(WidgetInterface):
                 dom = domain
             ids = rpc.execute('model', self.attrs['relation'], 'search',
                     dom , 0, CONFIG['client.limit'], None, context)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return False
         if len(ids) != 1 or not value:
@@ -179,7 +180,7 @@ class Many2Many(WidgetInterface):
         try:
             result = rpc.execute('model', self.attrs['relation'], 'read',
                     ids, ['rec_name'], rpc.CONTEXT)
-        except Exception:
+        except TrytonServerError:
             return str(ids)
         return ', '.join(x['rec_name'] for x in result)
 

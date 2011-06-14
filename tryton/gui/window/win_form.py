@@ -6,6 +6,7 @@ from tryton.config import CONFIG
 import gtk
 import pango
 import gettext
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -262,7 +263,7 @@ class WinForm(object):
                 dom = domain
             ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
                     0, CONFIG['client.limit'], None, context)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return False
         if len(ids) != 1:

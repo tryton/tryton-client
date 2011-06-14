@@ -7,6 +7,7 @@ import tryton.rpc as rpc
 import copy
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
+from tryton.exceptions import TrytonServerError
 import tryton.common as common
 
 _ = gettext.gettext
@@ -38,7 +39,7 @@ class Preference(object):
                 rpc.CONTEXT)
         try:
             view = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             view = common.process_exception(exception, parent, *args)
             if not view:
                 self.win.destroy()
@@ -55,7 +56,7 @@ class Preference(object):
         args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:
             preferences = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             preferences = common.process_exception(exception, parent, *args)
             if not preferences:
                 self.win.destroy()
@@ -94,7 +95,7 @@ class Preference(object):
                             password, rpc.CONTEXT)
                     try:
                         rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         if not common.process_exception(exception, self.win,
                                 *args):
                             continue
