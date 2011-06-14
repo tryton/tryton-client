@@ -3,6 +3,7 @@
 """
 Inter-Process Communication
 """
+from __future__ import with_statement
 import tempfile
 import os
 import threading
@@ -157,9 +158,8 @@ class FileClient(IPCClient):
             return False
         tmpdir = open(self.filename, 'r').readline().strip()
         _, tmpfile = tempfile.mkstemp(dir=tmpdir, text=True)
-        tmpfile = open(tmpfile, 'w')
-        print >> tmpfile, message
-        tmpfile.close()
+        with open(tmpfile, 'w') as tmpfile:
+            print >> tmpfile, message
         return True
 
 

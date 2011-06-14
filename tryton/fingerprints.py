@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from __future__ import with_statement
 import os
 from tryton.config import get_config_dir
 
@@ -15,23 +16,21 @@ class Fingerprints(dict):
     def load(self):
         if not os.path.isfile(KNOWN_HOSTS_PATH):
             return
-        known_hosts = open(KNOWN_HOSTS_PATH)
-        for line in known_hosts.xreadlines():
-            line = line.strip()
-            try:
-                key, sha1 = line.split(' ')
-                host, port = key.rsplit(':', 1)
-            except ValueError:
-                continue
-            self[(host, port)] = sha1
-        known_hosts.close()
+        with open(KNOWN_HOSTS_PATH) as known_hosts:
+            for line in known_hosts.xreadlines():
+                line = line.strip()
+                try:
+                    key, sha1 = line.split(' ')
+                    host, port = key.rsplit(':', 1)
+                except ValueError:
+                    continue
+                self[(host, port)] = sha1
 
     def save(self):
         lines = []
-        known_hosts = open(KNOWN_HOSTS_PATH, 'w')
-        known_hosts.writelines('%s:%s %s' % (host, port, sha1)
-                + os.linesep for (host, port), sha1 in self.iteritems())
-        known_hosts.close()
+        with open(KNOWN_HOSTS_PATH, 'w') as known_hosts:
+            known_hosts.writelines('%s:%s %s' % (host, port, sha1)
+                    + os.linesep for (host, port), sha1 in self.iteritems())
 
     def __setitem__(self, key, value):
         assert isinstance(key, tuple)

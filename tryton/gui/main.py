@@ -1634,9 +1634,8 @@ class Main(object):
         dialog = DBRestore(self.window, filename=filename)
         url, dbname, passwd, update = dialog.run(self.window)
         if dbname:
-            file_p = open(filename, 'rb')
-            data_b64 = base64.encodestring(file_p.read())
-            file_p.close()
+            with open(filename, 'rb') as file_p:
+                data_b64 = base64.encodestring(file_p.read())
             host, port = url.rsplit(':' , 1)
             rpcprogress = common.RPCProgress('db_exec', (host, int(port),
                 'restore', dbname, passwd, data_b64, update), self.window)
@@ -1713,9 +1712,8 @@ class Main(object):
                 filename=dbname + '-' + time.strftime('%Y%m%d%H%M') + '.dump')
 
         if filename:
-            file_ = open(filename, 'wb')
-            file_.write(dump)
-            file_.close()
+            with open(filename, 'wb') as file_:
+                file_.write(dump)
             common.message(_("Database backuped successfully!"), \
                     parent=self.window)
         else:
