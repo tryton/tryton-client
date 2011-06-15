@@ -238,7 +238,7 @@ class Action(SignalEvent):
         self.signal('active-changed')
 
     def _get_active(self):
-        if self.screen:
+        if self.screen and self.screen.current_record:
             return common.EvalEnvironment(self.screen.current_record, False)
         elif self.tree:
             return {'id': self.tree.sel_id_get()}
