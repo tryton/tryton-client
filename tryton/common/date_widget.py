@@ -194,7 +194,7 @@ class DateEntry(gtk.Entry):
         try:
             time.strptime(self.compute_date(text, default=default, year='2000'),
                     self.format)
-        except Exception:
+        except ValueError:
             return False
         return True
 
@@ -203,7 +203,7 @@ class DateEntry(gtk.Entry):
         date = self.compute_date(self.get_text())
         try:
             res = datetime.datetime(*time.strptime(date, self.format)[:6])
-        except Exception:
+        except ValueError:
             return None
         self.set_text(date)
         return res
@@ -336,7 +336,7 @@ def compute_date(cmd, dt, format):
                 dt = datetime.datetime.now()
             try:
                 return f(dt, groups)
-            except Exception:
+            except ValueError:
                 continue
 
 if __name__ == '__main__':

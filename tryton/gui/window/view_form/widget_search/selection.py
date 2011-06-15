@@ -7,6 +7,7 @@ import tryton.common as common
 import gobject
 import gettext
 from tryton.pyson import PYSONDecoder
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -50,7 +51,7 @@ class Selection(Interface):
                         'search_read', domain, 0, None, None,
                         ['rec_name'], rpc.CONTEXT)
                 selection = [(x['id'], x['rec_name']) for x in result]
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, parent)
                 selection = []
         else:
@@ -58,7 +59,7 @@ class Selection(Interface):
                 try:
                     selection = rpc.execute('model',
                             self.attrs['model'], selection, rpc.CONTEXT)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     common.process_exception(exception, parent)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))

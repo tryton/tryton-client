@@ -8,6 +8,7 @@ import field
 import datetime
 import logging
 import time
+from tryton.exceptions import TrytonServerError
 
 
 class Record(SignalEvent):
@@ -74,7 +75,7 @@ class Record(SignalEvent):
             args = ('model', self.model_name, 'read', ids, fields, ctx)
             try:
                 values = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 if raise_exception:
                     raise
                 values = common.process_exception(exception, self.window, *args)
@@ -245,7 +246,7 @@ class Record(SignalEvent):
                     self.context_get())
                 try:
                     res = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     res = common.process_exception(exception, self.window,
                             *args)
                     if not res:
@@ -266,7 +267,7 @@ class Record(SignalEvent):
                     try:
                         if not rpc.execute(*args):
                             return False
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         res = common.process_exception(exception, self.window,
                                 *args)
                         if not res:
@@ -288,7 +289,7 @@ class Record(SignalEvent):
                     self.group.fields.keys(), context)
             try:
                 vals = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 vals = common.process_exception(exception, self.window, *args)
                 if not vals:
                     return
@@ -306,7 +307,7 @@ class Record(SignalEvent):
         args = ('model', self.model_name, 'read', self.id, ['rec_name'], ctx)
         try:
             res = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             res = common.process_exception(exception, self.window, *args)
             if not res:
                 return ''
@@ -456,7 +457,7 @@ class Record(SignalEvent):
         args = ('model', self.model_name, 'on_change_' + fieldname, args, ctx)
         try:
             res = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             res = common.process_exception(exception, self.window, *args)
             if not res:
                 return
@@ -506,7 +507,7 @@ class Record(SignalEvent):
                     args, ctx)
             try:
                 res = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 res = common.process_exception(exception, self.window, *args)
                 if not res:
                     return
@@ -529,7 +530,7 @@ class Record(SignalEvent):
             ctx)
         try:
             res = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             res = common.process_exception(exception, self.window, *args)
             if not res:
                 # ensure res is a list
@@ -543,7 +544,7 @@ class Record(SignalEvent):
                 field_name + '=' + str(value), ctx)
         try:
             res = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             res = common.process_exception(exception, self.window, *args)
             if not res:
                 return
@@ -558,7 +559,7 @@ class Record(SignalEvent):
                 ], rpc.CONTEXT)
             try:
                 self.attachment_count = rpc.execute(*args)
-            except Exception:
+            except TrytonServerError:
                 return 0
         return self.attachment_count
 

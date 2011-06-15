@@ -22,11 +22,11 @@ class Float(Integer):
     def _value_get(self):
         try:
             value1 = locale.atof(self.entry1.get_text())
-        except Exception:
+        except ValueError:
             value1 = False
         try:
             value2 = locale.atof(self.entry2.get_text())
-        except Exception:
+        except ValueError:
             value2 = False
         return self._get_clause(value1, value2)
 
@@ -60,12 +60,12 @@ class Float(Integer):
         value = widget.get_text()
         position = widget.get_position()
         new_value = value[:position] + new_text + value[position:]
+        if new_value == '-':
+            return
         try:
-            if new_value == '-':
-                return
             if len(str(int(locale.atof(new_value)))) > self.digits[0]:
                 widget.stop_emission('insert-text')
-        except Exception:
+        except ValueError:
             widget.stop_emission('insert-text')
 
 
@@ -74,11 +74,11 @@ class Numeric(Float):
     def _value_get(self):
         try:
             value1 = Decimal(str(locale.atof(self.entry1.get_text())))
-        except Exception:
+        except ValueError:
             value1 = False
         try:
             value2 = Decimal(str(locale.atof(self.entry2.get_text())))
-        except Exception:
+        except ValueError:
             value2 = False
         res = self._get_clause(value1, value2)
         return res

@@ -6,6 +6,7 @@ from interface import Interface
 import tryton.rpc as rpc
 import tryton.common as common
 import gobject
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -47,7 +48,7 @@ class Reference(Interface):
                         self.attrs.get('domain', []),
                         0, None, None, ['rec_name'], rpc.CONTEXT)
                 selection = [(x['id'], x['rec_name']) for x in result]
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, parent)
                 selection = []
         else:
@@ -55,7 +56,7 @@ class Reference(Interface):
                 try:
                     selection = rpc.execute('model',
                             self.attrs['model'], selection, rpc.CONTEXT)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     common.process_exception(exception, parent)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))

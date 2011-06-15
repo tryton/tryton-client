@@ -11,6 +11,8 @@ import sys
 import locale
 import gtk
 
+from tryton.exceptions import TrytonError
+
 _ = gettext.gettext
 
 def get_home_dir():
@@ -122,10 +124,10 @@ class ConfigManager(object):
         opt, self.arguments = parser.parse_args()
 
         if len(self.arguments) > 1:
-            raise Exception(_('Too much arguments'))
+            raise TrytonError(_('Too much arguments'))
 
         if opt.config and not os.path.isfile(opt.config):
-            raise Exception(_('File "%s" not found') % (opt.config,))
+            raise TrytonError(_('File "%s" not found') % (opt.config,))
         self.rcfile = opt.config or os.path.join(get_config_dir(), 'tryton.conf')
         self.load()
 
@@ -150,7 +152,7 @@ class ConfigManager(object):
                     configparser.add_section(section)
                 configparser.set(section, name, self.config[entry])
             configparser.write(open(self.rcfile, 'wb'))
-        except Exception:
+        except IOError:
             logging.getLogger('common.options').warn(
                     _('Unable to write config file %s!') % \
                             (self.rcfile,))

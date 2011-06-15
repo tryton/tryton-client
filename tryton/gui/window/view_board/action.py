@@ -13,6 +13,7 @@ from tryton.pyson import PYSONDecoder
 import gettext
 from tryton.config import CONFIG
 from tryton.signal_event import SignalEvent
+from tryton.exceptions import TrytonServerError
 _ = gettext.gettext
 
 
@@ -28,7 +29,7 @@ class Action(SignalEvent):
         try:
             self.action = rpc.execute('model', 'ir.action.act_window', 'read',
                     self.act_id, False, rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self._window)
             raise
 
@@ -185,7 +186,7 @@ class Action(SignalEvent):
         try:
             action_id = rpc.execute('model', 'ir.action',
                     'get_action_id', self.act_id, rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self._window)
         if action_id:
             Action2.execute(action_id, {}, self._window)
@@ -212,7 +213,7 @@ class Action(SignalEvent):
             res_ids = rpc.execute('model', self.action['res_model'], 'search',
                     self.domain, 0, self.action['limit'] or
                     CONFIG['client.limit'], None, rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self._window)
             return False
         if self.screen:

@@ -8,6 +8,7 @@ from tryton.wizard import Wizard
 from tryton.common import message, error, selection, file_open, mailto
 from tryton.gui.window import Window
 from tryton.pyson import PYSONDecoder
+from tryton.exceptions import TrytonServerError
 import gettext
 import tempfile
 import base64
@@ -35,7 +36,7 @@ class Action(object):
             args = ('model', data['model'], 'search', [], 0, None, None, ctx)
             try:
                 ids = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 ids = common.process_exception(exception, window, *args)
                 if not ids:
                     return False
@@ -47,7 +48,7 @@ class Action(object):
         rpcprogress = common.RPCProgress('execute', args, window)
         try:
             res = rpcprogress.run()
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, window)
             return False
         if not res:
@@ -80,7 +81,7 @@ class Action(object):
             try:
                 res = rpc.execute('model', 'ir.action', 'read', act_id,
                         ['type'], ctx)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, window)
                 return
             if not res:
@@ -89,7 +90,7 @@ class Action(object):
         try:
             res = rpc.execute('model', action_type, 'search_read',
                     [('action', '=', act_id)], 0, 1, None, None, ctx)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, window)
             return
         Action._exec_action(res, window, data)
@@ -187,7 +188,7 @@ class Action(object):
                 actions = rpc.execute('model', 'ir.action.keyword',
                         'get_keyword', keyword, (data['model'], model_id),
                         rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, window)
                 return False
 

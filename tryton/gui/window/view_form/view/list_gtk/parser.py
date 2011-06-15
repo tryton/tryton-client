@@ -12,6 +12,7 @@ import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
 import tryton.common as common
+from tryton.exceptions import TrytonError
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
@@ -404,7 +405,7 @@ class Date(Char):
             return False
         try:
             date = datetime.date(*time.strptime(text, self.display_format)[:3])
-        except Exception:
+        except ValueError:
             return False
         return common.datetime_strftime(date, self.server_format)
 
@@ -424,16 +425,7 @@ class Datetime(Date):
             return ''
         date = datetime.datetime(*time.strptime(value,
             self.server_format)[:6])
-        if 'timezone' in rpc.CONTEXT:
-            try:
-                import pytz
-                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-                szone = pytz.timezone(rpc.TIMEZONE)
-                sdt = szone.localize(date, is_dst=True)
-                ldt = sdt.astimezone(lzone)
-                date = ldt
-            except Exception:
-                pass
+        date = common.timezoned_date(date)
         return common.datetime_strftime(date, self.display_format)
 
     def value_from_text(self, record, text):
@@ -442,18 +434,9 @@ class Datetime(Date):
         try:
             date = datetime.datetime(*time.strptime(text,
                 self.display_format)[:6])
-        except Exception:
+        except ValueError:
             return False
-        if 'timezone' in rpc.CONTEXT:
-            try:
-                import pytz
-                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-                szone = pytz.timezone(rpc.TIMEZONE)
-                ldt = lzone.localize(date, is_dst=True)
-                sdt = ldt.astimezone(szone)
-                date = sdt
-            except Exception:
-                pass
+        date = common.timezoned_date(date)
         return common.datetime_strftime(date, self.server_format)
 
 
@@ -486,7 +469,7 @@ class Float(Char):
     def value_from_text(self, record, text):
         try:
             return locale.atof(text)
-        except Exception:
+        except ValueError:
             return 0.0
 
 
@@ -526,7 +509,7 @@ class M2O(Char):
                 context)
         try:
             ids = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             ids = common.process_exception(exception, self.window, *args)
             if not ids:
                 return '???'
@@ -553,7 +536,7 @@ class M2O(Char):
             args = ('model', relation, 'search', dom, 0, None, None, context)
             try:
                 ids = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 ids = common.process_exception(exception, self.window, *args)
                 if not ids:
                     return False, False
@@ -591,7 +574,7 @@ class M2O(Char):
                     context)
             try:
                 res = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 res = common.process_exception(exception, self.window, *args)
                 if not res:
                     return False, None
@@ -664,7 +647,7 @@ class M2M(Char):
                 None, context)
         try:
             ids = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             ids = common.process_exception(exception, self.window, *args)
             if ids is False:
                 return []
@@ -684,7 +667,7 @@ class M2M(Char):
             args = ('model', relation, 'search', domain)
             try:
                 ids = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 ids = common.process_exception(exception, self.window, *args)
                 if ids is False:
                     return False, None
@@ -710,12 +693,12 @@ class Selection(Char):
         self._domain_cache = {}
         selection = self.attrs.get('selection', [])[:]
         if not isinstance(selection, (list, tuple)):
+            args = ('model', self.model_name, selection, rpc.CONTEXT)
             try:
-                selection = rpc.execute('model',
-                        self.model_name, selection, rpc.CONTEXT)
+                selection = rpc.execute(*args)
             except Exception, exception:
-                common.process_exception(exception, self.window)
-                selection = []
+                selection = (common.process_exception(exception, self.window,
+                    args) or [])
         self.selection = selection[:]
         if self.attrs.get('sort', True):
             selection.sort(lambda x, y: cmp(x[1], y[1]))
@@ -800,7 +783,7 @@ class Reference(Char):
             try:
                 selection = rpc.execute('model',
                         model_name, selection, rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
@@ -819,7 +802,7 @@ class Reference(Char):
                         rpc.CONTEXT)
                 try:
                     res = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     res = common.process_exception(exception, self.window,
                             *args)
                 if not res:
@@ -913,14 +896,14 @@ class Button(object):
                             self.attrs['name'], ctx)
                     try:
                         rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         common.process_exception(exception, self.window, *args)
                 elif button_type == 'object':
                     args = ('model', self.screen.model_name,
                             self.attrs['name'], [obj_id], ctx)
                     try:
                         rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         common.process_exception(exception, self.window, *args)
                 elif button_type == 'action':
                     action_id = None
@@ -928,7 +911,7 @@ class Button(object):
                             int(self.attrs['name']), ctx)
                     try:
                         action_id = rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         action_id = common.process_exception(exception,
                                 self.window, *args)
                     if action_id:
@@ -938,7 +921,7 @@ class Button(object):
                             'ids': [obj_id],
                             }, self.window, context=ctx)
                 else:
-                    raise Exception('Unallowed button type')
+                    raise TrytonError('Unallowed button type')
                 self.screen.reload(written=True)
             else:
                 self.screen.display()

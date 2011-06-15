@@ -90,7 +90,7 @@ class FileServer(IPCServer):
             for path in to_remove.copy():
                 try:
                     os.remove(path)
-                except Exception:
+                except OSError:
                     continue
                 to_remove.remove(path)
             time.sleep(1)

@@ -19,6 +19,7 @@ from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \
         get_config_dir
 import tryton.common as common
 from tryton.action import Action
+from tryton.exceptions import TrytonServerError, TrytonError
 from tryton.wizard import Wizard
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
@@ -45,7 +46,7 @@ except ImportError:
     gtk_osxapplication = None
 try:
     import gtkspell
-except Exception:
+except ImportError:
     gtkspell = None
 
 _ = gettext.gettext
@@ -981,7 +982,7 @@ class Main(object):
             try:
                 values = rpc.execute('model', self.menu_screen.model_name,
                         'read', ids, ['rec_name'], rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 return
             try:
@@ -992,7 +993,7 @@ class Main(object):
                         'user_id': rpc._USER,
                         'resource': self.menu_screen.model_name,
                         }, rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
             self.shortcut_set()
 
@@ -1006,7 +1007,7 @@ class Main(object):
             try:
                 shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
                         user, 'ir.ui.menu', rpc.CONTEXT)
-            except Exception:
+            except TrytonServerError:
                 shortcuts = []
         menu = gtk.Menu()
         for shortcut in shortcuts:
@@ -1146,7 +1147,7 @@ class Main(object):
         ctx['active_test'] = False
         try:
             ids1, ids2 = self.request_set(True)
-        except Exception, exception:
+        except TrytonServerError, exception:
             if common.process_exception(exception, self.window):
                 ids1, ids2 = self.request_set(True)
             else:
@@ -1173,7 +1174,7 @@ class Main(object):
                         len(ids2))
             self.sb_requests.set_text(message)
             return (ids, ids2)
-        except Exception:
+        except TrytonServerError:
             if exception:
                 raise
             return ([], [])
@@ -1185,15 +1186,16 @@ class Main(object):
             try:
                 dblogin = DBLogin(self.window)
                 res = dblogin.run(self.window)
-            except Exception, exception:
-                if exception.args == ('QueryCanceled',):
+            except TrytonError, exception:
+                if exception.ex_type == 'QueryCanceled':
                     return False
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 return
         self.window.present()
         try:
             log_response = rpc.login(*res)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return
         rpc.context_reload()
@@ -1202,7 +1204,7 @@ class Main(object):
             try:
                 prefs = rpc.execute('model', 'res.user', 'get_preferences',
                         False, rpc.CONTEXT)
-            except Exception:
+            except TrytonServerError:
                 prefs = None
             common.ICONFACTORY.load_icons()
             if prefs and 'language_direction' in prefs:
@@ -1338,7 +1340,7 @@ class Main(object):
             args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
             try:
                 prefs = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 prefs = common.process_exception(exception, self.window, *args)
                 if not prefs:
                     return False
@@ -1608,7 +1610,7 @@ class Main(object):
             dbname, passwd), self.window)
         try:
             rpcprogress.run()
-        except Exception, exception:
+        except TrytonServerError, exception:
             self.refresh_ssl()
             if exception[0] == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password" \
@@ -1641,7 +1643,7 @@ class Main(object):
                 'restore', dbname, passwd, data_b64, update), self.window)
             try:
                 res = rpcprogress.run()
-            except Exception, exception:
+            except TrytonServerError, exception:
                 self.refresh_ssl()
                 if exception[0] == \
                         "Couldn't restore database with password":
@@ -1684,7 +1686,7 @@ class Main(object):
             dbname, passwd), self.window)
         try:
             dump_b64 = rpcprogress.run()
-        except Exception, exception:
+        except TrytonServerError, exception:
             if exception[0] == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
                         "protected Database.\nBackup and restore " \
@@ -1740,7 +1742,7 @@ class Main(object):
             try:
                 params = dict(param.split('=', 1)
                         for param in urlp.params.split('&'))
-            except Exception:
+            except ValueError:
                 return
 
         def open_model(path):
@@ -1771,6 +1773,7 @@ class Main(object):
                         name=name, limit=limit, auto_refresh=auto_refresh,
                         search_value=search_value)
             except Exception:
+                # Prevent crashing the client
                 return
 
         def open_wizard(wizard):
@@ -1796,6 +1799,7 @@ class Main(object):
                             direct_print=direct_print, email_print=email_print,
                             email=email, context=context)
             except Exception:
+                # Prevent crashing the client
                 return
 
         def open_report(report):
@@ -1815,6 +1819,7 @@ class Main(object):
                         direct_print=direct_print, email_print=email_print,
                         email=email, context=context)
             except Exception:
+                # Prevent crashing the client
                 return
 
         def open_url():

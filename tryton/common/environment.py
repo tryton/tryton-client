@@ -20,12 +20,15 @@ class EvalEnvironment(dict):
             return self.parent._get_on_change_args([item])[item]
 
     def __getattr__(self, item):
-        return self.__getitem__(item)
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            raise AttributeError(item)
 
     def get(self, item, default=None):
         try:
-            return self.__getattr__(item)
-        except Exception:
+            return self.__getitem__(item)
+        except KeyError:
             pass
         return super(EvalEnvironment, self).get(item, default)
 

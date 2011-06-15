@@ -10,6 +10,7 @@ import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
 from tryton.gui.main import Main
 import logging
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -32,7 +33,7 @@ class Button(object):
                 icon = gtk.Image()
                 icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.widget.set_image(icon)
-            except Exception:
+            except KeyError:
                 log = logging.getLogger('common')
                 log.warning(_('Wrong icon for the button!'))
         self.widget.connect('clicked', self.button_clicked)
@@ -55,7 +56,7 @@ class Button(object):
                             self.attrs['name'], ctx)
                     try:
                         rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'object':
@@ -63,7 +64,7 @@ class Button(object):
                             [obj_id], ctx)
                     try:
                         rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         common.process_exception(exception, self.form.window,
                                 *args)
                 elif button_type == 'action':
@@ -72,7 +73,7 @@ class Button(object):
                             int(self.attrs['name']), ctx)
                     try:
                         action_id = rpc.execute(*args)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         action_id = common.process_exception(exception, self.form.window,
                                 *args)
                     if action_id:
@@ -101,14 +102,10 @@ class Button(object):
         if 'icon' in state_changes:
             stock = state_changes['icon']
             if stock:
-                try:
-                    common.ICONFACTORY.register_icon(stock)
-                    icon = gtk.Image()
-                    icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
-                    self.widget.set_image(icon)
-                except Exception:
-                    log = logging.getLogger('common')
-                    log.warning(_('Wrong icon for the button!'))
+                common.ICONFACTORY.register_icon(stock)
+                icon = gtk.Image()
+                icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+                self.widget.set_image(icon)
             else:
                 self.widget.set_image(gtk.Image())
 
@@ -685,7 +682,7 @@ class ParserForm(ParserInterface):
             lang_ids = rpc.execute('model', 'ir.lang',
                     'search', [('translatable', '=', '1')],
                     rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return False
 
@@ -700,7 +697,7 @@ class ParserForm(ParserInterface):
             langs = rpc.execute('model', 'ir.lang',
                     'read', lang_ids, ['code', 'name'],
                     rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.window)
             return False
 
@@ -784,7 +781,7 @@ class ParserForm(ParserInterface):
             try:
                 val = rpc.execute('model', model_name,
                         'read', [obj_id], [name], context)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 return False
             val = val[0]
@@ -837,7 +834,7 @@ class ParserForm(ParserInterface):
                         {str(name):  new_val['value']}, context)
                 try:
                     rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     common.process_exception(exception, self.window, *args)
         if response == gtk.RESPONSE_CANCEL:
             self.window.present()

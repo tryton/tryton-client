@@ -15,7 +15,9 @@ from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
-from tryton.common import TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES
+from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
+    timezoned_date)
+from tryton.exceptions import TrytonServerError
 import tryton.common as common
 import pango
 from tryton.translate import date_format
@@ -186,7 +188,7 @@ class Form(SignalEvent):
             new_value = value[:position] + new_text + value[position:]
             try:
                 locale.atoi(new_value)
-            except Exception:
+            except ValueError:
                 widget.stop_emission('insert-text')
         entry.connect('insert_text', sig_insert_text)
         table.attach(entry, 1, 2, 1, 2)
@@ -263,7 +265,7 @@ class Form(SignalEvent):
                 ctx)
         try:
             res = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             res = common.process_exception(exception, self.window, *args)
             if not res:
                 return
@@ -274,17 +276,7 @@ class Form(SignalEvent):
                 if line.get(key, False) \
                         and key in ('create_date', 'write_date'):
                     display_format = date_format() + ' ' + HM_FORMAT
-                    date = line[key]
-                    if 'timezone' in rpc.CONTEXT:
-                        try:
-                            import pytz
-                            lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-                            szone = pytz.timezone(rpc.TIMEZONE)
-                            sdt = szone.localize(datetime, is_dst=True)
-                            ldt = sdt.astimezone(lzone)
-                            date = ldt
-                        except Exception:
-                            pass
+                    date = timezoned_date(line[key])
                     value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value +'\n'
         message_str += _('Model:') + ' ' + self.model
@@ -337,7 +329,7 @@ class Form(SignalEvent):
         args = ('model', self.model, 'copy', res_ids, {}, ctx)
         try:
             new_ids = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             new_ids = common.process_exception(exception, self.window, *args)
         if new_ids:
             self.screen.load(new_ids)

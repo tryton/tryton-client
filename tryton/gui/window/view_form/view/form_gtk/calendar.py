@@ -8,7 +8,7 @@ import locale
 from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
-        TRYTON_ICON
+        TRYTON_ICON, timezoned_date
 from tryton.common import date_widget, Tooltips, datetime_strftime
 from tryton.translate import date_format
 
@@ -72,7 +72,7 @@ class Calendar(WidgetInterface):
             return False
         try:
             date = datetime.date(*time.strptime(value, self.format)[:3])
-        except Exception:
+        except ValueError:
             return False
         return datetime_strftime(date, DT_FORMAT)
 
@@ -207,18 +207,9 @@ class DateTime(WidgetInterface):
             return False
         try:
             date = datetime.datetime(*time.strptime(value, self.format)[:6])
-        except Exception:
+        except ValueError:
             return False
-        if 'timezone' in rpc.CONTEXT and timezone:
-            try:
-                import pytz
-                lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-                szone = pytz.timezone(rpc.TIMEZONE)
-                ldt = lzone.localize(date, is_dst=True)
-                sdt = ldt.astimezone(szone)
-                date = sdt
-            except Exception:
-                pass
+        date = timezoned_date(date)
         return datetime_strftime(date, DHM_FORMAT)
 
     def set_value(self, record, field):
@@ -236,16 +227,7 @@ class DateTime(WidgetInterface):
             self.entry.clear()
         else:
             date = datetime.datetime(*time.strptime(dt_val, DHM_FORMAT)[:6])
-            if 'timezone' in rpc.CONTEXT and timezone:
-                try:
-                    import pytz
-                    lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-                    szone = pytz.timezone(rpc.TIMEZONE)
-                    sdt = szone.localize(date, is_dst=True)
-                    ldt = sdt.astimezone(lzone)
-                    date = ldt
-                except Exception:
-                    pass
+            date = timezoned_date(date)
             format = self.format
             if date.year < 10:
                 format = format.replace('%Y', '000%Y')

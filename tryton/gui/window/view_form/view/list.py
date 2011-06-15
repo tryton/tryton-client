@@ -18,6 +18,7 @@ from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.pyson import PYSONEncoder
+from tryton.exceptions import TrytonServerError
 import os
 
 _ = gettext.gettext
@@ -137,7 +138,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 if old_pos != pos:
                     new_order[old_pos] = pos
                 pos += 1
-            except Exception:
+            except KeyError:
                 continue
         self.group.sort(lambda x, y: \
                 cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
@@ -465,7 +466,7 @@ class ViewList(ParserView):
                 try:
                     for field in fields:
                         record.__getitem__(field, True)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     return True
             iter_ = model.iter_next(iter_)
         return False
@@ -621,7 +622,7 @@ class ViewList(ParserView):
                             path[1].name].attrs['relation'], 0), rpc.CONTEXT)
                 try:
                     relates = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     relates = common.process_exception(exception, self.window,
                             *args)
                     if not relates:
@@ -725,7 +726,7 @@ class ViewList(ParserView):
                 try:
                     rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
                             self.screen.model_name, fields, rpc.CONTEXT)
-                except Exception:
+                except TrytonServerError:
                     pass
         self.widget_tree.destroy()
         self.screen = None

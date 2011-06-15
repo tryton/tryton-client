@@ -20,11 +20,11 @@ class CellRendererInteger(CellRendererText):
         value = entry.get_text()
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
+        if new_value == '-':
+            return
         try:
-            if new_value == '-':
-                return
             locale.atoi(new_value)
-        except Exception:
+        except ValueError:
             entry.stop_emission('insert-text')
 
 gobject.type_register(CellRendererInteger)

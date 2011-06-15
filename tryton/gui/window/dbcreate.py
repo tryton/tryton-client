@@ -7,6 +7,7 @@ import gettext
 import re
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
+from tryton.exceptions import TrytonServerError
 import tryton.rpc as rpc
 
 _ = gettext.gettext
@@ -68,7 +69,7 @@ class DBCreate(object):
             if self.combo_language and host and port:
                 common.refresh_langlist(self.combo_language, host, port)
             self.server_connection_state(True)
-        except Exception:
+        except TrytonServerError:
             self.server_connection_state(False)
             return False
         return True
@@ -308,7 +309,7 @@ class DBCreate(object):
         self.combo_language.set_model(liststore)
         try:
             common.refresh_langlist(self.combo_language, self.host, self.port)
-        except Exception:
+        except TrytonServerError:
             self.button_create.set_sensitive(False)
 
         while True:
@@ -351,7 +352,7 @@ class DBCreate(object):
                     try:
                         exist = rpc.db_exec(url_m.group(1),
                                 int(url_m.group(2)), 'db_exist', dbname)
-                    except Exception, exception:
+                    except TrytonServerError, exception:
                         common.process_exception(exception, self.dialog)
                         continue
                     if exist:
@@ -371,7 +372,7 @@ class DBCreate(object):
                                         langreal, admin_passwd.get_text()),
                                     self.dialog)
                             rpcprogress.run()
-                        except Exception, exception:
+                        except TrytonServerError, exception:
                             if str(exception[0]) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
                                     "the Tryton server. Please try again."),

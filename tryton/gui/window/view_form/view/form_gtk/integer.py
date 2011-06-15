@@ -17,7 +17,7 @@ class Integer(Char):
     def set_value(self, record, field):
         try:
             value = locale.atoi(self.entry.get_text())
-        except Exception:
+        except ValueError:
             value = 0
         return field.set_client(record, value)
 
@@ -37,9 +37,9 @@ class Integer(Char):
         value = entry.get_text()
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
+        if new_value == '-':
+            return
         try:
-            if new_value == '-':
-                return
             locale.atoi(new_value)
-        except Exception:
+        except ValueError:
             entry.stop_emission('insert-text')

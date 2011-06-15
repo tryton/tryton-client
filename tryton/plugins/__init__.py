@@ -23,18 +23,15 @@ if os.path.isdir(PLUGINS_PATH):
         try:
             module = imp.load_module(module, *imp.find_module(module, [PLUGINS_PATH]))
             MODULES.append(module)
-        except Exception, exception:
+        except ImportError, exception:
             continue
 
 def execute(datas, parent):
     result = {}
 
     for module in MODULES:
-        try:
-            for name, func in module.get_plugins(datas['model']):
-                result[name] = func
-        except Exception, exception:
-            continue
+        for name, func in module.get_plugins(datas['model']):
+            result[name] = func
     if not result:
         common.message(_('No available plugin for this resource!'), parent)
         return False

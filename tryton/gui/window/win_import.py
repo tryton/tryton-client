@@ -7,6 +7,7 @@ import tryton.common as common
 import tryton.rpc as rpc
 import csv
 from tryton.config import TRYTON_ICON, CONFIG
+from tryton.exceptions import TrytonServerError
 
 _ = gettext.gettext
 
@@ -229,7 +230,7 @@ class WinImport(object):
         args = ('model', model, 'fields_get', None, rpc.CONTEXT)
         try:
             return rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             return common.process_exception(exception, self.dialog, *args)
 
     def on_row_expanded(self, treeview, iter, path):
@@ -256,7 +257,7 @@ class WinImport(object):
         try:
             data = csv.reader(open(fname, 'rb'), quotechar=csvdel,
                     delimiter=csvsep)
-        except Exception:
+        except IOError:
             common.warning(_('Error opening CSV file'), self.dialog,
                     _('Error'))
             return True
@@ -354,7 +355,7 @@ class WinImport(object):
         try:
             res = rpc.execute('model', model, 'import_data', fields, datas,
                     rpc.CONTEXT)
-        except Exception, exception:
+        except TrytonServerError, exception:
             common.process_exception(exception, self.dialog)
             return False
         if res[0] >= 0:

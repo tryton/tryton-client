@@ -12,6 +12,7 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
+from tryton.exceptions import TrytonServerError
 
 
 class Screen(SignalEvent):
@@ -49,13 +50,13 @@ class Screen(SignalEvent):
         self.parent = None
         self.parent_name = None
         self.__window = window
+        self.filter_widget = None
         self.__group = None
         self.new_group()
         self.__current_record = None
         self.current_record = None
         self.screen_container = ScreenContainer()
         self.screen_container.alternate_view = alternate_view
-        self.filter_widget = None
         self.widget = self.screen_container.widget_get()
         self.__current_view = 0
         self.limit = limit
@@ -88,7 +89,7 @@ class Screen(SignalEvent):
                         self.fields_view_tree = rpc.execute('model',
                                 self.model_name, 'fields_view_get', False,
                                 'tree', ctx)
-                    except Exception:
+                    except TrytonServerError:
                         return
                 self.filter_widget = Form(self.fields_view_tree,
                         self.model_name, self.window, self.domain,
@@ -132,27 +133,24 @@ class Screen(SignalEvent):
                 values = ['AND', values, self.domain]
         else:
             values = self.domain
+        rpc_args = ('model', self.model_name, 'search', values, offset, limit,
+            self.sort, ctx)
         try:
-            try:
-                ids = rpc.execute('model', self.model_name, 'search', values,
-                        offset, limit, self.sort, ctx)
-            except Exception, exception:
-                common.process_exception(exception, self.window)
-                ids = rpc.execute('model', self.model_name, 'search', values,
-                        offset, limit, self.sort, ctx)
-            if not only_ids:
-                if len(ids) == limit:
-                    try:
-                        self.search_count = rpc.execute('model',
-                                self.model_name, 'search_count', values, ctx)
-                    except Exception, exception:
-                        common.process_exception(exception, self.window)
-                        self.search_count = rpc.execute('model',
-                                self.model_name, 'search_count', values, ctx)
-                else:
-                    self.search_count = len(ids)
-        except Exception:
-            ids = []
+            ids = rpc.execute(*rpc_args)
+        except TrytonServerError, exception:
+            ids = (common.process_exception(exception, self.window, rpc_args)
+                or [])
+        if not only_ids:
+            if len(ids) == limit:
+                rpc_args = ('model', self.model_name, 'search_count', values,
+                    ctx)
+                try:
+                    self.search_count = rpc.execute(*rpc_args)
+                except TrytonServerError, exception:
+                    self.search_count = (common.process_exception(exception,
+                        self.window, rpc_args) or 0)
+            else:
+                self.search_count = len(ids)
         self.screen_container.but_prev.set_sensitive(bool(offset))
         if (len(ids) == limit
                 and self.search_count > limit + offset):
@@ -218,9 +216,9 @@ class Screen(SignalEvent):
 
     def __set_current_record(self, record):
         self.__current_record = record
-        try:
+        if self.filter_widget:
             offset = int(self.filter_widget.get_offset())
-        except Exception:
+        else:
             offset = 0
         try:
             pos = self.group.index(record) + offset + 1
@@ -339,7 +337,7 @@ class Screen(SignalEvent):
                     ctx)
             try:
                 view = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 view = common.process_exception(exception, self.window, *args)
                 if not view:
                     return
@@ -540,7 +538,7 @@ class Screen(SignalEvent):
                         context)
                 try:
                     res = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     res = common.process_exception(exception, self.window,
                             *args)
                 if not res:
@@ -586,7 +584,7 @@ class Screen(SignalEvent):
                         [x.id for x in records], context)
                 try:
                     res = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     res = common.process_exception(exception, self.window,
                             *args)
                 if not res:

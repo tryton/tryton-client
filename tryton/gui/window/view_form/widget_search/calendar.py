@@ -103,7 +103,7 @@ class Calendar(Interface):
     def _date_get(self, value):
         try:
             date = datetime.date(*time.strptime(value, self.format)[:3])
-        except Exception:
+        except ValueError:
             return False
         if self.attrs.get('type', 'date') == 'datetime':
             return datetime_strftime(datetime.datetime.combine(date,
@@ -143,7 +143,7 @@ class Calendar(Interface):
                 return ''
             try:
                 return datetime_strftime(value, self.format)
-            except Exception:
+            except ValueError:
                 return ''
 
         i = self.liststore.get_iter_root()

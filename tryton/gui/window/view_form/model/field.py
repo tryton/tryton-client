@@ -9,6 +9,7 @@ import time
 import datetime
 from decimal import Decimal
 import logging
+from tryton.exceptions import TrytonServerError
 
 
 class Field(object):
@@ -137,12 +138,7 @@ class CharField(object):
         if (internal or False) != (record.value.get(self.name, False) or False):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
-            try:
-                self.sig_changed(record)
-            except Exception:
-                record.value[self.name] = internal
-                record.modified_fields = prev_modified_fields
-                return
+            self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
 
@@ -240,12 +236,7 @@ class FloatField(CharField):
             if not self.get_state_attrs(record).get('readonly', False):
                 record.modified_fields.setdefault(self.name)
                 record.signal('record-modified')
-                try:
-                    self.sig_changed(record)
-                except Exception:
-                    record.value[self.name] = internal
-                    record.modified_fields = prev_modified_fields
-                    return
+                self.sig_changed(record)
                 record.validate(softvalidation=True)
                 record.signal('record-changed')
 
@@ -264,12 +255,7 @@ class NumericField(CharField):
             if not self.get_state_attrs(record).get('readonly', False):
                 record.modified_fields.setdefault(self.name)
                 record.signal('record-modified')
-                try:
-                    self.sig_changed(record)
-                except Exception:
-                    record.value[self.name] = internal
-                    record.prev_modified_fields = prev_modified_fields
-                    return
+                self.sig_changed(record)
                 record.validate(softvalidation=True)
                 record.signal('record-changed')
 
@@ -292,12 +278,7 @@ class BooleanField(CharField):
         if internal != bool(record.value.get(self.name, False)):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
-            try:
-                self.sig_changed(record)
-            except Exception:
-                record.value[self.name] = internal
-                record.modified_fields = prev_modified_fields
-                return
+            self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
 
@@ -353,7 +334,7 @@ class M2OField(CharField):
                     ['rec_name'], rpc.CONTEXT)
             try:
                 result = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 result = common.process_exception(exception, record.window,
                         *args)
                 if not result:
@@ -386,20 +367,11 @@ class M2OField(CharField):
         if (internal[0] or False) != (record.value[self.name][0] or False):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
-            try:
-                self.sig_changed(record)
-            except Exception:
-                record.value[self.name] = internal
-                record.modified_fields = prev_modified_fields
-                return
+            self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
         elif force_change:
-            try:
-                self.sig_changed(record)
-            except Exception:
-                record.value[self.name] = internal
-                return
+            self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
 
@@ -584,7 +556,7 @@ class O2MField(CharField):
                         field_names, context)
                 try:
                     fields_to_load = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     fields_dict = common.process_exception(exception,
                             record.window, *args)
                     if not fields_dict:
@@ -627,7 +599,7 @@ class O2MField(CharField):
                     field_names, context)
             try:
                 fields = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 fields = common.process_exception(exception, record.window,
                         *args)
                 if not fields:
@@ -766,12 +738,7 @@ class ReferenceField(CharField):
         if (internal or False) != (record.value[self.name] or False):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
-            try:
-                self.sig_changed(record)
-            except Exception:
-                record.value[self.name] = internal
-                record.modified_fields = prev_modified_fields
-                return
+            self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
 
@@ -792,7 +759,7 @@ class ReferenceField(CharField):
                         ['rec_name'], rpc.CONTEXT)
                 try:
                     result = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     result = common.process_exception(exception, record.window,
                             *args)
                     if not result:

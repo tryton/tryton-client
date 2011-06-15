@@ -17,7 +17,7 @@ class Float(Integer):
     def set_value(self, record, field):
         try:
             value = locale.atof(self.entry.get_text())
-        except Exception:
+        except ValueError:
             value = 0.0
         return field.set_client(record, value)
 
@@ -41,30 +41,35 @@ class Float(Integer):
                     ord(locale.localeconv()['decimal_point'])))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
+        if not self.record:
+            entry.stop_emission('insert-text')
+            return
+
         value = entry.get_text()
         position = entry.get_position()
         new_value = value[:position] + new_text + value[position:]
+        decimal_point = locale.localeconv()['decimal_point']
+
+        if new_value in ('-', decimal_point):
+            return
+
+        if isinstance(self.digits, str):
+            digits = self.record.expr_eval(self.digits)
+        else:
+            digits = self.digits
+
         try:
-            decimal_point = locale.localeconv()['decimal_point']
-
-            if new_value in ('-', decimal_point):
-                return
-
-            if isinstance(self.digits, str):
-                digits = self.record.expr_eval(self.digits)
-            else:
-                digits = self.digits
-
             locale.atof(new_value)
-
-            new_int = new_value
-            new_decimal = ''
-            if decimal_point in new_value:
-                new_int, new_decimal = new_value.rsplit(decimal_point, 1)
-
-            if len(new_int) > digits[0] \
-                    or len(new_decimal) > digits[1]:
-                entry.stop_emission('insert-text')
-
-        except Exception:
+        except ValueError:
             entry.stop_emission('insert-text')
+            return
+
+        new_int = new_value
+        new_decimal = ''
+        if decimal_point in new_value:
+            new_int, new_decimal = new_value.rsplit(decimal_point, 1)
+
+        if len(new_int) > digits[0] \
+                or len(new_decimal) > digits[1]:
+            entry.stop_emission('insert-text')
+

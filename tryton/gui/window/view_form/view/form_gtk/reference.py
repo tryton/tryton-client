@@ -7,6 +7,7 @@ from interface import WidgetInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
+from tryton.exceptions import TrytonServerError
 import tryton.rpc as rpc
 import tryton.common as common
 from tryton.config import CONFIG
@@ -80,7 +81,7 @@ class Reference(WidgetInterface):
             try:
                 selection = rpc.execute('model',
                         self.model_name, selection, rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
@@ -177,7 +178,7 @@ class Reference(WidgetInterface):
                         dom = domain
                     ids = rpc.execute('model', model, 'search', dom, 0,
                             CONFIG['client.limit'], None, context)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     self.focus_out = True
                     self.changed = True
                     common.process_exception(exception, self.window)
@@ -269,7 +270,7 @@ class Reference(WidgetInterface):
                         rpc.CONTEXT)
                 try:
                     name = rpc.execute(*args)
-                except Exception, exception:
+                except TrytonServerError, exception:
                     name = common.process_exception(exception, self.window,
                             *args)
                     if not name:

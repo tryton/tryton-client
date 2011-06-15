@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 from __future__ import with_statement
 import gtk
+import glib
 import gettext
 import os
 import tempfile
@@ -208,7 +209,7 @@ class Image(WidgetInterface):
             try:
                 loader = gtk.gdk.PixbufLoader(ftype)
                 loader.write(data, len(data))
-            except Exception:
+            except glib.GError:
                 continue
             pixbuf = loader.get_pixbuf()
             if pixbuf:

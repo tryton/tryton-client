@@ -5,6 +5,8 @@ import gobject
 from interface import WidgetInterface
 import tryton.rpc as rpc
 import tryton.common as common
+from tryton.pyson import PYSONDecoder
+from tryton.exceptions import TrytonServerError
 
 
 class Selection(WidgetInterface):
@@ -41,7 +43,7 @@ class Selection(WidgetInterface):
             try:
                 selection = rpc.execute('model',
                         self.model_name, selection, rpc.CONTEXT)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 selection = []
         self.selection = selection[:]
@@ -63,7 +65,7 @@ class Selection(WidgetInterface):
             None, ['rec_name'], rpc.CONTEXT)
         try:
             result = rpc.execute(*args)
-        except Exception, exception:
+        except TrytonServerError, exception:
             result = common.process_exception(exception, self.window, args)
         if isinstance(result, list):
             selection = [(x['id'], x['rec_name']) for x in result]
