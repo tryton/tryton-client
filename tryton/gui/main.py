@@ -72,7 +72,7 @@ class Main(object):
         self.window.set_title('Tryton')
         self.window.set_icon(TRYTON_ICON)
         self.window.connect("destroy", Main.sig_quit)
-        self.window.connect("delete_event", self.sig_delete)
+        self.window.connect("delete_event", self.sig_close)
         self.window.connect('configure_event', self.sig_configure)
         self.window.connect('window_state_event', self.sig_window_state)
 
@@ -1389,17 +1389,10 @@ class Main(object):
 
         cls.tryton_client.quit_mainloop()
 
-    def sig_close(self, widget):
+    def sig_close(self, widget, event=None):
         if not self.sig_logout(widget):
             return False
         Main.sig_quit()
-
-    def sig_delete(self, widget, event):
-        if common.sur(_("Do you really want to quit?"), parent=self.window):
-            if not self.sig_logout(widget):
-                return True
-            return False
-        return True
 
     def sig_configure(self, widget, event):
         if hasattr(event, 'width') \
