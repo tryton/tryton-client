@@ -1,3 +1,4 @@
+* Use the same design for Many2Many than One2Many
 * Allow resize columns smaller than the header
 
 Version 2.0.0 - 2011-04-26

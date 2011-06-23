@@ -21,48 +21,60 @@ class Many2Many(WidgetInterface):
                 attrs=attrs)
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
+        self._readonly = True
 
-        hbox = gtk.HBox(homogeneous=False, spacing=3)
+        hbox = gtk.HBox(homogeneous=False, spacing=0)
+        hbox.set_border_width(2)
+
+        label = gtk.Label(attrs.get('string', ''))
+        label.set_alignment(0.0, 0.5)
+        hbox.pack_start(label, expand=True, fill=True)
+
+        hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
+
+        tooltips = common.Tooltips()
+
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('width_chars', 13)
         self.wid_text.connect('activate', self._sig_activate)
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
-        hbox.pack_start(gtk.VSeparator(), padding=2, expand=False, fill=False)
-
-        self.wid_but_add = gtk.Button()
-        hbox_add = gtk.HBox()
+        self.but_add = gtk.Button()
+        tooltips.set_tip(self.but_add, _('Add'))
+        self.but_add.connect('clicked', self._sig_add)
         img_add = gtk.Image()
-        img_add.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
-        hbox_add.pack_start(img_add)
-        label_add = gtk.Label(_('Add'))
-        hbox_add.pack_start(label_add)
-        self.wid_but_add.add(hbox_add)
-        self.wid_but_add.set_relief(gtk.RELIEF_HALF)
-        self.wid_but_add.set_focus_on_click(True)
-        self.wid_but_add.connect('clicked', self._sig_add)
-        hbox.pack_start(self.wid_but_add, padding=3, expand=False, fill=False)
+        img_add.set_from_stock('tryton-list-add',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_add.set_alignment(0.5, 0.5)
+        self.but_add.add(img_add)
+        self.but_add.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(self.but_add, expand=False, fill=False)
 
-        self.wid_but_remove = gtk.Button()
-        hbox_remove = gtk.HBox()
+
+        self.but_remove = gtk.Button()
+        tooltips.set_tip(self.but_remove, _('Remove'))
+        self.but_remove.connect('clicked', self._sig_remove)
         img_remove = gtk.Image()
-        img_remove.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
-        hbox_remove.pack_start(img_remove)
-        label_remove = gtk.Label(_('Remove'))
-        hbox_remove.pack_start(label_remove)
-        self.wid_but_remove.add(hbox_remove)
-        self.wid_but_remove.set_relief(gtk.RELIEF_HALF)
-        self.wid_but_remove.set_focus_on_click(True)
-        self.wid_but_remove.connect('clicked', self._sig_remove)
-        hbox.pack_start(self.wid_but_remove, expand=False, fill=False)
-
-        self.widget.pack_start(hbox, expand=False, fill=False)
+        img_remove.set_from_stock('tryton-list-remove',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_remove.set_alignment(0.5, 0.5)
+        self.but_remove.add(img_remove)
+        self.but_remove.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(self.but_remove, expand=False, fill=False)
 
         hbox.set_focus_chain([self.wid_text])
+
+        tooltips.enable()
+
+        frame = gtk.Frame()
+        frame.add(hbox)
+        frame.set_shadow_type(gtk.SHADOW_OUT)
+        self.widget.pack_start(frame, expand=False, fill=True)
 
         self.screen = Screen(attrs['relation'], self.window,
                 mode=['tree'], views_preload=attrs.get('views', {}),
                 row_activate=self._on_activate)
+        self.screen.signal_connect(self, 'record-message', self._sig_label)
 
         if not isinstance(self.screen.window, gtk.Dialog):
             self.screen.widget.set_size_request(0, 0)
@@ -155,11 +167,17 @@ class Many2Many(WidgetInterface):
             win.destroy()
 
     def _readonly_set(self, value):
-        super(Many2Many, self)._readonly_set(value)
+        self._readonly = value
         self.wid_text.set_editable(not value)
         self.wid_text.set_sensitive(not value)
-        self.wid_but_remove.set_sensitive(not value)
-        self.wid_but_add.set_sensitive(not value)
+        self.but_remove.set_sensitive(not value)
+        self.but_add.set_sensitive(not value)
+
+    def _sig_label(self, screen, signal_data):
+        if signal_data[0] >= 1:
+            self.but_remove.set_sensitive(not self._readonly)
+        else:
+            self.but_remove.set_sensitive(False)
 
     def display(self, record, field):
         super(Many2Many, self).display(record, field)
