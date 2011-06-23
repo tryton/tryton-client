@@ -127,7 +127,7 @@ class Many2One(WidgetInterface):
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids=ids, context=context, domain=domain,
-                        parent=self.window,
+                        parent=self.widget.get_toplevel(),
                         views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
@@ -155,7 +155,7 @@ class Many2One(WidgetInterface):
     def sig_new(self, *args):
         self.focus_out = False
         screen = self.get_screen()
-        win = WinForm(screen, self.window, new=True)
+        win = WinForm(screen, self.widget.get_toplevel(), new=True)
         if win.run():
             if screen.save_current():
                 value = (screen.current_record.id,
@@ -171,7 +171,7 @@ class Many2One(WidgetInterface):
         if value:
             screen = self.get_screen()
             screen.load([self.field.get(self.record)])
-            win = WinForm(screen, self.window)
+            win = WinForm(screen, self.widget.get_toplevel())
             while win.run():
                 if screen.save_current():
                     value = (screen.current_record.id,
@@ -212,7 +212,7 @@ class Many2One(WidgetInterface):
 
                 win = WinSearch(self.attrs['relation'], sel_multi=False,
                         ids=ids, context=context,
-                        domain=domain, parent=self.window,
+                        domain=domain, parent=self.widget.get_toplevel(),
                         views_preload=self.attrs.get('views', {}))
                 ids = win.run()
                 if ids:
