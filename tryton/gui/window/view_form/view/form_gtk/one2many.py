@@ -241,7 +241,7 @@ class One2Many(WidgetInterface):
             self.screen.new(context=ctx)
             self.screen.current_view.widget.set_sensitive(True)
         else:
-            win = WinForm(self.screen, self.window, new=True,
+            win = WinForm(self.screen, self.widget.get_toplevel(), new=True,
                 many=True, context=ctx)
             win.run()
             win.destroy()
@@ -256,7 +256,7 @@ class One2Many(WidgetInterface):
             if not record.validate(fields):
                 self.screen.display()
                 return
-            win = WinForm(self.screen, self.window)
+            win = WinForm(self.screen, self.widget.get_toplevel())
             win.run()
             win.destroy()
 

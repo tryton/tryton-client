@@ -116,7 +116,7 @@ class Binary(WidgetInterface):
 
     def sig_new(self, widget=None):
         filename = file_selection(_('Open...'),
-                parent=self.window)
+                parent=self.widget.get_toplevel())
         if filename and self.field:
             self.field.set_client(self.record,
                     base64.encodestring(open(filename, 'rb').read()))
@@ -144,7 +144,8 @@ class Binary(WidgetInterface):
         if self.filename_field:
             filename = self.filename_field.get(self.record)
         filename = file_selection(_('Save As...'), filename=filename,
-                parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
+            parent=self.widget.get_toplevel(),
+            action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename,'wb') as fp:
                 fp.write(base64.decodestring(self.field.get(self.record)))

@@ -156,7 +156,7 @@ class Reference(WidgetInterface):
             if not leave:
                 screen = Screen(model, self.window, mode=['form'])
                 screen.load([obj_id])
-                win = WinForm(screen, self.window)
+                win = WinForm(screen, self.widget.get_toplevel())
                 if win.run():
                     if screen.save_current():
                         value = (screen.current_record.id,
@@ -191,7 +191,7 @@ class Reference(WidgetInterface):
                     return True
 
                 win = WinSearch(model, sel_multi=False, ids=ids, context=context,
-                        domain=domain, parent=self.window)
+                        domain=domain, parent=self.widget.get_toplevel())
                 ids = win.run()
                 if ids:
                     self.field.set_client(self.record, (model, (ids[0], '')))
@@ -206,7 +206,7 @@ class Reference(WidgetInterface):
         if not model:
             return
         screen = Screen(model, self.window, mode=['form'])
-        win = WinForm(screen, self.window, new=True)
+        win = WinForm(screen, self.widget.get_toplevel(), new=True)
         if win.run():
             if screen.save_current():
                 value = (screen.current_record.id,

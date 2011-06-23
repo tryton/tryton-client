@@ -134,8 +134,9 @@ class Many2Many(WidgetInterface):
             return False
         if len(ids) != 1 or not value:
             win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                    context=context, domain=domain, parent=self.window,
-                    views_preload=self.attrs.get('views', {}))
+                context=context, domain=domain,
+                parent=self.widget.get_toplevel(),
+                views_preload=self.attrs.get('views', {}))
             ids = win.run()
 
         res_id = None
@@ -159,7 +160,7 @@ class Many2Many(WidgetInterface):
 
     def _sig_edit(self):
         if self.screen.current_record:
-            win = WinForm(self.screen, self.window)
+            win = WinForm(self.screen, self.widget.get_toplevel())
             if win.run():
                 self.screen.current_record.save()
             else:
