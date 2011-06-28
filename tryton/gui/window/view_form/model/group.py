@@ -20,7 +20,7 @@ class Group(SignalEvent, list):
         self.lock_signal = False
         self.__window = window
         self.parent = parent
-        self.parent_name = parent_name
+        self.parent_name = parent_name or ''
         self.child_name = child_name
         self.parent_datetime_field = parent_datetime_field
         self._context = context or {}
