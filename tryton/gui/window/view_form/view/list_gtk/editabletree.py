@@ -213,7 +213,6 @@ class EditableTreeView(gtk.TreeView):
         elif event.keyval == gtk.keysyms.Escape:
             if record.id < 0:
                 model.remove(model.get_iter(path))
-                model.row_deleted(path)
                 self.screen.current_record = False
             if not path[0]:
                 self.screen.current_record = False
