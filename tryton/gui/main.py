@@ -4,6 +4,7 @@ from __future__ import with_statement
 
 import os
 import sys
+import socket
 import gettext
 from urlparse import urlparse
 import urllib
@@ -1174,7 +1175,7 @@ class Main(object):
                         len(ids2))
             self.sb_requests.set_text(message)
             return (ids, ids2)
-        except TrytonServerError:
+        except (TrytonServerError, socket.error):
             if exception:
                 raise
             return ([], [])
