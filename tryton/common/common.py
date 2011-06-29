@@ -1084,16 +1084,13 @@ class DBProgress(object):
 
     def start(self):
         key = (self.host, self.port)
+        dbs, createdb = [], False
         try:
             dbs = refresh_dblist(self.host, self.port)
             createdb = True
-        except Exception, exception:
-            if exception[0] == 'AccessDenied':
-                dbs, createdb = [], False
-            else:
-                raise
-        self.db_info = (dbs, createdb)
-        self.updated.set()
+        finally:
+            self.db_info = (dbs, createdb)
+            self.updated.set()
 
     def update(self, combo, progressbar, dbname=''):
         key = (self.host, self.port)
