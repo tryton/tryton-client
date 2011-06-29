@@ -743,6 +743,8 @@ class ViewList(ParserView):
 
     def __select_changed(self, tree_sel):
         previous_record = self.screen.current_record
+        if previous_record and previous_record not in previous_record.group:
+            previous_record = None
 
         if tree_sel.get_mode() == gtk.SELECTION_SINGLE:
             model, iter_ = tree_sel.get_selected()
