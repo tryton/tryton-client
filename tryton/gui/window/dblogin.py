@@ -608,9 +608,10 @@ class DBLogin(object):
         self.expand_hostspec(self.expander)
 
         res, result = None, ('', '', '', '', '')
-        while not (res in (gtk.RESPONSE_CANCEL, gtk.RESPONSE_DELETE_EVENT)
-            or (res == gtk.RESPONSE_OK and all(result))):
+        while not all(result):
             res = self.dialog.run()
+            if res != gtk.RESPONSE_OK:
+                break
             active_profile = self.combo_profile.get_active()
             if active_profile != -1:
                 profile = self.profile_store[active_profile][0]
