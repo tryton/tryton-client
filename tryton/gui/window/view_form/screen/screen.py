@@ -659,14 +659,14 @@ class Screen(SignalEvent):
         view = self.current_view
         view.set_value()
         view.set_cursor(reset_view=False)
-        if view.view_type == 'tree':
+        if view.view_type == 'tree' and len(self.group):
             start, end = view.widget_tree.get_visible_range()
             vadjustment = view.widget_tree.get_vadjustment()
             vadjustment.value = vadjustment.value + vadjustment.page_increment
             store = view.store
             iter_ = store.get_iter(end)
             self.current_record = store.get_value(iter_, 0)
-        elif self.current_record.group:
+        elif view.view_type == 'form' and self.current_record.group:
             group = self.current_record.group
             record = self.current_record
             while group:
@@ -701,14 +701,14 @@ class Screen(SignalEvent):
         view = self.current_view
         view.set_value()
         view.set_cursor(reset_view=False)
-        if view.view_type == 'tree':
+        if view.view_type == 'tree' and len(self.group):
             start, end = view.widget_tree.get_visible_range()
             vadjustment = view.widget_tree.get_vadjustment()
             vadjustment.value = vadjustment.value - vadjustment.page_increment
             store = view.store
             iter_ = store.get_iter(start)
             self.current_record = store.get_value(iter_, 0)
-        elif self.current_record.group:
+        elif view.view_type == 'form' and self.current_record.group:
             group = self.current_record.group
             record = self.current_record
             idx = group.index(record) - 1
