@@ -180,7 +180,7 @@ class And(object):
             elif is_leaf(part) and self.base(part[0]) == symbol:
                 result.append(part)
             else:
-                field, _, _ = part
+                field = part[0]
                 if (field not in context
                     or field in context
                     and eval_leaf(part, context, operator.and_)):
