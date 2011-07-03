@@ -36,6 +36,7 @@ class Group(SignalEvent, list):
             self.readonly = True
         self.__id2record = {}
         self.__field_childs = None
+        self.exclude_field = None
 
     def __get_window(self):
         return self.__window
