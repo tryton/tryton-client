@@ -293,7 +293,10 @@ class Record(SignalEvent):
                 vals = common.process_exception(exception, self.window, *args)
                 if not vals:
                     return
-            if self.parent_name in self.group.fields and self.parent:
+            if (self.parent
+                    and self.parent_name in self.group.fields
+                    and (self.group.fields[self.parent_name].attrs['relation']
+                        == self.group.parent.model_name)):
                 vals[self.parent_name] = self.parent.id
             self.set_default(vals)
         for fieldname, fieldinfo in self.group.fields.iteritems():
@@ -323,6 +326,8 @@ class Record(SignalEvent):
             if fields and field_name not in fields:
                 continue
             if field.get_state_attrs(self).get('readonly', False):
+                continue
+            if field_name == self.group.exclude_field:
                 continue
             if not field.validate(self, softvalidation):
                 res = False

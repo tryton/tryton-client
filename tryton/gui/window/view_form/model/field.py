@@ -296,12 +296,13 @@ class M2OField(CharField):
 
     def get(self, record, check_load=True, readonly=True, modified=False):
         value = record.value.get(self.name)
-        if record.parent_name == self.name:
+        if (record.parent_name == self.name
+                and self.attrs['relation'] == record.group.parent.model_name):
             value = record.parent.id if record.parent else False
         if value:
             if isinstance(value, (int, basestring, long)):
                 self.set(record, value)
-                value = record.value.get(self.name)
+                value = record.value.get(self.name, value)
             if isinstance(value, (int, basestring, long)):
                 return value
             return value[0] or False
@@ -309,19 +310,21 @@ class M2OField(CharField):
 
     def get_client(self, record):
         value = record.value.get(self.name)
-        if record.parent_name == self.name:
+        if (record.parent_name == self.name
+                and self.attrs['relation'] == record.group.parent.model_name):
             value = record.parent.id if record.parent else False
         if value:
             if isinstance(value, (int, basestring, long)):
                 self.set(record, value)
-                value = record.value.get(self.name)
+                value = record.value.get(self.name, value)
             if isinstance(value, (int, basestring, long)):
                 return value
             return value[1]
         return False
 
     def set(self, record, value, modified=False):
-        if record.parent_name == self.name:
+        if (record.parent_name == self.name
+                and self.attrs['relation'] == record.group.parent.model_name):
             if record.parent:
                 if 'rec_name' in record.parent.value:
                     value = (record.parent.id, record.parent.value['rec_name'])
@@ -350,7 +353,8 @@ class M2OField(CharField):
             else:
                 record.value[self.name + '.rec_name'] = ''
         record.value[self.name] = value or (False, '')
-        if record.parent_name == self.name:
+        if (record.parent_name == self.name
+                and self.attrs['relation'] == record.group.parent.model_name):
             if record.parent:
                 if 'rec_name' not in record.parent.value:
                     record.parent.value['rec_name'] = \
@@ -393,7 +397,8 @@ class M2OField(CharField):
 
     def get_state_attrs(self, record):
         result = super(M2OField, self).get_state_attrs(record)
-        if record.parent_name == self.name:
+        if (record.parent_name == self.name
+                and self.attrs['relation'] == record.group.parent.model_name):
             result = result.copy()
             result['readonly'] = True
         return result

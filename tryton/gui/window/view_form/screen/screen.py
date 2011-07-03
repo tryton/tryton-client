@@ -49,6 +49,7 @@ class Screen(SignalEvent):
         self.view_ids = view_ids
         self.parent = None
         self.parent_name = None
+        self.exclude_field = exclude_field
         self.__window = window
         self.filter_widget = None
         self.__group = None
@@ -62,7 +63,6 @@ class Screen(SignalEvent):
         self.limit = limit
         self.search_value = search_value
         self.fields_view_tree = None
-        self.exclude_field = exclude_field
         self.sort = sort
         self.view_to_load = []
 
@@ -188,6 +188,7 @@ class Screen(SignalEvent):
             self._record_modified)
         self.__group.signal_connect(self, 'group-changed', self._group_changed)
         self.__group.add_fields(fields)
+        self.__group.exclude_field = self.exclude_field
 
     group = property(__get_group, __set_group)
 
