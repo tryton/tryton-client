@@ -50,7 +50,7 @@ class PySocket:
         self.connected = False
         self.buffer = ''
         self.fingerprints = fingerprints
-        if os.path.isfile(ca_certs):
+        if ca_certs and os.path.isfile(ca_certs):
             self.ca_certs = ca_certs
         else:
             self.ca_certs = None
