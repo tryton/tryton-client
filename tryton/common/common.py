@@ -155,7 +155,10 @@ def refresh_dblist(host, port):
 def refresh_langlist(lang_widget, host, port):
     liststore = lang_widget.get_model()
     liststore.clear()
-    lang_list = rpc.db_exec(host, port, 'list_lang')
+    try:
+        lang_list = rpc.db_exec(host, port, 'list_lang')
+    except socket.error:
+        return []
     from tryton.gui.main import Main
     Main.get_main().refresh_ssl()
     index = -1
