@@ -113,7 +113,7 @@ def server_version(host, port):
             _SEMAPHORE.release()
         logging.getLogger('rpc.result').debug(repr(res))
         return res
-    except TrytonServerError:
+    except (TrytonServerError, socket.error):
         logging.getLogger('rpc.result').debug(repr(None))
         return None
 
