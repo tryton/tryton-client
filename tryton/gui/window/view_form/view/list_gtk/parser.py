@@ -28,6 +28,7 @@ import locale
 import datetime
 import time
 import gettext
+import operator
 
 _ = gettext.gettext
 
@@ -701,7 +702,7 @@ class Selection(Char):
                     args) or [])
         self.selection = selection[:]
         if self.attrs.get('sort', True):
-            selection.sort(lambda x, y: cmp(x[1], y[1]))
+            selection.sort(key=operator.itemgetter(1))
         self.renderer.set_property('model', self.get_model(selection))
         self.renderer.set_property('text-column', 0)
 
@@ -786,7 +787,7 @@ class Reference(Char):
             except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 selection = []
-        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        selection.sort(key=operator.itemgetter(1))
         for i, j in selection:
             self._selection[i] = str(j)
 

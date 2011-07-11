@@ -2,7 +2,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 
-from __future__ import with_statement
 from setuptools import setup, find_packages
 import os
 import glob
@@ -113,14 +112,6 @@ elif os.name == 'mac' \
 
 execfile(os.path.join('tryton', 'version.py'))
 
-EXTRAS = {
-    'timezone': ['pytz'],
-}
-SIMPLEJSON = []
-if sys.version_info < (2, 6):
-    SIMPLEJSON = ['simplejson']
-    EXTRAS['ssl'] = ['ssl']
-
 dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
@@ -149,7 +140,6 @@ dist = setup(name=PACKAGE,
         'Natural Language :: Slovenian',
         'Natural Language :: Japanese',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Office/Business',
@@ -158,8 +148,10 @@ dist = setup(name=PACKAGE,
     install_requires=[
 #        "pygtk >= 2.0",
         "python-dateutil",
-    ] + SIMPLEJSON,
-    extras_require=EXTRAS,
+    ],
+    extras_require={
+        'timezone': ['pytz'],
+    },
     **args
 )
 

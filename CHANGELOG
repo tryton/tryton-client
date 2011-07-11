@@ -1,3 +1,4 @@
+* Drop support of Python 2.5
 * Use the same design for Many2Many than One2Many
 * Allow resize columns smaller than the header
 

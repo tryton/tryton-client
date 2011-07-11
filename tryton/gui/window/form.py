@@ -438,7 +438,7 @@ class Form(SignalEvent):
 
     def _record_message(self, screen, signal_data):
         name = '_'
-        if signal_data[0] >= 0:
+        if signal_data[0]:
             name = str(signal_data[0])
         msg = name + ' / ' + str(signal_data[1])
         if signal_data[1] < signal_data[2]:

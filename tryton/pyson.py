@@ -6,6 +6,7 @@ if sys.version_info < (2, 6):
 else:
     import json
 import datetime
+from functools import reduce
 
 
 class PYSON(object):

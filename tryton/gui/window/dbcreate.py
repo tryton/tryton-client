@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from __future__ import with_statement
 import gtk
 import gobject
 import gettext
@@ -373,7 +372,7 @@ class DBCreate(object):
                                     self.dialog)
                             rpcprogress.run()
                         except TrytonServerError, exception:
-                            if str(exception[0]) == "AccessDenied":
+                            if str(exception.args[0]) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
                                     "the Tryton server. Please try again."),
                                     self.dialog, _("Access denied!"))
@@ -387,7 +386,7 @@ class DBCreate(object):
                                     "be broken. Maybe drop this database! " \
                                     "Please check the error message for " \
                                     "possible informations.\n" \
-                                    "Error message:\n") + str(exception[0]),
+                                    "Error message:\n") + str(exception.args[0]),
                                     self.dialog, _("Error creating database!"))
                             parent.present()
                             self.dialog.destroy()

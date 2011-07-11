@@ -39,7 +39,7 @@ def db_list(host, port):
             try:
                 _SOCK.send(args)
             except socket.error, exception:
-                if exception[0] == 32:
+                if exception.args[0] == 32:
                     _SOCK.reconnect()
                     _SOCK.send(args)
                 else:
@@ -51,7 +51,7 @@ def db_list(host, port):
         logging.getLogger('rpc.result').debug(repr(res))
         return res
     except TrytonServerError, exception:
-        if exception[0] == 'AccessDenied':
+        if exception.args[0] == 'AccessDenied':
             raise
         else:
             logging.getLogger('rpc.result').debug(repr(None))
@@ -73,7 +73,7 @@ def db_exec(host, port, method, *args):
         try:
             _SOCK.send(args)
         except socket.error, exception:
-            if exception[0] == 32:
+            if exception.args[0] == 32:
                 _SOCK.reconnect()
                 _SOCK.send(args)
             else:
@@ -102,7 +102,7 @@ def server_version(host, port):
             try:
                 _SOCK.send(args)
             except socket.error, exception:
-                if exception[0] == 32:
+                if exception.args[0] == 32:
                     _SOCK.reconnect()
                     _SOCK.send(args)
                 else:

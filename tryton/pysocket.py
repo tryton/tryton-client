@@ -113,8 +113,8 @@ class PySocket:
             except socket.error:
                 peercert = None
             def format_hash(value):
-                return reduce(lambda x, (i, y): x + y.upper() +
-                        ((i % 2 and i + 1 < len(value)) and ':' or ''),
+                return reduce(lambda x, y: x + y[1].upper() +
+                        ((y[0] % 2 and y[0] + 1 < len(value)) and ':' or ''),
                         enumerate(value), '')
             if peercert and hashlib:
                 fingerprint = format_hash(hashlib.sha1(peercert).hexdigest())

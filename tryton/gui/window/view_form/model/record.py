@@ -8,6 +8,7 @@ import field
 import datetime
 import logging
 import time
+from functools import reduce
 from tryton.exceptions import TrytonServerError
 
 

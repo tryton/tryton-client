@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from __future__ import with_statement
 import os
 from tryton.config import get_config_dir
 
@@ -17,7 +16,7 @@ class Fingerprints(dict):
         if not os.path.isfile(KNOWN_HOSTS_PATH):
             return
         with open(KNOWN_HOSTS_PATH) as known_hosts:
-            for line in known_hosts.xreadlines():
+            for line in known_hosts:
                 line = line.strip()
                 try:
                     key, sha1 = line.split(' ')

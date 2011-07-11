@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from __future__ import with_statement
 
 import os
 import sys
@@ -1440,7 +1439,7 @@ class Main(object):
         hbox.pack_start(label, expand=True, fill=True)
         layout = label.get_layout()
         w, h = layout.get_size()
-        if (w / pango.SCALE) > 120 - noise_size:
+        if (w // pango.SCALE) > 120 - noise_size:
             label2 = gtk.Label('...')
             self.tooltips.set_tip(label2, page.name)
             hbox.pack_start(label2, expand=False, fill=False)
@@ -1606,14 +1605,14 @@ class Main(object):
             rpcprogress.run()
         except TrytonServerError, exception:
             self.refresh_ssl()
-            if exception[0] == "AccessDenied":
+            if exception.args[0] == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password" \
                         "\nPlease try again."), self.window,
                         _('Access denied!'))
                 self.sig_db_drop(self.window)
             else:
                 common.warning(_('Database drop failed with ' \
-                        'error message:\n') + str(exception[0]), \
+                        'error message:\n') + str(exception.args[0]), \
                         self.window, _('Database drop failed!'))
             return
         self.refresh_ssl()
@@ -1639,21 +1638,21 @@ class Main(object):
                 res = rpcprogress.run()
             except TrytonServerError, exception:
                 self.refresh_ssl()
-                if exception[0] == \
+                if exception.args[0] == \
                         "Couldn't restore database with password":
                     common.warning(_("It is not possible to restore a " \
                             "password protected database.\n" \
                             "Backup and restore needed to be proceed " \
                             "manual."), self.window, \
                             _('Database is password protected!'))
-                elif exception[0] == "AccessDenied":
+                elif exception.args[0] == "AccessDenied":
                     common.warning(_("Wrong Tryton Server Password.\n" \
                             "Please try again."), self.window, \
                             _('Access denied!'))
                     self.sig_db_restore(self.window)
                 else:
                     common.warning(_('Database restore failed with ' \
-                            'error message:\n') + str(exception[0]), \
+                            'error message:\n') + str(exception.args[0]), \
                             self.window, _('Database restore failed!'))
                 return
             self.refresh_ssl()
@@ -1681,19 +1680,19 @@ class Main(object):
         try:
             dump_b64 = rpcprogress.run()
         except TrytonServerError, exception:
-            if exception[0] == "Couldn't dump database with password":
+            if exception.args[0] == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
                         "protected Database.\nBackup and restore " \
                         "needed to be proceed manual."),
                         self.window, _('Database is password protected!'))
-            elif exception[0] == "AccessDenied":
+            elif exception.args[0] == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password.\n" \
                         "Please try again."), self.window,
                         _('Access denied!'))
                 self.sig_db_dump(self.window)
             else:
                 common.warning(_('Database dump failed with ' \
-                        'error message:\n') + str(exception[0]), \
+                        'error message:\n') + str(exception.args[0]), \
                         self.window, _('Database dump failed!'))
             rpc.logout()
             Main.get_main().refresh_ssl()

@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 #This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
 import gtk
+from functools import reduce
 from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
         DHM_FORMAT, COLOR_SCHEMES, datetime_strftime
 from tryton.pyson import PYSONDecoder
@@ -35,11 +36,11 @@ class Popup(object):
         widget_x, widget_y = widget.window.get_origin()
         width, height = widget.window.get_size()
         popup_width, popup_height = self.win.get_size()
-        if x < popup_width / 2:
-            x = popup_width / 2
-        if x > width - popup_width / 2:
-            x = width - popup_width / 2
-        pos_x = widget_x + x - popup_width / 2
+        if x < popup_width // 2:
+            x = popup_width // 2
+        if x > width - popup_width // 2:
+            x = width - popup_width // 2
+        pos_x = widget_x + x - popup_width // 2
         if pos_x < 0:
             pos_x = 0
         if y < popup_height + 5:
@@ -147,7 +148,7 @@ class Graph(gtk.DrawingArea):
         # Fill the background
         cr.save()
         r, g, b = hex2rgb(self.attrs.get('background', '#d5d5d5'))
-        linear = cairo.LinearGradient(width / 2, 0, width / 2, height)
+        linear = cairo.LinearGradient(width // 2, 0, width // 2, height)
         linear.add_color_stop_rgb(0, 1, 1, 1)
         linear.add_color_stop_rgb(1, r, g, b)
         cr.set_source(linear)

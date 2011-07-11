@@ -439,7 +439,8 @@ class ParserForm(ParserInterface):
                         pos = gtk.POS_BOTTOM
                 notebook.set_tab_pos(pos)
                 notebook.set_border_width(3)
-                container.wid_add(notebook, colspan=attrs.get('colspan', 4),
+                container.wid_add(notebook,
+                        colspan=int(attrs.get('colspan', 4)),
                         expand=True, fill=True)
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
                         self.parse(model_name, node, fields, notebook,

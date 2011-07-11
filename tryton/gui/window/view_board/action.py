@@ -199,7 +199,7 @@ class Action(SignalEvent):
 
     def _sig_label(self, screen, signal_data):
         name = '_'
-        if signal_data[0] >= 0:
+        if signal_data[0]:
             name = str(signal_data[0])
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)

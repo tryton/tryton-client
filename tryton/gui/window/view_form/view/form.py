@@ -1,5 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import operator
+from functools import reduce
 import gtk
 import gettext
 from tryton.common import message, TRYTON_ICON
@@ -229,7 +231,7 @@ class ViewForm(ParserView):
             # Get first the lazy one to reduce number of requests
             fields = [(name, field.attrs.get('loading', 'eager'))
                     for name, field in record.group.fields.iteritems()]
-            fields.sort(lambda x, y: cmp(y[1], x[1]))
+            fields.sort(key=operator.itemgetter(1))
             for field, _ in fields:
                 record[field].get(record, check_load=False)
         for name, widgets in self.widgets.iteritems():

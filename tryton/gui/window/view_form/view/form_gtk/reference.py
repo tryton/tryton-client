@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import operator
 import gtk
 import gobject
 import gettext
@@ -84,7 +85,7 @@ class Reference(WidgetInterface):
             except TrytonServerError, exception:
                 common.process_exception(exception, self.window)
                 selection = []
-        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        selection.sort(key=operator.itemgetter(1))
         self.set_popdown(selection)
 
         self.last_key = (None, 0)

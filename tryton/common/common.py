@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from __future__ import with_statement
 
 import gtk
 import gobject
@@ -98,7 +97,8 @@ class TrytonIconFactory(gtk.IconFactory):
             self.load_icons(refresh=True)
         icon_ref = (self._name2id[iconname], iconname)
         idx = self._tryton_icons.index(icon_ref)
-        to_load = slice(max(0, idx-self.batchnum/2), idx+self.batchnum/2)
+        to_load = slice(max(0, idx - self.batchnum // 2),
+            idx + self.batchnum // 2)
         ids = [e[0] for e in self._tryton_icons[to_load]]
         try:
             icons = rpc.execute('model', 'ir.ui.icon', 'read', ids,

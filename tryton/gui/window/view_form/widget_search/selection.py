@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
+import operator
 from interface import Interface
 import tryton.rpc as rpc
 import tryton.common as common
@@ -62,7 +63,7 @@ class Selection(Interface):
                 except TrytonServerError, exception:
                     common.process_exception(exception, parent)
                     selection = []
-        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        selection.sort(key=operator.itemgetter(1))
         self.attrs['selection'] = selection
         self.set_popdown(selection)
         self.widget.pack_start(self.entry, True, True)
