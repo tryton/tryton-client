@@ -560,7 +560,7 @@ class O2MField(CharField):
                 args = ('model', self.attrs['relation'], 'fields_get',
                         field_names, context)
                 try:
-                    fields_to_load = rpc.execute(*args)
+                    fields_dict = rpc.execute(*args)
                 except TrytonServerError, exception:
                     fields_dict = common.process_exception(exception,
                             record.window, *args)
@@ -568,17 +568,17 @@ class O2MField(CharField):
                         return False
 
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], fields_dict, record.window,
+        group = Group(self.attrs['relation'], fields, record.window,
                 parent=record, parent_name=parent_name, child_name=self.name,
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
+        group.load_fields(fields_dict)
         if record.value.get(self.name):
             group.record_deleted.extend(x for x in record.value[self.name]
                 if x.id > 0)
             group.record_deleted.extend(record.value[self.name].record_deleted)
             group.record_removed.extend(record.value[self.name].record_removed)
         record.value[self.name] = group
-        group.fields = fields
         for vals in (value or []):
             new_record = record.value[self.name].new(default=False)
             new_record.set_default(vals, modified=modified)
