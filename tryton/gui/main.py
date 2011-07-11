@@ -1391,7 +1391,7 @@ class Main(object):
 
     def sig_close(self, widget, event=None):
         if not self.sig_logout(widget):
-            return False
+            return True
         Main.sig_quit()
 
     def sig_configure(self, widget, event):
