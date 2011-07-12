@@ -3,10 +3,7 @@
 import gobject
 import gtk
 import sys
-if sys.version_info < (2, 6):
-    import simplejson as json
-else:
-    import json
+import json
 import tryton.rpc as rpc
 import locale
 from interface import ParserView

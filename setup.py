@@ -80,12 +80,9 @@ if os.name == 'nt':
     }
     args['zipfile'] = 'library.zip'
 
-    if sys.version_info < (2, 6):
-        data_files.append(('', ['msvcp71.dll']))
-    else:
-        data_files.append(('', ['msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll']))
-        manifest = read('Microsoft.VC90.CRT.manifest')
-        args['windows'][0]['other_resources'] = [(24, 1, manifest)]
+    data_files.append(('', ['msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll']))
+    manifest = read('Microsoft.VC90.CRT.manifest')
+    args['windows'][0]['other_resources'] = [(24, 1, manifest)]
 
 
 elif os.name == 'mac' \

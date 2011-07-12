@@ -9,10 +9,7 @@ from urlparse import urlparse
 import urllib
 import gobject
 import gtk
-if sys.version_info < (2, 6):
-    import simplejson as json
-else:
-    import json
+import json
 import webbrowser
 import tryton.rpc as rpc
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \

@@ -371,10 +371,7 @@ def file_open(filename, type, parent, print_p=False):
         if print_p:
             operation = 'print'
         try:
-            if sys.version_info[:2] >= (2, 5):
-                os.startfile(os.path.normpath(filename), operation)
-            else:
-                os.startfile(os.path.normpath(filename))
+            os.startfile(os.path.normpath(filename), operation)
         except WindowsError:
             save_name = file_selection(_('Save As...'), parent=parent,
                     action=gtk.FILE_CHOOSER_ACTION_SAVE)
