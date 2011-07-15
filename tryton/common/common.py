@@ -318,14 +318,16 @@ def file_selection(title, filename='', parent=None,
             win.add_filter(filt)
 
     def update_preview_cb(win, img):
+        have_preview = False
         filename = win.get_preview_filename()
-        try:
-            pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename.decode(
-                sys.getfilesystemencoding().encode('utf-8')), 128, 128)
-            img.set_from_pixbuf(pixbuf)
-            have_preview = True
-        except (IOError, glib.GError):
-            have_preview = False
+        if filename:
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename.decode(
+                        sys.getfilesystemencoding().encode('utf-8')), 128, 128)
+                img.set_from_pixbuf(pixbuf)
+                have_preview = True
+            except (IOError, glib.GError):
+                pass
         win.set_preview_widget_active(have_preview)
         return
 
