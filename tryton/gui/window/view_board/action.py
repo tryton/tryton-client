@@ -45,7 +45,6 @@ class Action(SignalEvent):
             self.action['view_mode'] = attrs['view_mode']
 
         self.action.setdefault('pyson_domain', '[]')
-        self.context.update({'active_id': False, 'active_ids': []})
         self.context.update(rpc.CONTEXT)
         self.context['_user'] = rpc._USER
         self.context.update(PYSONDecoder(self.context).decode(
