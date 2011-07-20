@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import itertools
 import pysocket
 import logging
 import socket
@@ -206,11 +207,18 @@ def _execute(blocking, *args):
         raise TrytonError('NotLogged')
     logging.getLogger('rpc.request').info(repr((args)))
     key = False
-    if len(args) >= 6 and args[1] == 'fields_view_get':
-        key = str(args)
+    if args[2] == 'fields_view_get':
+        args, ctx = args[:-1], args[-1]
+        # Make sure all the arguments are present
+        args = tuple(arg if arg is not None else default
+            for arg, default in itertools.izip_longest(args,
+                ('', '', 'fields_view_get', None, 'form', False),
+                fillvalue=None))
+        key = str(args + (ctx,))
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
-            args = args[:]
-            args = args + (_VIEW_CACHE[key][0],)
+            args += (_VIEW_CACHE[key][0], ctx)
+        else:
+            args += (ctx,)
     res = _SEMAPHORE.acquire(blocking)
     if not res:
         return
