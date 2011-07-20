@@ -17,7 +17,7 @@ class Group(SignalEvent, list):
         super(Group, self).__init__()
         if domain is None:
             domain = []
-        self.domain = domain
+        self.__domain = domain
         self.lock_signal = False
         self.__window = window
         self.parent = parent
@@ -48,6 +48,13 @@ class Group(SignalEvent, list):
         self.__window = window
 
     window = property(__get_window, __set_window)
+
+    @property
+    def domain(self):
+        if self.parent and self.child_name:
+            field = self.parent.group.fields[self.child_name]
+            return [self.__domain, field.domain_get(self.parent)]
+        return self.__domain
 
     def insert(self, pos, record):
         assert record.group is self
