@@ -7,6 +7,7 @@ from field import Field, O2MField
 from tryton.signal_event import SignalEvent
 import tryton.common as common
 from tryton.exceptions import TrytonServerError
+from tryton.common.domain_inversion import is_leaf
 
 
 class Group(SignalEvent, list):
@@ -18,6 +19,7 @@ class Group(SignalEvent, list):
         if domain is None:
             domain = []
         self.__domain = domain
+        self.__domain4inversion = None
         self.lock_signal = False
         self.__window = window
         self.parent = parent
@@ -55,6 +57,29 @@ class Group(SignalEvent, list):
             field = self.parent.group.fields[self.child_name]
             return [self.__domain, field.domain_get(self.parent)]
         return self.__domain
+
+    def clean4inversion(self, domain):
+        "This method will replace non relevant fields for domain inversion"
+        if domain in ([], ()):
+            return []
+        head, tail = domain[0], domain[1:]
+        if head in ('AND', 'OR'):
+            pass
+        elif is_leaf(head):
+            field = head[0]
+            if (field in self.fields
+                    and self.fields[field].attrs.get('readonly')):
+                head = []
+        else:
+            head = self.clean4inversion(head)
+        return [head] + self.clean4inversion(tail)
+
+    def __get_domain4inversion(self):
+        if self.__domain4inversion is None:
+            self.__domain4inversion = self.clean4inversion(self.domain)
+        return self.__domain4inversion
+
+    domain4inversion = property(__get_domain4inversion)
 
     def insert(self, pos, record):
         assert record.group is self
