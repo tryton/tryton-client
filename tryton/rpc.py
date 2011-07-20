@@ -212,7 +212,7 @@ def _execute(blocking, *args):
         # Make sure all the arguments are present
         args = tuple(arg if arg is not None else default
             for arg, default in itertools.izip_longest(args,
-                ('', '', 'fields_view_get', None, 'form', False),
+                ('', '', 'fields_view_get', None, 'form'),
                 fillvalue=None))
         key = str(args + (ctx,))
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
