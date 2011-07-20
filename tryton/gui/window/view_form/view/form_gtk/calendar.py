@@ -105,9 +105,6 @@ class Calendar(WidgetInterface):
             self.entry.set_text(value)
         return True
 
-    def display_value(self):
-        return self.entry.get_text()
-
     def cal_open(self, widget):
         win = gtk.Dialog(_('Date Selection'), self.window,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -240,9 +237,6 @@ class DateTime(WidgetInterface):
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
         return True
-
-    def display_value(self):
-        return self.entry.get_text()
 
     def cal_open(self, widget):
         win = gtk.Dialog(_('Date Time Selection'), self.window,

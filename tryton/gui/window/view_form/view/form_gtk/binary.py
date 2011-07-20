@@ -184,12 +184,6 @@ class Binary(WidgetInterface):
         self.but_save_as.set_sensitive(bool(field.get(record)))
         return True
 
-    def display_value(self):
-        if self.wid_text:
-            return self.wid_text.get_text()
-        else:
-            return ''
-
     def set_value(self, record, field):
         if self.wid_text:
             self.filename_field.set_client(self.record,

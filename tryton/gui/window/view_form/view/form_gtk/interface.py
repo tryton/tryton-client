@@ -110,9 +110,6 @@ class WidgetInterface(object):
             self.visible = True
             widget.show()
 
-    def display_value(self):
-        return self.field.get_client(self.record)
-
     def _focus_in(self):
         pass
 

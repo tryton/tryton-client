@@ -30,9 +30,6 @@ class Integer(Char):
         self.entry.set_text(locale.format('%d',
             field.get(record) or 0, True))
 
-    def display_value(self):
-        return self.entry.get_text()
-
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()
         position = entry.get_position()

@@ -118,10 +118,3 @@ class TextBox(WidgetInterface):
             elif spell:
                 spell.detach()
                 del spell
-
-    def display_value(self):
-        lines = (self.field.get_client(self.record) or '').split('\n')
-        if len(lines) > 1:
-            return lines[0] + '...'
-        else:
-            return lines[0]

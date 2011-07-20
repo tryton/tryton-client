@@ -290,10 +290,6 @@ class Reference(WidgetInterface):
             self.but_open.set_image(img)
         self.changed = True
 
-    def display_value(self):
-        return self.widget_combo.get_child().get_text() + ', ' + \
-                self.wid_text.get_text()
-
     def sig_key_pressed(self, *args):
         key = args[1].string.lower()
         if self.last_key[0] == key:

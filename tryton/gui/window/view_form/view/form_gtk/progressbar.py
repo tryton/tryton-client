@@ -35,6 +35,3 @@ class ProgressBar(WidgetInterface):
         self.widget.set_text(locale.format('%.' + str(digits[1]) + 'f',
             value, True))
         self.widget.set_fraction(value / 100.0)
-
-    def display_value(self):
-        return self.widget.get_text()

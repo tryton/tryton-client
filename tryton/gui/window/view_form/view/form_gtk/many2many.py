@@ -194,15 +194,6 @@ class Many2Many(WidgetInterface):
         self.screen.display()
         return True
 
-    def display_value(self):
-        ids = self.field.get_default(self.record)
-        try:
-            result = rpc.execute('model', self.attrs['relation'], 'read',
-                    ids, ['rec_name'], rpc.CONTEXT)
-        except TrytonServerError:
-            return str(ids)
-        return ', '.join(x['rec_name'] for x in result)
-
     def set_value(self, record, field):
         self.screen.current_view.set_value()
         return True

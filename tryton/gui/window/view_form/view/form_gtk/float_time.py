@@ -48,9 +48,6 @@ class FloatTime(WidgetInterface):
 
         self.entry.set_text(common.float_time_to_text(val, self.conv))
 
-    def display_value(self):
-        return self.entry.get_text()
-
     def _readonly_set(self, value):
         super(FloatTime, self)._readonly_set(value)
         self.entry.set_editable(not value)

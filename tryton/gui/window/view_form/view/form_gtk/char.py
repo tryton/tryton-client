@@ -68,18 +68,16 @@ class Char(WidgetInterface):
             value = ''
         else:
             value = field.get(record) or ''
-        self.display_value(value)
 
-    def display_value(self, value):
         if not self.autocomplete:
             self.entry.set_text(value)
-            return
-        for idx, row in enumerate(self.entry_store):
-            if row[0] == value:
-                self.entry.set_active(idx)
-                return
         else:
-            self.entry.get_child().set_text(value)
+            for idx, row in enumerate(self.entry_store):
+                if row[0] == value:
+                    self.entry.set_active(idx)
+                    return
+            else:
+                self.entry.get_child().set_text(value)
 
     def _readonly_set(self, value):
         sensitivity = {True: gtk.SENSITIVITY_OFF, False: gtk.SENSITIVITY_AUTO}
