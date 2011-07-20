@@ -206,7 +206,7 @@ def _execute(blocking, *args):
         raise TrytonError('NotLogged')
     logging.getLogger('rpc.request').info(repr((args)))
     key = False
-    if len(args) >= 6 and args[2] == 'fields_view_get':
+    if len(args) >= 6 and args[1] == 'fields_view_get':
         key = str(args)
         if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
             args = args[:]
