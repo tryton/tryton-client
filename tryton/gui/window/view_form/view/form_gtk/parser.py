@@ -386,8 +386,8 @@ class ParserForm(ParserInterface):
                 label = Label(text, attrs)
                 button_list.append(label)
                 label.set_use_markup(True)
-                if 'align' in attrs:
-                    label.set_alignment(float(attrs['align'] or 0.0), 0.5)
+                label.set_alignment(float(attrs.get('align', 0.0)),
+                    float(attrs.get('xalign', 0.5)))
                 if CONFIG['client.modepda']:
                     label.set_alignment(0.0, 0.5)
                 label.set_angle(int(attrs.get('angle', 0)))
