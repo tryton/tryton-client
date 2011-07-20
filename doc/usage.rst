@@ -88,9 +88,9 @@ Figure: Tryton client application::
                      |             |          ______                                  |
   Tabs               | Menu        |  [Tab1] |[Tab2]| [Tab3]...                       |
                      |-------------| +-------+      +--------------------------------+|
-                     | +           | | Tab2                                          ||
+                     | +           | | Menu Tab2                                     ||
                      | |-+         | |-----------------------------------------------||
-  Tool bar           | | |-        | | New Save|Delete|Find Previous Next Switch   v ||
+  Tool bar           | | |-        | | New Save Switch Reload | Prev Next | Attach v ||
                      | | |-        | |-----------------------------------------------||
                      | +           | |                                               ||
                      | |-+         | |                                               ||

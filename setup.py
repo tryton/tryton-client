@@ -143,7 +143,7 @@ dist = setup(name=PACKAGE,
     ],
     license=LICENSE,
     install_requires=[
-#        "pygtk >= 2.0",
+#        "pygtk >= 2.6",
         "python-dateutil",
     ],
     extras_require={

@@ -9,6 +9,7 @@ import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
 from tryton.config import CONFIG
+from tryton.gui import Main
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
@@ -19,15 +20,77 @@ from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
     timezoned_date)
 from tryton.exceptions import TrytonServerError
 import tryton.common as common
-import pango
 from tryton.translate import date_format
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+from tryton.pyson import PYSONEncoder
+
+from tabcontent import TabContent
 
 _ = gettext.gettext
 
 
-class Form(SignalEvent):
+class Form(SignalEvent, TabContent):
     "Form"
+
+    _toolbar_cache = {}
+    toolbar_def = [
+        ('new', 'tryton-new', _('New'), _('Create a new record'),
+            'sig_new'),
+        ('save', 'tryton-save', _('Save'), _('Save this record'),
+            'sig_save'),
+        ('switch', 'tryton-fullscreen', _('Switch'), _('Switch view'),
+            'sig_switch'),
+        ('reload', 'tryton-refresh', _('_Reload'), _('Reload'),
+            'sig_reload'),
+        (None,) * 5,
+        ('previous', 'tryton-go-previous', _('Previous'),
+            _('Previous Record'), 'sig_previous'),
+        ('next', 'tryton-go-next', _('Next'), _('Next Record'),
+            'sig_next'),
+        (None,) * 5,
+        ('attach', 'tryton-attachment', _('Attachment(0)'),
+            _('Add an attachment to the record'), 'sig_attach'),
+    ]
+    menu_def = [
+        (_('_New'), 'tryton-new', 'sig_new', '<tryton>/Form/New'),
+        (_('_Save'), 'tryton-save', 'sig_save', '<tryton>/Form/Save'),
+        (_('_Duplicate'), 'tryton-copy', 'sig_copy',
+            '<tryton>/Form/Duplicate'),
+        (_('_Delete...'), 'tryton-delete', 'sig_remove',
+            '<tryton>/Form/Delete'),
+        (None,) * 4,
+        (_('_Find...'), 'tryton-find', 'sig_search', '<tryton>/Form/Find'),
+        (_('_Next'), 'tryton-go-next', 'sig_next', '<tryton>/Form/Next'),
+        (_('_Previous'), 'tryton-go-previous', 'sig_previous',
+            '<tryton>/Form/Previous'),
+        (_('_Switch View'), 'tryton-fullscreen', 'sig_switch',
+            '<tryton>/Form/Switch View'),
+        (None,) * 4,
+        (_('_Close Tab'), 'tryton-close', 'sig_win_close',
+            '<tryton>/Form/Close'),
+        (None,) * 4,
+        (_('View _Logs...'), None, 'sig_logs', None),
+        (_('_Go to Record ID...'), None, 'sig_goto', '<tryton>/Form/Goto'),
+        (None,) * 4,
+        (_('_Reload/Undo'), 'tryton-refresh', 'sig_reload',
+            '<tryton>/Form/Reload'),
+        (None,) * 4,
+        (_('_Actions...'), 'tryton-executable', 'sig_action',
+            '<tryton>/Form/Actions'),
+        (_('_Relate...'), 'tryton-go-jump', 'sig_relate',
+            '<tryton>/Form/Relate'),
+        (_('_Report...'), 'tryton-print-open', 'sig_print_open',
+            '<tryton>/Form/Report'),
+        (_('_E-Mail...'), 'tryton-print-email', 'sig_print_email',
+            '<tryton>/Form/Email'),
+        (_('_Print...'), 'tryton-print', 'sig_print',
+            '<tryton>/Form/Print'),
+        (None,) * 4,
+        (_('_Export Data...'), 'tryton-save-as', 'sig_save_as',
+            '<tryton>/Form/Export Data'),
+        (_('_Import Data...'), None, 'sig_import',
+            '<tryton>/Form/Import Data'),
+    ]
 
     def __init__(self, model, window, res_id=False, domain=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
@@ -48,17 +111,10 @@ class Form(SignalEvent):
         self.domain = domain
         self.context = context
 
-        self.widget = gtk.VBox(spacing=3)
-        self.widget.show()
-
         self.screen = Screen(self.model, self.window, mode=mode,
                 context=self.context, view_ids=view_ids, domain=domain,
                 limit=limit, readonly=bool(auto_refresh),
                 search_value=search_value)
-        self.screen.signal_connect(self, 'record-message', self._record_message)
-        self.screen.signal_connect(self, 'record-modified', self._record_modified)
-        self.screen.signal_connect(self, 'attachment-count',
-                self._attachment_count)
         self.screen.widget.show()
 
         if not name:
@@ -66,87 +122,15 @@ class Form(SignalEvent):
         else:
             self.name = name
 
-        title = gtk.Label()
-        title.set_use_markup(True)
-        title.modify_font(pango.FontDescription("14"))
-        title.set_label('<b>' + self.name + '</b>')
-        title.set_padding(20, 4)
-        title.set_alignment(0.0, 0.5)
-        title.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#000000"))
-        title.show()
+        self.create_tabcontent()
+        self.screen.signal_connect(self, 'record-message',
+            self._record_message)
+        self.screen.signal_connect(self, 'record-modified',
+            self._record_modified)
+        self.screen.signal_connect(self, 'record-saved', self._record_saved)
+        self.screen.signal_connect(self, 'attachment-count',
+                self._attachment_count)
 
-
-        self.info_label = gtk.Label()
-        self.info_label.set_padding(3, 3)
-        self.info_label.set_alignment(1.0, 0.5)
-
-        self.eb_info = gtk.EventBox()
-        self.eb_info.add(self.info_label)
-        self.eb_info.connect('button-release-event',
-                lambda *a: self.message_info(''))
-
-        vbox = gtk.VBox()
-        vbox.pack_start(self.eb_info, expand=True, fill=True, padding=5)
-        vbox.show()
-
-        self.status_label = gtk.Label()
-        self.status_label.set_padding(5, 4)
-        self.status_label.set_alignment(0.0, 0.5)
-        self.status_label.show()
-
-        hbox = gtk.HBox()
-        hbox.pack_start(title, expand=True, fill=True)
-        hbox.pack_start(vbox, expand=False, fill=True, padding=20)
-        hbox.pack_start(self.status_label, expand=False, fill=True)
-        hbox.show()
-
-        frame = gtk.Frame()
-        frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        frame.add(hbox)
-        frame.show()
-
-        eb = gtk.EventBox()
-        eb.add(frame)
-        eb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#ffffff"))
-        eb.show()
-
-        self.widget.pack_start(eb, expand=False, fill=True, padding=3)
-
-        self.toolbar_box = gtk.HBox()
-        self.widget.pack_start(self.toolbar_box, False, True)
-
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_NONE)
-        viewport.add(self.screen.widget)
-        viewport.show()
-        self.scrolledwindow = gtk.ScrolledWindow()
-        self.scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-        self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_AUTOMATIC)
-        self.scrolledwindow.add(viewport)
-        self.scrolledwindow.show()
-
-        self.widget.pack_start(self.scrolledwindow)
-
-        self.handlers = {
-            'but_new': self.sig_new,
-            'but_copy': self.sig_copy,
-            'but_save': self.sig_save,
-            'but_save_as': self.sig_save_as,
-            'but_import': self.sig_import,
-            'but_remove': self.sig_remove,
-            'but_search': self.sig_search,
-            'but_previous': self.sig_previous,
-            'but_next': self.sig_next,
-            'but_goto_id': self.sig_goto,
-            'but_log': self.sig_logs,
-            'but_print': self.sig_print,
-            'but_reload': self.sig_reload,
-            'but_action': self.sig_action,
-            'but_switch': self.sig_switch,
-            'but_attach': self.sig_attach,
-            'but_close': self.sig_close,
-        }
         if res_id not in (None, False):
             if isinstance(res_id, (int, long)):
                 res_id = [res_id]
@@ -160,6 +144,24 @@ class Form(SignalEvent):
 
         if auto_refresh and int(auto_refresh):
             gobject.timeout_add(int(auto_refresh) * 1000, self.sig_reload)
+
+    def get_toolbars(self):
+        if self.model not in self._toolbar_cache:
+            ctx = {}
+            ctx.update(rpc.CONTEXT)
+            ctx.update(self.context)
+            args = ('model', self.model, 'view_toolbar_get', ctx)
+            try:
+                toolbars = rpc.execute(*args)
+            except TrytonServerError, exception:
+                toolbars = common.process_exception(exception, self.window,
+                    *args)
+                toolbars = toolbars if toolbars else {}
+            self._toolbar_cache[self.model] = toolbars
+        return self._toolbar_cache[self.model]
+
+    def widget_get(self):
+        return self.screen.widget
 
     def sig_goto(self, widget=None):
         if not self.modified_save():
@@ -203,9 +205,6 @@ class Form(SignalEvent):
         self.window.present()
 
     def destroy(self):
-        if self.toolbar_box.get_children():
-            toolbar = self.toolbar_box.get_children()[0]
-            self.toolbar_box.remove(toolbar)
         self.screen.signal_unconnect(self)
         self.screen.destroy()
         self.screen = None
@@ -238,7 +237,15 @@ class Form(SignalEvent):
             attachment_count = record.get_attachment_count(reload=reload)
         else:
             attachment_count = 0
-        self.signal('attachment-count', attachment_count)
+        self._attachment_count(None, attachment_count)
+
+    def _attachment_count(self, widget, signal_data):
+        label = _('Attachment(%d)') % signal_data
+        self.buttons['attach'].set_label(label)
+        if signal_data:
+            self.buttons['attach'].set_stock_id('tryton-attachment-hi')
+        else:
+            self.buttons['attach'].set_stock_id('tryton-attachment')
 
     def sig_switch(self, widget=None):
         if not self.modified_save():
@@ -349,12 +356,14 @@ class Form(SignalEvent):
             return
         self.screen.display_prev()
         self.message_info('')
+        self.activate_save(False)
 
     def sig_next(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_next()
         self.message_info('')
+        self.activate_save(False)
 
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
@@ -380,41 +389,41 @@ class Form(SignalEvent):
                     self.screen.display(set_cursor=True)
                     break
         self.message_info('')
+        self.activate_save(False)
         return True
 
-    def sig_action(self, keyword='form_action'):
-        ids = self.ids_get()
-        if self.screen.current_record:
-            obj_id = self.screen.current_record.id
-        else:
-            obj_id = False
-        if self.screen.current_view.view_type == 'form':
-            obj_id = self.screen.save_current()
-            if not obj_id:
-                return False
-            ids = [obj_id]
-        if self.screen.current_view.view_type == 'tree':
-            sel_ids = self.screen.current_view.sel_ids_get()
-            if sel_ids:
-                ids = sel_ids
-        if len(ids):
-            ctx = self.context.copy()
-            if 'active_ids' in ctx:
-                del ctx['active_ids']
-            if 'active_id' in ctx:
-                del ctx['active_id']
-            res = Action.exec_keyword(keyword, self.window, {
-                'model': self.screen.model_name,
-                'id': obj_id or False,
-                'ids': ids,
-                }, context=ctx, alwaysask=True)
-            if res:
-                self.sig_reload(test_modified=False)
-        else:
-            self.message_info(_('No record selected!'))
+    def sig_action(self, widget):
+        self.buttons['action'].props.active = True
 
-    def sig_print(self):
-        self.sig_action('form_print')
+    def sig_print(self, widget):
+        self.buttons['print'].props.active = True
+
+    def sig_print_open(self, widget):
+        self.buttons['open'].props.active = True
+
+    def sig_print_email(self, widget):
+        self.buttons['email'].props.active = True
+
+    def sig_relate(self, widget):
+        self.buttons['relate'].props.active = True
+
+    def action_popup(self, widget):
+        menu = widget._menu
+        if not widget.props.active:
+            menu.popdown()
+            return
+
+        def menu_position(menu):
+            parent = widget.get_toplevel()
+            parent_x, parent_y = parent.window.get_origin()
+            widget_allocation = widget.get_allocation()
+            return (
+                widget_allocation.x + parent_x,
+                widget_allocation.y + widget_allocation.height + parent_y,
+                False
+            )
+        menu.show_all()
+        menu.popup(None, None, menu_position, 0, 0)
 
     def sig_search(self, widget=None):
         if not self.modified_save():
@@ -440,6 +449,13 @@ class Form(SignalEvent):
         name = '_'
         if signal_data[0]:
             name = str(signal_data[0])
+        for button_id in ('print', 'action', 'relate', 'email', 'open', 'save',
+                'switch', 'attach'):
+            button = self.buttons[button_id]
+            can_be_sensitive = getattr(button, '_can_be_sensitive', True)
+            button.props.sensitive = (bool(signal_data[0])
+                and can_be_sensitive)
+
         msg = name + ' / ' + str(signal_data[1])
         if signal_data[1] < signal_data[2]:
             msg += _(' of ') + str(signal_data[2])
@@ -448,9 +464,10 @@ class Form(SignalEvent):
 
     def _record_modified(self, screen, signal_data):
         self.message_info('', color='white')
+        self.activate_save(True)
 
-    def _attachment_count(self, screen, signal_data):
-        self.signal('attachment-count', signal_data)
+    def _record_saved(self, screen, signal_data):
+        self.activate_save(False)
 
     def modified_save(self, reload=True):
         if self.screen.modified():
@@ -468,5 +485,108 @@ class Form(SignalEvent):
                 return False
         return True
 
-    def sig_close(self):
+    def sig_close(self, widget=None):
         return self.modified_save(reload=False)
+
+    def _action(self, action, atype):
+        action = action.copy()
+        if not self.screen.save_current():
+            return
+        record_id = self.screen.id_get()
+        record_ids = self.screen.sel_ids_get()
+        if atype in ('print', 'action'):
+            email = {}
+            if 'pyson_email' in action:
+                email = self.screen.current_record.expr_eval(
+                    action['pyson_email'])
+                if not email:
+                    email = {}
+            email['subject'] = action['name'].replace('_', '')
+            action['email'] = email
+            self.screen.display()
+        elif atype == 'relate':
+            encoder = PYSONEncoder()
+            if 'pyson_domain' in action:
+                action['pyson_domain'] = encoder.encode(
+                        self.screen.current_record.expr_eval(
+                                action['pyson_domain'], check_load=False))
+            if 'pyson_context' in action:
+                action['pyson_context'] = encoder.encode(
+                        self.screen.current_record.expr_eval(
+                            action['pyson_context'], check_load=False))
+        else:
+            raise NotImplementedError("Action type '%s' is not supported" %
+                atype)
+        data = {
+            'model': self.screen.model_name,
+            'id': record_id,
+            'ids': record_ids,
+        }
+        value = Action._exec_action(action, self.window, data, {})
+        if atype in ('print', 'action'):
+            if self.screen:
+                self.screen.reload(written=True)
+        return value
+
+    def activate_save(self, activate):
+        self.buttons['save'].props.sensitive = activate
+
+    def sig_win_close(self, widget):
+        Main.get_main().sig_win_close(widget)
+
+    def create_toolbar(self, toolbars):
+        gtktoolbar = super(Form, self).create_toolbar(toolbars)
+
+        iconstock = {
+            'print': 'tryton-print',
+            'action': 'tryton-executable',
+            'relate': 'tryton-go-jump',
+            'email': 'tryton-print-email',
+            'open': 'tryton-print-open',
+        }
+        for action_type, special_action, action_name, tooltip in (
+                ('action', 'action', _('Action'), _('Launch action')),
+                ('relate', 'relate', _('Relate'), _('Open related records')),
+                ('print', 'open', _('Report'), _('Open report')),
+                ('print', 'email', _('E-Mail'), _('E-Mail report')),
+                ('print', 'print', _('Print'), _('Print report')),
+        ):
+            tbutton = gtk.ToggleToolButton(iconstock.get(special_action))
+            tbutton.set_label(action_name)
+            tbutton._menu = self._create_popup_menu(tbutton,
+                action_type, toolbars[action_type], special_action)
+            tbutton.connect('toggled', self.action_popup)
+            self.tooltips.set_tip(tbutton, tooltip)
+            self.buttons[special_action] = tbutton
+            gtktoolbar.insert(tbutton, -1)
+            tbutton._can_be_sensitive = bool(toolbars.get(action_type))
+
+        return gtktoolbar
+
+    def _create_popup_menu(self, widget, keyword, actions, special_action):
+        menu = gtk.Menu()
+        menu.connect('deactivate', self._popup_menu_hide, widget)
+
+        for action in actions:
+            new_action = action.copy()
+            if special_action == 'print':
+                new_action['direct_print'] = True
+            elif special_action == 'email':
+                new_action['email_print'] = True
+            action_name = action['name']
+            if '_' not in action_name:
+                action_name = '_' + action_name
+            menuitem = gtk.MenuItem(action_name)
+            menuitem.set_use_underline(True)
+            menuitem.connect('activate', self._popup_menu_selected, widget,
+                new_action, keyword)
+            menu.add(menuitem)
+
+        return menu
+
+    def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):
+        self._action(action, keyword)
+        togglebutton.props.active = False
+
+    def _popup_menu_hide(self, menuitem, togglebutton):
+        togglebutton.props.active = False

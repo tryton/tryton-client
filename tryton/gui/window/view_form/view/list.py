@@ -238,10 +238,9 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 class ViewList(ParserView):
 
     def __init__(self, window, screen, widget, children=None, buttons=None,
-            toolbar=None, notebooks=None, cursor_widget=None,
-            children_field=None):
+            notebooks=None, cursor_widget=None, children_field=None):
         super(ViewList, self).__init__(window, screen, widget, children,
-                buttons, toolbar, notebooks, cursor_widget, children_field)
+                buttons, notebooks, cursor_widget, children_field)
         self.store = None
         self.view_type = 'tree'
 
@@ -276,62 +275,6 @@ class ViewList(ParserView):
                 hbox2.pack_start(children[i][1], expand=True, fill=False)
                 hbox2.pack_start(children[i][2], expand=True, fill=False)
                 hbox.pack_start(hbox2, expand=False, fill=False, padding=12)
-            hbox.show_all()
-
-        if toolbar and not CONFIG['client.modepda'] \
-                and (toolbar['print'] or toolbar['action']):
-            hbox = gtk.HBox()
-            self.widget.pack_start(hbox, expand=False, fill=False)
-
-            gtktoolbar = gtk.Toolbar()
-            gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-            gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
-            hbox.pack_start(gtktoolbar, True, True)
-
-            for icontype in ('print', 'action'):
-                if not toolbar[icontype]:
-                    continue
-
-                for tool in toolbar[icontype]:
-                    if not tool['icon.rec_name']:
-                        iconstock = {
-                            'print': 'tryton-print',
-                            'action': 'tryton-executable',
-                        }.get(icontype)
-                    else:
-                        iconstock = tool['icon.rec_name']
-                    common.ICONFACTORY.register_icon(iconstock)
-
-                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
-                        tbutton = gtk.MenuToolButton(iconstock)
-                    else:
-                        tbutton = gtk.ToolButton(iconstock)
-                    tbutton.set_use_underline(True)
-                    text = tool['name']
-                    if '_' not in text:
-                        text = '_' + text
-                    tbutton.set_label(text)
-                    gtktoolbar.insert(tbutton, -1)
-
-                    tbutton.connect('clicked', self._sig_clicked, tool,
-                            icontype)
-                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
-                        menu = gtk.Menu()
-                        for mtype, text in (('print', _('_Direct Print')),
-                                ('email', _('_Email as Attachment'))):
-                            menuitem = gtk.MenuItem(text)
-                            tool2 = tool.copy()
-                            if mtype == 'print':
-                                tool2['direct_print'] = True
-                                tool2['email_print'] = False
-                            else:
-                                tool2['direct_print'] = False
-                                tool2['email_print'] = True
-                            menuitem.connect('activate', self._sig_clicked,
-                                    tool2, icontype)
-                            menu.add(menuitem)
-                            menuitem.show()
-                        tbutton.set_menu(menu)
             hbox.show_all()
 
         self.display()
@@ -380,34 +323,6 @@ class ViewList(ParserView):
 
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]
-
-    def _sig_clicked(self, widget, action, atype):
-        return self._action(action, atype)
-
-    def _action(self, action, atype):
-        act = action.copy()
-        obj_ids = self.screen.sel_ids_get()
-        obj_id = self.screen.id_get()
-        if not obj_ids or not obj_id:
-            message(_('No record selected!'), self.window)
-            return False
-        email = {}
-        if action.get('pyson_email'):
-            email = self.screen.current_record.expr_eval(action['pyson_email'])
-            if not email:
-                email = {}
-        email['subject'] = action['name'].replace('_', '')
-        act['email'] = email
-        data = {
-            'model': self.screen.model_name,
-            'id': obj_id,
-            'ids': obj_ids,
-        }
-        value = Action._exec_action(act, self.window, data, {})
-        if self.screen:
-            self.screen.reload(written=True)
-        return value
-
 
     def on_keypress(self, widget, event):
         if event.keyval == gtk.keysyms.c and event.state & gtk.gdk.CONTROL_MASK:

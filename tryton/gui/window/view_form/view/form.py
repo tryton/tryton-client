@@ -8,9 +8,7 @@ from tryton.common import message, TRYTON_ICON
 import tryton.rpc as rpc
 import tryton.common as common
 from interface import ParserView
-from tryton.action import Action
 from tryton.config import CONFIG
-from tryton.pyson import PYSONEncoder
 
 _ = gettext.gettext
 
@@ -18,10 +16,10 @@ _ = gettext.gettext
 class ViewForm(ParserView):
 
     def __init__(self, window, screen, widget, children=None,
-            buttons=None, toolbar=None, notebooks=None, cursor_widget='',
+            buttons=None, notebooks=None, cursor_widget='',
             children_field=None):
         super(ViewForm, self).__init__(window, screen, widget, children,
-                buttons, toolbar, notebooks, cursor_widget, children_field)
+                buttons, notebooks, cursor_widget, children_field)
         self.view_type = 'form'
 
         for button in self.buttons:
@@ -55,119 +53,6 @@ class ViewForm(ParserView):
         vbox.pack_start(viewport, expand=True, fill=True)
 
         self.widget = vbox
-
-        if toolbar and not CONFIG['client.modepda']:
-            hbox = gtk.HBox(homogeneous=False)
-            self.widget.pack_start(hbox, False, False)
-
-            gtktoolbar = gtk.Toolbar()
-            gtktoolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-            gtktoolbar.set_style(gtk.TOOLBAR_BOTH)
-            hbox.pack_start(gtktoolbar, expand=True, fill=True)
-            for icontype in ('print', 'action', 'relate'):
-                if not toolbar[icontype]:
-                    continue
-
-                for tool in toolbar[icontype]:
-                    if not tool['icon.rec_name']:
-                        iconstock = {
-                            'print': 'tryton-print',
-                            'action': 'tryton-executable',
-                            'relate': 'tryton-go-jump',
-                        }.get(icontype)
-                    else:
-                        iconstock = tool['icon.rec_name']
-                    common.ICONFACTORY.register_icon(iconstock)
-
-                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
-                        tbutton = gtk.MenuToolButton(iconstock)
-                    else:
-                        tbutton = gtk.ToolButton(iconstock)
-                    tbutton.set_use_underline(True)
-                    text = tool['name']
-                    if '_' not in text:
-                        text = '_' + text
-                    tbutton.set_label(text)
-                    gtktoolbar.insert(tbutton, -1)
-
-                    tbutton.connect('clicked', self._sig_clicked, tool,
-                            icontype)
-                    if hasattr(gtk, 'MenuToolButton') and icontype == 'print':
-                        menu = gtk.Menu()
-                        for mtype, text in (('print', _('_Direct Print')),
-                                ('email', _('_Email as Attachment'))):
-                            menuitem = gtk.MenuItem(text)
-                            tool = tool.copy()
-                            if mtype == 'print':
-                                tool['direct_print'] = True
-                                tool['email_print'] = False
-                            else:
-                                tool['direct_print'] = False
-                                tool['email_print'] = True
-                            menuitem.connect('activate', self._sig_clicked,
-                                    tool, icontype)
-                            menu.add(menuitem)
-                            menuitem.show()
-                        tbutton.set_menu(menu)
-            hbox.show_all()
-
-
-    def _sig_clicked(self, widget, action, atype):
-        return self._action(action, atype)
-
-    def _action(self, action, atype):
-        act = action.copy()
-        if atype in ('print', 'action'):
-            self.screen.save_current()
-            obj_id = self.screen.current_record \
-                    and self.screen.current_record.id
-            if obj_id < 0:
-                if atype in ('print'):
-                    message(_('You must save this record ' \
-                        'to be able to use the print button!'), self.window)
-                if atype in ('action'):
-                    message(_('You must save this record ' \
-                        'to be able to use the action button!'), self.window)
-                return False
-            email = {}
-            if 'pyson_email' in action:
-                email = self.screen.current_record.expr_eval(
-                    action['pyson_email'])
-                if not email:
-                    email = {}
-            email['subject'] = action['name'].replace('_', '')
-            act['email'] = email
-            self.screen.display()
-        if atype == 'relate':
-            obj_id = self.screen.current_record \
-                    and self.screen.current_record.id
-            if not obj_id:
-                message(_('You must select a record ' \
-                        'to be able to use the relate button !'), self.window)
-                return False
-            if obj_id < 0:
-                message(_('You must save this record '
-                    'to be able to use the relate button!'), self.window)
-                return False
-            encoder = PYSONEncoder()
-            if 'pyson_domain' in act:
-                act['pyson_domain'] = encoder.encode(
-                        self.screen.current_record.expr_eval(
-                                act['pyson_domain'], check_load=False))
-            if 'pyson_context' in act:
-                act['pyson_context'] = encoder.encode(
-                        self.screen.current_record.expr_eval(
-                            act['pyson_context'], check_load=False))
-        data = {
-            'model': self.screen.model_name,
-            'id': obj_id,
-            'ids': [obj_id],
-        }
-        value = Action._exec_action(act, self.window, data, {})
-        if atype in ('print', 'action'):
-            if self.screen:
-                self.screen.reload(written=True)
-        return value
 
     def __getitem__(self, name):
         return self.widgets[name][0]

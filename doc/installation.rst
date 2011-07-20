@@ -5,7 +5,7 @@ Prerequisites
 -------------
 
  * Python 2.6 or later (http://www.python.org/)
- * pygtk 2.0 or later (http://www.pygtk.org/)
+ * pygtk 2.6 or later (http://www.pygtk.org/)
  * librsvg (http://librsvg.sourceforge.net/)
  * python-dateutil (http://labix.org/python-dateutil)
  * simplejson (http://undefined.org/python/#simplejson)

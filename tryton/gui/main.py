@@ -51,6 +51,7 @@ _ = gettext.gettext
 
 _MAIN = []
 
+
 class Main(object):
     window = None
     tryton_client = None
@@ -121,19 +122,13 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Actions', gtk.keysyms.E,
                 gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/Form/Print', gtk.keysyms.P,
+        gtk.accel_map_add_entry('<tryton>/Form/Report', gtk.keysyms.P,
                 gtk.gdk.CONTROL_MASK)
 
         if hasattr(gtk, 'accel_map_load'):
             gtk.accel_map_load(os.path.join(get_config_dir(), 'accel.map'))
 
         self.tooltips = common.Tooltips()
-
-        toolbar = gtk.Toolbar()
-        self.toolbar = toolbar
-        toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-        toolbar.set_style(gtk.TOOLBAR_BOTH)
-        self.toolbar_menu = None
 
         self.vbox = gtk.VBox()
         self.window.add(self.vbox)
@@ -143,15 +138,10 @@ class Main(object):
         self.menuitem_user = None
         self.menuitem_plugins = None
 
-        self.set_statusbar()
-        self.set_menubar()
-
         if self.macapp is not None:
             self.macapp.ready()
 
         self.buttons = {}
-        self._set_toolbar()
-        self.set_toolbar_label()
 
         self.pane = gtk.HPaned()
         self.menu_screen = None
@@ -164,6 +154,9 @@ class Main(object):
 
         self.pane.add2(self.notebook)
 
+        self.set_statusbar()
+        self.set_menubar()
+
         self.window.show_all()
 
         self.pages = []
@@ -175,18 +168,20 @@ class Main(object):
             self.radiomenuitem_pda.set_active(True)
         else:
             self.radiomenuitem_normal.set_active(True)
-        self.sb_set()
 
         settings = gtk.settings_get_default()
-        settings.set_property('gtk-button-images', True)
-        settings.set_property('gtk-can-change-accels',
-                CONFIG['client.can_change_accelerators'])
-        try:
-            settings.set_property('gtk-keynav-cursor-only', True)
-        except TypeError:
-            pass
+        for setting, value in (
+                ('gtk-button-images', True),
+                ('gtk-can-change-accels',
+                    CONFIG['client.can_change_accelerators']),
+                ('gtk-keynav-cursor-only', True)):
+            try:
+                # Due to a bug in old version of pyGTk gtk-button-images can
+                # not be set when there is no buttons
+                settings.set_property(setting, value)
+            except TypeError:
+                pass
 
-        self.sig_toolbar_show()
         self.sig_statusbar_show()
 
         if os.name in ('nt', 'mac') or \
@@ -438,161 +433,6 @@ class Main(object):
         menu_user.add(imagemenuitem_open_request)
         return menu_user
 
-    def _set_menu_form(self):
-        menu_form = gtk.Menu()
-
-        imagemenuitem_new = gtk.ImageMenuItem(_('_New'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-new', gtk.ICON_SIZE_MENU)
-        imagemenuitem_new.set_image(image)
-        imagemenuitem_new.connect('activate', self._sig_child_call, 'but_new')
-        imagemenuitem_new.set_accel_path('<tryton>/Form/New')
-        menu_form.add(imagemenuitem_new)
-
-        imagemenuitem_save = gtk.ImageMenuItem(_('_Save'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-save', gtk.ICON_SIZE_MENU)
-        imagemenuitem_save.set_image(image)
-        imagemenuitem_save.connect('activate', self._sig_child_call, 'but_save')
-        imagemenuitem_save.set_accel_path('<tryton>/Form/Save')
-        menu_form.add(imagemenuitem_save)
-
-        imagemenuitem_copy = gtk.ImageMenuItem(_('_Duplicate'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-copy', gtk.ICON_SIZE_MENU)
-        imagemenuitem_copy.set_image(image)
-        imagemenuitem_copy.connect('activate', self._sig_child_call, 'but_copy')
-        imagemenuitem_copy.set_accel_path('<tryton>/Form/Duplicate')
-        menu_form.add(imagemenuitem_copy)
-
-        imagemenuitem_delete = gtk.ImageMenuItem(_('_Delete...'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-delete', gtk.ICON_SIZE_MENU)
-        imagemenuitem_delete.set_image(image)
-        imagemenuitem_delete.connect('activate', self._sig_child_call, 'but_remove')
-        imagemenuitem_delete.set_accel_path('<tryton>/Form/Delete')
-        menu_form.add(imagemenuitem_delete)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_search = gtk.ImageMenuItem(_('_Find...'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-find', gtk.ICON_SIZE_MENU)
-        imagemenuitem_search.set_image(image)
-        imagemenuitem_search.connect('activate', self._sig_child_call, 'but_search')
-        imagemenuitem_search.set_accel_path('<tryton>/Form/Find')
-        menu_form.add(imagemenuitem_search)
-
-        imagemenuitem_next = gtk.ImageMenuItem(_('_Next'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-go-next', gtk.ICON_SIZE_MENU)
-        imagemenuitem_next.set_image(image)
-        imagemenuitem_next.connect('activate', self._sig_child_call, 'but_next')
-        imagemenuitem_next.set_accel_path('<tryton>/Form/Next')
-        menu_form.add(imagemenuitem_next)
-
-        imagemenuitem_previous = gtk.ImageMenuItem(_('_Previous'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_MENU)
-        imagemenuitem_previous.set_image(image)
-        imagemenuitem_previous.connect('activate', self._sig_child_call, 'but_previous')
-        imagemenuitem_previous.set_accel_path('<tryton>/Form/Previous')
-        menu_form.add(imagemenuitem_previous)
-
-        imagemenuitem_switch = gtk.ImageMenuItem(_('_Switch View'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_MENU)
-        imagemenuitem_switch.set_image(image)
-        imagemenuitem_switch.connect('activate', self._sig_child_call, 'but_switch')
-        imagemenuitem_switch.set_accel_path('<tryton>/Form/Switch View')
-        menu_form.add(imagemenuitem_switch)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_close = gtk.ImageMenuItem(_('_Close Tab'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-close', gtk.ICON_SIZE_MENU)
-        imagemenuitem_close.set_image(image)
-        imagemenuitem_close.connect('activate', self.sig_win_close)
-        imagemenuitem_close.set_accel_path('<tryton>/Form/Close')
-        menu_form.add(imagemenuitem_close)
-
-        imagemenuitem_win_prev = gtk.ImageMenuItem(_('_Previous Tab'), self.accel_group)
-        imagemenuitem_win_prev.connect('activate', self.sig_win_prev)
-        imagemenuitem_win_prev.set_accel_path('<tryton>/Form/Previous Tab')
-        menu_form.add(imagemenuitem_win_prev)
-
-        imagemenuitem_win_next = gtk.ImageMenuItem(_('_Next Tab'), self.accel_group)
-        imagemenuitem_win_next.connect('activate', self.sig_win_next)
-        imagemenuitem_win_next.set_accel_path('<tryton>/Form/Next Tab')
-        menu_form.add(imagemenuitem_win_next)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_log = gtk.ImageMenuItem(_('View _Logs...'))
-        imagemenuitem_log.connect('activate', self._sig_child_call, 'but_log')
-        menu_form.add(imagemenuitem_log)
-
-        imagemenuitem_goto_id = gtk.ImageMenuItem(_('_Go to Record ID...'),
-                self.accel_group)
-        imagemenuitem_goto_id.connect('activate', self._sig_child_call,
-                'but_goto_id')
-        imagemenuitem_goto_id.set_accel_path('<tryton>/Form/Goto')
-        menu_form.add(imagemenuitem_goto_id)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_reload = gtk.ImageMenuItem(_('_Reload/Undo'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-refresh', gtk.ICON_SIZE_MENU)
-        imagemenuitem_reload.set_image(image)
-        imagemenuitem_reload.connect('activate', self._sig_child_call,
-                'but_reload')
-        imagemenuitem_reload.set_accel_path('<tryton>/Form/Reload')
-        menu_form.add(imagemenuitem_reload)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_action = gtk.ImageMenuItem(_('_Actions...'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
-        imagemenuitem_action.set_image(image)
-        imagemenuitem_action.connect('activate', self._sig_child_call,
-                'but_action')
-        imagemenuitem_action.set_accel_path('<tryton>/Form/Actions')
-        menu_form.add(imagemenuitem_action)
-
-        imagemenuitem_print = gtk.ImageMenuItem(_('_Print...'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-print', gtk.ICON_SIZE_MENU)
-        imagemenuitem_print.set_image(image)
-        imagemenuitem_print.connect('activate', self._sig_child_call,
-                'but_print')
-        imagemenuitem_print.set_accel_path('<tryton>/Form/Print')
-        menu_form.add(imagemenuitem_print)
-
-        menu_form.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_export = gtk.ImageMenuItem(_('_Export Data...'))
-        image = gtk.Image()
-        image.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
-        imagemenuitem_export.set_image(image)
-        imagemenuitem_export.connect('activate', self._sig_child_call,
-                'but_save_as')
-        imagemenuitem_export.set_accel_path('<tryton>/Form/Export Data')
-        menu_form.add(imagemenuitem_export)
-
-        menuitem_import = gtk.MenuItem(_('_Import Data...'))
-        menuitem_import.connect('activate', self._sig_child_call,
-                'but_import')
-        menuitem_import.set_accel_path('<tryton>/Form/Import Data')
-        menu_form.add(menuitem_import)
-
-        menu_form.set_accel_group(self.accel_group)
-        menu_form.set_accel_path('<tryton>/Form')
-        menu_form.show_all()
-        return menu_form
-
     def _set_menu_options(self):
         menu_options = gtk.Menu()
 
@@ -687,14 +527,6 @@ class Main(object):
         menu_form.set_accel_group(self.accel_group)
         menu_form.set_accel_path('<tryton>/Options/Form')
         menuitem_form.set_submenu(menu_form)
-
-        checkmenuitem_toolbar = gtk.CheckMenuItem(_('Toolbar'))
-        checkmenuitem_toolbar.connect('activate',
-                lambda menuitem: self.sig_toolbar_change(menuitem.get_active()))
-        checkmenuitem_toolbar.set_accel_path('<tryton>/Options/Form/Toolbar')
-        menu_form.add(checkmenuitem_toolbar)
-        if CONFIG['form.toolbar']:
-            checkmenuitem_toolbar.set_active(True)
 
         checkmenuitem_statusbar = gtk.CheckMenuItem(_('Statusbar'))
         checkmenuitem_statusbar.connect('activate',
@@ -843,123 +675,6 @@ class Main(object):
 
         return menu_help
 
-    def _set_toolbar(self):
-        toolbutton_new = gtk.ToolButton('tryton-new')
-        toolbutton_new.set_use_underline(True)
-        self.toolbar.insert(toolbutton_new, -1)
-        toolbutton_new.connect('clicked', self._sig_child_call, 'but_new')
-        self.buttons['but_new'] = toolbutton_new
-
-        toolbutton_save = gtk.ToolButton('tryton-save')
-        toolbutton_save.set_use_underline(True)
-        self.toolbar.insert(toolbutton_save, -1)
-        toolbutton_save.connect('clicked', self._sig_child_call, 'but_save')
-        self.buttons['but_save'] = toolbutton_save
-
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        toolbutton_remove = gtk.ToolButton('tryton-delete')
-        toolbutton_remove.set_use_underline(True)
-        self.toolbar.insert(toolbutton_remove, -1)
-        toolbutton_remove.connect('clicked', self._sig_child_call, 'but_remove')
-        self.buttons['but_remove'] = toolbutton_remove
-
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        toolbutton_search = gtk.ToolButton('tryton-find')
-        toolbutton_search.set_use_underline(True)
-        self.toolbar.insert(toolbutton_search, -1)
-        toolbutton_search.connect('clicked', self._sig_child_call, 'but_search')
-        self.buttons['but_search'] = toolbutton_search
-
-        toolbutton_previous = gtk.ToolButton('tryton-go-previous')
-        self.toolbar.insert(toolbutton_previous, -1)
-        toolbutton_previous.connect('clicked', self._sig_child_call, 'but_previous')
-        self.buttons['but_previous'] = toolbutton_previous
-
-        toolbutton_next = gtk.ToolButton('tryton-go-next')
-        self.toolbar.insert(toolbutton_next, -1)
-        toolbutton_next.connect('clicked', self._sig_child_call, 'but_next')
-        self.buttons['but_next'] = toolbutton_next
-
-        toolbutton_switch = gtk.ToolButton('tryton-fullscreen')
-        self.toolbar.insert(toolbutton_switch, -1)
-        toolbutton_switch.connect('clicked', self._sig_child_call, 'but_switch')
-        self.buttons['but_switch'] = toolbutton_switch
-
-        toolbutton_reload = gtk.ToolButton('tryton-refresh')
-        toolbutton_reload.set_use_underline(True)
-        self.toolbar.insert(toolbutton_reload, -1)
-        toolbutton_reload.connect('clicked', self._sig_child_call, 'but_reload')
-        self.buttons['but_reload'] = toolbutton_reload
-
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        toolbutton_action = gtk.ToolButton('tryton-executable')
-        self.toolbar.insert(toolbutton_action, -1)
-        toolbutton_action.connect('clicked', self._sig_child_call, 'but_action')
-        self.buttons['but_action'] = toolbutton_action
-
-        toolbutton_print = gtk.ToolButton('tryton-print')
-        self.toolbar.insert(toolbutton_print, -1)
-        toolbutton_print.connect('clicked', self._sig_child_call, 'but_print')
-        self.buttons['but_print'] = toolbutton_print
-
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        toolbutton_attach = gtk.ToolButton('tryton-attachment')
-        self.toolbar.insert(toolbutton_attach, -1)
-        toolbutton_attach.connect('clicked', self._sig_child_call, 'but_attach')
-        self.buttons['but_attach'] = toolbutton_attach
-
-        self.menutoolbutton = None
-        if hasattr(gtk, 'MenuToolButton'):
-            self.menutoolbutton = gtk.MenuToolButton(None, None)
-            # Remove the button to keep only the toggle
-            hbox, = self.menutoolbutton.get_children()
-            button, toggle = hbox.get_children()
-            hbox.remove(button)
-            self.toolbar.insert(self.menutoolbutton, -1)
-            menu = self._set_menu_form()
-            self.menutoolbutton.set_menu(menu)
-            self.toolbar_menu = menu
-
-
-    def set_toolbar_label(self):
-        labels = {
-            'but_new': _('_New'),
-            'but_save': _('_Save'),
-            'but_remove': _('_Delete'),
-            'but_search': _('_Find'),
-            'but_previous': _('Previous'),
-            'but_next': _('Next'),
-            'but_switch': _('Switch'),
-            'but_reload': _('_Reload'),
-            'but_action': _('Action'),
-            'but_print': _('Print'),
-            'but_attach': _('Attachment(0)'),
-        }
-        tooltips = {
-            'but_new': _('Create a new record'),
-            'but_save': _('Save this record'),
-            'but_remove': _('Delete this record'),
-            'but_search': _('Find records'),
-            'but_previous': _('Previous Record'),
-            'but_next': _('Next Record'),
-            'but_switch': _('Switch view'),
-            'but_reload': _('Reload'),
-            'but_action': _('Action'),
-            'but_print': _('Print'),
-            'but_attach': _('Add an attachment to the record'),
-        }
-        for i in self.buttons:
-            self.buttons[i].set_label(labels[i])
-            self.tooltips.set_tip(self.buttons[i], tooltips[i])
-        if self.toolbar_menu and self.menutoolbutton:
-            self.toolbar_menu.destroy()
-            menu = self._set_menu_form()
-            self.menutoolbutton.set_menu(menu)
-
     @staticmethod
     def get_main():
         return _MAIN[0]
@@ -1040,17 +755,6 @@ class Main(object):
         else:
             settings.set_property('gtk-can-change-accels', False)
 
-    def sig_toolbar_change(self, value):
-        CONFIG['form.toolbar'] = value
-        return self.sig_toolbar_show()
-
-    def sig_toolbar_show(self):
-        toolbar = CONFIG['form.toolbar']
-        if toolbar:
-            self.toolbar.show()
-        else:
-            self.toolbar.hide()
-
     def sig_statusbar_change(self, value):
         CONFIG['form.statusbar'] = value
         return self.sig_statusbar_show()
@@ -1069,13 +773,16 @@ class Main(object):
     def sig_toolbar(self, option):
         CONFIG['client.toolbar'] = option
         if option == 'default':
-            self.toolbar.set_style(False)
+            barstyle = False
         elif option == 'both':
-            self.toolbar.set_style(gtk.TOOLBAR_BOTH)
+            barstyle = gtk.TOOLBAR_BOTH
         elif option == 'text':
-            self.toolbar.set_style(gtk.TOOLBAR_TEXT)
+            barstyle = gtk.TOOLBAR_TEXT
         elif option == 'icons':
-            self.toolbar.set_style(gtk.TOOLBAR_ICONS)
+            barstyle = gtk.TOOLBAR_ICONS
+        for page_idx in range(self.notebook.get_n_pages()):
+            page = self.get_page(page_idx)
+            page.toolbar.set_style(barstyle)
 
     @staticmethod
     def sig_form_tab(option):
@@ -1116,7 +823,6 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.set_toolbar_label()
                     self.shortcut_set()
                     self.set_statusbar()
                     self.request_set()
@@ -1215,7 +921,6 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.set_toolbar_label()
                     self.shortcut_set()
                     self.set_statusbar()
                     self.request_set()
@@ -1249,9 +954,7 @@ class Main(object):
         while res:
             wid = self.get_page()
             if wid:
-                if 'but_close' in wid.handlers:
-                    res = wid.handlers['but_close']()
-                if not res:
+                if not wid.sig_close():
                     return False
                 res = self._win_del()
             else:
@@ -1466,37 +1169,15 @@ class Main(object):
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(page.widget, True)
         self.notebook.set_current_page(-1)
-        page.signal_connect(self, 'attachment-count', self._attachment_count)
-
-    def sb_set(self, view=None):
-        if not view:
-            view = self.get_page()
-        for i in self.buttons:
-            if self.buttons[i]:
-                self.buttons[i].set_sensitive(
-                        bool(view and (i in view.handlers)))
-        if hasattr(view, 'update_attachment_count'):
-            view.update_attachment_count()
-        else:
-            self._attachment_count(view, 0)
-
-    def _attachment_count(self, widget, signal_data):
-        label = _('Attachment(%d)') % signal_data
-        self.buttons['but_attach'].set_label(label)
-        if signal_data:
-            self.buttons['but_attach'].set_stock_id('tryton-attachment-hi')
-        else:
-            self.buttons['but_attach'].set_stock_id('tryton-attachment')
 
     def _sig_remove_book(self, widget, page_widget):
         for page in self.pages:
             if page.widget == page_widget:
                 page_num = self.notebook.page_num(page.widget)
                 self.notebook.set_current_page(page_num)
-                if 'but_close' in page.handlers:
-                    res = page.handlers['but_close']()
-                    if not res:
-                        return
+                res = page.sig_close()
+                if not res:
+                    return
         self._win_del(page_widget)
 
     def _win_del(self, page_widget=None):
@@ -1513,7 +1194,6 @@ class Main(object):
                     page.signal_unconnect(self)
                     break
             self.notebook.remove_page(page_id)
-            self.sb_set()
 
             next_page_id = -1
             to_pop = []
@@ -1549,27 +1229,10 @@ class Main(object):
                 return page
         return None
 
-    def _sig_child_call(self, widget, button_name):
-        wid = self.get_page()
-        if wid:
-            res = True
-            if button_name in wid.handlers:
-                res = wid.handlers[button_name]()
-            if button_name == 'but_close' and res:
-                self._win_del()
-
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         self.current_page = self.notebook.get_current_page()
-
-        current_form = self.get_page(self.current_page)
-        parent = self.toolbar.get_parent()
-        if parent:
-            parent.remove(self.toolbar)
-        current_form.toolbar_box.add(self.toolbar)
-        current_form.toolbar_box.show_all()
-
-        self.sb_set()
+        current_form = self.get_page()
 
     def sig_db_new(self, widget):
         if not self.sig_logout(widget):

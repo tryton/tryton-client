@@ -12,7 +12,7 @@ import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
         TRYTON_ICON, HM_FORMAT
 import tryton.common as common
-from tryton.exceptions import TrytonError
+from tryton.exceptions import TrytonError, TrytonServerError
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
@@ -697,7 +697,7 @@ class Selection(Char):
             args = ('model', self.model_name, selection, rpc.CONTEXT)
             try:
                 selection = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 selection = (common.process_exception(exception, self.window,
                     args) or [])
         self.selection = selection[:]
@@ -757,7 +757,7 @@ class Selection(Char):
                 0, None, None, ['rec_name'], rpc.CONTEXT)
             try:
                 result = rpc.execute(*args)
-            except Exception, exception:
+            except TrytonServerError, exception:
                 result = common.process_exception(exception, self.window, *args)
 
             if isinstance(result, list):

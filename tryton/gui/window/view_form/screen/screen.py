@@ -333,21 +333,16 @@ class Screen(SignalEvent):
             ctx.update(rpc.CONTEXT)
             ctx.update(self.context)
             args = ('model', self.model_name, 'fields_view_get',
-                    view_id, view_type,
-                    self.parent and False or CONFIG['form.toolbar'],
-                    ctx)
+                    view_id, view_type, ctx)
             try:
                 view = rpc.execute(*args)
             except TrytonServerError, exception:
                 view = common.process_exception(exception, self.window, *args)
                 if not view:
                     return
-        return self.add_view(view, display, toolbar=view.get('toolbar', False),
-                context=context)
+        return self.add_view(view, display, context=context)
 
-    def add_view(self, view, display=False, toolbar=None, context=None):
-        if toolbar is None:
-            toolbar = {}
+    def add_view(self, view, display=False, context=None):
         arch = view['arch']
         fields = view['fields']
 
@@ -371,7 +366,7 @@ class Screen(SignalEvent):
         self.group.add_fields(fields, context=context)
 
         parser = WidgetParse(parent=self.parent, window=self.window)
-        view = parser.parse(self, xml_dom, self.group.fields, toolbar=toolbar,
+        view = parser.parse(self, xml_dom, self.group.fields,
                 children_field=children_field)
 
         self.views.append(view)
@@ -473,6 +468,7 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             self.current_view.display()
             return False
+        self.signal('record-saved')
         if path and obj_id:
             path = path[:-1] + ((path[-1][0], obj_id),)
         self.current_record = self.group.get_by_path(path)
