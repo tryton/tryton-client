@@ -10,6 +10,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.gui import Main
+from tryton.gui.window import Window
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
@@ -108,8 +109,12 @@ class Form(SignalEvent, TabContent):
 
         self.model = model
         self.window = window
+        self.res_id = res_id
         self.domain = domain
+        self.mode = mode
         self.context = context
+        self.auto_refresh = auto_refresh
+        self.view_ids = view_ids
 
         self.screen = Screen(self.model, self.window, mode=mode,
                 context=self.context, view_ids=view_ids, domain=domain,
@@ -162,6 +167,23 @@ class Form(SignalEvent, TabContent):
 
     def widget_get(self):
         return self.screen.widget
+
+    def __eq__(self, value):
+        if not value:
+            return False
+        if not isinstance(value, Form):
+            return False
+        return (self.model == value.model
+            and self.window == value.window
+            and self.res_id == value.res_id
+            and self.domain == value.domain
+            and self.mode == value.mode
+            and self.view_ids == value.view_ids
+            and self.context == value.context
+            and self.name == value.name
+            and self.screen.limit == value.screen.limit
+            and self.auto_refresh == value.auto_refresh
+            and self.screen.search_value == value.screen.search_value)
 
     def sig_goto(self, widget=None):
         if not self.modified_save():
@@ -585,7 +607,14 @@ class Form(SignalEvent, TabContent):
         return menu
 
     def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):
-        self._action(action, keyword)
+        event = gtk.get_current_event()
+        if event.button == 1:
+            hide = not bool(event.state
+                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
+        else:
+            hide = False
+        with Window(hide_current=hide):
+            self._action(action, keyword)
         togglebutton.props.active = False
 
     def _popup_menu_hide(self, menuitem, togglebutton):

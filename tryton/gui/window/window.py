@@ -6,6 +6,20 @@ from preference import *
 
 class Window(object):
 
+    hide_current = False
+    allow_similar = True
+
+    def __init__(self, hide_current=False, allow_similar=True):
+        Window.hide_current = hide_current
+        Window.allow_similar = allow_similar
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        Window.hide_current = False
+        Window.allow_similar = True
+
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None, window=None,
             context=None, mode=None, name=False, limit=None,
@@ -25,7 +39,8 @@ class Window(object):
             win = Board(model, window, view_ids and view_ids[0] or None,
                     context=context, name=name, auto_refresh=auto_refresh)
         win.icon = icon
-        Main.get_main().win_add(win)
+        Main.get_main().win_add(win, hide_current=Window.hide_current,
+            allow_similar=Window.allow_similar)
 
     @staticmethod
     def create_wizard(action, datas, parent, state='init', direct_print=False,
@@ -35,6 +50,6 @@ class Window(object):
         from wizard import Wizard
         win = Wizard(parent, name=name)
         win.icon = icon
-        Main.get_main().win_add(win)
+        Main.get_main().win_add(win, Window.hide_current)
         win.run(action, datas, state=state, direct_print=direct_print,
                 email_print=email_print, email=email, context=context)

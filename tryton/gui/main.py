@@ -1106,7 +1106,14 @@ class Main(object):
                 gtk.gdk.WINDOW_STATE_MAXIMIZED)
         return False
 
-    def win_add(self, page):
+    def win_add(self, page, hide_current=False, allow_similar=True):
+        if not allow_similar:
+            for other_page in self.pages:
+                if page == other_page:
+                    page_num = self.notebook.page_num(other_page.widget)
+                    other_page.widget.props.visible = True
+                    self.notebook.set_current_page(page_num)
+                    return
         if page.model == 'ir.ui.menu' and not self.pane.get_child1():
             screen = page.screen
             screen.screen_container.alternate_view = True
@@ -1119,6 +1126,11 @@ class Main(object):
             self.sig_win_menu()
         previous_page_id = self.notebook.get_current_page()
         previous_widget = self.notebook.get_nth_page(previous_page_id)
+        if previous_widget and hide_current:
+            previous_widget.props.visible = False
+            page_id = previous_page_id + 1
+        else:
+            page_id = -1
         self.previous_pages[page] = previous_widget
         self.pages.append(page)
         hbox = gtk.HBox(spacing=3)
@@ -1165,10 +1177,10 @@ class Main(object):
         hbox.set_size_request(120, -1)
         label_menu = gtk.Label(page.name)
         label_menu.set_alignment(0.0, 0.5)
-        self.notebook.append_page_menu(page.widget, hbox, label_menu)
+        self.notebook.insert_page_menu(page.widget, hbox, label_menu, page_id)
         if hasattr(self.notebook, 'set_tab_reorderable'):
             self.notebook.set_tab_reorderable(page.widget, True)
-        self.notebook.set_current_page(-1)
+        self.notebook.set_current_page(page_id)
 
     def _sig_remove_book(self, widget, page_widget):
         for page in self.pages:
@@ -1213,6 +1225,9 @@ class Main(object):
                 page.destroy()
             del page
 
+            current_widget = self.notebook.get_nth_page(next_page_id)
+            if current_widget:
+                current_widget.props.visible = True
             self.notebook.set_current_page(next_page_id)
         if not self.pages and self.menu_screen:
             self.menu_screen.current_view.set_cursor()

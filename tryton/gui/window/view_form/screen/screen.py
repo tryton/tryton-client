@@ -46,7 +46,7 @@ class Screen(SignalEvent):
         self.model_name = model_name
         self.context = context
         self.views = []
-        self.view_ids = view_ids
+        self.view_ids = view_ids[:]
         self.parent = None
         self.parent_name = None
         self.exclude_field = exclude_field
@@ -69,8 +69,8 @@ class Screen(SignalEvent):
         if mode:
             self.view_to_load = mode[1:]
             view_id = False
-            if view_ids:
-                view_id = view_ids.pop(0)
+            if self.view_ids:
+                view_id = self.view_ids.pop(0)
             view = self.add_view_id(view_id, mode[0])
             self.screen_container.set(view.widget)
         self.display()

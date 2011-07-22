@@ -15,6 +15,7 @@ from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.pyson import PYSONEncoder
+from tryton.gui.window import Window
 from tryton.exceptions import TrytonServerError
 import os
 
@@ -566,6 +567,11 @@ class ViewList(ParserView):
                     item.show()
                     menu.append(item)
                 menu.popup(None, None, None, event.button, event.time)
+        elif event.button == 2:
+            event.button = 1
+            event.state |= gtk.gdk.MOD1_MASK
+            treeview.emit('button-press-event', event)
+            return True
         return False
 
     def click_and_relate(self, action, value, path):
@@ -648,11 +654,17 @@ class ViewList(ParserView):
     def __sig_switch(self, treeview, path, column):
         if column._type == 'button':
             return
-        if not self.screen.row_activate():
-            if treeview.row_expanded(path):
-                treeview.collapse_row(path)
-            else:
-                treeview.expand_row(path, False)
+        allow_similar = False
+        event = gtk.get_current_event()
+        if (event.state & gtk.gdk.MOD1_MASK
+                or event.state & gtk.gdk.SHIFT_MASK):
+            allow_similar = True
+        with Window(allow_similar=allow_similar):
+            if not self.screen.row_activate():
+                if treeview.row_expanded(path):
+                    treeview.collapse_row(path)
+                else:
+                    treeview.expand_row(path, False)
 
     def __select_changed(self, tree_sel):
         previous_record = self.screen.current_record
