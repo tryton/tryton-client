@@ -138,7 +138,7 @@ class Screen(SignalEvent):
         try:
             ids = rpc.execute(*rpc_args)
         except TrytonServerError, exception:
-            ids = (common.process_exception(exception, self.window, rpc_args)
+            ids = (common.process_exception(exception, self.window, *rpc_args)
                 or [])
         if not only_ids:
             if len(ids) == limit:
@@ -148,7 +148,7 @@ class Screen(SignalEvent):
                     self.search_count = rpc.execute(*rpc_args)
                 except TrytonServerError, exception:
                     self.search_count = (common.process_exception(exception,
-                        self.window, rpc_args) or 0)
+                        self.window, *rpc_args) or 0)
             else:
                 self.search_count = len(ids)
         self.screen_container.but_prev.set_sensitive(bool(offset))
