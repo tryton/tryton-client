@@ -15,6 +15,7 @@ import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
 from tryton.translate import date_format
+from tryton.gui.window import Window
 
 
 class Popup(object):
@@ -138,11 +139,18 @@ class Graph(gtk.DrawingArea):
             del ctx['active_ids']
         if 'active_id' in ctx:
             del ctx['active_id']
-        return Action.exec_keyword('graph_open', window, {
-            'model': self.model,
-            'id': ids[0],
-            'ids': ids,
-            }, context=ctx, warning=False)
+        event = gtk.get_current_event()
+        if event.button == 1:
+            hide = not bool(event.state
+                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
+        else:
+            hide = False
+        with Window(hide_current=hide):
+            return Action.exec_keyword('graph_open', window, {
+                    'model': self.model,
+                    'id': ids[0],
+                    'ids': ids,
+                    }, context=ctx, warning=False)
 
     def drawBackground(self, cr, width, height):
         # Fill the background
