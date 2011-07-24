@@ -1114,7 +1114,7 @@ class Main(object):
                     other_page.widget.props.visible = True
                     self.notebook.set_current_page(page_num)
                     return
-        if page.model == 'ir.ui.menu' and not self.pane.get_child1():
+        if not self.pane.get_child1():
             screen = page.screen
             screen.screen_container.alternate_view = True
             screen.switch_view(view_type=screen.current_view.view_type)
@@ -1122,8 +1122,6 @@ class Main(object):
             self.menu_screen = screen
             screen.display(set_cursor=True)
             return
-        elif page.model == 'ir.ui.menu':
-            self.sig_win_menu()
         previous_page_id = self.notebook.get_current_page()
         previous_widget = self.notebook.get_nth_page(previous_page_id)
         if previous_widget and hide_current:
