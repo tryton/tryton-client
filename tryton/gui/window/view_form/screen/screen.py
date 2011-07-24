@@ -493,13 +493,13 @@ class Screen(SignalEvent):
                 get_modifiedonly=get_modifiedonly)
 
     def modified(self):
-        self.current_view.set_value()
         res = False
         if self.current_view.view_type != 'tree':
-            res = self.current_record and self.current_record.modified
+            if self.current_record:
+                res = self.current_record.modified or self.current_record.id < 0
         else:
             for record in self.group:
-                if record.modified:
+                if record.modified or record.id < 0:
                     res = True
         return res
 

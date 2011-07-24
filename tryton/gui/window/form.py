@@ -348,6 +348,7 @@ class Form(SignalEvent, TabContent):
                 return
         self.screen.new()
         self.message_info('')
+        self.activate_save()
 
     def sig_copy(self, widget=None):
         if not self.modified_save():
@@ -378,14 +379,12 @@ class Form(SignalEvent, TabContent):
             return
         self.screen.display_prev()
         self.message_info('')
-        self.activate_save(False)
 
     def sig_next(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_next()
         self.message_info('')
-        self.activate_save(False)
 
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
@@ -411,7 +410,7 @@ class Form(SignalEvent, TabContent):
                     self.screen.display(set_cursor=True)
                     break
         self.message_info('')
-        self.activate_save(False)
+        self.activate_save()
         return True
 
     def sig_action(self, widget):
@@ -483,13 +482,14 @@ class Form(SignalEvent, TabContent):
             msg += _(' of ') + str(signal_data[2])
         self.status_label.set_text(msg)
         self.message_info('')
+        self.activate_save()
 
     def _record_modified(self, screen, signal_data):
         self.message_info('', color='white')
-        self.activate_save(True)
+        self.activate_save()
 
     def _record_saved(self, screen, signal_data):
-        self.activate_save(False)
+        self.activate_save()
 
     def modified_save(self, reload=True):
         if self.screen.modified():
@@ -550,8 +550,8 @@ class Form(SignalEvent, TabContent):
                 self.screen.reload(written=True)
         return value
 
-    def activate_save(self, activate):
-        self.buttons['save'].props.sensitive = activate
+    def activate_save(self):
+        self.buttons['save'].props.sensitive = self.screen.modified()
 
     def sig_win_close(self, widget):
         Main.get_main().sig_win_close(widget)
