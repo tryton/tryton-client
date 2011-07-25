@@ -11,10 +11,8 @@ _ = gettext.gettext
 
 class _container(object):
 
-    def __init__(self, max_width):
+    def __init__(self):
         self.cont = []
-        self.max_width = max_width
-        self.width = {}
         self.count = 0
         self.col = 0
 
@@ -66,10 +64,6 @@ class _container(object):
                 yoptions=yopt, xoptions=gtk.FILL|gtk.EXPAND,
                 ypadding=ypadding, xpadding=5)
         self.cont[-1] = (table, i+length, j)
-        width = 750
-        if widget:
-            width = widget.size_request()[0]
-        self.width[('%d.%d') % (i, j)] = width
         return wid
 
 
@@ -161,12 +155,12 @@ class Parse(object):
     def _psr_char(self, name):
         pass
 
-    def parse(self, xml_data, max_width):
+    def parse(self, xml_data):
         psr = expat.ParserCreate()
         psr.StartElementHandler = self._psr_start
         psr.EndElementHandler = self._psr_end
         psr.CharacterDataHandler = self._psr_char
-        self.container = _container(max_width)
+        self.container = _container()
 
         psr.Parse(xml_data)
 
@@ -179,7 +173,7 @@ class Parse(object):
         vbox2 = gtk.VBox()
         vbox2.show()
 
-        self.container = _container(max_width)
+        self.container = _container()
         self.container.new(self.col)
         for i in self.add_widget_end:
             self.add_widget(*i)
@@ -215,11 +209,7 @@ class Form(object):
         self.parser = parser
         self.call = call
         self.context = context
-        #get the size of the window and the limite / decalage Hbox element
-        width = 640
-        if self.parent:
-            width = self.parent.size_request()[0]
-        (self.widgets, self.widget) = parser.parse(view['arch'], width)
+        (self.widgets, self.widget) = parser.parse(view['arch'])
         self.widget.show()
         self.spin_limit = parser.spin_limit
         self.spin_limit.connect('value-changed', self.limit_changed)
