@@ -9,7 +9,7 @@ from threading import Semaphore
 from tryton.fingerprints import Fingerprints
 from tryton.config import get_config_dir
 from tryton.ipc import Server as IPCServer
-from tryton.exceptions import TrytonError, TrytonServerError
+from tryton.exceptions import TrytonServerError
 
 _SOCK = None
 _USER = None
@@ -204,7 +204,7 @@ def context_reload():
 def _execute(blocking, *args):
     global _SOCK, _DATABASE, _USER, _SESSION
     if not _SOCK or not _SOCK.connected:
-        raise TrytonError('NotLogged')
+        raise TrytonServerError('NotLogged')
     logging.getLogger('rpc.request').info(repr((args)))
     key = False
     if args[2] == 'fields_view_get':
