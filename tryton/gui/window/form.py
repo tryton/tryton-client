@@ -569,19 +569,23 @@ class Form(SignalEvent, TabContent):
         for action_type, special_action, action_name, tooltip in (
                 ('action', 'action', _('Action'), _('Launch action')),
                 ('relate', 'relate', _('Relate'), _('Open related records')),
+                (None,) * 4,
                 ('print', 'open', _('Report'), _('Open report')),
                 ('print', 'email', _('E-Mail'), _('E-Mail report')),
                 ('print', 'print', _('Print'), _('Print report')),
         ):
-            tbutton = gtk.ToggleToolButton(iconstock.get(special_action))
-            tbutton.set_label(action_name)
-            tbutton._menu = self._create_popup_menu(tbutton,
-                action_type, toolbars[action_type], special_action)
-            tbutton.connect('toggled', self.action_popup)
-            self.tooltips.set_tip(tbutton, tooltip)
-            self.buttons[special_action] = tbutton
+            if action_type is not None:
+                tbutton = gtk.ToggleToolButton(iconstock.get(special_action))
+                tbutton.set_label(action_name)
+                tbutton._menu = self._create_popup_menu(tbutton,
+                    action_type, toolbars[action_type], special_action)
+                tbutton.connect('toggled', self.action_popup)
+                self.tooltips.set_tip(tbutton, tooltip)
+                self.buttons[special_action] = tbutton
+                tbutton._can_be_sensitive = bool(toolbars.get(action_type))
+            else:
+                tbutton = gtk.SeparatorToolItem()
             gtktoolbar.insert(tbutton, -1)
-            tbutton._can_be_sensitive = bool(toolbars.get(action_type))
 
         return gtktoolbar
 
