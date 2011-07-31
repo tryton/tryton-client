@@ -298,17 +298,18 @@ class Screen(SignalEvent):
             self.current_view.set_cursor()
             self.current_view.display()
             return
-        for i in xrange(len(self.views) + len(self.view_to_load)):
-            if len(self.view_to_load):
-                self.load_view_to_load()
-                self.__current_view = len(self.views) - 1
-            else:
-                self.__current_view = ((self.__current_view + 1)
-                        % len(self.views))
-            if not view_type:
-                break
-            elif self.current_view.view_type == view_type:
-                break
+        if not view_type or self.current_view.view_type != view_type:
+            for i in xrange(len(self.views) + len(self.view_to_load)):
+                if len(self.view_to_load):
+                    self.load_view_to_load()
+                    self.__current_view = len(self.views) - 1
+                else:
+                    self.__current_view = ((self.__current_view + 1)
+                            % len(self.views))
+                if not view_type:
+                    break
+                elif self.current_view.view_type == view_type:
+                    break
         self.screen_container.set(self.current_view.widget)
         if not self.current_record and self.current_view.view_type == 'form':
             self.new(default=default, context=context)
