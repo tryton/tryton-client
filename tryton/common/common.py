@@ -70,6 +70,10 @@ class TrytonIconFactory(gtk.IconFactory):
             icon_set = gtk.IconSet(pixbuf)
             self.add(name, icon_set)
             self._locale_icons.add(name)
+        for name in ('ok', 'cancel'):
+            icon_set = gtk.Style().lookup_icon_set('gtk-%s' % name)
+            self.add('tryton-%s' % name, icon_set)
+            self._locale_icons.add('tryton-%s' % name)
 
     def load_icons(self, refresh=False):
         if not refresh:

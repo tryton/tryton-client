@@ -367,7 +367,7 @@ class DBLogin(object):
         tooltips = common.Tooltips()
         button_cancel = gtk.Button(_('_Cancel'))
         img_cancel = gtk.Image()
-        img_cancel.set_from_stock('tryton-cancel', gtk.ICON_SIZE_BUTTON)
+        img_cancel.set_from_stock('gtk-cancel', gtk.ICON_SIZE_BUTTON)
         button_cancel.set_image(img_cancel)
         tooltips.set_tip(button_cancel,
             _('Cancel connection to the Tryton server'))

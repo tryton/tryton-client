@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,10 +13,12 @@
    height="256"
    id="svg2589"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="logo.svg"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="tryton-icon.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0">
+  <title
+     id="title3104">Tryton</title>
   <defs
      id="defs2591">
     <inkscape:perspective
@@ -34,16 +37,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-247.85714"
+     inkscape:cx="-750.71428"
      inkscape:cy="62.857143"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1676"
-     inkscape:window-height="1027"
+     inkscape:window-width="1280"
+     inkscape:window-height="1024"
      inkscape:window-x="0"
-     inkscape:window-y="19"
-     width="256px" />
+     inkscape:window-y="0"
+     width="256px"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata2594">
     <rdf:RDF>
@@ -52,6 +56,14 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Tryton</dc:title>
+        <cc:license
+           rdf:resource="" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Bertrand Chenal</dc:title>
+          </cc:Agent>
+        </dc:creator>
       </cc:Work>
     </rdf:RDF>
   </metadata>
