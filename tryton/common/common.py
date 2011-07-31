@@ -178,8 +178,9 @@ def refresh_langlist(lang_widget, host, port):
     lang_widget.set_active(index)
     return lang_list
 
-def request_server(server_widget, parent):
+def request_server(server_widget):
     result = False
+    parent = get_toplevel_window()
     dialog = gtk.Dialog(
         title= _('Tryton Connection'),
         parent=parent,
@@ -239,14 +240,42 @@ def request_server(server_widget, parent):
     dialog.destroy()
     return result
 
+def get_toplevel_window():
+    windows = [x for x in gtk.window_list_toplevels()
+        if x.window and x.props.visible]
+    trans2windows = dict((x.get_transient_for(), x) for x in windows)
+    for window in set(windows) - set(trans2windows.iterkeys()):
+        return window
+    return trans2windows[None]
 
-def selection(title, values, parent, alwaysask=False):
+def get_sensible_widget(window):
+    from tryton.gui.main import Main
+    main = Main.get_main()
+    if main and window == main.window:
+        focus_widget = window.get_focus()
+        page = main.get_page()
+        if page and focus_widget and focus_widget.is_ancestor(page.widget):
+            return page.widget
+    return window
+
+def center_window(window, parent, sensible):
+    parent_x, parent_y = parent.window.get_origin()
+    window_allocation = window.get_allocation()
+    sensible_allocation = sensible.get_allocation()
+    x = (parent_x + sensible_allocation.x +
+        int((sensible_allocation.width - window_allocation.width) / 2))
+    y = (parent_y + sensible_allocation.y +
+        int((sensible_allocation.height - window_allocation.height) / 2))
+    window.move(x, y)
+
+def selection(title, values, alwaysask=False):
     if not values or len(values)==0:
         return None
     elif len(values)==1 and (not alwaysask):
         key = values.keys()[0]
         return (key, values[key])
 
+    parent = get_toplevel_window()
     dialog = gtk.Dialog(_('Selection'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -300,9 +329,10 @@ def selection(title, values, parent, alwaysask=False):
     dialog.destroy()
     return res
 
-def file_selection(title, filename='', parent=None,
+def file_selection(title, filename='',
         action=gtk.FILE_CHOOSER_ACTION_OPEN, preview=True, multi=False,
         filters=None):
+    parent = get_toplevel_window()
     if action == gtk.FILE_CHOOSER_ACTION_OPEN:
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
             gtk.STOCK_OPEN,gtk.RESPONSE_OK)
@@ -371,7 +401,7 @@ def file_selection(title, filename='', parent=None,
         win.destroy()
         return filenames
 
-def file_open(filename, type, parent, print_p=False):
+def file_open(filename, type, print_p=False):
     if os.name == 'nt':
         operation = 'open'
         if print_p:
@@ -379,7 +409,7 @@ def file_open(filename, type, parent, print_p=False):
         try:
             os.startfile(os.path.normpath(filename), operation)
         except WindowsError:
-            save_name = file_selection(_('Save As...'), parent=parent,
+            save_name = file_selection(_('Save As...'),
                     action=gtk.FILE_CHOOSER_ACTION_SAVE)
             if save_name:
                 file_p = open(filename, 'rb')
@@ -414,7 +444,7 @@ def file_open(filename, type, parent, print_p=False):
         #TODO add dialog box
         pass
     if not cmd:
-        save_name = file_selection(_('Save As...'), parent=parent,
+        save_name = file_selection(_('Save As...'),
                 action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if save_name:
             file_p = open(filename, 'rb')
@@ -508,8 +538,8 @@ class UniqueDialog(object):
         if self.running:
             return
 
-        parent = args[1]
-        dialog = self.build_dialog(*args)
+        parent = get_toplevel_window()
+        dialog = self.build_dialog(parent, *args)
         dialog.set_icon(TRYTON_ICON)
         self.running = True
         dialog.show_all()
@@ -522,21 +552,21 @@ class UniqueDialog(object):
 
 class MessageDialog(UniqueDialog):
 
-    def build_dialog(self, message, parent, msg_type):
+    def build_dialog(self, parent, message, msg_type):
         dialog = gtk.MessageDialog(parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT, msg_type,
             gtk.BUTTONS_OK, message)
         return dialog
 
-    def __call__(self, message, parent, msg_type=gtk.MESSAGE_INFO):
-        super(MessageDialog, self).__call__(message, parent, msg_type)
+    def __call__(self, message, msg_type=gtk.MESSAGE_INFO):
+        super(MessageDialog, self).__call__(message, msg_type)
 
 message = MessageDialog()
 
 
 class WarningDialog(UniqueDialog):
 
-    def build_dialog(self, message, parent, title, buttons=gtk.BUTTONS_OK):
+    def build_dialog(self, parent, message, title, buttons=gtk.BUTTONS_OK):
         dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, buttons)
         if hasattr(dialog, 'format_secondary_markup'):
@@ -558,8 +588,8 @@ class UserWarningDialog(WarningDialog):
     def _set_always(self, toggle):
         self.always = toggle.get_active()
 
-    def build_dialog(self, message, parent, title):
-        dialog = super(UserWarningDialog, self).build_dialog(message, parent,
+    def build_dialog(self, parent, message, title):
+        dialog = super(UserWarningDialog, self).build_dialog(parent, message,
             title, gtk.BUTTONS_OK_CANCEL)
         check = gtk.CheckButton(_('Always ignore this warning.'))
         check.connect_after('toggled', self._set_always)
@@ -568,9 +598,8 @@ class UserWarningDialog(WarningDialog):
         dialog.vbox.pack_end(alignment, True, False)
         return dialog
 
-    def __call__(self, message, parent, title):
-        response = super(UserWarningDialog, self).__call__(message, parent,
-            title)
+    def __call__(self, message, title):
+        response = super(UserWarningDialog, self).__call__(message, title)
         if response == gtk.RESPONSE_OK:
             if self.always:
                 return 'always'
@@ -582,7 +611,7 @@ userwarning = UserWarningDialog()
 
 class ConfirmationDialog(UniqueDialog):
 
-    def build_dialog(self, message, parent):
+    def build_dialog(self, parent, message):
         dialog = gtk.Dialog(_('Confirmation'), parent, gtk.DIALOG_MODAL
                 | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
                 | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
@@ -596,22 +625,21 @@ class ConfirmationDialog(UniqueDialog):
         label = gtk.Label('%s' % (to_xml(message)))
         hbox.pack_start(label, True, True)
         dialog.vbox.pack_start(hbox)
-        dialog.set_transient_for(parent)
         return dialog
 
 
 class SurDialog(ConfirmationDialog):
 
-    def build_dialog(self, message, parent):
-        dialog = super(SurDialog, self).build_dialog(message, parent)
+    def build_dialog(self, parent, message):
+        dialog = super(SurDialog, self).build_dialog(parent, message)
         dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
         dialog.add_button("gtk-ok", gtk.RESPONSE_OK | gtk.CAN_DEFAULT
                 | gtk.HAS_DEFAULT)
         dialog.set_default_response(gtk.RESPONSE_OK)
         return dialog
 
-    def __call__(self, message, parent):
-        response = super(SurDialog, self).__call__(message, parent)
+    def __call__(self, message):
+        response = super(SurDialog, self).__call__(message)
         return response == gtk.RESPONSE_OK
 
 sur = SurDialog()
@@ -625,8 +653,8 @@ class Sur3BDialog(ConfirmationDialog):
         gtk.RESPONSE_CANCEL: 'cancel'
     }
 
-    def build_dialog(self, message, parent):
-        dialog = super(Sur3BDialog, self).build_dialog(message, parent)
+    def build_dialog(self, parent, message):
+        dialog = super(Sur3BDialog, self).build_dialog(parent, message)
         dialog.add_button("gtk-cancel", gtk.RESPONSE_CANCEL)
         dialog.add_button("gtk-no", gtk.RESPONSE_NO)
         dialog.add_button("gtk-yes", gtk.RESPONSE_YES | gtk.CAN_DEFAULT
@@ -634,8 +662,8 @@ class Sur3BDialog(ConfirmationDialog):
         dialog.set_default_response(gtk.RESPONSE_YES)
         return dialog
 
-    def __call__(self, message, parent):
-        response = super(Sur3BDialog, self).__call__(message, parent)
+    def __call__(self, message):
+        response = super(Sur3BDialog, self).__call__(message)
         return self.response_mapping.get(response, 'cancel')
 
 sur_3b = Sur3BDialog()
@@ -643,7 +671,7 @@ sur_3b = Sur3BDialog()
 
 class AskDialog(UniqueDialog):
 
-    def build_dialog(self, question, parent, visibility):
+    def build_dialog(self, parent, question, visibility):
         win = gtk.Dialog('Tryton', parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -666,12 +694,12 @@ class AskDialog(UniqueDialog):
         win.vbox.pack_start(hbox)
         return win
 
-    def __call__(self, question, parent, visibility=True):
+    def __call__(self, question, visibility=True):
         if self.running:
             return
 
-        dialog = self.build_dialog(question, parent,
-            visibility=visibility)
+        parent = get_toplevel_window()
+        dialog = self.build_dialog(parent, question, visibility=visibility)
         dialog.set_icon(TRYTON_ICON)
         self.running = True
         dialog.show_all()
@@ -689,7 +717,7 @@ ask = AskDialog()
 
 class ConcurrencyDialog(UniqueDialog):
 
-    def build_dialog(self, resource, parent, obj_id, context):
+    def build_dialog(self, parent, resource, obj_id, context):
         dialog = gtk.Dialog(_('Concurrency Exception'), parent, gtk.DIALOG_MODAL
                 | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
                 | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
@@ -725,9 +753,8 @@ class ConcurrencyDialog(UniqueDialog):
         dialog.add_action_widget(write_button, gtk.RESPONSE_OK)
         return dialog
 
-    def __call__(self, resource, obj_id, context, parent):
-        # parent must be the second parameter
-        res = super(ConcurrencyDialog, self).__call__(resource, parent, obj_id,
+    def __call__(self, resource, obj_id, context):
+        res = super(ConcurrencyDialog, self).__call__(resource, obj_id,
             context)
 
         if res == gtk.RESPONSE_OK:
@@ -735,7 +762,7 @@ class ConcurrencyDialog(UniqueDialog):
         if res == gtk.RESPONSE_APPLY:
             from tryton.gui.window import Window
             Window.create(False, resource, res_id=obj_id,
-                domain=[('id', '=', obj_id)], window=parent,
+                domain=[('id', '=', obj_id)],
                 context=context, mode=['form', 'tree'])
         return False
 
@@ -744,7 +771,7 @@ concurrency = ConcurrencyDialog()
 
 class ErrorDialog(UniqueDialog):
 
-    def build_dialog(self, title, parent, details):
+    def build_dialog(self, parent, title, details):
         dialog = gtk.Dialog(_('Error'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         dialog.set_has_separator(True)
@@ -813,20 +840,21 @@ class ErrorDialog(UniqueDialog):
         dialog.set_size_request(600, 400)
         return dialog
 
-    def __call__(self, title, parent, details):
+    def __call__(self, title, details):
         if title == details:
             title = ''
         log = logging.getLogger('common.message')
         log.error(details)
 
-        response = super(ErrorDialog, self).__call__(title, parent, details)
+        response = super(ErrorDialog, self).__call__(title, details)
         if response == gtk.RESPONSE_OK:
-            send_bugtracker(details, parent)
+            send_bugtracker(details)
 
 error = ErrorDialog()
 
-def send_bugtracker(msg, parent):
+def send_bugtracker(msg):
     from tryton import rpc
+    parent = get_toplevel_window()
     win = gtk.Dialog(_('Bug Tracker'), parent,
             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -909,7 +937,7 @@ def send_bugtracker(msg, parent):
                 server.set('issue' + str(issue_id), *['nosy=+' + user])
                 message(_('The same bug was already reported by another user.\n' \
                         'To keep you informed your username is added to the nosy-list of this issue') + \
-                        '%s' % issue_id, parent)
+                        '%s' % issue_id)
             else:
                 # create a new issue for this error-message
                 # first create message
@@ -919,49 +947,47 @@ def send_bugtracker(msg, parent):
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
                 message(_('Created new bug with ID ') + \
-                        'issue%s' % issue_id, parent)
+                        'issue%s' % issue_id)
             webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
         except (socket.error, xmlrpclib.Fault), exception:
             if (isinstance(exception, xmlrpclib.Fault)
                     and 'roundup.cgi.exceptions.Unauthorised' in
                     exception.faultString):
-                message(_('Connection error!\nBad username or password!'),
-                    parent)
+                message(_('Connection error!\nBad username or password!'))
                 return send_bugtracker(msg, parent)
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
                         sys.exc_value, sys.exc_traceback))
-            message(_('Exception:') + '\n' + tb_s, parent,
-                    msg_type=gtk.MESSAGE_ERROR)
+            message(_('Exception:') + '\n' + tb_s, msg_type=gtk.MESSAGE_ERROR)
 
 def to_xml(string):
     return string.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
 
 PLOCK = Lock()
 
-def process_exception(exception, parent, *args):
+def process_exception(exception, *args):
     global _USERNAME, _DATABASE, _SOCK
 
     if isinstance(exception, TrytonError):
         if exception.ex_type == 'BadFingerprint':
-            warning(_('The server fingerprint has changed since last'
-                ' connection!\nThe application will stop connecting to this'
-                ' server until its fingerprint is fixed.'),
-                parent, _('Security risk!'))
+            warning(
+                _('The server fingerprint has changed since last connection!\n'
+                'The application will stop connecting to this server '
+                'until its fingerprint is fixed.'), _('Security risk!'))
             from tryton.gui.main import Main
             Main.sig_quit()
             sys.exit()
         elif exception.ex_type == 'NotLogged':
             if not rpc._SOCK:
                 message(_('Connection error!\n' \
-                        'Unable to connect to the server!'), parent)
+                        'Unable to connect to the server!'))
                 return False
     elif isinstance(exception, TrytonServerError):
         if exception.ex_type == 'UserWarning':
             msg = ''
             if len(exception.args) > 4:
                 msg = exception.args[3]
-            res = userwarning(str(msg), parent, str(exception.args[2]))
+            res = userwarning(str(msg), str(exception.args[2]))
             if res in ('always', 'ok'):
                 args2 = ('model', 'res.user.warning', 'create', {
                         'user': rpc._USER,
@@ -971,33 +997,32 @@ def process_exception(exception, parent, *args):
                 try:
                     rpc.execute(*args2)
                 except TrytonServerError, exception:
-                    process_exception(exception, parent, *args2)
+                    process_exception(exception, *args2)
                 if args:
                     try:
                         return rpc.execute(*args)
                     except TrytonServerError, exception:
-                        return process_exception(exception, parent, *args)
+                        return process_exception(exception, *args)
                 return True
             return False
         elif exception.ex_type == 'UserError':
             msg = ''
             if len(exception.args) > 3:
                 msg = exception.args[2]
-            warning(str(msg), parent, str(exception.args[1]))
+            warning(str(msg), str(exception.args[1]))
             return False
         elif exception.ex_type == 'ConcurrencyException':
             if len(args) >= 6:
-                if concurrency(args[1], args[3][0], args[5], parent):
+                if concurrency(args[1], args[3][0], args[5]):
                     if '_timestamp' in args[5]:
                         del args[5]['_timestamp']
                     try:
                         return rpc.execute(*args)
                     except TrytonServerError, exception:
-                        return process_exception(exception, parent, *args)
+                        return process_exception(exception, *args)
                 return False
             else:
-                message(_('Concurrency Exception'), parent,
-                        msg_type=gtk.MESSAGE_ERROR)
+                message(_('Concurrency Exception'), msg_type=gtk.MESSAGE_ERROR)
                 return False
         elif exception.ex_type == 'NotLogged':
             if not PLOCK.acquire(False):
@@ -1006,7 +1031,7 @@ def process_exception(exception, parent, *args):
             port = rpc._SOCK.port
             try:
                 while True:
-                    password = ask(_('Password:'), parent, visibility=False)
+                    password = ask(_('Password:'), visibility=False)
                     if password is None:
                         continue
                     res = rpc.login(rpc._USERNAME, password, hostname, port,
@@ -1015,7 +1040,7 @@ def process_exception(exception, parent, *args):
                     Main.get_main().refresh_ssl()
                     if res == -1:
                         message(_('Connection error!\n' \
-                                'Unable to connect to the server!'), parent)
+                                'Unable to connect to the server!'))
                         return False
                     if res < 0:
                         continue
@@ -1023,7 +1048,7 @@ def process_exception(exception, parent, *args):
                         try:
                             return rpc.execute(*args)
                         except TrytonServerError, exception:
-                            return process_exception(exception, parent, *args)
+                            return process_exception(exception, *args)
                     return True
             finally:
                 PLOCK.release()
@@ -1031,7 +1056,7 @@ def process_exception(exception, parent, *args):
         msg = ''
         if len(exception.args) > 2:
             msg = exception.args[1]
-        warning(msg, parent, _('Network Error!'))
+        warning(msg, _('Network Error!'))
         return False
 
     if isinstance(exception, TrytonServerError):
@@ -1039,7 +1064,7 @@ def process_exception(exception, parent, *args):
     else:
         error_title = str(exception)
         error_detail = traceback.format_exc()
-    error(error_title, parent, error_detail)
+    error(error_title, error_detail)
     return False
 
 def node_attributes(node):
@@ -1151,10 +1176,10 @@ class DBProgress(object):
 
 class RPCProgress(object):
 
-    def __init__(self, method, args, parent):
+    def __init__(self, method, args):
         self.method = method
         self.args = args
-        self.parent = parent
+        self.parent = get_toplevel_window()
         self.res = None
         self.error = False
         self.exception = None
@@ -1176,6 +1201,8 @@ class RPCProgress(object):
 
         watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
         self.parent.window.set_cursor(watch)
+        parent_sensitive = self.parent.props.sensitive
+        self.parent.props.sensitive = False
         i = 0
         win = None
         progressbar = None
@@ -1219,10 +1246,12 @@ class RPCProgress(object):
                     win.window.set_cursor(watch)
                 with gtk.gdk.lock:
                     progressbar.pulse()
-            with gtk.gdk.lock:
-                while gtk.events_pending():
-                    gtk.main_iteration()
+            if win:
+                with gtk.gdk.lock:
+                    while gtk.events_pending():
+                        gtk.main_iteration()
             time.sleep(0.1)
+        self.parent.props.sensitive = parent_sensitive
         self.parent.window.set_cursor(None)
         if win:
             win.destroy()

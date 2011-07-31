@@ -18,10 +18,10 @@ from tryton.exceptions import TrytonServerError
 class Screen(SignalEvent):
     "Screen"
 
-    def __init__(self, model_name, window, view_ids=None, mode=None,
-            context=None, views_preload=None, domain=None, row_activate=None,
-            limit=None, readonly=False, exclude_field=None, sort=None,
-            search_value=None, alternate_view=False):
+    def __init__(self, model_name, view_ids=None, mode=None, context=None,
+            views_preload=None, domain=None, row_activate=None, limit=None,
+            readonly=False, exclude_field=None, sort=None, search_value=None,
+            alternate_view=False):
         if view_ids is None:
             view_ids = []
         if mode is None:
@@ -50,7 +50,6 @@ class Screen(SignalEvent):
         self.parent = None
         self.parent_name = None
         self.exclude_field = exclude_field
-        self.__window = window
         self.filter_widget = None
         self.__group = None
         self.new_group()
@@ -92,8 +91,8 @@ class Screen(SignalEvent):
                     except TrytonServerError:
                         return
                 self.filter_widget = Form(self.fields_view_tree,
-                        self.model_name, self.window, self.domain,
-                        (self, self.search_filter), self.context)
+                    self.model_name, self.domain, (self, self.search_filter),
+                    self.context)
                 self.screen_container.add_filter(self.filter_widget.widget,
                         self.search_filter, self.search_clear,
                         self.search_prev, self.search_next)
@@ -138,8 +137,7 @@ class Screen(SignalEvent):
         try:
             ids = rpc.execute(*rpc_args)
         except TrytonServerError, exception:
-            ids = (common.process_exception(exception, self.window, *rpc_args)
-                or [])
+            ids = (common.process_exception(exception, *rpc_args) or [])
         if not only_ids:
             if len(ids) == limit:
                 rpc_args = ('model', self.model_name, 'search_count', values,
@@ -148,7 +146,7 @@ class Screen(SignalEvent):
                     self.search_count = rpc.execute(*rpc_args)
                 except TrytonServerError, exception:
                     self.search_count = (common.process_exception(exception,
-                        self.window, *rpc_args) or 0)
+                            *rpc_args) or 0)
             else:
                 self.search_count = len(ids)
         self.screen_container.but_prev.set_sensitive(bool(offset))
@@ -193,7 +191,7 @@ class Screen(SignalEvent):
     group = property(__get_group, __set_group)
 
     def new_group(self):
-        self.group = Group(self.model_name, {}, self.window, domain=self.domain,
+        self.group = Group(self.model_name, {}, domain=self.domain,
             context=self.context, readonly=self.readonly)
 
     def _group_cleared(self, group, signal):
@@ -243,15 +241,6 @@ class Screen(SignalEvent):
 
     current_record = property(__get_current_record, __set_current_record)
 
-    def __get_window(self):
-        return self.__window
-
-    def __set_window(self, window):
-        self.group.window = window
-        self.__window = window
-
-    window = property(__get_window, __set_window)
-
     def update_attachment(self, record):
         if record != self.current_record:
             return False
@@ -266,7 +255,6 @@ class Screen(SignalEvent):
         self.group.signal_unconnect(self)
         self.group.destroy()
         self.parent = None
-        self.__window = None
         self.__group = None
         self.__current_record = None
         self.screen_container = None
@@ -274,9 +262,16 @@ class Screen(SignalEvent):
 
     def default_row_activate(self):
         from tryton.action import Action
+        from tryton.gui.main import Main
+        main = Main.get_main()
+        current_form = main.get_page()
+        if current_form:
+            for dialog in current_form.dialogs:
+                dialog.hide()
+
         if (self.current_view.view_type == 'tree' and
                 self.current_view.widget_tree.keyword_open):
-            return Action.exec_keyword('tree_open', self.window, {
+            return Action.exec_keyword('tree_open', {
                 'model': self.model_name,
                 'id': self.id_get(),
                 'ids': [self.id_get()],
@@ -338,7 +333,7 @@ class Screen(SignalEvent):
             try:
                 view = rpc.execute(*args)
             except TrytonServerError, exception:
-                view = common.process_exception(exception, self.window, *args)
+                view = common.process_exception(exception, *args)
                 if not view:
                     return
         return self.add_view(view, display, context=context)
@@ -366,7 +361,7 @@ class Screen(SignalEvent):
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
         self.group.add_fields(fields, context=context)
 
-        parser = WidgetParse(parent=self.parent, window=self.window)
+        parser = WidgetParse(parent=self.parent)
         view = parser.parse(self, xml_dom, self.group.fields,
                 children_field=children_field)
 
@@ -537,8 +532,7 @@ class Screen(SignalEvent):
                 try:
                     res = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    res = common.process_exception(exception, self.window,
-                            *args)
+                    res = common.process_exception(exception, *args)
                 if not res:
                     return False
             self.current_view.set_cursor()
@@ -583,8 +577,7 @@ class Screen(SignalEvent):
                 try:
                     res = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    res = common.process_exception(exception, self.window,
-                            *args)
+                    res = common.process_exception(exception, *args)
                 if not res:
                     return False
             if not records:

@@ -18,9 +18,8 @@ _ = gettext.gettext
 
 class One2Many(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(One2Many, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(One2Many, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.VBox(homogeneous=False, spacing=2)
         self._readonly = True
@@ -154,15 +153,13 @@ class One2Many(WidgetInterface):
         frame.set_shadow_type(gtk.SHADOW_OUT)
         self.widget.pack_start(frame, expand=False, fill=True)
 
-        self.screen = Screen(attrs['relation'], self.window,
-                mode=attrs.get('mode', 'tree,form').split(','),
-                views_preload=attrs.get('views', {}),
-                row_activate=self._on_activate,
-                exclude_field=attrs.get('relation_field', None))
+        self.screen = Screen(attrs['relation'],
+            mode=attrs.get('mode', 'tree,form').split(','),
+            views_preload=attrs.get('views', {}),
+            row_activate=self._on_activate,
+            exclude_field=attrs.get('relation_field', None))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
 
-        if not isinstance(self.screen.window, gtk.Dialog):
-            self.screen.widget.set_size_request(0, 0)
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
@@ -236,17 +233,19 @@ class One2Many(WidgetInterface):
         sequence = None
         if self.screen.current_view.view_type == 'tree':
             sequence = self.screen.current_view.widget_tree.sequence
+
+        def update_sequence():
+            if sequence:
+                self.screen.group.set_sequence(field=sequence)
+
         if (self.screen.current_view.view_type == 'form') \
                 or self.screen.editable_get():
             self.screen.new(context=ctx)
             self.screen.current_view.widget.set_sensitive(True)
+            update_sequence()
         else:
-            win = WinForm(self.screen, self.widget.get_toplevel(), new=True,
+            WinForm(self.screen, lambda a: update_sequence(), new=True,
                 many=True, context=ctx)
-            win.run()
-            win.destroy()
-        if sequence:
-            self.screen.group.set_sequence(field=sequence)
 
     def _sig_edit(self, widget=None):
         self.view.set_value()
@@ -256,9 +255,7 @@ class One2Many(WidgetInterface):
             if not record.validate(fields):
                 self.screen.display()
                 return
-            win = WinForm(self.screen, self.widget.get_toplevel())
-            win.run()
-            win.destroy()
+            WinForm(self.screen, lambda a: None)
 
     def _sig_next(self, widget):
         self.view.set_value()
@@ -309,22 +306,24 @@ class One2Many(WidgetInterface):
             ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
                     0, CONFIG['client.limit'], None, context)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return False
+        def callback(ids):
+            res_id = None
+            if ids:
+                res_id = ids[0]
+            self.screen.load(ids, modified=True)
+            self.screen.display(res_id=res_id)
+            if self.screen.current_view:
+                self.screen.current_view.set_cursor()
+            self.wid_text.set_text('')
         if len(ids) != 1:
-            win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                    context=context, domain=domain, parent=self.window,
-                    views_preload=self.attrs.get('views', {}))
-            ids = win.run()
+            WinSearch(self.attrs['relation'], callback, sel_multi=True,
+                ids=ids, context=context, domain=domain,
+                views_preload=self.attrs.get('views', {}))
+        else:
+            callback(ids)
 
-        res_id = None
-        if ids:
-            res_id = ids[0]
-        self.screen.load(ids, modified=True)
-        self.screen.display(res_id=res_id)
-        if self.screen.current_view:
-            self.screen.current_view.set_cursor()
-        self.wid_text.set_text('')
 
     def _sig_label(self, screen, signal_data):
         name = '_'

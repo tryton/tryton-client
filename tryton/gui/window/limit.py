@@ -4,6 +4,7 @@ import sys
 import gtk
 import gettext
 from tryton.config import TRYTON_ICON, CONFIG
+from tryton.common import get_toplevel_window
 
 _ = gettext.gettext
 
@@ -11,16 +12,15 @@ _ = gettext.gettext
 class Limit(object):
     'Set Search Limit'
 
-    def __init__(self, parent):
-        self.win = gtk.Dialog(_('Limit'), parent,
+    def __init__(self):
+        self.parent = get_toplevel_window()
+        self.win = gtk.Dialog(_('Limit'), self.parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
-        self.parent = parent
         self.win.set_default_response(gtk.RESPONSE_OK)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(True)
-        self.win.set_transient_for(parent)
         self.win.vbox.set_spacing(3)
         self.win.vbox.pack_start(gtk.Label(
             _('Search Limit Settings')), expand=False, fill=True)

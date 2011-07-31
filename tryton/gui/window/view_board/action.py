@@ -19,10 +19,9 @@ _ = gettext.gettext
 
 class Action(SignalEvent):
 
-    def __init__(self, window, attrs=None, context=None):
+    def __init__(self, attrs=None, context=None):
         super(Action, self).__init__()
         self.act_id = int(attrs['name'])
-        self._window = window
         self.screen = None
         self.context = context or {}
 
@@ -30,7 +29,7 @@ class Action(SignalEvent):
             self.action = rpc.execute('model', 'ir.action.act_window', 'read',
                     self.act_id, False, rpc.CONTEXT)
         except TrytonServerError, exception:
-            common.process_exception(exception, self._window)
+            common.process_exception(exception)
             raise
 
         view_ids = False
@@ -147,7 +146,7 @@ class Action(SignalEvent):
 
         if self.action['res_model']:
             self.screen = Screen(self.action['res_model'],
-                self._window, mode=self.action['view_mode'],
+                mode=self.action['view_mode'],
                 context=self.context, view_ids=view_ids,
                 domain=self.domain, readonly=True, alternate_view=True)
             alignment.add(self.screen.screen_container.alternate_viewport)
@@ -174,21 +173,21 @@ class Action(SignalEvent):
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
-        win = WinSearch(self.action['res_model'], domain=self.domain,
-                context=ctx, parent=self._window)
-        res = win.run()
-        if res:
-            self.screen.clear()
-            self.screen.load(res)
+        def callback(result):
+            if result:
+                self.screen.clear()
+                self.screen.load(res)
+        WinSearch(self.action['res_model'], callback, domain=self.domain,
+            context=ctx)
 
     def _sig_open(self, widget):
         try:
             action_id = rpc.execute('model', 'ir.action',
                     'get_action_id', self.act_id, rpc.CONTEXT)
         except TrytonServerError, exception:
-            common.process_exception(exception, self._window)
+            common.process_exception(exception)
         if action_id:
-            Action2.execute(action_id, {}, self._window)
+            Action2.execute(action_id, {})
 
     def _sig_previous(self, widget):
         self.screen.display_prev()
@@ -213,7 +212,7 @@ class Action(SignalEvent):
                     self.domain, 0, self.action['limit'] or
                     CONFIG['client.limit'], None, rpc.CONTEXT)
         except TrytonServerError, exception:
-            common.process_exception(exception, self._window)
+            common.process_exception(exception)
             return False
         if self.screen:
             self.screen.clear()

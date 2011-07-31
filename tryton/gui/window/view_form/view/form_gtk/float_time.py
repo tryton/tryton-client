@@ -8,9 +8,8 @@ import tryton.rpc as rpc
 
 class FloatTime(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(FloatTime, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(FloatTime, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox()
         self.entry = gtk.Entry()

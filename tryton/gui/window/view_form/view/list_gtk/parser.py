@@ -69,9 +69,9 @@ def sort_model(column, treeview, screen):
 
 class ParserTree(ParserInterface):
 
-    def __init__(self, window, parent=None, attrs=None, screen=None,
+    def __init__(self, parent=None, attrs=None, screen=None,
             children_field=None):
-        super(ParserTree, self).__init__(window, parent, attrs, screen,
+        super(ParserTree, self).__init__(parent, attrs, screen,
             children_field=children_field)
         self.treeview = None
 
@@ -113,7 +113,7 @@ class ParserTree(ParserInterface):
                         node_attrs[attr_name] = fields[fname].attrs[attr_name]
                 cell = CELLTYPES.get(node_attrs.get('widget',
                     fields[fname].attrs['type']))(fname, model_name,
-                    treeview, self.window, node_attrs)
+                    treeview, node_attrs)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
 
@@ -214,7 +214,7 @@ class ParserTree(ParserInterface):
                     dict_widget[i] = (fname, label, label_sum, digits)
             elif node.localName == 'button':
                 #TODO add shortcut
-                cell = Button(treeview, self.window, self.screen, node_attrs)
+                cell = Button(treeview, self.screen, node_attrs)
                 button_list.append(cell)
                 renderer = cell.renderer
                 string = node_attrs.get('string', _('Unknown'))
@@ -259,14 +259,13 @@ class ParserTree(ParserInterface):
 
 class Char(object):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Char, self).__init__()
         self.field_name = field_name
         self.model_name = model_name
         self.attrs = attrs or {}
         self.renderer = CellRendererText()
         self.treeview = treeview
-        self.window = window
 
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
@@ -338,7 +337,8 @@ class Char(object):
     def get_color(self, record):
         return record.expr_eval(self.treeview.colors, check_load=False)
 
-    def open_remote(self, record, create, changed=False, text=None):
+    def open_remote(self, record, create, changed=False, text=None,
+            callback=None):
         raise NotImplementedError
 
     def get_textual_value(self, record):
@@ -347,17 +347,19 @@ class Char(object):
         return record[self.field_name].get_client(record) or ''
 
     def value_from_text(self, record, text):
-        return text
+        field = record[self.field_name]
+        field.set_client(record, text)
 
 class Int(Char):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
-        super(Int, self).__init__(field_name, model_name, treeview, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Int, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
         self.renderer = CellRendererInteger()
 
     def value_from_text(self, record, text):
-        return int(text)
+        field = record[self.field_name]
+        field.set_client(record, int(text))
 
     def get_textual_value(self, record):
         return locale.format('%d',
@@ -365,9 +367,9 @@ class Int(Char):
 
 class Boolean(Int):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
-        super(Boolean, self).__init__(field_name, model_name, treeview, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Boolean, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
         self.renderer = CellRendererToggle()
         self.renderer.connect('toggled', self._sig_toggled)
 
@@ -388,9 +390,9 @@ class Boolean(Int):
 class Date(Char):
     server_format = DT_FORMAT
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
-        super(Date, self).__init__(field_name, model_name, treeview, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Date, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
         self.display_format = date_format()
         self.renderer = CellRendererDate(self.display_format)
 
@@ -402,21 +404,22 @@ class Date(Char):
         return common.datetime_strftime(date, self.display_format)
 
     def value_from_text(self, record, text):
-        if not text:
-            return False
+        field = record[self.field_name]
+        date = False
         try:
             date = datetime.date(*time.strptime(text, self.display_format)[:3])
+            date = common.datetime_strftime(date, self.server_format)
         except ValueError:
-            return False
-        return common.datetime_strftime(date, self.server_format)
+            date = False
+        field.set_client(record, date)
 
 
 class Datetime(Date):
     server_format = DHM_FORMAT
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Datetime, self).__init__(field_name, model_name, treeview,
-                window, attrs=attrs)
+            attrs=attrs)
         self.display_format = date_format() + ' ' + HM_FORMAT
         self.renderer.format = self.display_format
 
@@ -430,22 +433,23 @@ class Datetime(Date):
         return common.datetime_strftime(date, self.display_format)
 
     def value_from_text(self, record, text):
-        if not text:
-            return False
+        field = record[self.field_name]
+        date = False
         try:
             date = datetime.datetime(*time.strptime(text,
                 self.display_format)[:6])
+            date = common.timezoned_date(date)
+            date = common.datetime_strftime(date, self.server_format)
         except ValueError:
-            return False
-        date = common.timezoned_date(date)
-        return common.datetime_strftime(date, self.server_format)
+            date = False
+        field.set_client(record, date)
 
 
 class Float(Char):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
-        super(Float, self).__init__(field_name, model_name, treeview, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Float, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
         self.renderer = CellRendererFloat()
 
     def setter(self, column, cell, store, iter):
@@ -468,17 +472,19 @@ class Float(Char):
                 record[self.field_name].get_client(record) or 0.0, True)
 
     def value_from_text(self, record, text):
+        field = record[self.field_name]
         try:
-            return locale.atof(text)
+            value = locale.atof(text)
         except ValueError:
-            return 0.0
+            value = 0.0
+        field.set_client(record, value)
 
 
 class FloatTime(Char):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None):
         super(FloatTime, self).__init__(field_name, model_name, treeview,
-                window, attrs=attrs)
+            attrs=attrs)
         self.conv = None
         if attrs and attrs.get('float_time'):
             self.conv = rpc.CONTEXT.get(attrs['float_time'])
@@ -488,7 +494,8 @@ class FloatTime(Char):
         return common.float_time_to_text(val, self.conv)
 
     def value_from_text(self, record, text):
-        return common.text_to_float_time(text, self.conv)
+        field = record[self.field_name]
+        field.set_client(record, common.text_to_float_time(text, self.conv))
 
 class M2O(Char):
 
@@ -508,18 +515,23 @@ class M2O(Char):
             dom = domain
         args = ('model', relation, 'search', dom, 0, None, None,
                 context)
+        def callback(value):
+            field.set_client(record, value)
         try:
             ids = rpc.execute(*args)
         except TrytonServerError, exception:
-            ids = common.process_exception(exception, self.window, *args)
+            ids = common.process_exception(exception, *args)
             if not ids:
-                return '???'
+                callback('???')
+                return
         if len(ids) != 1:
-            return self.search_remote(relation, ids,
-                             domain=domain, context=context)[0]
-        return ids[0]
+            self.search_remote(record, relation, ids, domain=domain,
+                context=context)
+            return
+        callback(ids[0])
 
-    def open_remote(self, record, create=True, changed=False, text=None):
+    def open_remote(self, record, create=True, changed=False, text=None,
+            callback=None):
         field = record.group.fields[self.field_name]
         relation = field.attrs['relation']
 
@@ -538,53 +550,60 @@ class M2O(Char):
             try:
                 ids = rpc.execute(*args)
             except TrytonServerError, exception:
-                ids = common.process_exception(exception, self.window, *args)
+                ids = common.process_exception(exception, *args)
                 if not ids:
-                    return False, False
+                    field.set_client(record, False)
+                    if callback:
+                        callback()
+                    return
             if len(ids) == 1:
-                return True, ids[0]
-            searched = self.search_remote(relation, ids, domain=domain,
-                    context=context)
-            if searched[0]:
-                return True, searched
-            return False, False
-        screen = Screen(relation, self.window, domain=domain, context=context,
-                mode=['form'])
+                field.set_client(record, ids[0])
+                if callback:
+                    callback()
+                return
+            self.search_remote(record, relation, ids, domain=domain,
+                context=context, callback=callback)
+            return
+        screen = Screen(relation, domain=domain, context=context,
+            mode=['form'])
+
+        def open_callback(result):
+            if result and screen.save_current():
+                value = (screen.current_record.id,
+                    screen.current_record.rec_name())
+                field.set_client(record, value)
+            if callback:
+                callback()
         if obj_id:
             screen.load([obj_id])
-            win = WinForm(screen, self.window)
+            WinForm(screen, open_callback)
         else:
-            win = WinForm(screen, self.window, new=True)
-        value = False
-        if win.run():
-            if screen.save_current():
-                value = (screen.current_record.id,
-                        screen.current_record.rec_name())
-        win.destroy()
-        if value:
-            return True, value
-        else:
-            return False, False
+            WinForm(screen, open_callback, new=True)
 
-    def search_remote(self, relation, ids=None, domain=None, context=None):
-        win = WinSearch(relation, sel_multi=False, ids=ids, context=context,
-                domain=domain, parent=self.window)
-        found = win.run()
-        if found:
-            args = ('model', relation, 'read', found[0], ['rec_name'],
-                    context)
-            try:
-                res = rpc.execute(*args)
-            except TrytonServerError, exception:
-                res = common.process_exception(exception, self.window, *args)
-                if not res:
-                    return False, None
-            return found[0], res['rec_name']
-        else:
-            return False, None
+    def search_remote(self, record, relation, ids=None, domain=None,
+            context=None, callback=None):
+        field = record.group.fields[self.field_name]
+        def search_callback(found):
+            value = None
+            if found:
+                args = ('model', relation, 'read', found[0], ['rec_name'],
+                        context)
+                try:
+                    res = rpc.execute(*args)
+                except TrytonServerError, exception:
+                    res = common.process_exception(exception, *args)
+                if res:
+                    value = (found[0], res['rec_name'])
+            field.set_client(record, value)
+            if callback:
+                callback()
+        WinSearch(relation, search_callback, sel_multi=False, ids=ids,
+            context=context, domain=domain)
+
 
 class O2O(M2O):
     pass
+
 
 class UnsettableColumn(Exception):
 
@@ -605,19 +624,20 @@ class O2M(Char):
     def value_from_text(self, record, text):
         pass
 
-    def open_remote(self, record, create=True, changed=False, text=None):
+    def open_remote(self, record, create=True, changed=False, text=None,
+            callback=None):
         group = record.value[self.field_name]
         field = record.group.fields[self.field_name]
         relation = field.attrs['relation']
         context = field.context_get(record)
 
-        screen = Screen(relation, self.window, mode=['tree', 'form'],
-                exclude_field=field.attrs.get('relation_field'))
+        screen = Screen(relation, mode=['tree', 'form'],
+            exclude_field=field.attrs.get('relation_field'))
         screen.group = group
-        win = WinForm(screen, self.window, view_type='tree', context=context)
-        win.run()
-        win.destroy()
-        return False, False
+        def open_callback(result):
+            if callback:
+                callback()
+        WinForm(screen, open_callback, view_type='tree', context=context)
 
 
 class M2M(Char):
@@ -631,11 +651,12 @@ class M2M(Char):
                 get_client(record))) + ' )'
 
     def value_from_text(self, record, text):
-        if not text:
-            return []
-        if not (text[0] != '('):
-            return record[self.field_name].get(record)
         field = record[self.field_name]
+        if not text:
+            field.set_client(record, [])
+            return
+        if not (text[0] != '('):
+            return
         relation = field.attrs['relation']
         domain = field.domain_get(record)
         context = field.context_get(record)
@@ -649,15 +670,18 @@ class M2M(Char):
         try:
             ids = rpc.execute(*args)
         except TrytonServerError, exception:
-            ids = common.process_exception(exception, self.window, *args)
+            ids = common.process_exception(exception, *args)
             if ids is False:
-                return []
-        win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
-                domain=domain, parent=self.window)
-        found = win.run()
-        return found or []
+                field.set_client(record, [])
+                return
+        def callback(result):
+            field.set_client(record, result or [])
+        WinSearch(relation, callback, sel_multi=True, ids=ids, context=context,
+            domain=domain)
+        return
 
-    def open_remote(self, record, create=True, changed=False, text=None):
+    def open_remote(self, record, create=True, changed=False, text=None,
+            callback=None):
         field = record[self.field_name]
         relation = field.attrs['relation']
         context = field.context_get(record)
@@ -669,20 +693,26 @@ class M2M(Char):
             try:
                 ids = rpc.execute(*args)
             except TrytonServerError, exception:
-                ids = common.process_exception(exception, self.window, *args)
+                ids = common.process_exception(exception, *args)
                 if ids is False:
-                    return False, None
+                    field.set_client(record, False)
+                    if callback:
+                        callback()
             if ids and len(ids)==1:
-                return True, ids
+                field.set_client(record, ids)
+                if callback:
+                    callback()
+                return
         else:
             ids = [x.id for x in field.get_client(record)]
-        win = WinSearch(relation, sel_multi=True, ids=ids, context=context,
-                domain=domain, parent=self.window)
-        found = win.run()
-        if found:
-            return True, found
-        else:
-            return False, None
+        def open_callback(result):
+            if result:
+                field.set_client(record, result)
+            if callback:
+                callback()
+        WinSearch(relation, open_callback, sel_multi=True, ids=ids, context=context,
+            domain=domain)
+
 
 class Selection(Char):
 
@@ -698,8 +728,7 @@ class Selection(Char):
             try:
                 selection = rpc.execute(*args)
             except TrytonServerError, exception:
-                selection = (common.process_exception(exception, self.window,
-                    args) or [])
+                selection = (common.process_exception(exception, args) or [])
         self.selection = selection[:]
         if self.attrs.get('sort', True):
             selection.sort(key=operator.itemgetter(1))
@@ -726,7 +755,8 @@ class Selection(Char):
         return dict(self.selection).get(value, '')
 
     def value_from_text(self, record, text):
-        return self._selection.get(text, False), text
+        field = record[self.field_name]
+        field.set_client(record, self._selection.get(text, False))
 
     def editing_started(self, cell, editable, path):
         store = self.treeview.get_model()
@@ -758,7 +788,7 @@ class Selection(Char):
             try:
                 result = rpc.execute(*args)
             except TrytonServerError, exception:
-                result = common.process_exception(exception, self.window, *args)
+                result = common.process_exception(exception, *args)
 
             if isinstance(result, list):
                 selection = [(x['id'], x['rec_name']) for x in result]
@@ -775,9 +805,9 @@ class Selection(Char):
 
 class Reference(Char):
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Reference, self).__init__(field_name, model_name, treeview,
-                window, attrs=attrs)
+            attrs=attrs)
         self._selection = {}
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
@@ -785,7 +815,7 @@ class Reference(Char):
                 selection = rpc.execute('model',
                         model_name, selection, rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 selection = []
         selection.sort(key=operator.itemgetter(1))
         for i, j in selection:
@@ -804,8 +834,7 @@ class Reference(Char):
                 try:
                     res = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    res = common.process_exception(exception, self.window,
-                            *args)
+                    res = common.process_exception(exception, *args)
                 if not res:
                     name = '???'
                 else:
@@ -826,7 +855,7 @@ class ProgressBar(object):
         'top_to_bottom': gtk.PROGRESS_TOP_TO_BOTTOM,
     }
 
-    def __init__(self, field_name, model_name, treeview, window, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None):
         super(ProgressBar, self).__init__()
         self.field_name = field_name
         self.model_name = model_name
@@ -836,7 +865,6 @@ class ProgressBar(object):
             'left_to_right'), gtk.PROGRESS_LEFT_TO_RIGHT)
         self.renderer.set_property('orientation', orientation)
         self.treeview = treeview
-        self.window = window
 
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
@@ -849,24 +877,25 @@ class ProgressBar(object):
         text = locale.format('%.' + str(digit) + 'f', value, True)
         cell.set_property('text', text + '%')
 
-    def open_remote(self, record, create, changed=False, text=None):
+    def open_remote(self, record, create, changed=False, text=None,
+            callback=None):
         raise NotImplementedError
 
     def get_textual_value(self, record):
         return record[self.field_name].get_client(record) or ''
 
     def value_from_text(self, record, text):
-        return float(text)
+        field = record[self.field_name]
+        field.set_client(record, float(text))
 
 
 class Button(object):
 
-    def __init__(self, treeview, window, screen, attrs=None):
+    def __init__(self, treeview, screen, attrs=None):
         super(Button, self).__init__()
         self.attrs = attrs or {}
         self.renderer = CellRendererButton(attrs.get('string', _('Unknown')))
         self.treeview = treeview
-        self.window = window
         self.screen = screen
 
         self.renderer.connect('clicked', self.button_clicked)
@@ -887,7 +916,7 @@ class Button(object):
         obj_id = self.screen.save_current()
         if obj_id:
             if not self.attrs.get('confirm', False) or \
-                    common.sur(self.attrs['confirm'], self.window):
+                    common.sur(self.attrs['confirm']):
                 button_type = self.attrs.get('type', 'workflow')
                 ctx = rpc.CONTEXT.copy()
                 ctx.update(record.context_get())
@@ -898,14 +927,14 @@ class Button(object):
                     try:
                         rpc.execute(*args)
                     except TrytonServerError, exception:
-                        common.process_exception(exception, self.window, *args)
+                        common.process_exception(exception, *args)
                 elif button_type == 'object':
                     args = ('model', self.screen.model_name,
                             self.attrs['name'], [obj_id], ctx)
                     try:
                         rpc.execute(*args)
                     except TrytonServerError, exception:
-                        common.process_exception(exception, self.window, *args)
+                        common.process_exception(exception, *args)
                 elif button_type == 'action':
                     action_id = None
                     args = ('model', 'ir.action', 'get_action_id',
@@ -913,14 +942,13 @@ class Button(object):
                     try:
                         action_id = rpc.execute(*args)
                     except TrytonServerError, exception:
-                        action_id = common.process_exception(exception,
-                                self.window, *args)
+                        action_id = common.process_exception(exception, *args)
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.screen.model_name,
                             'id': obj_id,
                             'ids': [obj_id],
-                            }, self.window, context=ctx)
+                            }, context=ctx)
                 else:
                     raise TrytonError('Unallowed button type')
                 self.screen.reload(written=True)

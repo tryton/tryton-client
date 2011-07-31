@@ -11,10 +11,9 @@ _ = gettext.gettext
 
 class Integer(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None,
-            on_change=None):
-        super(Integer, self).__init__(name, parent, attrs=attrs,
-                context=context, on_change=on_change)
+    def __init__(self, name, attrs=None, context=None, on_change=None):
+        super(Integer, self).__init__(name, attrs=attrs, context=context,
+            on_change=on_change)
         self.widget = gtk.HBox(spacing=3)
 
         self.liststore = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)

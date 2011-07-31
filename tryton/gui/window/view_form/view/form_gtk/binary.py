@@ -20,9 +20,8 @@ def humanize(size):
 class Binary(WidgetInterface):
     "Binary"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Binary, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Binary, self).__init__(field_name, model_name, attrs=attrs)
 
         self.filename = attrs.get('filename')
 
@@ -136,7 +135,7 @@ class Binary(WidgetInterface):
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
-        file_open(file_path, type_, self.window)
+        file_open(file_path, type_)
 
     def sig_save_as(self, widget=None):
         filename = ''

@@ -128,10 +128,10 @@ class Graph(gtk.DrawingArea):
 
         self.queue_draw()
 
-    def action(self, window):
+    def action(self):
         self.popup.hide()
 
-    def action_keyword(self, ids, window):
+    def action_keyword(self, ids):
         if not ids:
             return
         ctx = self.group.context.copy()
@@ -146,7 +146,7 @@ class Graph(gtk.DrawingArea):
         else:
             hide = False
         with Window(hide_current=hide):
-            return Action.exec_keyword('graph_open', window, {
+            return Action.exec_keyword('graph_open', {
                     'model': self.model,
                     'id': ids[0],
                     'ids': ids,

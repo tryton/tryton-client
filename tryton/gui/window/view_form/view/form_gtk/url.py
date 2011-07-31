@@ -10,8 +10,8 @@ import tryton.common as common
 class URL(Char):
     "url"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(URL, self).__init__(field_name, model_name, window, attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(URL, self).__init__(field_name, model_name, attrs=attrs)
 
         self.tooltips = common.Tooltips()
         self.button = gtk.Button()

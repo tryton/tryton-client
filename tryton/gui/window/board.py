@@ -40,7 +40,7 @@ class Board(SignalEvent, TabContent):
             '<tryton>/Form/Close'),
     ]
 
-    def __init__(self, model, window, view_id, context=None, name=False,
+    def __init__(self, model, view_id, context=None, name=False,
             auto_refresh=False):
         super(Board, self).__init__()
 
@@ -48,14 +48,15 @@ class Board(SignalEvent, TabContent):
             view = rpc.execute('model', 'ir.ui.view', 'read',
                     view_id, ['arch'], context)
         except TrytonServerError, exception:
-            common.process_exception(exception, window)
+            common.process_exception(exception)
             raise
 
-        self.board = ViewBoard(view['arch'], window, context=context)
+        self.board = ViewBoard(view['arch'], context=context)
         self.model = model
         self.view_id = view_id
         self.context = context
         self.auto_refresh = auto_refresh
+        self.dialogs = []
         if not name:
             self.name = self.board.name
         else:

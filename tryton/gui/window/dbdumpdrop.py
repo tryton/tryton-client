@@ -41,9 +41,8 @@ class DBBackupDrop(object):
         return dbs
 
     @staticmethod
-    def refreshlist_ask(widget, server_widget, db_widget, label, db_progress,
-            parent=None):
-        res = common.request_server(server_widget, parent)
+    def refreshlist_ask(widget, server_widget, db_widget, label, db_progress):
+        res = common.request_server(server_widget)
         if not res:
             return None
         host, port = res
@@ -71,7 +70,7 @@ class DBBackupDrop(object):
         else:
             self.button_ok.set_sensitive(False)
 
-    def __init__(self, parent, function=None):
+    def __init__(self, function=None):
         # This widget is used for creating and droping a database!
         if function =="backup":
             dialog_title = _("Backup a database")
@@ -88,11 +87,10 @@ class DBBackupDrop(object):
         else:
             return None
 
-        self.dialog = gtk.Dialog( \
-                title =  dialog_title, \
-                parent = parent, \
-                flags = gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT \
-                | gtk.WIN_POS_CENTER_ON_PARENT,)
+        self.parent = common.get_toplevel_window()
+        self.dialog = gtk.Dialog(title=dialog_title, parent=self.parent,
+            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
+            | gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.connect("key-press-event", self.event_show_button_ok)
@@ -195,9 +193,8 @@ class DBBackupDrop(object):
         self.entry_serverpasswd.grab_focus()
         self.dialog.vbox.pack_start(self.dialog_vbox)
 
-    def run(self, parent):
+    def run(self):
         self.dialog.set_default_response(gtk.RESPONSE_OK)
-        self.dialog.set_transient_for(parent)
         self.dialog.show_all()
 
         pass_widget = self.entry_serverpasswd
@@ -215,8 +212,8 @@ class DBBackupDrop(object):
             CONFIG['login.server'], CONFIG['login.port'])
 
         change_button = self.button_server_change
-        change_button.connect_after('clicked', DBBackupDrop.refreshlist_ask, \
-                server_widget, db_widget, label, db_progress, self.dialog)
+        change_button.connect_after('clicked', DBBackupDrop.refreshlist_ask,
+                server_widget, db_widget, label, db_progress)
 
         while True:
             database = False
@@ -232,7 +229,7 @@ class DBBackupDrop(object):
                 self.dialog.destroy()
                 rpc.logout()
                 break
-        parent.present()
+        self.parent.present()
         self.dialog.destroy()
 
         return (url, database, passwd)

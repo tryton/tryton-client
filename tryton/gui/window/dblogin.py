@@ -356,9 +356,10 @@ class DBListEditor(object):
 
 
 class DBLogin(object):
-    def __init__(self, parent):
+    def __init__(self):
         # GTK Stuffs
-        self.dialog = gtk.Dialog(title=_('Login'), parent=parent,
+        self.parent = common.get_toplevel_window()
+        self.dialog = gtk.Dialog(title=_('Login'), parent=self.parent,
             flags=gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(True)
@@ -566,7 +567,7 @@ class DBLogin(object):
         else:
             return 8070
 
-    def run(self, parent):
+    def run(self):
         profile_name = CONFIG['login.profile']
         can_use_profile = self.profiles.has_section(profile_name)
         if can_use_profile:
@@ -637,14 +638,12 @@ class DBLogin(object):
             result = (self.entry_login.get_text(),
                 self.entry_password.get_text(), host, port, database)
 
+        self.parent.present()
+        self.dialog.destroy()
         if res != gtk.RESPONSE_OK:
-            parent.present()
-            self.dialog.destroy()
             rpc.logout()
             from tryton.gui.main import Main
             Main.get_main().refresh_ssl()
             raise TrytonError('QueryCanceled')
-        parent.present()
-        self.dialog.destroy()
         return result
 

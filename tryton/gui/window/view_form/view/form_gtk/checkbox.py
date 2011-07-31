@@ -8,9 +8,8 @@ _ = gettext.gettext
 
 class CheckBox(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(CheckBox, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(CheckBox, self).__init__(field_name, model_name, attrs=attrs)
         self.widget = gtk.CheckButton()
         self.widget.connect('focus-in-event', lambda x, y: self._focus_in())
         self.widget.connect('focus-out-event', lambda x, y: self._focus_out())

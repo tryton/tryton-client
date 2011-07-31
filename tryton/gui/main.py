@@ -17,7 +17,6 @@ from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \
 import tryton.common as common
 from tryton.action import Action
 from tryton.exceptions import TrytonServerError, TrytonError
-from tryton.wizard import Wizard
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
 from tryton.gui.window import Limit
@@ -163,6 +162,7 @@ class Main(object):
         self.previous_pages = {}
         self.current_page = 0
         self.last_page = 0
+        self.dialogs = []
 
         if CONFIG['client.modepda']:
             self.radiomenuitem_pda.set_active(True)
@@ -251,6 +251,10 @@ class Main(object):
         self.menuitem_shortcut.set_sensitive(False)
         menubar.add(menuitem_shortcut)
         menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
+        def shortcut_activate(widget):
+            if not menuitem_shortcut.get_submenu():
+                self.shortcut_set()
+        menuitem_shortcut.connect('select', shortcut_activate)
 
         menuitem_help = gtk.MenuItem(_('_Help'))
         menubar.add(menuitem_help)
@@ -679,13 +683,14 @@ class Main(object):
     def get_main():
         return _MAIN[0]
 
-    def shortcut_set(self, shortcuts=None):
+    def shortcut_set(self):
         def _action_shortcut(widget, action):
-            Action.exec_keyword('tree_open', self.window, {
+            Action.exec_keyword('tree_open', {
                 'model': 'ir.ui.menu',
                 'id': action,
                 'ids': [action],
                 })
+            self.shortcut_unset()
 
         def _add_shortcut(widget):
             ids = self.menu_screen.sel_ids_get()
@@ -695,7 +700,7 @@ class Main(object):
                 values = rpc.execute('model', self.menu_screen.model_name,
                         'read', ids, ['rec_name'], rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 return
             try:
                 for value in values:
@@ -706,21 +711,21 @@ class Main(object):
                         'resource': self.menu_screen.model_name,
                         }, rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
-            self.shortcut_set()
+                common.process_exception(exception)
+            self.shortcut_unset()
 
         def _manage_shortcut(widget):
             Window.create(False, 'ir.ui.view_sc', False,
                     domain=[('user_id', '=', rpc._USER)],
-                    window=self.window, mode=['tree', 'form'])
+                    mode=['tree', 'form'])
+            self.shortcut_unset()
 
-        if shortcuts is None:
-            user = rpc._USER
-            try:
-                shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
-                        user, 'ir.ui.menu', rpc.CONTEXT)
-            except TrytonServerError:
-                shortcuts = []
+        user = rpc._USER
+        try:
+            shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
+                    user, 'ir.ui.menu', rpc.CONTEXT)
+        except TrytonServerError:
+            shortcuts = []
         menu = gtk.Menu()
         for shortcut in shortcuts:
             menuitem = gtk.MenuItem(shortcut['name'])
@@ -735,13 +740,9 @@ class Main(object):
         menu.add(manage_shortcut)
         menu.show_all()
         self.menuitem_shortcut.set_submenu(menu)
-        self.menuitem_shortcut.set_sensitive(True)
 
     def shortcut_unset(self):
-        menu = gtk.Menu()
-        menu.show_all()
-        self.menuitem_shortcut.set_submenu(menu)
-        self.menuitem_shortcut.set_sensitive(False)
+        self.menuitem_shortcut.remove_submenu()
 
     def sig_accel_change(self, value):
         CONFIG['client.can_change_accelerators'] = value
@@ -789,13 +790,13 @@ class Main(object):
         CONFIG['client.form_tab'] = option
 
     def sig_limit(self, widget):
-        Limit(self.window).run()
+        Limit().run()
 
     def sig_file_actions(self, widget):
-        FileActions(self.window).run()
+        FileActions().run()
 
     def sig_email(self, widget):
-        Email(self.window).run()
+        Email().run()
 
     def sig_win_next(self, widget):
         page = self.notebook.get_current_page()
@@ -810,7 +811,7 @@ class Main(object):
     def sig_user_preferences(self, widget):
         if not self.close_pages():
             return False
-        win = Preference(rpc._USER, self.window)
+        win = Preference(rpc._USER)
         if win.run():
             rpc.context_reload()
             prefs = rpc.execute('model', 'res.user',
@@ -823,13 +824,12 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.shortcut_set()
+                    self.shortcut_unset()
                     self.set_statusbar()
                     self.request_set()
                     self.sig_win_menu()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
-        self.window.present()
         self.sig_win_menu()
         return True
 
@@ -842,7 +842,7 @@ class Main(object):
         ctx.update(rpc.CONTEXT)
         ctx['active_test'] = False
         return Window.create(None, 'res.request', False, [ ],
-                mode=['form', 'tree'], window=self.window, context=ctx)
+                mode=['form', 'tree'], context=ctx)
 
     def sig_request_open(self, widget):
         ctx = {}
@@ -851,13 +851,13 @@ class Main(object):
         try:
             ids1, ids2 = self.request_set(True)
         except TrytonServerError, exception:
-            if common.process_exception(exception, self.window):
+            if common.process_exception(exception):
                 ids1, ids2 = self.request_set(True)
             else:
                 raise
         ids = ids1 + ids2
         return Window.create(False, 'res.request', ids, [ ],
-                mode=['tree', 'form'], window=self.window, context=ctx)
+                mode=['tree', 'form'], context=ctx)
 
     def request_set(self, exception=False):
         try:
@@ -887,19 +887,17 @@ class Main(object):
             return
         if not res:
             try:
-                dblogin = DBLogin(self.window)
-                res = dblogin.run(self.window)
+                res = DBLogin().run()
             except TrytonError, exception:
                 if exception.ex_type == 'QueryCanceled':
                     return False
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 return
-        self.window.present()
         try:
             log_response = rpc.login(*res)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return
         rpc.context_reload()
         self.refresh_ssl()
@@ -921,20 +919,20 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.shortcut_set()
+                    self.shortcut_unset()
                     self.set_statusbar()
                     self.request_set()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
             common.message(_('Connection error!\n' \
-                    'Unable to connect to the server!'), self.window)
+                    'Unable to connect to the server!'))
         elif log_response == -2:
             common.message(_('Connection error!\n' \
-                    'Bad username or password!'), self.window)
+                    'Bad username or password!'))
             return self.sig_login()
-        if not self.menuitem_shortcut.get_property('sensitive'):
-            self.shortcut_set()
+        self.shortcut_unset()
+        self.menuitem_shortcut.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
         #self.menuitem_form.set_sensitive(True)
         self.menuitem_plugins.set_sensitive(True)
@@ -947,8 +945,7 @@ class Main(object):
         if self.notebook.get_n_pages():
             if not common.sur(
                     _('The following action requires to close all tabs.\n'
-                    'Do you want to continue?'),
-                    parent=self.window):
+                    'Do you want to continue?')):
                 return False
         res = True
         while res:
@@ -975,6 +972,7 @@ class Main(object):
         self.sb_servername.set_text('')
         self.sb_requests.set_text('')
         self.shortcut_unset()
+        self.menuitem_shortcut.set_sensitive(False)
         self.menuitem_user.set_sensitive(False)
         #self.menuitem_form.set_sensitive(False)
         self.menuitem_plugins.set_sensitive(False)
@@ -996,13 +994,13 @@ class Main(object):
             self.tooltips.set_tip(self.secure_img, '')
 
     def sig_tips(self, *args):
-        Tips(self.window)
+        Tips()
 
     def sig_about(self, widget):
-        About(self.window)
+        About()
 
     def sig_shortcuts(self, widget):
-        Shortcuts(self.window).run()
+        Shortcuts().run()
 
     def menu_toggle(self, nohide=False):
         has_focus = True
@@ -1041,7 +1039,7 @@ class Main(object):
             try:
                 prefs = rpc.execute(*args)
             except TrytonServerError, exception:
-                prefs = common.process_exception(exception, self.window, *args)
+                prefs = common.process_exception(exception, *args)
                 if not prefs:
                     return False
         self.sb_username.set_text(prefs.get('status_bar', ''))
@@ -1052,14 +1050,14 @@ class Main(object):
                 return False
             common.warning(_('You can not log into the system!\n' \
                     'Verify if you have a menu defined on your user.'),
-                    'Access Denied!', self.window)
+                    'Access Denied!')
             rpc.logout()
             self.refresh_ssl()
             return False
         act_id = prefs[menu_type]
         if except_id and act_id == except_id:
             return act_id
-        Action.execute(act_id, {}, self.window)
+        Action.execute(act_id, {})
         return act_id
 
     def sig_home_new(self, widget=None, quiet=True, except_id=False,
@@ -1076,7 +1074,7 @@ class Main(object):
                 'ids': self.pages[page].ids_get(),
                 'id': self.pages[page].id_get(),
                 }
-        tryton.plugins.execute(datas, self.window)
+        tryton.plugins.execute(datas)
 
     @classmethod
     def sig_quit(cls, widget=None):
@@ -1244,24 +1242,30 @@ class Main(object):
 
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
+        last_form = self.get_page(self.current_page)
+        if last_form:
+            for dialog in last_form.dialogs:
+                dialog.hide()
+
         self.current_page = self.notebook.get_current_page()
-        current_form = self.get_page()
+        current_form = self.get_page(self.current_page)
+        for dialog in current_form.dialogs:
+            dialog.show()
 
     def sig_db_new(self, widget):
         if not self.sig_logout(widget):
             return False
         dia = DBCreate(CONFIG['login.server'], int(CONFIG['login.port']),
             sig_login=self.sig_login)
-        res = dia.run(self.window)
+        res = dia.run()
         if res:
             CONFIG.save()
         return res
 
-    def sig_db_drop(self, widget):
+    def sig_db_drop(self, widget=None):
         if not self.sig_logout(widget):
             return False
-        dialog = DBBackupDrop(self.window, function='drop')
-        url, dbname, passwd = dialog.run(self.window)
+        url, dbname, passwd = DBBackupDrop(function='drop').run()
         if not dbname:
             rpc.logout()
             Main.get_main().refresh_ssl()
@@ -1269,44 +1273,42 @@ class Main(object):
 
         host, port = url.rsplit(':', 1)
         sure = common.sur_3b(_("You are going to delete a Tryton " \
-                "database.\nAre you really sure to proceed?"), self.window)
+                "database.\nAre you really sure to proceed?"))
         if sure == "ko" or sure == "cancel":
             return
         rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'drop',
-            dbname, passwd), self.window)
+            dbname, passwd))
         try:
             rpcprogress.run()
         except TrytonServerError, exception:
             self.refresh_ssl()
             if exception.args[0] == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password" \
-                        "\nPlease try again."), self.window,
+                        "\nPlease try again."),
                         _('Access denied!'))
-                self.sig_db_drop(self.window)
+                self.sig_db_drop()
             else:
-                common.warning(_('Database drop failed with ' \
-                        'error message:\n') + str(exception.args[0]), \
-                        self.window, _('Database drop failed!'))
+                common.warning(_('Database drop failed with error message:\n')
+                    + str(exception.args[0]), _('Database drop failed!'))
             return
         self.refresh_ssl()
-        common.message(_("Database dropped successfully!"), \
-                parent=self.window)
+        common.message(_("Database dropped successfully!"))
 
     def sig_db_restore(self, widget):
         if not self.sig_logout(widget):
             return False
-        filename = common.file_selection(_('Open Backup File to Restore...'), \
-                parent=self.window, preview=False)
+        filename = common.file_selection(_('Open Backup File to Restore...'),
+            preview=False)
         if not filename:
             return
-        dialog = DBRestore(self.window, filename=filename)
-        url, dbname, passwd, update = dialog.run(self.window)
+        dialog = DBRestore(filename=filename)
+        url, dbname, passwd, update = dialog.run()
         if dbname:
             with open(filename, 'rb') as file_p:
                 data_b64 = base64.encodestring(file_p.read())
             host, port = url.rsplit(':' , 1)
             rpcprogress = common.RPCProgress('db_exec', (host, int(port),
-                'restore', dbname, passwd, data_b64, update), self.window)
+                'restore', dbname, passwd, data_b64, update))
             try:
                 res = rpcprogress.run()
             except TrytonServerError, exception:
@@ -1316,31 +1318,29 @@ class Main(object):
                     common.warning(_("It is not possible to restore a " \
                             "password protected database.\n" \
                             "Backup and restore needed to be proceed " \
-                            "manual."), self.window, \
+                            "manual."),
                             _('Database is password protected!'))
                 elif exception.args[0] == "AccessDenied":
                     common.warning(_("Wrong Tryton Server Password.\n" \
-                            "Please try again."), self.window, \
+                            "Please try again."),
                             _('Access denied!'))
-                    self.sig_db_restore(self.window)
+                    self.sig_db_restore()
                 else:
                     common.warning(_('Database restore failed with ' \
                             'error message:\n') + str(exception.args[0]), \
-                            self.window, _('Database restore failed!'))
+                            _('Database restore failed!'))
                 return
             self.refresh_ssl()
             if res:
-                common.message(_("Database restored successfully!"), \
-                        parent=self.window)
+                common.message(_("Database restored successfully!"))
             else:
-                common.message(_('Database restore failed!'), \
-                        parent=self.window)
+                common.message(_('Database restore failed!'))
 
     def sig_db_dump(self, widget):
         if not self.sig_logout(widget):
             return False
-        dialog = DBBackupDrop(self.window, function='backup')
-        url, dbname, passwd = dialog.run(self.window)
+        dialog = DBBackupDrop(function='backup')
+        url, dbname, passwd = dialog.run()
 
         if not (dbname and url and passwd):
             rpc.logout()
@@ -1349,7 +1349,7 @@ class Main(object):
 
         host, port = url.rsplit(':', 1)
         rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'dump',
-            dbname, passwd), self.window)
+            dbname, passwd))
         try:
             dump_b64 = rpcprogress.run()
         except TrytonServerError, exception:
@@ -1357,16 +1357,16 @@ class Main(object):
                 common.warning(_("It is not possible to dump a password " \
                         "protected Database.\nBackup and restore " \
                         "needed to be proceed manual."),
-                        self.window, _('Database is password protected!'))
+                        _('Database is password protected!'))
             elif exception.args[0] == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password.\n" \
-                        "Please try again."), self.window,
+                        "Please try again."),
                         _('Access denied!'))
-                self.sig_db_dump(self.window)
+                self.sig_db_dump()
             else:
                 common.warning(_('Database dump failed with ' \
-                        'error message:\n') + str(exception.args[0]), \
-                        self.window, _('Database dump failed!'))
+                        'error message:\n') + str(exception.args[0]),
+                        _('Database dump failed!'))
             rpc.logout()
             Main.get_main().refresh_ssl()
             return
@@ -1374,16 +1374,14 @@ class Main(object):
         self.refresh_ssl()
         dump = base64.decodestring(dump_b64)
 
-        filename = common.file_selection(_('Save As...'), \
-                action=gtk.FILE_CHOOSER_ACTION_SAVE, parent=self.window, \
-                preview=False,
-                filename=dbname + '-' + time.strftime('%Y%m%d%H%M') + '.dump')
+        filename = common.file_selection(_('Save As...'),
+            action=gtk.FILE_CHOOSER_ACTION_SAVE, preview=False,
+            filename=dbname + '-' + time.strftime('%Y%m%d%H%M') + '.dump')
 
         if filename:
             with open(filename, 'wb') as file_:
                 file_.write(dump)
-            common.message(_("Database backuped successfully!"), \
-                    parent=self.window)
+            common.message(_("Database backuped successfully!"))
         else:
             rpc.logout()
             Main.get_main().refresh_ssl()
@@ -1435,9 +1433,8 @@ class Main(object):
                 mode = ['form', 'tree']
             try:
                 Window.create(view_ids, model, res_id=res_id, domain=domain,
-                        window=self.window, context=context, mode=mode,
-                        name=name, limit=limit, auto_refresh=auto_refresh,
-                        search_value=search_value)
+                    context=context, mode=mode, name=name, limit=limit,
+                    auto_refresh=auto_refresh, search_value=search_value)
             except Exception:
                 # Prevent crashing the client
                 return
@@ -1456,14 +1453,9 @@ class Main(object):
             except ValueError:
                 return
             try:
-                if window:
-                    Window.create_wizard(wizard, data, self.window,
-                            direct_print=direct_print, email_print=email_print,
-                            email=email, name=name, context=context)
-                else:
-                    Wizard.execute(wizard, data, self.window,
-                            direct_print=direct_print, email_print=email_print,
-                            email=email, context=context)
+                Window.create_wizard(wizard, data, direct_print=direct_print,
+                    email_print=email_print, email=email, name=name,
+                    context=context, window=window)
             except Exception:
                 # Prevent crashing the client
                 return
@@ -1481,9 +1473,8 @@ class Main(object):
             except ValueError:
                 return
             try:
-                Action.exec_report(report, data, self.window,
-                        direct_print=direct_print, email_print=email_print,
-                        email=email, context=context)
+                Action.exec_report(report, data, direct_print=direct_print,
+                    email_print=email_print, email=email, context=context)
             except Exception:
                 # Prevent crashing the client
                 return

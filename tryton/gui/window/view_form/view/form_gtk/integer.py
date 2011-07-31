@@ -7,9 +7,8 @@ import locale
 class Integer(Char):
     "Integer"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Integer, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Integer, self).__init__(field_name, model_name, attrs=attrs)
         self.entry.set_max_length(0)
         self.entry.set_alignment(1.0)
         self.entry.connect('insert_text', self.sig_insert_text)

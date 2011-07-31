@@ -1,3 +1,4 @@
+* Convert many popup to be no-modal
 * Add window manager for:
     - replace current window
     - prevent simmilar window

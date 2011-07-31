@@ -9,10 +9,9 @@ _ = gettext.gettext
 
 class CheckBox(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None,
-            on_change=None):
-        super(CheckBox, self).__init__(name, parent, attrs=attrs,
-                context=context, on_change=on_change)
+    def __init__(self, name, attrs=None, context=None, on_change=None):
+        super(CheckBox, self).__init__(name, attrs=attrs, context=context,
+            on_change=on_change)
 
         self.widget = gtk.combo_box_entry_new_text()
         self.widget.child.set_editable(True)

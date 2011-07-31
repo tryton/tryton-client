@@ -12,9 +12,8 @@ from tryton.exceptions import TrytonServerError
 
 class Selection(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Selection, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Selection, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.ComboBoxEntry()
@@ -45,7 +44,7 @@ class Selection(WidgetInterface):
                 selection = rpc.execute('model',
                         self.model_name, selection, rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 selection = []
         self.selection = selection[:]
         if self.attrs.get('sort', True):
@@ -67,7 +66,7 @@ class Selection(WidgetInterface):
         try:
             result = rpc.execute(*args)
         except TrytonServerError, exception:
-            result = common.process_exception(exception, self.window, args)
+            result = common.process_exception(exception, args)
         if isinstance(result, list):
             selection = [(x['id'], x['rec_name']) for x in result]
             selection.append((False, ''))

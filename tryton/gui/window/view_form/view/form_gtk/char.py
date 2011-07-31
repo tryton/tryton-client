@@ -13,8 +13,8 @@ _ = gettext.gettext
 class Char(WidgetInterface):
     "Char"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Char, self).__init__(field_name, model_name, window, attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Char, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox()
         self.autocomplete = bool(attrs.get('autocomplete'))
@@ -95,8 +95,8 @@ class Char(WidgetInterface):
 
 class Sha(Char):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Sha, self).__init__(field_name, model_name, window, attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Sha, self).__init__(field_name, model_name, attrs=attrs)
         self.entry.props.visibility = False
 
         self.visibility_checkbox = gtk.CheckButton()

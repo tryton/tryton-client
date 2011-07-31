@@ -20,8 +20,9 @@ GRAPH_TYPE = {
     'pie': Pie,
 }
 
-def save(widget, graph, window):
-    dia = gtk.Dialog(_('Save As'), window,
+def save(widget, graph):
+    parent = common.get_toplevel_window()
+    dia = gtk.Dialog(_('Save As'), parent,
             gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
             (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -93,24 +94,24 @@ def save(widget, graph, window):
                             gtk.MESSAGE_ERROR)
         else:
             break
-    window.present()
+    parent.present()
     dia.destroy()
     return
 
-def button_press(widget, event, graph, window):
+def button_press(widget, event, graph):
     if event.button == 3:
         menu = gtk.Menu()
         item = gtk.ImageMenuItem(_('Save As...'))
         img = gtk.Image()
         img.set_from_stock('tryton-save-as', gtk.ICON_SIZE_MENU)
         item.set_image(img)
-        item.connect('activate', save, graph, window)
+        item.connect('activate', save, graph)
         item.show()
         menu.append(item)
         menu.popup(None, None, None, event.button, event.time)
         return True
     elif event.button == 1:
-        graph.action(window)
+        graph.action()
 
 
 class ParserGraph(ParserInterface):
@@ -145,6 +146,6 @@ class ParserGraph(ParserInterface):
         widget = GRAPH_TYPE[attrs.get('type', 'vbar')](xfield, yfields, attrs, model)
         event = gtk.EventBox()
         event.add(widget)
-        event.connect('button-press-event', button_press, widget, self.window)
+        event.connect('button-press-event', button_press, widget)
 
         return event, {'root': widget}, [], '', [], None

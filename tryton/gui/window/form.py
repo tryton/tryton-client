@@ -93,7 +93,7 @@ class Form(SignalEvent, TabContent):
             '<tryton>/Form/Import Data'),
     ]
 
-    def __init__(self, model, window, res_id=False, domain=None, mode=None,
+    def __init__(self, model, res_id=False, domain=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False, search_value=None):
         super(Form, self).__init__()
@@ -108,18 +108,17 @@ class Form(SignalEvent, TabContent):
             context = {}
 
         self.model = model
-        self.window = window
         self.res_id = res_id
         self.domain = domain
         self.mode = mode
         self.context = context
         self.auto_refresh = auto_refresh
         self.view_ids = view_ids
+        self.dialogs = []
 
-        self.screen = Screen(self.model, self.window, mode=mode,
-                context=self.context, view_ids=view_ids, domain=domain,
-                limit=limit, readonly=bool(auto_refresh),
-                search_value=search_value)
+        self.screen = Screen(self.model, mode=mode, context=self.context,
+            view_ids=view_ids, domain=domain, limit=limit,
+            readonly=bool(auto_refresh), search_value=search_value)
         self.screen.widget.show()
 
         if not name:
@@ -159,8 +158,7 @@ class Form(SignalEvent, TabContent):
             try:
                 toolbars = rpc.execute(*args)
             except TrytonServerError, exception:
-                toolbars = common.process_exception(exception, self.window,
-                    *args)
+                toolbars = common.process_exception(exception, *args)
                 toolbars = toolbars if toolbars else {}
             self._toolbar_cache[self.model] = toolbars
         return self._toolbar_cache[self.model]
@@ -174,7 +172,6 @@ class Form(SignalEvent, TabContent):
         if not isinstance(value, Form):
             return False
         return (self.model == value.model
-            and self.window == value.window
             and self.res_id == value.res_id
             and self.domain == value.domain
             and self.mode == value.mode
@@ -188,7 +185,8 @@ class Form(SignalEvent, TabContent):
     def sig_goto(self, widget=None):
         if not self.modified_save():
             return
-        win = gtk.Dialog(_('Go to ID'), self.window,
+        parent = common.get_toplevel_window()
+        win = gtk.Dialog(_('Go to ID'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -224,7 +222,7 @@ class Form(SignalEvent, TabContent):
         if response == gtk.RESPONSE_OK:
             self.screen.display(locale.atoi(entry.get_text()), set_cursor=True)
         win.destroy()
-        self.window.present()
+        parent.present()
 
     def destroy(self):
         self.screen.signal_unconnect(self)
@@ -246,8 +244,7 @@ class Form(SignalEvent, TabContent):
     def sig_attach(self, widget=None):
         obj_id = self.id_get()
         if obj_id >= 0 and obj_id is not False:
-            win = Attachment(self.model, obj_id, self.window)
-            win.run()
+            Attachment(self.model, obj_id).run()
         else:
             self.message_info(_('No record selected!'))
         self.update_attachment_count(reload=True)
@@ -295,7 +292,7 @@ class Form(SignalEvent, TabContent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 return
         message_str = ''
@@ -309,7 +306,7 @@ class Form(SignalEvent, TabContent):
                     value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value +'\n'
         message_str += _('Model:') + ' ' + self.model
-        message(message_str, self.window)
+        message(message_str)
         return True
 
     def sig_remove(self, widget=None):
@@ -317,7 +314,7 @@ class Form(SignalEvent, TabContent):
             msg = _('Are you sure to remove this record?')
         else:
             msg = _('Are you sure to remove those records?')
-        if sur(msg, self.window):
+        if sur(msg):
             if not self.screen.remove(delete=True, force_remove=True):
                 self.message_info(_('Records not removed!'))
             else:
@@ -329,7 +326,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinImport(self.model, self.window)
+        win = WinImport(self.model)
         win.run()
 
     def sig_save_as(self, widget=None):
@@ -338,7 +335,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinExport(self.model, self.ids_get(), self.window,
+        win = WinExport(self.model, self.ids_get(),
                 context=self.context)
         win.run()
 
@@ -360,7 +357,7 @@ class Form(SignalEvent, TabContent):
         try:
             new_ids = rpc.execute(*args)
         except TrytonServerError, exception:
-            new_ids = common.process_exception(exception, self.window, *args)
+            new_ids = common.process_exception(exception, *args)
         if new_ids:
             self.screen.load(new_ids)
             self.message_info(_('Working now on the duplicated record(s)!'),
@@ -391,7 +388,7 @@ class Form(SignalEvent, TabContent):
             return False
         if test_modified and self.screen.modified():
             res = sur_3b(_('This record has been modified\n' \
-                    'do you want to save it ?'), self.window)
+                    'do you want to save it ?'))
             if res == 'ok':
                 self.sig_save(None)
             elif res == 'ko':
@@ -429,6 +426,8 @@ class Form(SignalEvent, TabContent):
         self.buttons['relate'].props.active = True
 
     def action_popup(self, widget):
+        button, = widget.get_children()
+        button.grab_focus()
         menu = widget._menu
         if not widget.props.active:
             menu.popdown()
@@ -449,12 +448,12 @@ class Form(SignalEvent, TabContent):
     def sig_search(self, widget=None):
         if not self.modified_save():
             return
-        win = WinSearch(self.model, domain=self.domain,
-                context=self.context, parent=self.window)
-        res = win.run()
-        if res:
-            self.screen.clear()
-            self.screen.load(res)
+        def callback(result):
+            if result:
+                self.screen.clear()
+                self.screen.load(result)
+        WinSearch(self.model, callback, domain=self.domain,
+            context=self.context)
 
     def message_info(self, message, color='red'):
         if message:
@@ -495,8 +494,7 @@ class Form(SignalEvent, TabContent):
         if self.screen.modified():
             value = sur_3b(
                     _('This record has been modified\n' \
-                            'do you want to save it ?'),
-                    self.window)
+                            'do you want to save it ?'))
             if value == 'ok':
                 return self.sig_save(None)
             elif value == 'ko':
@@ -508,6 +506,8 @@ class Form(SignalEvent, TabContent):
         return True
 
     def sig_close(self, widget=None):
+        for dialog in self.dialogs[:]:
+            dialog.destroy()
         return self.modified_save(reload=False)
 
     def _action(self, action, atype):
@@ -544,11 +544,7 @@ class Form(SignalEvent, TabContent):
             'id': record_id,
             'ids': record_ids,
         }
-        value = Action._exec_action(action, self.window, data, {})
-        if atype in ('print', 'action'):
-            if self.screen:
-                self.screen.reload(written=True)
-        return value
+        Action._exec_action(action, data, {})
 
     def activate_save(self):
         self.buttons['save'].props.sensitive = self.screen.modified()

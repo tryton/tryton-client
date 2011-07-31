@@ -18,9 +18,8 @@ NOIMAGE = open(os.path.join(PIXMAPS_DIR, 'tryton-noimage.png'), 'rb').read()
 
 class Image(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Image, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Image, self).__init__(field_name, model_name, attrs=attrs)
 
         self.filename = attrs.get('filename')
         self.height = int(attrs.get('img_height', 100))
@@ -127,8 +126,8 @@ class Image(WidgetInterface):
         for pat in ("*.png", "*.jpg", "*.gif", "*.tif", "*.xpm"):
             filter_image.add_pattern(pat)
 
-        filename = file_selection(_('Open...'), parent=self.window,
-                preview=True, filters=[filter_image, filter_all])
+        filename = file_selection(_('Open...'), preview=True,
+            filters=[filter_image, filter_all])
         if filename:
             self.field.set_client(self.record,
                     encodestring(open(filename, 'rb').read()))
@@ -149,14 +148,14 @@ class Image(WidgetInterface):
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
-        file_open(file_path, type_, self.window)
+        file_open(file_path, type_)
 
     def sig_save_as(self, widget):
         filename = ''
         if self.filename_field:
             filename = self.filename_field.get(self.record)
         filename = file_selection(_('Save As...'), filename=filename,
-                parent=self.window, action=gtk.FILE_CHOOSER_ACTION_SAVE)
+            action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename, 'wb') as fp:
                 fp.write(decodestring(self.field.get(self.record)))

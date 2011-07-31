@@ -26,16 +26,16 @@ if os.path.isdir(PLUGINS_PATH):
         except ImportError, exception:
             continue
 
-def execute(datas, parent):
+def execute(datas):
     result = {}
 
     for module in MODULES:
         for name, func in module.get_plugins(datas['model']):
             result[name] = func
     if not result:
-        common.message(_('No available plugin for this resource!'), parent)
+        common.message(_('No available plugin for this resource!'))
         return False
-    res = common.selection(_('Choose a Plugin'), result, parent, alwaysask=True)
+    res = common.selection(_('Choose a Plugin'), result, alwaysask=True)
     if res:
-        res[1](datas, parent)
+        res[1](datas)
     return True

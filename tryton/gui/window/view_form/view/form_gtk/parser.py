@@ -46,7 +46,7 @@ class Button(object):
         obj_id = self.form.screen.save_current()
         if obj_id:
             if not self.attrs.get('confirm', False) or \
-                    common.sur(self.attrs['confirm'], self.form.window):
+                    common.sur(self.attrs['confirm']):
                 button_type = self.attrs.get('type', 'workflow')
                 ctx = rpc.CONTEXT.copy()
                 ctx.update(record.context_get())
@@ -57,16 +57,14 @@ class Button(object):
                     try:
                         rpc.execute(*args)
                     except TrytonServerError, exception:
-                        common.process_exception(exception, self.form.window,
-                                *args)
+                        common.process_exception(exception, *args)
                 elif button_type == 'object':
                     args = ('model', self.form.screen.model_name, self.attrs['name'],
                             [obj_id], ctx)
                     try:
                         rpc.execute(*args)
                     except TrytonServerError, exception:
-                        common.process_exception(exception, self.form.window,
-                                *args)
+                        common.process_exception(exception, *args)
                 elif button_type == 'action':
                     action_id = None
                     args = ('model', 'ir.action', 'get_action_id',
@@ -74,14 +72,13 @@ class Button(object):
                     try:
                         action_id = rpc.execute(*args)
                     except TrytonServerError, exception:
-                        action_id = common.process_exception(exception, self.form.window,
-                                *args)
+                        action_id = common.process_exception(exception, *args)
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.form.screen.model_name,
                             'id': obj_id,
                             'ids': [obj_id],
-                            }, self.form.window, context=ctx)
+                            }, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
                 self.form.screen.reload(written=True)
@@ -289,10 +286,10 @@ class _container(object):
 
 class ParserForm(ParserInterface):
 
-    def __init__(self, window, parent=None, attrs=None, screen=None,
+    def __init__(self, parent=None, attrs=None, screen=None,
             children_field=None):
-        super(ParserForm, self).__init__(window, parent=parent, attrs=attrs,
-                screen=screen, children_field=children_field)
+        super(ParserForm, self).__init__(parent=parent, attrs=attrs,
+            screen=screen, children_field=children_field)
         self.widget_id = 0
 
     def parse(self, model_name, root_node, fields, notebook=None, paned=None,
@@ -445,16 +442,6 @@ class ParserForm(ParserInterface):
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
                         self.parse(model_name, node, fields, notebook,
                                 tooltips=tooltips)
-                max_width, max_height = -1, -1
-                window_width, window_height = Main.get_main().window.get_size()
-                for i in xrange(notebook.get_n_pages()):
-                    width, height = notebook.get_nth_page(i)\
-                            .get_child().get_child().size_request()
-                    if width > max_width and width < window_width - 50:
-                        max_width = width
-                    if height > max_height and height < window_height - 50:
-                        max_height = height
-                notebook.set_size_request(max_width + 20, max_height + 20)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -555,8 +542,7 @@ class ParserForm(ParserInterface):
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
 
-                widget_act = WIDGETS_TYPE[ftype][0](name, model_name,
-                        self.window, attrs)
+                widget_act = WIDGETS_TYPE[ftype][0](name, model_name, attrs)
                 self.widget_id += 1
                 widget_act.position = self.widget_id
                 dict_widget.setdefault(name, [])
@@ -674,8 +660,7 @@ class ParserForm(ParserInterface):
         obj_id = self.screen.current_record.id
         if obj_id < 0:
             common.message(
-                    _('You need to save the record before adding translations!'),
-                    parent=self.window)
+                    _('You need to save the record before adding translations!'))
             return False
 
         obj_id = self.screen.current_record.save(force_reload=False)
@@ -684,12 +669,11 @@ class ParserForm(ParserInterface):
                     'search', [('translatable', '=', '1')],
                     rpc.CONTEXT)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return False
 
         if not lang_ids:
-            common.message(_('No other language available!'),
-                    parent=self.window)
+            common.message(_('No other language available!'))
             return False
         try:
             lang_ids += rpc.execute('model', 'ir.lang',
@@ -699,7 +683,7 @@ class ParserForm(ParserInterface):
                     'read', lang_ids, ['code', 'name'],
                     rpc.CONTEXT)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return False
 
         code = rpc.CONTEXT.get('language', 'en_US')
@@ -749,7 +733,8 @@ class ParserForm(ParserInterface):
                 return None, False
 
 
-        win = gtk.Dialog(_('Add Translation'), self.window,
+        parent = common.get_toplevel_window()
+        win = gtk.Dialog(_('Add Translation'),parent,
                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         win.set_has_separator(True)
         win.vbox.set_spacing(5)
@@ -783,7 +768,7 @@ class ParserForm(ParserInterface):
                 val = rpc.execute('model', model_name,
                         'read', [obj_id], [name], context)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 return False
             val = val[0]
             if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
@@ -836,15 +821,12 @@ class ParserForm(ParserInterface):
                 try:
                     rpc.execute(*args)
                 except TrytonServerError, exception:
-                    common.process_exception(exception, self.window, *args)
-        if response == gtk.RESPONSE_CANCEL:
-            self.window.present()
-            win.destroy()
-            return
-        self.screen.current_record.reload()
-        self.window.present()
+                    common.process_exception(exception, *args)
+        if response != gtk.RESPONSE_CANCEL:
+            self.screen.current_record.reload()
         win.destroy()
-        return True
+        parent.present()
+        return response != gtk.RESPONSE_CANCEL
 
 from calendar import Calendar, DateTime
 from float import Float

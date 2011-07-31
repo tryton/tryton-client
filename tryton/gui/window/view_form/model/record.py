@@ -16,9 +16,8 @@ class Record(SignalEvent):
 
     id = -1
 
-    def __init__(self, model_name, obj_id, window, group=None):
+    def __init__(self, model_name, obj_id, group=None):
         super(Record, self).__init__()
-        self.__window = window
         self.model_name = model_name
         self.id = obj_id or Record.id
         if self.id < 0:
@@ -79,7 +78,7 @@ class Record(SignalEvent):
             except TrytonServerError, exception:
                 if raise_exception:
                     raise
-                values = common.process_exception(exception, self.window, *args)
+                values = common.process_exception(exception, *args)
                 if not values:
                     values = [{'id': x} for x in ids]
             id2value = dict((value['id'], value) for value in values)
@@ -129,8 +128,6 @@ class Record(SignalEvent):
         group.on_write = self.group.on_write
         group.readonly = self.group.readonly
         group._context.update(self.group._context)
-        if group.window != self.window:
-            group.window = self.window
         return group
 
     def get_path(self, group):
@@ -145,19 +142,6 @@ class Record(SignalEvent):
             i = i.parent
         path.reverse()
         return tuple(path)
-
-    def _get_window(self):
-        return self.__window
-
-    def _set_window(self, window):
-        self.__window = window
-        for fieldname, value in self.value.iteritems():
-            if fieldname not in self.group.fields:
-                continue
-            if isinstance(self.group.fields[fieldname], field.O2MField):
-                value.window = window
-
-    window = property(_get_window, _set_window)
 
     def get_removed(self):
         if self.group is not None:
@@ -248,8 +232,7 @@ class Record(SignalEvent):
                 try:
                     res = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    res = common.process_exception(exception, self.window,
-                            *args)
+                    res = common.process_exception(exception, *args)
                     if not res:
                         return False
                 old_id = self.id
@@ -269,8 +252,7 @@ class Record(SignalEvent):
                         if not rpc.execute(*args):
                             return False
                     except TrytonServerError, exception:
-                        res = common.process_exception(exception, self.window,
-                                *args)
+                        res = common.process_exception(exception, *args)
                         if not res:
                             return False
             self._loaded.clear()
@@ -291,7 +273,7 @@ class Record(SignalEvent):
             try:
                 vals = rpc.execute(*args)
             except TrytonServerError, exception:
-                vals = common.process_exception(exception, self.window, *args)
+                vals = common.process_exception(exception, *args)
                 if not vals:
                     return
             if (self.parent
@@ -312,7 +294,7 @@ class Record(SignalEvent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 return ''
         return res['rec_name']
@@ -464,7 +446,7 @@ class Record(SignalEvent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 return
         later = {}
@@ -514,7 +496,7 @@ class Record(SignalEvent):
             try:
                 res = rpc.execute(*args)
             except TrytonServerError, exception:
-                res = common.process_exception(exception, self.window, *args)
+                res = common.process_exception(exception, *args)
                 if not res:
                     return
             self.group.fields[fieldname].set_on_change(self, res)
@@ -537,7 +519,7 @@ class Record(SignalEvent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 # ensure res is a list
                 res = []
@@ -551,7 +533,7 @@ class Record(SignalEvent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 return
         self.set_default(res)
@@ -571,7 +553,6 @@ class Record(SignalEvent):
 
     def destroy(self):
         super(Record, self).destroy()
-        self.window = None
         self.group = None
         self.value = None
         self.next = None

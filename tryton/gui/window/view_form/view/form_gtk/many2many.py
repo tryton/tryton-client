@@ -16,9 +16,8 @@ _ = gettext.gettext
 
 class Many2Many(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Many2Many, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Many2Many, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
         self._readonly = True
@@ -71,13 +70,11 @@ class Many2Many(WidgetInterface):
         frame.set_shadow_type(gtk.SHADOW_OUT)
         self.widget.pack_start(frame, expand=False, fill=True)
 
-        self.screen = Screen(attrs['relation'], self.window,
-                mode=['tree'], views_preload=attrs.get('views', {}),
-                row_activate=self._on_activate)
+        self.screen = Screen(attrs['relation'], mode=['tree'],
+            views_preload=attrs.get('views', {}),
+            row_activate=self._on_activate)
         self.screen.signal_connect(self, 'record-message', self._sig_label)
 
-        if not isinstance(self.screen.window, gtk.Dialog):
-            self.screen.widget.set_size_request(0, 0)
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
 
         self.screen.widget.connect('key_press_event', self.on_keypress)
@@ -130,23 +127,24 @@ class Many2Many(WidgetInterface):
             ids = rpc.execute('model', self.attrs['relation'], 'search',
                     dom , 0, CONFIG['client.limit'], None, context)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return False
-        if len(ids) != 1 or not value:
-            win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                context=context, domain=domain,
-                parent=self.widget.get_toplevel(),
-                views_preload=self.attrs.get('views', {}))
-            ids = win.run()
 
-        res_id = None
-        if ids:
-            res_id = ids[0]
-        self.screen.load(ids, modified=True)
-        self.screen.display(res_id=res_id)
-        if self.screen.current_view:
-            self.screen.current_view.set_cursor()
-        self.wid_text.set_text('')
+        def callback(ids):
+            res_id = None
+            if ids:
+                res_id = ids[0]
+            self.screen.load(ids, modified=True)
+            self.screen.display(res_id=res_id)
+            if self.screen.current_view:
+                self.screen.current_view.set_cursor()
+            self.wid_text.set_text('')
+        if len(ids) != 1 or not value:
+            WinSearch(self.attrs['relation'], callback, sel_multi=True,
+                    ids=ids, context=context, domain=domain,
+                    views_preload=self.attrs.get('views', {}))
+        else:
+            callback(ids)
 
     def _sig_remove(self, *args):
         self.screen.remove(remove=True)
@@ -160,12 +158,12 @@ class Many2Many(WidgetInterface):
 
     def _sig_edit(self):
         if self.screen.current_record:
-            win = WinForm(self.screen, self.widget.get_toplevel())
-            if win.run():
-                self.screen.current_record.save()
-            else:
-                self.screen.current_record.cancel()
-            win.destroy()
+            def callback(result):
+                if result:
+                    self.screen.current_record.save()
+                else:
+                    self.screen.current_record.cancel()
+            WinForm(self.screen, callback)
 
     def _readonly_set(self, value):
         self._readonly = value

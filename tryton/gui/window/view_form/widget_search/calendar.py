@@ -8,6 +8,7 @@ import locale
 from interface import Interface
 from tryton.common import DT_FORMAT, DHM_FORMAT, TRYTON_ICON
 from tryton.common import date_widget, Tooltips, datetime_strftime
+from tryton.common import get_toplevel_window
 from tryton.translate import date_format
 import gobject
 
@@ -16,10 +17,10 @@ _ = gettext.gettext
 
 class Calendar(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None,
+    def __init__(self, name, attrs=None, context=None,
             on_change=None):
-        super(Calendar, self).__init__(name, parent, attrs=attrs,
-                context=context, on_change=on_change)
+        super(Calendar, self).__init__(name, attrs=attrs, context=context,
+            on_change=on_change)
 
         tooltips = Tooltips()
         self.widget = gtk.HBox(spacing=3)
@@ -54,8 +55,7 @@ class Calendar(Interface):
         self.eb1 = gtk.EventBox()
         tooltips.set_tip(self.eb1, _('Open the calendar'))
         self.eb1.set_events(gtk.gdk.BUTTON_PRESS)
-        self.eb1.connect('button_press_event', self.cal_open, self.entry1,
-                parent)
+        self.eb1.connect('button_press_event', self.cal_open, self.entry1)
         img = gtk.Image()
         img.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         img.set_alignment(0.5, 0.5)
@@ -76,8 +76,7 @@ class Calendar(Interface):
         self.eb2 = gtk.EventBox()
         tooltips.set_tip(self.eb2, _('Open the calendar'))
         self.eb2.set_events(gtk.gdk.BUTTON_PRESS)
-        self.eb2.connect('button_press_event', self.cal_open, self.entry2,
-                parent)
+        self.eb2.connect('button_press_event', self.cal_open, self.entry2)
         img = gtk.Image()
         img.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         img.set_alignment(0.5, 0.5)
@@ -161,7 +160,8 @@ class Calendar(Interface):
 
     value = property(_value_get, _value_set)
 
-    def cal_open(self, widget, event, dest, parent=None):
+    def cal_open(self, widget, event, dest):
+        parent = get_toplevel_window()
         win = gtk.Dialog(_('Date selection'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -193,6 +193,7 @@ class Calendar(Interface):
             dest.set_text(datetime_strftime(date, self.format))
             self.on_change()
         win.destroy()
+        parent.present()
 
     def clear(self):
         self.value = ('=', '')

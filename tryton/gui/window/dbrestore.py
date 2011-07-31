@@ -55,15 +55,14 @@ class DBRestore(object):
             gobject.idle_add(_move_cursor)
         entry.stop_emission("insert-text")
 
-    def __init__(self, parent=None, filename=None):
+    def __init__(self, filename=None):
         """
         Database restore widget
         """
-        self.dialog = gtk.Dialog( \
-                title = _("Restore Database"), \
-                parent=parent, \
-                flags = gtk.DIALOG_MODAL \
-                | gtk.WIN_POS_CENTER_ON_PARENT)
+        self.parent = common.get_toplevel_window()
+        self.dialog = gtk.Dialog(title=_("Restore Database"),
+            parent=self.parent, flags=gtk.DIALOG_MODAL
+            | gtk.WIN_POS_CENTER_ON_PARENT)
         vbox = gtk.VBox()
         self.dialog.vbox.pack_start(vbox)
         self.tooltips = common.Tooltips()
@@ -165,11 +164,10 @@ class DBRestore(object):
 
         self.entry_server_password.grab_focus()
 
-    def run(self, parent):
+    def run(self):
         """
         Database Restore widget run part
         """
-        self.dialog.set_transient_for(parent)
         self.dialog.show_all()
 
         self.entry_server_url.set_text('%(login.server)s:%(login.port)s' %
@@ -180,9 +178,9 @@ class DBRestore(object):
             url = False
             update = False
             #TODO: This needs to be unified with the other widgets
-            self.button_server_change.connect_after('clicked', \
-                    lambda a, b: common.request_server(b, self.dialog), \
-                    self.entry_server_url)
+            self.button_server_change.connect_after('clicked',
+                lambda a, b: common.request_server(b),
+                self.entry_server_url)
             res = self.dialog.run()
             if res == gtk.RESPONSE_OK:
                 database = self.entry_db_name.get_text()
@@ -194,7 +192,7 @@ class DBRestore(object):
                 self.dialog.destroy()
                 rpc.logout()
                 break
-        parent.present()
+        self.parent.present()
         self.dialog.destroy()
 
         return url, database, passwd, update

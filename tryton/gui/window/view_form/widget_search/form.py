@@ -69,10 +69,8 @@ class _container(object):
 
 class Parse(object):
 
-    def __init__(self, parent, fields, model='', context=None,
-            on_change=None):
+    def __init__(self, fields, model='', context=None, on_change=None):
         self.fields = fields
-        self.parent = parent
         self.model = model
         self.col = CONFIG['client.modepda'] and 1 or 6
         self.focusable = None
@@ -111,7 +109,7 @@ class Parse(object):
         self.fields[str(attrs['name'])]['model']=self.model
         if ftype not in WIDGETS_TYPE:
             return False
-        widget_act = WIDGETS_TYPE[ftype][0](str(attrs['name']), self.parent,
+        widget_act = WIDGETS_TYPE[ftype][0](str(attrs['name']),
                 attrs=self.fields[attrs['name']], context=self.context,
                 on_change=self.on_change)
         if 'string' in self.fields[str(attrs['name'])]:
@@ -195,15 +193,13 @@ class Parse(object):
 
 class Form(object):
 
-    def __init__(self, view, model=None, parent=None, domain=None,
-            call=None, context=None):
+    def __init__(self, view, model=None, domain=None, call=None, context=None):
         if domain is None:
             domain = []
         if context is None:
             context = {}
-        parser = Parse(parent, view['fields'], model=model, context=context,
-                on_change=self.on_change)
-        self.parent = parent
+        parser = Parse(view['fields'], model=model, context=context,
+            on_change=self.on_change)
         self.fields = view['fields']
         self.model = model
         self.parser = parser

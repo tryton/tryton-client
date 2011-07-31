@@ -18,10 +18,11 @@ _ = gettext.gettext
 class WinExport(object):
     "Window export"
 
-    def __init__(self, model, ids, parent, context=None):
+    def __init__(self, model, ids, context=None):
+        self.parent = common.get_toplevel_window()
         self.dialog = gtk.Dialog(
                 title= _("Export to CSV"),
-                parent=parent,
+                parent=self.parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
@@ -162,8 +163,6 @@ class WinExport(object):
         self.fields_data = {}
         self.context = context
 
-        self.parent = parent
-
         self.view1 = gtk.TreeView()
         self.view1.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         self.view1.connect('row-expanded', self.on_row_expanded)
@@ -241,7 +240,7 @@ class WinExport(object):
         try:
             return rpc.execute(*args)
         except TrytonServerError, exception:
-            return common.process_exception(exception, self.parent, *args)
+            return common.process_exception(exception, *args)
 
     def on_row_expanded(self, treeview, iter, path):
         child = self.model1.iter_children(iter)
@@ -279,15 +278,14 @@ class WinExport(object):
         try:
             export_ids = rpc.execute(*args)
         except TrytonServerError, exception:
-            export_ids = common.process_exception(exception, self.parent,
-                    *args)
+            export_ids = common.process_exception(exception, *args)
             if not export_ids:
                 return
         args = ('model', 'ir.export', 'read', export_ids, None, rpc.CONTEXT)
         try:
             exports = rpc.execute(*args)
         except TrytonServerError, exception:
-            exports = common.process_exception(exception, self.parent, *args)
+            exports = common.process_exception(exception, *args)
             if not exports:
                 return
         args = ('model', 'ir.export.line', 'read',
@@ -296,7 +294,7 @@ class WinExport(object):
         try:
             lines = rpc.execute(*args)
         except TrytonServerError, exception:
-            lines = common.process_exception(exception, self.parent, *args)
+            lines = common.process_exception(exception, *args)
             if not lines:
                 return
         id2lines = {}
@@ -310,7 +308,7 @@ class WinExport(object):
         self.pref_export.set_model(self.predef_model)
 
     def add_predef(self, widget):
-        name = common.ask(_('What is the name of this export?'), self.parent)
+        name = common.ask(_('What is the name of this export?'))
         if not name:
             return
         iter = self.model2.get_iter_root()
@@ -398,10 +396,9 @@ class WinExport(object):
                 self.export_csv(fname, fields2, result,
                         self.wid_write_field_names.get_active(), popup=False)
                 os.close(fileno)
-                common.file_open(fname, 'csv', self.parent)
+                common.file_open(fname, 'csv')
             else:
                 fname = common.file_selection(_('Save As...'),
-                        parent=self.parent,
                         action=gtk.FILE_CHOOSER_ACTION_SAVE)
                 if fname:
                     self.export_csv(fname, fields2, result,
@@ -429,15 +426,13 @@ class WinExport(object):
             file_p.close()
             if popup:
                 if len(result) == 1:
-                    common.message(_('%d record saved!') % len(result),
-                            self.parent)
+                    common.message(_('%d record saved!') % len(result))
                 else:
-                    common.message(_('%d records saved!') % len(result),
-                            self.parent)
+                    common.message(_('%d records saved!') % len(result))
             return True
         except IOError, exception:
             common.warning(_("Operation failed!\nError message:\n%s") \
-                     % (exception.args[0],), self.parent, _('Error'))
+                     % (exception.args[0],), _('Error'))
             return False
 
     def datas_read(self, ids, model, fields, context=None):

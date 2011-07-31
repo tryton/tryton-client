@@ -21,9 +21,8 @@ _ = gettext.gettext
 
 class Many2One(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Many2One, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Many2One, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox(spacing=0)
         self.widget.set_property('sensitive', True)
@@ -116,55 +115,48 @@ class Many2One(WidgetInterface):
                             context)
                 except TrytonServerError, exception:
                     self.focus_out = True
-                    common.process_exception(exception, self.window)
+                    common.process_exception(exception)
                     self.changed = True
-                    return False
+                    return
                 if len(ids)==1:
                     self.field.set_client(self.record, ids[0],
                             force_change=True)
                     self.focus_out = True
                     self.display(self.record, self.field)
-                    return True
+                    return
+                def callback(ids):
+                    if ids:
+                        self.field.set_client(self.record, ids[0],
+                                force_change=True)
+                    self.focus_out = True
+                    self.display(self.record, self.field)
 
-                win = WinSearch(self.attrs['relation'], sel_multi=False,
-                        ids=ids, context=context, domain=domain,
-                        parent=self.widget.get_toplevel(),
-                        views_preload=self.attrs.get('views', {}))
-                ids = win.run()
-                if ids:
-                    self.field.set_client(self.record, ids[0],
-                            force_change=True)
-                    self.focus_out = True
-                    self.display(self.record, self.field)
-                    return True
-                else:
-                    self.focus_out = True
-                    self.display(self.record, self.field)
-                    return False
+                WinSearch(self.attrs['relation'], callback, sel_multi=False,
+                    ids=ids, context=context, domain=domain,
+                    views_preload=self.attrs.get('views', {}))
+                return
         self.focus_out = True
         self.display(self.record, self.field)
         self.changed = True
-        return True
+        return
 
     def get_screen(self):
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
-        return Screen(self.attrs['relation'], self.window, domain=domain,
-                context=context, mode=['form'],
-                views_preload=self.attrs.get('views', {}),
-                readonly=self._readonly)
+        return Screen(self.attrs['relation'], domain=domain, context=context,
+            mode=['form'], views_preload=self.attrs.get('views', {}),
+            readonly=self._readonly)
 
     def sig_new(self, *args):
         self.focus_out = False
         screen = self.get_screen()
-        win = WinForm(screen, self.widget.get_toplevel(), new=True)
-        if win.run():
-            if screen.save_current():
+        def callback(result):
+            if result and screen.save_current():
                 value = (screen.current_record.id,
                         screen.current_record.rec_name())
                 self.field.set_client(self.record, value)
-        win.destroy()
-        self.focus_out = True
+            self.focus_out = True
+        WinForm(screen, callback, new=True)
 
     def sig_edit(self, widget):
         self.changed = False
@@ -173,53 +165,59 @@ class Many2One(WidgetInterface):
         if value:
             screen = self.get_screen()
             screen.load([self.field.get(self.record)])
-            win = WinForm(screen, self.widget.get_toplevel())
-            while win.run():
-                if screen.save_current():
+            def callback(result):
+                if result and screen.save_current():
                     value = (screen.current_record.id,
                             screen.current_record.rec_name())
-                    self.field.set_client(self.record, value, force_change=True)
-                    break
-                else:
+                    self.field.set_client(self.record, value,
+                        force_change=True)
+                elif result:
                     screen.display()
-            win.destroy()
-        else:
-            if not self._readonly:
-                domain = self.field.domain_get(self.record)
-                context = rpc.CONTEXT.copy()
-                context.update(self.field.context_get(self.record))
-                self.wid_text.grab_focus()
+                    return WinForm(screen, callback)
+                self.focus_out = True
+                self.display(self.record, self.field)
+                self.changed = True
+            WinForm(screen, callback)
+            return
+        elif not self._readonly:
+            domain = self.field.domain_get(self.record)
+            context = rpc.CONTEXT.copy()
+            context.update(self.field.context_get(self.record))
+            self.wid_text.grab_focus()
 
-                try:
-                    if self.wid_text.get_text():
-                        dom = [('rec_name', 'ilike',
-                            '%' + self.wid_text.get_text() + '%'),
-                            domain]
-                    else:
-                        dom = domain
-                    ids = rpc.execute('model', self.attrs['relation'],
-                            'search', dom, 0, CONFIG['client.limit'], None,
-                            context)
-                except TrytonServerError, exception:
-                    self.focus_out = True
-                    common.process_exception(exception, self.window)
-                    self.changed = True
-                    return False
-                if ids and len(ids)==1:
-                    self.field.set_client(self.record, ids[0],
-                            force_change=True)
-                    self.focus_out = True
-                    self.display(self.record, self.field)
-                    return True
+            try:
+                if self.wid_text.get_text():
+                    dom = [('rec_name', 'ilike',
+                        '%' + self.wid_text.get_text() + '%'),
+                        domain]
+                else:
+                    dom = domain
+                ids = rpc.execute('model', self.attrs['relation'],
+                        'search', dom, 0, CONFIG['client.limit'], None,
+                        context)
+            except TrytonServerError, exception:
+                self.focus_out = True
+                common.process_exception(exception)
+                self.changed = True
+                return False
+            if ids and len(ids)==1:
+                self.field.set_client(self.record, ids[0],
+                        force_change=True)
+                self.focus_out = True
+                self.display(self.record, self.field)
+                return True
 
-                win = WinSearch(self.attrs['relation'], sel_multi=False,
-                        ids=ids, context=context,
-                        domain=domain, parent=self.widget.get_toplevel(),
-                        views_preload=self.attrs.get('views', {}))
-                ids = win.run()
+            def callback(ids):
                 if ids:
                     self.field.set_client(self.record, ids[0],
                             force_change=True)
+                self.focus_out = True
+                self.display(self.record, self.field)
+                self.changed = True
+            WinSearch(self.attrs['relation'], callback, sel_multi=False,
+                ids=ids, context=context, domain=domain,
+                views_preload=self.attrs.get('views', {}))
+            return
         self.focus_out = True
         self.display(self.record, self.field)
         self.changed = True
@@ -233,7 +231,7 @@ class Many2One(WidgetInterface):
             self.sig_edit(widget)
             return True
         elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
-            return not self.sig_activate(widget, event, key_press=True)
+            self.sig_activate(widget, event, key_press=True)
         return False
 
     def sig_changed(self, *args):
@@ -273,7 +271,7 @@ class Many2One(WidgetInterface):
         try:
             relates = rpc.execute(*args)
         except TrytonServerError, exception:
-            relates = common.process_exception(exception, self.window)
+            relates = common.process_exception(exception)
             if not relates:
                 return False
         menu_entries = []
@@ -308,10 +306,9 @@ class Many2One(WidgetInterface):
         act = action.copy()
         obj_id = self.field.get(self.record)
         if not obj_id:
-            common.message(_('You must select a record to use the relation!'),
-                    self.window)
+            common.message(_('You must select a record to use the relation!'))
             return False
-        screen = Screen(self.attrs['relation'], self.window)
+        screen = Screen(self.attrs['relation'])
         screen.load([obj_id])
         encoder = PYSONEncoder()
         act['domain'] = encoder.encode(screen.current_record.expr_eval(
@@ -321,11 +318,11 @@ class Many2One(WidgetInterface):
         data['model'] = self.attrs['relation']
         data['id'] = obj_id
         data['ids'] = [obj_id]
-        return Action._exec_action(act, self.window, data, context)
+        return Action._exec_action(act, data, context)
 
     def click_and_action(self, atype):
         obj_id = self.field.get(self.record)
-        return Action.exec_keyword(atype, self.window, {
+        return Action.exec_keyword(atype, {
             'model': self.attrs['relation'],
             'id': obj_id or False,
             'ids': [obj_id],

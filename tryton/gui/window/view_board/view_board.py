@@ -9,12 +9,11 @@ from tryton.gui.window.view_board.action import Action
 class ViewBoard(object):
     'View board'
 
-    def __init__(self, arch, window, context=None):
-        self.window = window
+    def __init__(self, arch, context=None):
         self.context = context
 
         xml_dom = xml.dom.minidom.parseString(arch)
-        parser = ParserBoard(window, context)
+        parser = ParserBoard(context)
         for node in xml_dom.childNodes:
             if not node.nodeType == node.ELEMENT_NODE:
                 continue

@@ -338,8 +338,7 @@ class M2OField(CharField):
             try:
                 result = rpc.execute(*args)
             except TrytonServerError, exception:
-                result = common.process_exception(exception, record.window,
-                        *args)
+                result = common.process_exception(exception, *args)
                 if not result:
                     return
             value = value, result['rec_name']
@@ -435,7 +434,7 @@ class O2MField(CharField):
             return
         from group import Group
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record,
                 parent_name=parent_name,
                 child_name=self.name,
@@ -506,7 +505,7 @@ class O2MField(CharField):
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record, parent_name=parent_name,
                 child_name=self.name,
                 context=self.context,
@@ -557,13 +556,12 @@ class O2MField(CharField):
                 try:
                     fields_dict = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    fields_dict = common.process_exception(exception,
-                            record.window, *args)
+                    fields_dict = common.process_exception(exception, *args)
                     if not fields_dict:
                         return False
 
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], fields, record.window,
+        group = Group(self.attrs['relation'], fields_dict,
                 parent=record, parent_name=parent_name, child_name=self.name,
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
@@ -598,8 +596,7 @@ class O2MField(CharField):
             try:
                 fields = rpc.execute(*args)
             except TrytonServerError, exception:
-                fields = common.process_exception(exception, record.window,
-                        *args)
+                fields = common.process_exception(exception, *args)
                 if not fields:
                     return False
 
@@ -691,7 +688,7 @@ class M2MField(O2MField):
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record, parent_name=parent_name,
                 child_name=self.name,
                 context=self.context,
@@ -756,8 +753,7 @@ class ReferenceField(CharField):
                 try:
                     result = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    result = common.process_exception(exception, record.window,
-                            *args)
+                    result = common.process_exception(exception, *args)
                     if not result:
                         return
                 result = result['rec_name']
