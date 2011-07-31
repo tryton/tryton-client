@@ -4,6 +4,7 @@ import operator
 import gtk
 import gobject
 import gettext
+import math
 from interface import WidgetInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
@@ -29,7 +30,6 @@ class Reference(WidgetInterface):
         child.connect('changed',
                 self.sig_changed_combo)
         child.connect('key_press_event', self.sig_key_pressed)
-        self.widget_combo.set_size_request(int(attrs.get('widget_size', -1)), -1)
         self.widget.pack_start(self.widget_combo, expand=False, fill=True)
 
         self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
@@ -85,6 +85,16 @@ class Reference(WidgetInterface):
                 common.process_exception(exception)
                 selection = []
         selection.sort(key=operator.itemgetter(1))
+        if selection:
+            pop = sorted((len(x) for x in selection), reverse=True)
+            average = sum(pop) / len(pop)
+            deviation = int(math.sqrt(sum((x - average)**2 for x in pop) /
+                    len(pop)))
+            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
+        else:
+            width = 10
+        child.set_width_chars(width)
+
         self.set_popdown(selection)
 
         self.last_key = (None, 0)

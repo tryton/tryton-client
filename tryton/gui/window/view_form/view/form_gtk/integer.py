@@ -9,6 +9,11 @@ class Integer(Char):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Integer, self).__init__(field_name, model_name, attrs=attrs)
+        self.entry.set_width_chars(8)
+        _, _, padding, pack_type = self.widget.query_child_packing(
+            self.entry)
+        self.widget.set_child_packing(self.entry, False, False,
+            padding, pack_type)
         self.entry.set_max_length(0)
         self.entry.set_alignment(1.0)
         self.entry.connect('insert_text', self.sig_insert_text)

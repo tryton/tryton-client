@@ -29,7 +29,7 @@ class Binary(WidgetInterface):
 
         self.widget = gtk.HBox(spacing=0)
         self.wid_size = gtk.Entry()
-        self.wid_size.set_width_chars(11)
+        self.wid_size.set_width_chars(10)
         self.wid_size.props.sensitive = False
         if self.filename and attrs.get('filename_visible'):
             self.wid_text = gtk.Entry()

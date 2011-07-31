@@ -3,6 +3,7 @@
 import operator
 import gtk
 import gobject
+import math
 from interface import WidgetInterface
 import tryton.rpc as rpc
 import tryton.common as common
@@ -20,15 +21,14 @@ class Selection(WidgetInterface):
         child = self.entry.get_child()
         child.set_property('activates_default', True)
         child.set_max_length(int(attrs.get('size', 0)))
-        child.set_width_chars(5)
+        child.set_width_chars(10)
 
         child.connect('changed', self.sig_changed)
         self.changed = True
         child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
-        self.entry.set_size_request(int(attrs.get('widget_size', -1)), -1)
-        self.widget.pack_start(self.entry, expand=True, fill=True)
+        self.widget.pack_start(self.entry, expand=False, fill=False)
         self.widget.set_focus_chain([child])
 
         self._selection = {}
@@ -98,6 +98,15 @@ class Selection(WidgetInterface):
             completion.set_inline_selection(True)
         completion.set_model(model)
         self.entry.get_child().set_completion(completion)
+        if self._selection:
+            pop = sorted((len(x) for x in self._selection), reverse=True)
+            average = sum(pop) / len(pop)
+            deviation = int(math.sqrt(sum((x - average)**2 for x in pop) /
+                    len(pop)))
+            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
+        else:
+            width = 10
+        self.entry.get_child().set_width_chars(width)
         completion.set_text_column(0)
         return lst
 

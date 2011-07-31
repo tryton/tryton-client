@@ -11,6 +11,7 @@ class Float(Integer):
     def __init__(self, field_name, model_name, attrs=None):
         super(Float, self).__init__(field_name, model_name, attrs=attrs)
         self.digits = (16, 2)
+        self.entry.set_width_chars(sum(self.digits))
         self.entry.connect('key-press-event', self.key_press_event)
 
     def set_value(self, record, field):
@@ -30,6 +31,7 @@ class Float(Integer):
             digits = record.expr_eval(self.digits)
         else:
             digits = self.digits
+        self.entry.set_width_chars(sum(digits))
         self.entry.set_text(locale.format('%.' + str(digits[1]) + 'f',
             field.get(record) or 0.0, True))
 
