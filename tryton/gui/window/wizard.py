@@ -40,8 +40,8 @@ class Wizard(object):
         self.action = action
         self.datas = datas
         self.state = state
-        self.direct_print = False
-        self.email_print = False
+        self.direct_print = direct_print
+        self.email_print = email_print
         self.email = email
         self.context = context
         if not 'form' in datas:
