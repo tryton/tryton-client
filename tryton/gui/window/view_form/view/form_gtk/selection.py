@@ -18,7 +18,7 @@ class Selection(WidgetInterface):
 
         self.widget = gtk.HBox(spacing=3)
         self.entry = gtk.ComboBoxEntry()
-        child = self.entry.get_child()
+        child = self.entry.child
         child.set_property('activates_default', True)
         child.set_max_length(int(attrs.get('size', 0)))
         child.set_width_chars(10)
@@ -28,7 +28,7 @@ class Selection(WidgetInterface):
         child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
-        self.widget.pack_start(self.entry, expand=False, fill=False)
+        self.widget.pack_start(self.entry)
         self.widget.set_focus_chain([child])
 
         self._selection = {}
@@ -97,7 +97,7 @@ class Selection(WidgetInterface):
         if hasattr(completion, 'set_inline_selection'):
             completion.set_inline_selection(True)
         completion.set_model(model)
-        self.entry.get_child().set_completion(completion)
+        self.entry.child.set_completion(completion)
         if self._selection:
             pop = sorted((len(x) for x in self._selection), reverse=True)
             average = sum(pop) / len(pop)
@@ -106,7 +106,9 @@ class Selection(WidgetInterface):
             width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
         else:
             width = 10
-        self.entry.get_child().set_width_chars(width)
+        self.entry.child.set_width_chars(width)
+        if self._selection:
+            self.entry.child.set_max_length(max(len(x) for x in self._selection))
         completion.set_text_column(0)
         return lst
 
@@ -115,10 +117,10 @@ class Selection(WidgetInterface):
         self.entry.set_sensitive(not value)
 
     def _color_widget(self):
-        return self.entry.get_child()
+        return self.entry.child
 
     def value_get(self):
-        child = self.entry.get_child()
+        child = self.entry.child
         res = child.get_text()
         return self._selection.get(res, False), res
 
@@ -155,7 +157,7 @@ class Selection(WidgetInterface):
 
     def display(self, record, field):
         self.update_selection(record)
-        child = self.entry.get_child()
+        child = self.entry.child
         self.changed = False
         if not field:
             child.set_text('')
