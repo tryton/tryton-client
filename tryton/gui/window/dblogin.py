@@ -327,7 +327,7 @@ class DBListEditor(object):
         host = self.host_entry.get_text()
         port = int(self.port_entry.get_text())
         dia = DBCreate(host, port)
-        dbname = dia.run(self.dialog)
+        dbname = dia.run()
         self.username_entry.set_text('admin')
         self.display_dbwidget(None, None, dbname)
 
