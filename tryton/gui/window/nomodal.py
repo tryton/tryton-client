@@ -22,7 +22,7 @@ class NoModal(object):
 
     def destroy(self):
         self.page.dialogs.remove(self)
-        self.sensible_widget.props.sensitive = True
         self.parent.present()
+        self.sensible_widget.props.sensitive = True
         if self.parent_focus:
             self.parent_focus.grab_focus()

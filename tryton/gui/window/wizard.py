@@ -33,6 +33,7 @@ class Wizard(object):
         self.states = {}
         self.response2state = {}
         self.__processing = False
+        self.__waiting_response = False
 
     def run(self, action, datas, state='init', direct_print=False,
             email_print=False, email=None, context=None):
@@ -57,7 +58,7 @@ class Wizard(object):
     def process(self):
         from tryton.action import Action
         res = {}
-        if self.__processing:
+        if self.__processing or self.__waiting_response:
             return
         try:
             self.__processing = True
@@ -87,6 +88,7 @@ class Wizard(object):
                     self.clean()
                     self.update(res, res['state'], res['object'], context=ctx)
                     self.screen.current_record.set_default(self.datas['form'])
+                    self.__waiting_response = True
                     break
                 elif res['type'] == 'action':
                     self.state = res['state']
@@ -144,6 +146,7 @@ class Wizard(object):
         self.states = {}
 
     def response(self, widget, response):
+        self.__waiting_response = False
         state = self.response2state.get(response, 'end')
         self.screen.current_view.set_value()
         if not self.screen.current_record.validate() \
