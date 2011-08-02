@@ -24,4 +24,5 @@ class NoModal(object):
         self.page.dialogs.remove(self)
         self.sensible_widget.props.sensitive = True
         self.parent.present()
-        self.parent_focus.grab_focus()
+        if self.parent_focus:
+            self.parent_focus.grab_focus()
