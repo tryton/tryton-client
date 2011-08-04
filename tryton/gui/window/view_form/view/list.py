@@ -316,8 +316,9 @@ class ViewList(ParserView):
             self.widget_tree.connect('drag-data-delete', self.drag_data_delete)
 
         self.widget_tree.connect('key_press_event', self.on_keypress)
-        self.widget_tree.connect('test-expand-row', self.test_expand_row)
-        self.widget_tree.set_expander_column(self.widget_tree.get_column(0))
+        if self.children_field:
+            self.widget_tree.connect('test-expand-row', self.test_expand_row)
+            self.widget_tree.set_expander_column(self.widget_tree.get_column(0))
 
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]
@@ -346,7 +347,8 @@ class ViewList(ParserView):
             elif event.keyval == gtk.keysyms.Up:
                 if path == (0,):
                     return True
-        if event.keyval in (gtk.keysyms.Left, gtk.keysyms.Right):
+        if (event.keyval in (gtk.keysyms.Left, gtk.keysyms.Right)
+                and self.children_field):
             selection = widget.get_selection()
             model, paths = selection.get_selected_rows()
             if event.keyval == gtk.keysyms.Left:
@@ -655,7 +657,7 @@ class ViewList(ParserView):
                 or event.state & gtk.gdk.SHIFT_MASK):
             allow_similar = True
         with Window(allow_similar=allow_similar):
-            if not self.screen.row_activate():
+            if not self.screen.row_activate() and self.children_field:
                 if treeview.row_expanded(path):
                     treeview.collapse_row(path)
                 else:
