@@ -303,7 +303,7 @@ class WinExport(object):
         for export in exports:
             self.predef_model.append((
                 export['id'],
-                [x['name'] for x in id2lines[export['id']]],
+                [x['name'] for x in id2lines.get(export['id'], [])],
                 export['name']))
         self.pref_export.set_model(self.predef_model)
 
