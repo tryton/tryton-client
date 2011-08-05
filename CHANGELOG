@@ -1,3 +1,10 @@
+* Limit size of field when possible
+* Add xalign and yalign as fields attributes
+* Convert many popup to be no-modal
+* Add window manager for:
+    - replace current window
+    - prevent simmilar window
+* Merge and review toolbars in form and board
 * Drop support of Python 2.5
 * Use the same design for Many2Many than One2Many
 * Allow resize columns smaller than the header

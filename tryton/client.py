@@ -107,7 +107,7 @@ class TrytonClient(object):
                     traceback.format_exception(exctyp, value, tb))
             for path in sys.path:
                 tb_s = tb_s.replace(path, '')
-            common.error(str(value), main.window, tb_s)
+            common.error(str(value), tb_s)
 
         sys.excepthook = excepthook
 

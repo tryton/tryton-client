@@ -156,12 +156,12 @@ class Pie(Graph):
                     slice.highlight = False
                     self.queue_draw()
 
-    def action(self, window):
-        super(Pie, self).action(window)
+    def action(self):
+        super(Pie, self).action()
         for slice in self.slices:
             if slice.highlight:
                 ids = self.ids[slice.xname]
-                self.action_keyword(ids, window)
+                self.action_keyword(ids)
 
 
 class Slice(object):

@@ -7,18 +7,19 @@ import gtk
 import pango
 import gettext
 from tryton.exceptions import TrytonServerError
+from tryton.gui.window.nomodal import NoModal
 
 _ = gettext.gettext
 
 
-class WinForm(object):
+class WinForm(NoModal):
     "Form window"
 
-    def __init__(self, screen, parent, view_type='form', new=False,
-            many=False, context=None):
-
-        self.parent = parent
+    def __init__(self, screen, callback, view_type='form',
+            new=False, many=False, context=None):
+        NoModal.__init__(self)
         self.screen = screen
+        self.callback = callback
         self.context = context
         self.prev_view = self.screen.current_view
         self.screen.screen_container.alternate_view = True
@@ -32,13 +33,12 @@ class WinForm(object):
             self.screen.switch_view(view_type=view_type, context=context)
         if new and not switch_new:
             self.screen.new(context=self.context)
-        self.win = gtk.Dialog(_('Link'), parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
-        self.win.set_property('default-width', 760)
-        self.win.set_property('default-height', 500)
+        self.win = gtk.Dialog(_('Link'), self.parent,
+                gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(False)
+        self.win.connect('response', self.response)
 
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
@@ -190,23 +190,19 @@ class WinForm(object):
 
         scroll.add(self.screen.screen_container.alternate_viewport)
 
-        width, height = self.screen.current_view.widget.size_request()
-        scroll.set_size_request(width, height + 30)
-        parent_width, parent_height = parent.get_size()
-        win_width, win_height = self.win.get_size()
-        self.widget_width = min(parent_width - 20, max(win_width, width + 20))
-        self.widget_height = min(parent_height - 60, height + win_height + 20)
-        self.win.set_default_size(self.widget_width, self.widget_height)
+        sensible_allocation = self.sensible_widget.get_allocation()
+        self.win.set_default_size(int(sensible_allocation.width * 0.9),
+            int(sensible_allocation.height * 0.9))
 
         if view_type == 'tree':
             self.screen.signal_connect(self, 'record-message', self._sig_label)
             self.screen.screen_container.alternate_viewport.connect(
                     'key-press-event', self.on_keypress)
 
+        self.register()
         self.win.show()
 
-        self.prev_window = self.screen.window
-        self.screen.window = self.win
+        common.center_window(self.win, self.parent, self.sensible_widget)
 
         self.screen.display()
         self.screen.current_view.set_cursor()
@@ -265,22 +261,25 @@ class WinForm(object):
             ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
                     0, CONFIG['client.limit'], None, context)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.window)
+            common.process_exception(exception)
             return False
-        if len(ids) != 1:
-            win = WinSearch(self.attrs['relation'], sel_multi=True, ids=ids,
-                    context=context, domain=domain, parent=self.window,
-                    views_preload=self.attrs.get('views', {}))
-            ids = win.run()
 
-        res_id = None
-        if ids:
-            res_id = ids[0]
-        self.screen.load(ids, modified=True)
-        self.screen.display(res_id=res_id)
-        if self.screen.current_view:
-            self.screen.current_view.set_cursor()
-        self.wid_text.set_text('')
+        def callback(ids):
+            res_id = None
+            if ids:
+                res_id = ids[0]
+            self.screen.load(ids, modified=True)
+            self.screen.display(res_id=res_id)
+            if self.screen.current_view:
+                self.screen.current_view.set_cursor()
+            self.wid_text.set_text('')
+
+        if len(ids) != 1:
+            WinSearch(self.attrs['relation'], callback, sel_multi=True,
+                ids=ids, context=context, domain=domain,
+                views_preload=self.attrs.get('views', {}))
+        else:
+            callback(ids)
 
     def _sig_label(self, screen, signal_data):
         name = '_'
@@ -289,30 +288,30 @@ class WinForm(object):
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
-    def run(self):
+    def response(self, win, response_id):
         validate = False
         cancel_responses = (gtk.RESPONSE_CANCEL, gtk.RESPONSE_DELETE_EVENT)
-        while not validate:
-            response = self.win.run()
-            self.screen.current_view.set_value()
-            if (response in cancel_responses
-                    or self.screen.current_record is None):
-                break
+        self.screen.current_view.set_value()
+        if (response_id not in cancel_responses
+                and self.screen.current_record is not None):
             validate = self.screen.current_record.validate(
                 self.screen.current_view.get_fields())
             if not validate:
                 self.screen.current_view.set_cursor()
                 self.screen.display()
-                continue
-            if response == gtk.RESPONSE_ACCEPT:
+                return
+            if response_id == gtk.RESPONSE_ACCEPT:
                 self.new()
-                validate = False
+                return
         if (self.but_cancel
                 and self.screen.current_record
-                and response in cancel_responses):
+                and response_id in cancel_responses):
             self.screen.group.remove(self.screen.current_record, remove=True)
-            return False
-        return response not in cancel_responses
+            result = False
+        else:
+            result = response_id not in cancel_responses
+        self.destroy()
+        self.callback(result)
 
     def new(self):
         self.screen.new(context=self.context)
@@ -326,6 +325,12 @@ class WinForm(object):
             viewport.remove(viewport.get_child())
         self.screen.switch_view(view_type=self.prev_view.view_type)
         self.screen.signal_unconnect(self)
-        self.screen.window = self.prev_window
         self.win.destroy()
-        self.parent.present()
+        NoModal.destroy(self)
+
+    def show(self):
+        self.win.show()
+        common.center_window(self.win, self.parent, self.sensible_widget)
+
+    def hide(self):
+        self.win.hide()

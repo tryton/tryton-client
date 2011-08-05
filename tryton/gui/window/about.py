@@ -4,9 +4,10 @@
 import gtk
 import gettext
 import os
+import webbrowser
 from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
 from tryton.version import VERSION, WEBSITE
-import webbrowser
+from tryton.common import get_toplevel_window
 
 COPYRIGHT = '''\
 Copyright (C) 2010-2011 Nicolas Évrard.
@@ -710,11 +711,12 @@ _ = gettext.gettext
 
 class About(object):
 
-    def __init__(self, parent):
+    def __init__(self):
         gtk.about_dialog_set_email_hook(lambda widget, link:
                 webbrowser.open(link, new=2))
         gtk.about_dialog_set_url_hook(lambda widget, link:
                 webbrowser.open(link, new=2))
+        parent = get_toplevel_window()
         self.win = gtk.AboutDialog()
         self.win.set_transient_for(parent)
         self.win.set_name('Tryton')

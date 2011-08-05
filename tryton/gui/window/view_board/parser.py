@@ -10,8 +10,7 @@ from tryton.config import CONFIG, TRYTON_ICON
 
 class ParserBoard(object):
 
-    def __init__(self, window, context=None):
-        self.window = window
+    def __init__(self, context=None):
         self.title = None
         self.context = context
 
@@ -176,7 +175,7 @@ class ParserBoard(object):
                     paned.pack2(widget, resize=True, shrink=True)
             elif node.localName == 'action':
                 name = str(attrs['name'])
-                widget_act = Action(self.window, attrs, self.context)
+                widget_act = Action(attrs, self.context)
                 widgets.append(widget_act)
                 container.wid_add(widget_act.widget,
                         colspan=int(attrs.get('colspan', 1)),

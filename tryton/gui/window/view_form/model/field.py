@@ -42,7 +42,7 @@ class CharField(object):
         record.autocomplete_with(self.name)
 
     def domains_get(self, record):
-        screen_domain = domain_inversion(record.group.domain,
+        screen_domain = domain_inversion(record.group.domain4inversion,
             self.name, EvalEnvironment(record, False))
         if isinstance(screen_domain, bool) and not screen_domain:
             screen_domain = [('id', '=', False)]
@@ -338,8 +338,7 @@ class M2OField(CharField):
             try:
                 result = rpc.execute(*args)
             except TrytonServerError, exception:
-                result = common.process_exception(exception, record.window,
-                        *args)
+                result = common.process_exception(exception, *args)
                 if not result:
                     return
             value = value, result['rec_name']
@@ -443,7 +442,7 @@ class O2MField(CharField):
             return
         from group import Group
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record,
                 parent_name=parent_name,
                 child_name=self.name,
@@ -463,8 +462,12 @@ class O2MField(CharField):
     def get(self, record, check_load=True, readonly=True, modified=False):
         if record.value.get(self.name) is None:
             return []
+        record_removed = record.value[self.name].record_removed
+        record_deleted = record.value[self.name].record_deleted
         result = [('add', [])]
         for record2 in record.value[self.name]:
+            if record2 in record_removed or record2 in record_deleted:
+                continue
             if record2.id > 0:
                 values = record2.get(check_load=check_load,
                     get_readonly=readonly, get_modifiedonly=modified)
@@ -474,12 +477,10 @@ class O2MField(CharField):
             else:
                 result.append(('create',
                     record2.get(check_load=check_load, get_readonly=readonly)))
-        if record.value[self.name].record_removed:
-            result.append(('unlink', [x.id for x in \
-                record.value[self.name].record_removed]))
-        if record.value[self.name].record_deleted:
-            result.append(('delete', [x.id for x in \
-                record.value[self.name].record_deleted]))
+        if record_removed:
+            result.append(('unlink', [x.id for x in record_removed]))
+        if record_deleted:
+            result.append(('delete', [x.id for x in record_deleted]))
         return result
 
     def get_timestamp(self, record):
@@ -514,7 +515,7 @@ class O2MField(CharField):
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record, parent_name=parent_name,
                 child_name=self.name,
                 context=self.context,
@@ -567,13 +568,12 @@ class O2MField(CharField):
                 try:
                     fields_dict = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    fields_dict = common.process_exception(exception,
-                            record.window, *args)
+                    fields_dict = common.process_exception(exception, *args)
                     if not fields_dict:
                         return False
 
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], fields, record.window,
+        group = Group(self.attrs['relation'], fields_dict,
                 parent=record, parent_name=parent_name, child_name=self.name,
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
@@ -610,8 +610,7 @@ class O2MField(CharField):
             try:
                 fields = rpc.execute(*args)
             except TrytonServerError, exception:
-                fields = common.process_exception(exception, record.window,
-                        *args)
+                fields = common.process_exception(exception, *args)
                 if not fields:
                     return False
 
@@ -703,7 +702,7 @@ class M2MField(O2MField):
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {}, record.window,
+        group = Group(self.attrs['relation'], {},
                 parent=record, parent_name=parent_name,
                 child_name=self.name,
                 context=self.context,
@@ -770,8 +769,7 @@ class ReferenceField(CharField):
                 try:
                     result = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    result = common.process_exception(exception, record.window,
-                            *args)
+                    result = common.process_exception(exception, *args)
                     if not result:
                         return
                 result = result['rec_name']

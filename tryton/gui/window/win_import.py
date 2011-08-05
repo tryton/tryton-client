@@ -15,9 +15,10 @@ _ = gettext.gettext
 class WinImport(object):
     "Window import"
 
-    def __init__(self, model, parent):
+    def __init__(self, model):
+        self.parent = common.get_toplevel_window()
         self.dialog = gtk.Dialog(
-                title=_("Import from CSV"), parent=parent,
+                title=_("Import from CSV"), parent=self.parent,
                 flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
                 | gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
@@ -170,7 +171,6 @@ class WinImport(object):
         self.model = model
         self.fields_data = {}
 
-        self.parent = parent
         self.dialog.show_all()
         self.import_csv_file.set_current_folder(CONFIG['client.default_path'])
 
@@ -360,16 +360,14 @@ class WinImport(object):
             return False
         if res[0] >= 0:
             if res[0] == 1:
-                common.message(_('%d record imported!') % (res[0],),
-                        self.parent)
+                common.message(_('%d record imported!') % res[0])
             else:
-                common.message(_('%d records imported!') % (res[0],),
-                        self.parent)
+                common.message(_('%d records imported!') % res[0])
         else:
             buf = ''
             for key, val in res[1].items():
                 buf += ('\t%s: %s\n' % (str(key), str(val)))
-            common.error(_('Importation Error!'), self.parent,
+            common.error(_('Importation Error!'),
                     _('Error trying to import this record:\n' \
                     '%s\nError Message:\n%s\n\n%s') % (buf, res[2], res[3]))
         return True

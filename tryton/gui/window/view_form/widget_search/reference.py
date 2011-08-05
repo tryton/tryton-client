@@ -13,10 +13,9 @@ _ = gettext.gettext
 
 class Reference(Interface):
 
-    def __init__(self, name, parent, attrs=None, context=None,
-            on_change=None):
-        super(Reference, self).__init__(name, parent, attrs=attrs,
-                context=context, on_change=on_change)
+    def __init__(self, name, attrs=None, context=None, on_change=None):
+        super(Reference, self).__init__(name, attrs=attrs, context=context,
+            on_change=on_change)
 
         self.widget = gtk.HBox()
 
@@ -49,7 +48,7 @@ class Reference(Interface):
                         0, None, None, ['rec_name'], rpc.CONTEXT)
                 selection = [(x['id'], x['rec_name']) for x in result]
             except TrytonServerError, exception:
-                common.process_exception(exception, parent)
+                common.process_exception(exception)
                 selection = []
         else:
             if not isinstance(selection, (list, tuple)):
@@ -57,7 +56,7 @@ class Reference(Interface):
                     selection = rpc.execute('model',
                             self.attrs['model'], selection, rpc.CONTEXT)
                 except TrytonServerError, exception:
-                    common.process_exception(exception, parent)
+                    common.process_exception(exception)
                     selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         self.attrs['selection'] = selection

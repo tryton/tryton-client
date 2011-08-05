@@ -32,12 +32,12 @@ class EditableTreeView(gtk.TreeView):
             return
 
         try:
-            real_value = cell.value_from_text(current_record, value)
-            field.set_client(current_record, real_value)
+            cell.value_from_text(current_record, value)
         except parser.UnsettableColumn:
             return
 
-    def on_open_remote(self, current_record, fieldname, create, value):
+    def on_open_remote(self, current_record, fieldname, create, value,
+            entry=None, callback=None):
         field = current_record[fieldname]
         cell = self.cells[fieldname]
         if value != cell.get_textual_value(current_record) or not value:
@@ -45,13 +45,10 @@ class EditableTreeView(gtk.TreeView):
         else:
             changed = False
         try:
-            valid, value = cell.open_remote(current_record, create,
-                    changed, value)
-            if valid:
-                field.set_client(current_record, value)
+            cell.open_remote(current_record, create, changed, value,
+                callback=callback)
         except NotImplementedError:
             pass
-        return cell.get_textual_value(current_record)
 
     def on_create_line(self):
         model = self.get_model()
@@ -228,15 +225,19 @@ class EditableTreeView(gtk.TreeView):
             else:
                 value = entry.get_active_text()
             entry.disconnect(entry.editing_done_id)
-            newval = self.on_open_remote(record, column.name,
-                    create=(event.keyval==gtk.keysyms.F3), value=value)
-            if isinstance(entry, gtk.Entry):
-                entry.set_text(newval)
-            else:
-                entry.set_active_text(newval)
-            entry.editing_done_id = entry.connect('editing_done',
-                    self.on_editing_done)
-            self.set_cursor(path, column, True)
+            def callback():
+                cell = self.cells[column.name]
+                value = cell.get_textual_value(record)
+                if isinstance(entry, gtk.Entry):
+                    entry.set_text(value)
+                else:
+                    entry.set_active_text(value)
+                entry.editing_done_id = entry.connect('editing_done',
+                        self.on_editing_done)
+                self.set_cursor(path, column, True)
+            self.on_open_remote(record, column.name,
+                create=(event.keyval==gtk.keysyms.F3), value=value,
+                callback=callback)
         else:
             field = record[column.name]
             if isinstance(entry, gtk.Entry):

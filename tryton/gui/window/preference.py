@@ -16,13 +16,13 @@ _ = gettext.gettext
 class Preference(object):
     "Preference window"
 
-    def __init__(self, user, parent):
-        self.win = gtk.Dialog(_('Preferences'), parent,
+    def __init__(self, user):
+        self.parent = common.get_toplevel_window()
+        self.win = gtk.Dialog(_('Preferences'), self.parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_has_separator(False)
         self.win.set_icon(TRYTON_ICON)
-        self.parent = parent
 
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
@@ -40,7 +40,7 @@ class Preference(object):
         try:
             view = rpc.execute(*args)
         except TrytonServerError, exception:
-            view = common.process_exception(exception, parent, *args)
+            view = common.process_exception(exception, *args)
             if not view:
                 self.win.destroy()
                 self.win = None
@@ -49,7 +49,7 @@ class Preference(object):
         title = gtk.Label(_('Edit User Preferences'))
         title.show()
         self.win.vbox.pack_start(title, expand=False, fill=True)
-        self.screen = Screen('res.user', self.win, mode=[])
+        self.screen = Screen('res.user', mode=[])
         self.screen.new(default=False)
         self.screen.add_view(view)
 
@@ -57,7 +57,7 @@ class Preference(object):
         try:
             preferences = rpc.execute(*args)
         except TrytonServerError, exception:
-            preferences = common.process_exception(exception, parent, *args)
+            preferences = common.process_exception(exception, *args)
             if not preferences:
                 self.win.destroy()
                 raise
@@ -66,13 +66,13 @@ class Preference(object):
         self.screen.screen_container.set(self.screen.current_view.widget)
         self.screen.display(set_cursor=True)
 
-        width, height = self.screen.screen_container.size_get()
-        parent_width, parent_height = parent.get_size()
-        self.screen.widget.set_size_request(min(parent_width - 20, width + 20),
-                min(parent_height - 60, height + 25))
         self.screen.widget.show()
         self.win.vbox.pack_start(self.screen.widget)
         self.win.set_title(_('Preference'))
+
+        width, height = self.parent.get_size()
+        self.win.set_default_size(int(width * 0.9), int(height * 0.9))
+
         self.win.show()
 
     def run(self):

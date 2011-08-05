@@ -54,13 +54,13 @@ class DBCreate(object):
                 "Click on 'Change' to change the address."))
         return state
 
-    def server_change(self, widget, parent):
+    def server_change(self, widget):
         """
         This method checks the server connection via host and port. If the
         connection is successfull, it query the language list and pass true
         state to the GUI. Otherwise it pass false state to the GUI.
         """
-        res = common.request_server(self.entry_server_connection, parent)
+        res = common.request_server(self.entry_server_connection)
         if not res:
             return False
         host, port = res
@@ -287,7 +287,8 @@ class DBCreate(object):
         self.dialog.vbox.pack_start(dialog_vbox)
         self.sig_login = sig_login
 
-    def run(self, parent):
+    def run(self):
+        parent = common.get_toplevel_window()
         self.dialog.set_default_response(gtk.RESPONSE_OK)
         self.dialog.set_transient_for(parent)
         self.dialog.show_all()
@@ -296,7 +297,7 @@ class DBCreate(object):
         change_button = self.button_server_change
         admin_passwd = self.entry_adminpasswd
         admin_passwd2 = self.entry_adminpasswd2
-        change_button.connect_after('clicked', self.server_change, self.dialog)
+        change_button.connect_after('clicked', self.server_change)
 
         if self.host and self.port:
             url = '%s:%d' % (self.host, self.port)
@@ -327,20 +328,19 @@ class DBCreate(object):
                     common.warning(_('The database name is restricted to ' \
                         'alpha-nummerical characters and "_" (underscore). ' \
                         'Avoid all accents, space ' \
-                        'and any other special characters.'), self.dialog, \
+                        'and any other special characters.'),
                         _('Wrong characters in database name!'))
                     continue
                 elif admin_passwd.get_text() != admin_passwd2.get_text():
                     common.warning(
                         _("The new admin password " \
                               "doesn't match the confirmation field.\n"),
-                        self.dialog,
                         _("Passwords doesn't match!"))
                     continue
                 elif not admin_passwd.get_text():
                     common.warning(_("Admin password and confirmation are " \
                         "required to create a new database."), \
-                        self.dialog, _('Missing admin password!'))
+                        _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
                         and int(url_m.group(2)) \
@@ -352,12 +352,12 @@ class DBCreate(object):
                         exist = rpc.db_exec(url_m.group(1),
                                 int(url_m.group(2)), 'db_exist', dbname)
                     except TrytonServerError, exception:
-                        common.process_exception(exception, self.dialog)
+                        common.process_exception(exception)
                         continue
                     if exist:
                          common.warning(_("A database with the same name " \
                              "already exists.\n" \
-                             "Try another database name."), self.dialog,
+                             "Try another database name."),
                              _("This database name already exist!"))
                          self.entry_dbname.set_text("")
                          self.entry_dbname.grab_focus()
@@ -368,14 +368,13 @@ class DBCreate(object):
                         try:
                             rpcprogress = common.RPCProgress('db_exec',
                                     (host, int(port), 'create', dbname, passwd,
-                                        langreal, admin_passwd.get_text()),
-                                    self.dialog)
+                                        langreal, admin_passwd.get_text()))
                             rpcprogress.run()
                         except TrytonServerError, exception:
                             if str(exception.args[0]) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
                                     "the Tryton server. Please try again."),
-                                    self.dialog, _("Access denied!"))
+                                    _("Access denied!"))
                                 self.entry_serverpasswd.set_text("")
                                 self.entry_serverpasswd.grab_focus()
                                 continue
@@ -387,7 +386,7 @@ class DBCreate(object):
                                     "Please check the error message for " \
                                     "possible informations.\n" \
                                     "Error message:\n") + str(exception.args[0]),
-                                    self.dialog, _("Error creating database!"))
+                                    _("Error creating database!"))
                             parent.present()
                             self.dialog.destroy()
                             rpc.logout()

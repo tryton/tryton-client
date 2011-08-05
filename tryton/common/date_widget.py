@@ -275,7 +275,7 @@ class ComplexEntry(gtk.HBox):
         self.widget.select_region(0, 0)
         self.widget_cmd = CmdEntry()
         self.widget_cmd.hide()
-        self.pack_start(self.widget, expand=True, fill=True)
+        self.pack_start(self.widget, expand=False, fill=False)
         self.pack_start(self.widget_cmd, expand=False, fill=True)
 
     def _date_cb(self, event):

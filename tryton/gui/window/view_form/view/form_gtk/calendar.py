@@ -9,7 +9,8 @@ from interface import WidgetInterface
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
         TRYTON_ICON, timezoned_date
-from tryton.common import date_widget, Tooltips, datetime_strftime
+from tryton.common import date_widget, Tooltips, datetime_strftime, \
+        get_toplevel_window
 from tryton.translate import date_format
 
 _ = gettext.gettext
@@ -18,9 +19,8 @@ _ = gettext.gettext
 class Calendar(WidgetInterface):
     "Calendar"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Calendar, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Calendar, self).__init__(field_name, model_name, attrs=attrs)
 
         self.format = date_format()
         self.widget = date_widget.ComplexEntry(self.format, spacing=0)
@@ -106,7 +106,8 @@ class Calendar(WidgetInterface):
         return True
 
     def cal_open(self, widget):
-        win = gtk.Dialog(_('Date Selection'), self.window,
+        parent = get_toplevel_window()
+        win = gtk.Dialog(_('Date Selection'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -144,16 +145,15 @@ class Calendar(WidgetInterface):
                 format = format.replace('%Y', '0%Y')
             self.entry.set_text(datetime_strftime(date, format))
         self._focus_out()
-        self.window.present()
+        parent.present()
         win.destroy()
 
 
 class DateTime(WidgetInterface):
     "DateTime"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(DateTime, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(DateTime, self).__init__(field_name, model_name, attrs=attrs)
 
         self.format = date_format() + ' ' + HM_FORMAT
         self.widget = date_widget.ComplexEntry(self.format, spacing=0)
@@ -239,7 +239,8 @@ class DateTime(WidgetInterface):
         return True
 
     def cal_open(self, widget):
-        win = gtk.Dialog(_('Date Time Selection'), self.window,
+        parent = get_toplevel_window()
+        win = gtk.Dialog(_('Date Time Selection'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -290,5 +291,5 @@ class DateTime(WidgetInterface):
             value = datetime_strftime(date, DHM_FORMAT)
             self.show(value, timezone=False)
         self._focus_out()
-        self.window.present()
+        parent.present()
         win.destroy()

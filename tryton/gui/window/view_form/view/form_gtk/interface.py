@@ -6,10 +6,9 @@ from tryton.common import COLORS
 
 class WidgetInterface(object):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
+    def __init__(self, field_name, model_name, attrs=None):
         self.field_name = field_name
         self.model_name = model_name
-        self.window = window
         self.view = None # Filled by ViewForm
         self.attrs = attrs or {}
         for attr_name in ('readonly', 'invisible'):

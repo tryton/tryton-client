@@ -13,8 +13,8 @@ _ = gettext.gettext
 class Char(WidgetInterface):
     "Char"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Char, self).__init__(field_name, model_name, window, attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Char, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox()
         self.autocomplete = bool(attrs.get('autocomplete'))
@@ -30,12 +30,12 @@ class Char(WidgetInterface):
             focus_entry = self.entry.get_child()
         else:
             self.entry = gtk.Entry()
-            self.entry.set_property('activates_default', True)
-            self.entry.set_max_length(int(attrs.get('size', 0)))
-            self.entry.set_width_chars(5)
-            self.entry.connect('activate', self.sig_activate)
             focus_entry = self.entry
 
+        focus_entry.set_property('activates_default', True)
+        focus_entry.set_width_chars(10)
+        focus_entry.set_max_length(int(attrs.get('size', 0)))
+        focus_entry.connect('activate', self.sig_activate)
         focus_entry.connect('focus-in-event', lambda x, y: self._focus_in())
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.widget.pack_start(self.entry)
@@ -95,8 +95,8 @@ class Char(WidgetInterface):
 
 class Sha(Char):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Sha, self).__init__(field_name, model_name, window, attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Sha, self).__init__(field_name, model_name, attrs=attrs)
         self.entry.props.visibility = False
 
         self.visibility_checkbox = gtk.CheckButton()

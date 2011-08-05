@@ -114,6 +114,3 @@ class ScreenContainer(object):
             self.viewport.remove(self.viewport.get_child())
         self.viewport.add(widget)
         self.viewport.show_all()
-
-    def size_get(self):
-        return self.viewport.get_child().size_request()

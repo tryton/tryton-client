@@ -15,11 +15,10 @@ _ = gettext.gettext
 
 class ViewForm(ParserView):
 
-    def __init__(self, window, screen, widget, children=None,
-            buttons=None, notebooks=None, cursor_widget='',
-            children_field=None):
-        super(ViewForm, self).__init__(window, screen, widget, children,
-                buttons, notebooks, cursor_widget, children_field)
+    def __init__(self, screen, widget, children=None, buttons=None,
+            notebooks=None, cursor_widget='', children_field=None):
+        super(ViewForm, self).__init__(screen, widget, children, buttons,
+            notebooks, cursor_widget, children_field)
         self.view_type = 'form'
 
         for button in self.buttons:
@@ -41,15 +40,6 @@ class ViewForm(ParserView):
         viewport = gtk.Viewport()
         viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
         viewport.add(scroll)
-        if isinstance(self.screen.window, gtk.Dialog):
-            width, height = self.widget.size_request()
-            if self.screen.window:
-                parent = self.screen.window.get_transient_for()
-                if parent:
-                    parent_width, parent_height = parent.get_size()
-                    width = min(parent_width - 40, width)
-                    height = min(parent_height - 80, height)
-            vbox.set_size_request(width or -1, height or -1)
         vbox.pack_start(viewport, expand=True, fill=True)
 
         self.widget = vbox

@@ -4,6 +4,7 @@ import operator
 import gtk
 import gobject
 import gettext
+import math
 from interface import WidgetInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
@@ -18,9 +19,8 @@ _ = gettext.gettext
 
 class Reference(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Reference, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Reference, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox(spacing=0)
 
@@ -30,7 +30,6 @@ class Reference(WidgetInterface):
         child.connect('changed',
                 self.sig_changed_combo)
         child.connect('key_press_event', self.sig_key_pressed)
-        self.widget_combo.set_size_request(int(attrs.get('widget_size', -1)), -1)
         self.widget.pack_start(self.widget_combo, expand=False, fill=True)
 
         self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
@@ -83,9 +82,19 @@ class Reference(WidgetInterface):
                 selection = rpc.execute('model',
                         self.model_name, selection, rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, self.window)
+                common.process_exception(exception)
                 selection = []
         selection.sort(key=operator.itemgetter(1))
+        if selection:
+            pop = sorted((len(x) for x in selection), reverse=True)
+            average = sum(pop) / len(pop)
+            deviation = int(math.sqrt(sum((x - average)**2 for x in pop) /
+                    len(pop)))
+            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
+        else:
+            width = 10
+        child.set_width_chars(width)
+
         self.set_popdown(selection)
 
         self.last_key = (None, 0)
@@ -152,19 +161,22 @@ class Reference(WidgetInterface):
                 model, (obj_id, name) = value
             except ValueError:
                 self.focus_out = True
-                return False
+                return
         if model and obj_id:
             if not leave:
-                screen = Screen(model, self.window, mode=['form'])
+                screen = Screen(model, mode=['form'])
                 screen.load([obj_id])
-                win = WinForm(screen, self.widget.get_toplevel())
-                if win.run():
-                    if screen.save_current():
+                def callback(result):
+                    if result and screen.save_current():
                         value = (screen.current_record.id,
                                 screen.current_record.rec_name())
                         self.field.set_client(self.record, (model, value),
                                 force_change=True)
-                win.destroy()
+                    self.focus_out = True
+                    self.changed = True
+                    self.display(self.record, self.field)
+                WinForm(screen, callback)
+                return
         elif model:
             if not self._readonly and ( self.wid_text.get_text() or not leave):
                 domain = self.field.domain_get(self.record)
@@ -182,22 +194,25 @@ class Reference(WidgetInterface):
                 except TrytonServerError, exception:
                     self.focus_out = True
                     self.changed = True
-                    common.process_exception(exception, self.window)
-                    return False
+                    common.process_exception(exception)
+                    return
                 if ids and len(ids) == 1:
                     self.field.set_client(self.record, (model, (ids[0], '')))
                     self.display(self.record, self.field)
                     self.focus_out = True
                     self.changed = True
-                    return True
+                    return
 
-                win = WinSearch(model, sel_multi=False, ids=ids, context=context,
-                        domain=domain, parent=self.widget.get_toplevel())
-                ids = win.run()
-                if ids:
-                    self.field.set_client(self.record, (model, (ids[0], '')))
-        else:
-            self.field.set_client(self.record, ('', (name, name)))
+                def callback(ids):
+                    if ids:
+                        self.field.set_client(self.record, (model, (ids[0], '')))
+                    self.focus_out = True
+                    self.changed = True
+                    self.display(self.record, self.field)
+                WinSearch(model, callback, sel_multi=False, ids=ids,
+                        context=context, domain=domain)
+                return
+        self.field.set_client(self.record, ('', (name, name)))
         self.focus_out = True
         self.changed = True
         self.display(self.record, self.field)
@@ -206,7 +221,7 @@ class Reference(WidgetInterface):
         model = self.get_model()
         if not model:
             return
-        screen = Screen(model, self.window, mode=['form'])
+        screen = Screen(model, mode=['form'])
         win = WinForm(screen, self.widget.get_toplevel(), new=True)
         if win.run():
             if screen.save_current():
@@ -272,8 +287,7 @@ class Reference(WidgetInterface):
                 try:
                     name = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    name = common.process_exception(exception, self.window,
-                            *args)
+                    name = common.process_exception(exception, *args)
                     if not name:
                         name = '???'
             self.wid_text.set_text(name)

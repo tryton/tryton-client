@@ -10,6 +10,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.gui import Main
+from tryton.gui.window import Window
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
@@ -92,7 +93,7 @@ class Form(SignalEvent, TabContent):
             '<tryton>/Form/Import Data'),
     ]
 
-    def __init__(self, model, window, res_id=False, domain=None, mode=None,
+    def __init__(self, model, res_id=False, domain=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False, search_value=None):
         super(Form, self).__init__()
@@ -107,14 +108,17 @@ class Form(SignalEvent, TabContent):
             context = {}
 
         self.model = model
-        self.window = window
+        self.res_id = res_id
         self.domain = domain
+        self.mode = mode
         self.context = context
+        self.auto_refresh = auto_refresh
+        self.view_ids = view_ids
+        self.dialogs = []
 
-        self.screen = Screen(self.model, self.window, mode=mode,
-                context=self.context, view_ids=view_ids, domain=domain,
-                limit=limit, readonly=bool(auto_refresh),
-                search_value=search_value)
+        self.screen = Screen(self.model, mode=mode, context=self.context,
+            view_ids=view_ids, domain=domain, limit=limit,
+            readonly=bool(auto_refresh), search_value=search_value)
         self.screen.widget.show()
 
         if not name:
@@ -154,8 +158,7 @@ class Form(SignalEvent, TabContent):
             try:
                 toolbars = rpc.execute(*args)
             except TrytonServerError, exception:
-                toolbars = common.process_exception(exception, self.window,
-                    *args)
+                toolbars = common.process_exception(exception, *args)
                 toolbars = toolbars if toolbars else {}
             self._toolbar_cache[self.model] = toolbars
         return self._toolbar_cache[self.model]
@@ -163,10 +166,27 @@ class Form(SignalEvent, TabContent):
     def widget_get(self):
         return self.screen.widget
 
+    def __eq__(self, value):
+        if not value:
+            return False
+        if not isinstance(value, Form):
+            return False
+        return (self.model == value.model
+            and self.res_id == value.res_id
+            and self.domain == value.domain
+            and self.mode == value.mode
+            and self.view_ids == value.view_ids
+            and self.context == value.context
+            and self.name == value.name
+            and self.screen.limit == value.screen.limit
+            and self.auto_refresh == value.auto_refresh
+            and self.screen.search_value == value.screen.search_value)
+
     def sig_goto(self, widget=None):
         if not self.modified_save():
             return
-        win = gtk.Dialog(_('Go to ID'), self.window,
+        parent = common.get_toplevel_window()
+        win = gtk.Dialog(_('Go to ID'), parent,
                 gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
@@ -202,7 +222,7 @@ class Form(SignalEvent, TabContent):
         if response == gtk.RESPONSE_OK:
             self.screen.display(locale.atoi(entry.get_text()), set_cursor=True)
         win.destroy()
-        self.window.present()
+        parent.present()
 
     def destroy(self):
         self.screen.signal_unconnect(self)
@@ -224,8 +244,7 @@ class Form(SignalEvent, TabContent):
     def sig_attach(self, widget=None):
         obj_id = self.id_get()
         if obj_id >= 0 and obj_id is not False:
-            win = Attachment(self.model, obj_id, self.window)
-            win.run()
+            Attachment(self.model, obj_id).run()
         else:
             self.message_info(_('No record selected!'))
         self.update_attachment_count(reload=True)
@@ -273,7 +292,7 @@ class Form(SignalEvent, TabContent):
         try:
             res = rpc.execute(*args)
         except TrytonServerError, exception:
-            res = common.process_exception(exception, self.window, *args)
+            res = common.process_exception(exception, *args)
             if not res:
                 return
         message_str = ''
@@ -287,7 +306,7 @@ class Form(SignalEvent, TabContent):
                     value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value +'\n'
         message_str += _('Model:') + ' ' + self.model
-        message(message_str, self.window)
+        message(message_str)
         return True
 
     def sig_remove(self, widget=None):
@@ -295,7 +314,7 @@ class Form(SignalEvent, TabContent):
             msg = _('Are you sure to remove this record?')
         else:
             msg = _('Are you sure to remove those records?')
-        if sur(msg, self.window):
+        if sur(msg):
             if not self.screen.remove(delete=True, force_remove=True):
                 self.message_info(_('Records not removed!'))
             else:
@@ -307,7 +326,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinImport(self.model, self.window)
+        win = WinImport(self.model)
         win.run()
 
     def sig_save_as(self, widget=None):
@@ -316,7 +335,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinExport(self.model, self.ids_get(), self.window,
+        win = WinExport(self.model, self.ids_get(),
                 context=self.context)
         win.run()
 
@@ -326,6 +345,7 @@ class Form(SignalEvent, TabContent):
                 return
         self.screen.new()
         self.message_info('')
+        self.activate_save()
 
     def sig_copy(self, widget=None):
         if not self.modified_save():
@@ -337,7 +357,7 @@ class Form(SignalEvent, TabContent):
         try:
             new_ids = rpc.execute(*args)
         except TrytonServerError, exception:
-            new_ids = common.process_exception(exception, self.window, *args)
+            new_ids = common.process_exception(exception, *args)
         if new_ids:
             self.screen.load(new_ids)
             self.message_info(_('Working now on the duplicated record(s)!'),
@@ -356,21 +376,19 @@ class Form(SignalEvent, TabContent):
             return
         self.screen.display_prev()
         self.message_info('')
-        self.activate_save(False)
 
     def sig_next(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_next()
         self.message_info('')
-        self.activate_save(False)
 
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
             return False
         if test_modified and self.screen.modified():
             res = sur_3b(_('This record has been modified\n' \
-                    'do you want to save it ?'), self.window)
+                    'do you want to save it ?'))
             if res == 'ok':
                 self.sig_save(None)
             elif res == 'ko':
@@ -389,7 +407,7 @@ class Form(SignalEvent, TabContent):
                     self.screen.display(set_cursor=True)
                     break
         self.message_info('')
-        self.activate_save(False)
+        self.activate_save()
         return True
 
     def sig_action(self, widget):
@@ -408,6 +426,8 @@ class Form(SignalEvent, TabContent):
         self.buttons['relate'].props.active = True
 
     def action_popup(self, widget):
+        button, = widget.get_children()
+        button.grab_focus()
         menu = widget._menu
         if not widget.props.active:
             menu.popdown()
@@ -428,12 +448,12 @@ class Form(SignalEvent, TabContent):
     def sig_search(self, widget=None):
         if not self.modified_save():
             return
-        win = WinSearch(self.model, domain=self.domain,
-                context=self.context, parent=self.window)
-        res = win.run()
-        if res:
-            self.screen.clear()
-            self.screen.load(res)
+        def callback(result):
+            if result:
+                self.screen.clear()
+                self.screen.load(result)
+        WinSearch(self.model, callback, domain=self.domain,
+            context=self.context)
 
     def message_info(self, message, color='red'):
         if message:
@@ -461,20 +481,20 @@ class Form(SignalEvent, TabContent):
             msg += _(' of ') + str(signal_data[2])
         self.status_label.set_text(msg)
         self.message_info('')
+        self.activate_save()
 
     def _record_modified(self, screen, signal_data):
         self.message_info('', color='white')
-        self.activate_save(True)
+        self.activate_save()
 
     def _record_saved(self, screen, signal_data):
-        self.activate_save(False)
+        self.activate_save()
 
     def modified_save(self, reload=True):
         if self.screen.modified():
             value = sur_3b(
                     _('This record has been modified\n' \
-                            'do you want to save it ?'),
-                    self.window)
+                            'do you want to save it ?'))
             if value == 'ok':
                 return self.sig_save(None)
             elif value == 'ko':
@@ -486,6 +506,8 @@ class Form(SignalEvent, TabContent):
         return True
 
     def sig_close(self, widget=None):
+        for dialog in self.dialogs[:]:
+            dialog.destroy()
         return self.modified_save(reload=False)
 
     def _action(self, action, atype):
@@ -522,14 +544,10 @@ class Form(SignalEvent, TabContent):
             'id': record_id,
             'ids': record_ids,
         }
-        value = Action._exec_action(action, self.window, data, {})
-        if atype in ('print', 'action'):
-            if self.screen:
-                self.screen.reload(written=True)
-        return value
+        Action._exec_action(action, data, {})
 
-    def activate_save(self, activate):
-        self.buttons['save'].props.sensitive = activate
+    def activate_save(self):
+        self.buttons['save'].props.sensitive = self.screen.modified()
 
     def sig_win_close(self, widget):
         Main.get_main().sig_win_close(widget)
@@ -547,19 +565,23 @@ class Form(SignalEvent, TabContent):
         for action_type, special_action, action_name, tooltip in (
                 ('action', 'action', _('Action'), _('Launch action')),
                 ('relate', 'relate', _('Relate'), _('Open related records')),
+                (None,) * 4,
                 ('print', 'open', _('Report'), _('Open report')),
                 ('print', 'email', _('E-Mail'), _('E-Mail report')),
                 ('print', 'print', _('Print'), _('Print report')),
         ):
-            tbutton = gtk.ToggleToolButton(iconstock.get(special_action))
-            tbutton.set_label(action_name)
-            tbutton._menu = self._create_popup_menu(tbutton,
-                action_type, toolbars[action_type], special_action)
-            tbutton.connect('toggled', self.action_popup)
-            self.tooltips.set_tip(tbutton, tooltip)
-            self.buttons[special_action] = tbutton
+            if action_type is not None:
+                tbutton = gtk.ToggleToolButton(iconstock.get(special_action))
+                tbutton.set_label(action_name)
+                tbutton._menu = self._create_popup_menu(tbutton,
+                    action_type, toolbars[action_type], special_action)
+                tbutton.connect('toggled', self.action_popup)
+                self.tooltips.set_tip(tbutton, tooltip)
+                self.buttons[special_action] = tbutton
+                tbutton._can_be_sensitive = bool(toolbars.get(action_type))
+            else:
+                tbutton = gtk.SeparatorToolItem()
             gtktoolbar.insert(tbutton, -1)
-            tbutton._can_be_sensitive = bool(toolbars.get(action_type))
 
         return gtktoolbar
 
@@ -585,7 +607,14 @@ class Form(SignalEvent, TabContent):
         return menu
 
     def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):
-        self._action(action, keyword)
+        event = gtk.get_current_event()
+        if not hasattr(event, 'button') or event.button == 1:
+            hide = not bool(event.state
+                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
+        else:
+            hide = False
+        with Window(hide_current=hide):
+            self._action(action, keyword)
         togglebutton.props.active = False
 
     def _popup_menu_hide(self, menuitem, togglebutton):

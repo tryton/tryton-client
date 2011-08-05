@@ -20,9 +20,8 @@ def humanize(size):
 class Binary(WidgetInterface):
     "Binary"
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(Binary, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Binary, self).__init__(field_name, model_name, attrs=attrs)
 
         self.filename = attrs.get('filename')
 
@@ -30,7 +29,7 @@ class Binary(WidgetInterface):
 
         self.widget = gtk.HBox(spacing=0)
         self.wid_size = gtk.Entry()
-        self.wid_size.set_width_chars(11)
+        self.wid_size.set_width_chars(10)
         self.wid_size.props.sensitive = False
         if self.filename and attrs.get('filename_visible'):
             self.wid_text = gtk.Entry()
@@ -114,8 +113,7 @@ class Binary(WidgetInterface):
             return self.wid_size.grab_focus()
 
     def sig_new(self, widget=None):
-        filename = file_selection(_('Open...'),
-                parent=self.widget.get_toplevel())
+        filename = file_selection(_('Open...'))
         if filename and self.field:
             self.field.set_client(self.record,
                     base64.encodestring(open(filename, 'rb').read()))
@@ -136,14 +134,13 @@ class Binary(WidgetInterface):
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
-        file_open(file_path, type_, self.window)
+        file_open(file_path, type_)
 
     def sig_save_as(self, widget=None):
         filename = ''
         if self.filename_field:
             filename = self.filename_field.get(self.record)
         filename = file_selection(_('Save As...'), filename=filename,
-            parent=self.widget.get_toplevel(),
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename,'wb') as fp:

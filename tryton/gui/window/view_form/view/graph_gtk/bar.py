@@ -115,12 +115,12 @@ class Bar(Graph):
             self.queue_draw_area(minx - 1, miny - 1,
                     maxx - minx + 2, maxy - miny + 2)
 
-    def action(self, window):
-        super(Bar, self).action(window)
+    def action(self):
+        super(Bar, self).action()
         for bar in self.bars:
             if bar.highlight:
                 ids = self.ids[bar.xname]
-                self.action_keyword(ids, window)
+                self.action_keyword(ids)
 
 
 class VerticalBar(Bar):

@@ -5,9 +5,8 @@
 
 class ParserInterface(object):
 
-    def __init__(self, window, parent=None, attrs=None, screen=None,
+    def __init__(self, parent=None, attrs=None, screen=None,
             children_field=None):
-        self.window = window
         self.parent = parent
         self.attrs = attrs
         self.title = None
@@ -18,9 +17,8 @@ class ParserInterface(object):
 
 class ParserView(object):
 
-    def __init__(self, window, screen, widget, children=None, buttons=None,
+    def __init__(self, screen, widget, children=None, buttons=None,
             notebooks=None, cursor_widget=None, children_field=None):
-        self.window = window
         self.screen = screen
         self.widget = widget
         self.children = children

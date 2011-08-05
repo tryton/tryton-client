@@ -34,13 +34,13 @@ class WidgetParse(ParserInterface):
             if not node.nodeType == node.ELEMENT_NODE:
                 continue
             if node.localName in PARSERS:
-                widget = PARSERS[node.localName](self.window, self.parent,
-                        self.attrs, screen, children_field)
+                widget = PARSERS[node.localName](self.parent, self.attrs,
+                    screen, children_field)
                 wid, child, buttons, on_write, notebooks, cursor_widget = \
                         widget.parse(screen.model_name, node, fields)
                 screen.set_on_write(on_write)
-                res = PARSERS2[node.localName](self.window, screen, wid, child,
-                        buttons, notebooks, cursor_widget, children_field)
+                res = PARSERS2[node.localName](screen, wid, child, buttons,
+                    notebooks, cursor_widget, children_field)
                 res.title = widget.title
                 widget = res
                 break

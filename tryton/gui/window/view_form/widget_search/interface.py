@@ -8,11 +8,10 @@ _ = gettext.gettext
 class Interface(object):
     "Interface for search widget"
 
-    def __init__(self, name, parent, attrs=None, context=None, on_change=None):
+    def __init__(self, name, attrs=None, context=None, on_change=None):
         if attrs is None:
             attrs = {}
         self._value = None
-        self.parent = parent
         self.name = name
         self.model = attrs.get('model', None)
         self.attrs = attrs or {}

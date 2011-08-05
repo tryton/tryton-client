@@ -3,7 +3,6 @@
 import time
 import datetime
 import tryton.rpc as rpc
-from tryton.wizard import Wizard
 from tryton.common import message, error, selection, file_open, mailto
 from tryton.gui.window import Window
 from tryton.pyson import PYSONDecoder
@@ -20,7 +19,7 @@ _ = gettext.gettext
 class Action(object):
 
     @staticmethod
-    def exec_report(name, data, window, direct_print=False, email_print=False,
+    def exec_report(name, data, direct_print=False, email_print=False,
             email=None, context=None):
         if context is None:
             context = {}
@@ -36,19 +35,19 @@ class Action(object):
             try:
                 ids = rpc.execute(*args)
             except TrytonServerError, exception:
-                ids = common.process_exception(exception, window, *args)
+                ids = common.process_exception(exception, *args)
                 if not ids:
                     return False
             if ids == []:
-                message(_('Nothing to print!'), window)
+                message(_('Nothing to print!'))
                 return False
             data['id'] = ids[0]
         args = ('report', name, 'execute', ids, data, ctx)
-        rpcprogress = common.RPCProgress('execute', args, window)
+        rpcprogress = common.RPCProgress('execute', args)
         try:
             res = rpcprogress.run()
         except TrytonServerError, exception:
-            common.process_exception(exception, window)
+            common.process_exception(exception)
             return False
         if not res:
             return False
@@ -66,11 +65,11 @@ class Action(object):
                     subject=email.get('subject'), body=email.get('body'),
                     attachment=fp_name)
         else:
-            file_open(fp_name, type, window, print_p=print_p)
+            file_open(fp_name, type, print_p=print_p)
         return True
 
     @staticmethod
-    def execute(act_id, data, window, action_type=None, context=None):
+    def execute(act_id, data, action_type=None, context=None):
         if context is None:
             context = {}
         ctx = rpc.CONTEXT.copy()
@@ -81,7 +80,7 @@ class Action(object):
                 res = rpc.execute('model', 'ir.action', 'read', act_id,
                         ['type'], ctx)
             except TrytonServerError, exception:
-                common.process_exception(exception, window)
+                common.process_exception(exception)
                 return
             if not res:
                 raise Exception, 'ActionNotFound'
@@ -90,12 +89,12 @@ class Action(object):
             res = rpc.execute('model', action_type, 'search_read',
                     [('action', '=', act_id)], 0, 1, None, None, ctx)
         except TrytonServerError, exception:
-            common.process_exception(exception, window)
+            common.process_exception(exception)
             return
-        Action._exec_action(res, window, data)
+        Action._exec_action(res, data)
 
     @staticmethod
-    def _exec_action(action, window, data=None, context=None):
+    def _exec_action(action, data=None, context=None):
         if context is None:
             context = {}
         if data is None:
@@ -145,30 +144,22 @@ class Action(object):
             res_model = action.get('res_model', data.get('res_model'))
             res_id = action.get('res_id', data.get('res_id'))
 
-            Window.create(view_ids, res_model, res_id, domain, window,
+            Window.create(view_ids, res_model, res_id, domain,
                     action_ctx, view_mode, name=name,
                     limit=action.get('limit'),
                     auto_refresh=action.get('auto_refresh'),
                     search_value=search_value,
                     icon=(action.get('icon.rec_name') or ''))
         elif action['type'] == 'ir.action.wizard':
-            if action.get('window', False):
-                Window.create_wizard(action['wiz_name'], data, window,
-                    direct_print=action.get('direct_print', False),
-                    email_print=action.get('email_print', False),
-                    email=action.get('email'), name=action.get('name', False),
-                    context=context, icon=(action.get('icon.rec_name') or ''))
-            else:
-                Wizard.execute(action['wiz_name'], data, window,
-                        direct_print=action.get('direct_print', False),
-                        email_print=action.get('email_print', False),
-                        email=action.get('email'), context=context)
-            if action['wiz_name'] == 'ir.ui.view_sc.add':
-                from tryton.gui.main import Main
-                Main.get_main().shortcut_set()
+            Window.create_wizard(action['wiz_name'], data,
+                direct_print=action.get('direct_print', False),
+                email_print=action.get('email_print', False),
+                email=action.get('email'), name=action.get('name', False),
+                context=context, icon=(action.get('icon.rec_name') or ''),
+                window=action.get('window', False))
 
         elif action['type'] == 'ir.action.report':
-            Action.exec_report(action['report_name'], data, window,
+            Action.exec_report(action['report_name'], data,
                     direct_print=action.get('direct_print', False),
                     email_print=action.get('email_print', False),
                     email=action.get('email'), context=context)
@@ -178,7 +169,7 @@ class Action(object):
                 webbrowser.open(action['url'], new=2)
 
     @staticmethod
-    def exec_keyword(keyword, window, data=None, context=None, warning=True,
+    def exec_keyword(keyword, data=None, context=None, warning=True,
             alwaysask=False):
         actions = []
         if 'id' in data:
@@ -188,19 +179,18 @@ class Action(object):
                         'get_keyword', keyword, (data['model'], model_id),
                         rpc.CONTEXT)
             except TrytonServerError, exception:
-                common.process_exception(exception, window)
+                common.process_exception(exception)
                 return False
 
         keyact = {}
         for action in actions:
             keyact[action['name'].replace('_', '')] = action
 
-        res = selection(_('Select your action'), keyact, window,
-                alwaysask=alwaysask)
+        res = selection(_('Select your action'), keyact, alwaysask=alwaysask)
         if res:
             (name, action) = res
-            Action._exec_action(action, window, data, context=context)
+            Action._exec_action(action, data, context=context)
             return (name, action)
         elif not len(keyact) and warning:
-            message(_('No action defined!'), window)
+            message(_('No action defined!'))
         return False

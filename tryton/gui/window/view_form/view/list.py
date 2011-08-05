@@ -15,6 +15,7 @@ from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.pyson import PYSONEncoder
+from tryton.gui.window import Window
 from tryton.exceptions import TrytonServerError
 import os
 
@@ -237,10 +238,10 @@ class AdaptModelGroup(gtk.GenericTreeModel):
 
 class ViewList(ParserView):
 
-    def __init__(self, window, screen, widget, children=None, buttons=None,
+    def __init__(self, screen, widget, children=None, buttons=None,
             notebooks=None, cursor_widget=None, children_field=None):
-        super(ViewList, self).__init__(window, screen, widget, children,
-                buttons, notebooks, cursor_widget, children_field)
+        super(ViewList, self).__init__(screen, widget, children, buttons,
+            notebooks, cursor_widget, children_field)
         self.store = None
         self.view_type = 'tree'
 
@@ -254,9 +255,6 @@ class ViewList(ParserView):
         viewport.add(scroll)
         self.widget_tree = self.widget
 
-        if isinstance(self.screen.window, gtk.Dialog):
-            width, height = self.widget_tree.size_request()
-            vbox.set_size_request(width or -1, height or -1)
         vbox.pack_start(viewport, expand=True, fill=True)
 
         self.widget_tree.screen = screen
@@ -535,8 +533,7 @@ class ViewList(ParserView):
                 try:
                     relates = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    relates = common.process_exception(exception, self.window,
-                            *args)
+                    relates = common.process_exception(exception, *args)
                     if not relates:
                         return False
                 menu_entries = []
@@ -566,6 +563,11 @@ class ViewList(ParserView):
                     item.show()
                     menu.append(item)
                 menu.popup(None, None, None, event.button, event.time)
+        elif event.button == 2:
+            event.button = 1
+            event.state |= gtk.gdk.MOD1_MASK
+            treeview.emit('button-press-event', event)
+            return True
         return False
 
     def click_and_relate(self, action, value, path):
@@ -573,12 +575,11 @@ class ViewList(ParserView):
         context = {}
         act = action.copy()
         if not(value):
-            message(_('You must select a record to use the relation!'),
-                    self.window)
+            message(_('You must select a record to use the relation!'))
             return False
         from tryton.gui.window.view_form.screen import Screen
         screen = Screen(self.screen.group.fields[
-            path[1].name].attrs['relation'], self.window)
+            path[1].name].attrs['relation'])
         screen.load([value])
         encoder = PYSONEncoder()
         act['domain'] = encoder.encode(screen.current_record.expr_eval(
@@ -588,10 +589,10 @@ class ViewList(ParserView):
         data['model'] = self.screen.model_name
         data['id'] = value
         data['ids'] = [value]
-        return Action._exec_action(act, self.window, data, context)
+        return Action._exec_action(act, data, context)
 
     def click_and_action(self, atype, value, path):
-        return Action.exec_keyword(atype, self.window, {
+        return Action.exec_keyword(atype, {
             'model': self.screen.group.fields[
                 path[1].name].attrs['relation'],
             'id': value or False,
@@ -634,7 +635,7 @@ class ViewList(ParserView):
             if last_col and last_col.name in fields:
                 del fields[last_col.name]
 
-            if fields:
+            if fields and any(fields.itervalues()):
                 try:
                     rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
                             self.screen.model_name, fields, rpc.CONTEXT)
@@ -648,11 +649,17 @@ class ViewList(ParserView):
     def __sig_switch(self, treeview, path, column):
         if column._type == 'button':
             return
-        if not self.screen.row_activate():
-            if treeview.row_expanded(path):
-                treeview.collapse_row(path)
-            else:
-                treeview.expand_row(path, False)
+        allow_similar = False
+        event = gtk.get_current_event()
+        if (event.state & gtk.gdk.MOD1_MASK
+                or event.state & gtk.gdk.SHIFT_MASK):
+            allow_similar = True
+        with Window(allow_similar=allow_similar):
+            if not self.screen.row_activate():
+                if treeview.row_expanded(path):
+                    treeview.collapse_row(path)
+                else:
+                    treeview.expand_row(path, False)
 
     def __select_changed(self, tree_sel):
         previous_record = self.screen.current_record

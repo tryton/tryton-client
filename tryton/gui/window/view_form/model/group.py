@@ -7,19 +7,20 @@ from field import Field, O2MField
 from tryton.signal_event import SignalEvent
 import tryton.common as common
 from tryton.exceptions import TrytonServerError
+from tryton.common.domain_inversion import is_leaf
 
 
 class Group(SignalEvent, list):
 
-    def __init__(self, model_name, fields, window, ids=None, parent=None,
+    def __init__(self, model_name, fields, ids=None, parent=None,
             parent_name='', child_name='', context=None, domain=None,
             readonly=False, parent_datetime_field=None):
         super(Group, self).__init__()
         if domain is None:
             domain = []
         self.__domain = domain
+        self.__domain4inversion = None
         self.lock_signal = False
-        self.__window = window
         self.parent = parent
         self.parent_name = parent_name or ''
         self.child_name = child_name
@@ -39,22 +40,35 @@ class Group(SignalEvent, list):
         self.__field_childs = None
         self.exclude_field = None
 
-    def __get_window(self):
-        return self.__window
-
-    def __set_window(self, window):
-        for record in self:
-            record.window = window
-        self.__window = window
-
-    window = property(__get_window, __set_window)
-
     @property
     def domain(self):
         if self.parent and self.child_name:
             field = self.parent.group.fields[self.child_name]
             return [self.__domain, field.domain_get(self.parent)]
         return self.__domain
+
+    def clean4inversion(self, domain):
+        "This method will replace non relevant fields for domain inversion"
+        if domain in ([], ()):
+            return []
+        head, tail = domain[0], domain[1:]
+        if head in ('AND', 'OR'):
+            pass
+        elif is_leaf(head):
+            field = head[0]
+            if (field in self.fields
+                    and self.fields[field].attrs.get('readonly')):
+                head = []
+        else:
+            head = self.clean4inversion(head)
+        return [head] + self.clean4inversion(tail)
+
+    def __get_domain4inversion(self):
+        if self.__domain4inversion is None:
+            self.__domain4inversion = self.clean4inversion(self.domain)
+        return self.__domain4inversion
+
+    domain4inversion = property(__get_domain4inversion)
 
     def insert(self, pos, record):
         assert record.group is self
@@ -169,7 +183,7 @@ class Group(SignalEvent, list):
             try:
                 res += rpc.execute(*args)
             except TrytonServerError, exception:
-                res2 = common.process_exception(exception, self.window, *args)
+                res2 = common.process_exception(exception, *args)
                 if not res2:
                     return False
                 res += res2
@@ -186,8 +200,7 @@ class Group(SignalEvent, list):
         for id in ids:
             if self.get(id):
                 continue
-            new_record = Record(self.model_name, id, self.window,
-                group=self)
+            new_record = Record(self.model_name, id, group=self)
             self.append(new_record)
             new_records.append(new_record)
             new_record.signal_connect(self, 'record-changed',
@@ -230,7 +243,6 @@ class Group(SignalEvent, list):
         if record.group is not self:
             record.signal_unconnect(record.group)
             record.group = self
-            record.window = self.window
             record.signal_connect(self, 'record-changed', self._record_changed)
             record.signal_connect(self, 'record-modified', self._record_modified)
         if position == -1:
@@ -262,7 +274,7 @@ class Group(SignalEvent, list):
 
     def new(self, default=True, domain=None, context=None, signal=True,
             obj_id=None):
-        record = Record(self.model_name, obj_id, self.window, group=self)
+        record = Record(self.model_name, obj_id, group=self)
         record.signal_connect(self, 'record-changed', self._record_changed)
         record.signal_connect(self, 'record-modified', self._record_modified)
         if default:
@@ -362,7 +374,7 @@ class Group(SignalEvent, list):
             try:
                 values = rpc.execute(*args)
             except TrytonServerError, exception:
-                values = common.process_exception(exception, self.window, *args)
+                values = common.process_exception(exception, *args)
                 if not values:
                     return False
             for name in to_add:
@@ -383,7 +395,6 @@ class Group(SignalEvent, list):
 
     def destroy(self):
         super(Group, self).destroy()
-        self.__window = None
         self.parent = None
         self.fields = {}
         self.record_deleted, self.record_removed = [], []

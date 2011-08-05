@@ -201,12 +201,12 @@ class Line(Graph):
         super(Line, self).drawAxis(cr, width, height)
         self.drawLine(cr, 1.0, 0)
 
-    def action(self, window):
-        super(Line, self).action(window)
+    def action(self):
+        super(Line, self).action()
         for point in self.points:
             if point.highlight:
                 ids = self.ids[point.xname]
-                self.action_keyword(ids, window)
+                self.action_keyword(ids)
 
     def YLabels(self):
         ylabels = super(Line, self).YLabels()

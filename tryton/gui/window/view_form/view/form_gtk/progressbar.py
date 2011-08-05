@@ -14,9 +14,8 @@ class ProgressBar(WidgetInterface):
         'top_to_bottom': gtk.PROGRESS_TOP_TO_BOTTOM,
     }
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(ProgressBar, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(ProgressBar, self).__init__(field_name, model_name, attrs=attrs)
         self.widget = gtk.ProgressBar()
         orientation = self.orientations.get(attrs.get('orientation',
             'left_to_right'), gtk.PROGRESS_LEFT_TO_RIGHT)

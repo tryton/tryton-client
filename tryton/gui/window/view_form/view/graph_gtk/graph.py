@@ -15,6 +15,7 @@ import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
 from tryton.translate import date_format
+from tryton.gui.window import Window
 
 
 class Popup(object):
@@ -123,14 +124,14 @@ class Graph(gtk.DrawingArea):
         self.drawGraph(cx, width, height)
         self.drawAxis(cx, width, height)
         self.drawLegend(cx, width, height)
-        surface.write_to_png(filename)
+        surface.write_to_png(filename.encode('utf-8'))
 
         self.queue_draw()
 
-    def action(self, window):
+    def action(self):
         self.popup.hide()
 
-    def action_keyword(self, ids, window):
+    def action_keyword(self, ids):
         if not ids:
             return
         ctx = self.group.context.copy()
@@ -138,11 +139,18 @@ class Graph(gtk.DrawingArea):
             del ctx['active_ids']
         if 'active_id' in ctx:
             del ctx['active_id']
-        return Action.exec_keyword('graph_open', window, {
-            'model': self.model,
-            'id': ids[0],
-            'ids': ids,
-            }, context=ctx, warning=False)
+        event = gtk.get_current_event()
+        if event.button == 1:
+            hide = not bool(event.state
+                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
+        else:
+            hide = False
+        with Window(hide_current=hide):
+            return Action.exec_keyword('graph_open', {
+                    'model': self.model,
+                    'id': ids[0],
+                    'ids': ids,
+                    }, context=ctx, warning=False)
 
     def drawBackground(self, cr, width, height):
         # Fill the background

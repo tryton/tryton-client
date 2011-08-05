@@ -5,11 +5,11 @@ import gettext
 
 _ = gettext.gettext
 
-def translate_view(datas, parent):
+def translate_view(datas):
     model = datas['model']
     Window.create(False, 'ir.translation', res_id=False,
             domain=[('model', '=', model)],
-            mode=['tree', 'form'], window=parent)
+            mode=['tree', 'form'])
 
 def get_plugins(model):
     return [

@@ -6,28 +6,30 @@ import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 import tryton.gui.window.view_form.widget_search as widget_search
 from tryton.config import TRYTON_ICON
-import tryton.common as common
 from tryton.gui.window.win_form import WinForm
+from tryton.gui.window.nomodal import NoModal
 
 _ = gettext.gettext
 
 
-class WinSearch(object):
+class WinSearch(NoModal):
 
-    def __init__(self, model, sel_multi=True, ids=None, context=None,
-            domain=None, parent=None, views_preload=None):
+    def __init__(self, model, callback, sel_multi=True, ids=None, context=None,
+            domain=None, views_preload=None):
+        NoModal.__init__(self)
         if views_preload is None:
             views_preload = {}
         self.domain = domain or []
         self.context = context or {}
         self.sel_multi = sel_multi
-        self.parent = parent
+        self.callback = callback
 
         self.win = gtk.Dialog(_('Search'), self.parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT)
+            gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(True)
         self.win.set_default_response(gtk.RESPONSE_APPLY)
+        self.win.connect('response', self.response)
 
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
@@ -47,9 +49,9 @@ class WinSearch(object):
         scrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
-        self.screen = Screen(model, self.win, domain=domain,
-                mode=['tree'], context=context,
-                views_preload=views_preload, row_activate=self.sig_activate)
+        self.screen = Screen(model, domain=domain, mode=['tree'],
+            context=context, views_preload=views_preload,
+            row_activate=self.sig_activate)
         self.view = self.screen.current_view
         self.view.unset_editable()
         sel = self.view.widget_tree.get_selection()
@@ -74,6 +76,9 @@ class WinSearch(object):
 
         self.win.set_size_request(700, 500)
 
+        self.register()
+        self.win.show()
+
     def sig_activate(self, *args):
         self.view.widget_tree.emit_stop_by_name('row_activated')
         if not self.sel_multi:
@@ -86,33 +91,34 @@ class WinSearch(object):
         return False
 
     def destroy(self):
-        self.parent.present()
         self.screen.destroy()
         self.win.destroy()
+        NoModal.destroy(self)
 
-    def run(self):
-        end = False
-        while not end:
-            button = self.win.run()
-            if button == gtk.RESPONSE_OK:
+    def show(self):
+        self.win.show()
+
+    def hide(self):
+        self.win.hide()
+
+    def response(self, win, response_id):
+        res = None
+        if response_id == gtk.RESPONSE_OK:
+            res = self.screen.sel_ids_get()
+        elif response_id == gtk.RESPONSE_APPLY:
+            if not self.screen.search_filter():
                 res = self.screen.sel_ids_get()
-                end = True
-            elif button == gtk.RESPONSE_APPLY:
-                end = not self.screen.search_filter()
-                if end:
-                    res = self.screen.sel_ids_get()
-            elif button == gtk.RESPONSE_ACCEPT:
-                res = None
-                screen = Screen(self.model_name, self.win, domain=self.domain,
-                        context=self.context, mode=['form'])
-                win = WinForm(screen, self.win, new=True)
-                if win.run():
-                    if screen.save_current():
-                        res = [screen.current_record.id]
-                win.destroy()
-                end = True
             else:
-                res = None
-                end = True
+                return
+        elif response_id == gtk.RESPONSE_ACCEPT:
+            screen = Screen(self.model_name, domain=self.domain,
+                context=self.context, mode=['form'])
+            def callback(result):
+                if result and screen.save_current():
+                    res = [screen.current_record.id]
+                    self.destroy()
+                    self.callback(res)
+            WinForm(screen, callback, new=True)
+            return
         self.destroy()
-        return res
+        return self.callback(res)

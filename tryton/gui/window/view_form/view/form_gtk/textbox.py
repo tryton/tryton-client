@@ -13,9 +13,8 @@ except ImportError:
 
 class TextBox(WidgetInterface):
 
-    def __init__(self, field_name, model_name, window, attrs=None):
-        super(TextBox, self).__init__(field_name, model_name, window,
-                attrs=attrs)
+    def __init__(self, field_name, model_name, attrs=None):
+        super(TextBox, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox()
         self.scrolledwindow = gtk.ScrolledWindow()
