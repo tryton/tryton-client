@@ -30,6 +30,9 @@ class Action(object):
         del data['ids']
         ctx = rpc.CONTEXT.copy()
         ctx.update(context)
+        ctx['direct_print'] = direct_print
+        ctx['email_print'] = email_print
+        ctx['email'] = email
         if not ids:
             args = ('model', data['model'], 'search', [], 0, None, None, ctx)
             try:
