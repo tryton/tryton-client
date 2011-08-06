@@ -207,7 +207,8 @@ class ParserTree(ParserInterface):
                                 'float_time'):
                     label = gtk.Label(node_attrs['sum'] + _(': '))
                     label_sum = gtk.Label()
-                    if isinstance(fields[fname].attrs.get('digits'), str):
+                    if isinstance(fields[fname].attrs.get('digits'),
+                            basestring):
                         digits = 2
                     else:
                         digits = fields[fname].attrs.get('digits', (16, 2))[1]
@@ -456,18 +457,12 @@ class Float(Char):
         super(Float, self).setter(column, cell, store, iter)
         record = store.get_value(iter, 0)
         field = record[self.field_name]
-        if isinstance(field.attrs.get('digits'), str):
-            digits = record.expr_eval(field.attrs['digits'])
-        else:
-            digits = field.attrs.get('digits', (16, 2))
+        digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
         cell.digits = digits
 
     def get_textual_value(self, record):
         field = record[self.field_name]
-        if isinstance(field.attrs.get('digits'), str):
-            digit = record.expr_eval(field.attrs['digits'])[1]
-        else:
-            digit = field.attrs.get('digits', (16, 2))[1]
+        digit = record.expr_eval(field.attrs.get('digits', (16, 2)))[1]
         return locale.format('%.'+str(digit)+'f',
                 record[self.field_name].get_client(record) or 0.0, True)
 
@@ -870,10 +865,7 @@ class ProgressBar(object):
         record = store.get_value(iter, 0)
         value = float(self.get_textual_value(record) or 0.0)
         cell.set_property('value', value)
-        if isinstance(self.attrs.get('digits'), str):
-            digit = record.expr_eval(self.attrs['digits'])[1]
-        else:
-            digit = self.attrs.get('digits', (16, 2))[1]
+        digit = record.expr_eval(self.attrs.get('digits', (16, 2)))[1]
         text = locale.format('%.' + str(digit) + 'f', value, True)
         cell.set_property('text', text + '%')
 

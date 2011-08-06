@@ -169,7 +169,7 @@ class DBListEditor(object):
         for entryname in ('host', 'port', 'database', 'username'):
             entry = getattr(self, '%s_entry' % entryname)
             if entryname == 'port':
-                entry.set_text('8070')
+                entry.set_text('8000')
             else:
                 entry.set_text('')
         self.current_database = None
@@ -464,13 +464,13 @@ class DBLogin(object):
 
         # Profile informations
         self.profile_cfg = os.path.join(get_config_dir(), 'profiles.cfg')
-        self.profiles = ConfigParser.SafeConfigParser({'port': '8070'})
+        self.profiles = ConfigParser.SafeConfigParser({'port': '8000'})
         if not os.path.exists(self.profile_cfg):
             short_version = '.'.join(VERSION.split('.', 2)[:2])
             name = 'demo%s.tryton.org' % short_version
             self.profiles.add_section(name)
             self.profiles.set(name, 'host', name)
-            self.profiles.set(name, 'port', '8070')
+            self.profiles.set(name, 'port', '8000')
             self.profiles.set(name, 'database', 'demo%s' % short_version)
             self.profiles.set(name, 'username', 'demo')
         else:
@@ -565,7 +565,7 @@ class DBLogin(object):
         if ':' in netloc:
             return int(netloc.split(':')[1])
         else:
-            return 8070
+            return 8000
 
     def run(self):
         profile_name = CONFIG['login.profile']

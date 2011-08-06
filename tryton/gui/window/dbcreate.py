@@ -29,7 +29,7 @@ class DBCreate(object):
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
                 gtk.gdk.color_parse(common.COLOR_SCHEMES["black"]))
             self.tooltips.set_tip(self.entry_server_connection,_("This is the URL of " \
-            "the Tryton server. Use server 'localhost' and port '8070' if " \
+            "the Tryton server. Use server 'localhost' and port '8000' if " \
             "the server is installed on this computer. Click on 'Change' to " \
             "change the address."))
         else:
@@ -50,7 +50,7 @@ class DBCreate(object):
                 "2. Find out on which address and port it is listen.\n" \
                 "3. If there is a firewall between the server and this " \
                 "client, make shure that the server address and port " \
-                "(usually 8070) are not blocked.\n" \
+                "(usually 8000) are not blocked.\n" \
                 "Click on 'Change' to change the address."))
         return state
 
@@ -177,7 +177,7 @@ class DBCreate(object):
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
         self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
-            "the server. Use server 'localhost' and port '8070' if " \
+            "the server. Use server 'localhost' and port '8000' if " \
             "the server is installed on this computer. Click on 'Change' to " \
             "change the address."))
         self.button_server_change = gtk.Button(_("C_hange"), stock=None,

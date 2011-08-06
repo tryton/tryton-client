@@ -136,7 +136,7 @@ class DBBackupDrop(object):
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
         self.tooltips.set_tip(self.entry_server_connection, _("This is the " \
-                "URL of the server. Use server 'localhost' and port '8070' " \
+                "URL of the server. Use server 'localhost' and port '8000' " \
                 "if the server is installed on this computer. " \
                 "Click on 'Change' to change the address."))
         table.attach(self.entry_server_connection, 1, 2, 2, 3,

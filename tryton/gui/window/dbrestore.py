@@ -83,7 +83,7 @@ class DBRestore(object):
         self.entry_server_url.set_activates_default(True)
         self.entry_server_url.set_width_chars(16)
         self.tooltips.set_tip(self.entry_server_url, _("This is the URL of " \
-                "the server. Use server 'localhost' and port '8070' if " \
+                "the server. Use server 'localhost' and port '8000' if " \
                 "the server is installed on this computer. Click on " \
                 "'Change' to change the address."))
         table.attach(self.entry_server_url, 1, 2, 0, 1, yoptions=gtk.FILL)

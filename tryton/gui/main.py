@@ -889,7 +889,7 @@ class Main(object):
             try:
                 res = DBLogin().run()
             except TrytonError, exception:
-                if exception.ex_type == 'QueryCanceled':
+                if exception.faultCode == 'QueryCanceled':
                     return False
             except TrytonServerError, exception:
                 common.process_exception(exception)
@@ -982,12 +982,8 @@ class Main(object):
         return True
 
     def refresh_ssl(self):
-        if rpc.SECURE:
-            info = ''
-            if hasattr(rpc._SOCK.ssl_sock, 'server'):
-                info = str(rpc._SOCK.ssl_sock.server())
-            self.tooltips.set_tip(self.secure_img, _('SSL connection') + \
-                    '\n' + info)
+        if rpc.CONNECTION is not None and rpc.CONNECTION.ssl:
+            self.tooltips.set_tip(self.secure_img, _('SSL connection'))
             self.secure_img.show()
         else:
             self.secure_img.hide()
@@ -1044,7 +1040,7 @@ class Main(object):
                     return False
         self.sb_username.set_text(prefs.get('status_bar', ''))
         self.sb_servername.set_text('%s@%s:%d/%s' % (rpc._USERNAME,
-            rpc._SOCK.hostname, rpc._SOCK.port, rpc._DATABASE))
+            rpc._HOST, rpc._PORT, rpc._DATABASE))
         if not prefs[menu_type]:
             if quiet:
                 return False
@@ -1396,8 +1392,8 @@ class Main(object):
                 + [CONFIG.defaults['login.port']])[:2]
         database, path = (urlp.path[1:].split('/', 1) + [None])[:2]
         if (not path or
-                hostname != rpc._SOCK.hostname or
-                int(port) != rpc._SOCK.port or
+                hostname != rpc._HOST or
+                int(port) != rpc._PORT or
                 database != rpc._DATABASE):
             return
         type_, path = (path.split('/', 1) + [''])[:2]

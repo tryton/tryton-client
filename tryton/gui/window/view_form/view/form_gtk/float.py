@@ -27,10 +27,7 @@ class Float(Integer):
             self.entry.set_text('')
             return False
         self.digits = field.attrs.get('digits', (16, 2))
-        if isinstance(self.digits, str):
-            digits = record.expr_eval(self.digits)
-        else:
-            digits = self.digits
+        digits = record.expr_eval(self.digits)
         self.entry.set_width_chars(sum(digits))
         self.entry.set_text(locale.format('%.' + str(digits[1]) + 'f',
             field.get(record) or 0.0, True))
@@ -54,10 +51,7 @@ class Float(Integer):
         if new_value in ('-', decimal_point):
             return
 
-        if isinstance(self.digits, str):
-            digits = self.record.expr_eval(self.digits)
-        else:
-            digits = self.digits
+        digits = self.record.expr_eval(self.digits)
 
         try:
             locale.atof(new_value)

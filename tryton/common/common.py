@@ -200,7 +200,7 @@ def request_server(server_widget):
         xoptions=gtk.FILL)
     entry_port = gtk.Entry()
     entry_port.set_max_length(5)
-    entry_port.set_text("8070")
+    entry_port.set_text("8000")
     entry_port.set_activates_default(True)
     entry_port.set_width_chars(16)
     table.attach(entry_port, 1, 2, 1, 2, yoptions=False,
@@ -966,10 +966,9 @@ def to_xml(string):
 PLOCK = Lock()
 
 def process_exception(exception, *args):
-    global _USERNAME, _DATABASE, _SOCK
 
     if isinstance(exception, TrytonError):
-        if exception.ex_type == 'BadFingerprint':
+        if exception.faultCode == 'BadFingerprint':
             warning(
                 _('The server fingerprint has changed since last connection!\n'
                 'The application will stop connecting to this server '
@@ -977,13 +976,13 @@ def process_exception(exception, *args):
             from tryton.gui.main import Main
             Main.sig_quit()
             sys.exit()
-        elif exception.ex_type == 'NotLogged':
-            if not rpc._SOCK:
+        elif exception.faultCode == 'NotLogged':
+            if rpc.CONNECTION is None:
                 message(_('Connection error!\n' \
                         'Unable to connect to the server!'))
                 return False
     elif isinstance(exception, TrytonServerError):
-        if exception.ex_type == 'UserWarning':
+        if exception.faultCode == 'UserWarning':
             msg = ''
             if len(exception.args) > 4:
                 msg = exception.args[3]
@@ -1005,13 +1004,13 @@ def process_exception(exception, *args):
                         return process_exception(exception, *args)
                 return True
             return False
-        elif exception.ex_type == 'UserError':
+        elif exception.faultCode == 'UserError':
             msg = ''
             if len(exception.args) > 3:
                 msg = exception.args[2]
             warning(str(msg), str(exception.args[1]))
             return False
-        elif exception.ex_type == 'ConcurrencyException':
+        elif exception.faultCode == 'ConcurrencyException':
             if len(args) >= 6:
                 if concurrency(args[1], args[3][0], args[5]):
                     if '_timestamp' in args[5]:
@@ -1024,11 +1023,11 @@ def process_exception(exception, *args):
             else:
                 message(_('Concurrency Exception'), msg_type=gtk.MESSAGE_ERROR)
                 return False
-        elif exception.ex_type == 'NotLogged':
+        elif exception.faultCode == 'NotLogged':
             if not PLOCK.acquire(False):
                 return False
-            hostname = rpc._SOCK.hostname
-            port = rpc._SOCK.port
+            hostname = rpc._HOST
+            port = rpc._PORT
             try:
                 while True:
                     password = ask(_('Password:'), visibility=False)
@@ -1060,7 +1059,7 @@ def process_exception(exception, *args):
         return False
 
     if isinstance(exception, TrytonServerError):
-        error_title, error_detail = exception.ex_type, exception.traceback
+        error_title, error_detail = exception.faultCode, exception.faultString
     else:
         error_title = str(exception)
         error_detail = traceback.format_exc()

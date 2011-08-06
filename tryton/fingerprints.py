@@ -19,21 +19,19 @@ class Fingerprints(dict):
             for line in known_hosts:
                 line = line.strip()
                 try:
-                    key, sha1 = line.split(' ')
-                    host, port = key.rsplit(':', 1)
+                    host, sha1 = line.split(' ')
                 except ValueError:
                     continue
-                self[(host, port)] = sha1
+                self[host] = sha1
 
     def save(self):
         lines = []
         with open(KNOWN_HOSTS_PATH, 'w') as known_hosts:
-            known_hosts.writelines('%s:%s %s' % (host, port, sha1)
-                    + os.linesep for (host, port), sha1 in self.iteritems())
+            known_hosts.writelines('%s %s' % (host, sha1)
+                    + os.linesep for host, sha1 in self.iteritems())
 
     def __setitem__(self, key, value):
-        assert isinstance(key, tuple)
-        assert len(key) == 2
+        assert isinstance(key, basestring)
         assert len(value) == 59 # len of formated sha1
         super(Fingerprints, self).__setitem__(key, value)
         self.save()

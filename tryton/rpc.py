@@ -1,57 +1,43 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import itertools
-import pysocket
 import logging
 import socket
 import os
 from threading import Semaphore
+from functools import partial
+from tryton.jsonrpc import ServerProxy, Fault
 from tryton.fingerprints import Fingerprints
 from tryton.config import get_config_dir
 from tryton.ipc import Server as IPCServer
 from tryton.exceptions import TrytonServerError
 
-_SOCK = None
+CONNECTION = None
 _USER = None
 _USERNAME = ''
 _SESSION = ''
+_HOST = ''
+_PORT = None
 _DATABASE = ''
 CONTEXT = {}
 _VIEW_CACHE = {}
 TIMEZONE = 'utc'
-SECURE = False
 _SEMAPHORE = Semaphore()
 _CA_CERTS = os.path.join(get_config_dir(), 'ca_certs')
+if not os.path.isfile(_CA_CERTS):
+    _CA_CERTS = None
+_FINGERPRINTS = Fingerprints()
+
+ServerProxy = partial(ServerProxy, fingerprints=_FINGERPRINTS, ca_certs=_CA_CERTS)
 
 def db_list(host, port):
-    global _SOCK, SECURE
-    _SEMAPHORE.acquire()
     try:
-        try:
-            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
-                _SOCK.disconnect()
-            if _SOCK is None:
-                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
-                        ca_certs=_CA_CERTS)
-            if not _SOCK.connected:
-                _SOCK.connect(host, port)
-            args = (None, None, None, 'common', 'db', 'list')
-            logging.getLogger('rpc.request').info(repr(args))
-            try:
-                _SOCK.send(args)
-            except socket.error, exception:
-                if exception.args[0] == 32:
-                    _SOCK.reconnect()
-                    _SOCK.send(args)
-                else:
-                    raise
-            res = _SOCK.receive()
-            SECURE = _SOCK.ssl
-        finally:
-            _SEMAPHORE.release()
-        logging.getLogger('rpc.result').debug(repr(res))
-        return res
-    except TrytonServerError, exception:
+        connection = ServerProxy(host, port)
+        logging.getLogger('rpc.request').info('common.db.list(None, None)')
+        result = connection.common.db.list(None, None)
+        logging.getLogger('rpc.result').debug(repr(result))
+        return result
+    except Fault, exception:
         if exception.args[0] == 'AccessDenied':
             raise
         else:
@@ -59,137 +45,90 @@ def db_list(host, port):
             return None
 
 def db_exec(host, port, method, *args):
-    global _SOCK, SECURE
-    _SEMAPHORE.acquire()
-    try:
-        if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
-            _SOCK.disconnect()
-        if _SOCK is None:
-            _SOCK= pysocket.PySocket(fingerprints=Fingerprints(),
-                    ca_certs=_CA_CERTS)
-        if not _SOCK.connected:
-            _SOCK.connect(host, port)
-        args = (None, None, None, 'common', 'db', method) + args
-        logging.getLogger('rpc.request').info(repr(args))
-        try:
-            _SOCK.send(args)
-        except socket.error, exception:
-            if exception.args[0] == 32:
-                _SOCK.reconnect()
-                _SOCK.send(args)
-            else:
-                raise
-        res = _SOCK.receive()
-        SECURE = _SOCK.ssl
-    finally:
-        _SEMAPHORE.release()
-    logging.getLogger('rpc.result').debug(repr(res))
-    return res
+    connection = ServerProxy(host, port)
+    logging.getLogger('rpc.request').info('common.db.%s(None, None, %s)' %
+        (method, args))
+    result = getattr(connection.common.db, method)(None, None, *args)
+    logging.getLogger('rpc.result').debug(repr(result))
+    return result
 
 def server_version(host, port):
-    global _SOCK, SECURE
-    _SEMAPHORE.acquire()
     try:
-        try:
-            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
-                _SOCK.disconnect()
-            if _SOCK is None:
-                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
-                        ca_certs=_CA_CERTS)
-            if not _SOCK.connected:
-                _SOCK.connect(host, port)
-            args = (None, None, None, 'common', None, 'version')
-            logging.getLogger('rpc.request').info(repr(args))
-            try:
-                _SOCK.send(args)
-            except socket.error, exception:
-                if exception.args[0] == 32:
-                    _SOCK.reconnect()
-                    _SOCK.send(args)
-                else:
-                    raise
-            res = _SOCK.receive()
-            SECURE = _SOCK.ssl
-        finally:
-            _SEMAPHORE.release()
-        logging.getLogger('rpc.result').debug(repr(res))
-        return res
-    except (TrytonServerError, socket.error):
+        connection = ServerProxy(host, port)
+        logging.getLogger('rpc.request').info(
+            'common.server.version(None, None)')
+        result = connection.common.server.version(None, None)
+        logging.getLogger('rpc.result').debug(repr(result))
+        return result
+    except (Fault, socket.error):
         logging.getLogger('rpc.result').debug(repr(None))
         return None
 
 def login(username, password, host, port, database):
-    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
+    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE, _VIEW_CACHE
     _VIEW_CACHE = {}
-    SECURE = False
     try:
         _SEMAPHORE.acquire()
         try:
-            if _SOCK and (_SOCK.hostname != host or _SOCK.port != port):
-                _SOCK.disconnect()
-            if _SOCK is None:
-                _SOCK = pysocket.PySocket(fingerprints=Fingerprints(),
-                        ca_certs=_CA_CERTS)
-            if not _SOCK.connected:
-                _SOCK.connect(host, port)
-            args = (database, username, password, 'common', 'db', 'login')
-            logging.getLogger('rpc.request').info(repr(args))
-            _SOCK.send(args)
-            res = _SOCK.receive()
-            logging.getLogger('rpc.result').debug(repr(res))
+            connection = ServerProxy(host, port, database)
+            if str(connection) != str(CONNECTION):
+                if CONNECTION:
+                    CONNECTION.close()
+                CONNECTION = connection
+            else:
+                connection = CONNECTION
+            logging.getLogger('rpc.request').info('common.db.login(%s, %s)' %
+                (username, 'x' * 10))
+            result = connection.common.db.login(username, password)
+            logging.getLogger('rpc.result').debug(repr(result))
         finally:
             _SEMAPHORE.release()
-    except (socket.error, RuntimeError):
-        try:
-            _SOCK.reconnect()
-        except (socket.error, RuntimeError):
-            pass
+    except socket.error:
         _USER = None
         _SESSION = ''
         return -1
-    if not res:
+    if not result:
         _USER = None
         _SESSION = ''
         return -2
-    _USER = res[0]
+    _USER = result[0]
     _USERNAME = username
-    _SESSION = res[1]
+    _SESSION = result[1]
+    _HOST = host
+    _PORT = port
     _DATABASE = database
-    SECURE = _SOCK.ssl
     IPCServer(host, port, database).run()
     return 1
 
 def logout():
-    global _SOCK, _USER, _USERNAME, _SESSION, _DATABASE, _VIEW_CACHE, SECURE
+    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE, _VIEW_CACHE
     if IPCServer.instance:
         IPCServer.instance.stop()
-    if _SOCK and _USER:
+    if CONNECTION is not None:
         _SEMAPHORE.acquire()
         try:
-            args = (_DATABASE, _USER, _SESSION, 'common', 'db', 'logout')
-            logging.getLogger('rpc.request').info(repr(args))
-            _SOCK.sock.settimeout(pysocket.CONNECT_TIMEOUT)
-            _SOCK.send(args)
-            res = _SOCK.receive()
-            logging.getLogger('rpc.result').debug(repr(res))
-        except socket.error:
+            logging.getLogger('rpc.request').info('common.db.logout(%s, %s)' %
+                (_USER, _SESSION))
+            CONNECTION.common.db.logout(_USER, _SESSION)
+        except (Fault, socket.error):
             pass
         finally:
             _SEMAPHORE.release()
-        _SOCK.disconnect()
-        _SOCK = None
+        CONNECTION.close()
+        CONNECTION = None
     _USER = None
     _USERNAME = ''
     _SESSION = ''
+    _HOST = ''
+    _PORT = None
     _DATABASE = ''
     _VIEW_CACHE = {}
-    SECURE = False
 
 def context_reload():
-    global CONTEXT, TIMEZONE
+    global CONTEXT, TIMEZONE, _HOST, _PORT
     try:
         context = execute('model', 'res.user', 'get_preferences', True, {})
-    except TrytonServerError:
+    except Fault:
         return
     CONTEXT = {}
     for i in context:
@@ -197,15 +136,15 @@ def context_reload():
         CONTEXT[i] = value
         if i == 'timezone':
             try:
-                TIMEZONE = execute('common', None, 'timezone_get')
-            except TrytonServerError:
+                connection = ServerProxy(_HOST, _PORT)
+                TIMEZONE = connection.common.server.timezone_get(None, None)
+            except Fault:
                 pass
 
 def _execute(blocking, *args):
-    global _SOCK, _DATABASE, _USER, _SESSION
-    if not _SOCK or not _SOCK.connected:
+    global CONNECTION, _USER, _SESSION
+    if CONNECTION is None:
         raise TrytonServerError('NotLogged')
-    logging.getLogger('rpc.request').info(repr((args)))
     key = False
     if args[2] == 'fields_view_get':
         args, ctx = args[:-1], args[-1]
@@ -223,17 +162,10 @@ def _execute(blocking, *args):
     if not res:
         return
     try:
-        try:
-            _SOCK.send((_DATABASE, _USER, _SESSION) + args)
-            result = _SOCK.receive()
-        except (socket.error, RuntimeError):
-            try:
-                _SOCK.reconnect()
-                _SOCK.send((_DATABASE, _USER, _SESSION) + args)
-                result = _SOCK.receive()
-            except (socket.error, RuntimeError):
-                _SOCK.reconnect()
-                raise
+        name = '.'.join(args[:3])
+        args = (_USER, _SESSION) + args[3:]
+        logging.getLogger('rpc.request').info('%s%s' % (name, args))
+        result = getattr(CONNECTION, name)(*args)
     finally:
         _SEMAPHORE.release()
     if key:

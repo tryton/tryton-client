@@ -13,7 +13,7 @@ class Float(Integer):
     def __init__(self, name, attrs=None, context=None, on_change=None):
         super(Float, self).__init__(name, attrs=attrs, context=context,
             on_change=on_change)
-        if isinstance(self.attrs.get('digits'), str):
+        if isinstance(self.attrs.get('digits'), basestring):
             self.digits = (16, 2)
         else:
             self.digits = self.attrs.get('digits', (16, 2))

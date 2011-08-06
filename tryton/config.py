@@ -57,7 +57,7 @@ class ConfigManager(object):
             'login.profile': demo_server,
             'login.login': 'demo',
             'login.server': demo_server,
-            'login.port': '8070',
+            'login.port': '8000',
             'login.db': demo_database,
             'login.expanded': False,
             'tip.autostart': False,
