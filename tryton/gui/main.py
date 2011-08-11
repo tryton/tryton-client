@@ -170,14 +170,15 @@ class Main(object):
             self.radiomenuitem_normal.set_active(True)
 
         settings = gtk.settings_get_default()
+        # Due to a bug in old version of pyGTk gtk-button-images can
+        # not be set when there is no buttons
+        gtk.Button()
         for setting, value in (
                 ('gtk-button-images', True),
                 ('gtk-can-change-accels',
                     CONFIG['client.can_change_accelerators']),
                 ('gtk-keynav-cursor-only', True)):
             try:
-                # Due to a bug in old version of pyGTk gtk-button-images can
-                # not be set when there is no buttons
                 settings.set_property(setting, value)
             except TypeError:
                 pass
