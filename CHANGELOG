@@ -1,3 +1,4 @@
+* Remove delete on Escape in editable tree
 * Use JSON-RPC
 * Limit size of field when possible
 * Add xalign and yalign as fields attributes

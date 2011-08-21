@@ -207,12 +207,6 @@ class EditableTreeView(gtk.TreeView):
                 new_path = self._key_down(path, model, column)
             entry.editing_done_id = entry.connect('editing_done',
                     self.on_editing_done)
-        elif event.keyval == gtk.keysyms.Escape:
-            if record.id < 0:
-                self.screen.remove(delete=False, remove=True,
-                    force_remove=True)
-            else:
-                return False
         elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
             if isinstance(entry, gtk.Entry):
                 value = entry.get_text()
