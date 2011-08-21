@@ -152,6 +152,9 @@ class Group(SignalEvent, list):
             saved.append(record.save(force_reload=False))
         return saved
 
+    def delete(self, records, context=None):
+        return Record.delete(records, context=context)
+
     @property
     def root_group(self):
         root = self
@@ -176,7 +179,7 @@ class Group(SignalEvent, list):
 
     def on_write_ids(self, ids):
         if not self.on_write:
-            return False
+            return []
         res = []
         for fnct in self.on_write:
             args = ('model', self.model_name, fnct, ids, self.context)
@@ -185,7 +188,7 @@ class Group(SignalEvent, list):
             except TrytonServerError, exception:
                 res2 = common.process_exception(exception, *args)
                 if not res2:
-                    return False
+                    return []
                 res += res2
         return list({}.fromkeys(res))
 

@@ -515,106 +515,46 @@ class Screen(SignalEvent):
             self.group.unremove(record)
 
     def remove(self, delete=False, remove=False, force_remove=False):
-        res = False
-        reload_ids = []
+        records = None
         if self.current_view.view_type == 'form' and self.current_record:
-            record_id = self.current_record.id
-            if delete and record_id > 0:
-                context = {}
-                context.update(rpc.CONTEXT)
-                context.update(self.context)
-                context['_timestamp'] = self.current_record.get_timestamp()
-                reload_ids = self.group.on_write_ids([record_id])
-                if reload_ids and record_id in reload_ids:
-                    reload_ids.remove(record_id)
-                args = ('model', self.model_name, 'delete', [record_id],
-                        context)
-                try:
-                    res = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    res = common.process_exception(exception, *args)
-                if not res:
-                    return False
-            self.current_view.set_cursor()
-            record = self.current_record
-            idx = record.group.index(record)
-            record.group.remove(record, remove=remove,
-                force_remove=force_remove)
+            records = [self.current_record]
+        elif self.current_view.view_type == 'tree':
+            records = self.current_view.selected_records()
+        if delete:
+            if not self.group.delete([self.current_record]):
+                return False
 
-            if delete:
-                if (record.parent and
-                        record.parent.model_name == record.model_name):
+        top_record = records[0]
+        idx = top_record.group.index(top_record)
+        path = top_record.get_path(self.group)
+
+        for record in records:
+            # set current model to None to prevent __select_changed
+            # to save the previous_model as it can be already deleted.
+            self.current_record = None
+            record.group.remove(record, remove=remove, signal=False,
+                force_remove=force_remove)
+        # send record-changed only once
+        record.signal('record-changed')
+
+        if delete:
+            for record in records:
+                if record.parent:
                     record.parent.save()
 
-            if record.group:
-                idx = min(idx, len(record.group) - 1)
-                self.current_record = record.group[idx]
-            elif (record.parent and
-                    record.parent.model_name == record.model_name):
-                self.current_record = record.parent
-            else:
-                self.current_record = None
-            if reload_ids:
-                self.group.root_group.reload(reload_ids)
-            self.display()
-            res = True
-        if self.current_view.view_type == 'tree':
-            records = self.current_view.selected_records()
-            saved_records = [r for r in records if r.id >= 0]
-            if delete and saved_records:
-                context = {}
-                context.update(rpc.CONTEXT)
-                context.update(self.context)
-                context['_timestamp'] = {}
-                for record in saved_records:
-                    context['_timestamp'].update(record.get_timestamp())
-                reload_ids = self.group.on_write_ids([x.id for x in saved_records])
-                if reload_ids:
-                    for record in saved_records:
-                        if record.id in reload_ids:
-                            reload_ids.remove(record.id)
-                args = ('model', self.model_name, 'delete',
-                        [x.id for x in saved_records], context)
-                try:
-                    res = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    res = common.process_exception(exception, *args)
-                if not res:
-                    return False
-            if not records:
-                return True
-            path = self.current_view.store.on_get_path(records[0])
-            for record in records:
-                # set current model to None to prevent __select_changed
-                # to save the previous_model as it can be already deleted.
-                self.current_record = None
-                record.group.remove(record, remove=remove, signal=False,
-                    force_remove=force_remove)
-
-            # send record-changed only once
-            record.signal('record-changed')
-
-            if delete:
-                for record in records:
-                    if record.parent:
-                        record.parent.save()
-
-            if path[-1] > 0:
-                path = path[:-1] + (path[-1] - 1,)
-            else:
-                path = path[:-1]
-            if path:
-                iter_ = self.current_view.store.get_iter(path)
-                self.current_record = self.current_view.store.get_value(iter_, 0)
-            elif len(self.group):
-                self.current_record = self.group[0]
-            if reload_ids:
-                self.group.root_group.reload(reload_ids)
-            self.current_view.set_cursor()
-            self.display()
-            res = True
+        if idx > 0:
+            record = top_record.group[idx - 1]
+            path = path[:-1] + ((path[-1][0], record.id,))
+        else:
+            path = path[:-1]
+        if path:
+            self.current_record = self.group.get_by_path(path)
+        elif len(self.group):
+            self.current_record = self.group[0]
+        self.current_view.set_cursor()
+        self.display()
         self.request_set()
-        return res
+        return True
 
     def load(self, ids, set_cursor=True, modified=False):
         self.group.load(ids, display=False, modified=modified)

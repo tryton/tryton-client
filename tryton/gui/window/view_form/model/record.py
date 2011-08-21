@@ -266,6 +266,35 @@ class Record(SignalEvent):
             self.parent.save(force_reload=force_reload)
         return self.id
 
+    @staticmethod
+    def delete(records, context=None):
+        if not records:
+            return
+        record = records[0]
+        group = record.group
+        assert all(r.model_name == record.model_name for r in records)
+        assert all(r.group == group for r in records)
+        records = [r for r in records if r.id < 0]
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx.update(context or {})
+        ctx['_timestamp'] = {}
+        for rec in records:
+            context['_timestamp'].update(rec.get_timestamp())
+        record_ids = set(r.id for r in records)
+        reload_ids = set(group.on_write_ids(list(record_ids)))
+        reload_ids -= record_ids
+        reload_ids = list(reload_ids)
+        args = ('model', record.model_name, 'delete', list(record_ids), ctx)
+        try:
+            rpc.execute(*args)
+        except TrytonServerError, exception:
+            if not common.process_exception(exception, *args):
+                return False
+        if reload_ids:
+            group.root_group.reload(reload_ids)
+        return True
+
     def default_get(self, domain=None, context=None):
         if len(self.group.fields):
             args = ('model', self.model_name, 'default_get',
