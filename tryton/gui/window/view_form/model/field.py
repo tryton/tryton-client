@@ -332,7 +332,7 @@ class M2OField(CharField):
                     value = record.parent.id
             else:
                 value = False
-        if value and isinstance(value, (int, long)) and value > 0:
+        if value and isinstance(value, (int, long)) and value >= 0:
             args = ('model', self.attrs['relation'], 'read', value,
                     ['rec_name'], rpc.CONTEXT)
             try:
@@ -468,7 +468,7 @@ class O2MField(CharField):
         for record2 in record.value[self.name]:
             if record2 in record_removed or record2 in record_deleted:
                 continue
-            if record2.id > 0:
+            if record2.id >= 0:
                 values = record2.get(check_load=check_load,
                     get_readonly=readonly, get_modifiedonly=modified)
                 if record2.modified and values:
@@ -580,7 +580,7 @@ class O2MField(CharField):
         group.load_fields(fields_dict)
         if record.value.get(self.name):
             group.record_deleted.extend(x for x in record.value[self.name]
-                if x.id > 0)
+                if x.id >= 0)
             group.record_deleted.extend(record.value[self.name].record_deleted)
             group.record_removed.extend(record.value[self.name].record_removed)
         record.value[self.name] = group
@@ -687,7 +687,7 @@ class O2MField(CharField):
 class M2MField(O2MField):
 
     def get_default(self, record):
-        return [x.id for x in record.value.get(self.name) or [] if x.id > 0]
+        return [x.id for x in record.value.get(self.name) or [] if x.id >= 0]
 
     def get_eval(self, record, check_load=True):
         return [x.id for x in record.value.get(self.name) or []]
@@ -763,7 +763,7 @@ class ReferenceField(CharField):
             ref_id = int(ref_id)
             if not ref_id:
                 ref_str = ''
-            if not ref_str and ref_id > 0:
+            if not ref_str and ref_id >= 0:
                 args = ('model', ref_model, 'read', ref_id,
                         ['rec_name'], rpc.CONTEXT)
                 try:

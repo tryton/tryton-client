@@ -300,7 +300,7 @@ class Group(SignalEvent, list):
     def remove(self, record, remove=False, modified=True, signal=True,
             force_remove=False):
         idx = self.index(record)
-        if self[idx].id > 0:
+        if self[idx].id >= 0:
             if remove:
                 if self[idx] in self.record_deleted:
                     self.record_deleted.remove(self[idx])
@@ -315,7 +315,7 @@ class Group(SignalEvent, list):
         if modified:
             record.modified_fields.setdefault('id')
             record.signal('record-modified')
-        if not record.parent or self[idx].id <= 0 or force_remove:
+        if not record.parent or self[idx].id < 0 or force_remove:
             self._remove(self[idx])
 
         if len(self):
@@ -367,7 +367,7 @@ class Group(SignalEvent, list):
 
         new = []
         for record in self:
-            if record.id <= 0:
+            if record.id < 0:
                 new.append(record)
         ctx = context.copy()
 

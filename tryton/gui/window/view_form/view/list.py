@@ -800,7 +800,7 @@ class ViewList(ParserView):
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
             record = store.on_get_iter(path)
-            if record and record.id > 0:
+            if record and record.id >= 0:
                 ids.append(record.id)
         ids = []
         sel = self.widget_tree.get_selection()

@@ -19,7 +19,10 @@ class Record(SignalEvent):
     def __init__(self, model_name, obj_id, group=None):
         super(Record, self).__init__()
         self.model_name = model_name
-        self.id = obj_id or Record.id
+        if obj_id is None:
+            self.id = Record.id
+        else:
+            self.id = obj_id
         if self.id < 0:
             Record.id -= 1
         self._loaded = set()
@@ -35,7 +38,7 @@ class Record(SignalEvent):
         self.autocompletion = {}
 
     def __getitem__(self, name, raise_exception=False):
-        if name not in self._loaded and self.id > 0:
+        if name not in self._loaded and self.id >= 0:
             ids =  [self.id]
             if name == '*':
                 loading = reduce(
@@ -53,11 +56,11 @@ class Record(SignalEvent):
                         idx + n < length) and n < 100:
                     if idx - n >= 0:
                         record = self.group[idx - n]
-                        if name not in record._loaded and record.id > 0:
+                        if name not in record._loaded and record.id >= 0:
                             ids.append(record.id)
                     if idx + n < length:
                         record = self.group[idx + n]
-                        if name not in record._loaded and record.id > 0:
+                        if name not in record._loaded and record.id >= 0:
                             ids.append(record.id)
                     n += 1
             if loading == 'eager':
