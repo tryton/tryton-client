@@ -140,12 +140,11 @@ class Graph(gtk.DrawingArea):
         if 'active_id' in ctx:
             del ctx['active_id']
         event = gtk.get_current_event()
-        if event.button == 1:
-            hide = not bool(event.state
-                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
-        else:
-            hide = False
-        with Window(hide_current=hide):
+        allow_similar = False
+        if (event.state & gtk.gdk.CONTROL_MASK
+                or event.state & gtk.gdk.MOD1_MASK):
+            allow_similar = True
+        with Window(hide_current=True, allow_similar=allow_similar):
             return Action.exec_keyword('graph_open', {
                     'model': self.model,
                     'id': ids[0],

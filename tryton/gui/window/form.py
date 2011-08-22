@@ -608,12 +608,11 @@ class Form(SignalEvent, TabContent):
 
     def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):
         event = gtk.get_current_event()
-        if not hasattr(event, 'button') or event.button == 1:
-            hide = not bool(event.state
-                & (gtk.gdk.CONTROL_MASK | gtk.gdk.MOD1_MASK))
-        else:
-            hide = False
-        with Window(hide_current=hide):
+        allow_similar = False
+        if (event.state & gtk.gdk.CONTROL_MASK
+                or event.state & gtk.gdk.MOD1_MASK):
+            allow_similar = True
+        with Window(hide_current=True, allow_similar=allow_similar):
             self._action(action, keyword)
         togglebutton.props.active = False
 

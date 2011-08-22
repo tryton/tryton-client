@@ -7,7 +7,7 @@ from preference import *
 class Window(object):
 
     hide_current = False
-    allow_similar = True
+    allow_similar = False
 
     def __init__(self, hide_current=False, allow_similar=True):
         Window.hide_current = hide_current
@@ -18,7 +18,7 @@ class Window(object):
 
     def __exit__(self, type, value, traceback):
         Window.hide_current = False
-        Window.allow_similar = True
+        Window.allow_similar = False
 
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None,
