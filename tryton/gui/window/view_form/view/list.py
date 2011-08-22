@@ -384,27 +384,29 @@ class ViewList(ParserView):
         return False
 
     def on_copy(self):
-        clipboard = self.widget_tree.get_clipboard(gtk.gdk.SELECTION_CLIPBOARD)
-        targets = [
-            ('STRING', 0, 0),
-            ('TEXT', 0, 1),
-            ('COMPOUND_TEXT', 0, 2),
-            ('UTF8_STRING', 0, 3)
-        ]
-        selection = self.widget_tree.get_selection()
-        # Set to clipboard directly if not too much selected rows
-        # to speed up paste
-        # Don't use set_with_data on mac see:
-        # http://bugzilla.gnome.org/show_bug.cgi?id=508601
-        if selection.count_selected_rows() < 100 \
-                or os.name == 'mac' \
-                or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
-            data = []
-            selection.selected_foreach(self.copy_foreach, data)
-            clipboard.set_text('\n'.join(data))
-        else:
-            clipboard.set_with_data(targets, self.copy_get_func,
-                    self.copy_clear_func, selection)
+        for clipboard_type in (gtk.gdk.SELECTION_CLIPBOARD,
+                gtk.gdk.SELECTION_PRIMARY):
+            clipboard = self.widget_tree.get_clipboard(clipboard_type)
+            targets = [
+                ('STRING', 0, 0),
+                ('TEXT', 0, 1),
+                ('COMPOUND_TEXT', 0, 2),
+                ('UTF8_STRING', 0, 3)
+            ]
+            selection = self.widget_tree.get_selection()
+            # Set to clipboard directly if not too much selected rows
+            # to speed up paste
+            # Don't use set_with_data on mac see:
+            # http://bugzilla.gnome.org/show_bug.cgi?id=508601
+            if selection.count_selected_rows() < 100 \
+                    or os.name == 'mac' \
+                    or (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+                data = []
+                selection.selected_foreach(self.copy_foreach, data)
+                clipboard.set_text('\n'.join(data))
+            else:
+                clipboard.set_with_data(targets, self.copy_get_func,
+                        self.copy_clear_func, selection)
 
     def copy_foreach(self, treemodel, path,iter, data):
         record = treemodel.get_value(iter, 0)
@@ -527,6 +529,8 @@ class ViewList(ParserView):
                 return False
             record = model.group[path[0][0]]
 
+            menu_entries = []
+            menu_entries.append(('gtk-copy', lambda x: self.on_copy(), 1))
             if hasattr(path[1], '_type') and path[1]._type == 'many2one':
                 value = record[path[1].name].get(record)
                 args = ('model', 'ir.action.keyword', 'get_keyword',
@@ -536,35 +540,33 @@ class ViewList(ParserView):
                     relates = rpc.execute(*args)
                 except TrytonServerError, exception:
                     relates = common.process_exception(exception, *args)
-                    if not relates:
-                        return False
-                menu_entries = []
-                menu_entries.append((None, None, None))
-                menu_entries.append((_('Actions'),
-                    lambda x: self.click_and_action(
-                        'form_action', value, path), 0))
-                menu_entries.append((_('Reports'),
-                    lambda x: self.click_and_action(
-                        'form_print', value, path), 0))
-                menu_entries.append((None, None, None))
-                for relate in relates:
-                    relate['string'] = relate['name']
-                    fct = lambda action: lambda x: \
-                            self.click_and_relate(action, value, path)
-                    menu_entries.append(
-                            ('... ' + relate['name'], fct(relate), 0))
-                menu = gtk.Menu()
-                for stock_id, callback, sensitivity in menu_entries:
-                    if stock_id:
-                        item = gtk.ImageMenuItem(stock_id)
-                        if callback:
-                            item.connect('activate', callback)
-                        item.set_sensitive(bool(sensitivity or value))
-                    else:
-                        item = gtk.SeparatorMenuItem()
-                    item.show()
-                    menu.append(item)
-                menu.popup(None, None, None, event.button, event.time)
+                if relates:
+                    menu_entries.append((None, None, None))
+                    menu_entries.append((_('Actions'),
+                        lambda x: self.click_and_action(
+                            'form_action', value, path), 0))
+                    menu_entries.append((_('Reports'),
+                        lambda x: self.click_and_action(
+                            'form_print', value, path), 0))
+                    menu_entries.append((None, None, None))
+                    for relate in relates:
+                        relate['string'] = relate['name']
+                        fct = lambda action: lambda x: \
+                                self.click_and_relate(action, value, path)
+                        menu_entries.append(
+                                ('... ' + relate['name'], fct(relate), 0))
+            menu = gtk.Menu()
+            for stock_id, callback, sensitivity in menu_entries:
+                if stock_id:
+                    item = gtk.ImageMenuItem(stock_id)
+                    if callback:
+                        item.connect('activate', callback)
+                    item.set_sensitive(bool(sensitivity or value))
+                else:
+                    item = gtk.SeparatorMenuItem()
+                item.show()
+                menu.append(item)
+            menu.popup(None, None, None, event.button, event.time)
         elif event.button == 2:
             event.button = 1
             event.state |= gtk.gdk.MOD1_MASK
