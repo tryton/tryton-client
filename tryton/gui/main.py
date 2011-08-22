@@ -49,6 +49,7 @@ _ = gettext.gettext
 
 
 _MAIN = []
+TAB_SIZE = 120
 
 
 class Main(object):
@@ -1120,7 +1121,10 @@ class Main(object):
         previous_page_id = self.notebook.get_current_page()
         previous_widget = self.notebook.get_nth_page(previous_page_id)
         if previous_widget and hide_current:
-            previous_widget.props.visible = False
+            prev_tab_label = self.notebook.get_tab_label(previous_widget)
+            prev_tab_label.set_size_request(TAB_SIZE / 4, -1)
+            close_button = prev_tab_label.get_children()[-1]
+            close_button.hide()
             page_id = previous_page_id + 1
         else:
             page_id = -1
@@ -1144,7 +1148,7 @@ class Main(object):
         hbox.pack_start(label, expand=True, fill=True)
         layout = label.get_layout()
         w, h = layout.get_size()
-        if (w // pango.SCALE) > 120 - noise_size:
+        if (w // pango.SCALE) > TAB_SIZE - noise_size:
             label2 = gtk.Label('...')
             self.tooltips.set_tip(label2, page.name)
             hbox.pack_start(label2, expand=False, fill=False)
@@ -1167,7 +1171,7 @@ class Main(object):
         hbox.connect("style-set", on_style_set)
 
         hbox.show_all()
-        hbox.set_size_request(120, -1)
+        hbox.set_size_request(TAB_SIZE, -1)
         label_menu = gtk.Label(page.name)
         label_menu.set_alignment(0.0, 0.5)
         self.notebook.insert_page_menu(page.widget, hbox, label_menu, page_id)
@@ -1240,6 +1244,10 @@ class Main(object):
     def _sig_page_changt(self, notebook, page, page_num):
         self.last_page = self.current_page
         last_form = self.get_page(self.current_page)
+        tab_label = notebook.get_tab_label(notebook.get_nth_page(page_num))
+        tab_label.set_size_request(TAB_SIZE, -1)
+        close_button = tab_label.get_children()[-1]
+        close_button.show()
         if last_form:
             for dialog in last_form.dialogs:
                 dialog.hide()
