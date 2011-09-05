@@ -21,7 +21,10 @@ class ResponseError(xmlrpclib.ResponseError):
 
 
 class Fault(xmlrpclib.Fault):
-    pass
+
+    def __init__(self, faultCode, faultString='', **extra):
+        super(Fault, self).__init__(faultCode, str(faultString), **extra)
+        self.args = faultString
 
 
 class ProtocolError(xmlrpclib.ProtocolError):

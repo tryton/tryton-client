@@ -983,14 +983,12 @@ def process_exception(exception, *args):
                 return False
     elif isinstance(exception, TrytonServerError):
         if exception.faultCode == 'UserWarning':
-            msg = ''
-            if len(exception.args) > 4:
-                msg = exception.args[3]
-            res = userwarning(str(msg), str(exception.args[2]))
+            name, message, description = exception.args
+            res = userwarning(description, message)
             if res in ('always', 'ok'):
                 args2 = ('model', 'res.user.warning', 'create', {
                         'user': rpc._USER,
-                        'name': exception.args[1],
+                        'name': name,
                         'always': (res == 'always'),
                         }, rpc.CONTEXT)
                 try:
@@ -1005,10 +1003,8 @@ def process_exception(exception, *args):
                 return True
             return False
         elif exception.faultCode == 'UserError':
-            msg = ''
-            if len(exception.args) > 3:
-                msg = exception.args[2]
-            warning(str(msg), str(exception.args[1]))
+            message, description = exception.args
+            warning(description, message)
             return False
         elif exception.faultCode == 'ConcurrencyException':
             if len(args) >= 6:
