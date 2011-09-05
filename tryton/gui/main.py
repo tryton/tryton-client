@@ -967,7 +967,7 @@ class Main(object):
             self.menu_screen = None
         return True
 
-    def sig_logout(self, widget, disconnect=True):
+    def sig_logout(self, widget=None, disconnect=True):
         if not self.close_pages():
             return False
         self.sb_username.set_text('')

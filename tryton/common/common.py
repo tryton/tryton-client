@@ -1024,6 +1024,7 @@ def process_exception(exception, *args):
                 message(_('Concurrency Exception'), msg_type=gtk.MESSAGE_ERROR)
                 return False
         elif exception.faultCode == 'NotLogged':
+            from tryton.gui.main import Main
             if not PLOCK.acquire(False):
                 return False
             hostname = rpc._HOST
@@ -1032,10 +1033,10 @@ def process_exception(exception, *args):
                 while True:
                     password = ask(_('Password:'), visibility=False)
                     if password is None:
-                        continue
+                        Main.get_main().sig_logout()
+                        raise Exception('NotLogged')
                     res = rpc.login(rpc._USERNAME, password, hostname, port,
                             rpc._DATABASE)
-                    from tryton.gui.main import Main
                     Main.get_main().refresh_ssl()
                     if res == -1:
                         message(_('Connection error!\n' \
