@@ -269,14 +269,14 @@ class _container(object):
         if help_tip:
             self.tooltips.set_tip(widget, help_tip)
             self.tooltips.enable()
-        if translate and hasattr(widget, 'pack_start'):
+        if translate:
             button = gtk.Button()
             img = gtk.Image()
             img.set_from_stock('tryton-locale', gtk.ICON_SIZE_SMALL_TOOLBAR)
             button.set_image(img)
             button.set_relief(gtk.RELIEF_NONE)
             self.trans_box.append((button, name, fname, widget.get_children()[0]))
-            widget.pack_start(button, yfill=False, yexpand=False)
+            widget.get_child().pack_start(button, fill=False, expand=False)
         widget.show_all()
         table.attach(widget, width, width + colspan,
                 height, height + rowspan,
