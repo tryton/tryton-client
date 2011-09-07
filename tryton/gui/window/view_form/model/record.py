@@ -277,13 +277,13 @@ class Record(SignalEvent):
         group = record.group
         assert all(r.model_name == record.model_name for r in records)
         assert all(r.group == group for r in records)
-        records = [r for r in records if r.id < 0]
+        records = [r for r in records if r.id >= 0]
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(context or {})
         ctx['_timestamp'] = {}
         for rec in records:
-            context['_timestamp'].update(rec.get_timestamp())
+            ctx['_timestamp'].update(rec.get_timestamp())
         record_ids = set(r.id for r in records)
         reload_ids = set(group.on_write_ids(list(record_ids)))
         reload_ids -= record_ids

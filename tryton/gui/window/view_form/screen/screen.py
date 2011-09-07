@@ -544,7 +544,7 @@ class Screen(SignalEvent):
 
         if idx > 0:
             record = top_record.group[idx - 1]
-            path = path[:-1] + ((path[-1][0], record.id,))
+            path = path[:-1] + ((path[-1][0], record.id,),)
         else:
             path = path[:-1]
         if path:
