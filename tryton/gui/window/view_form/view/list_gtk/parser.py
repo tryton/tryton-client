@@ -188,7 +188,7 @@ class ParserTree(ParserInterface):
                 col.width = width
                 if width > 0:
                     col.set_fixed_width(width)
-                col.set_min_width(0)
+                col.set_min_width(1)
                 #XXX doesn't work well when resize columns
                 #col.set_expand(True)
                 if (not treeview.sequence
