@@ -9,7 +9,6 @@ from tryton.pyson import PYSONDecoder
 from tryton.exceptions import TrytonServerError
 import gettext
 import tempfile
-import base64
 import os
 import webbrowser
 import tryton.common as common
@@ -62,7 +61,7 @@ class Action(object):
                 name.replace(os.sep, '_').replace(os.altsep or os.sep, '_') \
                         + os.extsep + type)
         with open(fp_name, 'wb') as file_d:
-            file_d.write(base64.decodestring(data))
+            file_d.write(data)
         if email_print:
             mailto(to=email.get('to'), cc=email.get('cc'),
                     subject=email.get('subject'), body=email.get('body'),

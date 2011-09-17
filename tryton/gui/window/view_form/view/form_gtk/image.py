@@ -5,7 +5,6 @@ import glib
 import gettext
 import os
 import tempfile
-from base64 import encodestring, decodestring
 from tryton.common import file_selection, Tooltips, file_open
 from tryton.config import PIXMAPS_DIR
 from interface import WidgetInterface
@@ -129,8 +128,7 @@ class Image(WidgetInterface):
         filename = file_selection(_('Open...'), preview=True,
             filters=[filter_image, filter_all])
         if filename:
-            self.field.set_client(self.record,
-                    encodestring(open(filename, 'rb').read()))
+            self.field.set_client(self.record, open(filename, 'rb').read())
             if self.filename_field:
                 self.filename_field.set_client(self.record,
                         os.path.basename(filename))
@@ -144,7 +142,7 @@ class Image(WidgetInterface):
                 os.sep, '_').replace(os.altsep or os.sep, '_')
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
-            fp.write(decodestring(self.field.get(self.record)))
+            fp.write(self.field.get_data(self.record))
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
@@ -158,7 +156,7 @@ class Image(WidgetInterface):
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename, 'wb') as fp:
-                fp.write(decodestring(self.field.get(self.record)))
+                fp.write(self.field.get_data(self.record))
 
     def sig_remove(self, widget):
         self.field.set_client(self.record, False)
@@ -177,30 +175,32 @@ class Image(WidgetInterface):
         if info == 0:
             uri = selection.get_text().split('\n')[0]
             if uri:
-                self.field.set_client(self.record,
-                        encodestring(urllib.urlopen(uri).read()))
+                self.field.set_client(self.record, urllib.urlopen(uri).read())
             self.update_img()
         elif info == 1:
             uri = selection.data.split('\r\n')[0]
             if uri:
-                self.field.set_client(self.record,
-                        encodestring(urllib.urlopen(uri).read()))
+                self.field.set_client(self.record, urllib.urlopen(uri).read())
             self.update_img()
         elif info == 2:
             data = selection.get_pixbuf()
             if data:
-                self.field.set_client(self.record,
-                        encodestring(data))
+                self.field.set_client(self.record, data)
                 self.update_img()
 
     def update_img(self):
         value = None
         if self.field:
             value = self.field.get_client(self.record)
+        if isinstance(value, (int, long)):
+            if value > 10**6:
+                value = False
+            else:
+                value = self.field.get_data(self.record)
         if not value:
             data = NOIMAGE
         else:
-            data = decodestring(value)
+            data = value
 
         pixbuf = None
         for ftype in ('jpeg', 'gif', 'png', 'bmp', 'svg'):

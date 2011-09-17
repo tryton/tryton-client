@@ -75,6 +75,9 @@ class Record(SignalEvent):
             fields.append('_timestamp')
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
+            ctx.update(dict(('%s.%s' % (self.model_name, fname), 'size')
+                    for fname, field in self.group.fields.iteritems()
+                    if field.attrs['type'] == 'binary'))
             args = ('model', self.model_name, 'read', ids, fields, ctx)
             try:
                 values = rpc.execute(*args)

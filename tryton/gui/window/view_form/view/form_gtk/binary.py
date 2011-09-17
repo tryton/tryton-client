@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import base64
 import gtk
 import gettext
 import os
@@ -115,8 +114,7 @@ class Binary(WidgetInterface):
     def sig_new(self, widget=None):
         filename = file_selection(_('Open...'))
         if filename and self.field:
-            self.field.set_client(self.record,
-                    base64.encodestring(open(filename, 'rb').read()))
+            self.field.set_client(self.record, open(filename, 'rb').read())
             if self.filename_field:
                 self.filename_field.set_client(self.record,
                         os.path.basename(filename))
@@ -130,7 +128,7 @@ class Binary(WidgetInterface):
                 os.sep, '_').replace(os.altsep or os.sep, '_')
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
-            fp.write(base64.decodestring(self.field.get(self.record)))
+            fp.write(self.field.get_data(self.record))
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
@@ -144,7 +142,7 @@ class Binary(WidgetInterface):
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename,'wb') as fp:
-                fp.write(base64.decodestring(self.field.get(self.record)))
+                fp.write(self.field.get_data(self.record))
 
     def sig_remove(self, widget=None):
         self.field.set_client(self.record, False)
@@ -175,10 +173,10 @@ class Binary(WidgetInterface):
             return False
         if self.wid_text:
             self.wid_text.set_text(self.filename_field.get(record) or '')
-        self.wid_size.set_text(humanize(len(field.get(record) or [])))
+        self.wid_size.set_text(humanize(field.get_size(record) or 0))
         if self.but_open:
-            self.but_open.set_sensitive(bool(field.get(record)))
-        self.but_save_as.set_sensitive(bool(field.get(record)))
+            self.but_open.set_sensitive(bool(field.get_size(record)))
+        self.but_save_as.set_sensitive(bool(field.get_size(record)))
         return True
 
     def set_value(self, record, field):

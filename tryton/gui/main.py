@@ -30,7 +30,6 @@ from tryton.gui.window.about import About
 from tryton.gui.window.shortcuts import Shortcuts
 from tryton.gui.window.dbrestore import DBRestore
 import re
-import base64
 import tryton.translate as translate
 import tryton.plugins
 import pango
@@ -1310,10 +1309,10 @@ class Main(object):
         url, dbname, passwd, update = dialog.run()
         if dbname:
             with open(filename, 'rb') as file_p:
-                data_b64 = base64.encodestring(file_p.read())
+                data = file_p.read()
             host, port = url.rsplit(':' , 1)
             rpcprogress = common.RPCProgress('db_exec', (host, int(port),
-                'restore', dbname, passwd, data_b64, update))
+                'restore', dbname, passwd, buffer(data), update))
             try:
                 res = rpcprogress.run()
             except TrytonServerError, exception:
@@ -1356,7 +1355,7 @@ class Main(object):
         rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'dump',
             dbname, passwd))
         try:
-            dump_b64 = rpcprogress.run()
+            dump = rpcprogress.run()
         except TrytonServerError, exception:
             if exception.args[0] == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
@@ -1377,7 +1376,6 @@ class Main(object):
             return
 
         self.refresh_ssl()
-        dump = base64.decodestring(dump_b64)
 
         filename = common.file_selection(_('Save As...'),
             action=gtk.FILE_CHOOSER_ACTION_SAVE, preview=False,

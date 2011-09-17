@@ -1,9 +1,11 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import os
+import tempfile
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
-        merge, inverse_leaf, EvalEnvironment
+        merge, inverse_leaf, EvalEnvironment, RPCProgress
 import tryton.common as common
 import time
 import datetime
@@ -790,6 +792,55 @@ class ReferenceField(CharField):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
 
+class BinaryField(CharField):
+
+    def get(self, record, check_load=True, readonly=True, modified=False):
+        result = record.value.get(self.name, False) or False
+        if isinstance(result, basestring):
+            try:
+                with open(result, 'rb') as fp:
+                    result = buffer(fp.read())
+            except IOError:
+                result = self.get_data(record)
+        return result
+
+    def get_client(self, record):
+        return self.get(record)
+
+    def set_client(self, record, value, force_change=False):
+        _, filename = tempfile.mkstemp(prefix='tryton_')
+        with open(filename, 'wb') as fp:
+            fp.write(value)
+        self.set(record, filename)
+        record.modified_fields.setdefault(self.name)
+        record.signal('record-modified')
+        self.sig_changed(record)
+        record.validate(softvalidation=True)
+        record.signal('record-changed')
+
+    def get_size(self, record):
+        result = record.value.get(self.name) or 0
+        if isinstance(result, basestring):
+            result = os.stat(result).st_size
+        return result
+
+    def get_data(self, record):
+        if not isinstance(record.value.get(self.name), basestring):
+            ctx = rpc.CONTEXT.copy()
+            ctx.update(record.context_get())
+            rpcprogress = RPCProgress('execute', ('model', record.model_name,
+                    'read', record.id, [self.name], ctx))
+            try:
+                values = rpcprogress.run()
+            except TrytonServerError, exception:
+                values = common.process_exception(exception)
+                return ''
+            _, filename = tempfile.mkstemp(prefix='tryton_')
+            with open(filename, 'wb') as fp:
+                fp.write(values[self.name])
+            self.set(record, filename)
+        return self.get(record)
+
 TYPES = {
     'char': CharField,
     'sha': CharField,
@@ -807,4 +858,5 @@ TYPES = {
     'datetime': DateTimeField,
     'date': DateField,
     'one2one': O2OField,
+    'binary': BinaryField,
 }
