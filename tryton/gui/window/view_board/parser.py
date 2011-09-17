@@ -105,21 +105,14 @@ class ParserBoard(object):
                 container.newline()
             elif node.localName == 'notebook':
                 notebook = gtk.Notebook()
-                if attrs and 'tabpos' in attrs:
-                    pos = {'up':gtk.POS_TOP,
-                        'down':gtk.POS_BOTTOM,
-                        'left':gtk.POS_LEFT,
-                        'right':gtk.POS_RIGHT
-                    }[attrs['tabpos']]
-                else:
-                    if CONFIG['client.form_tab'] == 'top':
-                        pos = gtk.POS_TOP
-                    elif CONFIG['client.form_tab'] == 'left':
-                        pos = gtk.POS_LEFT
-                    elif CONFIG['client.form_tab'] == 'right':
-                        pos = gtk.POS_RIGHT
-                    elif CONFIG['client.form_tab'] == 'bottom':
-                        pos = gtk.POS_BOTTOM
+                if CONFIG['client.form_tab'] == 'top':
+                    pos = gtk.POS_TOP
+                elif CONFIG['client.form_tab'] == 'left':
+                    pos = gtk.POS_LEFT
+                elif CONFIG['client.form_tab'] == 'right':
+                    pos = gtk.POS_RIGHT
+                elif CONFIG['client.form_tab'] == 'bottom':
+                    pos = gtk.POS_BOTTOM
                 notebook.set_tab_pos(pos)
                 notebook.set_border_width(3)
                 container.wid_add(notebook,
