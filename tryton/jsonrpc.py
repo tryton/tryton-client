@@ -258,6 +258,9 @@ class ServerProxy(xmlrpclib.ServerProxy):
                 request,
                 verbose=self.__verbose
                 )
+        except:
+            self.__transport.close()
+            raise
 
         if response['id'] != id_:
             raise ResponseError('Invalid response id (%s) excpected %s' %
