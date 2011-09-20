@@ -38,7 +38,7 @@ def db_list(host, port):
         logging.getLogger('rpc.result').debug(repr(result))
         return result
     except Fault, exception:
-        if exception.args[0] == 'AccessDenied':
+        if exception.faultCode == 'AccessDenied':
             raise
         else:
             logging.getLogger('rpc.result').debug(repr(None))

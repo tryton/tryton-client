@@ -371,7 +371,7 @@ class DBCreate(object):
                                         langreal, admin_passwd.get_text()))
                             rpcprogress.run()
                         except TrytonServerError, exception:
-                            if str(exception.args[0]) == "AccessDenied":
+                            if str(exception.faultCode) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
                                     "the Tryton server. Please try again."),
                                     _("Access denied!"))
@@ -385,7 +385,8 @@ class DBCreate(object):
                                     "be broken. Maybe drop this database! " \
                                     "Please check the error message for " \
                                     "possible informations.\n" \
-                                    "Error message:\n") + str(exception.args[0]),
+                                    "Error message:\n")
+                                    + str(exception.faultCode),
                                     _("Error creating database!"))
                             parent.present()
                             self.dialog.destroy()

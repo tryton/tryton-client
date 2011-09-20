@@ -1286,14 +1286,14 @@ class Main(object):
             rpcprogress.run()
         except TrytonServerError, exception:
             self.refresh_ssl()
-            if exception.args[0] == "AccessDenied":
+            if exception.faultCode == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password" \
                         "\nPlease try again."),
                         _('Access denied!'))
                 self.sig_db_drop()
             else:
                 common.warning(_('Database drop failed with error message:\n')
-                    + str(exception.args[0]), _('Database drop failed!'))
+                    + str(exception.faultCode), _('Database drop failed!'))
             return
         self.refresh_ssl()
         common.message(_("Database dropped successfully!"))
@@ -1317,21 +1317,21 @@ class Main(object):
                 res = rpcprogress.run()
             except TrytonServerError, exception:
                 self.refresh_ssl()
-                if exception.args[0] == \
+                if exception.faultCode == \
                         "Couldn't restore database with password":
                     common.warning(_("It is not possible to restore a " \
                             "password protected database.\n" \
                             "Backup and restore needed to be proceed " \
                             "manual."),
                             _('Database is password protected!'))
-                elif exception.args[0] == "AccessDenied":
+                elif exception.faultCode == "AccessDenied":
                     common.warning(_("Wrong Tryton Server Password.\n" \
                             "Please try again."),
                             _('Access denied!'))
                     self.sig_db_restore()
                 else:
                     common.warning(_('Database restore failed with ' \
-                            'error message:\n') + str(exception.args[0]), \
+                            'error message:\n') + str(exception.faultCode), \
                             _('Database restore failed!'))
                 return
             self.refresh_ssl()
@@ -1357,19 +1357,19 @@ class Main(object):
         try:
             dump = rpcprogress.run()
         except TrytonServerError, exception:
-            if exception.args[0] == "Couldn't dump database with password":
+            if exception.faultCode == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \
                         "protected Database.\nBackup and restore " \
                         "needed to be proceed manual."),
                         _('Database is password protected!'))
-            elif exception.args[0] == "AccessDenied":
+            elif exception.faultCode == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password.\n" \
                         "Please try again."),
                         _('Access denied!'))
                 self.sig_db_dump()
             else:
                 common.warning(_('Database dump failed with ' \
-                        'error message:\n') + str(exception.args[0]),
+                        'error message:\n') + str(exception.faultCode),
                         _('Database dump failed!'))
             rpc.logout()
             Main.get_main().refresh_ssl()
