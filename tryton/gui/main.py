@@ -551,6 +551,18 @@ class Main(object):
         if CONFIG['client.save_width_height']:
             checkmenuitem_save_width_height.set_active(True)
 
+        checkmenuitem_save_tree_state = gtk.CheckMenuItem(
+            _('Save Tree Expanded State'))
+        checkmenuitem_save_tree_state.connect('activate',
+            lambda menuitem: CONFIG.__setitem__(
+                'client.save_tree_expanded_state',
+                menuitem.get_active()))
+        checkmenuitem_save_tree_state.set_accel_path(
+            '<tryton>/Options/Form/Save Tree Expanded State')
+        menu_form.add(checkmenuitem_save_tree_state)
+        if CONFIG['client.save_tree_expanded_state']:
+            checkmenuitem_save_tree_state.set_active(True)
+
         if gtkspell:
             checkmenuitem_spellcheck = gtk.CheckMenuItem(_('Spell Checking'))
             checkmenuitem_spellcheck.connect('activate',

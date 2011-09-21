@@ -22,6 +22,20 @@ import os
 _ = gettext.gettext
 
 
+def path_convert_id2pos(model, id_path):
+    "This function will transform a path of id into a path of position"
+    group = model.group
+    id_path = id_path[:]
+    while id_path:
+        current_id = id_path.pop(0)
+        try:
+            record = group.get(current_id)
+            group = record.children_group(model.children_field, check_load=True)
+        except (KeyError, AttributeError):
+            return None
+    return model.on_get_path(record)
+
+
 class AdaptModelGroup(gtk.GenericTreeModel):
 
     def __init__(self, group, children_field=None):
@@ -821,3 +835,29 @@ class ViewList(ParserView):
                     pass
                 else:
                     renderer.set_property('editable', False)
+
+    def get_expanded_paths(self, starting_path=None, starting_id_path=None):
+        # Use id instead of position
+        # because the position may change between load
+        if not starting_path:
+            starting_path = []
+        if not starting_id_path:
+            starting_id_path = []
+        id_paths = []
+        record = self.store.on_get_iter(starting_path)
+        for path_idx in range(self.store.on_iter_n_children(record)):
+            path = starting_path + [path_idx]
+            expanded = self.widget_tree.row_expanded(tuple(path))
+            if expanded:
+                expanded_record = self.store.on_get_iter(path)
+                id_path = starting_id_path + [expanded_record.id]
+                id_paths.append(id_path)
+                child_id_paths = self.get_expanded_paths(path, id_path)
+                id_paths += child_id_paths
+        return id_paths
+
+    def expand_nodes(self, nodes):
+        for node in nodes:
+            expand_path = path_convert_id2pos(self.store, node)
+            if expand_path:
+                self.widget_tree.expand_to_path(expand_path)

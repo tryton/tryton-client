@@ -2,7 +2,9 @@
 #this repository contains the full copyright notices and license terms.
 "Screen"
 import gobject
+import json
 import copy
+import collections
 import xml.dom.minidom
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
@@ -13,6 +15,7 @@ from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
 from tryton.exceptions import TrytonServerError
+from tryton.jsonrpc import JSONEncoder
 
 
 class Screen(SignalEvent):
@@ -64,6 +67,8 @@ class Screen(SignalEvent):
         self.fields_view_tree = None
         self.sort = sort
         self.view_to_load = []
+        self.expanded_nodes = collections.defaultdict(
+            lambda: collections.defaultdict(lambda: None))
 
         if mode:
             self.view_to_load = mode[1:]
@@ -250,6 +255,7 @@ class Screen(SignalEvent):
         return False
 
     def destroy(self):
+        self.save_tree_state()
         for view in self.views:
             view.destroy()
         self.group.signal_unconnect(self)
@@ -556,7 +562,58 @@ class Screen(SignalEvent):
         self.request_set()
         return True
 
+    def set_tree_state(self):
+        view = self.current_view
+        if (not CONFIG['client.save_tree_expanded_state']
+                or not self.current_view
+                or self.current_view.view_type != 'tree'
+                or not self.current_view.children_field
+                or not self.group):
+            return
+        parent = self.parent.id if self.parent else None
+        expanded_nodes = self.expanded_nodes[parent][view.children_field]
+        if expanded_nodes is None:
+            json_domain = self.get_tree_domain(parent)
+            try:
+                expanded_nodes = rpc.execute('model',
+                    'ir.ui.view_tree_expanded_state', 'get_expanded',
+                    self.model_name, json_domain,
+                    self.current_view.children_field, rpc.CONTEXT)
+                expanded_nodes = json.loads(expanded_nodes)
+            except TrytonServerError:
+                expanded_nodes = []
+            self.expanded_nodes[parent][view.children_field] = expanded_nodes
+        view.expand_nodes(expanded_nodes)
+
+    def save_tree_state(self):
+        view = self.current_view
+        if (not CONFIG['client.save_tree_expanded_state']
+                or not view
+                or view.view_type != 'tree'
+                or not view.children_field):
+            return
+        parent = self.parent.id if self.parent else None
+        paths = view.get_expanded_paths()
+        self.expanded_nodes[parent][view.children_field] = paths
+        json_domain = self.get_tree_domain(parent)
+        json_paths = json.dumps(paths)
+        try:
+            rpc.execute('model', 'ir.ui.view_tree_expanded_state',
+                'set_expanded', self.model_name, json_domain,
+                self.current_view.children_field, json_paths, rpc.CONTEXT)
+        except TrytonServerError:
+            pass
+
+    def get_tree_domain(self, parent):
+        if parent:
+            domain = (self.domain + [(self.exclude_field, '=', parent)])
+        else:
+            domain = self.domain
+        json_domain = json.dumps(domain, cls=JSONEncoder)
+        return json_domain
+
     def load(self, ids, set_cursor=True, modified=False):
+        self.expanded_nodes.clear()
         self.group.load(ids, display=False, modified=modified)
         self.current_view.reset()
         if ids:
@@ -586,6 +643,7 @@ class Screen(SignalEvent):
                     in ('tree', 'graph', 'calendar'))
             if set_cursor:
                 self.current_view.set_cursor(reset_view=False)
+        self.set_tree_state()
 
     def display_next(self):
         view = self.current_view

@@ -561,6 +561,11 @@ Save Width/Height:
   and trees. Additionally saving of manually adjusted widths and heights of
   dialog and popup windows.
 
+.. _Menu-Options-Form-Save_Tree_State:
+
+Save Tree Expanded State:
+  Check box to enable saving of manually expanded nodes in trees.
+
 .. _Menu-Options-Form-Spell_Checking:
 
 Spell Checking:
