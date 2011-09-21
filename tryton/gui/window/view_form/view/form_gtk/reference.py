@@ -155,7 +155,7 @@ class Reference(WidgetInterface):
 
         self.focus_out = False
         if not value:
-            model, (obj_id, name) = self.get_model() or '', (0, '')
+            model, (obj_id, name) = self.get_model() or '', (-1, '')
         else:
             try:
                 model, (obj_id, name) = value
@@ -250,18 +250,18 @@ class Reference(WidgetInterface):
         if not self.changed:
             return
         self.wid_text.set_text('')
-        self.field.set_client(self.record, (self.get_model(), (0, '')))
+        self.field.set_client(self.record, (self.get_model(), (-1, '')))
 
     def sig_changed(self, *args):
         if not self.changed:
             return False
         val = self.field.get_client(self.record)
         if not val:
-            model, (obj_id, name) = '', (0, '')
+            model, (obj_id, name) = '', (-1, '')
         else:
             model, (obj_id, name) = val
         if self.get_model() and obj_id:
-            self.field.set_client(self.record, (self.get_model(), (0, '')))
+            self.field.set_client(self.record, (self.get_model(), (-1, '')))
             self.display(self.record, self.field)
         return False
 
@@ -276,7 +276,7 @@ class Reference(WidgetInterface):
         value = field.get_client(record)
         img = gtk.Image()
         if not value:
-            model, (obj_id, name) = '', (0, '')
+            model, (obj_id, name) = '', (-1, '')
         else:
             model, (obj_id, name) = value
         if model:

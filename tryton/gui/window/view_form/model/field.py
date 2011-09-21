@@ -763,7 +763,7 @@ class ReferenceField(CharField):
         ref_model, (ref_id, ref_str) = value
         if ref_model:
             ref_id = int(ref_id)
-            if not ref_id:
+            if ref_id < 0:
                 ref_str = ''
             if not ref_str and ref_id >= 0:
                 args = ('model', ref_model, 'read', ref_id,
@@ -779,7 +779,7 @@ class ReferenceField(CharField):
                     record.value[self.name] = ref_model, (ref_id, result)
                     record.value[self.name + '.rec_name'] = result
                 else:
-                    record.value[self.name] = ref_model, (0, '')
+                    record.value[self.name] = ref_model, (-1, '')
                     record.value[self.name + '.rec_name'] = ''
             else:
                 record.value[self.name] = ref_model, (ref_id, ref_str)

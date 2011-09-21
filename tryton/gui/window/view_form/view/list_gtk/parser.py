@@ -819,7 +819,7 @@ class Reference(Char):
     def get_textual_value(self, record):
         value = record[self.field_name].get_client(record)
         if not value:
-            model, (obj_id, name) = '', (0, '')
+            model, (obj_id, name) = '', (-1, '')
         else:
             model, (obj_id, name) = value
         if model:

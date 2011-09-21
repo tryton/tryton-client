@@ -527,7 +527,7 @@ class ViewList(ParserView):
                 value = record[path[1].name].get(record)
                 args = ('model', 'ir.action.keyword', 'get_keyword',
                         'form_relate', (self.screen.group.fields[
-                            path[1].name].attrs['relation'], 0), rpc.CONTEXT)
+                            path[1].name].attrs['relation'], -1), rpc.CONTEXT)
                 try:
                     relates = rpc.execute(*args)
                 except TrytonServerError, exception:

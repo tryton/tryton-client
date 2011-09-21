@@ -267,7 +267,7 @@ class Many2One(WidgetInterface):
     def _populate_popup(self, widget, menu):
         value = self.field.get(self.record)
         args = ('model', 'ir.action.keyword', 'get_keyword',
-                'form_relate', (self.attrs['relation'], 0), rpc.CONTEXT)
+                'form_relate', (self.attrs['relation'], -1), rpc.CONTEXT)
         try:
             relates = rpc.execute(*args)
         except TrytonServerError, exception:
