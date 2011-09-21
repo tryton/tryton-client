@@ -281,15 +281,6 @@ class Reference(WidgetInterface):
             model, (obj_id, name) = value
         if model:
             child.set_text(self._selection2[model])
-            if not name and obj_id:
-                args = ('model', model, 'read', obj_id, ['rec_name'],
-                        rpc.CONTEXT)
-                try:
-                    name = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    name = common.process_exception(exception, *args)
-                    if not name:
-                        name = '???'
             self.wid_text.set_text(name)
             if obj_id:
                 img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)

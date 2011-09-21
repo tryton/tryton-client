@@ -823,17 +823,6 @@ class Reference(Char):
         else:
             model, (obj_id, name) = value
         if model:
-            if not name and obj_id:
-                args = ('model', model, 'read', obj_id, ['rec_name'],
-                        rpc.CONTEXT)
-                try:
-                    res = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    res = common.process_exception(exception, *args)
-                if not res:
-                    name = '???'
-                else:
-                    name = res['rec_name']
             return self._selection.get(model, model) + ',' + name
         else:
             return name
