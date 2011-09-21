@@ -253,9 +253,9 @@ class ServerProxy(xmlrpclib.ServerProxy):
                 request,
                 verbose=self.__verbose
                 )
-        except socket.error, v:
+        except (socket.error, httplib.HTTPException), v:
             # trap  'Broken pipe'
-            if v.args[0] != 32:
+            if isinstance(v, socket.error) and v.args[0] != 32:
                 raise
             # try one more time
             self.__transport.close()
