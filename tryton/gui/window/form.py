@@ -33,7 +33,6 @@ _ = gettext.gettext
 class Form(SignalEvent, TabContent):
     "Form"
 
-    _toolbar_cache = {}
     toolbar_def = [
         ('new', 'tryton-new', _('New'), _('Create a new record'),
             'sig_new'),
@@ -150,18 +149,16 @@ class Form(SignalEvent, TabContent):
             gobject.timeout_add(int(auto_refresh) * 1000, self.sig_reload)
 
     def get_toolbars(self):
-        if self.model not in self._toolbar_cache:
-            ctx = {}
-            ctx.update(rpc.CONTEXT)
-            ctx.update(self.context)
-            args = ('model', self.model, 'view_toolbar_get', ctx)
-            try:
-                toolbars = rpc.execute(*args)
-            except TrytonServerError, exception:
-                toolbars = common.process_exception(exception, *args)
-                toolbars = toolbars if toolbars else {}
-            self._toolbar_cache[self.model] = toolbars
-        return self._toolbar_cache[self.model]
+        ctx = {}
+        ctx.update(rpc.CONTEXT)
+        ctx.update(self.context)
+        args = ('model', self.model, 'view_toolbar_get', ctx)
+        try:
+            toolbars = rpc.execute(*args)
+        except TrytonServerError, exception:
+            toolbars = common.process_exception(exception, *args)
+            toolbars = toolbars if toolbars else {}
+        return toolbars
 
     def widget_get(self):
         return self.screen.widget
