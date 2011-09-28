@@ -21,7 +21,7 @@ class Fingerprints(dict):
                 try:
                     host, sha1 = line.split(' ')
                 except ValueError:
-                    continue
+                    host, sha1 = line, ''
                 self[host] = sha1
 
     def save(self):
@@ -32,6 +32,9 @@ class Fingerprints(dict):
 
     def __setitem__(self, key, value):
         assert isinstance(key, basestring)
-        assert len(value) == 59 # len of formated sha1
+        if value:
+            assert len(value) == 59 # len of formated sha1
+        else:
+            value = ''
         super(Fingerprints, self).__setitem__(key, value)
         self.save()

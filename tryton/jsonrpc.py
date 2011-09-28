@@ -139,7 +139,6 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
     def make_connection(self, host):
         if self.__connection and host == self.__connection[0]:
             return self.__connection[1]
-        fingerprint = None
         host, extra_headers, x509 = self.get_host_info(host)
 
         ca_certs =  self.__ca_certs
@@ -156,27 +155,41 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                 self.sock = ssl.wrap_socket(sock, self.key_file,
                     self.cert_file, ca_certs=ca_certs, cert_reqs=cert_reqs)
 
-        self.__connection = host, HTTPSConnection(host)
-        try:
-            self.__connection[1].connect()
-            sock = self.__connection[1].sock
-            try:
-                peercert = sock.getpeercert(True)
-            except socket.error:
-                peercert = None
-            def format_hash(value):
-                return reduce(lambda x, y: x + y[1].upper() +
-                        ((y[0] % 2 and y[0] + 1 < len(value)) and ':' or ''),
-                        enumerate(value), '')
-            fingerprint = format_hash(hashlib.sha1(peercert).hexdigest())
-        except ssl.SSLError, e:
+        def http_connection():
             self.__connection = host, httplib.HTTPConnection(host)
+
+        def https_connection():
+            self.__connection = host, HTTPSConnection(host)
+            try:
+                self.__connection[1].connect()
+                sock = self.__connection[1].sock
+                try:
+                    peercert = sock.getpeercert(True)
+                except socket.error:
+                    peercert = None
+                def format_hash(value):
+                    return reduce(lambda x, y: x + y[1].upper() +
+                            ((y[0] % 2 and y[0] + 1 < len(value)) and ':' or ''),
+                            enumerate(value), '')
+                return format_hash(hashlib.sha1(peercert).hexdigest())
+            except ssl.SSLError, e:
+                http_connection()
+
+        fingerprint = ''
+        if self.__fingerprints is not None and host in self.__fingerprints:
+            if self.__fingerprints[host]:
+                fingerprint = https_connection()
+            else:
+                http_connection()
+        else:
+            fingerprint = https_connection()
+
         if self.__fingerprints is not None:
-            if host in self.__fingerprints:
+            if host in self.__fingerprints and self.__fingerprints[host]:
                 if self.__fingerprints[host] != fingerprint:
                     self.close()
                     raise ssl.SSLError('BadFingerprint')
-            elif fingerprint:
+            else:
                 self.__fingerprints[host] = fingerprint
         return self.__connection[1]
 
