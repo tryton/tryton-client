@@ -86,7 +86,7 @@ class Preference(object):
                     vals = copy.copy(self.screen.get(get_modifiedonly=True))
                     if 'password' in vals:
                         password = common.ask(_('Current Password:'),
-                                self.win, visibility=False)
+                            visibility=False)
                         if not password:
                             break
                     else:
