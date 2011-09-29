@@ -822,10 +822,12 @@ class BinaryField(CharField):
         result = record.value.get(self.name) or 0
         if isinstance(result, basestring):
             result = os.stat(result).st_size
+        elif isinstance(result, buffer):
+            result = len(result)
         return result
 
     def get_data(self, record):
-        if not isinstance(record.value.get(self.name), basestring):
+        if not isinstance(record.value.get(self.name), (basestring, buffer)):
             ctx = rpc.CONTEXT.copy()
             ctx.update(record.context_get())
             rpcprogress = RPCProgress('execute', ('model', record.model_name,
