@@ -10,8 +10,10 @@ except NameError:
 
 # True only if running as a py2exe app
 if os.name == 'nt' and hasattr(sys, "frozen"):
-    sys.stdout = open(os.devnull, 'w')
-    sys.stderr = open(os.devnull, 'w')
+    if not ('-v' in sys.argv or '--verbose' in sys.argv or
+            '-l' in sys.argv or '--log-level' in sys.argv):
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
     etc = os.path.join(os.path.dirname(sys.executable), 'etc')
     os.environ['GTK2_RC_FILES'] = os.path.join(etc, 'gtk-2.0', 'gtkrc')
     os.environ['GDK_PIXBUF_MODULE_FILE'] = os.path.join(etc, 'gtk-2.0',
