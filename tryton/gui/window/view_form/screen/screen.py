@@ -8,6 +8,7 @@ import collections
 import xml.dom.minidom
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
+from tryton.gui.window.view_form.model.record import Record
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
 from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
@@ -606,7 +607,9 @@ class Screen(SignalEvent):
         if (not CONFIG['client.save_tree_expanded_state']
                 or not view
                 or view.view_type != 'tree'
-                or not view.children_field):
+                or not view.children_field
+                or not (self.parent is None
+                    or isinstance(self.parent, Record))):
             return
         parent = self.parent.id if self.parent else None
         paths = view.get_expanded_paths()
