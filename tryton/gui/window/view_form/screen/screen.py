@@ -9,13 +9,13 @@ import xml.dom.minidom
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
-from tryton.gui.window.view_form.widget_search import Form
 from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
 from tryton.exceptions import TrytonServerError
 from tryton.jsonrpc import JSONEncoder
+from tryton.common.tdp import DomainParser
 
 
 class Screen(SignalEvent):
@@ -36,6 +36,8 @@ class Screen(SignalEvent):
         if domain is None:
             domain = []
 
+        self.limit = limit or 1000
+        self.offset = 0
         super(Screen, self).__init__()
 
         self.readonly = readonly
@@ -62,13 +64,13 @@ class Screen(SignalEvent):
         self.screen_container.alternate_view = alternate_view
         self.widget = self.screen_container.widget_get()
         self.__current_view = 0
-        self.limit = limit
         self.search_value = search_value
         self.fields_view_tree = None
         self.sort = sort
         self.view_to_load = []
         self.expanded_nodes = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
+        self.domain_parser = None
 
         if mode:
             self.view_to_load = mode[1:]
@@ -84,68 +86,86 @@ class Screen(SignalEvent):
 
     def search_active(self, active=True):
         if active and not self.parent:
-            if not self.filter_widget:
-                if not self.fields_view_tree:
-                    ctx = {}
-                    ctx.update(rpc.CONTEXT)
-                    ctx.update(self.context)
-                    try:
-                        self.fields_view_tree = rpc.execute('model',
-                                self.model_name, 'fields_view_get', False,
-                                'tree', ctx)
-                    except TrytonServerError:
-                        return
-                self.filter_widget = Form(self.fields_view_tree,
-                    self.model_name, self.domain, (self, self.search_filter),
-                    self.context)
-                self.screen_container.add_filter(self.filter_widget.widget,
-                        self.search_filter, self.search_clear,
-                        self.search_prev, self.search_next)
-                self.filter_widget.set_limit(self.limit)
-                self.filter_widget.value = self.search_value
+            if not self.fields_view_tree:
+                ctx = {}
+                ctx.update(rpc.CONTEXT)
+                ctx.update(self.context)
+                try:
+                    self.fields_view_tree = rpc.execute('model',
+                            self.model_name, 'fields_view_get', False,
+                            'tree', ctx)
+                except TrytonServerError:
+                    return
+
+            fields = self.fields_view_tree['fields']
+            for name, props in fields.iteritems():
+                if props['type'] not in ('selection', 'reference'):
+                    continue
+                if isinstance(props['selection'], (tuple, list)):
+                    continue
+                props['selection'] = self.get_selection(props)
+
+            self.domain_parser = DomainParser(
+                self.fields_view_tree['fields'])
+
+            self.screen_container.set_screen(self)
             self.screen_container.show_filter()
         else:
             self.screen_container.hide_filter()
 
-    def search_prev(self, widget=None):
-        self.filter_widget.prev()
-        self.search_filter()
+    def get_selection(self, props):
+        try:
+            selection = rpc.execute('model',
+                    self.model_name, props['selection'], rpc.CONTEXT)
+        except TrytonServerError, exception:
+            common.process_exception(exception, None)
+            selection = []
+        selection.sort(lambda x, y: cmp(x[1], y[1]))
+        return selection
 
-    def search_next(self, widget=None):
-        self.filter_widget.next()
-        self.search_filter()
+    def search_prev(self, search_string):
+        self.offset -= self.limit
+        self.search_filter(search_string=search_string)
 
-    def search_clear(self, widget=None):
-        self.filter_widget.clear()
-        self.clear()
+    def search_next(self, search_string):
+        self.offset += self.limit
+        self.search_filter(search_string=search_string)
 
-    def search_filter(self, widget=None, only_ids=False):
-        limit = None
-        offset = 0
-        values = []
-        if self.filter_widget:
-            limit = self.filter_widget.get_limit()
-            offset = self.filter_widget.get_offset()
-            values = self.filter_widget.value
+    def search_complete(self, search_string):
+        parsed_tree = self.domain_parser.parse(search_string)
+        res = list(r for r in parsed_tree.complete() \
+                if r.strip() != search_string)
+        return res
+
+    def search_filter(self, search_string=None, only_ids=False):
+        domain = []
+
+        if self.domain_parser:
+            if search_string is not None:
+                domain = self.domain_parser.parse(search_string or '').domain()
+            else:
+                domain = self.search_value
+            self.screen_container.set_text(self.domain_parser.string(domain))
         else:
-            values = [('id', 'in', [x.id for x in self.group])]
+            domain = [('id', 'in', [x.id for x in self.group])]
+
         ctx = {}
         ctx.update(rpc.CONTEXT)
         ctx.update(self.context)
-        if values:
+        if domain:
             if self.domain:
-                values = ['AND', values, self.domain]
+                domain = ['AND', domain, self.domain]
         else:
-            values = self.domain
-        rpc_args = ('model', self.model_name, 'search', values, offset, limit,
-            self.sort, ctx)
+            domain = self.domain
+        rpc_args = ('model', self.model_name, 'search', domain, self.offset,
+            self.limit, self.sort, ctx)
         try:
             ids = rpc.execute(*rpc_args)
         except TrytonServerError, exception:
             ids = (common.process_exception(exception, *rpc_args) or [])
         if not only_ids:
-            if len(ids) == limit:
-                rpc_args = ('model', self.model_name, 'search_count', values,
+            if len(ids) == self.limit:
+                rpc_args = ('model', self.model_name, 'search_count', domain,
                     ctx)
                 try:
                     self.search_count = rpc.execute(*rpc_args)
@@ -154,9 +174,9 @@ class Screen(SignalEvent):
                             *rpc_args) or 0)
             else:
                 self.search_count = len(ids)
-        self.screen_container.but_prev.set_sensitive(bool(offset))
-        if (len(ids) == limit
-                and self.search_count > limit + offset):
+        self.screen_container.but_prev.set_sensitive(bool(self.offset))
+        if (len(ids) == self.limit
+                and self.search_count > self.limit + self.offset):
             self.screen_container.but_next.set_sensitive(True)
         else:
             self.screen_container.but_next.set_sensitive(False)
@@ -220,12 +240,8 @@ class Screen(SignalEvent):
 
     def __set_current_record(self, record):
         self.__current_record = record
-        if self.filter_widget:
-            offset = int(self.filter_widget.get_offset())
-        else:
-            offset = 0
         try:
-            pos = self.group.index(record) + offset + 1
+            pos = self.group.index(record) + self.offset + 1
         except ValueError:
             pos = []
             i = record
@@ -234,7 +250,7 @@ class Screen(SignalEvent):
                 i = i.parent
             pos.reverse()
             pos = tuple(pos)
-        self.signal('record-message', (pos or 0, len(self.group) + offset,
+        self.signal('record-message', (pos or 0, len(self.group) + self.offset,
             self.search_count, record and record.id))
         attachment_count = 0
         if record and record.attachment_count > 0:

@@ -92,9 +92,9 @@ Figure: Tryton client application::
                      | |-+         | |-----------------------------------------------||
   Tool bar           | | |-        | | New Save Switch Reload | Prev Next | Attach v ||
                      | | |-        | |-----------------------------------------------||
-                     | +           | |                                               ||
-                     | |-+         | |                                               ||
-                     | | |-        | |                                               ||
+                     | +           | |        ____________________                   ||
+  Search widget      | |-+         | | Search |                   | <- -> Find Clear ||
+                     | | |-        | |-----------------------------------------------||
                      | | |-        | |                                               ||
                      | +           | |                                               ||
   View               | |-+         | |                                               ||
@@ -874,6 +874,101 @@ Attachment:
   On click it opens the attachments :term:`dialog`. The default dialog
   shows a list view of the attached files and links.
 
+Search Widget
+*************
+
+The search widget adds the ability to easily search for records on the current
+tab.  This widget is visible only on :term:`tree view`.
+
+The Syntax
+^^^^^^^^^^
+
+A query is composed of search clauses.
+A clause is composed of a field name (with `:` at the end), an operator and a value.
+The field name is optional and defaults to the record name.
+The operator is also optional and defaults to `like` or `equal` depending on
+the type of the field.  The default operator is `=` except for fields of type
+`char`, `text` and `many2one` which is `ilike`.
+
+Field Names
+^^^^^^^^^^^
+
+All field names shown in the :term:`tree view` can be searched. Field names
+must be followed by a `:`
+
+    For example: ``Name:``
+
+If the field name contains spaces, it is possible to
+escape it using double quotes.
+
+    For example: ``"Receivable Today":``
+
+Operators
+^^^^^^^^^
+
+The following operators can be used:
+
+    * `=`: equal to
+    * `<`: less then
+    * `<=`: less then or equal to
+    * `>`: greater then
+    * `>=`: greater then or equal to
+    * `!=`: not equal
+    * `!`: not equal or not like (depending of the type of field)
+
+    For example: ``Name: != Dwight``
+
+.. note:: The `ilike` operator is never explicit and `%` is appended to the
+    value to make it behaves like `starts with`
+
+Values
+^^^^^^
+
+The format of the value depends on the type of the field.
+A list of values can be set using `;` as separator.
+
+    For example: ``Name: Michael; Pam``
+
+    It will find all records having the `Name` starting with `Michael` or
+    `Pam`.
+
+A range of number values can be set using `..`.
+
+    For example: ``Amount: 100..500``
+
+    It will find all records with `Amount` between `100` and `500` (left
+    included and right excluded)
+
+There are two wildcards:
+
+    * `%`: matches any string of zero or more characters.
+    * `_`: matches any single character.
+
+It is possible to escape special characters in values by using double quotes.
+
+    For example: ``Name: "Michael:Scott"``
+
+    Here it will search with the value `Michael:Scott`.
+
+Clause composition
+^^^^^^^^^^^^^^^^^^
+
+The clauses can be composed using the two boolean operators `and` and `or`.
+By default, there is an implicit `and` between each clause if no operator is
+specified.
+
+    For example: ``Name: Michael Amount: 100``
+
+    is the same as ``Name: Michael and Amount: 100``
+
+The `and` operator has a highest precedence than `or` but you can change it by
+using parenthesis.
+
+    For example: ``(Name: Michael or Name: Pam) and Amount: 100``
+
+    is different than ``Name: Michael or Name: Pam and Amount: 100``
+
+    which is evaluated as ``Name: Michael or (Name: Pam and Amount: 100)``
 
 Appendix
 ********

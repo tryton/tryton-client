@@ -101,8 +101,6 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK|gtk.gdk.SHIFT_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Delete', gtk.keysyms.D,
                 gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/Form/Find', gtk.keysyms.F,
-                gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Next', gtk.keysyms.Page_Down,
                 0)
         gtk.accel_map_add_entry('<tryton>/Form/Previous', gtk.keysyms.Page_Up,

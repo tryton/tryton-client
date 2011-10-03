@@ -4,7 +4,6 @@ import gtk
 import gettext
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
-import tryton.gui.window.view_form.widget_search as widget_search
 from tryton.config import TRYTON_ICON
 from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.nomodal import NoModal

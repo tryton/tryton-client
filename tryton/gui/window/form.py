@@ -11,7 +11,6 @@ from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.gui import Main
 from tryton.gui.window import Window
-from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
@@ -59,7 +58,6 @@ class Form(SignalEvent, TabContent):
         (_('_Delete...'), 'tryton-delete', 'sig_remove',
             '<tryton>/Form/Delete'),
         (None,) * 4,
-        (_('_Find...'), 'tryton-find', 'sig_search', '<tryton>/Form/Find'),
         (_('_Next'), 'tryton-go-next', 'sig_next', '<tryton>/Form/Next'),
         (_('_Previous'), 'tryton-go-previous', 'sig_previous',
             '<tryton>/Form/Previous'),
@@ -441,16 +439,6 @@ class Form(SignalEvent, TabContent):
             )
         menu.show_all()
         menu.popup(None, None, menu_position, 0, 0)
-
-    def sig_search(self, widget=None):
-        if not self.modified_save():
-            return
-        def callback(result):
-            if result:
-                self.screen.clear()
-                self.screen.load(result)
-        WinSearch(self.model, callback, domain=self.domain,
-            context=self.context)
 
     def message_info(self, message, color='red'):
         if message:

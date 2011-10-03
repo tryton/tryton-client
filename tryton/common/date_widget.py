@@ -161,6 +161,8 @@ class DateEntry(gtk.Entry):
             return False
 
         match = self.regex.match(text)
+        if not match:
+            return False
         for i in range(len(match.groups())):
             val = match.group(i + 1)
             n = len(val)
