@@ -31,14 +31,20 @@ class ParserBoard(object):
             if not node.nodeType == node.ELEMENT_NODE:
                 continue
             attrs = common.node_attributes(node)
+            yexpand = int(attrs.get('yexpand', 0))
+            yfill = int(attrs.get('yfill', 0))
+            xexpand = int(attrs.get('xexpand', 1))
+            xfill = int(attrs.get('xfill', 1))
+            colspan = int(attrs.get('colspan', 1))
             if node.localName == 'image':
                 common.ICONFACTORY.register_icon(attrs['name'])
                 icon = gtk.Image()
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
-                container.wid_add(icon, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand',0)), ypadding=10,
-                        help_tip=attrs.get('help', False),
-                        yfill=int(attrs.get('yfill', 0)))
+                container.wid_add(icon,
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=10,
+                    xexpand=xexpand, xfill=xfill)
             elif node.localName == 'separator':
                 text = attrs.get('string', '')
                 if 'string' in attrs or 'name' in attrs:
@@ -55,10 +61,11 @@ class ParserBoard(object):
                     label.set_alignment(float(attrs.get('align', 0.0)), 0.5)
                     vbox.pack_start(label)
                 vbox.pack_start(gtk.HSeparator())
-                container.wid_add(vbox, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand', 0)),
-                        ypadding=10, help_tip=attrs.get('help', False),
-                        yfill=int(attrs.get('yfill', 0)))
+                container.wid_add(vbox,
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=10,
+                    xexpand=xexpand, xfill=xfill)
             elif node.localName == 'label':
                 text = attrs.get('string', '')
                 if not text:
@@ -82,25 +89,15 @@ class ParserBoard(object):
                     continue
                 label = gtk.Label(text)
                 label.set_use_markup(True)
-                if 'align' in attrs:
-                    label.set_alignment(float(attrs['align'] or 0.0), 0.5)
+                label.set_alignment(float(attrs.get('xalign', 1.0)),
+                    float(attrs.get('yalign', 0.0)))
                 label.set_angle(int(attrs.get('angle', 0)))
-                expand = False
-                if 'yexpand' in attrs:
-                    yexpand = bool(common.safe_eval(attrs['yexpand']))
-                yfill = False
-                if 'yfill' in attrs:
-                    yfill = bool(common.safe_eval(attrs['yfill']))
-                xexpand = False
-                if 'xexpand' in attrs:
-                    xexpand = bool(common.safe_eval(attrs['xexpand']))
-                xfill = True
-                if 'xfill' in attrs:
-                    xfill = bool(common.safe_eval(attrs['xfill']))
+                xexpand = bool(attrs.get('xexpand', 0))
                 container.wid_add(label,
-                        colspan=int(attrs.get('colspan', 1)),
-                        yexpand=yexpand, help_tip=attrs.get('help', False),
-                        yfill=yfill, xexpand=xexpand, xfill=xfill)
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
             elif node.localName == 'newline':
                 container.newline()
             elif node.localName == 'notebook':
@@ -140,10 +137,10 @@ class ParserBoard(object):
                     frame.add(widget)
                 else:
                     frame = widget
-                container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand', 0)),
-                        rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
-                        yfill=int(attrs.get('yfill', 1)), xpadding=0)
+                container.wid_add(frame,
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=0,
+                    xexpand=xexpand, xfill=xfill, xpadding=0)
             elif node.localName == 'hpaned':
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
@@ -171,7 +168,10 @@ class ParserBoard(object):
                 name = str(attrs['name'])
                 widget_act = Action(attrs, self.context)
                 widgets.append(widget_act)
+                yexpand = bool(attrs.get('yexpand', 1))
+                yfill = bool(attrs.get('yfill', 1))
                 container.wid_add(widget_act.widget,
-                        colspan=int(attrs.get('colspan', 1)),
-                        yexpand=True, yfill=True)
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
         return container.pop(), widgets

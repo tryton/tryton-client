@@ -332,15 +332,21 @@ class ParserForm(ParserInterface):
                 if attrs.get('name') and fields.get(attrs['name']) \
                         and attrs['name'] != self.screen.exclude_field:
                     cursor_widget = attrs.get('name')
+            yexpand = int(attrs.get('yexpand', 0))
+            yfill = int(attrs.get('yfill', 0))
+            xexpand = int(attrs.get('xexpand', 1))
+            xfill = int(attrs.get('xfill', 1))
+            colspan = int(attrs.get('colspan', 1))
             if node.localName == 'image':
                 common.ICONFACTORY.register_icon(attrs['name'])
                 icon = Image(attrs)
                 button_list.append(icon)
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
-                container.wid_add(icon, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand',0)), ypadding=10,
-                        help_tip=attrs.get('help', False),
-                        yfill=int(attrs.get('yfill', 0)))
+                container.wid_add(icon,
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=10,
+                    xexpand=xexpand, xfill=xfill)
             elif node.localName == 'separator':
                 text = attrs.get('string', '')
                 if 'name' in attrs:
@@ -359,10 +365,11 @@ class ParserForm(ParserInterface):
                     label.set_alignment(float(attrs.get('xalign', 0.0)), 0.5)
                     vbox.pack_start(label)
                 vbox.pack_start(gtk.HSeparator())
-                container.wid_add(vbox, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand', 0)),
-                        ypadding=10, help_tip=attrs.get('help', False),
-                        yfill=int(attrs.get('yfill', 0)))
+                container.wid_add(vbox,
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=10,
+                    xexpand=xexpand, xfill=xfill)
             elif node.localName == 'label':
                 text = attrs.get('string', '')
                 if 'name' in attrs and attrs['name'] in fields:
@@ -401,22 +408,12 @@ class ParserForm(ParserInterface):
                 label.set_alignment(float(attrs.get('xalign', 1.0)),
                     float(attrs.get('yalign', 0.0)))
                 label.set_angle(int(attrs.get('angle', 0)))
-                yexpand = False
-                if 'yexpand' in attrs:
-                    yexpand = bool(common.safe_eval(attrs['yexpand']))
-                yfill = False
-                if 'yfill' in attrs:
-                    yfill = bool(common.safe_eval(attrs['yfill']))
-                xexpand = False
-                if 'xexpand' in attrs:
-                    xexpand = bool(common.safe_eval(attrs['xexpand']))
-                xfill = True
-                if 'xfill' in attrs:
-                    xfill = bool(common.safe_eval(attrs['xfill']))
+                xexpand = bool(attrs.get('xexpand', 0))
                 container.wid_add(label,
-                        colspan=int(attrs.get('colspan', 1)),
-                        yexpand=yexpand, help_tip=attrs.get('help', False),
-                        yfill=yfill, xexpand=xexpand, xfill=xfill)
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'newline':
                 container.newline()
@@ -425,8 +422,10 @@ class ParserForm(ParserInterface):
                 button = Button(attrs)
                 button_list.append(button)
                 container.wid_add(button.widget,
-                        colspan=int(attrs.get('colspan', 1)),
-                        help_tip=attrs.get('help', False))
+                    help_tip=attrs.get('help', False),
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'notebook':
                 notebook = gtk.Notebook()
@@ -442,9 +441,13 @@ class ParserForm(ParserInterface):
                     pos = gtk.POS_BOTTOM
                 notebook.set_tab_pos(pos)
                 notebook.set_border_width(3)
+                colspan = int(attrs.get('colspan', 4))
+                yexpand = bool(attrs.get('yexpand', 1))
+                yfill = bool(attrs.get('yfill', 1))
                 container.wid_add(notebook,
-                        colspan=int(attrs.get('colspan', 4)),
-                        yexpand=True, yfill=True)
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
                         self.parse(model_name, node, fields, notebook,
                                 tooltips=tooltips)
@@ -553,19 +556,8 @@ class ParserForm(ParserInterface):
                 widget_act.position = self.widget_id
                 dict_widget.setdefault(name, [])
                 dict_widget[name].append(widget_act)
-                size = int(attrs.get('colspan', WIDGETS_TYPE[ftype][1]))
-                yexpand = WIDGETS_TYPE[ftype][2]
-                if 'yexpand' in attrs:
-                    yexpand = bool(common.safe_eval(attrs['yexpand']))
-                yfill = WIDGETS_TYPE[ftype][3]
-                if 'yfill' in attrs:
-                    yfill = bool(common.safe_eval(attrs['yfill']))
-                xexpand = True
-                if 'xexpand' in attrs:
-                    xexpand = bool(common.safe_eval(attrs['xexpand']))
-                xfill = True
-                if 'xfill' in attrs:
-                    xfill = bool(common.safe_eval(attrs['xfill']))
+                yexpand = bool(attrs.get('yexpand', WIDGETS_TYPE[ftype][2]))
+                yfill = bool(attrs.get('yfill', WIDGETS_TYPE[ftype][3]))
                 hlp = fields[name].attrs.get('help', attrs.get('help', False))
                 if attrs.get('height', False) or attrs.get('width', False):
                     widget_act.widget.set_size_request(
@@ -575,9 +567,12 @@ class ParserForm(ParserInterface):
                 if ftype in ('char', 'text'):
                     translate = fields[name].attrs.get('translate', False)
                 container.wid_add(Alignment(widget_act.widget, attrs),
-                        fields[name].attrs['string'], yexpand,
-                        translate=translate, colspan=size, fname=name,
-                        help_tip=hlp, yfill=yfill, xexpand=xexpand, xfill=xfill)
+                    fields[name].attrs['string'], fname=name,
+                    help_tip=hlp,
+                    translate=translate,
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill,
+                    xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
                 widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
@@ -605,10 +600,10 @@ class ParserForm(ParserInterface):
                 frame = Frame(text, attrs)
                 frame.add(widget)
                 button_list.append(frame)
-                container.wid_add(frame, colspan=int(attrs.get('colspan', 1)),
-                        yexpand=int(attrs.get('yexpand', 0)),
-                        rowspan=int(attrs.get('rowspan', 1)), ypadding=0,
-                        yfill=int(attrs.get('yfill', 1)), xpadding=0)
+                container.wid_add(frame,
+                    colspan=colspan,
+                    yexpand=yexpand, yfill=yfill, ypadding=0,
+                    xexpand=xexpand, xfill=xfill,  xpadding=0)
             elif node.localName == 'hpaned':
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
