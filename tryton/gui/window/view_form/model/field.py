@@ -828,6 +828,8 @@ class BinaryField(CharField):
 
     def get_data(self, record):
         if not isinstance(record.value.get(self.name), (basestring, buffer)):
+            if record.id < 0:
+                return ''
             ctx = rpc.CONTEXT.copy()
             ctx.update(record.context_get())
             rpcprogress = RPCProgress('execute', ('model', record.model_name,
