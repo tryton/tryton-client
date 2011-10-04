@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
+import tryton.common as common
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
@@ -76,7 +77,11 @@ class WinSearch(NoModal):
         self.win.set_size_request(700, 500)
 
         self.register()
+        sensible_allocation = self.sensible_widget.get_allocation()
+        self.win.set_default_size(int(sensible_allocation.width * 0.9),
+            int(sensible_allocation.height * 0.9))
         self.win.show()
+        common.center_window(self.win, self.parent, self.sensible_widget)
 
     def sig_activate(self, *args):
         self.view.widget_tree.emit_stop_by_name('row_activated')
