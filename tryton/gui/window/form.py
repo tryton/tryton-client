@@ -395,7 +395,7 @@ class Form(SignalEvent, TabContent):
             self.screen.display()
         else:
             obj_id = self.id_get()
-            self.screen.search_filter()
+            self.screen.search_filter(self.screen.screen_container.get_text())
             for record in self.screen.group:
                 if record.id == obj_id:
                     self.screen.current_record = record
