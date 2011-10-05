@@ -5,6 +5,10 @@ from jsonrpc import Fault
 TrytonServerError = Fault
 
 
+class TrytonServerUnavailable(Exception):
+    pass
+
+
 class TrytonError(Exception):
 
     def __init__(self, faultCode):

@@ -14,7 +14,7 @@ from tryton.signal_event import SignalEvent
 from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
-from tryton.exceptions import TrytonServerError
+from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
 from tryton.common.tdp import DomainParser
 
@@ -620,7 +620,7 @@ class Screen(SignalEvent):
             rpc.execute('model', 'ir.ui.view_tree_expanded_state',
                 'set_expanded', self.model_name, json_domain,
                 self.current_view.children_field, json_paths, rpc.CONTEXT)
-        except TrytonServerError:
+        except (TrytonServerError, TrytonServerUnavailable):
             pass
 
     def get_tree_domain(self, parent):

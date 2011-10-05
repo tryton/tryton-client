@@ -1,5 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+import httplib
 import itertools
 import logging
 import socket
@@ -10,7 +11,7 @@ from tryton.jsonrpc import ServerProxy, Fault
 from tryton.fingerprints import Fingerprints
 from tryton.config import get_config_dir
 from tryton.ipc import Server as IPCServer
-from tryton.exceptions import TrytonServerError
+from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 
 CONNECTION = None
 _USER = None
@@ -114,7 +115,7 @@ def logout():
             logging.getLogger('rpc.request').info('common.db.logout(%s, %s)' %
                 (_USER, _SESSION))
             CONNECTION.common.db.logout(_USER, _SESSION)
-        except (Fault, socket.error):
+        except (Fault, socket.error, httplib.CannotSendRequest):
             pass
         finally:
             _SEMAPHORE.release()
@@ -176,6 +177,8 @@ def _execute(blocking, *args):
         args = (_USER, _SESSION) + args[3:]
         logging.getLogger('rpc.request').info('%s%s' % (name, args))
         result = getattr(CONNECTION, name)(*args)
+    except httplib.CannotSendRequest, exception:
+        raise TrytonServerUnavailable(exception)
     finally:
         _SEMAPHORE.release()
     if key and method == 'fields_view_get':

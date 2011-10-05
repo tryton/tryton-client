@@ -42,7 +42,8 @@ try:
 except ImportError:
     pytz = None
 
-from tryton.exceptions import TrytonServerError, TrytonError
+from tryton.exceptions import (TrytonServerError, TrytonError,
+    TrytonServerUnavailable)
 
 _ = gettext.gettext
 
@@ -1048,7 +1049,7 @@ def process_exception(exception, *args):
                     return True
             finally:
                 PLOCK.release()
-    elif isinstance(exception, socket.error):
+    elif isinstance(exception, (socket.error, TrytonServerUnavailable)):
         msg = ''
         if len(exception.args) > 2:
             msg = exception.args[1]
