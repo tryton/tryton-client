@@ -120,16 +120,16 @@ class DBBackupDrop(object):
         label_subtitle.set_justify(gtk.JUSTIFY_LEFT)
         label_subtitle.set_alignment(0, 1)
         label_subtitle.set_padding( 9, 5)
-        table.attach(label_subtitle, 0, 3, 0, 1, xoptions=gtk.FILL)
+        table.attach(label_subtitle, 0, 3, 0, 1, yoptions=False, xoptions=gtk.FILL)
 
         hseparator = gtk.HSeparator()
-        table.attach(hseparator, 0, 3, 1, 2, yoptions=gtk.FILL)
+        table.attach(hseparator, 0, 3, 1, 2, yoptions=False)
 
         self.label_server = gtk.Label(_("Server Connection:"))
         self.label_server.set_alignment(1, 0.5)
         self.label_server.set_padding(3, 3)
-        table.attach(self.label_server, 0, 1, 2, 3, xoptions=gtk.FILL,
-                yoptions=gtk.FILL)
+        table.attach(self.label_server, 0, 1, 2, 3, yoptions=False,
+            xoptions=gtk.FILL)
 
         self.entry_server_connection = gtk.Entry()
         self.entry_server_connection.set_sensitive(False)
@@ -148,38 +148,43 @@ class DBBackupDrop(object):
         img_button_server_change.set_from_stock('tryton-preferences-system', \
                 gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
-        table.attach(self.button_server_change, 2, 3, 2, 3, yoptions=gtk.FILL, \
-                xoptions=gtk.FILL)
+        table.attach(self.button_server_change, 2, 3, 2, 3, yoptions=False)
 
         self.label_database = gtk.Label()
         self.label_database.set_text(_("Database:"))
         self.label_database.set_alignment(1, 0.5)
         self.label_database.set_padding(3, 3)
-        table.attach(self.label_database, 0, 1, 3, 4, xoptions=gtk.FILL,
-                yoptions=gtk.FILL)
+        table.attach(self.label_database, 0, 1, 3, 4, yoptions=False,
+            xoptions=gtk.FILL)
 
-        vbox_combo = gtk.VBox()
+        vbox_combo = gtk.VBox(homogeneous=True)
         self.combo_database = gtk.ComboBox()
+        dbstore = gtk.ListStore(gobject.TYPE_STRING)
+        cell = gtk.CellRendererText()
+        self.combo_database.pack_start(cell, True)
+        self.combo_database.add_attribute(cell, 'text', 0)
+        self.combo_database.set_model(dbstore)
         self.db_progressbar = gtk.ProgressBar()
         self.combo_database_label = gtk.Label()
         self.combo_database_label.set_use_markup(True)
         self.combo_database_label.set_alignment(0, 1)
-        vbox_combo.pack_start(self.combo_database, True, True)
-        vbox_combo.pack_start(self.combo_database_label, False, False)
-        vbox_combo.pack_start(self.db_progressbar, True, True)
+        vbox_combo.pack_start(self.combo_database)
+        vbox_combo.pack_start(self.combo_database_label)
+        vbox_combo.pack_start(self.db_progressbar)
         width, height = 0, 0
+        # Compute size_request of box in order to prevent "form jumping"
         for child in vbox_combo.get_children():
             cwidth, cheight = child.size_request()
             width, height = max(width, cwidth), max(height, cheight)
         vbox_combo.set_size_request(width, height)
-        table.attach(vbox_combo, 1, 3, 3, 4, yoptions=gtk.FILL)
+        table.attach(vbox_combo, 1, 3, 3, 4, yoptions=False)
 
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         self.label_serverpasswd.set_alignment(1, 0.5)
         self.label_serverpasswd.set_padding( 3, 3)
-        table.attach(self.label_serverpasswd, 0, 1, 4, 5, xoptions=gtk.FILL,
-                yoptions=gtk.FILL)
+        table.attach(self.label_serverpasswd, 0, 1, 4, 5, yoptions=False,
+            xoptions=gtk.FILL)
 
         self.entry_serverpasswd = gtk.Entry()
         self.entry_serverpasswd.set_visibility(False)
@@ -188,7 +193,7 @@ class DBBackupDrop(object):
                 "password of the Tryton server. It doesn't belong to a " \
                 "real user. This password is usually defined in the trytond " \
                 "configuration."))
-        table.attach(self.entry_serverpasswd, 1, 3, 4, 5, yoptions=gtk.FILL)
+        table.attach(self.entry_serverpasswd, 1, 3, 4, 5, yoptions=False)
 
         self.entry_serverpasswd.grab_focus()
         self.dialog.vbox.pack_start(self.dialog_vbox)
@@ -203,12 +208,7 @@ class DBBackupDrop(object):
         db_widget = self.combo_database
         db_progress = self.db_progressbar
         label = self.combo_database_label
-        liststore = gtk.ListStore(str)
-        db_widget.set_model(liststore)
-        cell = gtk.CellRendererText()
-        db_widget.pack_start(cell, True)
-        db_widget.add_attribute(cell, 'text', 0)
-        res = self.refreshlist(None, db_widget, label, db_progress,
+        self.refreshlist(None, db_widget, label, db_progress,
             CONFIG['login.server'], CONFIG['login.port'])
 
         change_button = self.button_server_change
