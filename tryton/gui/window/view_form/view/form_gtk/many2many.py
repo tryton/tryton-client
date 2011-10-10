@@ -36,6 +36,7 @@ class Many2Many(WidgetInterface):
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('width_chars', 13)
         self.wid_text.connect('activate', self._sig_activate)
+        self.wid_text.connect('focus-out-event', self._focus_out)
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_add = gtk.Button()
@@ -113,6 +114,10 @@ class Many2Many(WidgetInterface):
         if name != 'readonly':
             widget.modify_text(gtk.STATE_INSENSITIVE,
                     self.colors['text_color_insensitive'])
+
+    def _focus_out(self, *args):
+        if self.wid_text.get_text():
+            self._sig_add()
 
     def _sig_add(self, *args):
         domain = self.field.domain_get(self.record)

@@ -40,6 +40,7 @@ class One2Many(WidgetInterface):
             self.wid_text = gtk.Entry()
             self.wid_text.set_property('width_chars', 13)
             self.wid_text.connect('activate', self._sig_activate)
+            self.wid_text.connect('focus-out-event', self._focus_out)
             hbox.pack_start(self.wid_text, expand=True, fill=True)
 
             self.but_add = gtk.Button()
@@ -286,6 +287,10 @@ class One2Many(WidgetInterface):
     def _sig_activate(self, *args):
         self._sig_add()
         self.wid_text.grab_focus()
+
+    def _focus_out(self, *args):
+        if self.wid_text.get_text():
+            self._sig_add()
 
     def _sig_add(self, *args):
         self.view.set_value()
