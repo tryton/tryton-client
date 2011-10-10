@@ -250,12 +250,14 @@ class Many2One(WidgetInterface):
         super(Many2One, self).display(record, field)
         if not field:
             self.wid_text.set_text('')
+            self.wid_text.set_position(0)
             self.changed = True
             return False
         img = self.but_open.get_image()
         current_stock = img.get_stock()[0]
-        res = field.get_client(record)
-        self.wid_text.set_text((res and str(res)) or '')
+        res = field.get_client(record) or ''
+        self.wid_text.set_text(res)
+        self.wid_text.set_position(len(res))
         if res and current_stock != 'tryton-open':
             img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.tooltips.set_tip(self.but_open, _('Open a record'))

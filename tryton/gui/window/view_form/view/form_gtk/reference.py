@@ -250,6 +250,7 @@ class Reference(WidgetInterface):
         if not self.changed:
             return
         self.wid_text.set_text('')
+        self.wid_text.set_position(0)
         self.field.set_client(self.record, (self.get_model(), (-1, '')))
 
     def sig_changed(self, *args):
@@ -270,6 +271,7 @@ class Reference(WidgetInterface):
         self.changed = False
         if not field:
             child.set_text('')
+            child.set_position(0)
             self.changed =True
             return False
         super(Reference, self).display(record, field)
@@ -281,7 +283,9 @@ class Reference(WidgetInterface):
             model, (obj_id, name) = value
         if model:
             child.set_text(self._selection2[model])
+            child.set_position(len(self._selection2[model]))
             self.wid_text.set_text(name)
+            self.wid_text.set_position(len(name))
             if obj_id:
                 img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.but_open.set_image(img)
@@ -290,7 +294,9 @@ class Reference(WidgetInterface):
                 self.but_open.set_image(img)
         else:
             child.set_text('')
+            child.set_position(0)
             self.wid_text.set_text(str(name))
+            self.wid_text.set_position(len(str(name)))
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_open.set_image(img)
         self.changed = True
