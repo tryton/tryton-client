@@ -15,6 +15,8 @@ import base64
 
 __all__ = ["ResponseError", "Fault", "ProtocolError", "Transport",
     "ServerProxy"]
+CONNECT_TIMEOUT = 5
+DEFAULT_TIMEOUT = None
 
 
 class ResponseError(xmlrpclib.ResponseError):
@@ -156,10 +158,13 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                     self.cert_file, ca_certs=ca_certs, cert_reqs=cert_reqs)
 
         def http_connection():
-            self.__connection = host, httplib.HTTPConnection(host)
+            self.__connection = host, httplib.HTTPConnection(host,
+                timeout=CONNECT_TIMEOUT)
+            self.__connection[1].connect()
 
         def https_connection():
-            self.__connection = host, HTTPSConnection(host)
+            self.__connection = host, HTTPSConnection(host,
+                timeout=CONNECT_TIMEOUT)
             try:
                 self.__connection[1].connect()
                 sock = self.__connection[1].sock
@@ -191,6 +196,8 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                     raise ssl.SSLError('BadFingerprint')
             else:
                 self.__fingerprints[host] = fingerprint
+        self.__connection[1].timeout = DEFAULT_TIMEOUT
+        self.__connection[1].sock.settimeout(DEFAULT_TIMEOUT)
         return self.__connection[1]
 
     if sys.version_info[:2] <= (2, 6):
