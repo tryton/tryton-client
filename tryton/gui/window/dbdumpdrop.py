@@ -3,6 +3,7 @@
 import threading
 
 import gtk
+import gobject
 import gettext
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
@@ -19,26 +20,26 @@ class DBBackupDrop(object):
         db_widget.hide()
         label.hide()
         dbprogress = common.DBProgress(host, port)
-        dbs, createdb = dbprogress.update(db_widget, db_progress)
-        if dbs is None or dbs == -1:
-            if dbs is None:
+        def callback(dbs, createdb):
+            if dbs is None or dbs == -1:
+                if dbs is None:
+                    label.set_label('<b>' + \
+                            _('Could not connect to server!') + '</b>')
+                else:
+                    label.set_label('<b>' + \
+                        _('This client version is not compatible with the server!')
+                        + '</b>')
+                db_widget.hide()
+                label.show()
+            elif dbs == 0:
                 label.set_label('<b>' + \
-                        _('Could not connect to server!') + '</b>')
+                        _('No database found, you must create one!') + '</b>')
+                db_widget.hide()
+                label.show()
             else:
-                label.set_label('<b>' + \
-                    _('This client version is not compatible with the server!')
-                    + '</b>')
-            db_widget.hide()
-            label.show()
-        elif dbs == 0:
-            label.set_label('<b>' + \
-                    _('No database found, you must create one!') + '</b>')
-            db_widget.hide()
-            label.show()
-        else:
-            label.hide()
-            db_widget.show()
-        return dbs
+                label.hide()
+                db_widget.show()
+        dbprogress.update(db_widget, db_progress, callback)
 
     @staticmethod
     def refreshlist_ask(widget, server_widget, db_widget, label, db_progress):

@@ -1125,7 +1125,7 @@ class DBProgress(object):
 
     def start(self):
         key = (self.host, self.port)
-        dbs, createdb = [], False
+        dbs, createdb = None, False
         try:
             dbs = refresh_dblist(self.host, self.port)
             createdb = True
@@ -1133,42 +1133,42 @@ class DBProgress(object):
             self.db_info = (dbs, createdb)
             self.updated.set()
 
-    def update(self, combo, progressbar, dbname=''):
+    def update(self, combo, progressbar, callback, dbname=''):
         key = (self.host, self.port)
         self.db_info = None
         thread = threading.Thread(target=self.start).start()
+        gobject.timeout_add(100, self.end, combo, progressbar, callback,
+            dbname)
 
-        i = 0
-        while not self.updated.isSet():
-            i += 1
-            time.sleep(0.1)
-            if i >= 10:
-                progressbar.show()
-                progressbar.pulse()
-            while gtk.events_pending():
-                gtk.main_iteration()
+    def end(self, combo, progressbar, callback, dbname):
+        if not self.updated.isSet():
+            progressbar.show()
+            progressbar.pulse()
+            return True
         progressbar.hide()
         dbs, createdb = self.db_info
 
         if dbs is None:
-            return None, False
+            dbs, createdb = None, False
         elif dbs == -1:
-            return -1, False
+            dbs, createdb = -1, False
+        else:
+            from tryton.gui.main import Main
+            Main.get_main().refresh_ssl()
+            liststore = combo.get_model()
+            liststore.clear()
+            index = -1
+            for db_num, db_name in enumerate(dbs):
+                liststore.append([db_name])
+                if db_name == dbname:
+                    index = db_num
+            if index == -1:
+                index = 0
+            combo.set_active(index)
+            dbs = len(dbs)
 
-        from tryton.gui.main import Main
-        Main.get_main().refresh_ssl()
-        liststore = combo.get_model()
-        liststore.clear()
-        index = -1
-        for db_num, db_name in enumerate(dbs):
-            liststore.append([db_name])
-            if db_name == dbname:
-                index = db_num
-        if index == -1:
-            index = 0
-        combo.set_active(index)
-
-        return len(dbs), createdb
+        callback(dbs, createdb)
+        return False
 
 
 class RPCProgress(object):

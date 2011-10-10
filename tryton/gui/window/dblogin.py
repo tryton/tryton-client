@@ -22,7 +22,7 @@ _ = gettext.gettext
 
 class DBListEditor(object):
 
-    def __init__(self, parent, profile_store, profiles):
+    def __init__(self, parent, profile_store, profiles, callback):
         self.profiles = profiles
         self.current_database = None
         self.old_profile, self.current_profile = None, None
@@ -142,6 +142,16 @@ class DBListEditor(object):
         self.dialog.set_default_size(640, 350)
         self.dialog.set_default_response(gtk.RESPONSE_ACCEPT)
 
+        self.dialog.connect('close', lambda *a: False)
+        self.dialog.connect('response', self.response)
+        self.callback = callback
+
+    def response(self, widget, response):
+        if self.callback:
+            self.callback(self.current_profile['name'])
+        self.parent.present()
+        self.dialog.destroy()
+
     def run(self, profile_name):
         self.clear_entries()  # must be done before show_all for windows
         self.dialog.show_all()
@@ -154,10 +164,6 @@ class DBListEditor(object):
                 i = 0
             self.profile_tree.get_selection().select_path((i,))
             self.profile_selected(self.profile_tree)
-        self.dialog.run()
-        self.parent.present()
-        self.dialog.destroy()
-        return self.current_profile['name']
 
     def _current_profile(self):
         model, selection = self.profile_tree.get_selection().get_selected()
@@ -284,6 +290,8 @@ class DBListEditor(object):
         port = self.port_entry.get_text()
         if not (host and port):
             return
+        if self.updating_db:
+            return
         if dbname is None:
             dbname = self.current_database
 
@@ -293,33 +301,40 @@ class DBListEditor(object):
         self.remove_button.set_sensitive(False)
         self.ok_button.set_sensitive(False)
         self.cell.set_property('editable', False)
+        self.host_entry.set_sensitive(False)
+        self.port_entry.set_sensitive(False)
         self.updating_db = True
-        dbs, createdb = dbprogress.update(self.database_combo,
-            self.database_progressbar, dbname)
-        self.updating_db = False
 
-        if dbs is None and createdb is None:
-            pass
-        elif dbs is None or dbs == -1:
-            if dbs is None:
-                label = _(u'Could not connect to the server')
-            else:
-                label = _(u'Incompatible version of the server')
-            self.database_label.set_label('<b>%s</b>' % label)
-            self.database_label.show()
-        elif dbs == 0:
-            if createdb:
-                self.database_button.show()
-            else:
-                self.database_entry.show()
-        else:
-            self.database_entry.set_text(dbname if dbname else '')
-            self.database_combo.show()
+        def callback(dbs, createdb):
+            self.updating_db = False
 
-        self.add_button.set_sensitive(True)
-        self.remove_button.set_sensitive(True)
-        self.ok_button.set_sensitive(True)
-        self.cell.set_property('editable', True)
+            if dbs is None and createdb is None:
+                pass
+            elif dbs is None or dbs == -1:
+                if dbs is None:
+                    label = _(u'Could not connect to the server')
+                else:
+                    label = _(u'Incompatible version of the server')
+                self.database_label.set_label('<b>%s</b>' % label)
+                self.database_label.show()
+            elif dbs == 0:
+                if createdb:
+                    self.database_button.show()
+                else:
+                    self.database_entry.show()
+            else:
+                self.database_entry.set_text(dbname if dbname else '')
+                self.database_combo.show()
+
+            self.add_button.set_sensitive(True)
+            self.remove_button.set_sensitive(True)
+            self.ok_button.set_sensitive(True)
+            self.cell.set_property('editable', True)
+            self.host_entry.set_sensitive(True)
+            self.port_entry.set_sensitive(True)
+
+        dbprogress.update(self.database_combo,
+            self.database_progressbar, callback, dbname)
 
     def db_create(self, button):
         if not self.current_profile['name']:
@@ -481,20 +496,23 @@ class DBLogin(object):
             self.profile_store.append([section, active])
 
     def profile_manage(self, widget):
-        dia = DBListEditor(self.dialog, self.profile_store, self.profiles)
+        def callback(profile_name):
+            with open(self.profile_cfg, 'wb') as configfile:
+                self.profiles.write(configfile)
+
+            for idx, row in enumerate(self.profile_store):
+                if row[0] == profile_name and row[1]:
+                    self.combo_profile.set_active(idx)
+                    self.profile_changed(self.combo_profile)
+                    break
+
+        dia = DBListEditor(self.dialog, self.profile_store, self.profiles,
+            callback)
         active_profile = self.combo_profile.get_active()
         profile_name = None
         if active_profile != -1:
             profile_name = self.profile_store[active_profile][0]
-        profile_name = dia.run(profile_name)
-        with open(self.profile_cfg, 'wb') as configfile:
-            self.profiles.write(configfile)
-
-        for idx, row in enumerate(self.profile_store):
-            if row[0] == profile_name and row[1]:
-                self.combo_profile.set_active(idx)
-                self.profile_changed(self.combo_profile)
-                break
+        dia.run(profile_name)
 
     def profile_changed(self, combobox):
         position = combobox.get_active()
@@ -544,6 +562,7 @@ class DBLogin(object):
         else:
             idx = -1
         self.combo_profile.set_active(idx)
+        return False
 
     def expand_hostspec(self, expander, *args):
         visibility = expander.props.expanded
@@ -626,7 +645,12 @@ class DBLogin(object):
                 hostname = '[%s]' % host
             else:
                 hostname = host
-            if not common.test_server_version(host, port):
+            try:
+                if not common.test_server_version(host, port):
+                    common.warning('', _(u'Incompatible version of the server'))
+                    continue
+            except Exception, exception:
+                common.process_exception(exception)
                 continue
             database = self.entry_database.get_text()
             login = self.entry_login.get_text()
