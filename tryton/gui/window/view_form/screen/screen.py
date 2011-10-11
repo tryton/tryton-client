@@ -544,7 +544,7 @@ class Screen(SignalEvent):
         elif self.current_view.view_type == 'tree':
             records = self.current_view.selected_records()
         if delete:
-            if not self.group.delete([self.current_record]):
+            if not self.group.delete(records):
                 return False
 
         top_record = records[0]
