@@ -814,7 +814,7 @@ class BinaryField(CharField):
     def set_client(self, record, value, force_change=False):
         _, filename = tempfile.mkstemp(prefix='tryton_')
         with open(filename, 'wb') as fp:
-            fp.write(value)
+            fp.write(value or '')
         self.set(record, filename)
         record.modified_fields.setdefault(self.name)
         record.signal('record-modified')
@@ -845,7 +845,7 @@ class BinaryField(CharField):
                 return ''
             _, filename = tempfile.mkstemp(prefix='tryton_')
             with open(filename, 'wb') as fp:
-                fp.write(values[self.name])
+                fp.write(values[self.name] or '')
             self.set(record, filename)
         return self.get(record)
 
