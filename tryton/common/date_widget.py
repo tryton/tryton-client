@@ -158,11 +158,11 @@ class DateEntry(gtk.Entry):
         if default is None:
             default = datetime_strftime(datetime.datetime.now(), self.format)
         if text == self.initial_value or not text:
-            return False
+            return ''
 
         match = self.regex.match(text)
         if not match:
-            return False
+            return ''
         for i in range(len(match.groups())):
             val = match.group(i + 1)
             n = len(val)
