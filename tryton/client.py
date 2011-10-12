@@ -97,17 +97,9 @@ class TrytonClient(object):
         if hasattr(signal, 'SIGQUIT'):
             signal.signal(signal.SIGQUIT, lambda signum, frame: main.sig_quit())
 
-        def excepthook(exctyp, value, tb):
+        def excepthook(exctyp, exception, tb):
             import common
-
-            if str(value) == 'NotLogged':
-                return
-
-            tb_s = reduce(lambda x, y: x+y,
-                    traceback.format_exception(exctyp, value, tb))
-            for path in sys.path:
-                tb_s = tb_s.replace(path, '')
-            common.error(str(value), tb_s)
+            common.process_exception(exception)
 
         sys.excepthook = excepthook
 

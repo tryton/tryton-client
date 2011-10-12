@@ -1050,10 +1050,7 @@ def process_exception(exception, *args):
             finally:
                 PLOCK.release()
     elif isinstance(exception, (socket.error, TrytonServerUnavailable)):
-        msg = ''
-        if len(exception.args) > 2:
-            msg = exception.args[1]
-        warning(msg, _('Network Error!'))
+        warning(str(exception), _('Network Error!'))
         return False
 
     if isinstance(exception, TrytonServerError):
@@ -1129,6 +1126,8 @@ class DBProgress(object):
         try:
             dbs = refresh_dblist(self.host, self.port)
             createdb = True
+        except Exception:
+            pass
         finally:
             self.db_info = (dbs, createdb)
             self.updated.set()
@@ -1184,7 +1183,7 @@ class RPCProgress(object):
     def start(self):
         try:
             self.res = getattr(rpc, self.method)(*self.args)
-        except TrytonServerError, exception:
+        except Exception, exception:
             self.error = True
             self.res = False
             self.exception = exception

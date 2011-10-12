@@ -63,8 +63,7 @@ def server_version(host, port):
         logging.getLogger('rpc.result').debug(repr(result))
         return result
     except (Fault, socket.error):
-        logging.getLogger('rpc.result').debug(repr(None))
-        return None
+        raise
 
 def login(username, password, host, port, database):
     global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE, _VIEW_CACHE
@@ -177,8 +176,8 @@ def _execute(blocking, *args):
         args = (_USER, _SESSION) + args[3:]
         logging.getLogger('rpc.request').info('%s%s' % (name, args))
         result = getattr(CONNECTION, name)(*args)
-    except httplib.CannotSendRequest, exception:
-        raise TrytonServerUnavailable(exception)
+    except (httplib.CannotSendRequest, socket.error), exception:
+        raise TrytonServerUnavailable(*exception.args)
     finally:
         _SEMAPHORE.release()
     if key and method == 'fields_view_get':
