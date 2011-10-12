@@ -508,7 +508,8 @@ class Form(SignalEvent, TabContent):
                     action['pyson_email'])
                 if not email:
                     email = {}
-            email['subject'] = action['name'].replace('_', '')
+            if 'subject' not in email:
+                email['subject'] = action['name'].replace('_', '')
             action['email'] = email
             self.screen.display()
         elif atype == 'relate':
