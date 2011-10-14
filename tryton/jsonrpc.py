@@ -52,6 +52,11 @@ def object_hook(dct):
 
 class JSONEncoder(json.JSONEncoder):
 
+    def __init__(self, *args, **kwargs):
+        super(JSONEncoder, self).__init__(*args, **kwargs)
+        # Force to use our custom decimal with simplejson
+        self.use_decimal = False
+
     def default(self, obj):
         if isinstance(obj, datetime.date):
             if isinstance(obj, datetime.datetime):
