@@ -9,7 +9,10 @@ from urlparse import urlparse
 import urllib
 import gobject
 import gtk
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import webbrowser
 import tryton.rpc as rpc
 from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR, DATA_DIR, \

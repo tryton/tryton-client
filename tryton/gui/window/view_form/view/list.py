@@ -3,7 +3,10 @@
 import gobject
 import gtk
 import sys
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import tryton.rpc as rpc
 import locale
 from interface import ParserView

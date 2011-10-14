@@ -2,7 +2,10 @@
 #this repository contains the full copyright notices and license terms.
 "Screen"
 import gobject
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import copy
 import collections
 import xml.dom.minidom
