@@ -99,7 +99,9 @@ class TrytonClient(object):
 
         def excepthook(exctyp, exception, tb):
             import common
-            common.process_exception(exception)
+            import traceback
+            tb = '\n'.join(traceback.format_tb(tb))
+            common.process_exception(exception, tb=tb)
 
         sys.excepthook = excepthook
 

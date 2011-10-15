@@ -966,7 +966,7 @@ def to_xml(string):
 
 PLOCK = Lock()
 
-def process_exception(exception, *args):
+def process_exception(exception, *args, **kwargs):
 
     if isinstance(exception, TrytonError):
         if exception.faultCode == 'BadFingerprint':
@@ -1057,7 +1057,10 @@ def process_exception(exception, *args):
         error_title, error_detail = exception.faultCode, exception.faultString
     else:
         error_title = str(exception)
-        error_detail = traceback.format_exc()
+        if 'tb' in kwargs:
+            error_detail = kwargs['tb']
+        else:
+            error_detail = traceback.format_exc()
     error(error_title, error_detail)
     return False
 
