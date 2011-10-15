@@ -73,16 +73,12 @@ def login(username, password, host, port, database):
     try:
         _SEMAPHORE.acquire()
         try:
-            connection = ServerProxy(host, port, database)
-            if str(connection) != str(CONNECTION):
-                if CONNECTION:
-                    CONNECTION.close()
-                CONNECTION = connection
-            else:
-                connection = CONNECTION
+            if CONNECTION is not None:
+                CONNECTION.close()
+            CONNECTION = ServerProxy(host, port, database)
             logging.getLogger('rpc.request').info('common.db.login(%s, %s)' %
                 (username, 'x' * 10))
-            result = connection.common.db.login(username, password)
+            result = CONNECTION.common.db.login(username, password)
             logging.getLogger('rpc.result').debug(repr(result))
         finally:
             _SEMAPHORE.release()
