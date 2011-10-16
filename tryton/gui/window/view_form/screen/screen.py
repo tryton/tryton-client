@@ -144,7 +144,7 @@ class Screen(SignalEvent):
     def search_filter(self, search_string=None, only_ids=False):
         domain = []
 
-        if self.domain_parser:
+        if self.domain_parser and not self.parent:
             if search_string is not None:
                 domain = self.domain_parser.parse(search_string or '').domain()
             else:
