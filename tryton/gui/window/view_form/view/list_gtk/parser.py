@@ -59,11 +59,12 @@ def sort_model(column, treeview, screen):
             column.arrow.hide()
     store = treeview.get_model()
     unsaved_records = [x for x in store.group if x.id < 0]
+    search_string = screen.screen_container.get_text() or None
     if screen.search_count == len(store):
-        ids = screen.search_filter(only_ids=True)
+        ids = screen.search_filter(search_string=search_string, only_ids=True)
         store.sort(ids)
     else:
-        screen.search_filter()
+        screen.search_filter(search_string=search_string)
     for record in unsaved_records:
         store.group.append(record)
 
