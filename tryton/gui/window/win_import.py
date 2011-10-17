@@ -288,7 +288,7 @@ class WinImport(object):
                     field = word
                 else:
                     common.warning(
-                            _('Error processing the file at field%s.') %
+                            _('Error processing the file at field %s.') %
                             word, self.dialog, _('Error'))
                     return True
                 num = self.model2.append()

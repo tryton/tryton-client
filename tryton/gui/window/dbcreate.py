@@ -47,9 +47,9 @@ class DBCreate(object):
             self.tooltips.set_tip(self.entry_server_connection, _( \
                 "Can not connect to the server!\n" \
                 "1. Try to check if the server is running.\n" \
-                "2. Find out on which address and port it is listen.\n" \
+                "2. Find out on which address and port it is listening.\n" \
                 "3. If there is a firewall between the server and this " \
-                "client, make shure that the server address and port " \
+                "client, make sure that the server address and port " \
                 "(usually 8000) are not blocked.\n" \
                 "Click on 'Change' to change the address."))
         return state
