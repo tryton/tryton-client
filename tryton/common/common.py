@@ -1124,7 +1124,6 @@ class DBProgress(object):
         self.db_info = None
 
     def start(self):
-        key = (self.host, self.port)
         dbs, createdb = None, False
         try:
             dbs = refresh_dblist(self.host, self.port)
@@ -1136,7 +1135,6 @@ class DBProgress(object):
             self.updated.set()
 
     def update(self, combo, progressbar, callback, dbname=''):
-        key = (self.host, self.port)
         self.db_info = None
         thread = threading.Thread(target=self.start).start()
         gobject.timeout_add(100, self.end, combo, progressbar, callback,
