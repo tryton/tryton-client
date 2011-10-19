@@ -137,6 +137,7 @@ class Main(object):
         self.menubar = None
         self.menuitem_user = None
         self.menuitem_plugins = None
+        self.menuitem_shortcut = None
 
         if self.macapp is not None:
             self.macapp.ready()
@@ -249,8 +250,12 @@ class Main(object):
         menu_plugins.set_accel_path('<tryton>/Plugins')
 
         menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
+        if self.menuitem_shortcut:
+            menuitem_shortcut.set_sensitive(
+                self.menuitem_shortcut.get_property('sensitive'))
+        else:
+            menuitem_shortcut.set_sensitive(False)
         self.menuitem_shortcut = menuitem_shortcut
-        self.menuitem_shortcut.set_sensitive(False)
         menubar.add(menuitem_shortcut)
         menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
         def shortcut_activate(widget):
