@@ -259,7 +259,8 @@ class Main(object):
         menubar.add(menuitem_shortcut)
         menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
         def shortcut_activate(widget):
-            if not menuitem_shortcut.get_submenu():
+            if (not menuitem_shortcut.get_submenu()
+                    or not menuitem_shortcut.get_submenu().get_children()):
                 self.shortcut_set()
         menuitem_shortcut.connect('select', shortcut_activate)
 
@@ -745,7 +746,9 @@ class Main(object):
                     user, 'ir.ui.menu', rpc.CONTEXT)
         except TrytonServerError:
             shortcuts = []
-        menu = gtk.Menu()
+        menu = self.menuitem_shortcut.get_submenu()
+        if not menu:
+            menu = gtk.Menu()
         for shortcut in shortcuts:
             menuitem = gtk.MenuItem(shortcut['name'])
             menuitem.connect('activate', _action_shortcut, shortcut['res_id'])
@@ -762,6 +765,8 @@ class Main(object):
 
     def shortcut_unset(self):
         self.menuitem_shortcut.remove_submenu()
+        # Set a submenu to get keyboard shortcut working
+        self.menuitem_shortcut.set_submenu(gtk.Menu())
 
     def sig_accel_change(self, value):
         CONFIG['client.can_change_accelerators'] = value
