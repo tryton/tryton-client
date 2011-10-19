@@ -92,14 +92,7 @@ class Calendar(WidgetInterface):
             if len(value)>10:
                 value = value[:10]
             date = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
-            format = self.format
-            if date.year < 10:
-                format = format.replace('%Y', '000%Y')
-            elif date.year < 100:
-                format = format.replace('%Y', '00%Y')
-            elif date.year < 1000:
-                format = format.replace('%Y', '0%Y')
-            value = datetime_strftime(date, format)
+            value = datetime_strftime(date, self.format)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -136,14 +129,7 @@ class Calendar(WidgetInterface):
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
             date = datetime.date(year, month + 1, day)
-            format = self.format
-            if date.year < 10:
-                format = format.replace('%Y', '000%Y')
-            elif date.year < 100:
-                format = format.replace('%Y', '00%Y')
-            elif date.year < 1000:
-                format = format.replace('%Y', '0%Y')
-            self.entry.set_text(datetime_strftime(date, format))
+            self.entry.set_text(datetime_strftime(date, self.format))
         self._focus_out()
         parent.present()
         win.destroy()
@@ -225,14 +211,7 @@ class DateTime(WidgetInterface):
         else:
             date = datetime.datetime(*time.strptime(dt_val, DHM_FORMAT)[:6])
             date = timezoned_date(date)
-            format = self.format
-            if date.year < 10:
-                format = format.replace('%Y', '000%Y')
-            elif date.year < 100:
-                format = format.replace('%Y', '00%Y')
-            elif date.year < 1000:
-                format = format.replace('%Y', '0%Y')
-            value = datetime_strftime(date, format)
+            value = datetime_strftime(date, self.format)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
