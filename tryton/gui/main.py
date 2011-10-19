@@ -953,7 +953,6 @@ class Main(object):
         self.shortcut_unset()
         self.menuitem_shortcut.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
-        #self.menuitem_form.set_sensitive(True)
         self.menuitem_plugins.set_sensitive(True)
         if CONFIG.arguments:
             url = CONFIG.arguments.pop()
@@ -993,7 +992,6 @@ class Main(object):
         self.shortcut_unset()
         self.menuitem_shortcut.set_sensitive(False)
         self.menuitem_user.set_sensitive(False)
-        #self.menuitem_form.set_sensitive(False)
         self.menuitem_plugins.set_sensitive(False)
         if disconnect:
             rpc.logout()
