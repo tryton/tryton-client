@@ -113,7 +113,7 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
 
     def __init__(self, fingerprints=None, ca_certs=None):
         xmlrpclib.Transport.__init__(self)
-        self.__connection = (None, None)
+        self._connection = (None, None)
         self.__fingerprints = fingerprints
         self.__ca_certs = ca_certs
 
@@ -147,8 +147,8 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
             connection.send(request_body)
 
     def make_connection(self, host):
-        if self.__connection and host == self.__connection[0]:
-            return self.__connection[1]
+        if self._connection and host == self._connection[0]:
+            return self._connection[1]
         host, extra_headers, x509 = self.get_host_info(host)
 
         ca_certs =  self.__ca_certs
@@ -166,16 +166,16 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                     self.cert_file, ca_certs=ca_certs, cert_reqs=cert_reqs)
 
         def http_connection():
-            self.__connection = host, httplib.HTTPConnection(host,
+            self._connection = host, httplib.HTTPConnection(host,
                 timeout=CONNECT_TIMEOUT)
-            self.__connection[1].connect()
+            self._connection[1].connect()
 
         def https_connection():
-            self.__connection = host, HTTPSConnection(host,
+            self._connection = host, HTTPSConnection(host,
                 timeout=CONNECT_TIMEOUT)
             try:
-                self.__connection[1].connect()
-                sock = self.__connection[1].sock
+                self._connection[1].connect()
+                sock = self._connection[1].sock
                 try:
                     peercert = sock.getpeercert(True)
                 except socket.error:
@@ -204,9 +204,9 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                     raise ssl.SSLError('BadFingerprint')
             else:
                 self.__fingerprints[host] = fingerprint
-        self.__connection[1].timeout = DEFAULT_TIMEOUT
-        self.__connection[1].sock.settimeout(DEFAULT_TIMEOUT)
-        return self.__connection[1]
+        self._connection[1].timeout = DEFAULT_TIMEOUT
+        self._connection[1].sock.settimeout(DEFAULT_TIMEOUT)
+        return self._connection[1]
 
     if sys.version_info[:2] <= (2, 6):
 
@@ -250,9 +250,9 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
             connection.putheader("Accept-Encoding", "gzip")
 
         def close(self):
-            if self.__connection[1]:
-                self.__connection[1].close()
-                self.__connection = (None, None)
+            if self._connection[1]:
+                self._connection[1].close()
+                self._connection = (None, None)
 
 
 class ServerProxy(xmlrpclib.ServerProxy):
