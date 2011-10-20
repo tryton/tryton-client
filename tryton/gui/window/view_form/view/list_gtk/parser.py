@@ -348,9 +348,11 @@ class Char(object):
             return ''
         return record[self.field_name].get_client(record) or ''
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, text)
+        if callback:
+            callback()
 
 class Int(Char):
 
@@ -359,9 +361,11 @@ class Int(Char):
             attrs=attrs)
         self.renderer = CellRendererInteger()
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, int(text))
+        if callback:
+            callback()
 
     def get_textual_value(self, record):
         return locale.format('%d',
@@ -405,7 +409,7 @@ class Date(Char):
         date = datetime.date(*time.strptime(value, self.server_format)[:3])
         return common.datetime_strftime(date, self.display_format)
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         date = False
         try:
@@ -414,6 +418,8 @@ class Date(Char):
         except ValueError:
             date = False
         field.set_client(record, date)
+        if callback:
+            callback()
 
 
 class Datetime(Date):
@@ -434,7 +440,7 @@ class Datetime(Date):
         date = common.timezoned_date(date)
         return common.datetime_strftime(date, self.display_format)
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         date = False
         try:
@@ -445,6 +451,8 @@ class Datetime(Date):
         except ValueError:
             date = False
         field.set_client(record, date)
+        if callback:
+            callback()
 
 
 class Float(Char):
@@ -467,13 +475,15 @@ class Float(Char):
         return locale.format('%.'+str(digit)+'f',
                 record[self.field_name].get_client(record) or 0.0, True)
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         try:
             value = locale.atof(text)
         except ValueError:
             value = 0.0
         field.set_client(record, value)
+        if callback:
+            callback()
 
 
 class FloatTime(Char):
@@ -489,16 +499,20 @@ class FloatTime(Char):
         val = record[self.field_name].get_client(record)
         return common.float_time_to_text(val, self.conv)
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, common.text_to_float_time(text, self.conv))
+        if callback:
+            callback()
 
 class M2O(Char):
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record.group.fields[self.field_name]
         if not text and not field.get_state_attrs(
                 record)['required']:
+            if callback:
+                callback()
             return False
 
         relation = record[self.field_name].attrs['relation']
@@ -511,20 +525,23 @@ class M2O(Char):
             dom = domain
         args = ('model', relation, 'search', dom, 0, None, None,
                 context)
-        def callback(value):
-            field.set_client(record, value)
         try:
             ids = rpc.execute(*args)
         except TrytonServerError, exception:
             ids = common.process_exception(exception, *args)
             if not ids:
-                callback('???')
+                field.set_client(record, '???')
+                if callback:
+                    callback()
                 return
         if len(ids) != 1:
-            self.search_remote(record, relation, ids, domain=domain,
-                context=context)
+            if callback:
+                self.search_remote(record, relation, ids, domain=domain,
+                    context=context, callback=callback)
             return
-        callback(ids[0])
+        field.set_client(record, ids[0])
+        if callback:
+            callback()
 
     def open_remote(self, record, create=True, changed=False, text=None,
             callback=None):
@@ -617,8 +634,9 @@ class O2M(Char):
         return '( ' + str(len(record[self.field_name].\
                 get_client(record))) + ' )'
 
-    def value_from_text(self, record, text):
-        pass
+    def value_from_text(self, record, text, callback=None):
+        if callback:
+            callback()
 
     def open_remote(self, record, create=True, changed=False, text=None,
             callback=None):
@@ -646,12 +664,16 @@ class M2M(Char):
         return '( ' + str(len(record[self.field_name].\
                 get_client(record))) + ' )'
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         if not text:
             field.set_client(record, [])
+            if callback:
+                callback()
             return
         if not (text[0] != '('):
+            if callback:
+                callback()
             return
         relation = field.attrs['relation']
         domain = field.domain_get(record)
@@ -669,11 +691,17 @@ class M2M(Char):
             ids = common.process_exception(exception, *args)
             if ids is False:
                 field.set_client(record, [])
+                if callback:
+                    callback()
                 return
-        def callback(result):
+        if not callback:
+            return
+        def winsearch_callback(result):
             field.set_client(record, result or [])
-        WinSearch(relation, callback, sel_multi=True, ids=ids, context=context,
-            domain=domain)
+            if callback:
+                callback()
+        WinSearch(relation, winsearch_callback, sel_multi=True, ids=ids,
+            context=context, domain=domain)
         return
 
     def open_remote(self, record, create=True, changed=False, text=None,
@@ -750,9 +778,11 @@ class Selection(Char):
             value = value[0]
         return dict(self.selection).get(value, '')
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, self._selection.get(text, False))
+        if callback:
+            callback()
 
     def editing_started(self, cell, editable, path):
         store = self.treeview.get_model()
@@ -828,8 +858,9 @@ class Reference(Char):
         else:
             return name
 
-    def value_from_text(self, record, text):
-        pass
+    def value_from_text(self, record, text, callback=None):
+        if callback:
+            callback()
 
 
 class ProgressBar(object):
@@ -866,9 +897,11 @@ class ProgressBar(object):
     def get_textual_value(self, record):
         return record[self.field_name].get_client(record) or ''
 
-    def value_from_text(self, record, text):
+    def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, float(text))
+        if callback:
+            callback()
 
 
 class Button(object):

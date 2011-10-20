@@ -20,7 +20,7 @@ class EditableTreeView(gtk.TreeView):
         self.editable = position
         self.cells = {}
 
-    def on_quit_cell(self, current_record, fieldname, value):
+    def on_quit_cell(self, current_record, fieldname, value, callback=None):
         field = current_record[fieldname]
         if hasattr(field, 'editabletree_entry'):
             del field.editabletree_entry
@@ -32,7 +32,7 @@ class EditableTreeView(gtk.TreeView):
             return
 
         try:
-            cell.value_from_text(current_record, value)
+            cell.value_from_text(current_record, value, callback=callback)
         except parser.UnsettableColumn:
             return
 
@@ -151,9 +151,11 @@ class EditableTreeView(gtk.TreeView):
             else:
                 txt = entry.get_active_text()
             entry.disconnect(entry.editing_done_id)
-            self.on_quit_cell(record, column.name, txt)
-            entry.editing_done_id = entry.connect('editing_done',
-                    self.on_editing_done)
+            def callback():
+                entry.editing_done_id = entry.connect('editing_done',
+                        self.on_editing_done)
+                self.set_cursor(path, column, True)
+            self.on_quit_cell(record, column.name, txt, callback=callback)
         if event.keyval in self.leaving_record_events:
             fields = self.cells.keys()
             if not record.validate(fields):
