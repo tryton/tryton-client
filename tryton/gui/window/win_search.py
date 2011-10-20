@@ -87,6 +87,7 @@ class WinSearch(NoModal):
         self.view.widget_tree.emit_stop_by_name('row_activated')
         if not self.sel_multi:
             self.win.response(gtk.RESPONSE_OK)
+            return True
         return False
 
     def sig_button(self, view, event):
