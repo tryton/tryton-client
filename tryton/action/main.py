@@ -137,7 +137,7 @@ class Action(object):
             search_context['context'] = ctx
             search_context['_user'] = rpc._USER
             search_value = PYSONDecoder(search_context).decode(
-                    action['pyson_search_value'] or '{}')
+                    action['pyson_search_value'] or '[]')
 
             name = False
             if action.get('window_name', True):
