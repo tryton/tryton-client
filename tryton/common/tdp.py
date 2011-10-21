@@ -1109,7 +1109,7 @@ def test_date_complete():
         'Date Time: ' + today_str,
         'Date: ' + today_str,
         ]
-    assert list(parser.parse('Date: ' + today_str[0]).complete()) == [
+    assert list(parser.parse('Date: ' + today_str[0:2]).complete()) == [
         'Date Time: ' + today_str,
         'Date: ' + today_str,
         ]
