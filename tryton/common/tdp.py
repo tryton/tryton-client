@@ -471,30 +471,23 @@ class BiggerThanOrEqual(Comparator):
     value = '>='
 
 
-class Equal(Base, InfixMixin):
+class Equal(Comparator):
     value = '='
-    lbp = 60
     fmt = '%s%s%s'
 
     def domain(self, parent_field=None):
         assert not self.left, 'Unexpected left child %s' % self.left
-        res = []
-        if parent_field is not None:
-            field_name = parent_field['name']
-        else:
-            field_name = 'rec_name'
+        return super(Equal, self).domain(parent_field)
 
-        if self.right:
-            _, value = self.right.split()
-            if parent_field:
-                value = cast(parent_field, value)
-            res.append((field_name, '=', value))
-        return res
 
 class Not(Base, InfixMixin):
     value = '!'
     lbp = 60
     fmt = '%s%s%s'
+
+    def split(self):
+        assert isinstance(self.right, Literal)
+        return self.right.split()
 
     def domain(self, parent_field=None):
         assert not self.left, 'Unexpected left child %s' % self.left
@@ -520,25 +513,9 @@ class Not(Base, InfixMixin):
             res.append((field_name, oper, value))
         return res
 
-class NotEqual(Base, InfixMixin):
+class NotEqual(Equal):
     value = '!='
-    lbp = 60
     fmt = '%s%s%s'
-
-    def domain(self, parent_field=None):
-        assert not self.left, 'Unexpected left child %s' % self.left
-        res = []
-        if parent_field is not None:
-            field_name = parent_field['name']
-        else:
-            field_name = 'rec_name'
-
-        if self.right:
-            field, value = self.right.split()
-            if parent_field:
-                value = cast(parent_field, value)
-            res.append((field_name, '!=', value))
-        return res
 
 
 class And(Base, InfixMixin):
@@ -1307,6 +1284,12 @@ def test_composite_domain():
     assert parser.parse('char: foo and (char: bar or boolean: 0').domain() == [
         ('char', 'ilike', 'foo%'),
         ['OR', ('char', 'ilike', 'bar%'), ('boolean', '=', False)]]
+    assert parser.parse('Selection: Ham Selection: Spam').domain() == [
+        ('selection', '=', 'ham'), ('selection', '=', 'spam')]
+    assert parser.parse('Selection: =Ham Selection: =Spam').domain() == [
+        ('selection', '=', 'ham'), ('selection', '=', 'spam')]
+    assert parser.parse('Selection: !Ham Selection: !Spam').domain() == [
+        ('selection', '!=', 'ham'), ('selection', '!=', 'spam')]
 
 def test_composite_string():
     parser = test_parser()
