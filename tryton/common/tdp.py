@@ -486,7 +486,7 @@ class Not(Base, InfixMixin):
     fmt = '%s%s%s'
 
     def split(self):
-        assert isinstance(self.right, Literal)
+        assert isinstance(self.right, (Literal, Comma))
         return self.right.split()
 
     def domain(self, parent_field=None):
@@ -1290,6 +1290,9 @@ def test_composite_domain():
         ('selection', '=', 'ham'), ('selection', '=', 'spam')]
     assert parser.parse('Selection: !Ham Selection: !Spam').domain() == [
         ('selection', '!=', 'ham'), ('selection', '!=', 'spam')]
+    assert parser.parse('Selection: !Ham; Spam Char: bar').domain() == [
+        ('selection', 'not in', ['ham', 'spam']), ('char', 'ilike', 'bar%')]
+
 
 def test_composite_string():
     parser = test_parser()
