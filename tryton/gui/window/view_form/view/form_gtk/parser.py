@@ -689,12 +689,15 @@ class ParserForm(ParserInterface):
 
         code = rpc.CONTEXT.get('language', 'en_US')
 
+        widget_entry = widget_entry.get_children()[0]
+        if isinstance(widget_entry, gtk.ScrolledWindow):
+            widget_entry = widget_entry.get_child()
         #widget accessor functions
         def value_get(widget):
-            if type(widget) == type(gtk.Entry()):
+            if isinstance(widget, gtk.Entry):
                 return widget.get_text()
-            elif type(widget.child) == type(gtk.TextView()):
-                buf = widget.child.get_buffer()
+            elif isinstance(widget, gtk.TextView):
+                buf = widget.get_buffer()
                 iter_start = buf.get_start_iter()
                 iter_end = buf.get_end_iter()
                 return buf.get_text(iter_start, iter_end, False)
@@ -704,22 +707,22 @@ class ParserForm(ParserInterface):
         def value_set(widget, value):
             if not value:
                 value = ''
-            if type(widget) == type(gtk.Entry()):
+            if isinstance(widget, gtk.Entry):
                 widget.set_text(value)
-            elif type(widget.child) == type(gtk.TextView()):
-                buf = widget.child.get_buffer()
+            elif isinstance(widget, gtk.TextView):
+                buf = widget.get_buffer()
                 buf.delete(buf.get_start_iter(), buf.get_end_iter())
                 iter_start = buf.get_start_iter()
                 buf.insert(iter_start, value)
 
         def widget_duplicate(widget):
-            if type(widget) == type(gtk.Entry()):
+            if isinstance(widget, gtk.Entry):
                 entry = gtk.Entry()
                 entry.set_property('activates_default', True)
                 entry.set_max_length(widget.get_max_length())
                 entry.set_width_chars(widget.get_width_chars())
                 return entry, gtk.FILL
-            elif type(widget.child) == type(gtk.TextView()):
+            elif isinstance(widget, gtk.TextView):
                 textview = gtk.TextView()
                 textview.set_wrap_mode(gtk.WRAP_WORD)
                 scrolledwindow = gtk.ScrolledWindow()
