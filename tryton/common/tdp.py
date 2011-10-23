@@ -317,9 +317,13 @@ class Colon(Base, InfixMixin):
 
     def complete(self, parent_field=None):
         assert parent_field is None, parent_field
-        field, _ = self.left.split()
 
-        left = self.left and tuple(self.left.complete(field)) or ('',)
+        if self.left:
+            field, _ = self.left.split()
+            left = self.left and tuple(self.left.complete(field)) or ('',)
+        else:
+            field = None
+            left = ['']
         if not isinstance(self.right, Colon):
             right = tuple(self.right.complete(parent_field=field))
         else:
@@ -330,9 +334,10 @@ class Colon(Base, InfixMixin):
                 yield self.complete_fmt(lvalue, self.value, rvalue)
 
     def domain(self, parent_field=None):
-        if not self.left:
-            return []
-        field, value = self.left.split()
+        if self.left:
+            field, value = self.left.split()
+        else:
+            field, value = None, ''
 
         #Recurse left
         if isinstance(self.left, Literal):
@@ -353,17 +358,18 @@ class Colon(Base, InfixMixin):
                             domain = node.domain()
                         break
                     node = node.left
-        else:
+        elif self.left:
             domain = self.left.domain(parent_field)
+        else:
+            domain = []
 
         #Recurse right
-        if isinstance(self.right, Literal):
-            if field:
-                value = cast(field, ' '.join(self.right.flatten()))
-                if field['type'] in ('char', 'text', 'many2one'):
-                    value += '%'
+        if isinstance(self.right, Literal) and field:
+            value = cast(field, ' '.join(self.right.flatten()))
+            if field['type'] in ('char', 'text', 'many2one'):
+                value += '%'
 
-                domain.append((field['name'] , operator(field), value))
+            domain.append((field['name'] , operator(field), value))
         else:
             domain.extend(self.right.domain(field))
 
@@ -1182,6 +1188,8 @@ def test_composite_complete():
     today = datetime.date.today()
     today_str = datetime_strftime(today, date_format())
     parser = test_parser()
+    assert list(parser.parse(': foo').complete()) == [': foo']
+    assert list(parser.parse(': foo b').complete()) == [': foo Boolean:']
     assert list(parser.parse('char: foo boolean: false').complete()) == [
         'Char: foo Boolean: False']
     assert list(parser.parse('char: foo or char: bar').complete()) == [
@@ -1357,8 +1365,11 @@ def test_column():
     parser = test_parser()
     assert parser.parse(':').domain() == []
     assert parser.parse('::').domain() == []
-    assert parser.parse(': foo').domain() == []
+    assert parser.parse(': foo').domain() == [('rec_name', 'ilike', 'foo%')]
     assert parser.parse('foo :').domain() == [('rec_name', 'ilike', 'foo%')]
+    assert parser.parse(': foo b').domain() == [('rec_name', 'ilike', 'foo b%')]
+    assert parser.parse('": foo b"').domain() == [
+        ('rec_name', 'ilike', ': foo b%')]
 
 def test_double_dot():
     parser = test_parser()
