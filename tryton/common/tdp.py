@@ -1430,6 +1430,10 @@ def test_str():
  [right]                      <class 'tryton.common.tdp.End'>'''
 
 if __name__ == '__main__':
+    test_comparator()
+    test_comma()
+    test_double_dot()
+    test_column()
     test_selection_complete()
     test_selection_domain()
     test_selection_string()
