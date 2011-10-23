@@ -162,7 +162,7 @@ class Reference(WidgetInterface):
             except ValueError:
                 self.focus_out = True
                 return
-        if model and obj_id:
+        if model and obj_id >= 0:
             if not leave:
                 screen = Screen(model, mode=['form'])
                 screen.load([obj_id])
@@ -222,13 +222,12 @@ class Reference(WidgetInterface):
         if not model:
             return
         screen = Screen(model, mode=['form'])
-        win = WinForm(screen, self.widget.get_toplevel(), new=True)
-        if win.run():
-            if screen.save_current():
+        def callback(result):
+            if result and screen.save_current():
                 value = (screen.current_record.id,
                         screen.current_record.rec_name())
                 self.field.set_client(self.record, (model, value))
-        win.destroy()
+        WinForm(screen, callback, new=True)
 
     def sig_key_press(self, widget, event):
         editable = self.wid_text.get_editable()
@@ -261,7 +260,7 @@ class Reference(WidgetInterface):
             model, (obj_id, name) = '', (-1, '')
         else:
             model, (obj_id, name) = val
-        if self.get_model() and obj_id:
+        if self.get_model() and obj_id >= 0:
             self.field.set_client(self.record, (self.get_model(), (-1, '')))
             self.display(self.record, self.field)
         return False
@@ -286,7 +285,7 @@ class Reference(WidgetInterface):
             child.set_position(len(self._selection2[model]))
             self.wid_text.set_text(name)
             self.wid_text.set_position(len(name))
-            if obj_id:
+            if obj_id >= 0:
                 img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.but_open.set_image(img)
             else:
