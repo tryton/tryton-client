@@ -36,6 +36,7 @@ class Record(SignalEvent):
         self.next = {} # Used in Group list
         self.value = {}
         self.autocompletion = {}
+        self.exception = False
 
     def __getitem__(self, name, raise_exception=False):
         if name not in self._loaded and self.id >= 0:
@@ -79,6 +80,7 @@ class Record(SignalEvent):
                     for fname, field in self.group.fields.iteritems()
                     if field.attrs['type'] == 'binary'))
             args = ('model', self.model_name, 'read', ids, fields, ctx)
+            exception = None
             try:
                 values = rpc.execute(*args)
             except TrytonServerError, exception:
@@ -87,10 +89,16 @@ class Record(SignalEvent):
                 values = common.process_exception(exception, *args)
                 if not values:
                     values = [{'id': x} for x in ids]
+                    default_values = dict((f, False) for f in fields)
+                    for value in values:
+                        value.update(default_values)
+                    self.exception = True
             id2value = dict((value['id'], value) for value in values)
             if ids != [self.id]:
                 for id in ids:
                     record = self.group.get(id)
+                    if not record.exception:
+                        record.exception = bool(exception)
                     value = id2value.get(id)
                     if record and value:
                         record.set(value, signal=False)
@@ -164,7 +172,7 @@ class Record(SignalEvent):
     deleted = property(get_deleted)
 
     def get_readonly(self):
-        return self.deleted or self.removed
+        return self.deleted or self.removed or self.exception
 
     readonly = property(get_readonly)
 
