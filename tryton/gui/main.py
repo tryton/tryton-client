@@ -1183,12 +1183,9 @@ class Main(object):
         self.tooltips.set_tip(button, _('Close Tab'))
         button.connect('clicked', self._sig_remove_book, page.widget)
         hbox.pack_start(button, expand=False, fill=False)
-
-        def on_style_set(widget, prevstyle):
-            x, y = gtk.icon_size_lookup_for_settings(button.get_settings(),
-                    gtk.ICON_SIZE_MENU)
-            button.set_size_request(x, y)
-        hbox.connect("style-set", on_style_set)
+        x, y = gtk.icon_size_lookup_for_settings(button.get_settings(),
+                gtk.ICON_SIZE_MENU)
+        button.set_size_request(x, y)
 
         hbox.show_all()
         hbox.set_size_request(TAB_SIZE, -1)
