@@ -150,10 +150,9 @@ class EditableTreeView(gtk.TreeView):
                 txt = entry.get_text()
             else:
                 txt = entry.get_active_text()
-            entry.disconnect(entry.editing_done_id)
+            entry.handler_block(entry.editing_done_id)
             def callback():
-                entry.editing_done_id = entry.connect('editing_done',
-                        self.on_editing_done)
+                entry.handler_unblock(entry.editing_done_id)
                 self.set_cursor(path, column, True)
             self.on_quit_cell(record, column.name, txt, callback=callback)
         if event.keyval in self.leaving_record_events:
@@ -179,15 +178,13 @@ class EditableTreeView(gtk.TreeView):
             new_col = self.__prev_column(column)
             self.set_cursor(path, new_col, True)
         elif event.keyval == gtk.keysyms.Up:
-            entry.disconnect(entry.editing_done_id)
+            entry.handler_block(entry.editing_done_id)
             self._key_up(path, model, column)
-            entry.editing_done_id = entry.connect('editing_done',
-                    self.on_editing_done)
+            entry.handler_unblock(entry.editing_done_id)
         elif event.keyval == gtk.keysyms.Down:
-            entry.disconnect(entry.editing_done_id)
+            entry.handler_block(entry.editing_done_id)
             self._key_down(path, model, column)
-            entry.editing_done_id = entry.connect('editing_done',
-                    self.on_editing_done)
+            entry.handler_unblock(entry.editing_done_id)
         elif event.keyval in (gtk.keysyms.Return,):
             col = None
             for column in self.get_columns():
@@ -202,19 +199,18 @@ class EditableTreeView(gtk.TreeView):
                 if column.get_visible() and editable:
                     col = column
                     break
-            entry.disconnect(entry.editing_done_id)
+            entry.handler_block(entry.editing_done_id)
             if self.editable == 'top':
                 new_path = self._key_up(path, model, col)
             else:
                 new_path = self._key_down(path, model, column)
-            entry.editing_done_id = entry.connect('editing_done',
-                    self.on_editing_done)
+            entry.handler_unblock(entry.editing_done_id)
         elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
             if isinstance(entry, gtk.Entry):
                 value = entry.get_text()
             else:
                 value = entry.get_active_text()
-            entry.disconnect(entry.editing_done_id)
+            entry.handler_block(entry.editing_done_id)
             def callback():
                 cell = self.cells[column.name]
                 value = cell.get_textual_value(record)
@@ -222,8 +218,7 @@ class EditableTreeView(gtk.TreeView):
                     entry.set_text(value)
                 else:
                     entry.set_active_text(value)
-                entry.editing_done_id = entry.connect('editing_done',
-                        self.on_editing_done)
+                entry.handler_unblock(entry.editing_done_id)
                 self.set_cursor(path, column, True)
             self.on_open_remote(record, column.name,
                 create=(event.keyval==gtk.keysyms.F3), value=value,
