@@ -557,9 +557,6 @@ class O2MField(CharField):
         if fields:
             fields = dict((fname, field.attrs)
                 for fname, field in fields.iteritems())
-
-        # value is a list of dict
-        fields_dict = {}
         if value and len(value):
             context = self.context_get(record)
             field_names = []
@@ -572,18 +569,17 @@ class O2MField(CharField):
                 args = ('model', self.attrs['relation'], 'fields_get',
                         field_names, context)
                 try:
-                    fields_dict = rpc.execute(*args)
+                    fields = rpc.execute(*args)
                 except TrytonServerError, exception:
-                    fields_dict = common.process_exception(exception, *args)
-                    if not fields_dict:
+                    fields = common.process_exception(exception, *args)
+                    if not fields:
                         return False
 
         parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], fields_dict,
+        group = Group(self.attrs['relation'], fields,
                 parent=record, parent_name=parent_name, child_name=self.name,
                 context=self.context,
                 parent_datetime_field=self.attrs.get('datetime_field'))
-        group.load_fields(fields_dict)
         if record.value.get(self.name):
             group.record_deleted.extend(x for x in record.value[self.name]
                 if x.id >= 0)
