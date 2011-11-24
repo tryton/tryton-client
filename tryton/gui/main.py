@@ -88,7 +88,7 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/File/Quit', gtk.keysyms.Q,
                 gtk.gdk.CONTROL_MASK)
-        if os.name != 'mac':
+        if sys.platform != 'darwin':
             gtk.accel_map_add_entry('<tryton>/User/Menu Reload', gtk.keysyms.T,
                     gtk.gdk.MOD1_MASK)
         gtk.accel_map_add_entry('<tryton>/User/Menu Toggle', gtk.keysyms.T,
@@ -187,8 +187,7 @@ class Main(object):
 
         self.sig_statusbar_show()
 
-        if os.name in ('nt', 'mac') or \
-                (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+        if os.name == 'nt' or sys.platform == 'darwin':
             # Disable actions, on win32 we use os.startfile
             # and on mac we use /usr/bin/open
             self.menuitem_actions.set_sensitive(False)
