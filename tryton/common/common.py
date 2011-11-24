@@ -419,8 +419,7 @@ def file_open(filename, type, print_p=False):
                 save_p.close()
                 file_p.close()
         return
-    elif os.name == 'mac' or \
-            (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
+    elif sys.platform == 'darwin':
         pid = os.fork()
         if not pid:
             pid = os.fork()
