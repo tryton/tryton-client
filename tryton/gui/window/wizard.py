@@ -272,7 +272,8 @@ class WizardForm(Wizard,SignalEvent):
 
     def _get_button(self, state):
         button = super(WizardForm, self)._get_button(state)
-        button.connect('clicked', self.response, state[0])
+        response = len(self.states)
+        button.connect('clicked', self.response, response)
         self.hbuttonbox.pack_start(button)
         return button
 
