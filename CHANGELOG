@@ -1,3 +1,7 @@
+* Improve board view:
+    - use the same search widget as form
+    - link double click to open popup
+
 Version 2.2.0 - 2011-10-24
 * Bug fixes (see mercurial logs for details)
 * New search widget
