@@ -51,17 +51,17 @@ def cast(field, value):
                 return conv(value)
             except ValueError:
                 continue
-        return False
+        return 0
     elif type_ == 'float':
         try:
             return float(value)
         except ValueError:
-            return False
+            return 0.0
     elif type_ == 'numeric':
         try:
             return Decimal(value)
         except decimal.InvalidOperation:
-            return False
+            return Decimal(0)
     elif type_ in ('selection', 'reference'):
         for key, text in field['selection']:
             if text == value:
