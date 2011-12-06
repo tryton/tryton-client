@@ -7,6 +7,7 @@ import glib
 import pango
 import gettext
 import os
+import subprocess
 import re
 import logging
 from tryton.config import CONFIG
@@ -482,22 +483,7 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
                 attachment=attachment or '',
                 )
         args = shlex.split(str(cmd))
-        prog = find_in_path(args[0])
-        args[0] = os.path.basename(args[0])
-        if os.name == 'nt':
-            os.spawnv(os.P_NOWAIT, prog, args)
-            return
-        pid = os.fork()
-        if not pid:
-            pid = os.fork()
-            if not pid:
-                try:
-                    os.execv(prog, args)
-                except OSError:
-                    sys.exit(0)
-            time.sleep(0.1)
-            sys.exit(0)
-        os.waitpid(pid, 0)
+        subprocess.Popen(args)
         return
     #http://www.faqs.org/rfcs/rfc2368.html
     url = "mailto:"
