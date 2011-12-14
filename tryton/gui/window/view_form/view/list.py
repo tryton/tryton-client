@@ -17,6 +17,7 @@ import tryton.common as common
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
+from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.pyson import PYSONEncoder
 from tryton.gui.window import Window
 from tryton.exceptions import TrytonServerError
@@ -797,7 +798,7 @@ class ViewList(ParserView):
                     editable = renderer.get_property('activatable')
                 elif isinstance(renderer,
                         (gtk.CellRendererProgress, CellRendererButton,
-                            gtk.CellRendererPixbuf)):
+                            gtk.CellRendererPixbuf, CellRendererBinary)):
                     editable = False
                 else:
                     editable = renderer.get_property('editable')
