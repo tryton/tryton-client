@@ -124,6 +124,8 @@ class Main(object):
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Report', gtk.keysyms.P,
                 gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/Form/Search', gtk.keysyms.F,
+            gtk.gdk.CONTROL_MASK)
 
         if hasattr(gtk, 'accel_map_load'):
             gtk.accel_map_load(os.path.join(get_config_dir(), 'accel.map'))

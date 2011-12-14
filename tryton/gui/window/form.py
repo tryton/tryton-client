@@ -63,6 +63,7 @@ class Form(SignalEvent, TabContent):
             '<tryton>/Form/Previous'),
         (_('_Switch View'), 'tryton-fullscreen', 'sig_switch',
             '<tryton>/Form/Switch View'),
+        (_('_Search'), 'tryton-find', 'sig_search', '<tryton>/Form/Search'),
         (None,) * 4,
         (_('_Close Tab'), 'tryton-close', 'sig_win_close',
             '<tryton>/Form/Close'),
@@ -419,6 +420,11 @@ class Form(SignalEvent, TabContent):
 
     def sig_relate(self, widget):
         self.buttons['relate'].props.active = True
+
+    def sig_search(self, widget):
+        search_container = self.screen.screen_container
+        if hasattr(search_container, 'search_entry'):
+            search_container.search_entry.grab_focus()
 
     def action_popup(self, widget):
         button, = widget.get_children()
