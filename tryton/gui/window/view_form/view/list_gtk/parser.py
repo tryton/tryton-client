@@ -1,7 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 
+import os
 import gobject
+import tempfile
 from editabletree import EditableTreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
@@ -10,7 +12,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.config import CONFIG
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
-        TRYTON_ICON, HM_FORMAT
+        TRYTON_ICON, HM_FORMAT, file_selection, file_open
 import tryton.common as common
 from tryton.exceptions import TrytonError, TrytonServerError
 from tryton.common.cellrendererbutton import CellRendererButton
@@ -20,6 +22,7 @@ from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common.cellrenderercombo import CellRendererCombo
 from tryton.common.cellrendererinteger import CellRendererInteger
 from tryton.common.cellrendererfloat import CellRendererFloat
+from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.action import Action
 from tryton.translate import date_format
 from tryton.pyson import PYSONDecoder
@@ -108,7 +111,7 @@ class ParserTree(ParserInterface):
                     continue
                 for attr_name in ('relation', 'domain', 'selection',
                         'relation_field', 'string', 'views', 'invisible',
-                        'add_remove', 'sort', 'context'):
+                        'add_remove', 'sort', 'context', 'filename'):
                     if attr_name in fields[fname].attrs and \
                             not attr_name in node_attrs:
                         node_attrs[attr_name] = fields[fname].attrs[attr_name]
@@ -127,7 +130,8 @@ class ParserTree(ParserInterface):
                     pass
                 else:
                     renderer.set_property('editable', not readonly)
-                if not readonly:
+                if (not readonly
+                        and not isinstance(renderer, CellRendererBinary)):
                     renderer.connect_after('editing-started', send_keys,
                             treeview)
 
@@ -504,6 +508,76 @@ class FloatTime(Char):
         field.set_client(record, common.text_to_float_time(text, self.conv))
         if callback:
             callback()
+
+
+class Binary(Char):
+
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Binary, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
+        self.filename = attrs.get('filename')
+        self.renderer = CellRendererBinary(bool(self.filename))
+        self.renderer.connect('new', self.new_binary)
+        self.renderer.connect('open', self.open_binary)
+        self.renderer.connect('save', self.save_binary)
+        self.renderer.connect('clear', self.clear_binary)
+
+    def get_textual_value(self, record):
+        pass
+
+    def value_from_text(self, record, text, callback=None):
+        if callback:
+            callback()
+
+    def setter(self, column, cell, store, iter):
+        record = store.get_value(iter, 0)
+        size = record[self.field_name].get_size(record)
+        cell.set_property('content', bool(size))
+
+    def _get_record_field(self, path):
+        store = self.treeview.get_model()
+        record = store.get_value(store.get_iter(path), 0)
+        field = record.group.fields[self.field_name]
+        return record, field
+
+    def new_binary(self, renderer, path):
+        filename = file_selection(_('Open...'))
+        record, field = self._get_record_field(path)
+        if filename:
+            field.set_client(record, open(filename, 'rb').read())
+
+    def open_binary(self, renderer, path):
+        if not self.filename:
+            return
+        dtemp = tempfile.mkdtemp(prefix='tryton_')
+        record, field = self._get_record_field(path)
+        filename_field = record.group.fields.get(self.filename)
+        filename = filename_field.get(record).replace(
+            os.sep, '_').replace(os.altsep or os.sep, '_')
+        file_path = os.path.join(dtemp, filename)
+        with open(file_path, 'wb') as fp:
+            fp.write(field.get_data(record))
+        root, type_ = os.path.splitext(filename)
+        if type_:
+            type_ = type_[1:]
+        file_open(file_path, type_)
+
+    def save_binary(self, renderer, path):
+        filename = ''
+        record, field = self._get_record_field(path)
+        if self.filename:
+            filename_field = record.group.fields.get(self.filename)
+            filename = filename_field.get(record)
+        filename = file_selection(_('Save As...'), filename=filename,
+            action=gtk.FILE_CHOOSER_ACTION_SAVE)
+        if filename:
+            with open(filename,'wb') as fp:
+                fp.write(field.get_data(record))
+
+    def clear_binary(self, renderer, path):
+        record, field = self._get_record_field(path)
+        field.set_client(record, False)
+
 
 class M2O(Char):
 
@@ -994,4 +1068,5 @@ CELLTYPES = {
     'progressbar': ProgressBar,
     'reference': Reference,
     'one2one': O2O,
+    'binary': Binary,
 }
