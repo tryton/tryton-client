@@ -1,3 +1,5 @@
+* Add shortcut to focus search entry
+* Add binary field to tree views
 * Improve board view:
     - use the same search widget as form
     - link double click to open popup
