@@ -155,3 +155,7 @@ class ScreenContainer(object):
 
     def do_search(self, widget=None):
         self.screen.search_filter(self.get_text())
+
+    def set_cursor(self, new=False, reset_view=True):
+        if self.filter_vbox:
+            self.search_entry.grab_focus()

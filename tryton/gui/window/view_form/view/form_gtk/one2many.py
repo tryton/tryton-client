@@ -319,8 +319,7 @@ class One2Many(WidgetInterface):
                 res_id = ids[0]
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
-            if self.screen.current_view:
-                self.screen.current_view.set_cursor()
+            self.screen.set_cursor()
             self.wid_text.set_text('')
         if len(ids) != 1:
             WinSearch(self.attrs['relation'], callback, sel_multi=True,

@@ -610,3 +610,7 @@ class Form(SignalEvent, TabContent):
 
     def _popup_menu_hide(self, menuitem, togglebutton):
         togglebutton.props.active = False
+
+    def set_cursor(self):
+        if self.screen:
+            self.screen.set_cursor()

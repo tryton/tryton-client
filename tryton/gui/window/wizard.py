@@ -245,7 +245,7 @@ class Wizard(object):
 
         self.screen.new(default=False)
         self.screen.current_record.set_default(val)
-        self.screen.current_view.set_cursor()
+        self.screen.set_cursor()
 
 
 class WizardForm(Wizard,SignalEvent):
