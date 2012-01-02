@@ -310,7 +310,7 @@ class Screen(SignalEvent):
         fields = self.current_view.get_fields()
         if self.current_record and not self.current_record.validate(fields):
             self.screen_container.set(self.current_view.widget)
-            self.current_view.set_cursor()
+            self.set_cursor()
             self.current_view.display()
             return
         if not view_type or self.current_view.view_type != view_type:
@@ -394,7 +394,7 @@ class Screen(SignalEvent):
             if (not self.current_record
                 and self.current_view.view_type == 'form'):
                 self.new()
-            self.current_view.set_cursor()
+            self.set_cursor()
             self.current_view.cancel()
             self.display()
         return view
@@ -440,8 +440,7 @@ class Screen(SignalEvent):
         if self.current_view:
             fields = self.current_view.get_fields()
         self.display()
-        if self.current_view:
-            self.current_view.set_cursor(new=True)
+        self.set_cursor(new=True)
         self.request_set()
         return self.current_record
 
@@ -481,7 +480,7 @@ class Screen(SignalEvent):
         elif self.current_record.validate(fields):
             obj_id = self.current_record.save(force_reload=True)
         else:
-            self.current_view.set_cursor()
+            self.set_cursor()
             self.current_view.display()
             return False
         self.signal('record-saved')
@@ -498,6 +497,17 @@ class Screen(SignalEvent):
         return self.views[self.__current_view]
 
     current_view = property(__get_current_view)
+
+    def set_cursor(self, new=False, reset_view=True):
+        current_view = self.current_view
+        if not current_view:
+            return
+        elif current_view.view_type == 'tree' and not self.current_record:
+            # The widget might have been destroyed
+            if self.screen_container:
+                self.screen_container.set_cursor(new=new, reset_view=reset_view)
+        elif current_view.view_type in ('tree', 'form'):
+            current_view.set_cursor(new=new, reset_view=reset_view)
 
     def get(self, get_readonly=True, includeid=False, check_load=True,
             get_modifiedonly=False):
@@ -577,7 +587,7 @@ class Screen(SignalEvent):
             self.current_record = self.group.get_by_path(path)
         elif len(self.group):
             self.current_record = self.group[0]
-        self.current_view.set_cursor()
+        self.set_cursor()
         self.display()
         self.request_set()
         return True
@@ -644,7 +654,7 @@ class Screen(SignalEvent):
             self.current_record = None
             self.display()
         if set_cursor:
-            self.current_view.set_cursor()
+            self.set_cursor()
         self.request_set()
 
     def display(self, res_id=None, set_cursor=False):
@@ -664,13 +674,13 @@ class Screen(SignalEvent):
             self.search_active(self.current_view.view_type \
                     in ('tree', 'graph', 'calendar'))
             if set_cursor:
-                self.current_view.set_cursor(reset_view=False)
+                self.set_cursor(reset_view=False)
         self.set_tree_state()
 
     def display_next(self):
         view = self.current_view
         view.set_value()
-        view.set_cursor(reset_view=False)
+        self.set_cursor(reset_view=False)
         if view.view_type == 'tree' and len(self.group):
             start, end = view.widget_tree.get_visible_range()
             vadjustment = view.widget_tree.get_vadjustment()
@@ -706,13 +716,13 @@ class Screen(SignalEvent):
             self.current_record = record
         else:
             self.current_record = len(self.group) and self.group[0]
-        view.set_cursor(reset_view=False)
+        self.set_cursor(reset_view=False)
         view.display()
 
     def display_prev(self):
         view = self.current_view
         view.set_value()
-        view.set_cursor(reset_view=False)
+        self.set_cursor(reset_view=False)
         if view.view_type == 'tree' and len(self.group):
             start, end = view.widget_tree.get_visible_range()
             vadjustment = view.widget_tree.get_vadjustment()
@@ -738,7 +748,7 @@ class Screen(SignalEvent):
             self.current_record = record
         else:
             self.current_record = len(self.group) and self.group[-1]
-        view.set_cursor(reset_view=False)
+        self.set_cursor(reset_view=False)
         view.display()
 
     def sel_ids_get(self):

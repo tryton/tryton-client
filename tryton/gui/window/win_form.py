@@ -270,8 +270,7 @@ class WinForm(NoModal):
                 res_id = ids[0]
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
-            if self.screen.current_view:
-                self.screen.current_view.set_cursor()
+            self.screen.set_cursor()
             self.wid_text.set_text('')
 
         if len(ids) != 1:
@@ -297,7 +296,7 @@ class WinForm(NoModal):
             validate = self.screen.current_record.validate(
                 self.screen.current_view.get_fields())
             if not validate:
-                self.screen.current_view.set_cursor()
+                self.screen.set_cursor()
                 self.screen.display()
                 return
             if response_id == gtk.RESPONSE_ACCEPT:
@@ -316,7 +315,7 @@ class WinForm(NoModal):
     def new(self):
         self.screen.new(context=self.context)
         self.screen.current_view.display()
-        self.screen.current_view.set_cursor(new=True)
+        self.screen.set_cursor(new=True)
 
     def destroy(self):
         self.screen.screen_container.alternate_view = False

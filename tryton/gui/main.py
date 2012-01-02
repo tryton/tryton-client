@@ -1038,7 +1038,7 @@ class Main(object):
         else:
             self.pane.set_position(int(CONFIG['menu.pane']))
             if self.menu_screen:
-                self.menu_screen.current_view.set_cursor()
+                self.menu_screen.set_cursor()
 
     def sig_win_menu(self, widget=None, quiet=True, prefs=None):
         if self.pane.get_child1():
@@ -1127,9 +1127,13 @@ class Main(object):
         if not allow_similar:
             for other_page in self.pages:
                 if page == other_page:
+                    current_page = self.notebook.get_current_page()
                     page_num = self.notebook.page_num(other_page.widget)
                     other_page.widget.props.visible = True
                     self.notebook.set_current_page(page_num)
+                    # In order to focus the page
+                    if current_page == page_num:
+                        self._sig_page_changt(self.notebook, None, page_num)
                     return
         if not self.pane.get_child1():
             screen = page.screen
@@ -1245,7 +1249,7 @@ class Main(object):
                 current_widget.props.visible = True
             self.notebook.set_current_page(next_page_id)
         if not self.pages and self.menu_screen:
-            self.menu_screen.current_view.set_cursor()
+            self.menu_screen.set_cursor()
         return self.notebook.get_current_page() != -1
 
     def get_page(self, page_id=None):
@@ -1272,6 +1276,9 @@ class Main(object):
 
         self.current_page = self.notebook.get_current_page()
         current_form = self.get_page(self.current_page)
+        # Using idle_add because the gtk.TreeView grabs the focus at the
+        # end of the event
+        gobject.idle_add(current_form.set_cursor)
         for dialog in current_form.dialogs:
             dialog.show()
 
