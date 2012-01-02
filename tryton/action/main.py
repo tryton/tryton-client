@@ -25,26 +25,12 @@ class Action(object):
         if email is None:
             email = {}
         data = data.copy()
-        ids = data['ids']
-        del data['ids']
         ctx = rpc.CONTEXT.copy()
         ctx.update(context)
         ctx['direct_print'] = direct_print
         ctx['email_print'] = email_print
         ctx['email'] = email
-        if not ids:
-            args = ('model', data['model'], 'search', [], 0, None, None, ctx)
-            try:
-                ids = rpc.execute(*args)
-            except TrytonServerError, exception:
-                ids = common.process_exception(exception, *args)
-                if not ids:
-                    return False
-            if ids == []:
-                message(_('Nothing to print!'))
-                return False
-            data['id'] = ids[0]
-        args = ('report', name, 'execute', ids, data, ctx)
+        args = ('report', name, 'execute', data.get('ids', []), data, ctx)
         rpcprogress = common.RPCProgress('execute', args)
         try:
             res = rpcprogress.run()

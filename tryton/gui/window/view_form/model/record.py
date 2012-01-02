@@ -227,6 +227,16 @@ class Record(SignalEvent):
         value['id'] = self.id
         return value
 
+    def get_on_change_value(self, check_load=True):
+        if check_load:
+            self._check_load()
+        value = {}
+        for name, field in self.group.fields.iteritems():
+            value[name] = field.get_on_change_value(self,
+                check_load=check_load)
+        value['id'] = self.id
+        return value
+
     def cancel(self):
         self._loaded.clear()
         self.modified_fields.clear()

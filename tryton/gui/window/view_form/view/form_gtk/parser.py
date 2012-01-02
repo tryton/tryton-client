@@ -3,108 +3,15 @@
 import gtk
 import gettext
 import copy
+import logging
 import tryton.rpc as rpc
-from tryton.action import Action
 from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
 from tryton.config import CONFIG, TRYTON_ICON
-from tryton.gui.main import Main
-import logging
 from tryton.exceptions import TrytonServerError
+from tryton.common.button import Button
 
 _ = gettext.gettext
-
-
-class Button(object):
-
-    def __init__(self, attrs=None):
-        super(Button, self).__init__()
-        self.attrs = attrs or {}
-        self.widget = gtk.Button()
-        text = attrs.get('string', _('Unknown'))
-        if '_' not in text:
-            text = '_' + text
-        self.widget.set_use_underline(True)
-        self.widget.set_label(text)
-        if attrs.get('icon', False):
-            try:
-                stock = attrs['icon']
-                common.ICONFACTORY.register_icon(stock)
-                icon = gtk.Image()
-                icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
-                self.widget.set_image(icon)
-            except KeyError:
-                log = logging.getLogger('common')
-                log.warning(_('Wrong icon for the button!'))
-        self.widget.connect('clicked', self.button_clicked)
-        self.form = None #fill later by ViewForm
-
-    def button_clicked(self, widget):
-        if not self.form:
-            return
-        record = self.form.screen.current_record
-        obj_id = self.form.screen.save_current()
-        if obj_id:
-            if not self.attrs.get('confirm', False) or \
-                    common.sur(self.attrs['confirm']):
-                button_type = self.attrs.get('type', 'workflow')
-                ctx = rpc.CONTEXT.copy()
-                ctx.update(record.context_get())
-                if button_type == 'workflow':
-                    args = ('model', self.form.screen.model_name,
-                            'workflow_trigger_validate', obj_id,
-                            self.attrs['name'], ctx)
-                    try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
-                elif button_type == 'object':
-                    args = ('model', self.form.screen.model_name, self.attrs['name'],
-                            [obj_id], ctx)
-                    try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
-                elif button_type == 'action':
-                    action_id = None
-                    args = ('model', 'ir.action', 'get_action_id',
-                            int(self.attrs['name']), ctx)
-                    try:
-                        action_id = rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        action_id = common.process_exception(exception, *args)
-                    if action_id:
-                        Action.execute(action_id, {
-                            'model': self.form.screen.model_name,
-                            'id': obj_id,
-                            'ids': [obj_id],
-                            }, context=ctx)
-                else:
-                    raise Exception('Unallowed button type')
-                self.form.screen.reload(written=True)
-        else:
-            self.form.screen.display()
-
-    def state_set(self, record):
-        if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
-        else:
-            state_changes = {}
-        if state_changes.get('invisible', False):
-            self.widget.hide()
-        else:
-            self.widget.show()
-        self.widget.set_sensitive(not state_changes.get('readonly', False))
-        if 'icon' in state_changes:
-            stock = state_changes['icon']
-            if stock:
-                common.ICONFACTORY.register_icon(stock)
-                icon = gtk.Image()
-                icon.set_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
-                self.widget.set_image(icon)
-            else:
-                self.widget.set_image(gtk.Image())
 
 
 class Label(gtk.Label):
@@ -421,7 +328,7 @@ class ParserForm(ParserInterface):
             elif node.localName == 'button':
                 button = Button(attrs)
                 button_list.append(button)
-                container.wid_add(button.widget,
+                container.wid_add(button,
                     help_tip=attrs.get('help', False),
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill,

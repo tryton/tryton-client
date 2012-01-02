@@ -43,9 +43,8 @@ class Window(object):
             allow_similar=Window.allow_similar)
 
     @staticmethod
-    def create_wizard(action, data, state='init', direct_print=False,
-            email_print=False, email=None, name=False, context=None, icon=None,
-            window=False):
+    def create_wizard(action, data, direct_print=False, email_print=False,
+            email=None, name=False, context=None, icon=None, window=False):
         from tryton.gui import Main
         from wizard import WizardForm, WizardDialog
         if window:
@@ -54,5 +53,5 @@ class Window(object):
             Main.get_main().win_add(win, Window.hide_current)
         else:
             win = WizardDialog(name=name)
-        win.run(action, data, state=state, direct_print=direct_print,
-                email_print=email_print, email=email, context=context)
+        win.run(action, data, direct_print=direct_print,
+            email_print=email_print, email=email, context=context)

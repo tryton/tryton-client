@@ -508,6 +508,12 @@ class Screen(SignalEvent):
                 includeid=includeid, check_load=check_load,
                 get_modifiedonly=get_modifiedonly)
 
+    def get_on_change_value(self, check_load=True):
+        if not self.current_record:
+            return None
+        self.current_view.set_value()
+        return self.current_record.get_on_change_value(check_load=check_load)
+
     def modified(self):
         res = False
         if self.current_view.view_type != 'tree':
