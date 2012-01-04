@@ -3,8 +3,16 @@
 """
 %prog [options]
 """
-import os
 import sys
+try:
+    import cdecimal
+    # Use cdecimal globally
+    if 'decimal' not in sys.modules:
+        sys.modules['decimal'] = cdecimal
+except ImportError:
+    import decimal
+    sys.modules['cdecimal'] = decimal
+import os
 import pygtk
 pygtk.require('2.0')
 import gtk

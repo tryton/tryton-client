@@ -10,6 +10,7 @@ Prerequisites
  * python-dateutil (http://labix.org/python-dateutil)
  * Optional: simplejson (http://undefined.org/python/#simplejson)
  * Optional: pytz (http://pytz.sourceforge.net/)
+ * Optional: cdecimal (http://www.bytereef.org/mpdecimal/index.html)
 
 Installation
 ------------

@@ -151,6 +151,7 @@ dist = setup(name=PACKAGE,
     extras_require={
         'timezone': ['pytz'],
         'simplejson': ['simplejson'],
+        'cdecimal': ['cdecimal'],
     },
     **args
 )
