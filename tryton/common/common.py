@@ -1455,3 +1455,9 @@ def timezoned_date(date):
         ldt = sdt.astimezone(lzone)
         date = ldt
     return date
+
+def humanize(size):
+    for x in ('bytes', 'KB', 'MB', 'GB', 'TB', 'PB'):
+        if size < 1000:
+            return '%3.1f%s' % (size, x)
+        size /= 1000.0

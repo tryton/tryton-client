@@ -185,6 +185,7 @@ class ParserTree(ParserInterface):
                     'one2many': 50,
                     'many2many': 50,
                     'boolean': 20,
+                    'binary': 200,
                 }
                 if 'width' in node_attrs:
                     width = int(node_attrs['width'])
@@ -532,7 +533,7 @@ class Binary(Char):
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         size = record[self.field_name].get_size(record)
-        cell.set_property('content', bool(size))
+        cell.set_property('size', common.humanize(size) if size else '')
 
     def _get_record_field(self, path):
         store = self.treeview.get_model()
@@ -545,6 +546,9 @@ class Binary(Char):
         record, field = self._get_record_field(path)
         if filename:
             field.set_client(record, open(filename, 'rb').read())
+            if self.filename:
+                filename_field = record.group.fields[self.filename]
+                filename_field.set_client(record, os.path.basename(filename))
 
     def open_binary(self, renderer, path):
         if not self.filename:

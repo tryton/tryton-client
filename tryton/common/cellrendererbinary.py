@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
+import pango
 
 
 class CellRendererBinary(gtk.GenericCellRenderer):
@@ -10,7 +11,7 @@ class CellRendererBinary(gtk.GenericCellRenderer):
             gobject.PARAM_READWRITE),
         'editable': (gobject.TYPE_INT, 'Editable', 'Editable', 0, 10, 0,
             gobject.PARAM_READWRITE),
-        'content': (gobject.TYPE_INT, 'Content', 'Content', 0, 10, 0,
+        'size': (gobject.TYPE_STRING, 'Size', 'Size', '',
             gobject.PARAM_READWRITE),
     }
     __gsignals__ = {
@@ -56,7 +57,7 @@ class CellRendererBinary(gtk.GenericCellRenderer):
         return getattr(self, pspec.name)
 
     def button_width(self, cell_area):
-        return ((cell_area.width - (len(self.buttons) + 1) * 2)
+        return ((cell_area.width / 2 - (len(self.buttons) + 1) * 2)
             / len(self.buttons))
 
     def on_get_size(self, widget, cell_area=None):
@@ -68,9 +69,10 @@ class CellRendererBinary(gtk.GenericCellRenderer):
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
         button_width = self.button_width(cell_area)
+
         for index, button_name in enumerate(self.buttons):
             x_offset = button_width * index + 2 * (index + 1)
-            x_button = cell_area.x + x_offset
+            x_button = cell_area.x + cell_area.width / 2 + 5 + x_offset
             if x_button < event.x < x_button + button_width:
                 break
         else:
@@ -79,7 +81,7 @@ class CellRendererBinary(gtk.GenericCellRenderer):
             return
         if not self.editable and button_name in ('new', 'clear'):
             return
-        if not self.content and button_name == 'save':
+        if not self.size and button_name == 'save':
             return
         if event is None or event.type == gtk.gdk.BUTTON_PRESS:
             self.clicking = button_name
@@ -96,6 +98,19 @@ class CellRendererBinary(gtk.GenericCellRenderer):
         # Handle Pixmap window as pygtk failed
         if type(window) == gtk.gdk.Pixmap:
             return
+
+        # display size
+        layout = widget.create_pango_layout(self.size)
+        layout.set_font_description(widget.style.font_desc)
+        w, h = layout.get_size()
+        x = int(cell_area.x + (cell_area.width - w / pango.SCALE) * 0)
+        y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
+        state = gtk.STATE_NORMAL
+        if flags & gtk.CELL_RENDERER_SELECTED:
+            state = gtk.STATE_ACTIVE
+        window.draw_layout(widget.style.text_gc[state], x, y, layout)
+
+        # display buttons
         button_width = self.button_width(cell_area)
         for index, button_name in enumerate(self.buttons):
             state = gtk.STATE_NORMAL
@@ -105,12 +120,13 @@ class CellRendererBinary(gtk.GenericCellRenderer):
                 state = gtk.STATE_ACTIVE
                 shadow = gtk.SHADOW_IN
             if (not self.editable and button_name in ('new', 'clear')
-                    or not self.content and button_name in ('open', 'save')):
+                    or not self.size and button_name in ('open', 'save')):
                 state = gtk.STATE_INSENSITIVE
                 pixbuf = pxbf_insens
             else:
                 pixbuf = pxbf_sens
-            x_offset = button_width * index + 2 * (index + 1)
+            x_offset = (cell_area.width / 2 + 5
+                + button_width * index + 2 * (index + 1)) - 1
             widget.style.paint_box(window, state, shadow,
                 None, widget, "button", cell_area.x + x_offset, cell_area.y,
                 button_width, cell_area.height)

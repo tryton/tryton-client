@@ -4,16 +4,11 @@ import gtk
 import gettext
 import os
 import tempfile
+from tryton.common import common
 from tryton.common import file_selection, message, warning, Tooltips, file_open
 from interface import WidgetInterface
 
 _ = gettext.gettext
-
-def humanize(size):
-    for x in ('bytes', 'KB', 'MB', 'GB', 'TB', 'PB'):
-        if size < 1000:
-            return '%3.1f%s' % (size, x)
-        size /= 1000.0
 
 
 class Binary(WidgetInterface):
@@ -173,7 +168,7 @@ class Binary(WidgetInterface):
             return False
         if self.wid_text:
             self.wid_text.set_text(self.filename_field.get(record) or '')
-        self.wid_size.set_text(humanize(field.get_size(record) or 0))
+        self.wid_size.set_text(common.humanize(field.get_size(record) or 0))
         if self.but_open:
             self.but_open.set_sensitive(bool(field.get_size(record)))
         self.but_save_as.set_sensitive(bool(field.get_size(record)))
