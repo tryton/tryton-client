@@ -240,7 +240,9 @@ class Form(SignalEvent, TabContent):
     def sig_attach(self, widget=None):
         obj_id = self.id_get()
         if obj_id >= 0 and obj_id is not False:
-            Attachment(self.model, obj_id).run()
+            def callback():
+                self.update_attachment_count(reload=True)
+            Attachment(self.model, obj_id, callback)
         else:
             self.message_info(_('No record selected!'))
         self.update_attachment_count(reload=True)

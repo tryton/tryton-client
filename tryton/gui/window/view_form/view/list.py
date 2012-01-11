@@ -634,28 +634,32 @@ class ViewList(ParserView):
     def __getitem__(self, name):
         return None
 
-    def destroy(self):
-        if CONFIG['client.save_width_height']:
-            fields = {}
-            last_col = None
-            for col in self.widget_tree.get_columns():
-                if col.get_visible():
-                    last_col = col
-                if not hasattr(col, 'name') or not hasattr(col, 'width'):
-                    continue
-                if col.get_width() != col.width and col.get_visible():
-                    fields[col.name] = col.get_width()
-            #Don't set width for last visible columns
-            #as it depends of the screen size
-            if last_col and last_col.name in fields:
-                del fields[last_col.name]
+    def save_width_height(self):
+        if not CONFIG['client.save_width_height']:
+            return
+        fields = {}
+        last_col = None
+        for col in self.widget_tree.get_columns():
+            if col.get_visible():
+                last_col = col
+            if not hasattr(col, 'name') or not hasattr(col, 'width'):
+                continue
+            if col.get_width() != col.width and col.get_visible():
+                fields[col.name] = col.get_width()
+        #Don't set width for last visible columns
+        #as it depends of the screen size
+        if last_col and last_col.name in fields:
+            del fields[last_col.name]
 
-            if fields and any(fields.itervalues()):
-                try:
-                    rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
-                            self.screen.model_name, fields, rpc.CONTEXT)
-                except TrytonServerError:
-                    pass
+        if fields and any(fields.itervalues()):
+            try:
+                rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
+                        self.screen.model_name, fields, rpc.CONTEXT)
+            except TrytonServerError:
+                pass
+
+    def destroy(self):
+        self.save_width_height()
         self.widget_tree.destroy()
         self.screen = None
         self.widget_tree = None
