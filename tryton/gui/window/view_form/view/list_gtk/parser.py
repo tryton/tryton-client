@@ -241,6 +241,7 @@ class ParserTree(ParserInterface):
                 col.set_widget(label)
 
                 col._type = 'button'
+                col.set_cell_data_func(renderer, cell.setter)
                 if 'width' in node_attrs:
                     width = int(node_attrs['width'])
                 else:
@@ -996,6 +997,15 @@ class Button(object):
         self.screen = screen
 
         self.renderer.connect('clicked', self.button_clicked)
+
+    def setter(self, column, cell, store, iter):
+        record = store.get_value(iter, 0)
+        states = record.expr_eval(self.attrs.get('states', {}),
+            check_load=False)
+        invisible = states.get('invisible', False)
+        cell.set_property('visible', not invisible)
+        # TODO readonly
+        # TODO icon
 
     def button_clicked(self, widget, path):
         if not path:
