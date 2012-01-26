@@ -20,11 +20,9 @@ class WinExport(object):
 
     def __init__(self, model, ids, context=None):
         self.parent = common.get_toplevel_window()
-        self.dialog = gtk.Dialog(
-                title= _("Export to CSV"),
-                parent=self.parent,
-                flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-                | gtk.WIN_POS_CENTER_ON_PARENT)
+        self.dialog = gtk.Dialog(title=_("Export to CSV"), parent=self.parent,
+            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
 
         vbox = gtk.VBox()
@@ -419,7 +417,7 @@ class WinExport(object):
                 row = []
                 for val in data:
                     if type(val) == types.StringType:
-                        row.append(val.replace('\n',' ').replace('\t',' '))
+                        row.append(val.replace('\n', ' ').replace('\t', ' '))
                     else:
                         row.append(val)
                 writer.writerow(row)

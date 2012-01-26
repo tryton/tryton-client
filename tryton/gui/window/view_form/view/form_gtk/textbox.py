@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 from interface import WidgetInterface
-import tryton.rpc as rpc
 from tryton.config import CONFIG
 
 try:
@@ -28,7 +27,8 @@ class TextBox(WidgetInterface):
         #TODO better tab solution
         self.textview.set_accepts_tab(False)
         self.textview.connect('focus-in-event', lambda x, y: self._focus_in())
-        self.textview.connect('focus-out-event', lambda x, y: self._focus_out())
+        self.textview.connect('focus-out-event',
+            lambda x, y: self._focus_out())
         self.scrolledwindow.add(self.textview)
         self.scrolledwindow.show_all()
 

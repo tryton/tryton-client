@@ -9,7 +9,7 @@ class WidgetInterface(object):
     def __init__(self, field_name, model_name, attrs=None):
         self.field_name = field_name
         self.model_name = model_name
-        self.view = None # Filled by ViewForm
+        self.view = None  # Filled by ViewForm
         self.attrs = attrs or {}
         for attr_name in ('readonly', 'invisible'):
             if attr_name in self.attrs:

@@ -30,7 +30,9 @@ if not os.path.isfile(_CA_CERTS):
     _CA_CERTS = None
 _FINGERPRINTS = Fingerprints()
 
-ServerProxy = partial(ServerProxy, fingerprints=_FINGERPRINTS, ca_certs=_CA_CERTS)
+ServerProxy = partial(ServerProxy, fingerprints=_FINGERPRINTS,
+    ca_certs=_CA_CERTS)
+
 
 def db_list(host, port):
     try:
@@ -46,6 +48,7 @@ def db_list(host, port):
             logging.getLogger('rpc.result').debug(repr(None))
             return None
 
+
 def db_exec(host, port, method, *args):
     connection = ServerProxy(host, port)
     logging.getLogger('rpc.request').info('common.db.%s(None, None, %s)' %
@@ -53,6 +56,7 @@ def db_exec(host, port, method, *args):
     result = getattr(connection.common.db, method)(None, None, *args)
     logging.getLogger('rpc.result').debug(repr(result))
     return result
+
 
 def server_version(host, port):
     try:
@@ -65,9 +69,10 @@ def server_version(host, port):
     except (Fault, socket.error):
         raise
 
+
 def login(username, password, host, port, database):
-    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE, _VIEW_CACHE
-    global _TOOLBAR_CACHE
+    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE
+    global _VIEW_CACHE, _TOOLBAR_CACHE
     _VIEW_CACHE = {}
     _TOOLBAR_CACHE = {}
     try:
@@ -99,9 +104,10 @@ def login(username, password, host, port, database):
     IPCServer(host, port, database).run()
     return 1
 
+
 def logout():
-    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE, _VIEW_CACHE
-    global _TOOLBAR_CACHE
+    global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE
+    global _VIEW_CACHE, _TOOLBAR_CACHE
     if IPCServer.instance:
         IPCServer.instance.stop()
     if CONNECTION is not None:
@@ -125,6 +131,7 @@ def logout():
     _VIEW_CACHE = {}
     _TOOLBAR_CACHE = {}
 
+
 def context_reload():
     global CONTEXT, TIMEZONE, _HOST, _PORT
     try:
@@ -141,6 +148,7 @@ def context_reload():
                 TIMEZONE = connection.common.server.timezone_get(None, None)
             except Fault:
                 pass
+
 
 def _execute(blocking, *args):
     global CONNECTION, _USER, _SESSION
@@ -186,8 +194,10 @@ def _execute(blocking, *args):
     logging.getLogger('rpc.result').debug(repr(result))
     return result
 
+
 def execute(*args):
     return _execute(True, *args)
+
 
 def execute_nonblocking(*args):
     return _execute(False, *args)

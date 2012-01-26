@@ -88,7 +88,7 @@ class Reference(WidgetInterface):
         if selection:
             pop = sorted((len(x) for x in selection), reverse=True)
             average = sum(pop) / len(pop)
-            deviation = int(math.sqrt(sum((x - average)**2 for x in pop) /
+            deviation = int(math.sqrt(sum((x - average) ** 2 for x in pop) /
                     len(pop)))
             width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
         else:
@@ -149,7 +149,6 @@ class Reference(WidgetInterface):
     def sig_focus_out(self, widget, event, leave=False):
         if not self.focus_out:
             return
-        child = self.widget_combo.get_child()
         self.changed = False
         value = self.field.get_client(self.record)
 
@@ -166,6 +165,7 @@ class Reference(WidgetInterface):
             if not leave:
                 screen = Screen(model, mode=['form'])
                 screen.load([obj_id])
+
                 def callback(result):
                     if result and screen.save_current():
                         value = (screen.current_record.id,
@@ -178,7 +178,7 @@ class Reference(WidgetInterface):
                 WinForm(screen, callback)
                 return
         elif model:
-            if not self._readonly and ( self.wid_text.get_text() or not leave):
+            if not self._readonly and (self.wid_text.get_text() or not leave):
                 domain = self.field.domain_get(self.record)
                 context = self.field.context_get(self.record)
 
@@ -205,7 +205,8 @@ class Reference(WidgetInterface):
 
                 def callback(ids):
                     if ids:
-                        self.field.set_client(self.record, (model, (ids[0], '')))
+                        self.field.set_client(self.record,
+                            (model, (ids[0], '')))
                     self.focus_out = True
                     self.changed = True
                     self.display(self.record, self.field)
@@ -223,6 +224,7 @@ class Reference(WidgetInterface):
         if not model:
             return
         screen = Screen(model, mode=['form'])
+
         def callback(result):
             if result and screen.save_current():
                 value = (screen.current_record.id,
@@ -238,7 +240,8 @@ class Reference(WidgetInterface):
         elif event.keyval == gtk.keysyms.F2:
             self.sig_focus_out(widget, event)
             return True
-        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
+        elif (event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return)
+                and editable):
             if self.field.get(self.record) or \
                     not self.wid_text.get_text():
                 return False
@@ -272,7 +275,7 @@ class Reference(WidgetInterface):
         if not field:
             child.set_text('')
             child.set_position(0)
-            self.changed =True
+            self.changed = True
             return False
         super(Reference, self).display(record, field)
         value = field.get_client(record)
@@ -306,8 +309,8 @@ class Reference(WidgetInterface):
         if self.last_key[0] == key:
             self.last_key[1] += 1
         else:
-            self.last_key = [ key, 1 ]
-        if not self.key_catalog.has_key(key):
+            self.last_key = [key, 1]
+        if key not in self.key_catalog:
             return
         self.widget_combo.set_active_iter(
                 self.key_catalog[key][self.last_key[1] \

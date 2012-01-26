@@ -4,10 +4,7 @@ import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
-import field
-import datetime
-import logging
-import time
+import field as fields
 from functools import reduce
 from tryton.exceptions import TrytonServerError
 
@@ -33,14 +30,14 @@ class Record(SignalEvent):
         self.modified_fields = {}
         self._timestamp = None
         self.attachment_count = -1
-        self.next = {} # Used in Group list
+        self.next = {}  # Used in Group list
         self.value = {}
         self.autocompletion = {}
         self.exception = False
 
     def __getitem__(self, name, raise_exception=False):
         if name not in self._loaded and self.id >= 0:
-            ids =  [self.id]
+            ids = [self.id]
             if name == '*':
                 loading = reduce(
                         lambda x, y: 'eager' if x == y == 'eager' else 'lazy',
@@ -65,21 +62,22 @@ class Record(SignalEvent):
                             ids.append(record.id)
                     n += 1
             if loading == 'eager':
-                fields = [fname for fname, field in self.group.fields.iteritems()
-                        if field.attrs.get('loading', 'eager') == 'eager']
+                fnames = [fname
+                    for fname, field in self.group.fields.iteritems()
+                    if field.attrs.get('loading', 'eager') == 'eager']
             else:
-                fields = self.group.fields.keys()
-            fields = [fname for fname in fields if fname not in self._loaded]
-            fields.extend(('%s.rec_name' % fname for fname in fields[:]
+                fnames = self.group.fields.keys()
+            fnames = [fname for fname in fnames if fname not in self._loaded]
+            fnames.extend(('%s.rec_name' % fname for fname in fnames[:]
                     if self.group.fields[fname].attrs['type']
                     in ('many2one', 'one2one', 'reference')))
-            fields.append('_timestamp')
+            fnames.append('_timestamp')
             ctx = rpc.CONTEXT.copy()
             ctx.update(self.context_get())
             ctx.update(dict(('%s.%s' % (self.model_name, fname), 'size')
                     for fname, field in self.group.fields.iteritems()
                     if field.attrs['type'] == 'binary'))
-            args = ('model', self.model_name, 'read', ids, fields, ctx)
+            args = ('model', self.model_name, 'read', ids, fnames, ctx)
             exception = None
             try:
                 values = rpc.execute(*args)
@@ -89,7 +87,7 @@ class Record(SignalEvent):
                 values = common.process_exception(exception, *args)
                 if not values:
                     values = [{'id': x} for x in ids]
-                    default_values = dict((f, False) for f in fields)
+                    default_values = dict((f, False) for f in fnames)
                     for value in values:
                         value.update(default_values)
                     self.exception = True
@@ -391,10 +389,11 @@ class Record(SignalEvent):
         for fieldname, value in val.items():
             if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.group.fields[fieldname], field.M2OField):
+            if isinstance(self.group.fields[fieldname], fields.M2OField):
                 if fieldname + '.rec_name' in val:
                     value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.group.fields[fieldname], field.ReferenceField):
+            elif isinstance(self.group.fields[fieldname],
+                    fields.ReferenceField):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
@@ -417,13 +416,14 @@ class Record(SignalEvent):
                 continue
             if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.group.fields[fieldname], field.O2MField):
+            if isinstance(self.group.fields[fieldname], fields.O2MField):
                 later[fieldname] = value
                 continue
-            if isinstance(self.group.fields[fieldname], field.M2OField):
+            if isinstance(self.group.fields[fieldname], fields.M2OField):
                 if fieldname + '.rec_name' in val:
                     value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.group.fields[fieldname], field.ReferenceField):
+            elif isinstance(self.group.fields[fieldname],
+                    fields.ReferenceField):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in val:
@@ -501,14 +501,14 @@ class Record(SignalEvent):
         for fieldname, value in res.items():
             if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.group.fields[fieldname], field.O2MField):
+            if isinstance(self.group.fields[fieldname], fields.O2MField):
                 later[fieldname] = value
                 continue
-            if isinstance(self.group.fields[fieldname], field.M2OField):
+            if isinstance(self.group.fields[fieldname], fields.M2OField):
                 if fieldname + '.rec_name' in res:
                     value = (value, res[fieldname + '.rec_name'])
             elif isinstance(self.group.fields[fieldname],
-                    field.ReferenceField):
+                    fields.ReferenceField):
                 if value:
                     ref_model, ref_id = value.split(',', 1)
                     if fieldname + '.rec_name' in res:

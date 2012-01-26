@@ -6,7 +6,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-import copy
 import collections
 import xml.dom.minidom
 import tryton.rpc as rpc
@@ -14,7 +13,6 @@ from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.model.record import Record
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
 from tryton.signal_event import SignalEvent
-from tryton.common import node_attributes
 from tryton.config import CONFIG
 import tryton.common as common
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
@@ -441,9 +439,6 @@ class Screen(SignalEvent):
         record = group.new(default, self.domain, ctx)
         group.add(record, self.new_model_position())
         self.current_record = record
-        fields = None
-        if self.current_view:
-            fields = self.current_view.get_fields()
         self.display()
         self.set_cursor(new=True)
         self.request_set()
@@ -510,7 +505,8 @@ class Screen(SignalEvent):
         elif current_view.view_type == 'tree' and not self.current_record:
             # The widget might have been destroyed
             if self.screen_container:
-                self.screen_container.set_cursor(new=new, reset_view=reset_view)
+                self.screen_container.set_cursor(new=new,
+                    reset_view=reset_view)
         elif current_view.view_type in ('tree', 'form'):
             current_view.set_cursor(new=new, reset_view=reset_view)
 
@@ -533,7 +529,8 @@ class Screen(SignalEvent):
         res = False
         if self.current_view.view_type != 'tree':
             if self.current_record:
-                res = self.current_record.modified or self.current_record.id < 0
+                res = (self.current_record.modified
+                    or self.current_record.id < 0)
         else:
             for record in self.group:
                 if record.modified or record.id < 0:

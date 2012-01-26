@@ -6,6 +6,7 @@ import tryton.common as common
 
 _ = gettext.gettext
 
+
 class ScreenContainer(object):
 
     def __init__(self):
@@ -139,7 +140,7 @@ class ScreenContainer(object):
             model.append([r.strip()])
 
     def clear(self, widget=None):
-        self.search_entry.set_text('');
+        self.search_entry.set_text('')
 
     def get_text(self):
         return self.search_entry.get_text().strip().decode('utf-8')

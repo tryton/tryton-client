@@ -7,7 +7,6 @@ import locale
 
 class CellRendererInteger(CellRendererText):
 
-
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
         editable = super(CellRendererInteger, self).on_start_editing(event,

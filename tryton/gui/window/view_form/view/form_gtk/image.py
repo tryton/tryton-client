@@ -54,7 +54,8 @@ class Image(WidgetInterface):
             if self.filename:
                 self.but_open = gtk.Button()
                 img_open = gtk.Image()
-                img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
+                img_open.set_from_stock('tryton-open',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
                 self.but_open.set_image(img_open)
                 self.but_open.set_relief(gtk.RELIEF_NONE)
                 self.but_open.connect('clicked', self.sig_open)
@@ -65,7 +66,8 @@ class Image(WidgetInterface):
 
             self.but_save_as = gtk.Button()
             img_save_as = gtk.Image()
-            img_save_as.set_from_stock('tryton-save', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_save_as.set_from_stock('tryton-save',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_save_as.set_image(img_save_as)
             self.but_save_as.set_relief(gtk.RELIEF_NONE)
             self.but_save_as.connect('clicked', self.sig_save_as)
@@ -74,7 +76,8 @@ class Image(WidgetInterface):
 
             self.but_remove = gtk.Button()
             img_remove = gtk.Image()
-            img_remove.set_from_stock('tryton-clear', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_remove.set_from_stock('tryton-clear',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.but_remove.set_image(img_remove)
             self.but_remove.set_relief(gtk.RELIEF_NONE)
             self.but_remove.connect('clicked', self.sig_remove)
@@ -193,7 +196,7 @@ class Image(WidgetInterface):
         if self.field:
             value = self.field.get_client(self.record)
         if isinstance(value, (int, long)):
-            if value > 10**6:
+            if value > 10 ** 6:
                 value = False
             else:
                 value = self.field.get_data(self.record)

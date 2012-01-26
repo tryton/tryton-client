@@ -45,7 +45,7 @@ class WinImport(object):
         hbox_mapping.pack_start(vbox_buttons, False, True, 0)
 
         button_add = gtk.Button(_("_Add"), stock=None, use_underline=True)
-        button_add.set_alignment(0.0,0.0)
+        button_add.set_alignment(0.0, 0.0)
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
         button_add.set_image(img_button)
@@ -54,7 +54,7 @@ class WinImport(object):
 
         button_remove = gtk.Button(_("_Remove"), stock=None,
                 use_underline=True)
-        button_remove.set_alignment(0.0,0.0)
+        button_remove.set_alignment(0.0, 0.0)
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
         button_remove.set_image(img_button)
@@ -63,7 +63,7 @@ class WinImport(object):
 
         button_remove_all = gtk.Button(_("Clear"), stock=None,
                 use_underline=True)
-        button_remove_all.set_alignment(0.0,0.0)
+        button_remove_all.set_alignment(0.0, 0.0)
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
         button_remove_all.set_image(img_button)
@@ -75,7 +75,7 @@ class WinImport(object):
 
         button_autodetect = gtk.Button(_("Auto-Detect"), stock=None,
                 use_underline=True)
-        button_autodetect.set_alignment(0.0,0.0)
+        button_autodetect.set_alignment(0.0, 0.0)
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         button_autodetect.set_image(img_button)
@@ -132,15 +132,15 @@ class WinImport(object):
         table.attach(self.import_csv_sep, 1, 2, 0, 1)
 
         label_import_csv_del = gtk.Label(_("Text Delimiter:"))
-        label_import_csv_del.set_alignment( 1, 0.5)
+        label_import_csv_del.set_alignment(1, 0.5)
         table.attach(label_import_csv_del, 2, 3, 0, 1)
         self.import_csv_del = gtk.Entry()
-        self.import_csv_del.set_text( "\"")
-        self.import_csv_del.set_width_chars( 1)
+        self.import_csv_del.set_text("\"")
+        self.import_csv_del.set_width_chars(1)
         table.attach(self.import_csv_del, 3, 4, 0, 1)
 
         label_import_csv_enc = gtk.Label(_("Encoding:"))
-        label_import_csv_enc.set_alignment( 1, 0.5)
+        label_import_csv_enc.set_alignment(1, 0.5)
         table.attach(label_import_csv_enc, 0, 1, 1, 2)
         self.import_csv_enc = gtk.combo_box_new_text()
         self.import_csv_enc.append_text("UTF-8")
@@ -148,7 +148,7 @@ class WinImport(object):
         table.attach(self.import_csv_enc, 1, 2, 1, 2)
 
         label_import_csv_skip = gtk.Label(_("Lines to Skip:"))
-        label_import_csv_skip.set_alignment( 1, 0.5)
+        label_import_csv_skip.set_alignment(1, 0.5)
         table.attach(label_import_csv_skip, 2, 3, 1, 2)
 
         self.import_csv_skip_adj = gtk.Adjustment(0, 0, 100, 1, 10)
@@ -266,7 +266,6 @@ class WinImport(object):
                 if word not in self.fields_invert and word not in self.fields:
                     iter = self.model1.get_iter_first()
                     prefix = ''
-                    prefix_name = ''
                     for parent in word.split('/')[:-1]:
                         while iter:
                             if self.model1.get_value(iter, 0) == parent or \
@@ -300,7 +299,7 @@ class WinImport(object):
     def _sig_sel_add(self, store, path, iter):
         num = self.model2.append()
         name = self.fields[store.get_value(iter, 1)][0]
-        self.model2.set(num, 0, name, 1, store.get_value(iter,1))
+        self.model2.set(num, 0, name, 1, store.get_value(iter, 1))
 
     def sig_unsel(self, widget=None):
         store, paths = self.view2.get_selection().get_selected_rows()

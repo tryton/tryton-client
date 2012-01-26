@@ -3,12 +3,12 @@
 from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
 import gtk
-from graph import Graph
 from bar import VerticalBar, HorizontalBar
 from line import Line
 from pie import Pie
 from tryton.config import TRYTON_ICON, CONFIG
-import sys, os
+import sys
+import os
 import gettext
 
 _ = gettext.gettext
@@ -20,12 +20,12 @@ GRAPH_TYPE = {
     'pie': Pie,
 }
 
+
 def save(widget, graph):
     parent = common.get_toplevel_window()
     dia = gtk.Dialog(_('Save As'), parent,
-            gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                gtk.STOCK_OK, gtk.RESPONSE_OK))
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK))
     dia.set_icon(TRYTON_ICON)
     dia.set_has_separator(True)
     dia.set_default_response(gtk.RESPONSE_OK)
@@ -98,6 +98,7 @@ def save(widget, graph):
     dia.destroy()
     return
 
+
 def button_press(widget, event, graph):
     if event.button == 3:
         menu = gtk.Menu()
@@ -132,7 +133,8 @@ class ParserGraph(ParserInterface):
                         continue
                     xfield = common.node_attributes(child)
                     if not xfield.get('string'):
-                        xfield['string'] = fields[xfield['name']].attrs['string']
+                        xfield['string'] = fields[xfield['name']
+                            ].attrs['string']
                     break
             elif node.localName == 'y':
                 for child in node.childNodes:
@@ -140,10 +142,12 @@ class ParserGraph(ParserInterface):
                         continue
                     yattrs = common.node_attributes(child)
                     if not yattrs.get('string') and yattrs['name'] != '#':
-                        yattrs['string'] = fields[yattrs['name']].attrs['string']
+                        yattrs['string'] = fields[yattrs['name']
+                            ].attrs['string']
                     yfields.append(yattrs)
 
-        widget = GRAPH_TYPE[attrs.get('type', 'vbar')](xfield, yfields, attrs, model)
+        widget = GRAPH_TYPE[attrs.get('type', 'vbar')
+            ](xfield, yfields, attrs, model)
         event = gtk.EventBox()
         event.add(widget)
         event.connect('button-press-event', button_press, widget)

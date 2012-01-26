@@ -100,10 +100,13 @@ class CellRendererText(gtk.GenericCellRenderer):
             editable.modify_text(gtk.STATE_INSENSITIVE, fg_color)
         else:
             editable.modify_bg(gtk.STATE_ACTIVE, style.bg[gtk.STATE_ACTIVE])
-            editable.modify_base(gtk.STATE_NORMAL, style.base[gtk.STATE_NORMAL])
+            editable.modify_base(gtk.STATE_NORMAL,
+                style.base[gtk.STATE_NORMAL])
             editable.modify_fg(gtk.STATE_NORMAL, style.fg[gtk.STATE_NORMAL])
-            editable.modify_text(gtk.STATE_NORMAL, style.text[gtk.STATE_NORMAL])
-            editable.modify_text(gtk.STATE_INSENSITIVE, style.text[gtk.STATE_INSENSITIVE])
+            editable.modify_text(gtk.STATE_NORMAL,
+                style.text[gtk.STATE_NORMAL])
+            editable.modify_text(gtk.STATE_INSENSITIVE,
+                style.text[gtk.STATE_INSENSITIVE])
 
         editable.set_text(self.text)
         editable.grab_focus()

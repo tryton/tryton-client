@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-#This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
+#This code is inspired by the pycha project
+#(http://www.lorenzogil.com/projects/pycha/)
 from graph import Graph, Area
 import math
 import cairo
@@ -97,7 +98,8 @@ class Pie(Graph):
                     cr.set_source_rgba(*color)
                     slice.draw(cr, self.centerx, self.centery, self.radius)
                     cr.fill()
-                cr.set_source_rgb(*hex2rgb(self.attrs.get('background', '#f5f5f5')))
+                cr.set_source_rgb(*hex2rgb(
+                        self.attrs.get('background', '#f5f5f5')))
                 slice.draw(cr, self.centerx, self.centery, self.radius)
                 cr.set_line_width(2)
                 cr.stroke()
@@ -120,7 +122,8 @@ class Pie(Graph):
         if event.y == self.centery:
             angle = math.pi / 2
         else:
-            angle = math.atan((event.x - self.centerx)/(self.centery - event.y))
+            angle = math.atan((event.x - self.centerx)
+                / (self.centery - event.y))
         if event.x >= self.centerx:
             if event.y <= self.centery:
                 pass
@@ -139,12 +142,14 @@ class Pie(Graph):
                     if self.yfields[0].get('widget') == 'float_time':
                         conv = None
                         if self.yfields[0].get('float_time'):
-                            conv = rpc.CONTEXT.get(self.yfields[0]['float_time'])
+                            conv = rpc.CONTEXT.get(
+                                self.yfields[0]['float_time'])
                         value = float_time_to_text(slice.fraction * self.sum,
                                 conv)
                         sum = float_time_to_text(self.sum, conv)
                     else:
-                        value = locale.format('%.2f', slice.fraction * self.sum)
+                        value = locale.format('%.2f',
+                            slice.fraction * self.sum)
                         sum = locale.format('%.2f', self.sum)
                     label = '%s (%s%%)\n%s/%s' % (self.labels[slice.xname],
                             locale.format('%.2f', slice.fraction * 100),
@@ -181,8 +186,8 @@ class Slice(object):
         cr.new_path()
         cr.move_to(centerx, centery)
         cr.arc(centerx, centery, radius,
-                self.startAngle - (math.pi/2),
-                self.endAngle - (math.pi/2))
+            self.startAngle - (math.pi / 2),
+            self.endAngle - (math.pi / 2))
         cr.line_to(centerx, centery)
         cr.close_path()
 

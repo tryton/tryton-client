@@ -11,7 +11,7 @@ import subprocess
 import re
 import logging
 from tryton.config import CONFIG
-from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+from tryton.config import TRYTON_ICON, PIXMAPS_DIR
 import time
 import sys
 import xmlrpclib
@@ -37,7 +37,7 @@ try:
 except ImportError:
     ssl = None
 import dis
-from threading import Lock, Semaphore
+from threading import Lock
 try:
     import pytz
 except ImportError:
@@ -128,6 +128,7 @@ class TrytonIconFactory(gtk.IconFactory):
 ICONFACTORY = TrytonIconFactory()
 ICONFACTORY.add_default()
 
+
 def find_in_path(name):
     if os.name == "nt":
         sep = ';'
@@ -141,11 +142,13 @@ def find_in_path(name):
             return val
     return name
 
+
 def test_server_version(host, port):
     version = rpc.server_version(host, port)
     if not version:
         return False
     return version.split('.')[:2] == VERSION.split('.')[:2]
+
 
 def refresh_dblist(host, port):
     '''
@@ -157,6 +160,7 @@ def refresh_dblist(host, port):
     if not test_server_version(host, port):
         return -1
     return rpc.db_list(host, port)
+
 
 def refresh_langlist(lang_widget, host, port):
     liststore = lang_widget.get_model()
@@ -174,17 +178,18 @@ def refresh_langlist(lang_widget, host, port):
         liststore.insert(i, (val, key))
         if key == lang:
             index = i
-        if key == 'en_US' and index < 0 :
+        if key == 'en_US' and index < 0:
             index = i
         i += 1
     lang_widget.set_active(index)
     return lang_list
 
+
 def request_server(server_widget):
     result = False
     parent = get_toplevel_window()
     dialog = gtk.Dialog(
-        title= _('Tryton Connection'),
+        title=_('Tryton Connection'),
         parent=parent,
         flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
             gtk.WIN_POS_CENTER_ON_PARENT |
@@ -211,7 +216,7 @@ def request_server(server_widget):
     entry_server.set_text("localhost")
     entry_server.set_activates_default(True)
     entry_server.set_width_chars(16)
-    table.attach(entry_server, 1, 2, 0, 1,yoptions=False,
+    table.attach(entry_server, 1, 2, 0, 1, yoptions=False,
         xoptions=gtk.FILL | gtk.EXPAND)
     label_port = gtk.Label(_("Port:"))
     label_port.set_alignment(1, 0.5)
@@ -242,6 +247,7 @@ def request_server(server_widget):
     dialog.destroy()
     return result
 
+
 def get_toplevel_window():
     windows = [x for x in gtk.window_list_toplevels()
         if x.window and x.props.visible]
@@ -249,6 +255,7 @@ def get_toplevel_window():
     for window in set(windows) - set(trans2windows.iterkeys()):
         return window
     return trans2windows[None]
+
 
 def get_sensible_widget(window):
     from tryton.gui.main import Main
@@ -260,6 +267,7 @@ def get_sensible_widget(window):
             return page.widget
     return window
 
+
 def center_window(window, parent, sensible):
     parent_x, parent_y = parent.window.get_origin()
     window_allocation = window.get_allocation()
@@ -270,10 +278,11 @@ def center_window(window, parent, sensible):
         int((sensible_allocation.height - window_allocation.height) / 2))
     window.move(x, y)
 
+
 def selection(title, values, alwaysask=False):
-    if not values or len(values)==0:
+    if not values or len(values) == 0:
         return None
-    elif len(values)==1 and (not alwaysask):
+    elif len(values) == 1 and (not alwaysask):
         key = values.keys()[0]
         return (key, values[key])
 
@@ -331,13 +340,14 @@ def selection(title, values, alwaysask=False):
     dialog.destroy()
     return res
 
+
 def file_selection(title, filename='',
         action=gtk.FILE_CHOOSER_ACTION_OPEN, preview=True, multi=False,
         filters=None):
     parent = get_toplevel_window()
     if action == gtk.FILE_CHOOSER_ACTION_OPEN:
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-            gtk.STOCK_OPEN,gtk.RESPONSE_OK)
+            gtk.STOCK_OPEN, gtk.RESPONSE_OK)
     else:
         buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
             gtk.STOCK_SAVE, gtk.RESPONSE_OK)
@@ -402,6 +412,7 @@ def file_selection(title, filename='',
         parent.present()
         win.destroy()
         return filenames
+
 
 def file_open(filename, type, print_p=False):
     def save():
@@ -518,7 +529,7 @@ class MessageDialog(UniqueDialog):
 
     def build_dialog(self, parent, message, msg_type):
         dialog = gtk.MessageDialog(parent,
-            gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT, msg_type,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, msg_type,
             gtk.BUTTONS_OK, message)
         return dialog
 
@@ -537,7 +548,8 @@ class WarningDialog(UniqueDialog):
             dialog.set_markup('<b>%s</b>' % (to_xml(title)))
             dialog.format_secondary_markup(to_xml(message))
         else:
-            dialog.set_markup('<b>%s</b>\n%s' % (to_xml(title), to_xml(message)))
+            dialog.set_markup(
+                '<b>%s</b>\n%s' % (to_xml(title), to_xml(message)))
         return dialog
 
 warning = WarningDialog()
@@ -637,7 +649,7 @@ class AskDialog(UniqueDialog):
 
     def build_dialog(self, parent, question, visibility):
         win = gtk.Dialog('Tryton', parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
+                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                     gtk.STOCK_OK, gtk.RESPONSE_OK))
         win.set_has_separator(True)
@@ -682,9 +694,9 @@ ask = AskDialog()
 class ConcurrencyDialog(UniqueDialog):
 
     def build_dialog(self, parent, resource, obj_id, context):
-        dialog = gtk.Dialog(_('Concurrency Exception'), parent, gtk.DIALOG_MODAL
-                | gtk.DIALOG_DESTROY_WITH_PARENT | gtk.WIN_POS_CENTER_ON_PARENT
-                | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+        dialog = gtk.Dialog(_('Concurrency Exception'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT | gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
         dialog.set_has_separator(True)
         dialog.set_default_response(gtk.RESPONSE_CANCEL)
         hbox = gtk.HBox()
@@ -816,6 +828,7 @@ class ErrorDialog(UniqueDialog):
 
 error = ErrorDialog()
 
+
 def send_bugtracker(title, msg):
     from tryton import rpc
     parent = get_toplevel_window()
@@ -875,8 +888,9 @@ def send_bugtracker(title, msg):
             protocol = 'http'
             if ssl or hasattr(socket, 'ssl'):
                 protocol = 'https'
-            server = xmlrpclib.Server(('%s://%s:%s@' + CONFIG['roundup.xmlrpc'])
-                    % (protocol, user, password), allow_none=True)
+            server = xmlrpclib.Server(
+                ('%s://%s:%s@' + CONFIG['roundup.xmlrpc'])
+                % (protocol, user, password), allow_none=True)
             if hashlib:
                 msg_md5 = hashlib.md5(msg + '\n' + title).hexdigest()
             else:
@@ -892,9 +906,10 @@ def send_bugtracker(title, msg):
             if issue_id:
                 # issue to same message already exists, add user to nosy-list
                 server.set('issue' + str(issue_id), *['nosy=+' + user])
-                message(_('The same bug was already reported by another user.\n' \
-                        'To keep you informed your username is added to the nosy-list of this issue') + \
-                        '%s' % issue_id)
+                message(
+                    _('The same bug was already reported by another user.\n'
+                        'To keep you informed your username is added '
+                        'to the nosy-list of this issue') + '%s' % issue_id)
             else:
                 # create a new issue for this error-message
                 # first create message
@@ -905,7 +920,8 @@ def send_bugtracker(title, msg):
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
                 message(_('Created new bug with ID ') + \
                         'issue%s' % issue_id)
-            webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id, new=2)
+            webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id,
+                new=2)
         except (socket.error, xmlrpclib.Fault), exception:
             if (isinstance(exception, xmlrpclib.Fault)
                     and 'roundup.cgi.exceptions.Unauthorised' in
@@ -917,10 +933,13 @@ def send_bugtracker(title, msg):
                         sys.exc_value, sys.exc_traceback))
             message(_('Exception:') + '\n' + tb_s, msg_type=gtk.MESSAGE_ERROR)
 
+
 def to_xml(string):
-    return string.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+    return string.replace('&', '&amp;'
+        ).replace('<', '&lt;').replace('>', '&gt;')
 
 PLOCK = Lock()
+
 
 def process_exception(exception, *args, **kwargs):
 
@@ -1020,6 +1039,7 @@ def process_exception(exception, *args, **kwargs):
     error(error_title, error_detail)
     return False
 
+
 def node_attributes(node):
     result = {}
     attrs = node.attributes
@@ -1028,6 +1048,7 @@ def node_attributes(node):
     for i in range(attrs.length):
         result[str(attrs.item(i).localName)] = str(attrs.item(i).nodeValue)
     return result
+
 
 def hex2rgb(hexstring, digits=2):
     """
@@ -1039,10 +1060,11 @@ def hex2rgb(hexstring, digits=2):
     if isinstance(hexstring, (tuple, list)):
         return hexstring
     top = float(int(digits * 'f', 16))
-    r = int(hexstring[1:digits+1], 16)
-    g = int(hexstring[digits+1:digits*2+1], 16)
-    b = int(hexstring[digits*2+1:digits*3+1], 16)
+    r = int(hexstring[1:digits + 1], 16)
+    g = int(hexstring[digits + 1:digits * 2 + 1], 16)
+    b = int(hexstring[digits * 2 + 1:digits * 3 + 1], 16)
     return r / top, g / top, b / top
+
 
 def clamp(minValue, maxValue, value):
     """Make sure value is between minValue and maxValue"""
@@ -1052,11 +1074,13 @@ def clamp(minValue, maxValue, value):
                 return maxValue
     return value
 
+
 def lighten(r, g, b, amount):
     """Return a lighter version of the color (r, g, b)"""
     return (clamp(0.0, 1.0, r + amount),
             clamp(0.0, 1.0, g + amount),
             clamp(0.0, 1.0, b + amount))
+
 
 def generateColorscheme(masterColor, keys, light=0.06):
     """
@@ -1092,7 +1116,7 @@ class DBProgress(object):
 
     def update(self, combo, progressbar, callback, dbname=''):
         self.db_info = None
-        thread = threading.Thread(target=self.start).start()
+        threading.Thread(target=self.start).start()
         gobject.timeout_add(100, self.end, combo, progressbar, callback,
             dbname)
 
@@ -1177,7 +1201,8 @@ class RPCProgress(object):
                     hbox.pack_start(img, expand=True, fill=False)
                     vbox2 = gtk.VBox(False, 0)
                     label = gtk.Label()
-                    label.set_markup('<b>'+_('Operation in progress')+'</b>')
+                    label.set_markup(
+                        '<b>' + _('Operation in progress') + '</b>')
                     label.set_alignment(0.0, 0.5)
                     vbox2.pack_start(label, expand=True, fill=False)
                     vbox2.pack_start(gtk.HSeparator(), expand=True, fill=True)
@@ -1243,8 +1268,8 @@ COLOR_SCHEMES = {
 }
 
 COLORS = {
-    'invalid':'#ff6969',
-    'required':'#d2d2ff',
+    'invalid': '#ff6969',
+    'required': '#d2d2ff',
 }
 
 DT_FORMAT = '%Y-%m-%d'
@@ -1257,7 +1282,7 @@ FLOAT_TIME_CONV = {
     'w': 168,
     'd': 24,
     'h': 1,
-    'm': 1.0/60,
+    'm': 1.0 / 60,
 }
 
 FLOAT_TIME_SEPS = {
@@ -1268,6 +1293,7 @@ FLOAT_TIME_SEPS = {
     'h': _('h'),
     'm': _('m'),
 }
+
 
 def text_to_float_time(text, conv=None):
     try:
@@ -1311,6 +1337,7 @@ def text_to_float_time(text, conv=None):
     except ValueError:
         return 0.0
 
+
 def float_time_to_text(val, conv=None):
     if conv:
         tmp_conv = FLOAT_TIME_CONV.copy()
@@ -1333,7 +1360,7 @@ def float_time_to_text(val, conv=None):
     val = val - days * conv['d']
     hours = int(val)
     val = val - hours
-    mins = int((val% 1 + 0.01) / conv['m'])
+    mins = int((val % 1 + 0.01) / conv['m'])
     if years:
         value += ' ' + locale.format('%d', years, True) + FLOAT_TIME_SEPS['Y']
     if months:
@@ -1346,6 +1373,7 @@ def float_time_to_text(val, conv=None):
         value += ' %02d:%02d' % (hours, mins)
     value = value.strip()
     return value
+
 
 def filter_domain(domain):
     '''
@@ -1365,22 +1393,22 @@ def filter_domain(domain):
     return res
 
 _ALLOWED_CODES = set(dis.opmap[x] for x in [
-    'POP_TOP','ROT_TWO','ROT_THREE','ROT_FOUR','DUP_TOP',
-    'BUILD_LIST','BUILD_MAP','BUILD_TUPLE',
-    'LOAD_CONST','RETURN_VALUE','STORE_SUBSCR',
-    'UNARY_POSITIVE','UNARY_NEGATIVE','UNARY_NOT',
-    'UNARY_INVERT','BINARY_POWER','BINARY_MULTIPLY',
-    'BINARY_DIVIDE','BINARY_FLOOR_DIVIDE','BINARY_TRUE_DIVIDE',
-    'BINARY_MODULO','BINARY_ADD','BINARY_SUBTRACT',
-    'BINARY_LSHIFT','BINARY_RSHIFT','BINARY_AND','BINARY_XOR', 'BINARY_OR',
-    'STORE_MAP', 'LOAD_NAME', 'CALL_FUNCTION', 'COMPARE_OP', 'LOAD_ATTR',
-    'STORE_NAME', 'GET_ITER', 'FOR_ITER', 'LIST_APPEND', 'JUMP_ABSOLUTE',
-    'DELETE_NAME', 'JUMP_IF_TRUE', 'JUMP_IF_FALSE', 'JUMP_IF_FALSE_OR_POP',
-    'JUMP_IF_TRUE_OR_POP', 'POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE',
-    'BINARY_SUBSCR',
-    ] if x in dis.opmap)
+        'POP_TOP', 'ROT_TWO', 'ROT_THREE', 'ROT_FOUR', 'DUP_TOP', 'BUILD_LIST',
+        'BUILD_MAP', 'BUILD_TUPLE', 'LOAD_CONST', 'RETURN_VALUE',
+        'STORE_SUBSCR', 'UNARY_POSITIVE', 'UNARY_NEGATIVE', 'UNARY_NOT',
+        'UNARY_INVERT', 'BINARY_POWER', 'BINARY_MULTIPLY', 'BINARY_DIVIDE',
+        'BINARY_FLOOR_DIVIDE', 'BINARY_TRUE_DIVIDE', 'BINARY_MODULO',
+        'BINARY_ADD', 'BINARY_SUBTRACT', 'BINARY_LSHIFT', 'BINARY_RSHIFT',
+        'BINARY_AND', 'BINARY_XOR', 'BINARY_OR', 'STORE_MAP', 'LOAD_NAME',
+        'CALL_FUNCTION', 'COMPARE_OP', 'LOAD_ATTR', 'STORE_NAME', 'GET_ITER',
+        'FOR_ITER', 'LIST_APPEND', 'JUMP_ABSOLUTE', 'DELETE_NAME',
+        'JUMP_IF_TRUE', 'JUMP_IF_FALSE', 'JUMP_IF_FALSE_OR_POP',
+        'JUMP_IF_TRUE_OR_POP', 'POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE',
+        'BINARY_SUBSCR',
+        ] if x in dis.opmap)
 
 _SAFE_EVAL_CACHE = {}
+
 
 def safe_eval(source, data=None):
     if '__subclasses__' in source:
@@ -1418,6 +1446,7 @@ def safe_eval(source, data=None):
         'dict': dict,
         }}, data)
 
+
 def timezoned_date(date):
     if pytz and rpc.CONTEXT.get('timezone'):
         lzone = pytz.timezone(rpc.CONTEXT['timezone'])
@@ -1426,6 +1455,7 @@ def timezoned_date(date):
         ldt = sdt.astimezone(lzone)
         date = ldt
     return date
+
 
 def humanize(size):
     for x in ('bytes', 'KB', 'MB', 'GB', 'TB', 'PB'):

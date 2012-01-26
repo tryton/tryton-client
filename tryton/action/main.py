@@ -1,9 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import time
-import datetime
 import tryton.rpc as rpc
-from tryton.common import message, error, selection, file_open, mailto
+from tryton.common import message, selection, file_open, mailto
 from tryton.gui.window import Window
 from tryton.pyson import PYSONDecoder
 from tryton.exceptions import TrytonServerError
@@ -14,6 +12,7 @@ import webbrowser
 import tryton.common as common
 
 _ = gettext.gettext
+
 
 class Action(object):
 
@@ -71,7 +70,7 @@ class Action(object):
                 common.process_exception(exception)
                 return
             if not res:
-                raise Exception, 'ActionNotFound'
+                raise Exception('ActionNotFound')
             action_type = res['type']
         try:
             res = rpc.execute('model', action_type, 'search_read',
@@ -117,7 +116,8 @@ class Action(object):
             domain_context = ctx.copy()
             domain_context['context'] = ctx
             domain_context['_user'] = rpc._USER
-            domain = PYSONDecoder(domain_context).decode(action['pyson_domain'])
+            domain = PYSONDecoder(domain_context).decode(
+                action['pyson_domain'])
 
             search_context = ctx.copy()
             search_context['context'] = ctx

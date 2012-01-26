@@ -75,7 +75,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
         if cell_area is None:
             return (0, 0, 30, 18)
         else:
-            return (cell_area.x, cell_area.y, cell_area.width, cell_area.height)
+            return (cell_area.x, cell_area.y,
+                cell_area.width, cell_area.height)
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
@@ -89,6 +90,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
             while gtk.events_pending():
                 gtk.main_iteration()
             self.emit("clicked", path)
+
             def timeout(self, widget):
                 self.clicking = False
                 widget.queue_draw()

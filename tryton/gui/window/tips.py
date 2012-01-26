@@ -18,7 +18,8 @@ class Tips(object):
 
 
 '''),
-            _(u'''<b>Do you know Triton, one of the namesakes for our project?</b>
+            _(
+u'''<b>Do you know Triton, one of the namesakes for our project?</b>
 
 Triton (pronounced /ˈtraɪtən/ TRYE-tən, or as in Greek Τρίτων) is the
 largest moon of the planet Neptune, discovered on October 10, 1846
@@ -40,7 +41,6 @@ and paste in any application with Ctrl + V
 You can save any graphs in PNG file with right-click on it.
 '''),
         ]
-
 
         parent = get_toplevel_window()
         self.win = gtk.Dialog(_('Tips'), parent,
@@ -118,5 +118,3 @@ You can save any graphs in PNG file with right-click on it.
     def tip_previous(self, widget):
         self.number -= 1
         self.tip_set()
-
-

@@ -62,14 +62,15 @@ class CellRendererBinary(gtk.GenericCellRenderer):
 
     def button_width(self):
         return (sum(width for _, _, width, _ in  self.images.itervalues())
-            + ( 2 * (BUTTON_BORDER + BUTTON_SPACING) * len(self.buttons))
+            + (2 * (BUTTON_BORDER + BUTTON_SPACING) * len(self.buttons))
             - 2 * BUTTON_SPACING)
 
     def on_get_size(self, widget, cell_area=None):
         if cell_area is None:
             return (0, 0, 30, 18)
         else:
-            return (cell_area.x, cell_area.y, cell_area.width, cell_area.height)
+            return (cell_area.x, cell_area.y,
+                cell_area.width, cell_area.height)
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
@@ -80,7 +81,8 @@ class CellRendererBinary(gtk.GenericCellRenderer):
             x_offset = (cell_area.width - button_width
                 + (pxbf_width + (2 * BUTTON_BORDER) + BUTTON_SPACING) * index)
             x_button = cell_area.x + x_offset
-            if x_button < event.x < x_button + pxbf_width + (2 * BUTTON_BORDER):
+            if x_button < event.x < (x_button + pxbf_width
+                    + (2 * BUTTON_BORDER)):
                 break
         else:
             button_name = None
@@ -93,6 +95,7 @@ class CellRendererBinary(gtk.GenericCellRenderer):
         if event is None or event.type == gtk.gdk.BUTTON_PRESS:
             self.clicking = button_name
             self.emit(button_name, path)
+
             def timeout(self, widget):
                 self.clicking = ''
                 widget.queue_draw()

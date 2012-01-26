@@ -36,6 +36,7 @@ class Fault(xmlrpclib.Fault):
 class ProtocolError(xmlrpclib.ProtocolError):
     pass
 
+
 def object_hook(dct):
     if '__class__' in dct:
         if dct['__class__'] == 'datetime':
@@ -109,7 +110,7 @@ class JSONUnmarshaller(object):
 class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
 
     accept_gzip_encoding = True
-    encode_threshold = 1400 # common MTU
+    encode_threshold = 1400  # common MTU
 
     def __init__(self, fingerprints=None, ca_certs=None):
         xmlrpclib.Transport.__init__(self)
@@ -123,7 +124,8 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
         return parser, target
 
     def get_host_info(self, host):
-        host, extra_headers, x509 = xmlrpclib.Transport.get_host_info(self, host)
+        host, extra_headers, x509 = xmlrpclib.Transport.get_host_info(
+            self, host)
         if extra_headers is None:
             extra_headers = []
         extra_headers.append(('Connection', 'keep-alive'))
@@ -151,11 +153,11 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
             return self._connection[1]
         host, extra_headers, x509 = self.get_host_info(host)
 
-        ca_certs =  self.__ca_certs
+        ca_certs = self.__ca_certs
         cert_reqs = ssl.CERT_REQUIRED if ca_certs else ssl.CERT_NONE
 
-
         class HTTPSConnection(httplib.HTTPSConnection):
+
             def connect(self):
                 sock = socket.create_connection((self.host, self.port),
                     self.timeout)
@@ -180,12 +182,13 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
                     peercert = sock.getpeercert(True)
                 except socket.error:
                     peercert = None
+
                 def format_hash(value):
                     return reduce(lambda x, y: x + y[1].upper() +
-                            ((y[0] % 2 and y[0] + 1 < len(value)) and ':' or ''),
-                            enumerate(value), '')
+                        ((y[0] % 2 and y[0] + 1 < len(value)) and ':' or ''),
+                        enumerate(value), '')
                 return format_hash(hashlib.sha1(peercert).hexdigest())
-            except ssl.SSLError, e:
+            except ssl.SSLError:
                 http_connection()
 
         fingerprint = ''

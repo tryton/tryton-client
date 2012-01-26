@@ -22,21 +22,18 @@ import logging
 from urlparse import urlparse
 import threading
 
-from tryton import version
-from tryton import config
 import tryton.common as common
-from tryton.config import CONFIG, CURRENT_DIR, PREFIX, PIXMAPS_DIR, \
-        TRYTON_ICON, get_config_dir
+from tryton.config import CONFIG, get_config_dir
 from tryton import translate
 from tryton import gui
 from tryton.ipc import Client as IPCClient
-import traceback
 import time
 import signal
 
 if not hasattr(gtk.gdk, 'lock'):
     class _Lock(object):
         __enter__ = gtk.gdk.threads_enter
+
         def __exit__(*ignored):
             gtk.gdk.threads_leave()
 
@@ -44,10 +41,12 @@ if not hasattr(gtk.gdk, 'lock'):
 
 if sys.platform == 'win32':
     class Dialog(gtk.Dialog):
+
         def run(self):
             with gtk.gdk.lock:
                 return super(Dialog, self).run()
     gtk.Dialog = Dialog
+
 
 class TrytonClient(object):
     "Tryton client"
@@ -103,7 +102,8 @@ class TrytonClient(object):
         signal.signal(signal.SIGINT, lambda signum, frame: main.sig_quit())
         signal.signal(signal.SIGTERM, lambda signum, frame: main.sig_quit())
         if hasattr(signal, 'SIGQUIT'):
-            signal.signal(signal.SIGQUIT, lambda signum, frame: main.sig_quit())
+            signal.signal(signal.SIGQUIT,
+                lambda signum, frame: main.sig_quit())
 
         def excepthook(exctyp, exception, tb):
             import common
@@ -135,7 +135,7 @@ class TrytonClient(object):
             if sys.platform == 'win32':
                 while not self.quit_client.isSet():
                     with gtk.gdk.lock:
-                            running = gtk.main_iteration(True)
+                            gtk.main_iteration(True)
             else:
                 gtk.main()
         except KeyboardInterrupt:

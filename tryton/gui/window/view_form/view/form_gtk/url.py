@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import gettext
 import gtk
 from char import Char
 import webbrowser
@@ -104,4 +103,3 @@ class SIP(URL):
         else:
             self.tooltips.set_tip(self.button, '')
             self.tooltips.disable()
-

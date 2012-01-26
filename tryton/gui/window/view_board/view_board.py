@@ -6,6 +6,7 @@ import xml.dom.minidom
 from parser import ParserBoard
 from tryton.gui.window.view_board.action import Action
 
+
 class ViewBoard(object):
     'View board'
 

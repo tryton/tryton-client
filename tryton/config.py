@@ -15,10 +15,12 @@ from tryton.exceptions import TrytonError
 
 _ = gettext.gettext
 
+
 def get_home_dir():
     if os.name == 'nt':
         return os.path.join(os.environ['HOMEDRIVE'], os.environ['HOMEPATH'])
     return os.environ['HOME']
+
 
 def get_config_dir():
     if os.name == 'nt':
@@ -103,18 +105,19 @@ class ConfigManager(object):
 
         if opt.config and not os.path.isfile(opt.config):
             raise TrytonError(_('File "%s" not found') % (opt.config,))
-        self.rcfile = opt.config or os.path.join(get_config_dir(), 'tryton.conf')
+        self.rcfile = opt.config or os.path.join(
+            get_config_dir(), 'tryton.conf')
         self.load()
 
         for arg in ('log_level', 'log_logger'):
             if getattr(opt, arg):
-                self.options['logging.'+arg[4:]] = getattr(opt, arg)
+                self.options['logging.' + arg[4:]] = getattr(opt, arg)
         if opt.verbose:
             self.options['logging.default'] = 'INFO'
 
         for arg in ('login', 'port', 'server'):
             if getattr(opt, arg):
-                self.options['login.'+arg] = getattr(opt, arg)
+                self.options['login.' + arg] = getattr(opt, arg)
 
     def save(self):
         try:
@@ -178,6 +181,7 @@ if not os.path.isdir(PIXMAPS_DIR):
 
 TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
         os.path.join(PIXMAPS_DIR, 'tryton-icon.png').encode('utf-8'))
+
 
 def _data_dir():
     data_dir = os.path.join(CURRENT_DIR, 'share', 'tryton')

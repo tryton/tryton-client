@@ -9,7 +9,6 @@ import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui import Main
 from tryton.exceptions import TrytonServerError
-from tryton.config import CONFIG
 from tryton.gui.window.nomodal import NoModal
 from tryton.common.button import Button
 _ = gettext.gettext
@@ -74,7 +73,9 @@ class Wizard(object):
                 ctx['active_ids'] = self.ids
                 ctx['active_model'] = self.model
                 if self.screen:
-                    data = {self.screen_state: self.screen.get_on_change_value()}
+                    data = {
+                        self.screen_state: self.screen.get_on_change_value(),
+                        }
                 else:
                     data = {}
                 rpcprogress = common.RPCProgress('execute', ('wizard',
@@ -230,7 +231,7 @@ class Wizard(object):
         self.screen.set_cursor()
 
 
-class WizardForm(Wizard,SignalEvent):
+class WizardForm(Wizard, SignalEvent):
     "Wizard"
 
     def __init__(self, name=False):

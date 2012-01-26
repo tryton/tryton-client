@@ -5,7 +5,7 @@ import gobject
 import gettext
 import re
 import tryton.common as common
-from tryton.config import CONFIG, TRYTON_ICON, PIXMAPS_DIR
+from tryton.config import CONFIG, TRYTON_ICON
 from tryton.exceptions import TrytonServerError
 import tryton.rpc as rpc
 
@@ -28,10 +28,11 @@ class DBCreate(object):
             self.entry_adminpasswd2.set_sensitive(True)
             self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
                 gtk.gdk.color_parse(common.COLOR_SCHEMES["black"]))
-            self.tooltips.set_tip(self.entry_server_connection,_("This is the URL of " \
-            "the Tryton server. Use server 'localhost' and port '8000' if " \
-            "the server is installed on this computer. Click on 'Change' to " \
-            "change the address."))
+            self.tooltips.set_tip(self.entry_server_connection,
+                _("This is the URL of the Tryton server. Use server "
+                    "'localhost' and port '8000' if the server is installed "
+                    "on this computer. Click on 'Change' to change the "
+                    "address."))
         else:
             self.entry_serverpasswd.set_sensitive(False)
             self.entry_dbname.set_sensitive(False)
@@ -89,12 +90,12 @@ class DBCreate(object):
         must be filled, then the Create button is set to sensitive. This
         event method doesn't check the valid of single entrys.
         """
-        if  self.entry_server_connection.get_text() !=  "" \
-            and self.entry_serverpasswd.get_text() != "" \
-            and self.entry_dbname.get_text() != "" \
-            and self.combo_language.get_active() != -1 \
-            and self.entry_adminpasswd.get_text() != "" \
-            and self.entry_adminpasswd2.get_text() != "":
+        if  (self.entry_server_connection.get_text() != ""
+                and self.entry_serverpasswd.get_text() != ""
+                and self.entry_dbname.get_text() != ""
+                and self.combo_language.get_active() != -1
+                and self.entry_adminpasswd.get_text() != ""
+                and self.entry_adminpasswd2.get_text() != ""):
             widget.unset_flags(gtk.HAS_DEFAULT)
             self.button_create.set_sensitive(True)
             self.button_create.set_flags(gtk.CAN_DEFAULT)
@@ -114,7 +115,7 @@ class DBCreate(object):
         - First character must be a letter
         """
 
-        if (new_text.isalnum() or new_text == '_' ):
+        if new_text.isalnum() or new_text == '_':
             _hid = entry.get_data('handlerid')
             entry.handler_block(_hid)
             _pos = entry.get_position()
@@ -133,11 +134,9 @@ class DBCreate(object):
         self.port = port
 
         # GTK Stuffs
-        self.dialog = gtk.Dialog(
-            title= _("Create new database"),
-            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-            | gtk.WIN_POS_CENTER_ON_PARENT,
-        )
+        self.dialog = gtk.Dialog(title=_("Create new database"),
+            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
+            gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_has_separator(True)
         self.dialog.set_icon(TRYTON_ICON)
         # This event is needed for controlling the button_create
@@ -152,7 +151,8 @@ class DBCreate(object):
         img_connect = gtk.Image()
         img_connect.set_from_stock('tryton-new', gtk.ICON_SIZE_BUTTON)
         self.button_create.set_image(img_connect)
-        self.tooltips.set_tip(self.button_create, _('Create the new database.'))
+        self.tooltips.set_tip(self.button_create,
+            _('Create the new database.'))
         self.dialog.add_action_widget(self.button_create, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
 
@@ -163,10 +163,10 @@ class DBCreate(object):
         table.set_col_spacings(3)
 
         self.label_server_setup = gtk.Label()
-        self.label_server_setup.set_markup("<b>"+ _("Server Setup:")+ "</b>")
+        self.label_server_setup.set_markup("<b>" + _("Server Setup:") + "</b>")
         self.label_server_setup.set_justify(gtk.JUSTIFY_LEFT)
         self.label_server_setup.set_alignment(0, 1)
-        self.label_server_setup.set_padding( 9, 5)
+        self.label_server_setup.set_padding(9, 5)
         table.attach(self.label_server_setup, 0, 3, 0, 1, xoptions=gtk.FILL)
         self.label_server = gtk.Label(_("Server connection:"))
         self.label_server.set_alignment(1, 0.5)
@@ -176,25 +176,26 @@ class DBCreate(object):
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
-        self.tooltips.set_tip(self.entry_server_connection, _("This is the URL of " \
-            "the server. Use server 'localhost' and port '8000' if " \
-            "the server is installed on this computer. Click on 'Change' to " \
-            "change the address."))
+        self.tooltips.set_tip(self.entry_server_connection,
+            _("This is the URL of the server. Use server 'localhost' and port "
+                "'8000' if the server is installed on this computer. Click on "
+                "'Change' to change the address."))
         self.button_server_change = gtk.Button(_("C_hange"), stock=None,
              use_underline=True)
         img_button_server_change = gtk.Image()
-        img_button_server_change.set_from_stock('tryton-preferences-system', \
+        img_button_server_change.set_from_stock('tryton-preferences-system',
             gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
-        table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False, xoptions=gtk.FILL)
-        self.tooltips.set_tip(self.button_server_change, _("Setup the " \
-            "server connection..."))
+        table.attach(self.button_server_change, 2, 3, 1, 2, yoptions=False,
+            xoptions=gtk.FILL)
+        self.tooltips.set_tip(self.button_server_change,
+            _("Setup the server connection..."))
 
         table.attach(self.entry_server_connection, 1, 2, 1, 2)
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         self.label_serverpasswd.set_alignment(1, 0.5)
-        self.label_serverpasswd.set_padding( 3, 3)
+        self.label_serverpasswd.set_padding(3, 3)
         table.attach(self.label_serverpasswd, 0, 1, 2, 3, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
         self.entry_serverpasswd = gtk.Entry()
@@ -212,15 +213,15 @@ class DBCreate(object):
         table.attach(self.hseparator, 0, 3, 3, 4, yoptions=gtk.FILL)
 
         label_dbname = gtk.Label()
-        label_dbname.set_markup("<b>" + _("New database setup:")  + "</b>")
+        label_dbname.set_markup("<b>" + _("New database setup:") + "</b>")
         label_dbname.set_justify(gtk.JUSTIFY_LEFT)
         label_dbname.set_alignment(0, 1)
-        label_dbname.set_padding( 9, 5)
+        label_dbname.set_padding(9, 5)
         table.attach(label_dbname, 0, 3, 4, 5, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
         label_dbname = gtk.Label(_("Database name:"))
         label_dbname.set_justify(gtk.JUSTIFY_RIGHT)
-        label_dbname.set_padding( 3, 3)
+        label_dbname.set_padding(3, 3)
         label_dbname.set_alignment(1, 0.5)
         table.attach(label_dbname, 0, 1, 5, 6, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
@@ -229,18 +230,18 @@ class DBCreate(object):
         self.entry_dbname.set_width_chars(16)
         self.entry_dbname.set_activates_default(True)
         table.attach(self.entry_dbname, 1, 3, 5, 6, yoptions=gtk.FILL)
-        self.tooltips.set_tip(self.entry_dbname, _("Choose the name of the new " \
-            "database.\n" \
-            "Allowed characters are alphanumerical or _ (underscore)\n" \
-            "You need to avoid all accents, space or special characters! " \
-            "Example: tryton"))
-        handlerid = self.entry_dbname.connect("insert-text", \
+        self.tooltips.set_tip(self.entry_dbname,
+            _("Choose the name of the new database.\n"
+                "Allowed characters are alphanumerical or _ (underscore)\n"
+                "You need to avoid all accents, space or special characters! "
+                "Example: tryton"))
+        handlerid = self.entry_dbname.connect("insert-text",
             self.entry_insert_text)
         self.entry_dbname.set_data('handlerid', handlerid)
         label_language = gtk.Label(_("Default language:"))
         label_language.set_justify(gtk.JUSTIFY_RIGHT)
         label_language.set_alignment(1, 0.5)
-        label_language.set_padding( 3, 3)
+        label_language.set_padding(3, 3)
         table.attach(label_language, 0, 1, 6, 7, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
         eventbox_language = gtk.EventBox()
@@ -253,24 +254,25 @@ class DBCreate(object):
             "the administration menu."))
         label_adminpasswd = gtk.Label(_("Admin password:"))
         label_adminpasswd.set_justify(gtk.JUSTIFY_RIGHT)
-        label_adminpasswd.set_padding( 3, 3)
+        label_adminpasswd.set_padding(3, 3)
         label_adminpasswd.set_alignment(1, 0.5)
         table.attach(label_adminpasswd, 0, 1, 7, 8, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
         self.entry_adminpasswd = gtk.Entry()
         self.entry_adminpasswd.set_visibility(False)
         self.entry_adminpasswd.set_activates_default(True)
-        self.tooltips.set_tip(self.entry_adminpasswd, _("Choose a password for " \
-            "the admin user of the new database. With these credentials you " \
-            "will be later able to login into the database:\n" \
-            "User name: admin\n" \
-            "Password: <The password you set here>"))
+        self.tooltips.set_tip(self.entry_adminpasswd,
+            _("Choose a password for the admin user of the new database. "
+                "With these credentials you will be later able to login into "
+                "the database:\n"
+                "User name: admin\n"
+                "Password: <The password you set here>"))
         table.attach(self.entry_adminpasswd, 1, 3, 7, 8, yoptions=gtk.FILL)
         self.entry_adminpasswd.connect("key-press-event", \
             self.event_passwd_clear)
         label_adminpasswd2 = gtk.Label(_("Confirm admin password:"))
         label_adminpasswd2.set_justify(gtk.JUSTIFY_RIGHT)
-        label_adminpasswd2.set_padding( 3, 3)
+        label_adminpasswd2.set_padding(3, 3)
         label_adminpasswd2.set_alignment(1, 0.5)
         table.attach(label_adminpasswd2, 0, 1, 8, 9, xoptions=gtk.FILL,
                 yoptions=gtk.FILL)
@@ -355,14 +357,14 @@ class DBCreate(object):
                         common.process_exception(exception)
                         continue
                     if exist:
-                         common.warning(_("A database with the same name " \
-                             "already exists.\n" \
-                             "Try another database name."),
-                             _("This database name already exist!"))
-                         self.entry_dbname.set_text("")
-                         self.entry_dbname.grab_focus()
-                         continue
-                    else: # Everything runs fine, break the block here
+                        common.warning(_("A database with the same name "
+                                "already exists.\n"
+                                "Try another database name."),
+                            _("This database name already exist!"))
+                        self.entry_dbname.set_text("")
+                        self.entry_dbname.grab_focus()
+                        continue
+                    else:  # Everything runs fine, break the block here
                         host = url_m.group(1)
                         port = url_m.group(2)
                         try:
@@ -378,13 +380,13 @@ class DBCreate(object):
                                 self.entry_serverpasswd.set_text("")
                                 self.entry_serverpasswd.grab_focus()
                                 continue
-                            else: # Unclassified error
-                                common.warning(_("Can't create the " \
-                                    "database, caused by an unknown reason.\n" \
-                                    "If there is a database created, it could " \
-                                    "be broken. Maybe drop this database! " \
-                                    "Please check the error message for " \
-                                    "possible informations.\n" \
+                            else:  # Unclassified error
+                                common.warning(_("Can't create the "
+                                    "database, caused by an unknown reason.\n"
+                                    "If there is a database created, it could "
+                                    "be broken. Maybe drop this database! "
+                                    "Please check the error message for "
+                                    "possible informations.\n"
                                     "Error message:\n")
                                     + str(exception.faultCode),
                                     _("Error creating database!"))
@@ -410,4 +412,3 @@ class DBCreate(object):
         parent.present()
         self.dialog.destroy()
         return dbname
-

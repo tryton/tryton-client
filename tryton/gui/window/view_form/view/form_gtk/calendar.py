@@ -4,10 +4,8 @@ import time
 import datetime
 import gtk
 import gettext
-import locale
 from interface import WidgetInterface
-import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, message, \
+from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, \
         TRYTON_ICON, timezoned_date
 from tryton.common import date_widget, Tooltips, datetime_strftime, \
         get_toplevel_window
@@ -89,7 +87,7 @@ class Calendar(WidgetInterface):
         if not value:
             self.entry.clear()
         else:
-            if len(value)>10:
+            if len(value) > 10:
                 value = value[:10]
             date = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
             value = datetime_strftime(date, self.format)
@@ -101,9 +99,9 @@ class Calendar(WidgetInterface):
     def cal_open(self, widget):
         parent = get_toplevel_window()
         win = gtk.Dialog(_('Date Selection'), parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                gtk.STOCK_OK, gtk.RESPONSE_OK))
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK,
+                gtk.RESPONSE_OK))
         win.set_has_separator(True)
         win.set_icon(TRYTON_ICON)
 
@@ -120,7 +118,7 @@ class Calendar(WidgetInterface):
         try:
             val = self.get_value(self.record)
             if val:
-                cal.select_month(int(val[5:7])-1, int(val[0:4]))
+                cal.select_month(int(val[5:7]) - 1, int(val[0:4]))
                 cal.select_day(int(val[8:10]))
         except ValueError:
             pass
@@ -220,9 +218,9 @@ class DateTime(WidgetInterface):
     def cal_open(self, widget):
         parent = get_toplevel_window()
         win = gtk.Dialog(_('Date Time Selection'), parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                gtk.STOCK_OK, gtk.RESPONSE_OK))
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK,
+                gtk.RESPONSE_OK))
         win.set_has_separator(True)
         win.set_icon(TRYTON_ICON)
         win.vbox.set_spacing(2)
@@ -252,7 +250,7 @@ class DateTime(WidgetInterface):
             if val:
                 widget_hour.set_value(int(val[11:13]))
                 widget_minute.set_value(int(val[-5:-3]))
-                cal.select_month(int(val[5:7])-1, int(val[0:4]))
+                cal.select_month(int(val[5:7]) - 1, int(val[0:4]))
                 cal.select_day(int(val[8:10]))
             else:
                 widget_hour.set_value(time.localtime()[3])

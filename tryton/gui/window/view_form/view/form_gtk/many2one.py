@@ -1,10 +1,8 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import gobject
 import gtk
 import gettext
 from interface import WidgetInterface
-from tryton.common import TRYTON_ICON, COLOR_SCHEMES
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
@@ -14,7 +12,6 @@ from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.pyson import PYSONEncoder
 from tryton.exceptions import TrytonServerError
-import pango
 
 _ = gettext.gettext
 
@@ -33,7 +30,8 @@ class Many2One(WidgetInterface):
         self.wid_text.connect_after('key_press_event', self.sig_key_press)
         self.wid_text.connect('populate-popup', self._populate_popup)
         self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
-        self.wid_text.connect('focus-out-event', lambda x, y: self._focus_out())
+        self.wid_text.connect('focus-out-event',
+            lambda x, y: self._focus_out())
         self.wid_text.connect_after('changed', self.sig_changed)
         self.changed = True
         self.wid_text.connect('activate', self.sig_activate)
@@ -118,12 +116,13 @@ class Many2One(WidgetInterface):
                     common.process_exception(exception)
                     self.changed = True
                     return
-                if len(ids)==1:
+                if len(ids) == 1:
                     self.field.set_client(self.record, ids[0],
                             force_change=True)
                     self.focus_out = True
                     self.display(self.record, self.field)
                     return
+
                 def callback(ids):
                     if ids:
                         self.field.set_client(self.record, ids[0],
@@ -150,6 +149,7 @@ class Many2One(WidgetInterface):
     def sig_new(self, *args):
         self.focus_out = False
         screen = self.get_screen()
+
         def callback(result):
             if result and screen.save_current():
                 value = (screen.current_record.id,
@@ -165,6 +165,7 @@ class Many2One(WidgetInterface):
         if value:
             screen = self.get_screen()
             screen.load([self.field.get(self.record)])
+
             def callback(result):
                 if result and screen.save_current():
                     value = (screen.current_record.id,
@@ -200,7 +201,7 @@ class Many2One(WidgetInterface):
                 common.process_exception(exception)
                 self.changed = True
                 return False
-            if ids and len(ids)==1:
+            if ids and len(ids) == 1:
                 self.field.set_client(self.record, ids[0],
                         force_change=True)
                 self.focus_out = True
@@ -230,7 +231,8 @@ class Many2One(WidgetInterface):
         elif event.keyval == gtk.keysyms.F2:
             self.sig_edit(widget)
             return True
-        elif event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return) and editable:
+        elif (event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return)
+                and editable):
             self.sig_activate(widget, event, key_press=True)
         return False
 
@@ -243,7 +245,7 @@ class Many2One(WidgetInterface):
         return False
 
     def set_value(self, record, field):
-        pass # No update of the model, the model is updated in real time !
+        pass  # No update of the model, the model is updated in real time !
 
     def display(self, record, field):
         self.changed = False
@@ -280,9 +282,9 @@ class Many2One(WidgetInterface):
         menu_entries.append((None, None, None))
         menu_entries.append((None, None, None))
         menu_entries.append((_('Actions'),
-            lambda x: self.click_and_action('form_action'),0))
+            lambda x: self.click_and_action('form_action'), 0))
         menu_entries.append((_('Reports'),
-            lambda x: self.click_and_action('form_print'),0))
+            lambda x: self.click_and_action('form_print'), 0))
         menu_entries.append((None, None, None))
         for relate in relates:
             relate['string'] = relate['name']

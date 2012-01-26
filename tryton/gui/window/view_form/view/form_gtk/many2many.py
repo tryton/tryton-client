@@ -50,7 +50,6 @@ class Many2Many(WidgetInterface):
         self.but_add.set_relief(gtk.RELIEF_NONE)
         hbox.pack_start(self.but_add, expand=False, fill=False)
 
-
         self.but_remove = gtk.Button()
         tooltips.set_tip(self.but_remove, _('Remove'))
         self.but_remove.connect('clicked', self._sig_remove)
@@ -130,7 +129,7 @@ class Many2Many(WidgetInterface):
             else:
                 dom = domain
             ids = rpc.execute('model', self.attrs['relation'], 'search',
-                    dom , 0, CONFIG['client.limit'], None, context)
+                dom, 0, CONFIG['client.limit'], None, context)
         except TrytonServerError, exception:
             common.process_exception(exception)
             return False

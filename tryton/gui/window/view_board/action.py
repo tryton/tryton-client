@@ -4,14 +4,9 @@
 import gtk
 from tryton.gui.window.view_form.screen import Screen
 import tryton.rpc as rpc
-import time
-import datetime
-from tryton.gui.window.win_search import WinSearch
-from tryton.action import Action as Action2
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import gettext
-from tryton.config import CONFIG
 from tryton.signal_event import SignalEvent
 from tryton.exceptions import TrytonServerError
 from tryton.gui.window.win_form import WinForm
@@ -89,7 +84,7 @@ class Action(SignalEvent):
         else:
             self.title.set_text(name)
 
-        self.widget.set_size_request(int(attrs.get('width',-1)),
+        self.widget.set_size_request(int(attrs.get('width', -1)),
                 int(attrs.get('height', -1)))
 
         self.screen.search_filter()
@@ -97,6 +92,7 @@ class Action(SignalEvent):
     def row_activate(self):
         if not self.screen.current_record:
             pass
+
         def callback(result):
             if result:
                 self.screen.current_record.save()
@@ -133,5 +129,5 @@ class Action(SignalEvent):
             return
         del self.domain[:]
         self.domain.extend(new_domain)
-        if hasattr(self, 'screen'): # Catch early update
+        if hasattr(self, 'screen'):  # Catch early update
             self.display()
