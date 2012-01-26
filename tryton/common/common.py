@@ -808,15 +808,15 @@ class ErrorDialog(UniqueDialog):
         if title == details:
             title = ''
         log = logging.getLogger('common.message')
-        log.error(details)
+        log.error(details + '\n' + title)
 
         response = super(ErrorDialog, self).__call__(title, details)
         if response == gtk.RESPONSE_OK:
-            send_bugtracker(details)
+            send_bugtracker(title, details)
 
 error = ErrorDialog()
 
-def send_bugtracker(msg):
+def send_bugtracker(title, msg):
     from tryton import rpc
     parent = get_toplevel_window()
     win = gtk.Dialog(_('Bug Tracker'), parent,
@@ -878,18 +878,11 @@ def send_bugtracker(msg):
             server = xmlrpclib.Server(('%s://%s:%s@' + CONFIG['roundup.xmlrpc'])
                     % (protocol, user, password), allow_none=True)
             if hashlib:
-                msg_md5 = hashlib.md5(msg).hexdigest()
+                msg_md5 = hashlib.md5(msg + '\n' + title).hexdigest()
             else:
-                msg_md5 = md5.new(msg).hexdigest()
-            # use the last line of the message as title
-            title = '[no title]'
-            for line in msg.splitlines():
-                #don't use empty line nor ^ from sql error
-                if line and '^' != line.strip():
-                    if len(line) > 128:
-                        title = line[:128] + '...'
-                    else:
-                        title = line
+                msg_md5 = md5.new(msg + '\n' + title).hexdigest()
+            if not title:
+                title = '[no title]'
             issue_id = None
             msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
             if msg_ids:
@@ -918,7 +911,7 @@ def send_bugtracker(msg):
                     and 'roundup.cgi.exceptions.Unauthorised' in
                     exception.faultString):
                 message(_('Connection error!\nBad username or password!'))
-                return send_bugtracker(msg)
+                return send_bugtracker(title, msg)
             tb_s = reduce(lambda x, y: x + y,
                     traceback.format_exception(sys.exc_type,
                         sys.exc_value, sys.exc_traceback))
