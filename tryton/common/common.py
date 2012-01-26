@@ -404,47 +404,7 @@ def file_selection(title, filename='',
         return filenames
 
 def file_open(filename, type, print_p=False):
-    if os.name == 'nt':
-        operation = 'open'
-        if print_p:
-            operation = 'print'
-        try:
-            os.startfile(os.path.normpath(filename), operation)
-        except WindowsError:
-            save_name = file_selection(_('Save As...'),
-                    action=gtk.FILE_CHOOSER_ACTION_SAVE)
-            if save_name:
-                file_p = open(filename, 'rb')
-                save_p = open(save_name, 'wb+')
-                save_p.write(file_p.read())
-                save_p.close()
-                file_p.close()
-        return
-    elif sys.platform == 'darwin':
-        pid = os.fork()
-        if not pid:
-            pid = os.fork()
-            if not pid:
-                try:
-                    os.execv('/usr/bin/open', ['/usr/bin/open', filename])
-                except OSError:
-                    sys.exit(0)
-            time.sleep(0.1)
-            sys.exit(0)
-        os.waitpid(pid, 0)
-        return
-    cmd = ''
-    if isinstance(CONFIG['client.actions'], basestring):
-        CONFIG['client.actions'] = safe_eval(CONFIG['client.actions'])
-    if type in CONFIG['client.actions']:
-        if print_p:
-            cmd = CONFIG['client.actions'][type][1]
-        else:
-            cmd = CONFIG['client.actions'][type][0]
-    if not cmd:
-        #TODO add dialog box
-        pass
-    if not cmd:
+    def save():
         save_name = file_selection(_('Save As...'),
                 action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if save_name:
@@ -453,25 +413,26 @@ def file_open(filename, type, print_p=False):
             save_p.write(file_p.read())
             save_p.close()
             file_p.close()
-        return
-    cmd = cmd % filename
-    args = shlex.split(str(cmd))
-    prog = find_in_path(args[0])
-    args[0] = os.path.basename(args[0])
-    if print_p:
-        os.spawnv(os.P_WAIT, prog, args)
-        return
-    pid = os.fork()
-    if not pid:
-        pid = os.fork()
-        if not pid:
-            try:
-                os.execv(prog, args)
-            except OSError:
-                sys.exit(0)
-        time.sleep(0.1)
-        sys.exit(0)
-    os.waitpid(pid, 0)
+
+    if os.name == 'nt':
+        operation = 'open'
+        if print_p:
+            operation = 'print'
+        try:
+            os.startfile(os.path.normpath(filename), operation)
+        except WindowsError:
+            save()
+    elif sys.platform == 'darwin':
+        try:
+            subprocess.Popen(['/usr/bin/open', filename])
+        except OSError:
+            save()
+    else:
+        try:
+            subprocess.Popen(['xdg-open', filename])
+        except OSError:
+            save()
+
 
 def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
     if CONFIG['client.email']:
@@ -485,6 +446,23 @@ def mailto(to=None, cc=None, subject=None, body=None, attachment=None):
         args = shlex.split(str(cmd))
         subprocess.Popen(args)
         return
+    if os.name != 'nt' and sys.platform != 'darwin':
+        args = ['xdg-email', '--utf8']
+        if cc:
+            args.extend(['--cc', cc])
+        if subject:
+            args.extend(['--subject', subject])
+        if body:
+            args.extend(['--body', body])
+        if attachment:
+            args.extend(['--attach', attachment])
+        if to:
+            args.append(to)
+        try:
+            subprocess.Popen(args)
+            return
+        except OSError:
+            pass
     #http://www.faqs.org/rfcs/rfc2368.html
     url = "mailto:"
     if to:

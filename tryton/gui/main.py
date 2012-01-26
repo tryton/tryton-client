@@ -23,7 +23,6 @@ from tryton.exceptions import TrytonServerError, TrytonError
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
 from tryton.gui.window import Limit
-from tryton.gui.window import FileActions
 from tryton.gui.window import Email
 from tryton.gui.window.dblogin import DBLogin
 from tryton.gui.window.dbcreate import DBCreate
@@ -188,11 +187,6 @@ class Main(object):
                 pass
 
         self.sig_statusbar_show()
-
-        if os.name == 'nt' or sys.platform == 'darwin':
-            # Disable actions, on win32 we use os.startfile
-            # and on mac we use /usr/bin/open
-            self.menuitem_actions.set_sensitive(False)
 
         # Adding a timer the check to requests
         gobject.timeout_add(5 * 60 * 1000, self.request_set)
@@ -631,12 +625,6 @@ class Main(object):
         menuitem_limit.set_accel_path('<tryton>/Options/Search Limit')
         menu_options.add(menuitem_limit)
 
-        menuitem_actions = gtk.MenuItem(_('File _Actions...'))
-        self.menuitem_actions = menuitem_actions
-        menuitem_actions.connect('activate', self.sig_file_actions)
-        menuitem_actions.set_accel_path('<tryton>/Options/File Actions')
-        menu_options.add(menuitem_actions)
-
         menuitem_email = gtk.MenuItem(_('_Email...'))
         self.menuitem_email = menuitem_email
         menuitem_email.connect('activate', self.sig_email)
@@ -816,9 +804,6 @@ class Main(object):
 
     def sig_limit(self, widget):
         Limit().run()
-
-    def sig_file_actions(self, widget):
-        FileActions().run()
 
     def sig_email(self, widget):
         Email().run()

@@ -29,20 +29,6 @@ def get_config_dir():
 if not os.path.isdir(get_config_dir()):
     os.makedirs(get_config_dir(), 0700)
 
-def find_path(progs, args):
-    if os.name == 'nt':
-        return ''
-    if sys.platform == 'darwin':
-        return ''
-    paths = [x for x in os.environ['PATH'].split(':')
-            if os.path.isdir(x)]
-    for dir in paths:
-        for prog in progs:
-            val = os.path.join(dir, prog)
-            if os.path.isfile(val) or os.path.islink(val):
-                return val + ' ' + args
-    return ''
-
 
 class ConfigManager(object):
     "Config manager"
@@ -78,17 +64,6 @@ class ConfigManager(object):
             'client.default_path': get_home_dir(),
             'client.lang': locale.getdefaultlocale()[0],
             'client.language_direction': 'ltr',
-            'client.actions': {
-                'odt': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                'txt': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
-                    'kpdf', 'epdfview', 'acroread'], '"%s"'), 1: ''},
-                'png': {0: find_path(['feh', 'display', 'qiv', 'eye'], '"%s"'), 1: ''},
-                'csv': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                },
             'client.email': '',
             'client.can_change_accelerators': False,
             'client.limit': 1000,
