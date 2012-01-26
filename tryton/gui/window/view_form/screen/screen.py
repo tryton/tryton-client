@@ -375,7 +375,7 @@ class Screen(SignalEvent):
         else:
             loading = 'lazy'
         for field in fields:
-            if field not in self.group.fields:
+            if field not in self.group.fields or loading == 'eager':
                 fields[field]['loading'] = loading
             else:
                 fields[field]['loading'] = \
