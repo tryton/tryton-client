@@ -54,13 +54,22 @@ class CellRendererButton(gtk.GenericCellRenderer):
         x = cell_area.x
         y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
         window.draw_layout(widget.style.text_gc[0], x, y, layout)
+        widget.style.paint_layout(window, state, True, expose_area, widget,
+            "cellrendererbutton", x, y, layout)
 
         layout = widget.create_pango_layout(self.text)
         layout.set_font_description(widget.style.font_desc)
+        layout.set_ellipsize(pango.ELLIPSIZE_END)
         w, h = layout.get_size()
-        x = int(cell_area.x + (cell_area.width - w / pango.SCALE) / 2)
+        if cell_area.width < w / pango.SCALE:
+            x = cell_area.x + 2 / pango.SCALE
+        else:
+            x = int(cell_area.x + (cell_area.width - w / pango.SCALE) / 2)
         y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
-        window.draw_layout(widget.style.text_gc[0], x, y, layout)
+        layout.set_width((cell_area.width - 4) * pango.SCALE)
+        layout.set_wrap(pango.WRAP_CHAR)
+        widget.style.paint_layout(window, state, True, expose_area, widget,
+            "cellrendererbutton", x, y, layout)
 
     def on_get_size(self, widget, cell_area=None):
         if cell_area is None:

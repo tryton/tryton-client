@@ -4,6 +4,9 @@ import gtk
 import gobject
 import pango
 
+BUTTON_BORDER = 10
+BUTTON_SPACING = 2
+
 
 class CellRendererBinary(gtk.GenericCellRenderer):
     __gproperties__ = {
@@ -48,7 +51,8 @@ class CellRendererBinary(gtk.GenericCellRenderer):
             img_insensitive = img_sensitive.copy()
             img_sensitive.saturate_and_pixelate(img_insensitive, 0, False)
             width = img_sensitive.get_width()
-            self.images[key] = (img_sensitive, img_insensitive, width)
+            height = img_sensitive.get_height()
+            self.images[key] = (img_sensitive, img_insensitive, width, height)
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
@@ -56,9 +60,10 @@ class CellRendererBinary(gtk.GenericCellRenderer):
     def do_get_property(self, pspec):
         return getattr(self, pspec.name)
 
-    def button_width(self, cell_area):
-        return ((cell_area.width / 2 - (len(self.buttons) + 1) * 2)
-            / len(self.buttons))
+    def button_width(self):
+        return (sum(width for _, _, width, _ in  self.images.itervalues())
+            + ( 2 * (BUTTON_BORDER + BUTTON_SPACING) * len(self.buttons))
+            - 2 * BUTTON_SPACING)
 
     def on_get_size(self, widget, cell_area=None):
         if cell_area is None:
@@ -68,12 +73,14 @@ class CellRendererBinary(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
-        button_width = self.button_width(cell_area)
+        button_width = self.button_width()
 
         for index, button_name in enumerate(self.buttons):
-            x_offset = button_width * index + 2 * (index + 1)
-            x_button = cell_area.x + cell_area.width / 2 + 5 + x_offset
-            if x_button < event.x < x_button + button_width:
+            _, _, pxbf_width, _ = self.images[button_name]
+            x_offset = (cell_area.width - button_width
+                + (pxbf_width + (2 * BUTTON_BORDER) + BUTTON_SPACING) * index)
+            x_button = cell_area.x + x_offset
+            if x_button < event.x < x_button + pxbf_width + (2 * BUTTON_BORDER):
                 break
         else:
             button_name = None
@@ -99,24 +106,31 @@ class CellRendererBinary(gtk.GenericCellRenderer):
         if type(window) == gtk.gdk.Pixmap:
             return
 
+        button_width = self.button_width()
+
         # display size
         layout = widget.create_pango_layout(self.size)
         layout.set_font_description(widget.style.font_desc)
         w, h = layout.get_size()
-        x = int(cell_area.x + (cell_area.width - w / pango.SCALE) * 0)
+        x = int(cell_area.x + cell_area.width - button_width - w / pango.SCALE
+            - BUTTON_SPACING)
         y = int(cell_area.y + (cell_area.height - h / pango.SCALE) / 2)
+        layout.set_width(((cell_area.width / 2) - 2) * pango.SCALE)
         state = gtk.STATE_NORMAL
         if flags & gtk.CELL_RENDERER_SELECTED:
             state = gtk.STATE_ACTIVE
-        window.draw_layout(widget.style.text_gc[state], x, y, layout)
+        if x >= cell_area.x:
+            widget.style.paint_layout(window, state, True, expose_area,
+                widget, "cellrendererbinary", x, y, layout)
 
         # display buttons
-        button_width = self.button_width(cell_area)
         for index, button_name in enumerate(self.buttons):
             state = gtk.STATE_NORMAL
             shadow = gtk.SHADOW_OUT
-            pxbf_sens, pxbf_insens, pxbf_width = self.images[button_name]
-            if self.clicking and flags & gtk.CELL_RENDERER_SELECTED:
+            pxbf_sens, pxbf_insens, pxbf_width, pxbf_height = \
+                self.images[button_name]
+            if (self.clicking == button_name
+                    and flags & gtk.CELL_RENDERER_SELECTED):
                 state = gtk.STATE_ACTIVE
                 shadow = gtk.SHADOW_IN
             if (not self.editable and button_name in ('new', 'clear')
@@ -125,14 +139,16 @@ class CellRendererBinary(gtk.GenericCellRenderer):
                 pixbuf = pxbf_insens
             else:
                 pixbuf = pxbf_sens
-            x_offset = (cell_area.width / 2 + 5
-                + button_width * index + 2 * (index + 1)) - 1
+            x_offset = (cell_area.width - button_width
+                + (pxbf_width + (2 * BUTTON_BORDER) + BUTTON_SPACING) * index)
+            if x_offset < 0:
+                continue
             widget.style.paint_box(window, state, shadow,
                 None, widget, "button", cell_area.x + x_offset, cell_area.y,
-                button_width, cell_area.height)
+                pxbf_width + (2 * BUTTON_BORDER), cell_area.height)
             window.draw_pixbuf(widget.style.black_gc,
                 pixbuf, 0, 0,
-                cell_area.x + x_offset + button_width / 2 - pxbf_width / 2,
-                cell_area.y)
+                cell_area.x + x_offset + BUTTON_BORDER,
+                cell_area.y + (cell_area.height - pxbf_height) / 2)
 
 gobject.type_register(CellRendererBinary)
