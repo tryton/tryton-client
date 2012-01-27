@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
-from tryton.common import TRYTON_ICON, COLOR_SCHEMES
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
@@ -11,7 +10,6 @@ from tryton.config import CONFIG
 from tryton.exceptions import TrytonServerError
 import tryton.common as common
 import tryton.rpc as rpc
-import pango
 
 _ = gettext.gettext
 
@@ -47,7 +45,8 @@ class One2Many(WidgetInterface):
             tooltips.set_tip(self.but_add, _('Add'))
             self.but_add.connect('clicked', self._sig_add)
             img_add = gtk.Image()
-            img_add.set_from_stock('tryton-list-add', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_add.set_from_stock('tryton-list-add',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_add.set_alignment(0.5, 0.5)
             self.but_add.add(img_add)
             self.but_add.set_relief(gtk.RELIEF_NONE)
@@ -57,7 +56,8 @@ class One2Many(WidgetInterface):
             tooltips.set_tip(self.but_remove, _('Remove'))
             self.but_remove.connect('clicked', self._sig_remove, True)
             img_remove = gtk.Image()
-            img_remove.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_remove.set_from_stock('tryton-list-remove',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_remove.set_alignment(0.5, 0.5)
             self.but_remove.add(img_remove)
             self.but_remove.set_relief(gtk.RELIEF_NONE)
@@ -111,7 +111,8 @@ class One2Many(WidgetInterface):
         tooltips.set_tip(self.but_pre, _('Previous'))
         self.but_pre.connect('clicked', self._sig_previous)
         img_pre = gtk.Image()
-        img_pre.set_from_stock('tryton-go-previous', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_pre.set_from_stock('tryton-go-previous',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_pre.set_alignment(0.5, 0.5)
         self.but_pre.add(img_pre)
         self.but_pre.set_relief(gtk.RELIEF_NONE)
@@ -136,7 +137,8 @@ class One2Many(WidgetInterface):
         tooltips.set_tip(but_switch, _('Switch'))
         but_switch.connect('clicked', self.switch_view)
         img_switch = gtk.Image()
-        img_switch.set_from_stock('tryton-fullscreen', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_switch.set_from_stock('tryton-fullscreen',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_switch.set_alignment(0.5, 0.5)
         but_switch.add(img_switch)
         but_switch.set_relief(gtk.RELIEF_NONE)
@@ -304,7 +306,8 @@ class One2Many(WidgetInterface):
 
         try:
             if self.wid_text.get_text():
-                dom = [('rec_name', 'ilike', '%' + self.wid_text.get_text() + '%'),
+                dom = [('rec_name', 'ilike',
+                        '%' + self.wid_text.get_text() + '%'),
                     ['OR', domain, ('id', 'in', removed_ids)]]
             else:
                 dom = ['OR', domain, ('id', 'in', removed_ids)]
@@ -313,6 +316,7 @@ class One2Many(WidgetInterface):
         except TrytonServerError, exception:
             common.process_exception(exception)
             return False
+
         def callback(ids):
             res_id = None
             if ids:
@@ -327,7 +331,6 @@ class One2Many(WidgetInterface):
                 views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
-
 
     def _sig_label(self, screen, signal_data):
         name = '_'
@@ -386,7 +389,7 @@ class One2Many(WidgetInterface):
     def set_value(self, record, field):
         self.screen.save_tree_state()
         self.screen.current_view.set_value()
-        if self.screen.modified(): # TODO check if required
+        if self.screen.modified():  # TODO check if required
             record.modified_fields.setdefault(field.name)
             record.signal('record-modified')
         return True

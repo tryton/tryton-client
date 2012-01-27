@@ -3,14 +3,13 @@
 import os
 import tempfile
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, datetime_strftime, \
+from tryton.common import DT_FORMAT, DHM_FORMAT, datetime_strftime, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
         merge, inverse_leaf, EvalEnvironment, RPCProgress
 import tryton.common as common
 import time
 import datetime
 from decimal import Decimal
-import logging
 from tryton.exceptions import TrytonServerError
 
 
@@ -60,8 +59,8 @@ class CharField(object):
     def validation_domains(self, record):
         screen_domain, attr_domain = self.domains_get(record)
         if attr_domain:
-            return screen_domain, screen_domain + unlocalize_domain(attr_domain,
-                self.name)
+            return (screen_domain, screen_domain +
+                unlocalize_domain(attr_domain, self.name))
         else:
             return screen_domain, screen_domain
 
@@ -91,12 +90,13 @@ class CharField(object):
         elif domain == [('id', '=', False)]:
             res = False
         else:
-            if (isinstance(inverted_domain, list) \
-                and len(inverted_domain) == 1 and inverted_domain[0][1] == '='):
-                # If the inverted domain is so constraint that only one value is
-                # possible we should use it. But we must also pay attention to
-                # the fact that the original domain might be a 'OR' domain and
-                # thus not preventing the modification of fields.
+            if (isinstance(inverted_domain, list)
+                    and len(inverted_domain) == 1
+                    and inverted_domain[0][1] == '='):
+                # If the inverted domain is so constraint that only one value
+                # is possible we should use it. But we must also pay attention
+                # to the fact that the original domain might be a 'OR' domain
+                # and thus not preventing the modification of fields.
                 leftpart, _, value = inverted_domain[0][:3]
                 setdefault = True
                 if '.' in leftpart:
@@ -135,9 +135,9 @@ class CharField(object):
 
     def set_client(self, record, value, force_change=False):
         internal = record.value.get(self.name, False)
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
-        if (internal or False) != (record.value.get(self.name, False) or False):
+        if ((internal or False)
+                != (record.value.get(self.name, False) or False)):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
             self.sig_changed(record)
@@ -230,11 +230,10 @@ class FloatField(CharField):
 
     def set_client(self, record, value, force_change=False):
         internal = record.value.get(self.name)
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        if abs(float(internal or 0.0) - float(record.value[self.name] or 0.0)) \
-                >= (10.0**(-int(digits[1]))):
+        if (abs(float(internal or 0.0) - float(record.value[self.name] or 0.0))
+                >= (10.0 ** (-int(digits[1])))):
             if not self.get_state_attrs(record).get('readonly', False):
                 record.modified_fields.setdefault(self.name)
                 record.signal('record-modified')
@@ -248,12 +247,11 @@ class NumericField(CharField):
     def set_client(self, record, value, force_change=False):
         value = Decimal(str(value))
         internal = record.value.get(self.name)
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        if abs((internal or Decimal('0.0')) - \
-                (record.value[self.name] or Decimal('0.0'))) \
-                >= Decimal(str(10.0**(-int(digits[1])))):
+        if (abs((internal or Decimal('0.0'))
+                    - (record.value[self.name] or Decimal('0.0')))
+                >= Decimal(str(10.0 ** (-int(digits[1]))))):
             if not self.get_state_attrs(record).get('readonly', False):
                 record.modified_fields.setdefault(self.name)
                 record.signal('record-modified')
@@ -270,12 +268,12 @@ class IntegerField(CharField):
     def get_client(self, record):
         return record.value.get(self.name) or 0
 
+
 class BooleanField(CharField):
 
     def set_client(self, record, value, force_change=False):
         value = bool(value)
         internal = bool(record.value.get(self.name, False))
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
         if internal != bool(record.value.get(self.name, False)):
             record.modified_fields.setdefault(self.name)
@@ -367,7 +365,6 @@ class M2OField(CharField):
 
     def set_client(self, record, value, force_change=False):
         internal = record.value.get(self.name) or (False, '')
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
         if (internal[0] or False) != (record.value[self.name][0] or False):
             record.modified_fields.setdefault(self.name)
@@ -394,7 +391,8 @@ class M2OField(CharField):
 
     def domain_get(self, record):
         screen_domain, attr_domain = self.domains_get(record)
-        return localize_domain(inverse_leaf(screen_domain), self.name) + attr_domain
+        return (localize_domain(inverse_leaf(screen_domain), self.name)
+            + attr_domain)
 
     def get_state_attrs(self, record):
         result = super(M2OField, self).get_state_attrs(record)
@@ -403,6 +401,7 @@ class M2OField(CharField):
             result = result.copy()
             result['readonly'] = True
         return result
+
 
 class O2OField(M2OField):
     pass
@@ -453,7 +452,8 @@ class O2MField(CharField):
         if record.model_name == self.attrs['relation']:
             group.fields = record.group.fields
         group.signal_connect(group, 'group-changed', self._group_changed)
-        group.signal_connect(group, 'group-list-changed', self._group_list_changed)
+        group.signal_connect(group, 'group-list-changed',
+            self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         record.value[self.name] = group
 
@@ -493,10 +493,10 @@ class O2MField(CharField):
         if record.value.get(self.name) is None:
             return {}
         result = {}
-        for record2 in (record.value[self.name] \
-                + record.value[self.name].record_removed \
+        for record2 in (record.value[self.name]
+                + record.value[self.name].record_removed
                 + record.value[self.name].record_deleted):
-             result.update(record2.get_timestamp())
+            result.update(record2.get_timestamp())
         return result
 
     def get_eval(self, record, check_load=True):
@@ -530,7 +530,8 @@ class O2MField(CharField):
         record.value[self.name] = group
         group.load(value, display=False)
         group.signal_connect(group, 'group-changed', self._group_changed)
-        group.signal_connect(group, 'group-list-changed', self._group_list_changed)
+        group.signal_connect(group, 'group-list-changed',
+            self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         if modified:
             record.modified_fields.setdefault(self.name)
@@ -591,7 +592,8 @@ class O2MField(CharField):
             new_record.set_default(vals, modified=modified)
             group.add(new_record)
         group.signal_connect(group, 'group-changed', self._group_changed)
-        group.signal_connect(group, 'group-list-changed', self._group_list_changed)
+        group.signal_connect(group, 'group-list-changed',
+            self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         return True
 
@@ -717,7 +719,8 @@ class M2MField(O2MField):
         group.fields = fields
         group.load(value, display=False)
         group.signal_connect(group, 'group-changed', self._group_changed)
-        group.signal_connect(group, 'group-list-changed', self._group_list_changed)
+        group.signal_connect(group, 'group-list-changed',
+            self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         if modified:
             record.modified_fields.setdefault(self.name)
@@ -744,7 +747,6 @@ class ReferenceField(CharField):
 
     def set_client(self, record, value, force_change=False):
         internal = record.value.get(self.name)
-        prev_modified_fields = record.modified_fields.copy()
         self.set(record, value)
         if (internal or False) != (record.value[self.name] or False):
             record.modified_fields.setdefault(self.name)
@@ -791,6 +793,7 @@ class ReferenceField(CharField):
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
+
 
 class BinaryField(CharField):
 
@@ -849,14 +852,14 @@ TYPES = {
     'char': CharField,
     'sha': CharField,
     'float_time': FloatField,
-    'integer' : IntegerField,
-    'biginteger' : IntegerField,
-    'float' : FloatField,
-    'numeric' : NumericField,
-    'many2one' : M2OField,
-    'many2many' : M2MField,
-    'one2many' : O2MField,
-    'reference' : ReferenceField,
+    'integer': IntegerField,
+    'biginteger': IntegerField,
+    'float': FloatField,
+    'numeric': NumericField,
+    'many2one': M2OField,
+    'many2many': M2MField,
+    'one2many': O2MField,
+    'reference': ReferenceField,
     'selection': SelectionField,
     'boolean': BooleanField,
     'datetime': DateTimeField,

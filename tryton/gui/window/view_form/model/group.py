@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import copy
 import tryton.rpc as rpc
 from record import Record
 from field import Field, O2MField
@@ -236,8 +235,8 @@ class Group(SignalEvent, list):
         ctx = rpc.CONTEXT.copy()
         ctx.update(self._context)
         if self.parent_datetime_field:
-            ctx['_datetime'] = self.parent.get_eval(check_load=False)\
-                    [self.parent_datetime_field]
+            ctx['_datetime'] = self.parent.get_eval(check_load=False
+                )[self.parent_datetime_field]
         return ctx
 
     context = property(_get_context)
@@ -247,7 +246,8 @@ class Group(SignalEvent, list):
             record.signal_unconnect(record.group)
             record.group = self
             record.signal_connect(self, 'record-changed', self._record_changed)
-            record.signal_connect(self, 'record-modified', self._record_modified)
+            record.signal_connect(self, 'record-modified',
+                self._record_modified)
         if position == -1:
             self.append(record)
         else:
@@ -373,7 +373,8 @@ class Group(SignalEvent, list):
 
         if len(new) and len(to_add):
             ctx.update(self.context)
-            args = ('model', self.model_name, 'default_get', to_add.keys(), ctx)
+            args = ('model', self.model_name, 'default_get', to_add.keys(),
+                ctx)
             try:
                 values = rpc.execute(*args)
             except TrytonServerError, exception:

@@ -4,11 +4,9 @@ import operator
 from functools import reduce
 import gtk
 import gettext
-from tryton.common import message, TRYTON_ICON
 import tryton.rpc as rpc
 import tryton.common as common
 from interface import ParserView
-from tryton.config import CONFIG
 from tryton.exceptions import TrytonServerError
 from tryton.action import Action
 
@@ -196,4 +194,3 @@ class ViewForm(ParserView):
                 self.screen.reload(written=True)
         else:
             self.screen.display()
-

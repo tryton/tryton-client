@@ -12,6 +12,7 @@ from tryton.config import get_config_dir
 
 __all__ = ['Server', 'Client']
 
+
 class IPCServer(object):
 
     thread = None
@@ -112,7 +113,7 @@ class FIFOServer(IPCServer):
             pass
 
     def _read(self):
-        fifo = os.fdopen(os.open(self.filename, os.O_RDONLY|os.O_NONBLOCK))
+        fifo = os.fdopen(os.open(self.filename, os.O_RDONLY | os.O_NONBLOCK))
         data = ''
         while self.running:
             try:

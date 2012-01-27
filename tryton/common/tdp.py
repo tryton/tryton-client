@@ -32,6 +32,7 @@ OPERATORS = set((
         'ilike',
         'not ilike'))
 
+
 def operator(field):
     type_ = field['type'] if field else ''
     if type_ in ('char', 'text', 'many2one') or not field:
@@ -68,7 +69,7 @@ def cast(field, value):
                 return key
         return value
     elif type_ == 'datetime':
-        value = value.replace(' : ', ':') # Parser add spaces arround :
+        value = value.replace(' : ', ':')  # Parser add spaces arround :
         try:
             value = datetime.datetime(*time.strptime(value,
                     date_format() + ' ' + HM_FORMAT)[:6])
@@ -86,6 +87,7 @@ def cast(field, value):
             return False
     else:
         return value
+
 
 def quote(value):
     for test in (':', ' '):
@@ -127,15 +129,16 @@ class Base(object):
     right = property(_get_right, _set_right)
 
     def domain(self, parent_field=None):
-        raise NotImplementedError("domain method is missing on %s" % \
-                self.__class__)
+        raise NotImplementedError("domain method is missing on %s"
+            % self.__class__)
 
     def complete_fmt(self, left, value, right):
         return (self.fmt % (left, value, right)).strip()
 
     def complete(self, parent_field=None):
         left = self.left and tuple(self.left.complete()) or ('',)
-        right = self.right and tuple(self.right.complete(parent_field)) or ('',)
+        right = (self.right and tuple(self.right.complete(parent_field))
+            or ('',))
 
         for lvalue in left:
             for rvalue in right:
@@ -144,15 +147,15 @@ class Base(object):
     def split(self, words=""):
         field, value = None, ' '.join(words)
         for i in xrange(len(words)):
-            candidate = ' '.join(words[-i-1:])
+            candidate = ' '.join(words[-i - 1:])
             if candidate.lower() in self.parser.dom_fields:
                 field = self.parser.dom_fields[candidate.lower()]
-                value = ' '.join(words[:-i-1])
+                value = ' '.join(words[:-i - 1])
 
         return field, value
 
     def __str__(self, prefix=''):
-        res = '%s[%s] %s'% (prefix, self.pos or 'root', self.value)
+        res = '%s[%s] %s' % (prefix, self.pos or 'root', self.value)
         res = res.ljust(30) + str(type(self))
         if self.left:
             res += "\n" + self.left.__str__(' ' + prefix)
@@ -202,8 +205,8 @@ class Literal(Base):
             candidate = word + candidate
             for field in suggestions:
                 if field.lower().startswith(candidate.lower()):
-                    if words[pos+1:]:
-                        new_item = ' '.join(reversed(words[pos+1:]))
+                    if words[pos + 1:]:
+                        new_item = ' '.join(reversed(words[pos + 1:]))
                         new_item += ' ' + field
                     else:
                         new_item = field
@@ -221,7 +224,7 @@ class Literal(Base):
 
                 if field.lower().startswith(candidate.lower()):
                     new_item = quote(field)
-                    if (i-len(words) < 0) and words[i-len(words):]:
+                    if (i - len(words) < 0) and words[i - len(words):]:
                         find = False
                         for item in self.suggest(words[i - len(words):],
                                 self.parser.sugg_fields):
@@ -230,7 +233,7 @@ class Literal(Base):
                             find = True
                         if find:
                             break
-                        new_item += ' ' + ' '.join(words[i-len(words):])
+                        new_item += ' ' + ' '.join(words[i - len(words):])
                     yield new_item
                     break
 
@@ -246,7 +249,8 @@ class Literal(Base):
         if parent_field:
             if parent_field['type'] in ('selection', 'reference', 'boolean'):
                 if parent_field['type'] in ('selection', 'reference'):
-                    suggestions = tuple(x[1] for x in parent_field['selection'])
+                    suggestions = tuple(x[1]
+                        for x in parent_field['selection'])
                 else:
                     suggestions = (_('Y'), _('Yes'), _('True'), '1', _('N'),
                         _('No'), _('False'), '0')
@@ -369,11 +373,12 @@ class Colon(Base, InfixMixin):
             if field['type'] in ('char', 'text', 'many2one'):
                 value += '%'
 
-            domain.append((field['name'] , operator(field), value))
+            domain.append((field['name'], operator(field), value))
         else:
             domain.extend(self.right.domain(field))
 
         return domain
+
 
 class DoubleDot(Base, InfixMixin):
     value = '..'
@@ -436,7 +441,7 @@ class Comma(Base, InfixMixin):
                 node = node.left
         walk(self.left, values)
 
-        return [(field_name, 'in' , list(reversed(values)))]
+        return [(field_name, 'in', list(reversed(values)))]
 
 
 class Comparator(Base, InfixMixin):
@@ -464,14 +469,18 @@ class Comparator(Base, InfixMixin):
             res.append((field_name, self.value, value))
         return res
 
+
 class LessThan(Comparator):
     value = '<'
+
 
 class LessThanOrEqual(Comparator):
     value = '<='
 
+
 class BiggerThan(Comparator):
     value = '>'
+
 
 class BiggerThanOrEqual(Comparator):
     value = '>='
@@ -518,6 +527,7 @@ class Not(Base, InfixMixin):
                 oper = '!='
             res.append((field_name, oper, value))
         return res
+
 
 class NotEqual(Equal):
     value = '!='
@@ -573,6 +583,7 @@ class CloseParenthesis(Base):
         if self.left:
             return self.left.domain()
         return []
+
 
 class OpenParenthesis(Base):
     value = '('
@@ -701,7 +712,7 @@ class DomainParser:
         return left
 
     def next_token(self):
-        try :
+        try:
             new_tk = self.token_flow.next()
         except StopIteration:
             return End(self)
@@ -808,6 +819,7 @@ class DomainParser:
             domain = domain[1:]
         else:
             nary = ' '
+
         def format(expression):
             if (isinstance(expression, (list, tuple))
                     and len(expression) > 2
@@ -892,6 +904,7 @@ def test_parser():
         }
     return DomainParser(fields)
 
+
 def test_selection_complete():
     parser = test_parser()
     assert list(parser.parse('S').complete()) == ['Selection:']
@@ -912,6 +925,7 @@ def test_selection_complete():
     assert list(parser.parse('Selection: Ham foo').complete()) == [
         'Selection: Ham foo']
 
+
 def test_selection_domain():
     parser = test_parser()
     assert parser.parse('S').domain() == [('rec_name', 'ilike', 'S%')]
@@ -923,6 +937,7 @@ def test_selection_domain():
     assert parser.parse('Selection: Ham; Spam').domain() == [
         ('selection', 'in', ['ham', 'spam'])]
 
+
 def test_selection_string():
     parser = test_parser()
     assert parser.string([]) == ''
@@ -932,6 +947,7 @@ def test_selection_string():
     assert parser.string([('selection', '!=', 'ham')]) == 'Selection: !Ham'
     assert parser.string([('selection', 'in', ['ham', 'spam'])]) == \
         'Selection: Ham; Spam'
+
 
 def test_boolean_complete():
     parser = test_parser()
@@ -943,12 +959,14 @@ def test_boolean_complete():
     assert list(parser.parse('boolean: y').complete()) == ['Boolean: Y',
         'Boolean: Yes']
     assert list(parser.parse('boolean: 1').complete()) == ['Boolean: 1']
-    assert list(parser.parse('boolean: false').complete()) == ['Boolean: False']
+    assert list(parser.parse('boolean: false').complete()) ==\
+        ['Boolean: False']
     assert list(parser.parse('boolean: f').complete()) == ['Boolean: False']
     assert list(parser.parse('boolean: n').complete()) == ['Boolean: N',
         'Boolean: No']
     assert list(parser.parse('boolean: 0').complete()) == ['Boolean: 0']
     assert list(parser.parse('boolean: =1').complete()) == ['Boolean: =1']
+
 
 def test_boolean_domain():
     parser = test_parser()
@@ -961,12 +979,14 @@ def test_boolean_domain():
     assert parser.parse('Boolean: true; false').domain() == [
         ('boolean', 'in', [True, False])]
 
+
 def test_boolean_string():
     parser = test_parser()
     assert parser.string([('boolean', '=', True)]) == 'Boolean: True'
     assert parser.string([('boolean', '=', False)]) == 'Boolean: False'
     assert parser.string([('boolean', 'in', [True, False])]) == \
         'Boolean: True; False'
+
 
 def test_char_complete():
     parser = test_parser()
@@ -976,6 +996,7 @@ def test_char_complete():
     assert list(parser.parse('Char: foo bar').complete()) == [
         'Char: "foo bar"']
     assert list(parser.parse('char: =foo').complete()) == ['Char: =foo']
+
 
 def test_char_domain():
     parser = test_parser()
@@ -989,7 +1010,9 @@ def test_char_domain():
     assert parser.parse('Char: !=foo').domain() == [('char', '!=', 'foo')]
     assert parser.parse('Char: != foo').domain() == [('char', '!=', 'foo')]
     assert parser.parse('Char: 2; 3').domain() == [('char', 'in', ['2', '3'])]
-    assert parser.parse('Char:! 2; 3').domain() == [('char', 'not in', ['2', '3'])]
+    assert parser.parse('Char:! 2; 3').domain() == [
+        ('char', 'not in', ['2', '3'])]
+
 
 def test_char_string():
     parser = test_parser()
@@ -1007,6 +1030,7 @@ def test_numeric_complete():
     assert list(parser.parse('numeric: 100').complete()) == [
         'Numeric: 100']
 
+
 def test_numeric_domain():
     parser = test_parser()
     assert parser.parse('Numeric: >100').domain() == [
@@ -1022,16 +1046,19 @@ def test_numeric_domain():
     assert parser.parse('Numeric: 2; 3').domain() == [
         ('numeric', 'in', [Decimal(2), Decimal(3)])]
 
+
 def test_numeric_string():
     parser = test_parser()
     assert parser.string([('numeric', '=', Decimal(100))]) == 'Numeric: 100.00'
     assert parser.string([('numeric', 'in', [Decimal(2), Decimal(3)])]) == \
         'Numeric: 2.00; 3.00'
 
+
 def test_integer_complete():
     parser = test_parser()
     assert list(parser.parse('integer: 42').complete()) == ['Integer: 42']
     assert list(parser.parse('integer: 2;3').complete()) == ['Integer: 2; 3']
+
 
 def test_integer_domain():
     parser = test_parser()
@@ -1050,6 +1077,7 @@ def test_integer_domain():
     assert parser.parse('Integer: 2; 3').domain() == [
         ('integer', 'in', [2, 3])]
 
+
 def test_integer_string():
     parser = test_parser()
     assert parser.string([('integer', '=', 42)]) == 'Integer: 42'
@@ -1060,6 +1088,7 @@ def test_integer_string():
 def test_float_complete():
     parser = test_parser()
     assert list(parser.parse('float: 3.14').complete()) == ['Float: 3.14']
+
 
 def test_float_domain():
     parser = test_parser()
@@ -1076,6 +1105,7 @@ def test_float_domain():
     assert parser.parse('Float: foo').domain() == [
         ('float', '=', False)]
 
+
 def test_float_string():
     parser = test_parser()
     assert parser.string([('float', '=', 3.14)]) == 'Float: 3.14'
@@ -1083,6 +1113,7 @@ def test_float_string():
     assert parser.string([('float', '>', 42)]) == 'Float: >42.00'
     assert parser.string([('float', 'not in', [3.14, 42])]) == \
         'Float: !3.14; 42.00'
+
 
 def test_date_complete():
     today = datetime.date.today()
@@ -1113,6 +1144,7 @@ def test_date_complete():
         'Date: 12/04/2002',
         ]
 
+
 def test_date_domain():
     today = datetime.date.today()
     today_str = datetime_strftime(today, date_format())
@@ -1127,7 +1159,9 @@ def test_date_domain():
     assert parser.parse('Date: 12/4/2002').domain() == [
         ('date', '=', datetime.date(2002, 12, 4))]
     assert parser.parse('Date: 12/4/2002; 1/1/1970').domain() == [
-        ('date', 'in', [datetime.date(2002, 12, 4), datetime.date(1970, 1, 1)])]
+        ('date', 'in', [datetime.date(2002, 12, 4),
+                datetime.date(1970, 1, 1)])]
+
 
 def test_date_string():
     parser = test_parser()
@@ -1137,6 +1171,7 @@ def test_date_string():
     assert parser.string([('date', 'in', [datetime.date(2002, 12, 4),
                     datetime.date(1970, 1, 1)])]) == \
                         'Date: 12/04/2002; 01/01/1970'
+
 
 def test_datetime_complete():
     today = datetime.date.today()
@@ -1148,6 +1183,7 @@ def test_datetime_complete():
             ).complete()) == ['Date Time: "' + today_str + ' 12:30:00"']
     assert list(parser.parse('Date Time: ' + today_str + ' 12:30:00'
             ).complete()) == ['Date Time: "' + today_str + ' 12:30:00"']
+
 
 def test_datetime_domain():
     today = datetime.date.today()
@@ -1170,6 +1206,7 @@ def test_datetime_domain():
                 datetime.datetime.combine(datetime.date(1970, 1, 1),
                     datetime.time.min)])]
 
+
 def test_datetime_string():
     parser = test_parser()
     assert parser.string([('datetime', '=', False)]) == 'Date Time: ='
@@ -1183,6 +1220,7 @@ def test_datetime_string():
                     datetime.datetime.combine(datetime.date(1970, 1, 1),
                         datetime.time.min)])]) == \
                             'Date Time: 12/04/2002; 01/01/1970'
+
 
 def test_composite_complete():
     today = datetime.date.today()
@@ -1230,6 +1268,7 @@ def test_composite_complete():
         'Selection: Ham or Selection: Spamham',
         ]
 
+
 def test_composite_domain():
     parser = test_parser()
     assert parser.parse('char: foo boolean: false').domain() == [
@@ -1250,9 +1289,9 @@ def test_composite_domain():
     assert parser.parse('char: foo or char: bar or boolean: 0').domain() == [
         'OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%'),
         ('boolean', '=', False)]
-    assert parser.parse('(char: foo or char: bar) and boolean: 1').domain() == [
-        ['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
-        ('boolean', '=', True)]
+    assert parser.parse('(char: foo or char: bar) and boolean: 1').domain() ==\
+        [['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
+            ('boolean', '=', True)]
     assert parser.parse('(char: foo or char: bar) boolean: 1').domain() == [
         ['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
         ('boolean', '=', True)]
@@ -1260,15 +1299,18 @@ def test_composite_domain():
         ).domain() == [
             ['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
             ('datetime', '=', datetime.datetime(2002, 12, 4, 0, 0))]
-    assert parser.parse('(char: foo or char: bar) Date Time: 12/4/2002').domain() == [
-        ['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
-        ('datetime', '=', datetime.datetime(2002, 12, 4, 0, 0))]
-    assert parser.parse('char: foo or (char: bar and boolean: 1)').domain() == [
-        'OR', ('char', 'ilike', 'foo%'), [
-            ('char', 'ilike', 'bar%'), ('boolean', '=', True)]]
-    assert parser.parse('char: foo and (char: bar or boolean: 0)').domain() == [
-        ('char', 'ilike', 'foo%'),
-        ['OR', ('char', 'ilike', 'bar%'), ('boolean', '=', False)]]
+    assert parser.parse(
+        '(char: foo or char: bar) Date Time: 12/4/2002').domain() == [
+            ['OR', ('char', 'ilike', 'foo%'), ('char', 'ilike', 'bar%')],
+            ('datetime', '=', datetime.datetime(2002, 12, 4, 0, 0))]
+    assert parser.parse(
+        'char: foo or (char: bar and boolean: 1)').domain() == [
+            'OR', ('char', 'ilike', 'foo%'), [
+                ('char', 'ilike', 'bar%'), ('boolean', '=', True)]]
+    assert parser.parse(
+        'char: foo and (char: bar or boolean: 0)').domain() == [
+            ('char', 'ilike', 'foo%'),
+            ['OR', ('char', 'ilike', 'bar%'), ('boolean', '=', False)]]
     assert parser.parse('char: foo (char: bar or boolean: 0)').domain() == [
         ('char', 'ilike', 'foo%'),
         ['OR', ('char', 'ilike', 'bar%'), ('boolean', '=', False)]]
@@ -1338,6 +1380,7 @@ def test_composite_string():
             ['OR', ('char', 'ilike', 'bar%'), ('boolean', '=', False)]]) == \
                 'Char: foo (Char: bar or Boolean: False)'
 
+
 def test_quote_complete():
     parser = test_parser()
     assert list(parser.parse('"char"').complete()) == ['Char:']
@@ -1348,11 +1391,13 @@ def test_quote_complete():
     assert list(parser.parse('Char: "Boolean: false"').complete()) == [
         'Char: "Boolean: false"']
 
+
 def test_quote_domain():
     parser = test_parser()
     assert parser.parse('"char"').domain() == [('rec_name', 'ilike', 'char%')]
     assert parser.parse('char: "foo bar"').domain() == [
         ('char', 'ilike', 'foo bar%')]
+
 
 def test_quote_string():
     parser = test_parser()
@@ -1361,15 +1406,18 @@ def test_quote_string():
     assert parser.string([('char', 'ilike', 'Boolean: false%')]) == \
         'Char: "Boolean: false"'
 
+
 def test_column():
     parser = test_parser()
     assert parser.parse(':').domain() == []
     assert parser.parse('::').domain() == []
     assert parser.parse(': foo').domain() == [('rec_name', 'ilike', 'foo%')]
     assert parser.parse('foo :').domain() == [('rec_name', 'ilike', 'foo%')]
-    assert parser.parse(': foo b').domain() == [('rec_name', 'ilike', 'foo b%')]
+    assert parser.parse(': foo b').domain() == [
+        ('rec_name', 'ilike', 'foo b%')]
     assert parser.parse('": foo b"').domain() == [
         ('rec_name', 'ilike', ': foo b%')]
+
 
 def test_double_dot():
     parser = test_parser()
@@ -1383,6 +1431,7 @@ def test_double_dot():
         ('char', '>=', 'a'), ('char', '<', 'z')]
     assert parser.parse('Integer: 0..42 Char: foo').domain() == [
         ('integer', '>=', 0), ('integer', '<', 42), ('char', 'ilike', 'foo%')]
+
 
 def test_comma():
     parser = test_parser()
@@ -1409,6 +1458,7 @@ def test_comma():
     assert parser.parse('Integer: 0; 1;; 2; 3').domain() == [
         ('integer', 'in', [0, 1, 0, 2, 3])]
 
+
 def test_comparator():
     parser = test_parser()
     assert parser.parse('< foo').domain() == [
@@ -1429,6 +1479,7 @@ def test_comparator():
         ('integer', '!=', 10)]
     assert parser.parse('foo <').domain() == [
         ('rec_name', 'ilike', 'foo%'), ('rec_name', '<', '')]
+
 
 def test_str():
     parser = test_parser()

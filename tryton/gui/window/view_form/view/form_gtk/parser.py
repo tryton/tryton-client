@@ -72,7 +72,7 @@ class Image(gtk.Image):
 class Frame(gtk.Frame):
 
     def __init__(self, label=None, attrs=None):
-        if not label: # label must be None to have no label widget
+        if not label:  # label must be None to have no label widget
             label = None
         super(Frame, self).__init__(label=label)
         self.attrs = attrs or {}
@@ -137,8 +137,8 @@ class _container(object):
         table.set_col_spacings(0)
         table.set_row_spacings(0)
         table.set_border_width(0)
-        self.cont.append( (table, 0, 0) )
-        self.col.append( col )
+        self.cont.append((table, 0, 0))
+        self.col.append(col)
 
     def get(self):
         return self.cont[-1][0]
@@ -155,8 +155,8 @@ class _container(object):
         table.resize(height + 1, self.col[-1])
 
     def wid_add(self, widget, name='', yexpand=False, ypadding=2, rowspan=1,
-            colspan=1, translate=False, fname=None, help_tip=False, yfill=False,
-            xexpand=True, xfill=True, xpadding=3):
+            colspan=1, translate=False, fname=None, help_tip=False,
+            yfill=False, xexpand=True, xfill=True, xpadding=3):
         (table, width, height) = self.cont[-1]
         if colspan > self.col[-1]:
             colspan = self.col[-1]
@@ -182,7 +182,8 @@ class _container(object):
             img.set_from_stock('tryton-locale', gtk.ICON_SIZE_SMALL_TOOLBAR)
             button.set_image(img)
             button.set_relief(gtk.RELIEF_NONE)
-            self.trans_box.append((button, name, fname, widget.get_children()[0]))
+            self.trans_box.append((button, name, fname,
+                    widget.get_children()[0]))
             widget.get_child().pack_start(button, fill=False, expand=False)
         widget.show_all()
         table.attach(widget, width, width + colspan,
@@ -355,9 +356,9 @@ class ParserForm(ParserInterface):
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill,
                     xexpand=xexpand, xfill=xfill)
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model_name, node, fields, notebook,
-                                tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
+                    = self.parse(model_name, node, fields, notebook,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -369,7 +370,7 @@ class ParserForm(ParserInterface):
             elif node.localName == 'page':
                 if CONFIG['client.form_tab'] == 'left':
                     angle = 90
-                    tab_box  = gtk.VBox(spacing=3)
+                    tab_box = gtk.VBox(spacing=3)
                     image_pos, image_rotate = ('end',
                         gtk.gdk.PIXBUF_ROTATE_COUNTERCLOCKWISE)
                 elif CONFIG['client.form_tab'] == 'right':
@@ -412,9 +413,9 @@ class ParserForm(ParserInterface):
                     else:
                         tab_box.pack_start(icon)
                 tab_box.show_all()
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model_name, node, fields, notebook,
-                                tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
+                    = self.parse(model_name, node, fields, notebook,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -482,8 +483,8 @@ class ParserForm(ParserInterface):
                     xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model_name, node, fields, tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
+                    = self.parse(model_name, node, fields, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -515,9 +516,9 @@ class ParserForm(ParserInterface):
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
                         yexpand=True, yfill=True)
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model_name, node, fields, paned=hpaned,
-                                tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
+                    = self.parse(model_name, node, fields, paned=hpaned,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -531,9 +532,9 @@ class ParserForm(ParserInterface):
                 vpaned = gtk.VPaned()
                 container.wid_add(vpaned, colspan=int(attrs.get('colspan', 4)),
                         yexpand=True, yfill=True)
-                widget, widgets, buttons, spam, notebook_list, cursor_widget2 = \
-                        self.parse(model_name, node, fields, paned=vpaned,
-                                tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list, cursor_widget2\
+                    = self.parse(model_name, node, fields, paned=vpaned,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -544,9 +545,9 @@ class ParserForm(ParserInterface):
                 if 'position' in attrs:
                     vpaned.set_position(int(attrs['position']))
             elif node.localName == 'child':
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2 = \
-                        self.parse(model_name, node, fields, paned=paned,
-                                tooltips=tooltips)
+                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
+                    = self.parse(model_name, node, fields, paned=paned,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
@@ -568,7 +569,7 @@ class ParserForm(ParserInterface):
         obj_id = self.screen.current_record.id
         if obj_id < 0:
             common.message(
-                    _('You need to save the record before adding translations!'))
+                _('You need to save the record before adding translations!'))
             return False
 
         obj_id = self.screen.current_record.save(force_reload=False)
@@ -599,6 +600,7 @@ class ParserForm(ParserInterface):
         widget_entry = widget_entry.get_children()[0]
         if isinstance(widget_entry, gtk.ScrolledWindow):
             widget_entry = widget_entry.get_child()
+
         #widget accessor functions
         def value_get(widget):
             if isinstance(widget, gtk.Entry):
@@ -643,10 +645,9 @@ class ParserForm(ParserInterface):
             else:
                 return None, False
 
-
         parent = common.get_toplevel_window()
-        win = gtk.Dialog(_('Add Translation'),parent,
-                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        win = gtk.Dialog(_('Add Translation'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
         win.set_has_separator(True)
         win.vbox.set_spacing(5)
         win.set_property('default-width', 600)
@@ -657,7 +658,7 @@ class ParserForm(ParserInterface):
         accel_group = gtk.AccelGroup()
         win.add_accel_group(accel_group)
 
-        but_cancel = win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
 
         but_ok = win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         but_ok.add_accelerator('clicked', accel_group, gtk.keysyms.Return,
@@ -689,17 +690,16 @@ class ParserForm(ParserInterface):
             label.set_alignment(1.0, 0.5)
             (entry, yoptions) = widget_duplicate(widget_entry)
 
-            hbox = gtk.HBox(homogeneous=False)
             if code == lang['code']:
                 value_set(entry, value_get(widget_entry))
             else:
                 value_set(entry, val[name])
 
             entries_list.append((val['id'], lang['code'], entry))
-            table.attach(label, 0, 1, i, i+1, yoptions=False, xoptions=gtk.FILL,
-                    ypadding=2, xpadding=3)
-            table.attach(entry, 1, 2, i, i+1, yoptions=yoptions,
-                    ypadding=2, xpadding=3)
+            table.attach(label, 0, 1, i, i + 1, yoptions=False,
+                xoptions=gtk.FILL, ypadding=2, xpadding=3)
+            table.attach(entry, 1, 2, i, i + 1, yoptions=yoptions,
+                ypadding=2, xpadding=3)
             i += 1
 
         vbox.pack_start(table)
@@ -714,7 +714,6 @@ class ParserForm(ParserInterface):
         win.vbox.add(scrolledwindow)
         win.show_all()
 
-        data = []
         response = win.run()
         if response == gtk.RESPONSE_OK:
             to_save = [(x[0], x[1], value_get(x[2])) for x in entries_list]
@@ -776,11 +775,11 @@ WIDGETS_TYPE = {
     'one2many': (One2Many, 1, True, True),
     'many2many': (Many2Many, 1, True, True),
     'many2one': (Many2One, 1, False, False),
-    'email' : (Email, 1, False, False),
-    'url' : (URL, 1, False, False),
-    'callto' : (CallTo, 1, False, False),
-    'sip' : (SIP, 1, False, False),
-    'image' : (Image2, 1, False, False),
+    'email': (Email, 1, False, False),
+    'url': (URL, 1, False, False),
+    'callto': (CallTo, 1, False, False),
+    'sip': (SIP, 1, False, False),
+    'image': (Image2, 1, False, False),
     'progressbar': (ProgressBar, 1, False, False),
     'one2one': (One2One, 1, False, False),
 }

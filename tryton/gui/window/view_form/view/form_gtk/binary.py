@@ -5,7 +5,7 @@ import gettext
 import os
 import tempfile
 from tryton.common import common
-from tryton.common import file_selection, message, warning, Tooltips, file_open
+from tryton.common import file_selection, Tooltips, file_open
 from interface import WidgetInterface
 
 _ = gettext.gettext
@@ -24,12 +24,15 @@ class Binary(WidgetInterface):
         self.widget = gtk.HBox(spacing=0)
         self.wid_size = gtk.Entry()
         self.wid_size.set_width_chars(10)
+        self.wid_size.set_alignment(1.0)
         self.wid_size.props.sensitive = False
         if self.filename and attrs.get('filename_visible'):
             self.wid_text = gtk.Entry()
             self.wid_text.set_property('activates_default', True)
-            self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
-            self.wid_text.connect('focus-out-event', lambda x, y: self._focus_out())
+            self.wid_text.connect('focus-in-event',
+                lambda x, y: self._focus_in())
+            self.wid_text.connect('focus-out-event',
+                lambda x, y: self._focus_out())
             self.wid_text.connect_after('key_press_event', self.sig_key_press)
             self.widget.pack_start(self.wid_text, expand=True, fill=True)
         else:
@@ -136,7 +139,7 @@ class Binary(WidgetInterface):
         filename = file_selection(_('Save As...'), filename=filename,
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
-            with open(filename,'wb') as fp:
+            with open(filename, 'wb') as fp:
                 fp.write(self.field.get_data(self.record))
 
     def sig_remove(self, widget=None):

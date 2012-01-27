@@ -8,10 +8,8 @@ import locale
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
-from tryton.config import CONFIG
 from tryton.gui import Main
 from tryton.gui.window import Window
-from tryton.gui.window.preference import Preference
 from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
@@ -21,7 +19,7 @@ from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
 from tryton.exceptions import TrytonServerError
 import tryton.common as common
 from tryton.translate import date_format
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT
+from tryton.common import HM_FORMAT
 from tryton.pyson import PYSONEncoder
 
 from tabcontent import TabContent
@@ -183,9 +181,9 @@ class Form(SignalEvent, TabContent):
             return
         parent = common.get_toplevel_window()
         win = gtk.Dialog(_('Go to ID'), parent,
-                gtk.DIALOG_MODAL|gtk.DIALOG_DESTROY_WITH_PARENT,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                    gtk.STOCK_OK, gtk.RESPONSE_OK))
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK,
+                gtk.RESPONSE_OK))
         win.set_icon(TRYTON_ICON)
         win.set_has_separator(True)
         win.set_default_response(gtk.RESPONSE_OK)
@@ -200,6 +198,7 @@ class Form(SignalEvent, TabContent):
         entry.set_property('activates_default', True)
         entry.set_max_length(0)
         entry.set_alignment(1.0)
+
         def sig_insert_text(widget, new_text, new_text_length, position):
             value = widget.get_text()
             position = widget.get_position()
@@ -240,7 +239,9 @@ class Form(SignalEvent, TabContent):
     def sig_attach(self, widget=None):
         obj_id = self.id_get()
         if obj_id >= 0 and obj_id is not False:
-            Attachment(self.model, obj_id).run()
+            def callback():
+                self.update_attachment_count(reload=True)
+            Attachment(self.model, obj_id, callback)
         else:
             self.message_info(_('No record selected!'))
         self.update_attachment_count(reload=True)
@@ -300,7 +301,7 @@ class Form(SignalEvent, TabContent):
                     display_format = date_format() + ' ' + HM_FORMAT
                     date = timezoned_date(line[key])
                     value = common.datetime_strftime(date, display_format)
-                message_str += val + ' ' + value +'\n'
+                message_str += val + ' ' + value + '\n'
         message_str += _('Model:') + ' ' + self.model
         message(message_str)
         return True
@@ -482,6 +483,7 @@ class Form(SignalEvent, TabContent):
         self.activate_save()
 
     def modified_save(self, reload=True):
+        self.screen.current_view.set_value()
         if self.screen.modified():
             value = sur_3b(
                     _('This record has been modified\n' \

@@ -21,10 +21,12 @@ if os.path.isdir(PLUGINS_PATH):
             continue
         module = os.path.splitext(plugin)[0]
         try:
-            module = imp.load_module(module, *imp.find_module(module, [PLUGINS_PATH]))
+            module = imp.load_module(module, *imp.find_module(module,
+                    [PLUGINS_PATH]))
             MODULES.append(module)
         except ImportError, exception:
             continue
+
 
 def execute(datas):
     result = {}

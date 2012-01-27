@@ -15,10 +15,12 @@ from tryton.exceptions import TrytonError
 
 _ = gettext.gettext
 
+
 def get_home_dir():
     if os.name == 'nt':
         return os.path.join(os.environ['HOMEDRIVE'], os.environ['HOMEPATH'])
     return os.environ['HOME']
+
 
 def get_config_dir():
     if os.name == 'nt':
@@ -28,20 +30,6 @@ def get_config_dir():
             VERSION.rsplit('.', 1)[0])
 if not os.path.isdir(get_config_dir()):
     os.makedirs(get_config_dir(), 0700)
-
-def find_path(progs, args):
-    if os.name == 'nt':
-        return ''
-    if sys.platform == 'darwin':
-        return ''
-    paths = [x for x in os.environ['PATH'].split(':')
-            if os.path.isdir(x)]
-    for dir in paths:
-        for prog in progs:
-            val = os.path.join(dir, prog)
-            if os.path.isfile(val) or os.path.islink(val):
-                return val + ' ' + args
-    return ''
 
 
 class ConfigManager(object):
@@ -78,17 +66,6 @@ class ConfigManager(object):
             'client.default_path': get_home_dir(),
             'client.lang': locale.getdefaultlocale()[0],
             'client.language_direction': 'ltr',
-            'client.actions': {
-                'odt': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                'txt': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                'pdf': {0: find_path(['evince', 'xpdf', 'gpdf',
-                    'kpdf', 'epdfview', 'acroread'], '"%s"'), 1: ''},
-                'png': {0: find_path(['feh', 'display', 'qiv', 'eye'], '"%s"'), 1: ''},
-                'csv': {0: find_path(['ooffice', 'ooffice2', 'libreoffice'], '"%s"'),
-                    1: find_path(['ooffice', 'ooffice2', 'libreoffice'], '-p "%s"')},
-                },
             'client.email': '',
             'client.can_change_accelerators': False,
             'client.limit': 1000,
@@ -128,18 +105,19 @@ class ConfigManager(object):
 
         if opt.config and not os.path.isfile(opt.config):
             raise TrytonError(_('File "%s" not found') % (opt.config,))
-        self.rcfile = opt.config or os.path.join(get_config_dir(), 'tryton.conf')
+        self.rcfile = opt.config or os.path.join(
+            get_config_dir(), 'tryton.conf')
         self.load()
 
         for arg in ('log_level', 'log_logger'):
             if getattr(opt, arg):
-                self.options['logging.'+arg[4:]] = getattr(opt, arg)
+                self.options['logging.' + arg[4:]] = getattr(opt, arg)
         if opt.verbose:
             self.options['logging.default'] = 'INFO'
 
         for arg in ('login', 'port', 'server'):
             if getattr(opt, arg):
-                self.options['login.'+arg] = getattr(opt, arg)
+                self.options['login.' + arg] = getattr(opt, arg)
 
     def save(self):
         try:
@@ -203,6 +181,7 @@ if not os.path.isdir(PIXMAPS_DIR):
 
 TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
         os.path.join(PIXMAPS_DIR, 'tryton-icon.png').encode('utf-8'))
+
 
 def _data_dir():
     data_dir = os.path.join(CURRENT_DIR, 'share', 'tryton')

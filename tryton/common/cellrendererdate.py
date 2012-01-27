@@ -3,7 +3,7 @@
 import gtk
 import gobject
 import pango
-from date_widget import mapping, DateEntry, compute_date
+from date_widget import DateEntry, compute_date
 
 
 class CellRendererDate(gtk.GenericCellRenderer):
@@ -100,10 +100,13 @@ class CellRendererDate(gtk.GenericCellRenderer):
             editable.modify_text(gtk.STATE_INSENSITIVE, fg_color)
         else:
             editable.modify_bg(gtk.STATE_ACTIVE, style.bg[gtk.STATE_ACTIVE])
-            editable.modify_base(gtk.STATE_NORMAL, style.base[gtk.STATE_NORMAL])
+            editable.modify_base(gtk.STATE_NORMAL,
+                style.base[gtk.STATE_NORMAL])
             editable.modify_fg(gtk.STATE_NORMAL, style.fg[gtk.STATE_NORMAL])
-            editable.modify_text(gtk.STATE_NORMAL, style.text[gtk.STATE_NORMAL])
-            editable.modify_text(gtk.STATE_INSENSITIVE, style.text[gtk.STATE_INSENSITIVE])
+            editable.modify_text(gtk.STATE_NORMAL,
+                style.text[gtk.STATE_NORMAL])
+            editable.modify_text(gtk.STATE_INSENSITIVE,
+                style.text[gtk.STATE_INSENSITIVE])
 
         if self.text:
             editable.set_text(self.text)
@@ -126,9 +129,10 @@ class CellRendererDate(gtk.GenericCellRenderer):
         if ok:
             self._date_cb(event)
         else:
-            if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
+            if (hasattr(event, 'keyval')
+                    and not event.keyval == gtk.keysyms.Escape):
                 dt = widget.date_get()
-                res= compute_date(self.cmd, dt, widget.format)
+                res = compute_date(self.cmd, dt, widget.format)
                 if res:
                     widget.date_set(res)
             self.cmd = ''

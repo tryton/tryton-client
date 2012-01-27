@@ -3,9 +3,8 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
-import os
 import webbrowser
-from tryton.config import TRYTON_ICON, PIXMAPS_DIR, DATA_DIR
+from tryton.config import TRYTON_ICON
 from tryton.version import VERSION, WEBSITE
 from tryton.common import get_toplevel_window
 

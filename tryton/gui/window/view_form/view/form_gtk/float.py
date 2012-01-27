@@ -67,4 +67,3 @@ class Float(Integer):
         if len(new_int) > digits[0] \
                 or len(new_decimal) > digits[1]:
             entry.stop_emission('insert-text')
-

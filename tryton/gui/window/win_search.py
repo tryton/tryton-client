@@ -3,7 +3,6 @@
 import gtk
 import gettext
 import tryton.common as common
-import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
 from tryton.gui.window.win_form import WinForm
@@ -34,7 +33,8 @@ class WinSearch(NoModal):
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
 
-        self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL,
+            gtk.RESPONSE_CANCEL)
         self.but_find = self.win.add_button(gtk.STOCK_FIND, gtk.RESPONSE_APPLY)
         self.but_ok = self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.but_ok.add_accelerator('clicked', self.accel_group,
@@ -118,6 +118,7 @@ class WinSearch(NoModal):
         elif response_id == gtk.RESPONSE_ACCEPT:
             screen = Screen(self.model_name, domain=self.domain,
                 context=self.context, mode=['form'])
+
             def callback(result):
                 if result and screen.save_current():
                     res = [screen.current_record.id]

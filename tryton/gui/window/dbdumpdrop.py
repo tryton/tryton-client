@@ -1,7 +1,5 @@
 # This file is part of Tryton.  The COPYRIGHT file at the top level of this
 # repository contains the full copyright notices and license terms.
-import threading
-
 import gtk
 import gobject
 import gettext
@@ -10,6 +8,7 @@ from tryton.config import CONFIG, TRYTON_ICON
 import tryton.rpc as rpc
 
 _ = gettext.gettext
+
 
 class DBBackupDrop(object):
     """
@@ -20,14 +19,16 @@ class DBBackupDrop(object):
         db_widget.hide()
         label.hide()
         dbprogress = common.DBProgress(host, port)
+
         def callback(dbs, createdb):
             if dbs is None or dbs == -1:
                 if dbs is None:
-                    label.set_label('<b>' + \
-                            _('Could not connect to server!') + '</b>')
+                    label.set_label('<b>' +
+                        _('Could not connect to server!') + '</b>')
                 else:
-                    label.set_label('<b>' + \
-                        _('This client version is not compatible with the server!')
+                    label.set_label('<b>' +
+                        _('This client version is not compatible '
+                            'with the server!')
                         + '</b>')
                 db_widget.hide()
                 label.show()
@@ -58,9 +59,9 @@ class DBBackupDrop(object):
         must be filled, then the Create button is set to sensitive. This
         event method doesn't check the valid of single entrys.
         """
-        if  self.entry_server_connection.get_text() !=  "" \
-                and self.combo_database.get_active_text() != "" \
-                and self.entry_serverpasswd.get_text() != "":
+        if (self.entry_server_connection.get_text() != ""
+                and self.combo_database.get_active_text() != ""
+                and self.entry_serverpasswd.get_text() != ""):
             widget.unset_flags(gtk.HAS_DEFAULT)
             self.button_ok.set_sensitive(True)
             self.button_ok.set_flags(gtk.CAN_DEFAULT)
@@ -73,7 +74,7 @@ class DBBackupDrop(object):
 
     def __init__(self, function=None):
         # This widget is used for creating and droping a database!
-        if function =="backup":
+        if function == "backup":
             dialog_title = _("Backup a database")
             button_ok_text = _("Backup")
             button_ok_tooltip = _("Backup the choosen database.")
@@ -114,14 +115,15 @@ class DBBackupDrop(object):
         table.set_border_width(10)
         table.set_row_spacings(3)
         table.set_col_spacings(3)
-        self.dialog_vbox.pack_start(table, True, False,0)
+        self.dialog_vbox.pack_start(table, True, False, 0)
 
         label_subtitle = gtk.Label()
-        label_subtitle.set_markup("<b>"+ label_subtitle_text + "</b>")
+        label_subtitle.set_markup("<b>" + label_subtitle_text + "</b>")
         label_subtitle.set_justify(gtk.JUSTIFY_LEFT)
         label_subtitle.set_alignment(0, 1)
-        label_subtitle.set_padding( 9, 5)
-        table.attach(label_subtitle, 0, 3, 0, 1, yoptions=False, xoptions=gtk.FILL)
+        label_subtitle.set_padding(9, 5)
+        table.attach(label_subtitle, 0, 3, 0, 1, yoptions=False,
+            xoptions=gtk.FILL)
 
         hseparator = gtk.HSeparator()
         table.attach(hseparator, 0, 3, 1, 2, yoptions=False)
@@ -183,7 +185,7 @@ class DBBackupDrop(object):
         self.label_serverpasswd = gtk.Label(_("Tryton Server Password:"))
         self.label_serverpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         self.label_serverpasswd.set_alignment(1, 0.5)
-        self.label_serverpasswd.set_padding( 3, 3)
+        self.label_serverpasswd.set_padding(3, 3)
         table.attach(self.label_serverpasswd, 0, 1, 4, 5, yoptions=False,
             xoptions=gtk.FILL)
 
@@ -234,4 +236,3 @@ class DBBackupDrop(object):
         self.dialog.destroy()
 
         return (url, database, passwd)
-

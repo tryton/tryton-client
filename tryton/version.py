@@ -4,4 +4,3 @@ PACKAGE = "tryton"
 VERSION = "2.3.0"
 LICENSE = "GPL-3"
 WEBSITE = "http://www.tryton.org/"
-

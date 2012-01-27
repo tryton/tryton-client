@@ -1,6 +1,5 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import sys
 try:
     import simplejson as json
 except ImportError:
@@ -22,7 +21,7 @@ class PYSON(object):
         raise NotImplementedError
 
     def __invert__(self):
-        if self.types()!= set([bool]):
+        if self.types() != set([bool]):
             return Not(Bool(self))
         else:
             return Not(self)
@@ -307,7 +306,8 @@ class If(PYSON):
     def __init__(self, condition, then_statement, else_statement=None):
         super(If, self).__init__()
         if isinstance(condition, PYSON):
-            assert condition.types() == set([bool]), 'condition must be boolean'
+            assert condition.types() == set([bool]), \
+                'condition must be boolean'
         else:
             assert isinstance(condition, bool), 'condition must be boolean'
         if isinstance(then_statement, PYSON):

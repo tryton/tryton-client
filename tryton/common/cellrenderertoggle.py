@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
-import pango
 
 
 class CellRendererToggle(gtk.GenericCellRenderer):

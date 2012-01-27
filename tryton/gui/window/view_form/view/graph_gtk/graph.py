@@ -1,20 +1,19 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-#This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
+#This code is inspired by the pycha project
+#(http://www.lorenzogil.com/projects/pycha/)
 import gtk
 from functools import reduce
 from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
-        DHM_FORMAT, COLOR_SCHEMES, datetime_strftime
+        COLOR_SCHEMES, datetime_strftime
 from tryton.pyson import PYSONDecoder
 import locale
 import math
 import datetime
-import time
 from dateutil.relativedelta import relativedelta
 import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
-from tryton.translate import date_format
 from tryton.gui.window import Window
 
 
@@ -65,10 +64,11 @@ class Popup(object):
     def enter(self, widget, event):
         self.win.hide()
 
+
 class Graph(gtk.DrawingArea):
     'Graph'
 
-    __gsignals__ = { "expose-event": "override" }
+    __gsignals__ = {"expose-event": "override"}
 
     def __init__(self, xfield, yfields, attrs, model):
         super(Graph, self).__init__()
@@ -167,13 +167,12 @@ class Graph(gtk.DrawingArea):
     def drawGraph(self, cr, width, height):
         pass
 
-
     def YLabels(self):
         ylabels = []
         if self.yrange == 0.0:
             base = 1
         else:
-            base = 10**int(math.log(self.yrange, 10))
+            base = 10 ** int(math.log(self.yrange, 10))
         for i in xrange(int(self.yrange / base) + 1):
             val = int(self.minyval / base) * base + i * base
             h = (val - self.minyval) * self.yscale
@@ -356,7 +355,6 @@ class Graph(gtk.DrawingArea):
             self.ids[x].append(model.id)
             self.datas.setdefault(x, {})
             for yfield in self.yfields:
-                name = yfield['name']
                 key = yfield.get('key', yfield['name'])
                 self.datas[x].setdefault(key, 0.0)
                 if yfield.get('domain'):
@@ -411,7 +409,8 @@ class Graph(gtk.DrawingArea):
             yLabelWidth = 0
         width = width - self.leftPadding - yLabelWidth - self.rightPadding
         height = height - self.topPadding - self.bottomPadding - xLabelHeight
-        self.area = Area(self.leftPadding + yLabelWidth, self.topPadding, width, height)
+        self.area = Area(self.leftPadding + yLabelWidth, self.topPadding,
+            width, height)
 
     def updateXY(self):
         self.maxxval = len(self.datas)
@@ -457,6 +456,7 @@ class Graph(gtk.DrawingArea):
 
     def _getDatasKeys(self):
         return [x.get('key', x['name']) for x in self.yfields]
+
 
 class Area(object):
 

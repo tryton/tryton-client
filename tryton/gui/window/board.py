@@ -2,8 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 "Board"
 import gettext
-import gtk
-from tryton.config import CONFIG
 from tryton.signal_event import SignalEvent
 from tryton.gui import Main
 import tryton.rpc as rpc

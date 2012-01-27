@@ -5,7 +5,7 @@ import os
 import locale
 import gettext
 from version import PACKAGE
-from tryton.client import CURRENT_DIR, PREFIX
+from tryton.config import CURRENT_DIR, PREFIX
 import logging
 import gtk
 import sys
@@ -197,11 +197,13 @@ def setlang(lang=None, locale_dict=None):
             conv[field] = locale_dict[field]
         locale.localeconv = lambda: conv
 
+
 def set_language_direction(direction):
     if direction == 'rtl':
         gtk.widget_set_default_direction(gtk.TEXT_DIR_RTL)
     else:
         gtk.widget_set_default_direction(gtk.TEXT_DIR_LTR)
+
 
 def date_format():
     '''

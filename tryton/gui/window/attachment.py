@@ -5,20 +5,27 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_form import WinForm
 
 
-class Attachment(object):
+class Attachment(WinForm):
     "Attachment window"
 
-    def __init__(self, model_name, record_id):
+    def __init__(self, model_name, record_id, callback=None):
         self.resource = '%s,%s' % (model_name, record_id)
-
-    def run(self):
+        self.attachment_callback = callback
         screen = Screen('ir.attachment', domain=[
             ('resource', '=', self.resource),
             ], mode=['tree', 'form'], context={
                 'resource': self.resource,
             }, exclude_field='resource')
         screen.search_filter()
-        def callback(result):
-            if result:
-                screen.group.save()
-        WinForm(screen, callback, view_type='tree')
+        super(Attachment, self).__init__(screen, self.callback,
+            view_type='tree')
+
+    def destroy(self):
+        self.prev_view.save_width_height()
+        super(Attachment, self).destroy()
+
+    def callback(self, result):
+        if result:
+            self.screen.group.save()
+        if self.attachment_callback:
+            self.attachment_callback()

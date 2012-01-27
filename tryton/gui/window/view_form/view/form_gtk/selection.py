@@ -7,7 +7,6 @@ import math
 from interface import WidgetInterface
 import tryton.rpc as rpc
 import tryton.common as common
-from tryton.pyson import PYSONDecoder
 from tryton.exceptions import TrytonServerError
 
 
@@ -61,8 +60,8 @@ class Selection(WidgetInterface):
         if domain == self._last_domain:
             return
 
-        args = ('model', self.attrs['relation'], 'search_read', domain, 0, None,
-            None, ['rec_name'], rpc.CONTEXT)
+        args = ('model', self.attrs['relation'], 'search_read', domain, 0,
+            None, None, ['rec_name'], rpc.CONTEXT)
         try:
             result = rpc.execute(*args)
         except TrytonServerError, exception:
@@ -101,14 +100,15 @@ class Selection(WidgetInterface):
         if self._selection:
             pop = sorted((len(x) for x in self._selection), reverse=True)
             average = sum(pop) / len(pop)
-            deviation = int(math.sqrt(sum((x - average)**2 for x in pop) /
+            deviation = int(math.sqrt(sum((x - average) ** 2 for x in pop) /
                     len(pop)))
             width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
         else:
             width = 10
         self.entry.child.set_width_chars(width)
         if self._selection:
-            self.entry.child.set_max_length(max(len(x) for x in self._selection))
+            self.entry.child.set_max_length(
+                max(len(x) for x in self._selection))
         completion.set_text_column(0)
         return lst
 

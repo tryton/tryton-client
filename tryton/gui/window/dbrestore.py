@@ -5,7 +5,7 @@ import gtk
 import gobject
 import gettext
 import tryton.common as common
-from tryton.config import CONFIG, TRYTON_ICON
+from tryton.config import CONFIG
 import tryton.rpc as rpc
 
 _ = gettext.gettext
@@ -19,10 +19,10 @@ class DBRestore(object):
         must be filled, then the restore button is set to sensitive. This
         event method doesn't check the valid of single entrys.
         """
-        if  self.entry_server_url.get_text() !=  "" \
-                and self.entry_server_password.get_text() != "" \
-                and self.entry_server_url.get_text() != "" \
-                and self.entry_db_name.get_text() != "":
+        if (self.entry_server_url.get_text() != ""
+                and self.entry_server_password.get_text() != ""
+                and self.entry_server_url.get_text() != ""
+                and self.entry_db_name.get_text() != ""):
             widget.unset_flags(gtk.HAS_DEFAULT)
             self.button_restore.set_sensitive(True)
             self.button_restore.set_flags(gtk.CAN_DEFAULT)
@@ -40,7 +40,7 @@ class DBRestore(object):
         - Allowed characters are alpha-nummeric [A-Za-z0-9] and underscore (_)
         - First character must be a letter
         """
-        if (new_text.isalnum() or new_text == '_' ):
+        if new_text.isalnum() or new_text == '_':
             _hid = entry.get_data('handlerid')
             entry.handler_block(_hid)
             _pos = entry.get_position()
@@ -48,6 +48,7 @@ class DBRestore(object):
                 new_text = ""
             _pos = entry.insert_text(new_text, _pos)
             entry.handler_unblock(_hid)
+
             def _move_cursor():
                 with gtk.gdk.lock:
                     entry.set_position(_pos)
@@ -158,7 +159,8 @@ class DBRestore(object):
         img_restore.set_from_stock('tryton-folder-saved-search', \
                 gtk.ICON_SIZE_BUTTON)
         self.button_restore.set_image(img_restore)
-        self.tooltips.set_tip(self.button_restore, _('Restore the database from file.'))
+        self.tooltips.set_tip(self.button_restore,
+            _('Restore the database from file.'))
         self.dialog.add_action_widget(self.button_restore, gtk.RESPONSE_OK)
         self.dialog.set_default_response(gtk.RESPONSE_OK)
 

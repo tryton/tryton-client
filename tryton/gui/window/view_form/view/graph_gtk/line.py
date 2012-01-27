@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-#This code is inspired by the pycha project (http://www.lorenzogil.com/projects/pycha/)
+#This code is inspired by the pycha project
+#(http://www.lorenzogil.com/projects/pycha/)
 from graph import Graph
 from tryton.common import hex2rgb, float_time_to_text, safe_eval
 import locale
@@ -33,8 +34,8 @@ class Line(Graph):
                 if self.xrange == 0:
                     x = 1.0
 
-                if not bool(safe_eval(yfield2attrs[yfield].get('empty', '1'))) \
-                        and yval == 0:
+                if (not bool(safe_eval(yfield2attrs[yfield].get('empty', '1')))
+                        and yval == 0):
                     continue
 
                 point = Point(x, y, xval, yval, xfield, yfield)
@@ -140,8 +141,9 @@ class Line(Graph):
 
         highlight = False
         draw_points = []
-        yfields_float_time = dict([(x.get('key', x['name']), x.get('float_time'))
-            for x in self.yfields if x.get('widget')])
+        yfields_float_time = dict(
+            (x.get('key', x['name']), x.get('float_time'))
+            for x in self.yfields if x.get('widget'))
         for point in self.points:
             if point == nearest[0] and nearest[1] < dia / 100:
                 if not point.highlight:

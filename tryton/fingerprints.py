@@ -25,7 +25,6 @@ class Fingerprints(dict):
                 self[host] = sha1
 
     def save(self):
-        lines = []
         with open(KNOWN_HOSTS_PATH, 'w') as known_hosts:
             known_hosts.writelines('%s %s' % (host, sha1)
                     + os.linesep for host, sha1 in self.iteritems())
@@ -33,7 +32,7 @@ class Fingerprints(dict):
     def __setitem__(self, key, value):
         assert isinstance(key, basestring)
         if value:
-            assert len(value) == 59 # len of formated sha1
+            assert len(value) == 59  # len of formated sha1
         else:
             value = ''
         super(Fingerprints, self).__setitem__(key, value)

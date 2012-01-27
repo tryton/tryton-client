@@ -5,17 +5,20 @@ import gettext
 
 _ = gettext.gettext
 
+
 def workflow_print(datas):
     datas = datas.copy()
     datas['nested'] = False
     Action.exec_report('workflow.instance.graph', datas)
     return True
 
+
 def workflow_print_complex(datas):
     datas = datas.copy()
     datas['nested'] = True
     Action.exec_report('workflow.instance.graph', datas)
     return True
+
 
 def get_plugins(model):
     return [

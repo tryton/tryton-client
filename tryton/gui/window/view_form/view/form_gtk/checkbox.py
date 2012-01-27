@@ -6,6 +6,7 @@ import gettext
 
 _ = gettext.gettext
 
+
 class CheckBox(WidgetInterface):
 
     def __init__(self, field_name, model_name, attrs=None):

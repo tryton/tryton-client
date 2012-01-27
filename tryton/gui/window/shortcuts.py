@@ -91,7 +91,7 @@ Examples:
                 label.set_alignment(0, 0.5)
                 table.attach(label, 1, 2, i, i + 1,
                         yoptions=False, xoptions=gtk.FILL)
-            i +=1
+            i += 1
         return table
 
     def run(self):

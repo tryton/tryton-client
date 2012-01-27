@@ -24,6 +24,7 @@ mapping = {
     '%p': ('__', '([_ AP][_ M])'),
 }
 
+
 class DateEntry(gtk.Entry):
 
     def __init__(self, format, callback=None, callback_process=None):
@@ -68,7 +69,8 @@ class DateEntry(gtk.Entry):
             return
 
         if self.mode_cmd:
-            if self.callback: self.callback(value)
+            if self.callback:
+                self.callback(value)
             self.stop_emission('insert-text')
             return
 
@@ -110,7 +112,8 @@ class DateEntry(gtk.Entry):
             end = len(self.initial_value)
         if end < 0:
             end = 0
-        while (start > 0) and (self.initial_value[start] not in ['_', ' ','0','X']):
+        while (start > 0
+                and self.initial_value[start] not in ['_', ' ', '0', 'X']):
             start -= 1
         text = self.get_text()
         text = text[:start] + self.initial_value[start:end] + text[end:]
@@ -179,15 +182,16 @@ class DateEntry(gtk.Entry):
 
         for a in range(len(self.initial_value)):
             if self.initial_value[a] == text[a]:
-                text = text[:a] + default[a] + text[a+1:]
+                text = text[:a] + default[a] + text[a + 1:]
         return text
 
     def test_date(self, text):
         default = datetime_strftime(datetime.datetime(2000, 1, 1),
                 self.format)
         try:
-            time.strptime(self.compute_date(text, default=default, year='2000'),
-                    self.format)
+            time.strptime(
+                self.compute_date(text, default=default, year='2000'),
+                self.format)
         except ValueError:
             return False
         return True
@@ -287,7 +291,8 @@ class ComplexEntry(gtk.HBox):
             self.widget_cmd.show()
             self._date_cb(event)
         else:
-            if hasattr(event, 'keyval') and not event.keyval == gtk.keysyms.Escape:
+            if (hasattr(event, 'keyval')
+                    and not event.keyval == gtk.keysyms.Escape):
                 cmd = self.widget_cmd.get_text()
                 dt = self.widget.date_get() or datetime.datetime.now()
                 res = compute_date(cmd, dt, self.widget.format)
@@ -295,6 +300,7 @@ class ComplexEntry(gtk.HBox):
                     self.widget.date_set(res)
             self.widget_cmd.set_text('')
             self.widget_cmd.hide()
+
 
 def compute_date(cmd, dt, format):
     lst = {
@@ -320,8 +326,8 @@ def compute_date(cmd, dt, format):
                 relativedelta(months=int(r.group(1))),
         '^([\\+-]\d+)y$': lambda dt, r: dt + \
                 relativedelta(years=int(r.group(1))),
-        '^=$': lambda dt,r: datetime.datetime.now(),
-        '^-$': lambda dt,r: False
+        '^=$': lambda dt, r: datetime.datetime.now(),
+        '^-$': lambda dt, r: False
     }
     for r, f in lst.items():
         groups = re.match(r, cmd)
@@ -336,6 +342,7 @@ def compute_date(cmd, dt, format):
 if __name__ == '__main__':
     win = gtk.Window()
     win.set_title('gtk.Entry subclass')
+
     def cb(window, event):
         gtk.main_quit()
     win.connect('delete-event', cb)

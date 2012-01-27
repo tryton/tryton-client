@@ -581,24 +581,6 @@ Tabs Position
   * Right
   * Bottom
 
-.. _Menu-Options-File_Actions:
-
-File Actions...:
-  Opens a dialog to set up file types for print and open actions.
-  Use ``"%s"`` as a placeholder for the document name.
-
-  * Provided file types:
-
-    - ODT file: Open Office Writer Document
-    - PDF file: Adobes(TM) Portable Document Format
-    - PNG file: Portable Network Graphics format
-    - TXT file: Pure text file
-
-  * Provided actions
-
-    - Open: Setting up program system call which opens the specific file type.
-    - Print: Setting up program system call printing the specific file type.
-
 .. _Menu-Options-Email:
 
 Email...:

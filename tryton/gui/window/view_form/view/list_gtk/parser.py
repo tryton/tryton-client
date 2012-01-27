@@ -12,7 +12,7 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.config import CONFIG
 import tryton.rpc as rpc
 from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
-        TRYTON_ICON, HM_FORMAT, file_selection, file_open
+        HM_FORMAT, file_selection, file_open
 import tryton.common as common
 from tryton.exceptions import TrytonError, TrytonServerError
 from tryton.common.cellrendererbutton import CellRendererButton
@@ -25,7 +25,6 @@ from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.action import Action
 from tryton.translate import date_format
-from tryton.pyson import PYSONDecoder
 import gtk
 import locale
 import datetime
@@ -35,12 +34,14 @@ import operator
 
 _ = gettext.gettext
 
+
 def send_keys(renderer, editable, position, treeview):
     editable.connect('key_press_event', treeview.on_keypressed)
     editable.editing_done_id = editable.connect('editing_done',
             treeview.on_editing_done)
     if isinstance(editable, (gtk.ComboBoxEntry, gtk.ComboBox)):
         editable.connect('changed', treeview.on_editing_done)
+
 
 def sort_model(column, treeview, screen):
     for col in treeview.get_columns():
@@ -70,6 +71,7 @@ def sort_model(column, treeview, screen):
         screen.search_filter(search_string=search_string)
     for record in unsaved_records:
         store.group.append(record)
+
 
 class ParserTree(ParserInterface):
 
@@ -142,6 +144,7 @@ class ParserTree(ParserInterface):
                     render_pixbuf = gtk.CellRendererPixbuf()
                     col.pack_start(render_pixbuf, expand=False)
                     icon = node_attrs['icon']
+
                     def setter(column, cell, store, iter):
                         record = store.get_value(iter, 0)
                         value = record[icon].get_client(record) or ''
@@ -242,6 +245,7 @@ class ParserTree(ParserInterface):
                 col.set_widget(label)
 
                 col._type = 'button'
+                col.set_cell_data_func(renderer, cell.setter)
                 if 'width' in node_attrs:
                     width = int(node_attrs['width'])
                 else:
@@ -328,7 +332,8 @@ class Char(object):
                 bg_color = 'white'
                 if not field.get_state_attrs(record).get('valid', True):
                     bg_color = COLORS.get('invalid', 'white')
-                elif bool(int(field.get_state_attrs(record).get('required', 0))):
+                elif bool(int(
+                            field.get_state_attrs(record).get('required', 0))):
                     bg_color = COLORS.get('required', 'white')
                 cell.set_property('background', bg_color)
                 if bg_color == 'white':
@@ -366,6 +371,7 @@ class Char(object):
         if callback:
             callback()
 
+
 class Int(Char):
 
     def __init__(self, field_name, model_name, treeview, attrs=None):
@@ -382,6 +388,7 @@ class Int(Char):
     def get_textual_value(self, record):
         return locale.format('%d',
                 record[self.field_name].get_client(record) or 0, True)
+
 
 class Boolean(Int):
 
@@ -484,7 +491,7 @@ class Float(Char):
     def get_textual_value(self, record):
         field = record[self.field_name]
         digit = record.expr_eval(field.attrs.get('digits', (16, 2)))[1]
-        return locale.format('%.'+str(digit)+'f',
+        return locale.format('%.' + str(digit) + 'f',
                 record[self.field_name].get_client(record) or 0.0, True)
 
     def value_from_text(self, record, text, callback=None):
@@ -513,7 +520,9 @@ class FloatTime(Char):
 
     def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
-        field.set_client(record, common.text_to_float_time(text, self.conv))
+        digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
+        field.set_client(record,
+            round(common.text_to_float_time(text, self.conv), digits[1]))
         if callback:
             callback()
 
@@ -582,7 +591,7 @@ class Binary(Char):
         filename = file_selection(_('Save As...'), filename=filename,
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
-            with open(filename,'wb') as fp:
+            with open(filename, 'wb') as fp:
                 fp.write(field.get_data(record))
 
     def clear_binary(self, renderer, path):
@@ -681,6 +690,7 @@ class M2O(Char):
     def search_remote(self, record, relation, ids=None, domain=None,
             context=None, callback=None):
         field = record.group.fields[self.field_name]
+
         def search_callback(found):
             value = None
             if found:
@@ -733,6 +743,7 @@ class O2M(Char):
         screen = Screen(relation, mode=['tree', 'form'],
             exclude_field=field.attrs.get('relation_field'))
         screen.group = group
+
         def open_callback(result):
             if callback:
                 callback()
@@ -781,6 +792,7 @@ class M2M(Char):
                 return
         if not callback:
             return
+
         def winsearch_callback(result):
             field.set_client(record, result or [])
             if callback:
@@ -807,20 +819,21 @@ class M2M(Char):
                     field.set_client(record, False)
                     if callback:
                         callback()
-            if ids and len(ids)==1:
+            if ids and len(ids) == 1:
                 field.set_client(record, ids)
                 if callback:
                     callback()
                 return
         else:
             ids = [x.id for x in field.get_client(record)]
+
         def open_callback(result):
             if result:
                 field.set_client(record, result)
             if callback:
                 callback()
-        WinSearch(relation, open_callback, sel_multi=True, ids=ids, context=context,
-            domain=domain)
+        WinSearch(relation, open_callback, sel_multi=True, ids=ids,
+            context=context, domain=domain)
 
 
 class Selection(Char):
@@ -1001,6 +1014,15 @@ class Button(object):
         self.screen = screen
 
         self.renderer.connect('clicked', self.button_clicked)
+
+    def setter(self, column, cell, store, iter):
+        record = store.get_value(iter, 0)
+        states = record.expr_eval(self.attrs.get('states', {}),
+            check_load=False)
+        invisible = states.get('invisible', False)
+        cell.set_property('visible', not invisible)
+        # TODO readonly
+        # TODO icon
 
     def button_clicked(self, widget, path):
         if not path:

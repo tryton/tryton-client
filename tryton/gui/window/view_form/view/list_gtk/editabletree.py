@@ -38,7 +38,6 @@ class EditableTreeView(gtk.TreeView):
 
     def on_open_remote(self, current_record, fieldname, create, value,
             entry=None, callback=None):
-        field = current_record[fieldname]
         cell = self.cells[fieldname]
         if value != cell.get_textual_value(current_record) or not value:
             changed = True
@@ -151,6 +150,7 @@ class EditableTreeView(gtk.TreeView):
             else:
                 txt = entry.get_active_text()
             entry.handler_block(entry.editing_done_id)
+
             def callback():
                 entry.handler_unblock(entry.editing_done_id)
                 self.set_cursor(path, column, True)
@@ -201,9 +201,9 @@ class EditableTreeView(gtk.TreeView):
                     break
             entry.handler_block(entry.editing_done_id)
             if self.editable == 'top':
-                new_path = self._key_up(path, model, col)
+                self._key_up(path, model, col)
             else:
-                new_path = self._key_down(path, model, column)
+                self._key_down(path, model, column)
             entry.handler_unblock(entry.editing_done_id)
         elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
             if isinstance(entry, gtk.Entry):
@@ -211,6 +211,7 @@ class EditableTreeView(gtk.TreeView):
             else:
                 value = entry.get_active_text()
             entry.handler_block(entry.editing_done_id)
+
             def callback():
                 cell = self.cells[column.name]
                 value = cell.get_textual_value(record)
@@ -221,13 +222,14 @@ class EditableTreeView(gtk.TreeView):
                 entry.handler_unblock(entry.editing_done_id)
                 self.set_cursor(path, column, True)
             self.on_open_remote(record, column.name,
-                create=(event.keyval==gtk.keysyms.F3), value=value,
+                create=(event.keyval == gtk.keysyms.F3), value=value,
                 callback=callback)
         else:
             field = record[column.name]
             if isinstance(entry, gtk.Entry):
                 entry.set_max_length(int(field.attrs.get('size', 0)))
-            # store in the record the entry widget to get the value in set_value
+            # store in the record the entry widget to get the value in
+            # set_value
             field.editabletree_entry = entry
             record.modified_fields.setdefault(column.name)
             return False
