@@ -1,7 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
-from interface import WidgetInterface
+from interface import WidgetInterface, TranslateMixin
 from tryton.config import CONFIG
 
 try:
@@ -10,7 +10,7 @@ except ImportError:
     gtkspell = None
 
 
-class TextBox(WidgetInterface):
+class TextBox(WidgetInterface, TranslateMixin):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(TextBox, self).__init__(field_name, model_name, attrs=attrs)
@@ -36,12 +36,46 @@ class TextBox(WidgetInterface):
         self.widget.pack_start(self.scrolledwindow)
         self.lang = None
 
+        self.button = None
+        if attrs.get('translate'):
+            self.button = self.translate_button()
+            self.widget.pack_start(self.button, False, False)
+
+    def translate_widget(self):
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
+            gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        scrolledwindow.set_size_request(-1, 80)
+
+        textview = gtk.TextView()
+        textview.set_wrap_mode(gtk.WRAP_WORD)
+        textview.set_accepts_tab(False)
+
+        scrolledwindow.add(textview)
+        return scrolledwindow
+
+    @staticmethod
+    def translate_widget_set(widget, value):
+        textview = widget.get_child()
+        buf = textview.get_buffer()
+        buf.delete(buf.get_start_iter(), buf.get_end_iter())
+        buf.insert(buf.get_start_iter(), value or '')
+
+    @staticmethod
+    def translate_widget_get(widget):
+        textview = widget.get_child()
+        buf = textview.get_buffer()
+        return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+
     def grab_focus(self):
         return self.textview.grab_focus()
 
     def _readonly_set(self, value):
         super(TextBox, self)._readonly_set(value)
         self.textview.set_editable(not value)
+        if self.button:
+            self.button.set_sensitive(not value)
         if value:
             self.widget.set_focus_chain([])
         else:

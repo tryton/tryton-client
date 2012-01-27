@@ -2,7 +2,16 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gobject
+import gettext
+
 from tryton.common import COLORS
+import tryton.common as common
+import tryton.rpc as rpc
+from tryton.exceptions import TrytonServerError
+from tryton.gui.window.nomodal import NoModal
+from tryton.common import TRYTON_ICON
+
+_ = gettext.gettext
 
 
 class WidgetInterface(object):
@@ -154,3 +163,146 @@ class WidgetInterface(object):
 
     def cancel(self):
         pass
+
+
+class TranslateDialog(NoModal):
+
+    def __init__(self, widget, languages):
+        NoModal.__init__(self)
+        self.widget = widget
+        self.win = gtk.Dialog(_('Translation'), self.parent,
+            gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.win.set_icon(TRYTON_ICON)
+        self.win.connect('response', self.response)
+
+        self.accel_group = gtk.AccelGroup()
+        self.win.add_accel_group(self.accel_group)
+
+        self.win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK).add_accelerator(
+            'clicked', self.accel_group, gtk.keysyms.Return,
+            gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
+
+        self.widgets = {}
+        table = gtk.Table(len(languages), 2)
+        table.set_homogeneous(False)
+        table.set_col_spacings(3)
+        table.set_row_spacings(2)
+        table.set_border_width(1)
+        for i, language in enumerate(languages):
+            if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
+                label = _(':') + language['name']
+            else:
+                label = language['name'] + _(':')
+            label = gtk.Label(label)
+            label.set_alignment(1.0, 0.5)
+            table.attach(label, 0, 1, i, i + 1, xoptions=gtk.FILL)
+
+            context = rpc.CONTEXT.copy()
+            context['language'] = language['code']
+            try:
+                value = rpc.execute('model', self.widget.record.model_name,
+                    'read', self.widget.record.id, [self.widget.field_name],
+                    context)[self.widget.field_name]
+            except TrytonServerError, exception:
+                common.process_exception(exception)
+                return
+            widget = self.widget.translate_widget()
+            self.widgets[language['code']] = (widget, value)
+            self.widget.translate_widget_set(widget, value)
+            table.attach(widget, 1, 2, i, i + 1)
+
+        vbox = gtk.VBox()
+        vbox.pack_start(table, False, True)
+        viewport = gtk.Viewport()
+        viewport.set_shadow_type(gtk.SHADOW_NONE)
+        viewport.add(vbox)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
+        scrolledwindow.add(viewport)
+        self.win.vbox.pack_start(scrolledwindow, True, True)
+
+        sensible_allocation = self.sensible_widget.get_allocation()
+        self.win.set_default_size(int(sensible_allocation.width * 0.9),
+            int(sensible_allocation.height * 0.9))
+
+        self.register()
+        self.win.show_all()
+        common.center_window(self.win, self.parent, self.sensible_widget)
+
+    def response(self, win, response):
+        if response == gtk.RESPONSE_OK:
+            for code, widget in self.widgets.iteritems():
+                widget, old_value = widget
+                new_value = self.widget.translate_widget_get(widget)
+                if new_value == old_value:
+                    continue
+                context = rpc.CONTEXT.copy()
+                context['language'] = code
+                context['fuzzy_translation'] = False
+                args = ('model', self.widget.record.model_name, 'write',
+                    self.widget.record.id, {
+                        self.widget.field_name: new_value,
+                        }, context)
+                try:
+                    rpc.execute(*args)
+                except TrytonServerError, exception:
+                    common.process_exception(exception, *args)
+            self.widget.record.cancel()
+            self.widget.view.display()
+        self.destroy()
+
+    def destroy(self):
+        self.win.destroy()
+        NoModal.destroy(self)
+
+
+class TranslateMixin:
+
+    def translate_button(self):
+        button = gtk.Button()
+        img = gtk.Image()
+        img.set_from_stock('tryton-locale', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        button.set_image(img)
+        button.set_relief(gtk.RELIEF_NONE)
+        button.connect('clicked', self.translate)
+        return button
+
+    def translate(self, widget):
+        if self.record.id < 0 or self.record.modified:
+            common.message(
+                _('You need to save the record before adding translations!'))
+            return
+
+        try:
+            lang_ids = rpc.execute('model', 'ir.lang', 'search', [
+                    ('translatable', '=', True),
+                    ], rpc.CONTEXT)
+        except TrytonServerError, exception:
+            common.process_exception(exception)
+            return
+
+        if not lang_ids:
+            common.message(_('No other language available!'))
+            return
+        try:
+            languages = rpc.execute('model', 'ir.lang', 'read', lang_ids,
+                ['code', 'name'], rpc.CONTEXT)
+        except TrytonServerError, exception:
+            common.process_exception(exception)
+            return
+
+        TranslateDialog(self, languages)
+
+    def translate_widget(self):
+        raise NotImplemented
+
+    @staticmethod
+    def translate_widget_set(widget, value):
+        raise NotImplemented
+
+    @staticmethod
+    def translate_widget_get(widget):
+        raise NotImplemented

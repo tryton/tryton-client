@@ -4,13 +4,13 @@ import gettext
 
 import gobject
 import gtk
-from interface import WidgetInterface
+from interface import WidgetInterface, TranslateMixin
 from tryton.common import Tooltips
 
 _ = gettext.gettext
 
 
-class Char(WidgetInterface):
+class Char(WidgetInterface, TranslateMixin):
     "Char"
 
     def __init__(self, field_name, model_name, attrs=None):
@@ -41,6 +41,26 @@ class Char(WidgetInterface):
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
         focus_entry.connect('key-press-event', self.send_modified)
         self.widget.pack_start(self.entry)
+
+        self.button = None
+        if attrs.get('translate'):
+            self.button = self.translate_button()
+            self.widget.pack_start(self.button, False, False)
+
+    def translate_widget(self):
+        entry = gtk.Entry()
+        entry.set_property('activates_default', True)
+        entry.set_width_chars(10)
+        entry.set_max_length(int(self.attrs.get('size', 0)))
+        return entry
+
+    @staticmethod
+    def translate_widget_set(widget, value):
+        widget.set_text(value)
+
+    @staticmethod
+    def translate_widget_get(widget):
+        return widget.get_text()
 
     def _color_widget(self):
         if self.autocomplete:
@@ -97,6 +117,8 @@ class Char(WidgetInterface):
             self.entry.set_button_sensitivity(sensitivity[value])
         else:
             self.entry.set_editable(not value)
+        if self.button:
+            self.button.set_sensitive(not value)
         if value:
             self.widget.set_focus_chain([])
         else:

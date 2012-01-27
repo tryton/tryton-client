@@ -1,3 +1,4 @@
+* Add support for fuzzy_translation
 * Activate save button on editing
 * Refactor set/get and set/get_client of fields
 * Display binary size alongside the buttons in treeview

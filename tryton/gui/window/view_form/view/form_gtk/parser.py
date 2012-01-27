@@ -2,13 +2,10 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
-import copy
 import logging
-import tryton.rpc as rpc
 from tryton.gui.window.view_form.view.interface import ParserInterface
 import tryton.common as common
-from tryton.config import CONFIG, TRYTON_ICON
-from tryton.exceptions import TrytonServerError
+from tryton.config import CONFIG
 from tryton.common.button import Button
 
 _ = gettext.gettext
@@ -129,7 +126,6 @@ class _container(object):
         self.cont = []
         self.col = []
         self.tooltips = tooltips
-        self.trans_box = []
 
     def new(self, col=4):
         table = gtk.Table(1, col)
@@ -155,7 +151,7 @@ class _container(object):
         table.resize(height + 1, self.col[-1])
 
     def wid_add(self, widget, name='', yexpand=False, ypadding=2, rowspan=1,
-            colspan=1, translate=False, fname=None, help_tip=False,
+            colspan=1, fname=None, help_tip=False,
             yfill=False, xexpand=True, xfill=True, xpadding=3):
         (table, width, height) = self.cont[-1]
         if colspan > self.col[-1]:
@@ -176,15 +172,6 @@ class _container(object):
         if help_tip:
             self.tooltips.set_tip(widget, help_tip)
             self.tooltips.enable()
-        if translate:
-            button = gtk.Button()
-            img = gtk.Image()
-            img.set_from_stock('tryton-locale', gtk.ICON_SIZE_SMALL_TOOLBAR)
-            button.set_image(img)
-            button.set_relief(gtk.RELIEF_NONE)
-            self.trans_box.append((button, name, fname,
-                    widget.get_children()[0]))
-            widget.get_child().pack_start(button, fill=False, expand=False)
         widget.show_all()
         table.attach(widget, width, width + colspan,
                 height, height + rowspan,
@@ -454,7 +441,7 @@ class ParserForm(ParserInterface):
                 for attr_name in ('relation', 'domain', 'selection',
                         'relation_field', 'string', 'views', 'invisible',
                         'add_remove', 'sort', 'context', 'size', 'filename',
-                        'autocomplete'):
+                        'autocomplete', 'translate'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
@@ -471,13 +458,9 @@ class ParserForm(ParserInterface):
                     widget_act.widget.set_size_request(
                             int(attrs.get('width', -1)),
                             int(attrs.get('height', -1)))
-                translate = False
-                if ftype in ('char', 'text'):
-                    translate = fields[name].attrs.get('translate', False)
                 container.wid_add(Alignment(widget_act.widget, attrs),
                     fields[name].attrs['string'], fname=name,
                     help_tip=hlp,
-                    translate=translate,
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill,
                     xexpand=xexpand, xfill=xfill)
@@ -559,184 +542,8 @@ class ParserForm(ParserInterface):
                     paned.pack1(widget, resize=True, shrink=True)
                 elif not paned.get_child2():
                     paned.pack2(widget, resize=True, shrink=True)
-        for (button, src, name, widget) in container.trans_box:
-            button.connect('clicked', self.translate, model_name, name,
-                    src, widget)
         return container.pop(), dict_widget, button_list, on_write, \
                 notebook_list, cursor_widget
-
-    def translate(self, widget, model_name, name, src, widget_entry):
-        obj_id = self.screen.current_record.id
-        if obj_id < 0:
-            common.message(
-                _('You need to save the record before adding translations!'))
-            return False
-
-        obj_id = self.screen.current_record.save(force_reload=False)
-        try:
-            lang_ids = rpc.execute('model', 'ir.lang',
-                    'search', [('translatable', '=', '1')],
-                    rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
-            return False
-
-        if not lang_ids:
-            common.message(_('No other language available!'))
-            return False
-        try:
-            lang_ids += rpc.execute('model', 'ir.lang',
-                    'search', [('code', '=', 'en_US')],
-                    rpc.CONTEXT)
-            langs = rpc.execute('model', 'ir.lang',
-                    'read', lang_ids, ['code', 'name'],
-                    rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
-            return False
-
-        code = rpc.CONTEXT.get('language', 'en_US')
-
-        widget_entry = widget_entry.get_children()[0]
-        if isinstance(widget_entry, gtk.ScrolledWindow):
-            widget_entry = widget_entry.get_child()
-
-        #widget accessor functions
-        def value_get(widget):
-            if isinstance(widget, gtk.Entry):
-                return widget.get_text()
-            elif isinstance(widget, gtk.TextView):
-                buf = widget.get_buffer()
-                iter_start = buf.get_start_iter()
-                iter_end = buf.get_end_iter()
-                return buf.get_text(iter_start, iter_end, False)
-            else:
-                return None
-
-        def value_set(widget, value):
-            if not value:
-                value = ''
-            if isinstance(widget, gtk.Entry):
-                widget.set_text(value)
-            elif isinstance(widget, gtk.TextView):
-                buf = widget.get_buffer()
-                buf.delete(buf.get_start_iter(), buf.get_end_iter())
-                iter_start = buf.get_start_iter()
-                buf.insert(iter_start, value)
-
-        def widget_duplicate(widget):
-            if isinstance(widget, gtk.Entry):
-                entry = gtk.Entry()
-                entry.set_property('activates_default', True)
-                entry.set_max_length(widget.get_max_length())
-                entry.set_width_chars(widget.get_width_chars())
-                return entry, gtk.FILL
-            elif isinstance(widget, gtk.TextView):
-                textview = gtk.TextView()
-                textview.set_wrap_mode(gtk.WRAP_WORD)
-                scrolledwindow = gtk.ScrolledWindow()
-                scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                        gtk.POLICY_ALWAYS)
-                scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-                scrolledwindow.set_size_request(-1, 80)
-                scrolledwindow.add(textview)
-                textview.set_accepts_tab(False)
-                return scrolledwindow, gtk.FILL | gtk.EXPAND
-            else:
-                return None, False
-
-        parent = common.get_toplevel_window()
-        win = gtk.Dialog(_('Add Translation'), parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        win.set_has_separator(True)
-        win.vbox.set_spacing(5)
-        win.set_property('default-width', 600)
-        win.set_property('default-height', 400)
-        win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-        win.set_icon(TRYTON_ICON)
-
-        accel_group = gtk.AccelGroup()
-        win.add_accel_group(accel_group)
-
-        win.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-
-        but_ok = win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-        but_ok.add_accelerator('clicked', accel_group, gtk.keysyms.Return,
-                gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
-
-        vbox = gtk.VBox(spacing=5)
-
-        entries_list = []
-        table = gtk.Table(len(langs), 2)
-        table.set_homogeneous(False)
-        table.set_col_spacings(3)
-        table.set_row_spacings(0)
-        table.set_border_width(1)
-        i = 0
-        for lang in langs:
-            context = copy.copy(rpc.CONTEXT)
-            context['language'] = lang['code']
-            try:
-                val = rpc.execute('model', model_name,
-                        'read', [obj_id], [name], context)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
-                return False
-            val = val[0]
-            if gtk.widget_get_default_direction() == gtk.TEXT_DIR_RTL:
-                label = gtk.Label(_(':') + lang['name'])
-            else:
-                label = gtk.Label(lang['name'] + _(':'))
-            label.set_alignment(1.0, 0.5)
-            (entry, yoptions) = widget_duplicate(widget_entry)
-
-            if code == lang['code']:
-                value_set(entry, value_get(widget_entry))
-            else:
-                value_set(entry, val[name])
-
-            entries_list.append((val['id'], lang['code'], entry))
-            table.attach(label, 0, 1, i, i + 1, yoptions=False,
-                xoptions=gtk.FILL, ypadding=2, xpadding=3)
-            table.attach(entry, 1, 2, i, i + 1, yoptions=yoptions,
-                ypadding=2, xpadding=3)
-            i += 1
-
-        vbox.pack_start(table)
-        viewport = gtk.Viewport()
-        viewport.set_shadow_type(gtk.SHADOW_NONE)
-        viewport.add(vbox)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                gtk.POLICY_AUTOMATIC)
-        scrolledwindow.set_shadow_type(gtk.SHADOW_NONE)
-        scrolledwindow.add(viewport)
-        win.vbox.add(scrolledwindow)
-        win.show_all()
-
-        response = win.run()
-        if response == gtk.RESPONSE_OK:
-            to_save = [(x[0], x[1], value_get(x[2])) for x in entries_list]
-            while to_save != []:
-                new_val = {}
-                new_val['id'], new_val['code'], new_val['value'] = \
-                        to_save.pop()
-                #update form field
-                if new_val['code'] == code:
-                    value_set(widget_entry, new_val['value'])
-                context = copy.copy(rpc.CONTEXT)
-                context['language'] = new_val['code']
-                args = ('model', model_name, 'write', [obj_id],
-                        {str(name):  new_val['value']}, context)
-                try:
-                    rpc.execute(*args)
-                except TrytonServerError, exception:
-                    common.process_exception(exception, *args)
-        if response != gtk.RESPONSE_CANCEL:
-            self.screen.current_record.reload()
-        win.destroy()
-        parent.present()
-        return response != gtk.RESPONSE_CANCEL
 
 from calendar import Calendar, DateTime
 from float import Float
