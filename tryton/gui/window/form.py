@@ -126,7 +126,7 @@ class Form(SignalEvent, TabContent):
         self.screen.signal_connect(self, 'record-message',
             self._record_message)
         self.screen.signal_connect(self, 'record-modified',
-            self._record_modified)
+            lambda *a: gobject.idle_add(self._record_modified, *a))
         self.screen.signal_connect(self, 'record-saved', self._record_saved)
         self.screen.signal_connect(self, 'attachment-count',
                 self._attachment_count)

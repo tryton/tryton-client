@@ -83,6 +83,11 @@ class ViewForm(ParserView):
             return [self.screen.current_record]
         return []
 
+    @property
+    def modified(self):
+        return any(w.modified for widgets in self.widgets.itervalues()
+            for w in widgets)
+
     def reset(self):
         record = self.screen.current_record
         if record:

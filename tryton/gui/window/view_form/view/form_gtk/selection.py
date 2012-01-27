@@ -22,11 +22,10 @@ class Selection(WidgetInterface):
         child.set_max_length(int(attrs.get('size', 0)))
         child.set_width_chars(10)
 
-        child.connect('changed', self.sig_changed)
-        self.changed = True
         child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
+        child.connect('changed', self.send_modified)
         self.widget.pack_start(self.entry)
         self.widget.set_focus_chain([child])
 
@@ -120,21 +119,8 @@ class Selection(WidgetInterface):
         return self.entry.child
 
     def value_get(self):
-        child = self.entry.child
-        res = child.get_text()
-        return self._selection.get(res, False), res
-
-    def sig_key_press(self, widget, event):
-        if event.type == gtk.gdk.KEY_PRESS \
-                and event.state & gtk.gdk.CONTROL_MASK \
-                and event.keyval == gtk.keysyms.space:
-            self.entry.popup()
-
-    def sig_activate(self, widget, event=None):
-        if not self.field:
-            return
         text = self.entry.child.get_text()
-        value = False
+        value = None
         if text:
             for txt, val in self._selection.items():
                 if not val:
@@ -143,10 +129,26 @@ class Selection(WidgetInterface):
                     value = val
                     if len(txt) == len(text):
                         break
-        if 'relation' in self.attrs:
-            value = (value, text)
-        self.field.set_client(self.record, value)
+        return value
+
+    def sig_key_press(self, widget, event):
+        if event.type == gtk.gdk.KEY_PRESS \
+                and event.state & gtk.gdk.CONTROL_MASK \
+                and event.keyval == gtk.keysyms.space:
+            self.entry.popup()
+        self.send_modified()
+
+    def sig_activate(self, widget, event=None):
+        if not self.field:
+            return
+        self.field.set_client(self.record, self.value_get())
         self.display(self.record, self.field)
+
+    @property
+    def modified(self):
+        if self.record and self.field:
+            return self.field.get(self.record) != self.value_get()
+        return False
 
     def set_value(self, record, field):
         field.set_client(record, self.value_get())
@@ -158,13 +160,13 @@ class Selection(WidgetInterface):
     def display(self, record, field):
         self.update_selection(record)
         child = self.entry.child
-        self.changed = False
         if not field:
             child.set_text('')
             return False
         super(Selection, self).display(record, field)
         value = field.get(record)
         if isinstance(value, (list, tuple)):
+            # Compatibility with Many2One
             value = value[0]
         if not value:
             child.set_text('')
@@ -187,8 +189,3 @@ class Selection(WidgetInterface):
                         break
             if not found:
                 child.set_text('')
-        self.changed = True
-
-    def sig_changed(self, *args):
-        if self.changed:
-            self._focus_out()

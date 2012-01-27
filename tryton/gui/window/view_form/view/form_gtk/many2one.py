@@ -27,6 +27,7 @@ class Many2One(WidgetInterface):
         self.wid_text = gtk.Entry()
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.set_property('activates_default', True)
+        self.wid_text.connect('key-press-event', self.send_modified)
         self.wid_text.connect_after('key_press_event', self.sig_key_press)
         self.wid_text.connect('populate-popup', self._populate_popup)
         self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
@@ -37,7 +38,6 @@ class Many2One(WidgetInterface):
         self.wid_text.connect('activate', self.sig_activate)
         self.wid_text.connect_after('focus-out-event', self.sig_activate)
         self.focus_out = True
-        self.widget.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
@@ -46,7 +46,6 @@ class Many2One(WidgetInterface):
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_edit)
         self.but_open.set_alignment(0.5, 0.5)
-        self.widget.pack_start(self.but_open, expand=False, fill=False)
 
         self.but_new = gtk.Button()
         img_new = gtk.Image()
@@ -55,7 +54,10 @@ class Many2One(WidgetInterface):
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
         self.but_new.set_alignment(0.5, 0.5)
-        self.widget.pack_start(self.but_new, expand=False, fill=False)
+
+        self.widget.pack_end(self.but_new, expand=False, fill=False)
+        self.widget.pack_end(self.but_open, expand=False, fill=False)
+        self.widget.pack_end(self.wid_text, expand=True, fill=True)
 
         self.widget.set_focus_chain([self.wid_text])
 
@@ -69,6 +71,9 @@ class Many2One(WidgetInterface):
     def grab_focus(self):
         return self.wid_text.grab_focus()
 
+    def get_model(self):
+        return self.attrs['relation']
+
     def _readonly_set(self, value):
         self._readonly = value
         self.wid_text.set_editable(not value)
@@ -78,24 +83,46 @@ class Many2One(WidgetInterface):
         else:
             self.widget.set_focus_chain([self.wid_text])
 
+    @property
+    def modified(self):
+        if self.record and self.field:
+            value = self.wid_text.get_text()
+            return self.field.get_client(self.record) != value
+        return False
+
     def _color_widget(self):
         return self.wid_text
 
+    @staticmethod
+    def has_target(value):
+        return value is not None
+
+    @staticmethod
+    def value_from_id(id_, str_=None):
+        if str_ is None:
+            str_ = ''
+        return id_, str_
+
+    @staticmethod
+    def id_from_value(value):
+        return value
+
     def sig_activate(self, widget, event=None, key_press=False):
-        if not self.focus_out:
-            return
-        if not self.field:
+        if not self.focus_out or not self.field:
             return
         self.changed = False
         value = self.field.get(self.record)
+        model = self.get_model()
 
         self.focus_out = False
-        if not value:
+        if model and not self.has_target(value):
             if not key_press and not event:
                 widget.emit_stop_by_name('activate')
-            if not self._readonly and (self.wid_text.get_text() or \
-                    (self.field.get_state_attrs(
-                        self.record)['required']) and key_press):
+            if (not self._readonly
+                    and (self.wid_text.get_text()
+                        or (self.field.get_state_attrs(
+                                self.record)['required'])
+                            and key_press)):
                 domain = self.field.domain_get(self.record)
                 context = rpc.CONTEXT.copy()
                 context.update(self.field.context_get(self.record))
@@ -108,29 +135,30 @@ class Many2One(WidgetInterface):
                             domain]
                     else:
                         dom = domain
-                    ids = rpc.execute('model', self.attrs['relation'],
-                            'search', dom, 0, CONFIG['client.limit'], None,
-                            context)
+                    ids = rpc.execute('model', model, 'search', dom, 0,
+                        CONFIG['client.limit'], None, context)
                 except TrytonServerError, exception:
                     self.focus_out = True
                     common.process_exception(exception)
                     self.changed = True
                     return
                 if len(ids) == 1:
-                    self.field.set_client(self.record, ids[0],
-                            force_change=True)
+                    self.field.set_client(self.record,
+                        self.value_from_id(ids[0]), force_change=True)
                     self.focus_out = True
                     self.display(self.record, self.field)
+                    self.changed = True
                     return
 
                 def callback(ids):
                     if ids:
-                        self.field.set_client(self.record, ids[0],
-                                force_change=True)
+                        self.field.set_client(self.record,
+                            self.value_from_id(ids[0]), force_change=True)
                     self.focus_out = True
                     self.display(self.record, self.field)
+                    self.changed = True
 
-                WinSearch(self.attrs['relation'], callback, sel_multi=False,
+                WinSearch(model, callback, sel_multi=False,
                     ids=ids, context=context, domain=domain,
                     views_preload=self.attrs.get('views', {}))
                 return
@@ -142,7 +170,7 @@ class Many2One(WidgetInterface):
     def get_screen(self):
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
-        return Screen(self.attrs['relation'], domain=domain, context=context,
+        return Screen(self.get_model(), domain=domain, context=context,
             mode=['form'], views_preload=self.attrs.get('views', {}),
             readonly=self._readonly)
 
@@ -152,25 +180,30 @@ class Many2One(WidgetInterface):
 
         def callback(result):
             if result and screen.save_current():
-                value = (screen.current_record.id,
-                        screen.current_record.rec_name())
-                self.field.set_client(self.record, value)
+                self.field.set_client(self.record,
+                    self.value_from_id(screen.current_record.id,
+                        screen.current_record.rec_name()))
+                self.display(self.record, self.field)
             self.focus_out = True
         WinForm(screen, callback, new=True)
 
     def sig_edit(self, widget):
+        if not self.focus_out or not self.field:
+            return
         self.changed = False
         value = self.field.get(self.record)
+        model = self.get_model()
+
         self.focus_out = False
-        if value:
+        if model and self.has_target(value):
             screen = self.get_screen()
-            screen.load([self.field.get(self.record)])
+            screen.load([self.id_from_value(self.field.get(self.record))])
 
             def callback(result):
                 if result and screen.save_current():
-                    value = (screen.current_record.id,
-                            screen.current_record.rec_name())
-                    self.field.set_client(self.record, value,
+                    self.field.set_client(self.record,
+                        self.value_from_id(screen.current_record.id,
+                            screen.current_record.rec_name()),
                         force_change=True)
                 elif result:
                     screen.display()
@@ -180,7 +213,7 @@ class Many2One(WidgetInterface):
                 self.changed = True
             WinForm(screen, callback)
             return
-        elif not self._readonly:
+        elif model and not self._readonly:
             domain = self.field.domain_get(self.record)
             context = rpc.CONTEXT.copy()
             context.update(self.field.context_get(self.record))
@@ -193,35 +226,35 @@ class Many2One(WidgetInterface):
                         domain]
                 else:
                     dom = domain
-                ids = rpc.execute('model', self.attrs['relation'],
-                        'search', dom, 0, CONFIG['client.limit'], None,
-                        context)
+                ids = rpc.execute('model', model, 'search', dom, 0,
+                    CONFIG['client.limit'], None, context)
             except TrytonServerError, exception:
                 self.focus_out = True
                 common.process_exception(exception)
                 self.changed = True
                 return False
-            if ids and len(ids) == 1:
-                self.field.set_client(self.record, ids[0],
-                        force_change=True)
+            if len(ids) == 1:
+                self.field.set_client(self.record, self.value_from_id(ids[0]),
+                    force_change=True)
                 self.focus_out = True
                 self.display(self.record, self.field)
                 return True
 
             def callback(ids):
                 if ids:
-                    self.field.set_client(self.record, ids[0],
-                            force_change=True)
+                    self.field.set_client(self.record,
+                        self.value_from_id(ids[0]), force_change=True)
                 self.focus_out = True
                 self.display(self.record, self.field)
                 self.changed = True
-            WinSearch(self.attrs['relation'], callback, sel_multi=False,
+            WinSearch(model, callback, sel_multi=False,
                 ids=ids, context=context, domain=domain,
                 views_preload=self.attrs.get('views', {}))
             return
         self.focus_out = True
         self.display(self.record, self.field)
         self.changed = True
+        return
 
     def sig_key_press(self, widget, event, *args):
         editable = self.wid_text.get_editable()
@@ -239,13 +272,20 @@ class Many2One(WidgetInterface):
     def sig_changed(self, *args):
         if not self.changed:
             return False
-        if self.field.get(self.record):
-            self.field.set_client(self.record, False)
+        value = self.field.get(self.record)
+        if self.has_target(value):
+            self.field.set_client(self.record, self.value_from_id(None, ''))
             self.display(self.record, self.field)
         return False
 
     def set_value(self, record, field):
         pass  # No update of the model, the model is updated in real time !
+
+    def set_text(self, value):
+        if not value:
+            value = ''
+        self.wid_text.set_text(value)
+        self.wid_text.set_position(len(value))
 
     def display(self, record, field):
         self.changed = False
@@ -257,13 +297,12 @@ class Many2One(WidgetInterface):
             return False
         img = self.but_open.get_image()
         current_stock = img.get_stock()[0]
-        res = field.get_client(record) or ''
-        self.wid_text.set_text(res)
-        self.wid_text.set_position(len(res))
-        if res and current_stock != 'tryton-open':
+        self.set_text(field.get_client(record))
+        value = field.get(record)
+        if self.has_target(value) and current_stock != 'tryton-open':
             img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.tooltips.set_tip(self.but_open, _('Open a record'))
-        elif not res and current_stock != 'tryton-find':
+        elif not self.has_target(value) and current_stock != 'tryton-find':
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
             self.tooltips.set_tip(self.but_open, _('Search a record'))
         self.changed = True

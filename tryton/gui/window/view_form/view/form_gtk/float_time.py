@@ -19,6 +19,7 @@ class FloatTime(WidgetInterface):
         self.entry.connect('activate', self.sig_activate)
         self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
+        self.entry.connect('key-press-event', self.send_modified)
         self.widget.pack_start(self.entry)
 
         self.conv = None
@@ -30,6 +31,14 @@ class FloatTime(WidgetInterface):
 
     def grab_focus(self):
         return self.entry.grab_focus()
+
+    @property
+    def modified(self):
+        if self.record and self.field:
+            value = self.entry.get_text()
+            return common.text_to_float_time(self.field.get(self.record),
+                self.conv) != value
+        return False
 
     def set_value(self, record, field):
         value = self.entry.get_text()

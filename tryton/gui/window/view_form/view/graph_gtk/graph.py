@@ -4,7 +4,7 @@
 #(http://www.lorenzogil.com/projects/pycha/)
 import gtk
 from functools import reduce
-from tryton.common import hex2rgb, generateColorscheme, DT_FORMAT, \
+from tryton.common import hex2rgb, generateColorscheme, \
         COLOR_SCHEMES, datetime_strftime
 from tryton.pyson import PYSONDecoder
 import locale
@@ -15,6 +15,7 @@ import tryton.rpc as rpc
 import cairo
 from tryton.action import Action
 from tryton.gui.window import Window
+from tryton.translate import date_format
 
 
 class Popup(object):
@@ -374,7 +375,7 @@ class Graph(gtk.DrawingArea):
         if isinstance(minx, datetime.datetime):
             date = minx
             while date <= maxx:
-                self.labels[date] = datetime_strftime(date, DT_FORMAT)
+                self.labels[date] = datetime_strftime(date, date_format())
                 self.datas.setdefault(date, {})
                 for yfield in self.yfields:
                     self.datas[date].setdefault(
@@ -383,7 +384,7 @@ class Graph(gtk.DrawingArea):
         elif isinstance(minx, datetime.date):
             date = minx
             while date <= maxx:
-                self.labels[date] = datetime_strftime(date, DT_FORMAT)
+                self.labels[date] = datetime_strftime(date, date_format())
                 self.datas.setdefault(date, {})
                 for yfield in self.yfields:
                     self.datas[date].setdefault(

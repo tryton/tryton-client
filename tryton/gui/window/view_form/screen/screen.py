@@ -526,16 +526,17 @@ class Screen(SignalEvent):
         return self.current_record.get_on_change_value(check_load=check_load)
 
     def modified(self):
-        res = False
         if self.current_view.view_type != 'tree':
             if self.current_record:
-                res = (self.current_record.modified
-                    or self.current_record.id < 0)
+                if self.current_record.modified or self.current_record.id < 0:
+                    return True
         else:
             for record in self.group:
                 if record.modified or record.id < 0:
-                    res = True
-        return res
+                    return True
+        if self.current_view.modified:
+            return True
+        return False
 
     def reload(self, written=False):
         ids = self.sel_ids_get()

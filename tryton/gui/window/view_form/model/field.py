@@ -2,8 +2,9 @@
 #this repository contains the full copyright notices and license terms.
 import os
 import tempfile
+import locale
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, datetime_strftime, \
+from tryton.common import datetime_strftime, HM_FORMAT, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
         merge, inverse_leaf, EvalEnvironment, RPCProgress
 import tryton.common as common
@@ -11,6 +12,7 @@ import time
 import datetime
 from decimal import Decimal
 from tryton.exceptions import TrytonServerError
+from tryton.translate import date_format
 
 
 class Field(object):
@@ -98,6 +100,9 @@ class CharField(object):
                 # to the fact that the original domain might be a 'OR' domain
                 # and thus not preventing the modification of fields.
                 leftpart, _, value = inverted_domain[0][:3]
+                if value is False:
+                    # XXX to remove once server domains are fixed
+                    value = None
                 setdefault = True
                 if '.' in leftpart:
                     recordpart, localpart = leftpart.split('.', 1)
@@ -124,7 +129,7 @@ class CharField(object):
         return True
 
     def get(self, record, check_load=True, readonly=True, modified=False):
-        return record.value.get(self.name, False) or False
+        return record.value.get(self.name)
 
     def get_eval(self, record, check_load=True):
         return self.get(record, check_load=check_load, readonly=True,
@@ -134,18 +139,21 @@ class CharField(object):
         return self.get_eval(record, check_load=check_load)
 
     def set_client(self, record, value, force_change=False):
-        internal = record.value.get(self.name, False)
+        previous_value = self.get(record)
         self.set(record, value)
-        if ((internal or False)
-                != (record.value.get(self.name, False) or False)):
+        if previous_value != self.get(record):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
             self.sig_changed(record)
             record.validate(softvalidation=True)
             record.signal('record-changed')
+        elif force_change:
+            self.sig_changed(record)
+            record.validate(softvalidation=True)
+            record.signal('record-changed')
 
     def get_client(self, record):
-        return record.value.get(self.name) or False
+        return record.value.get(self.name) or ''
 
     def set_default(self, record, value, modified=False):
         res = self.set(record, value, modified=modified)
@@ -189,75 +197,78 @@ class CharField(object):
 
 class SelectionField(CharField):
 
-    def set(self, record, value, modified=False):
-        if isinstance(value, (list, tuple)):
-            value = value[0]
-        return super(SelectionField, self).set(record, value,
-                modified=modified)
+    def get_client(self, record):
+        return record.value.get(self.name)
 
 
 class DateTimeField(CharField):
 
     def set_client(self, record, value, force_change=False):
-        if value and not isinstance(value, datetime.datetime):
-            value = datetime.datetime(*time.strptime(value, DHM_FORMAT)[:6])
-        return super(DateTimeField, self).set_client(record, value,
-                force_change=force_change)
+        if not isinstance(value, datetime.datetime):
+            try:
+                value = datetime.datetime(*time.strptime(value,
+                        date_format() + ' ' + HM_FORMAT)[:6])
+                value = common.timezoned_date(value)
+            except ValueError:
+                value = None
+        super(DateTimeField, self).set_client(record, value,
+            force_change=force_change)
 
     def get_client(self, record):
         value = super(DateTimeField, self).get_client(record)
-        if not value:
-            return False
-        return datetime_strftime(value, DHM_FORMAT)
+        if value:
+            value = common.timezoned_date(value)
+            return datetime_strftime(value, date_format() + ' ' + HM_FORMAT)
+        return ''
 
 
 class DateField(CharField):
 
     def set_client(self, record, value, force_change=False):
-        if value and not isinstance(value, datetime.date):
-            value = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
-        return super(DateField, self).set_client(record, value,
-                force_change=force_change)
+        if not isinstance(value, datetime.date):
+            try:
+                value = datetime.date(*time.strptime(value,
+                        date_format())[:3])
+            except ValueError:
+                value = None
+        super(DateField, self).set_client(record, value,
+            force_change=force_change)
 
     def get_client(self, record):
         value = super(DateField, self).get_client(record)
-        if not value:
-            return False
-        return datetime_strftime(value, DT_FORMAT)
+        if value:
+            return datetime_strftime(value, date_format())
+        return ''
 
 
 class FloatField(CharField):
 
     def set_client(self, record, value, force_change=False):
-        internal = record.value.get(self.name)
-        self.set(record, value)
+        if isinstance(value, basestring):
+            try:
+                value = locale.atof(value)
+            except ValueError:
+                value = 0.0
+        super(FloatField, self).set_client(record, value,
+            force_change=force_change)
+
+    def get_client(self, record):
+        value = super(FloatField, self).get_client(record) or 0.0
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        if (abs(float(internal or 0.0) - float(record.value[self.name] or 0.0))
-                >= (10.0 ** (-int(digits[1])))):
-            if not self.get_state_attrs(record).get('readonly', False):
-                record.modified_fields.setdefault(self.name)
-                record.signal('record-modified')
-                self.sig_changed(record)
-                record.validate(softvalidation=True)
-                record.signal('record-changed')
+        return locale.format('%.' + str(digits[1]) + 'f', value, True)
 
 
 class NumericField(CharField):
 
     def set_client(self, record, value, force_change=False):
         value = Decimal(str(value))
-        internal = record.value.get(self.name)
-        self.set(record, value)
+        super(NumericField, self).set_client(record, value,
+            force_change=force_change)
+
+    def get_client(self, record):
+        value = super(NumericField, self).get_client(record) or 0.0
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        if (abs((internal or Decimal('0.0'))
-                    - (record.value[self.name] or Decimal('0.0')))
-                >= Decimal(str(10.0 ** (-int(digits[1]))))):
-            if not self.get_state_attrs(record).get('readonly', False):
-                record.modified_fields.setdefault(self.name)
-                record.signal('record-modified')
-                self.sig_changed(record)
-                record.validate(softvalidation=True)
-                record.signal('record-changed')
+        return locale.format('%.' + str(digits[1]) + 'f', value, True)
 
 
 class IntegerField(CharField):
@@ -265,25 +276,28 @@ class IntegerField(CharField):
     def get(self, record, check_load=True, readonly=True, modified=False):
         return record.value.get(self.name) or 0
 
+    def set_client(self, record, value):
+        if isinstance(value, basestring):
+            try:
+                value = locale.atoi(value)
+            except ValueError:
+                value = 0
+        super(IntegerField, self).set_client(record, value)
+
     def get_client(self, record):
-        return record.value.get(self.name) or 0
+        value = super(IntegerField, self).get_client(record) or 0
+        return locale.format('%d', value, True)
 
 
 class BooleanField(CharField):
 
     def set_client(self, record, value, force_change=False):
         value = bool(value)
-        internal = bool(record.value.get(self.name, False))
-        self.set(record, value)
-        if internal != bool(record.value.get(self.name, False)):
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            self.sig_changed(record)
-            record.validate(softvalidation=True)
-            record.signal('record-changed')
+        super(BooleanField, self).set_client(record, value,
+            force_change=force_change)
 
     def get(self, record, check_load=True, readonly=True, modified=False):
-        return bool(record.value.get(self.name, False))
+        return bool(record.value.get(self.name))
 
     def get_client(self, record):
         return bool(record.value.get(self.name))
@@ -298,41 +312,37 @@ class M2OField(CharField):
         value = record.value.get(self.name)
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
-            value = record.parent.id if record.parent else False
-        if value:
-            if isinstance(value, (int, basestring, long)):
-                self.set(record, value)
-                value = record.value.get(self.name, value)
-            if isinstance(value, (int, basestring, long)):
-                return value
-            return value[0] or False
-        return False
+            value = record.parent.id if record.parent else None
+        return value
 
     def get_client(self, record):
-        value = record.value.get(self.name)
-        if (record.parent_name == self.name
-                and self.attrs['relation'] == record.group.parent.model_name):
-            value = record.parent.id if record.parent else False
-        if value:
-            if isinstance(value, (int, basestring, long)):
-                self.set(record, value)
-                value = record.value.get(self.name, value)
-            if isinstance(value, (int, basestring, long)):
-                return value
-            return value[1]
-        return False
+        rec_name = record.value.get(self.name + '.rec_name')
+        if rec_name is None:
+            self.set(record, self.get(record))
+            rec_name = record.value.get(self.name + '.rec_name') or ''
+        return rec_name
+
+    def set_client(self, record, value, force_change=False):
+        if isinstance(value, (tuple, list)):
+            value, rec_name = value
+            record.value[self.name + '.rec_name'] = rec_name
+        super(M2OField, self).set_client(record, value,
+            force_change=force_change)
 
     def set(self, record, value, modified=False):
+        rec_name = record.value.get(self.name + '.rec_name') or ''
+        if value is False:
+            value = None
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
             if record.parent:
+                value = record.parent.id
                 if 'rec_name' in record.parent.value:
-                    value = (record.parent.id, record.parent.value['rec_name'])
-                else:
-                    value = record.parent.id
+                    rec_name = record.parent.value['rec_name'] or ''
             else:
-                value = False
-        if value and isinstance(value, (int, long)) and value >= 0:
+                value = None
+        if not rec_name and value >= 0:
+            int(value)
             args = ('model', self.attrs['relation'], 'read', value,
                     ['rec_name'], rpc.CONTEXT)
             try:
@@ -341,40 +351,17 @@ class M2OField(CharField):
                 result = common.process_exception(exception, *args)
                 if not result:
                     return
-            value = value, result['rec_name']
-        if value and (isinstance(value, (int, long))
-                or len(value) != 2):
-            value = (False, '')
-            record.value[self.name + '.rec_name'] = ''
-        else:
-            if value:
-                record.value[self.name + '.rec_name'] = value[1]
-            else:
-                record.value[self.name + '.rec_name'] = ''
-        record.value[self.name] = value or (False, '')
+            rec_name = result['rec_name'] or ''
+        record.value[self.name + '.rec_name'] = rec_name
+        record.value[self.name] = value
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
             if record.parent:
-                if 'rec_name' not in record.parent.value:
-                    record.parent.value['rec_name'] = \
-                            record.value[self.name + '.rec_name']
+                if (self.name + 'rec_name') not in record.parent.value:
+                    record.parent.value[self.name + 'rec_name'] = rec_name
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
-            record.signal('record-changed')
-
-    def set_client(self, record, value, force_change=False):
-        internal = record.value.get(self.name) or (False, '')
-        self.set(record, value)
-        if (internal[0] or False) != (record.value[self.name][0] or False):
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            self.sig_changed(record)
-            record.validate(softvalidation=True)
-            record.signal('record-changed')
-        elif force_change:
-            self.sig_changed(record)
-            record.validate(softvalidation=True)
             record.signal('record-changed')
 
     def context_get(self, record, check_load=True, eval_context=True):
@@ -425,7 +412,6 @@ class O2MField(CharField):
         if not record.parent:
             return
         record.parent.modified_fields.setdefault(self.name)
-        record.parent.signal('record-modified')
         self.sig_changed(record.parent)
         record.parent.validate(softvalidation=True)
         record.parent.signal('record-changed')
@@ -437,6 +423,11 @@ class O2MField(CharField):
     def _group_cleared(self, group, signal):
         if group.model_name == group.parent.model_name:
             group.parent.signal('group-cleared')
+
+    def _record_modified(self, group, record):
+        if not record.parent:
+            return
+        record.parent.signal('record-modified')
 
     def _set_default_value(self, record):
         if record.value.get(self.name) is not None:
@@ -455,6 +446,7 @@ class O2MField(CharField):
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
+        group.signal_connect(group, 'record-modified', self._record_modified)
         record.value[self.name] = group
 
     def get_client(self, record):
@@ -533,6 +525,7 @@ class O2MField(CharField):
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
+        group.signal_connect(group, 'record-modified', self._record_modified)
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
@@ -595,6 +588,7 @@ class O2MField(CharField):
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
+        group.signal_connect(group, 'record-modified', self._record_modified)
         return True
 
     def set_on_change(self, record, value):
@@ -722,6 +716,7 @@ class M2MField(O2MField):
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
+        group.signal_connect(group, 'record-modified', self._record_modified)
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
@@ -732,42 +727,40 @@ class ReferenceField(CharField):
 
     def get_client(self, record):
         if record.value.get(self.name):
-            return record.value[self.name]
-        return False
+            model, _ = record.value[self.name]
+            name = record.value.get(self.name + '.rec_name') or ''
+            return model, name
+        else:
+            return None
 
     def get(self, record, check_load=True, readonly=True, modified=False):
         if record.value.get(self.name):
-            if isinstance(record.value[self.name][1], (list, tuple)):
-                return '%s,%s' % (record.value[self.name][0],
-                        str(record.value[self.name][1][0]))
-            else:
-                return '%s,%s' % (record.value[self.name][0],
-                        str(record.value[self.name][1]))
-        return False
+            return ','.join(map(str, record.value[self.name]))
+        return None
 
     def set_client(self, record, value, force_change=False):
-        internal = record.value.get(self.name)
-        self.set(record, value)
-        if (internal or False) != (record.value[self.name] or False):
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            self.sig_changed(record)
-            record.validate(softvalidation=True)
-            record.signal('record-changed')
+        ref_model, ref_id = value
+        if isinstance(ref_id, (tuple, list)):
+            ref_id, rec_name = ref_id
+            record.value[self.name + '.rec_name'] = rec_name
+        super(ReferenceField, self).set_client(record, (ref_model, ref_id),
+            force_change=force_change)
 
     def set(self, record, value, modified=False):
         if not value:
-            record.value[self.name] = False
+            record.value[self.name] = None
             return
         if isinstance(value, basestring):
-            model, ref_id = value.split(',')
-            value = model, (ref_id, record.value.get(self.name + '.rec_name'))
-        ref_model, (ref_id, ref_str) = value
-        if ref_model:
-            ref_id = int(ref_id)
-            if ref_id < 0:
-                ref_str = ''
-            if not ref_str and ref_id >= 0:
+            ref_model, ref_id = value.split(',')
+            if not ref_id:
+                ref_id = None
+            else:
+                ref_id = int(ref_id)
+        else:
+            ref_model, ref_id = value
+        rec_name = record.value.get(self.name + '.rec_name') or ''
+        if ref_model and ref_id >= 0:
+            if not rec_name and ref_id >= 0:
                 args = ('model', ref_model, 'read', ref_id,
                         ['rec_name'], rpc.CONTEXT)
                 try:
@@ -776,20 +769,11 @@ class ReferenceField(CharField):
                     result = common.process_exception(exception, *args)
                     if not result:
                         return
-                result = result['rec_name']
-                if result:
-                    record.value[self.name] = ref_model, (ref_id, result)
-                    record.value[self.name + '.rec_name'] = result
-                else:
-                    record.value[self.name] = ref_model, (-1, '')
-                    record.value[self.name + '.rec_name'] = ''
-            else:
-                record.value[self.name] = ref_model, (ref_id, ref_str)
-                record.value[self.name + '.rec_name'] = ref_str
+                rec_name = result['rec_name']
         else:
-            record.value[self.name] = ref_model, (ref_id, ref_id)
-            if self.name + '.rec_name' in record.value:
-                del record.value[self.name + '.rec_name']
+            rec_name = ''
+        record.value[self.name] = ref_model, ref_id
+        record.value[self.name + '.rec_name'] = rec_name
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
@@ -798,7 +782,7 @@ class ReferenceField(CharField):
 class BinaryField(CharField):
 
     def get(self, record, check_load=True, readonly=True, modified=False):
-        result = record.value.get(self.name, False) or False
+        result = record.value.get(self.name)
         if isinstance(result, basestring):
             try:
                 with open(result, 'rb') as fp:

@@ -5,10 +5,8 @@ import datetime
 import gtk
 import gettext
 from interface import WidgetInterface
-from tryton.common import DT_FORMAT, DHM_FORMAT, HM_FORMAT, \
-        TRYTON_ICON, timezoned_date
-from tryton.common import date_widget, Tooltips, datetime_strftime, \
-        get_toplevel_window
+from tryton.common import HM_FORMAT, TRYTON_ICON
+from tryton.common import date_widget, Tooltips, get_toplevel_window
 from tryton.translate import date_format
 
 _ = gettext.gettext
@@ -17,11 +15,12 @@ _ = gettext.gettext
 class Calendar(WidgetInterface):
     "Calendar"
 
-    def __init__(self, field_name, model_name, attrs=None):
+    def __init__(self, field_name, model_name, attrs=None, format=None):
         super(Calendar, self).__init__(field_name, model_name, attrs=attrs)
 
-        self.format = date_format()
-        self.widget = date_widget.ComplexEntry(self.format, spacing=0)
+        if format is None:
+            format = date_format()
+        self.widget = date_widget.ComplexEntry(format, spacing=0)
         self.entry = self.widget.widget
         self.entry.set_property('activates_default', True)
         self.entry.connect('key_press_event', self.sig_key_press)
@@ -54,7 +53,15 @@ class Calendar(WidgetInterface):
         else:
             self.widget.set_focus_chain([self.entry])
 
+    @property
+    def modified(self):
+        if self.record and self.field:
+            value = self.entry.compute_date(self.entry.get_text())
+            return self.field.get_client(self.record) != value
+        return False
+
     def sig_key_press(self, widget, event):
+        self.send_modified()
         if not self.entry.get_editable():
             return False
         if event.keyval == gtk.keysyms.F2:
@@ -64,18 +71,8 @@ class Calendar(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
-    def get_value(self, record):
-        value = self.entry.get_text()
-        if value == '':
-            return False
-        try:
-            date = datetime.date(*time.strptime(value, self.format)[:3])
-        except ValueError:
-            return False
-        return datetime_strftime(date, DT_FORMAT)
-
     def set_value(self, record, field):
-        field.set_client(record, self.get_value(record))
+        field.set_client(record, self.entry.get_text())
         return True
 
     def display(self, record, field):
@@ -87,10 +84,6 @@ class Calendar(WidgetInterface):
         if not value:
             self.entry.clear()
         else:
-            if len(value) > 10:
-                value = value[:10]
-            date = datetime.date(*time.strptime(value, DT_FORMAT)[:3])
-            value = datetime_strftime(date, self.format)
             if len(value) > self.entry.get_width_chars():
                 self.entry.set_width_chars(len(value))
             self.entry.set_text(value)
@@ -115,105 +108,29 @@ class Calendar(WidgetInterface):
         win.vbox.pack_start(cal, expand=True, fill=True)
         win.show_all()
 
-        try:
-            val = self.get_value(self.record)
-            if val:
-                cal.select_month(int(val[5:7]) - 1, int(val[0:4]))
-                cal.select_day(int(val[8:10]))
-        except ValueError:
-            pass
+        self.set_value(self.record, self.field)
+        val = self.field.get(self.record)
+        if val:
+            cal.select_month(val.month - 1, val.year)
+            cal.select_day(val.day)
 
         response = win.run()
         if response == gtk.RESPONSE_OK:
             year, month, day = cal.get_date()
             date = datetime.date(year, month + 1, day)
-            self.entry.set_text(datetime_strftime(date, self.format))
+            self.field.set_client(self.record, date)
+            self.display(self.record, self.field)
         self._focus_out()
         parent.present()
         win.destroy()
 
 
-class DateTime(WidgetInterface):
+class DateTime(Calendar):
     "DateTime"
 
     def __init__(self, field_name, model_name, attrs=None):
-        super(DateTime, self).__init__(field_name, model_name, attrs=attrs)
-
-        self.format = date_format() + ' ' + HM_FORMAT
-        self.widget = date_widget.ComplexEntry(self.format, spacing=0)
-        self.entry = self.widget.widget
-        self.entry.set_property('activates_default', True)
-        self.entry.connect('key_press_event', self.sig_key_press)
-        self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
-        self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
-
-        self.but_open = gtk.Button()
-        img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        self.but_open.set_image(img_find)
-        self.but_open.set_relief(gtk.RELIEF_NONE)
-        self.but_open.connect('clicked', self.cal_open)
-        self.but_open.set_alignment(0.5, 0.5)
-        self.widget.pack_start(self.but_open, expand=False, fill=False)
-        self.widget.set_focus_chain([self.entry])
-
-        tooltips = Tooltips()
-        tooltips.set_tip(self.but_open, _('Open the calendar'))
-        tooltips.enable()
-
-    def _color_widget(self):
-        return self.entry
-
-    def _readonly_set(self, value):
-        self.entry.set_editable(not value)
-        self.but_open.set_sensitive(not value)
-        if value:
-            self.widget.set_focus_chain([])
-        else:
-            self.widget.set_focus_chain([self.entry])
-
-    def sig_key_press(self, widget, event):
-        if not self.entry.get_editable():
-            return False
-        if event.keyval == gtk.keysyms.F2:
-            self.cal_open(widget)
-            return True
-
-    def grab_focus(self):
-        return self.entry.grab_focus()
-
-    def get_value(self, record, timezone=True):
-        value = self.entry.get_text()
-        if value == '':
-            return False
-        try:
-            date = datetime.datetime(*time.strptime(value, self.format)[:6])
-        except ValueError:
-            return False
-        date = timezoned_date(date)
-        return datetime_strftime(date, DHM_FORMAT)
-
-    def set_value(self, record, field):
-        field.set_client(record, self.get_value(record))
-        return True
-
-    def display(self, record, field):
-        super(DateTime, self).display(record, field)
-        if not field:
-            return self.show(False)
-        self.show(field.get_client(record))
-
-    def show(self, dt_val, timezone=True):
-        if not dt_val:
-            self.entry.clear()
-        else:
-            date = datetime.datetime(*time.strptime(dt_val, DHM_FORMAT)[:6])
-            date = timezoned_date(date)
-            value = datetime_strftime(date, self.format)
-            if len(value) > self.entry.get_width_chars():
-                self.entry.set_width_chars(len(value))
-            self.entry.set_text(value)
-        return True
+        super(DateTime, self).__init__(field_name, model_name, attrs=attrs,
+            format=date_format() + ' ' + HM_FORMAT)
 
     def cal_open(self, widget):
         parent = get_toplevel_window()
@@ -245,18 +162,16 @@ class DateTime(WidgetInterface):
         win.vbox.pack_start(cal, expand=True, fill=True)
         win.show_all()
 
-        try:
-            val = self.get_value(self.record, timezone=False)
-            if val:
-                widget_hour.set_value(int(val[11:13]))
-                widget_minute.set_value(int(val[-5:-3]))
-                cal.select_month(int(val[5:7]) - 1, int(val[0:4]))
-                cal.select_day(int(val[8:10]))
-            else:
-                widget_hour.set_value(time.localtime()[3])
-                widget_minute.set_value(time.localtime()[4])
-        except ValueError:
-            pass
+        self.set_value(self.record, self.field)
+        val = self.field.get(self.record)
+        if val:
+            widget_hour.set_value(val.hour)
+            widget_minute.set_value(val.minute)
+            cal.select_month(val.month - 1, val.year)
+            cal.select_day(val.day)
+        else:
+            widget_hour.set_value(time.localtime()[3])
+            widget_minute.set_value(time.localtime()[4])
         response = win.run()
         if response == gtk.RESPONSE_OK:
             hour = int(widget_hour.get_value())
@@ -265,8 +180,8 @@ class DateTime(WidgetInterface):
             month = int(cal.get_date()[1]) + 1
             day = int(cal.get_date()[2])
             date = datetime.datetime(year, month, day, hour, minute)
-            value = datetime_strftime(date, DHM_FORMAT)
-            self.show(value, timezone=False)
+            self.field.set_client(self.record, date)
+            self.display(self.record, self.field)
         self._focus_out()
         parent.present()
         win.destroy()

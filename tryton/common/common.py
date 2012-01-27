@@ -1272,9 +1272,7 @@ COLORS = {
     'required': '#d2d2ff',
 }
 
-DT_FORMAT = '%Y-%m-%d'
 HM_FORMAT = '%H:%M:%S'
-DHM_FORMAT = DT_FORMAT + ' ' + HM_FORMAT
 
 FLOAT_TIME_CONV = {
     'Y': 8760,

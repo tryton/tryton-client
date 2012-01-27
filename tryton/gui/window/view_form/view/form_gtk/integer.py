@@ -9,6 +9,7 @@ class Integer(Char):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Integer, self).__init__(field_name, model_name, attrs=attrs)
+        self._default_value = 0
         self.entry.set_width_chars(8)
         _, _, padding, pack_type = self.widget.query_child_packing(
             self.entry)
@@ -19,11 +20,7 @@ class Integer(Char):
         self.entry.connect('insert_text', self.sig_insert_text)
 
     def set_value(self, record, field):
-        try:
-            value = locale.atoi(self.entry.get_text())
-        except ValueError:
-            value = 0
-        return field.set_client(record, value)
+        return field.set_client(record, self.entry.get_text())
 
     def display(self, record, field):
         # skip Char call because set_text doesn't work with int
@@ -31,8 +28,7 @@ class Integer(Char):
         if not field:
             self.entry.set_text('')
             return False
-        self.entry.set_text(locale.format('%d',
-            field.get(record) or 0, True))
+        self.entry.set_text(field.get_client(record))
 
     def sig_insert_text(self, entry, new_text, new_text_length, position):
         value = entry.get_text()

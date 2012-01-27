@@ -15,6 +15,7 @@ class Char(WidgetInterface):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Char, self).__init__(field_name, model_name, attrs=attrs)
+        self._default_value = ''
 
         self.widget = gtk.HBox()
         self.autocomplete = bool(attrs.get('autocomplete'))
@@ -38,6 +39,7 @@ class Char(WidgetInterface):
         focus_entry.connect('activate', self.sig_activate)
         focus_entry.connect('focus-in-event', lambda x, y: self._focus_in())
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
+        focus_entry.connect('key-press-event', self.send_modified)
         self.widget.pack_start(self.entry)
 
     def _color_widget(self):
@@ -48,9 +50,17 @@ class Char(WidgetInterface):
     def grab_focus(self):
         return self.entry.grab_focus()
 
+    @property
+    def modified(self):
+        if self.record and self.field:
+            entry = self.entry.get_child() if self.autocomplete else self.entry
+            value = entry.get_text() or self._default_value
+            return self.field.get_client(self.record) != value
+        return False
+
     def set_value(self, record, field):
         entry = self.entry.get_child() if self.autocomplete else self.entry
-        value = entry.get_text() or False
+        value = entry.get_text() or self._default_value
         return field.set_client(record, value)
 
     def display(self, record, field):
@@ -67,7 +77,7 @@ class Char(WidgetInterface):
         if not field:
             value = ''
         else:
-            value = field.get(record) or ''
+            value = field.get_client(record)
 
         if not self.autocomplete:
             self.entry.set_text(value)

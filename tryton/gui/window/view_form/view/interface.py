@@ -33,3 +33,7 @@ class ParserView(object):
 
     def get_fields(self):
         return self.children.keys()
+
+    @property
+    def modified(self):
+        return False

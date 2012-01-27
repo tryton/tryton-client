@@ -131,7 +131,7 @@ class Record(SignalEvent):
         if check_load:
             self._check_load([field_name])
         group = self.value.get(field_name)
-        if group is False or group is None:
+        if group is None:
             return []
 
         if id(group.fields) != id(self.group.fields):
@@ -389,18 +389,11 @@ class Record(SignalEvent):
         for fieldname, value in val.items():
             if fieldname not in self.group.fields:
                 continue
-            if isinstance(self.group.fields[fieldname], fields.M2OField):
-                if fieldname + '.rec_name' in val:
-                    value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.group.fields[fieldname],
-                    fields.ReferenceField):
-                if value:
-                    ref_model, ref_id = value.split(',', 1)
-                    if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id,
-                            val[fieldname + '.rec_name'])
-                    else:
-                        value = ref_model, (ref_id, ref_id)
+            if isinstance(self.group.fields[fieldname], (fields.M2OField,
+                        fields.ReferenceField)):
+                field_rec_name = fieldname + '.rec_name'
+                if field_rec_name in val:
+                    self.value[field_rec_name] = val[field_rec_name]
             self.group.fields[fieldname].set_default(self, value,
                 modified=modified)
             self._loaded.add(fieldname)
@@ -419,18 +412,11 @@ class Record(SignalEvent):
             if isinstance(self.group.fields[fieldname], fields.O2MField):
                 later[fieldname] = value
                 continue
-            if isinstance(self.group.fields[fieldname], fields.M2OField):
-                if fieldname + '.rec_name' in val:
-                    value = (value, val[fieldname + '.rec_name'])
-            elif isinstance(self.group.fields[fieldname],
-                    fields.ReferenceField):
-                if value:
-                    ref_model, ref_id = value.split(',', 1)
-                    if fieldname + '.rec_name' in val:
-                        value = ref_model, (ref_id,
-                            val[fieldname + '.rec_name'])
-                    else:
-                        value = ref_model, (ref_id, ref_id)
+            if isinstance(self.group.fields[fieldname], (fields.M2OField,
+                        fields.ReferenceField)):
+                field_rec_name = fieldname + '.rec_name'
+                if field_rec_name in val:
+                    self.value[field_rec_name] = val[field_rec_name]
             self.group.fields[fieldname].set(self, value, modified=False)
             self._loaded.add(fieldname)
         for fieldname, value in later.iteritems():

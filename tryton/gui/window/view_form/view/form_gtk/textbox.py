@@ -29,6 +29,7 @@ class TextBox(WidgetInterface):
         self.textview.connect('focus-in-event', lambda x, y: self._focus_in())
         self.textview.connect('focus-out-event',
             lambda x, y: self._focus_out())
+        self.textview.connect('key-press-event', self.send_modified)
         self.scrolledwindow.add(self.textview)
         self.scrolledwindow.show_all()
 
@@ -75,12 +76,20 @@ class TextBox(WidgetInterface):
     def _color_widget(self):
         return self.textview
 
-    def set_value(self, record, field):
+    @property
+    def modified(self):
+        if self.record and self.field:
+            return self.field.get_client(self.record) != self.get_value()
+        return False
+
+    def get_value(self):
         buf = self.textview.get_buffer()
         iter_start = buf.get_start_iter()
         iter_end = buf.get_end_iter()
-        current_text = buf.get_text(iter_start, iter_end, False)
-        field.set_client(record, current_text or False)
+        return buf.get_text(iter_start, iter_end, False)
+
+    def set_value(self, record, field):
+        field.set_client(record, self.get_value())
 
     def display(self, record, field):
         super(TextBox, self).display(record, field)

@@ -204,6 +204,10 @@ class One2Many(WidgetInterface):
         self.screen.switch_view()
         self.color_set(self.color_name)
 
+    @property
+    def modified(self):
+        return self.screen.current_view.modified
+
     def color_set(self, name):
         super(One2Many, self).color_set(name)
         widget = self._color_widget()

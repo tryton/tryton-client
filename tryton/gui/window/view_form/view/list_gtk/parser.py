@@ -11,7 +11,7 @@ from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import CONFIG
 import tryton.rpc as rpc
-from tryton.common import DT_FORMAT, DHM_FORMAT, COLORS, node_attributes, \
+from tryton.common import COLORS, node_attributes, \
         HM_FORMAT, file_selection, file_open
 import tryton.common as common
 from tryton.exceptions import TrytonError, TrytonServerError
@@ -276,6 +276,7 @@ class Char(object):
         self.model_name = model_name
         self.attrs = attrs or {}
         self.renderer = CellRendererText()
+        self.renderer.connect('editing-started', self.editing_started)
         self.treeview = treeview
 
     def setter(self, column, cell, store, iter):
@@ -356,13 +357,22 @@ class Char(object):
     def get_textual_value(self, record):
         if not record:
             return ''
-        return record[self.field_name].get_client(record) or ''
+        return record[self.field_name].get_client(record)
 
     def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
         field.set_client(record, text)
         if callback:
             callback()
+
+    def editing_started(self, cell, editable, path):
+        store = self.treeview.get_model()
+        record = store.get_value(store.get_iter(path), 0)
+
+        def send():
+            record.signal('record-modified')
+        gobject.idle_add(send)
+        return False
 
 
 class Int(Char):
@@ -371,16 +381,7 @@ class Int(Char):
         super(Int, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
         self.renderer = CellRendererInteger()
-
-    def value_from_text(self, record, text, callback=None):
-        field = record[self.field_name]
-        field.set_client(record, int(text))
-        if callback:
-            callback()
-
-    def get_textual_value(self, record):
-        return locale.format('%d',
-                record[self.field_name].get_client(record) or 0, True)
+        self.renderer.connect('editing-started', self.editing_started)
 
 
 class Boolean(Int):
@@ -390,9 +391,6 @@ class Boolean(Int):
             attrs=attrs)
         self.renderer = CellRendererToggle()
         self.renderer.connect('toggled', self._sig_toggled)
-
-    def get_textual_value(self, record):
-        return record[self.field_name].get_client(record)
 
     def _sig_toggled(self, renderer, path):
         store = self.treeview.get_model()
@@ -406,65 +404,20 @@ class Boolean(Int):
 
 
 class Date(Char):
-    server_format = DT_FORMAT
 
     def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Date, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
-        self.display_format = date_format()
-        self.renderer = CellRendererDate(self.display_format)
-
-    def get_textual_value(self, record):
-        value = record[self.field_name].get_client(record)
-        if not value:
-            return ''
-        date = datetime.date(*time.strptime(value, self.server_format)[:3])
-        return common.datetime_strftime(date, self.display_format)
-
-    def value_from_text(self, record, text, callback=None):
-        field = record[self.field_name]
-        date = False
-        try:
-            date = datetime.date(*time.strptime(text, self.display_format)[:3])
-            date = common.datetime_strftime(date, self.server_format)
-        except ValueError:
-            date = False
-        field.set_client(record, date)
-        if callback:
-            callback()
+        self.renderer = CellRendererDate(date_format())
+        self.renderer.connect('editing-started', self.editing_started)
 
 
 class Datetime(Date):
-    server_format = DHM_FORMAT
 
     def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Datetime, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
-        self.display_format = date_format() + ' ' + HM_FORMAT
-        self.renderer.format = self.display_format
-
-    def get_textual_value(self, record):
-        value = record[self.field_name].get_client(record)
-        if not value:
-            return ''
-        date = datetime.datetime(*time.strptime(value,
-            self.server_format)[:6])
-        date = common.timezoned_date(date)
-        return common.datetime_strftime(date, self.display_format)
-
-    def value_from_text(self, record, text, callback=None):
-        field = record[self.field_name]
-        date = False
-        try:
-            date = datetime.datetime(*time.strptime(text,
-                self.display_format)[:6])
-            date = common.timezoned_date(date)
-            date = common.datetime_strftime(date, self.server_format)
-        except ValueError:
-            date = False
-        field.set_client(record, date)
-        if callback:
-            callback()
+        self.renderer.format = date_format() + ' ' + HM_FORMAT
 
 
 class Float(Char):
@@ -473,6 +426,7 @@ class Float(Char):
         super(Float, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
         self.renderer = CellRendererFloat()
+        self.renderer.connect('editing-started', self.editing_started)
 
     def setter(self, column, cell, store, iter):
         super(Float, self).setter(column, cell, store, iter)
@@ -480,22 +434,6 @@ class Float(Char):
         field = record[self.field_name]
         digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
         cell.digits = digits
-
-    def get_textual_value(self, record):
-        field = record[self.field_name]
-        digit = record.expr_eval(field.attrs.get('digits', (16, 2)))[1]
-        return locale.format('%.' + str(digit) + 'f',
-                record[self.field_name].get_client(record) or 0.0, True)
-
-    def value_from_text(self, record, text, callback=None):
-        field = record[self.field_name]
-        try:
-            value = locale.atof(text)
-        except ValueError:
-            value = 0.0
-        field.set_client(record, value)
-        if callback:
-            callback()
 
 
 class FloatTime(Char):
@@ -508,7 +446,7 @@ class FloatTime(Char):
             self.conv = rpc.CONTEXT.get(attrs['float_time'])
 
     def get_textual_value(self, record):
-        val = record[self.field_name].get_client(record)
+        val = record[self.field_name].get(record)
         return common.float_time_to_text(val, self.conv)
 
     def value_from_text(self, record, text, callback=None):
@@ -865,8 +803,6 @@ class Selection(Char):
     def get_textual_value(self, record):
         self.update_selection(record)
         value = record[self.field_name].get(record)
-        if isinstance(value, (list, tuple)):
-            value = value[0]
         return dict(self.selection).get(value, '')
 
     def value_from_text(self, record, text, callback=None):
@@ -876,6 +812,7 @@ class Selection(Char):
             callback()
 
     def editing_started(self, cell, editable, path):
+        super(Selection, self).editing_started(cell, editable, path)
         store = self.treeview.get_model()
         record = store.get_value(store.get_iter(path), 0)
         self.update_selection(record)
@@ -943,9 +880,9 @@ class Reference(Char):
     def get_textual_value(self, record):
         value = record[self.field_name].get_client(record)
         if not value:
-            model, (obj_id, name) = '', (-1, '')
+            model, name = '', ''
         else:
-            model, (obj_id, name) = value
+            model, name = value
         if model:
             return self._selection.get(model, model) + ',' + name
         else:

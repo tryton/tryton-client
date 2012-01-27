@@ -226,6 +226,7 @@ class Group(SignalEvent, list):
             self.signal('group-changed', new_records[0])
 
         if new_records and modified:
+            new_records[0].signal('record-modified')
             new_records[0].signal('record-changed')
 
         self.current_idx = 0

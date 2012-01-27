@@ -1,3 +1,5 @@
+* Activate save button on editing
+* Refactor set/get and set/get_client of fields
 * Display binary size alongside the buttons in treeview
 * Set correctly the focus on tab switching
 * Add shortcut to focus search entry

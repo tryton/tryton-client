@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
+import gobject
 from tryton.common import COLORS
 
 
@@ -50,6 +51,16 @@ class WidgetInterface(object):
 
     def grab_focus(self):
         return self.widget.grab_focus()
+
+    @property
+    def modified(self):
+        return False
+
+    def send_modified(self, *args):
+        def send():
+            self.record.signal('record-modified')
+        gobject.idle_add(send)
+        return False
 
     def color_set(self, name):
         self.color_name = name

@@ -335,6 +335,11 @@ class ViewList(ParserView):
             self.widget_tree.set_expander_column(
                 self.widget_tree.get_column(0))
 
+    @property
+    def modified(self):
+        return any(c.renderer.props.editing
+            for c in self.widget_tree.cells.itervalues())
+
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]
 
