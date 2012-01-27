@@ -74,6 +74,8 @@ class CellRendererBinary(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
+        if event is None:
+            return
         button_width = self.button_width()
 
         for index, button_name in enumerate(self.buttons):
@@ -92,7 +94,7 @@ class CellRendererBinary(gtk.GenericCellRenderer):
             return
         if not self.size and button_name == 'save':
             return
-        if event is None or event.type == gtk.gdk.BUTTON_PRESS:
+        if event.type == gtk.gdk.BUTTON_PRESS:
             self.clicking = button_name
             self.emit(button_name, path)
 
