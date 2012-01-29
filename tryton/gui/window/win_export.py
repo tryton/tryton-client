@@ -325,7 +325,7 @@ class WinExport(object):
         try:
             new_id = rpc.execute(*args)
         except TrytonServerError, exception:
-            new_id = common.process_exception(exception, self.dialog, *args)
+            new_id = common.process_exception(exception, *args)
             if not new_id:
                 return
         self.predef_model.append((
@@ -346,7 +346,7 @@ class WinExport(object):
         try:
             rpc.execute(*args)
         except TrytonServerError, exception:
-            if not common.process_exception(exception, self.dialog, *args):
+            if not common.process_exception(exception, *args):
                 return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
@@ -442,6 +442,6 @@ class WinExport(object):
             datas = rpc.execute('model', model,
                     'export_data', ids, fields, ctx)
         except TrytonServerError, exception:
-            common.process_exception(exception, self.dialog)
+            common.process_exception(exception)
             return []
         return datas
