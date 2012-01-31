@@ -71,8 +71,9 @@ class Many2Many(WidgetInterface):
         frame.set_shadow_type(gtk.SHADOW_OUT)
         self.widget.pack_start(frame, expand=False, fill=True)
 
-        self.screen = Screen(attrs['relation'], mode=['tree'],
-            views_preload=attrs.get('views', {}),
+        self.screen = Screen(attrs['relation'],
+            view_ids=attrs.get('view_ids').split(','),
+            mode=['tree'], views_preload=attrs.get('views', {}),
             row_activate=self._on_activate)
         self.screen.signal_connect(self, 'record-message', self._sig_label)
 
@@ -150,8 +151,9 @@ class Many2Many(WidgetInterface):
             self.wid_text.set_text('')
         if len(ids) != 1 or not value:
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
-                    ids=ids, context=context, domain=domain,
-                    views_preload=self.attrs.get('views', {}))
+                ids=ids, context=context, domain=domain,
+                views_ids=self.attrs.get('views_ids').split(','),
+                views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
 

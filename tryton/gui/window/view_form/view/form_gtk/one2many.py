@@ -158,6 +158,7 @@ class One2Many(WidgetInterface):
 
         self.screen = Screen(attrs['relation'],
             mode=attrs.get('mode', 'tree,form').split(','),
+            view_ids=attrs.get('view_ids', '').split(','),
             views_preload=attrs.get('views', {}),
             row_activate=self._on_activate,
             exclude_field=attrs.get('relation_field', None))
@@ -332,6 +333,7 @@ class One2Many(WidgetInterface):
         if len(ids) != 1:
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
+                view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
