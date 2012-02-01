@@ -373,12 +373,14 @@ class Form(SignalEvent, TabContent):
             return
         self.screen.display_prev()
         self.message_info('')
+        self.activate_save()
 
     def sig_next(self, widget=None):
         if not self.modified_save():
             return
         self.screen.display_next()
         self.message_info('')
+        self.activate_save()
 
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
@@ -476,7 +478,6 @@ class Form(SignalEvent, TabContent):
         self.activate_save()
 
     def _record_modified(self, screen, signal_data):
-        self.message_info('', color='white')
         self.activate_save()
 
     def _record_saved(self, screen, signal_data):
