@@ -281,7 +281,9 @@ class WinForm(NoModal):
 
         if len(ids) != 1:
             WinSearch(model_name, callback, sel_multi=True,
-                ids=ids, context=context, domain=domain)
+                ids=ids, context=context, domain=domain,
+                view_ids=self.attrs.get('view_ids').split(','),
+                views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
 

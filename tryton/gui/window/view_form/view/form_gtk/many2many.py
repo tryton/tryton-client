@@ -37,6 +37,7 @@ class Many2Many(WidgetInterface):
         self.wid_text.set_property('width_chars', 13)
         self.wid_text.connect('activate', self._sig_activate)
         self.wid_text.connect('focus-out-event', self._focus_out)
+        self.focus_out = True
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_add = gtk.Button()
@@ -70,8 +71,9 @@ class Many2Many(WidgetInterface):
         frame.set_shadow_type(gtk.SHADOW_OUT)
         self.widget.pack_start(frame, expand=False, fill=True)
 
-        self.screen = Screen(attrs['relation'], mode=['tree'],
-            views_preload=attrs.get('views', {}),
+        self.screen = Screen(attrs['relation'],
+            view_ids=attrs.get('view_ids').split(','),
+            mode=['tree'], views_preload=attrs.get('views', {}),
             row_activate=self._on_activate)
         self.screen.signal_connect(self, 'record-message', self._sig_label)
 
@@ -119,10 +121,13 @@ class Many2Many(WidgetInterface):
             self._sig_add()
 
     def _sig_add(self, *args):
+        if not self.focus_out:
+            return
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
         value = self.wid_text.get_text()
 
+        self.focus_out = False
         try:
             if value:
                 dom = [('rec_name', 'ilike', '%' + value + '%'), domain]
@@ -132,20 +137,23 @@ class Many2Many(WidgetInterface):
                 dom, 0, CONFIG['client.limit'], None, context)
         except TrytonServerError, exception:
             common.process_exception(exception)
+            self.focus_out = True
             return False
 
         def callback(ids):
             res_id = None
             if ids:
                 res_id = ids[0]
+            self.focus_out = True
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
             self.screen.set_cursor()
             self.wid_text.set_text('')
         if len(ids) != 1 or not value:
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
-                    ids=ids, context=context, domain=domain,
-                    views_preload=self.attrs.get('views', {}))
+                ids=ids, context=context, domain=domain,
+                views_ids=self.attrs.get('views_ids').split(','),
+                views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
 

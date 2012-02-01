@@ -14,7 +14,7 @@ _ = gettext.gettext
 class WinSearch(NoModal):
 
     def __init__(self, model, callback, sel_multi=True, ids=None, context=None,
-            domain=None, views_preload=None):
+            domain=None, view_ids=None, views_preload=None):
         NoModal.__init__(self)
         if views_preload is None:
             views_preload = {}
@@ -50,7 +50,7 @@ class WinSearch(NoModal):
         self.win.vbox.pack_start(scrollwindow, expand=True, fill=True)
 
         self.screen = Screen(model, domain=domain, mode=['tree'],
-            context=context, views_preload=views_preload,
+            context=context, view_ids=view_ids, views_preload=views_preload,
             row_activate=self.sig_activate)
         self.view = self.screen.current_view
         self.view.unset_editable()
