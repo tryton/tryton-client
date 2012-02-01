@@ -30,6 +30,8 @@ class Field(object):
 
 class CharField(object):
 
+    _default = ''
+
     def __init__(self, attrs):
         self.attrs = attrs
         self.name = attrs['name']
@@ -129,7 +131,7 @@ class CharField(object):
         return True
 
     def get(self, record, check_load=True, readonly=True, modified=False):
-        return record.value.get(self.name)
+        return record.value.get(self.name) or self._default
 
     def get_eval(self, record, check_load=True):
         return self.get(record, check_load=check_load, readonly=True,
@@ -153,7 +155,7 @@ class CharField(object):
             record.signal('record-changed')
 
     def get_client(self, record):
-        return record.value.get(self.name) or ''
+        return record.value.get(self.name) or self._default
 
     def set_default(self, record, value, modified=False):
         res = self.set(record, value, modified=modified)
@@ -197,11 +199,15 @@ class CharField(object):
 
 class SelectionField(CharField):
 
+    _default = None
+
     def get_client(self, record):
         return record.value.get(self.name)
 
 
 class DateTimeField(CharField):
+
+    _default = None
 
     def set_client(self, record, value, force_change=False):
         if not isinstance(value, datetime.datetime):
@@ -210,7 +216,7 @@ class DateTimeField(CharField):
                         date_format() + ' ' + HM_FORMAT)[:6])
                 value = common.timezoned_date(value)
             except ValueError:
-                value = None
+                value = self._default
         super(DateTimeField, self).set_client(record, value,
             force_change=force_change)
 
@@ -224,13 +230,15 @@ class DateTimeField(CharField):
 
 class DateField(CharField):
 
+    _default = None
+
     def set_client(self, record, value, force_change=False):
         if not isinstance(value, datetime.date):
             try:
                 value = datetime.date(*time.strptime(value,
                         date_format())[:3])
             except ValueError:
-                value = None
+                value = self._default
         super(DateField, self).set_client(record, value,
             force_change=force_change)
 
@@ -243,53 +251,62 @@ class DateField(CharField):
 
 class FloatField(CharField):
 
+    _default = 0.0
+
     def set_client(self, record, value, force_change=False):
         if isinstance(value, basestring):
             try:
                 value = locale.atof(value)
             except ValueError:
-                value = 0.0
+                value = self._default
         super(FloatField, self).set_client(record, value,
             force_change=force_change)
 
     def get_client(self, record):
-        value = super(FloatField, self).get_client(record) or 0.0
+        value = super(FloatField, self).get_client(record)
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
         return locale.format('%.' + str(digits[1]) + 'f', value, True)
 
 
 class NumericField(CharField):
 
+    _default = Decimal(0)
+
     def set_client(self, record, value, force_change=False):
-        value = Decimal(str(value))
+        if isinstance(value, basestring):
+            try:
+                value = Decimal(str(locale.atof(value, Decimal)))
+            except ValueError:
+                value = self._default
         super(NumericField, self).set_client(record, value,
             force_change=force_change)
 
     def get_client(self, record):
-        value = super(NumericField, self).get_client(record) or 0.0
+        value = super(NumericField, self).get_client(record)
         digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
         return locale.format('%.' + str(digits[1]) + 'f', value, True)
 
 
 class IntegerField(CharField):
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
-        return record.value.get(self.name) or 0
+    _default = 0
 
     def set_client(self, record, value):
         if isinstance(value, basestring):
             try:
                 value = locale.atoi(value)
             except ValueError:
-                value = 0
+                value = self._default
         super(IntegerField, self).set_client(record, value)
 
     def get_client(self, record):
-        value = super(IntegerField, self).get_client(record) or 0
+        value = super(IntegerField, self).get_client(record)
         return locale.format('%d', value, True)
 
 
 class BooleanField(CharField):
+
+    _default = False
 
     def set_client(self, record, value, force_change=False):
         value = bool(value)
@@ -307,6 +324,8 @@ class M2OField(CharField):
     '''
     internal = (id, name)
     '''
+
+    _default = None
 
     def get(self, record, check_load=True, readonly=True, modified=False):
         value = record.value.get(self.name)
@@ -398,6 +417,8 @@ class O2MField(CharField):
     '''
     internal = Group of the related objects
     '''
+
+    _default = None
 
     def __init__(self, attrs):
         super(O2MField, self).__init__(attrs)
@@ -725,6 +746,8 @@ class M2MField(O2MField):
 
 class ReferenceField(CharField):
 
+    _default = None
+
     def get_client(self, record):
         if record.value.get(self.name):
             model, _ = record.value[self.name]
@@ -748,7 +771,7 @@ class ReferenceField(CharField):
 
     def set(self, record, value, modified=False):
         if not value:
-            record.value[self.name] = None
+            record.value[self.name] = self._default
             return
         if isinstance(value, basestring):
             ref_model, ref_id = value.split(',')
@@ -781,8 +804,10 @@ class ReferenceField(CharField):
 
 class BinaryField(CharField):
 
+    _default = None
+
     def get(self, record, check_load=True, readonly=True, modified=False):
-        result = record.value.get(self.name)
+        result = record.value.get(self.name) or self._default
         if isinstance(result, basestring):
             try:
                 with open(result, 'rb') as fp:
