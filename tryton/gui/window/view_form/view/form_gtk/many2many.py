@@ -152,7 +152,7 @@ class Many2Many(WidgetInterface):
         if len(ids) != 1 or not value:
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
-                views_ids=self.attrs.get('views_ids').split(','),
+                view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
         else:
             callback(ids)
