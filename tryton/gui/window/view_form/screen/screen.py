@@ -327,7 +327,8 @@ class Screen(SignalEvent):
         if not self.current_record and self.current_view.view_type == 'form':
             self.new(default=default, context=context)
         self.current_view.cancel()
-        self.display(set_cursor=True)
+        self.display()
+        self.set_cursor()
 
     def load_view_to_load(self):
         if len(self.view_to_load):
