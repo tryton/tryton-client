@@ -545,7 +545,7 @@ class ParserForm(ParserInterface):
         return container.pop(), dict_widget, button_list, on_write, \
                 notebook_list, cursor_widget
 
-from calendar import Calendar, DateTime
+from calendar import Calendar, DateTime, Time
 from float import Float
 from integer import Integer
 from selection import Selection
@@ -567,6 +567,7 @@ from one2one import One2One
 WIDGETS_TYPE = {
     'date': (Calendar, 1, False, False),
     'datetime': (DateTime, 1, False, False),
+    'time': (Time, 1, False, False),
     'float': (Float, 1, False, False),
     'numeric': (Float, 1, False, False),
     'integer': (Integer, 1, False, False),

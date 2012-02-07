@@ -185,3 +185,15 @@ class DateTime(Calendar):
         self._focus_out()
         parent.present()
         win.destroy()
+
+
+class Time(Calendar):
+    "Time"
+
+    def __init__(self, field_name, model_name, attrs=None):
+        super(Time, self).__init__(field_name, model_name, attrs=attrs,
+            format=HM_FORMAT)
+        self.widget.remove(self.but_open)
+
+    def sig_key_press(self, widget, event):
+        self.send_modified()

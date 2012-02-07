@@ -44,6 +44,8 @@ def object_hook(dct):
                     dct['hour'], dct['minute'], dct['second'])
         elif dct['__class__'] == 'date':
             return datetime.date(dct['year'], dct['month'], dct['day'])
+        elif dct['__class__'] == 'time':
+            return datetime.time(dct['hour'], dct['minute'], dct['second'])
         elif dct['__class__'] == 'buffer':
             return buffer(base64.decodestring(dct['base64']))
         elif dct['__class__'] == 'Decimal':
@@ -74,6 +76,12 @@ class JSONEncoder(json.JSONEncoder):
                     'month': obj.month,
                     'day': obj.day,
                     }
+        elif isinstance(obj, datetime.time):
+            return {'__class__': 'time',
+                'hour': obj.hour,
+                'minute': obj.minute,
+                'second': obj.second,
+                }
         elif isinstance(obj, buffer):
             return {'__class__': 'buffer',
                 'base64': base64.encodestring(obj),

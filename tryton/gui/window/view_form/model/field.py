@@ -249,6 +249,24 @@ class DateField(CharField):
         return ''
 
 
+class TimeField(CharField):
+
+    def set_client(self, record, value, force_change=False):
+        if not isinstance(value, datetime.time):
+            try:
+                value = datetime.time(*time.strptime(value, HM_FORMAT)[3:6])
+            except ValueError:
+                value = None
+        super(TimeField, self).set_client(record, value,
+            force_change=force_change)
+
+    def get_client(self, record):
+        value = super(TimeField, self).get_client(record)
+        if value:
+            return value.strftime(HM_FORMAT)
+        return ''
+
+
 class FloatField(CharField):
 
     _default = 0.0
@@ -872,6 +890,7 @@ TYPES = {
     'boolean': BooleanField,
     'datetime': DateTimeField,
     'date': DateField,
+    'time': TimeField,
     'one2one': O2OField,
     'binary': BinaryField,
 }

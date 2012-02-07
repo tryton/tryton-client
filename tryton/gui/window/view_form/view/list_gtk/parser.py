@@ -427,6 +427,14 @@ class Datetime(Date):
         self.renderer.format = date_format() + ' ' + HM_FORMAT
 
 
+class Time(Date):
+
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(Time, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
+        self.renderer.format = HM_FORMAT
+
+
 class Float(Char):
 
     def __init__(self, field_name, model_name, treeview, attrs=None):
@@ -1029,6 +1037,7 @@ CELLTYPES = {
     'integer': Int,
     'biginteger': Int,
     'datetime': Datetime,
+    'time': Time,
     'boolean': Boolean,
     'text': Char,
     'url': Char,
