@@ -32,30 +32,35 @@ try:
 except ImportError:
         pass
 
+languages = (
+    'bg_BG',
+    'ca_ES',
+    'cs_CZ',
+    'de_DE',
+    'es_CO',
+    'es_ES',
+    'fr_FR',
+    'ja_JP',
+    'lt_LT',
+    'nl_NL',
+    'ru_RU',
+    'sl_SI',
+    )
+
+def all_languages():
+    for lang in languages:
+        yield lang
+        yield lang.split('_')[0]
+
 data_files=[
     ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
         glob.glob('share/pixmaps/tryton/*.svg')),
-    ('share/locale/bg_BG/LC_MESSAGES',
-        glob.glob('share/locale/bg_BG/LC_MESSAGES/*.mo')),
-    ('share/locale/cs_CZ/LC_MESSAGES',
-        glob.glob('share/locale/cs_CZ/LC_MESSAGES/*.mo')),
-    ('share/locale/de_DE/LC_MESSAGES',
-        glob.glob('share/locale/de_DE/LC_MESSAGES/*.mo')),
-    ('share/locale/es_CO/LC_MESSAGES',
-        glob.glob('share/locale/es_CO/LC_MESSAGES/*.mo')),
-    ('share/locale/es_ES/LC_MESSAGES',
-        glob.glob('share/locale/es_ES/LC_MESSAGES/*.mo')),
-    ('share/locale/fr_FR/LC_MESSAGES',
-        glob.glob('share/locale/fr_FR/LC_MESSAGES/*.mo')),
-    ('share/locale/ru_RU/LC_MESSAGES',
-        glob.glob('share/locale/ru_RU/LC_MESSAGES/*.mo')),
-    ('share/locale/sl_SI/LC_MESSAGES',
-        glob.glob('share/locale/sl_SI/LC_MESSAGES/*.mo')),
-    ('share/locale/ja_JP/LC_MESSAGES',
-        glob.glob('share/locale/ja_JP/LC_MESSAGES/*.mo')),
-]
-
-trans_lang = ('bg', 'cs', 'de', 'es', 'fr', 'ru', 'sl', 'ja')
+    ]
+for lang in languages:
+    data_files += [
+        ('share/locale/%s/LC_MESSAGES' % lang,
+            glob.glob('share/locale/%s/LC_MESSAGES/*.mo')),
+        ]
 
 if os.name == 'nt':
     import py2exe
@@ -128,6 +133,7 @@ dist = setup(name=PACKAGE,
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: Bulgarian',
+        'Natural Language :: Catalan',
         'Natural Language :: Czech',
         'Natural Language :: Dutch',
         'Natural Language :: English',
@@ -229,7 +235,7 @@ if os.name == 'nt':
             if os.path.isfile(file):
                 shutil.copy(file, dist_dir)
 
-        for lang in trans_lang:
+        for lang in all_languages():
             if os.path.isdir(os.path.join(dist_dir, 'share', 'locale', lang)):
                 shutil.rmtree(os.path.join(dist_dir, 'share', 'locale', lang))
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
@@ -327,7 +333,7 @@ elif sys.platform == 'darwin':
         shutil.copy(os.path.join(gtk_dir, 'share', 'themes', 'Clearlooks',
             'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))
 
-        for lang in trans_lang:
+        for lang in all_languages():
             if os.path.isdir(os.path.join(resources_dir, 'share', 'locale', lang)):
                 shutil.rmtree(os.path.join(resources_dir, 'share', 'locale', lang))
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
