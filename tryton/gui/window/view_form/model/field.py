@@ -779,11 +779,13 @@ class ReferenceField(CharField):
         return None
 
     def set_client(self, record, value, force_change=False):
-        ref_model, ref_id = value
-        if isinstance(ref_id, (tuple, list)):
-            ref_id, rec_name = ref_id
-            record.value[self.name + '.rec_name'] = rec_name
-        super(ReferenceField, self).set_client(record, (ref_model, ref_id),
+        if value:
+            ref_model, ref_id = value
+            if isinstance(ref_id, (tuple, list)):
+                ref_id, rec_name = ref_id
+                record.value[self.name + '.rec_name'] = rec_name
+            value = (ref_model, ref_id)
+        super(ReferenceField, self).set_client(record, value,
             force_change=force_change)
 
     def set(self, record, value, modified=False):
@@ -795,7 +797,10 @@ class ReferenceField(CharField):
             if not ref_id:
                 ref_id = None
             else:
-                ref_id = int(ref_id)
+                try:
+                    ref_id = int(ref_id)
+                except ValueError:
+                    pass
         else:
             ref_model, ref_id = value
         rec_name = record.value.get(self.name + '.rec_name') or ''
@@ -811,7 +816,7 @@ class ReferenceField(CharField):
                         return
                 rec_name = result['rec_name']
         else:
-            rec_name = ''
+            rec_name = ref_id
         record.value[self.name] = ref_model, ref_id
         record.value[self.name + '.rec_name'] = rec_name
         if modified:

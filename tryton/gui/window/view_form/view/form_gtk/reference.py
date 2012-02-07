@@ -82,8 +82,8 @@ class Reference(Many2One):
         if self.record and self.field:
             try:
                 model, name = self.field.get_client(self.record)
-            except ValueError:
-                model, name = None
+            except (ValueError, TypeError):
+                model, name = '', ''
             return (model != self.get_model()
                 or name != self.wid_text.get_text())
         return False
@@ -95,7 +95,10 @@ class Reference(Many2One):
         if not value:
             value = None
         else:
-            value = int(value)
+            try:
+                value = int(value)
+            except ValueError:
+                value = None
         result = model == self.get_model() and value >= 0
         return result
 
@@ -116,8 +119,17 @@ class Reference(Many2One):
         self.wid_text.set_position(0)
         self.field.set_client(self.record, (self.get_model(), (-1, '')))
 
+    def set_value(self, record, field):
+        if not self.get_model():
+            value = self.wid_text.get_text()
+            return field.set_client(record, ('', value))
+        return super(Reference, self).set_value(record, field)
+
     def set_text(self, value):
-        model, value = value
+        if value:
+            model, value = value
+        else:
+            model, value = None, None
         super(Reference, self).set_text(value)
         child = self.widget_combo.get_child()
         if model:
