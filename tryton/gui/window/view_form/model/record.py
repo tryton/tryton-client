@@ -490,18 +490,11 @@ class Record(SignalEvent):
             if isinstance(self.group.fields[fieldname], fields.O2MField):
                 later[fieldname] = value
                 continue
-            if isinstance(self.group.fields[fieldname], fields.M2OField):
-                if fieldname + '.rec_name' in res:
-                    value = (value, res[fieldname + '.rec_name'])
-            elif isinstance(self.group.fields[fieldname],
-                    fields.ReferenceField):
-                if value:
-                    ref_model, ref_id = value.split(',', 1)
-                    if fieldname + '.rec_name' in res:
-                        value = ref_model, (ref_id,
-                                res[fieldname + '.rec_name'])
-                    else:
-                        value = ref_model, (ref_id, ref_id)
+            if isinstance(self.group.fields[fieldname], (fields.M2OField,
+                        fields.ReferenceField)):
+                field_rec_name = fieldname + '.rec_name'
+                if field_rec_name in res:
+                    self.value[field_rec_name] = res[field_rec_name]
             self.group.fields[fieldname].set_on_change(self, value)
         for fieldname, value in later.items():
             # on change recursion checking is done only for x2many
