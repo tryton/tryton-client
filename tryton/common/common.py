@@ -1460,7 +1460,7 @@ def timezoned_date(date, reverse=False):
     return date
 
 def untimezoned_date(date):
-    return timezoned_date(date, reverse=True)
+    return timezoned_date(date, reverse=True).replace(tzinfo=None)
 
 
 def humanize(size):
