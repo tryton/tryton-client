@@ -67,7 +67,8 @@ class WidgetInterface(object):
 
     def send_modified(self, *args):
         def send():
-            self.record.signal('record-modified')
+            if self.record:
+                self.record.signal('record-modified')
         gobject.idle_add(send)
         return False
 
