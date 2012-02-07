@@ -214,7 +214,7 @@ class DateTimeField(CharField):
             try:
                 value = datetime.datetime(*time.strptime(value,
                         date_format() + ' ' + HM_FORMAT)[:6])
-                value = common.timezoned_date(value)
+                value = common.untimezoned_date(value)
             except ValueError:
                 value = self._default
         super(DateTimeField, self).set_client(record, value,

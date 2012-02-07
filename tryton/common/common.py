@@ -566,17 +566,20 @@ class UserWarningDialog(WarningDialog):
 
     def build_dialog(self, parent, message, title):
         dialog = super(UserWarningDialog, self).build_dialog(parent, message,
-            title, gtk.BUTTONS_OK_CANCEL)
+            title, gtk.BUTTONS_YES_NO)
         check = gtk.CheckButton(_('Always ignore this warning.'))
         check.connect_after('toggled', self._set_always)
-        alignment = gtk.Alignment(1, 0.5)
+        alignment = gtk.Alignment(0, 0.5)
         alignment.add(check)
-        dialog.vbox.pack_end(alignment, True, False)
+        dialog.vbox.pack_start(alignment, True, False)
+        label = gtk.Label(_('Do you want to proceed?'))
+        label.set_alignment(1, 0.5)
+        dialog.vbox.pack_start(label, True, True)
         return dialog
 
     def __call__(self, message, title):
         response = super(UserWarningDialog, self).__call__(message, title)
-        if response == gtk.RESPONSE_OK:
+        if response == gtk.RESPONSE_YES:
             if self.always:
                 return 'always'
             return 'ok'
@@ -1445,14 +1448,19 @@ def safe_eval(source, data=None):
         }}, data)
 
 
-def timezoned_date(date):
-    if pytz and rpc.CONTEXT.get('timezone'):
+def timezoned_date(date, reverse=False):
+    if pytz and rpc.CONTEXT.get('timezone') and rpc.TIMEZONE:
         lzone = pytz.timezone(rpc.CONTEXT['timezone'])
         szone = pytz.timezone(rpc.TIMEZONE)
+        if reverse:
+            lzone, szone = szone, lzone
         sdt = szone.localize(date, is_dst=True)
         ldt = sdt.astimezone(lzone)
         date = ldt
     return date
+
+def untimezoned_date(date):
+    return timezoned_date(date, reverse=True)
 
 
 def humanize(size):
