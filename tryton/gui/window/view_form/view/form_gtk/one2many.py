@@ -53,7 +53,7 @@ class One2Many(WidgetInterface):
             hbox.pack_start(self.but_add, expand=False, fill=False)
 
             self.but_remove = gtk.Button()
-            tooltips.set_tip(self.but_remove, _('Remove'))
+            tooltips.set_tip(self.but_remove, _('Remove <Del>'))
             self.but_remove.connect('clicked', self._sig_remove, True)
             img_remove = gtk.Image()
             img_remove.set_from_stock('tryton-list-remove',
@@ -66,7 +66,7 @@ class One2Many(WidgetInterface):
             hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
         self.but_new = gtk.Button()
-        tooltips.set_tip(self.but_new, _('Create a new record'))
+        tooltips.set_tip(self.but_new, _('Create a new record <F3>'))
         self.but_new.connect('clicked', self._sig_new)
         img_new = gtk.Image()
         img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -76,7 +76,7 @@ class One2Many(WidgetInterface):
         hbox.pack_start(self.but_new, expand=False, fill=False)
 
         self.but_open = gtk.Button()
-        tooltips.set_tip(self.but_open, _('Edit selected record'))
+        tooltips.set_tip(self.but_open, _('Edit selected record <F2>'))
         self.but_open.connect('clicked', self._sig_edit)
         img_open = gtk.Image()
         img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -86,7 +86,7 @@ class One2Many(WidgetInterface):
         hbox.pack_start(self.but_open, expand=False, fill=False)
 
         self.but_del = gtk.Button()
-        tooltips.set_tip(self.but_del, _('Delete selected record'))
+        tooltips.set_tip(self.but_del, _('Delete selected record <Del>'))
         self.but_del.connect('clicked', self._sig_remove, False)
         img_del = gtk.Image()
         img_del.set_from_stock('tryton-delete', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -96,7 +96,7 @@ class One2Many(WidgetInterface):
         hbox.pack_start(self.but_del, expand=False, fill=False)
 
         self.but_undel = gtk.Button()
-        tooltips.set_tip(self.but_undel, _('Undelete selected record'))
+        tooltips.set_tip(self.but_undel, _('Undelete selected record <Ins>'))
         self.but_undel.connect('clicked', self._sig_undelete)
         img_undel = gtk.Image()
         img_undel.set_from_stock('tryton-undo', gtk.ICON_SIZE_SMALL_TOOLBAR)

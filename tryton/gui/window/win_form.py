@@ -118,7 +118,7 @@ class WinForm(NoModal):
             tooltips = common.Tooltips()
 
             self.but_new = gtk.Button()
-            tooltips.set_tip(self.but_new, _('Create a new record'))
+            tooltips.set_tip(self.but_new, _('Create a new record <F3>'))
             self.but_new.connect('clicked', self._sig_new)
             img_new = gtk.Image()
             img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -128,7 +128,7 @@ class WinForm(NoModal):
             hbox.pack_start(self.but_new, expand=False, fill=False)
 
             self.but_del = gtk.Button()
-            tooltips.set_tip(self.but_del, _('Delete selected record'))
+            tooltips.set_tip(self.but_del, _('Delete selected record <Del>'))
             self.but_del.connect('clicked', self._sig_remove)
             img_del = gtk.Image()
             img_del.set_from_stock('tryton-delete',

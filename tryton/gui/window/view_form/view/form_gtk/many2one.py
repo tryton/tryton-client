@@ -62,8 +62,8 @@ class Many2One(WidgetInterface):
         self.widget.set_focus_chain([self.wid_text])
 
         self.tooltips = common.Tooltips()
-        self.tooltips.set_tip(self.but_new, _('Create a new record'))
-        self.tooltips.set_tip(self.but_open, _('Open a record'))
+        self.tooltips.set_tip(self.but_new, _('Create a new record <F3>'))
+        self.tooltips.set_tip(self.but_open, _('Open a record <F2>'))
         self.tooltips.enable()
 
         self._readonly = False
@@ -303,10 +303,10 @@ class Many2One(WidgetInterface):
         value = field.get(record)
         if self.has_target(value) and current_stock != 'tryton-open':
             img.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.tooltips.set_tip(self.but_open, _('Open a record'))
+            self.tooltips.set_tip(self.but_open, _('Open a record <F2>'))
         elif not self.has_target(value) and current_stock != 'tryton-find':
             img.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
-            self.tooltips.set_tip(self.but_open, _('Search a record'))
+            self.tooltips.set_tip(self.but_open, _('Search a record <F2>'))
         self.changed = True
 
     def _populate_popup(self, widget, menu):

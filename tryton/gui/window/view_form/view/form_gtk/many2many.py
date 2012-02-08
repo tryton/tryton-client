@@ -52,7 +52,7 @@ class Many2Many(WidgetInterface):
         hbox.pack_start(self.but_add, expand=False, fill=False)
 
         self.but_remove = gtk.Button()
-        tooltips.set_tip(self.but_remove, _('Remove'))
+        tooltips.set_tip(self.but_remove, _('Remove <Del>'))
         self.but_remove.connect('clicked', self._sig_remove)
         img_remove = gtk.Image()
         img_remove.set_from_stock('tryton-list-remove',
