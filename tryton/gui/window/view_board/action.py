@@ -91,7 +91,7 @@ class Action(SignalEvent):
 
     def row_activate(self):
         if not self.screen.current_record:
-            pass
+            return
 
         def callback(result):
             if result:

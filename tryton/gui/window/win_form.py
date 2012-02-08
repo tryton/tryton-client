@@ -316,8 +316,8 @@ class WinForm(NoModal):
             result = False
         else:
             result = response_id not in cancel_responses
-        self.destroy()
         self.callback(result)
+        self.destroy()
 
     def new(self):
         self.screen.new(context=self.context)
