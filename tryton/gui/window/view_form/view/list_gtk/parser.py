@@ -4,6 +4,7 @@
 import os
 import gobject
 import tempfile
+from functools import wraps
 from editabletree import EditableTreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
@@ -71,6 +72,16 @@ def sort_model(column, treeview, screen):
         screen.search_filter(search_string=search_string)
     for record in unsaved_records:
         store.group.append(record)
+
+
+def realized(func):
+    "Decorator for treeview realized"
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        if not self.treeview.get_realized():
+            return
+        return func(self, *args, **kwargs)
+    return wrapper
 
 
 class ParserTree(ParserInterface):
@@ -146,6 +157,8 @@ class ParserTree(ParserInterface):
                     icon = node_attrs['icon']
 
                     def setter(column, cell, store, iter):
+                        if not self.treeview.get_realized():
+                            return
                         record = store.get_value(iter, 0)
                         value = record[icon].get_client(record) or ''
                         common.ICONFACTORY.register_icon(value)
@@ -286,6 +299,7 @@ class Char(object):
         self.renderer.connect('editing-started', self.editing_started)
         self.treeview = treeview
 
+    @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         text = self.get_textual_value(record)
@@ -443,6 +457,7 @@ class Float(Char):
         self.renderer = CellRendererFloat()
         self.renderer.connect('editing-started', self.editing_started)
 
+    @realized
     def setter(self, column, cell, store, iter):
         super(Float, self).setter(column, cell, store, iter)
         record = store.get_value(iter, 0)
@@ -492,6 +507,7 @@ class Binary(Char):
         if callback:
             callback()
 
+    @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         size = record[self.field_name].get_size(record)
@@ -667,6 +683,7 @@ class UnsettableColumn(Exception):
 
 class O2M(Char):
 
+    @realized
     def setter(self, column, cell, store, iter):
         super(O2M, self).setter(column, cell, store, iter)
         cell.set_property('xalign', 0.5)
@@ -698,6 +715,7 @@ class O2M(Char):
 
 class M2M(Char):
 
+    @realized
     def setter(self, column, cell, store, iter):
         super(M2M, self).setter(column, cell, store, iter)
         cell.set_property('xalign', 0.5)
@@ -927,6 +945,7 @@ class ProgressBar(object):
         self.renderer.set_property('orientation', orientation)
         self.treeview = treeview
 
+    @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         value = float(self.get_textual_value(record) or 0.0)
@@ -960,6 +979,7 @@ class Button(object):
 
         self.renderer.connect('clicked', self.button_clicked)
 
+    @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         states = record.expr_eval(self.attrs.get('states', {}),
