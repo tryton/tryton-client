@@ -279,6 +279,10 @@ class WizardForm(Wizard, SignalEvent):
         super(WizardForm, self).end()
         Main.get_main()._win_del(self.widget)
 
+    def set_cursor(self):
+        if self.screen:
+            self.screen.set_cursor()
+
 
 class WizardDialog(Wizard, NoModal):
 
