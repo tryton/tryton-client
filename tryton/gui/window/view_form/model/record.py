@@ -1,5 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
+from weakref import WeakSet
+from collections import defaultdict
 import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent
 import tryton.common as common
@@ -7,6 +9,8 @@ from tryton.pyson import PYSONDecoder
 import field as fields
 from functools import reduce
 from tryton.exceptions import TrytonServerError
+
+POOL = defaultdict(WeakSet)
 
 
 class Record(SignalEvent):
@@ -34,10 +38,13 @@ class Record(SignalEvent):
         self.value = {}
         self.autocompletion = {}
         self.exception = False
+        POOL[model_name].add(self)
 
     def __getitem__(self, name, raise_exception=False):
         if name not in self._loaded and self.id >= 0:
-            ids = [self.id]
+            id2record = {
+                self.id: self,
+                }
             if name == '*':
                 loading = reduce(
                         lambda x, y: 'eager' if x == y == 'eager' else 'lazy',
@@ -50,17 +57,27 @@ class Record(SignalEvent):
                 idx = self.group.index(self)
                 length = len(self.group)
                 n = 1
-                while len(ids) < 80 and (idx - n >= 0 or \
+                while len(id2record) < 80 and (idx - n >= 0 or \
                         idx + n < length) and n < 100:
                     if idx - n >= 0:
                         record = self.group[idx - n]
                         if name not in record._loaded and record.id >= 0:
-                            ids.append(record.id)
+                            id2record[record.id] = record
                     if idx + n < length:
                         record = self.group[idx + n]
                         if name not in record._loaded and record.id >= 0:
-                            ids.append(record.id)
+                            id2record[record.id] = record
                     n += 1
+            record_context = self.context_get()
+            if loading == 'eager' and len(id2record) < 80:
+                for record in POOL[self.model_name]:
+                    if (name not in record._loaded
+                            and record.id >= 0
+                            and record.id not in id2record
+                            and record.context_get() == record_context):
+                        id2record[record.id] = record
+                        if len(id2record) == 80:
+                            break
             if loading == 'eager':
                 fnames = [fname
                     for fname, field in self.group.fields.iteritems()
@@ -73,11 +90,12 @@ class Record(SignalEvent):
                     in ('many2one', 'one2one', 'reference')))
             fnames.append('_timestamp')
             ctx = rpc.CONTEXT.copy()
-            ctx.update(self.context_get())
+            ctx.update(record_context)
             ctx.update(dict(('%s.%s' % (self.model_name, fname), 'size')
                     for fname, field in self.group.fields.iteritems()
-                    if field.attrs['type'] == 'binary'))
-            args = ('model', self.model_name, 'read', ids, fnames, ctx)
+                    if field.attrs['type'] == 'binary' and fname in fnames))
+            args = ('model', self.model_name, 'read', id2record.keys(), fnames,
+                ctx)
             exception = None
             try:
                 values = rpc.execute(*args)
@@ -86,15 +104,14 @@ class Record(SignalEvent):
                     raise
                 values = common.process_exception(exception, *args)
                 if not values:
-                    values = [{'id': x} for x in ids]
+                    values = [{'id': x} for x in id2record]
                     default_values = dict((f, False) for f in fnames)
                     for value in values:
                         value.update(default_values)
                     self.exception = True
             id2value = dict((value['id'], value) for value in values)
-            if ids != [self.id]:
-                for id in ids:
-                    record = self.group.get(id)
+            if len(id2record) > 1:
+                for id, record in id2record.iteritems():
                     if not record.exception:
                         record.exception = bool(exception)
                     value = id2value.get(id)
@@ -586,3 +603,4 @@ class Record(SignalEvent):
                 v.destroy()
         self.value = None
         self.next = None
+        POOL[self.model_name].remove(self)

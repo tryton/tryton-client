@@ -1,3 +1,4 @@
+* Add a record pool to prefetch more records
 * Add Time widget
 * Add support for fuzzy_translation
 * Activate save button on editing
