@@ -1,6 +1,9 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-from weakref import WeakSet
+try:
+    from weakref import WeakSet
+except ImportError:
+    from weakrefset import WeakSet
 from collections import defaultdict
 import tryton.rpc as rpc
 from tryton.signal_event import SignalEvent

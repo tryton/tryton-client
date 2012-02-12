@@ -114,6 +114,10 @@ elif sys.platform == 'darwin':
 
 execfile(os.path.join('tryton', 'version.py'))
 
+WEAKREF = []
+if sys.version_info < (2, 7):
+    WEAKREF = ['weakrefset']
+
 dist = setup(name=PACKAGE,
     version=VERSION,
     description='Tryton client',
@@ -153,7 +157,7 @@ dist = setup(name=PACKAGE,
     install_requires=[
 #        "pygtk >= 2.6",
         "python-dateutil",
-    ],
+    ] + WEAKREF,
     extras_require={
         'timezone': ['pytz'],
         'simplejson': ['simplejson'],

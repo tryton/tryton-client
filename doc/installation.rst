@@ -8,6 +8,7 @@ Prerequisites
  * pygtk 2.6 or later (http://www.pygtk.org/)
  * librsvg (http://librsvg.sourceforge.net/)
  * python-dateutil (http://labix.org/python-dateutil)
+ * weakrefset for Python 2.6 (https://code.google.com/p/weakrefset/)
  * Optional: simplejson (http://undefined.org/python/#simplejson)
  * Optional: pytz (http://pytz.sourceforge.net/)
  * Optional: cdecimal (http://www.bytereef.org/mpdecimal/index.html)
