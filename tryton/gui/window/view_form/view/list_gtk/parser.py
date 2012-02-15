@@ -78,7 +78,8 @@ def realized(func):
     "Decorator for treeview realized"
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        if not self.treeview.get_realized():
+        if (hasattr(self.treeview, 'get_realized')
+                and not self.treeview.get_realized()):
             return
         return func(self, *args, **kwargs)
     return wrapper
@@ -157,7 +158,8 @@ class ParserTree(ParserInterface):
                     icon = node_attrs['icon']
 
                     def setter(column, cell, store, iter):
-                        if not self.treeview.get_realized():
+                        if (hasattr(self.treeview, 'get_realized')
+                                and not self.treeview.get_realized()):
                             return
                         record = store.get_value(iter, 0)
                         value = record[icon].get_client(record) or ''
