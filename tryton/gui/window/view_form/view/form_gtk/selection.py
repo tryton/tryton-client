@@ -26,6 +26,7 @@ class Selection(WidgetInterface):
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
         child.connect('changed', self.send_modified)
+        self.entry.connect('notify::active', lambda *a: self._focus_out())
         self.widget.pack_start(self.entry)
         self.widget.set_focus_chain([child])
 
@@ -109,6 +110,7 @@ class Selection(WidgetInterface):
             self.entry.child.set_max_length(
                 max(len(x) for x in self._selection))
         completion.set_text_column(0)
+        completion.connect('match-selected', lambda *a: self._focus_out())
         return lst
 
     def _readonly_set(self, value):
