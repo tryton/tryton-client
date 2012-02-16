@@ -160,7 +160,7 @@ class Many2One(WidgetInterface):
 
                 WinSearch(model, callback, sel_multi=False,
                     ids=ids, context=context, domain=domain,
-                    view_ids=self.attrs.get('view_ids').split(','),
+                    view_ids=self.attrs.get('view_ids', '').split(','),
                     views_preload=self.attrs.get('views', {}))
                 return
         self.focus_out = True
@@ -172,7 +172,7 @@ class Many2One(WidgetInterface):
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
         return Screen(self.get_model(), domain=domain, context=context,
-            mode=['form'], view_ids=self.attrs.get('view_ids').split(','),
+            mode=['form'], view_ids=self.attrs.get('view_ids', '').split(','),
             views_preload=self.attrs.get('views', {}), readonly=self._readonly)
 
     def sig_new(self, *args):
@@ -250,7 +250,7 @@ class Many2One(WidgetInterface):
                 self.changed = True
             WinSearch(model, callback, sel_multi=False,
                 ids=ids, context=context, domain=domain,
-                view_ids=self.attrs.get('view_ids').split(','),
+                view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
             return
         self.focus_out = True

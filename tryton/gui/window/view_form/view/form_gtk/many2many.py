@@ -72,7 +72,7 @@ class Many2Many(WidgetInterface):
         self.widget.pack_start(frame, expand=False, fill=True)
 
         self.screen = Screen(attrs['relation'],
-            view_ids=attrs.get('view_ids').split(','),
+            view_ids=attrs.get('view_ids', '').split(','),
             mode=['tree'], views_preload=attrs.get('views', {}),
             row_activate=self._on_activate)
         self.screen.signal_connect(self, 'record-message', self._sig_label)
