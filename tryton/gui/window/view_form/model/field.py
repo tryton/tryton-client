@@ -393,8 +393,8 @@ class M2OField(CharField):
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
             if record.parent:
-                if (self.name + 'rec_name') not in record.parent.value:
-                    record.parent.value[self.name + 'rec_name'] = rec_name
+                if 'rec_name' not in record.parent.value:
+                    record.parent.value['rec_name'] = rec_name
         if modified:
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
