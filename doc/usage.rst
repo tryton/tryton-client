@@ -663,7 +663,6 @@ About...:
 Tool Bar
 ********
 The tool bar contains the functionalities linked to the current tab.
-The tool bar contains functions for the current tab.
 Some operations are working with one record or with a selection of
 :term:`records`. In :term:`form view` the actual record is selected for
 operations. In :term:`tree view` all selected records are used for operations.
@@ -678,72 +677,6 @@ New:
 Save:
   Saves the actual record.
 
-.. _Toolbar-Duplicate:
-
-Duplicate:
-  Duplicates the content of the actual record in a newly created record.
-
-.. _Toolbar-Delete:
-
-Delete:
-  Deletes the selected or actual record.
-
-.. _Toolbar-Find:
-
-.. _search_widget:
-
-Find...:
-  Opens a :term:`dialog` for finding :term:`fields` with search criteria and
-  operators.
-
-  * Search criteria: Defines the aspects to seek for.
-  * General search operators:
-
-    - Equals: Search for results which are exactly the same as the following
-      term.
-    - Does Not Equal: Search for results which are different from the following
-      term.
-
-  * Additional search operators on numbers, amounts and strings:
-
-    - Contains: Search for results which contain the following term.
-    - Does Not Contain:  Search for results which do not include the
-      following term.
-    - Starts With: Search for results beginning with the following term.
-    - Ends With: Search for results ending with the following term.
-
-  * Additional search operators for numbers and amounts:
-
-    - Is Between: Search for results inside a range (from - to).
-    - Is Not Between: Search for results outside a range (from - to).
-    - Is Different: Same as 'Does Not Equal', see above.
-
-  * Advanced Search expander opens additional search criteria.
-
-    - Limit: Limits the count of results.
-    - Offset: Skips a number of results and show only the following.
-
-  * Actions:
-
-    - Find: Search for results of the given criteria.
-    - New: Create a new record (used when search was fruitless, to create
-      quickly a new record).
-    - Ok: Open the selected results.
-    - Cancel
-
-.. note:: To search for deactivated records the *Active* search criteria must be
-        set to *No*.
-
-.. _Toolbar-Next:
-
-Next:
-  Goes to the next record in a list (sequence).
-
-.. _Toolbar-Previous:
-
-Previous:
-  Goes to the last record in a list (sequence).
-
 .. _Toolbar-Switch_View:
 
 Switch View:
@@ -755,21 +688,36 @@ Switch View:
 
   Not all views provide all aspects.
 
-.. _Toolbar-Close:
+.. _Toolbar-Reload_Undo:
 
-Close Tab:
-  Closes the current tab. A Request :term:`Dialog` opens in case of unsaved
-  changes.
+Reload/Undo:
+  Reloads the content of the actual tab. Undoes changes, if save request for
+  the current record is denied.
 
-.. _Toolbar-Previous_Tab:
+.. _Toolbar-Duplicate:
 
-Previous Tab:
-  Shows the previous (left) tab of the actual tab.
+Duplicate:
+  Duplicates the content of the actual record in a newly created record.
 
-.. _Toolbar-Next_Tab:
+.. _Toolbar-Delete:
 
-Next Tab:
-  Shows the next (right) tab of the actual tab.
+Delete:
+  Deletes the selected or actual record.
+
+.. _Toolbar-Previous:
+
+Previous:
+  Goes to the last record in a list (sequence).
+
+.. _Toolbar-Next:
+
+Next:
+  Goes to the next record in a list (sequence).
+
+.. _Toolbar-Search:
+
+Search:
+    Goes to the search widget.
 
 .. _Toolbar-View_Logs:
 
@@ -781,16 +729,39 @@ View Logs...:
 Go to Record ID...:
   Opens specific record id in the current view.
 
-.. _Toolbar-Reload_Undo:
+.. _Toolbar-Close:
 
-Reload/Undo:
-  Reloads the content of the actual tab. Undoes changes, if save request for
-  the current record is denied.
+Close Tab:
+  Closes the current tab. A Request :term:`Dialog` opens in case of unsaved
+  changes.
+
+.. _Toolbar-Attachment:
+
+Attachment:
+  The attachment item handles the document management system of
+  Tryton which is able to attach files to any arbitrary :term:`model`.
+  On click it opens the attachments :term:`dialog`. The default dialog
+  shows a list view of the attached files and links.
 
 .. _Toolbar-Actions:
 
 Actions...:
   Shows all actions for the actual view, model and record.
+
+.. _Toolbar-Relate:
+
+Relate...:
+  Shows all relate view for the actual view, model and record.
+
+.. _Toolbar-Report:
+
+Report...:
+  Shows all reports for the actual view, model and record.
+
+.. _Toolbar-Email:
+
+E-Mail...:
+  Shows all email reports for the actual view, model and record.
 
 .. _Toolbar-Print:
 
@@ -847,14 +818,6 @@ Import Data...:
     - Auto-Detect: Tries to auto detect fields in the CSV *File to Import*.
     - Ok: Proceeds the data import.
     - Cancel
-
-.. _Toolbar-Attachment:
-
-Attachment:
-  The attachment item handles the document management system of
-  Tryton which is able to attach files to any arbitrary :term:`model`.
-  On click it opens the attachments :term:`dialog`. The default dialog
-  shows a list view of the attached files and links.
 
 Search Widget
 *************

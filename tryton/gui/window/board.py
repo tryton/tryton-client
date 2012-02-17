@@ -34,6 +34,7 @@ class Board(SignalEvent, TabContent):
         (_('_Reload/Undo'), 'tryton-refresh', 'sig_reload',
             '<tryton>/Form/Reload'),
         (_('_Delete...'), 'tryton-delete', None, '<tryton>/Form/Delete'),
+        (None,) * 4,
         (_('_Close Tab'), 'tryton-close', 'sig_win_close',
             '<tryton>/Form/Close'),
     ]
