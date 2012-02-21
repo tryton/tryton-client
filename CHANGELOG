@@ -1,3 +1,4 @@
+* Add the richtext widget for WYSIWYG Editor on text fields
 * Add a record pool to prefetch more records
 * Add Time widget
 * Add support for fuzzy_translation

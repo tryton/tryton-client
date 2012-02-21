@@ -819,14 +819,20 @@ Import Data...:
     - Ok: Proceeds the data import.
     - Cancel
 
+Widgets
+*******
+
+There are a several widgets used on Tryton in client side. The follow sections
+will explains some of them.
+
 Search Widget
-*************
+^^^^^^^^^^^^^
 
 The search widget adds the ability to easily search for records on the current
 tab.  This widget is visible only on :term:`tree view`.
 
 The Syntax
-^^^^^^^^^^
+++++++++++
 
 A query is composed of search clauses.
 A clause is composed of a field name (with `:` at the end), an operator and a value.
@@ -836,7 +842,7 @@ the type of the field.  The default operator is `=` except for fields of type
 `char`, `text` and `many2one` which is `ilike`.
 
 Field Names
-^^^^^^^^^^^
++++++++++++
 
 All field names shown in the :term:`tree view` can be searched. Field names
 must be followed by a `:`
@@ -849,7 +855,7 @@ escape it using double quotes.
     For example: ``"Receivable Today":``
 
 Operators
-^^^^^^^^^
++++++++++
 
 The following operators can be used:
 
@@ -867,7 +873,7 @@ The following operators can be used:
     value to make it behaves like `starts with`
 
 Values
-^^^^^^
+++++++
 
 The format of the value depends on the type of the field.
 A list of values can be set using `;` as separator.
@@ -896,7 +902,7 @@ It is possible to escape special characters in values by using double quotes.
     Here it will search with the value `Michael:Scott`.
 
 Clause composition
-^^^^^^^^^^^^^^^^^^
+++++++++++++++++++
 
 The clauses can be composed using the two boolean operators `and` and `or`.
 By default, there is an implicit `and` between each clause if no operator is
@@ -914,6 +920,42 @@ using parenthesis.
     is different than ``Name: Michael or Name: Pam and Amount: 100``
 
     which is evaluated as ``Name: Michael or (Name: Pam and Amount: 100)``
+
+RichText Editor
+^^^^^^^^^^^^^^
+
+This feature create a rich text editor with various features that allow for
+text formatting. The features are:
+
+  * Bold: On/off style of bold text
+  * Italic: On/off style of italic text
+  * Underline: On/off style of underline text
+  * Choose font family: Choice from a combo box the desired font family
+  * Choose font size: Choice from a combo box the desired size font
+  * Text justify: Choice between four options for alignment of the line (left, 
+    right, center, fill)
+  * Background color: Choose the background color of text from a color palette
+  * Foreground color: Choose the foreground color of text from a color palette
+
+Besides these features, it can change and edit text markup. The text markup 
+feature has a similar HTML tags and is used to describe the format specified by 
+the user and is a way of storing this format for future opening of a correct 
+formatted text. The tags are explain follows:
+
+  * Bold: Tag `b` is used, i.e. <b>text</b>
+  * Italic: Tag `i` is used, i.e. <i>text</i>
+  * Underline: Tag `u` is used, i.e. <u>text</u>
+  * Font family: It is a attrbute `font-family` for `span` tag, i.e.
+    <span font-family="Arial">text</span>
+  * Font size: It is a attrbute `size` for `span` tag, i.e. <span size="12">
+    text</span>
+  * Text Justify: For justification text is used paragraph tag `p`. The
+    paragraph tag is used to create new lines and the alignment is applied
+    across the board. Example: <p align='center'>some text</p>
+  * Background color: It is a attrbute `background` for `span` tag, i.e.
+    <span background='#7f7f7f'>text</span>
+  * Foreground color: It is a attrbute `foreground` for `span` tag, i.e.
+    <span foreground='#00f'>text</span>
 
 Appendix
 ********

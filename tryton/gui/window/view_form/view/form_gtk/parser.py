@@ -562,6 +562,7 @@ from url import Email, URL, CallTo, SIP
 from image import Image as Image2
 from progressbar import ProgressBar
 from one2one import One2One
+from richtextbox import RichTextBox
 
 
 WIDGETS_TYPE = {
@@ -590,4 +591,5 @@ WIDGETS_TYPE = {
     'image': (Image2, 1, False, False),
     'progressbar': (ProgressBar, 1, False, False),
     'one2one': (One2One, 1, False, False),
+    'richtext': (RichTextBox, 1, True, True),
 }

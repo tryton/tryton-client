@@ -15,7 +15,7 @@ class TextBox(WidgetInterface, TranslateMixin):
     def __init__(self, field_name, model_name, attrs=None):
         super(TextBox, self).__init__(field_name, model_name, attrs=attrs)
 
-        self.widget = gtk.HBox()
+        self.widget = gtk.VBox()
         self.scrolledwindow = gtk.ScrolledWindow()
         self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
                 gtk.POLICY_AUTOMATIC)
@@ -33,13 +33,15 @@ class TextBox(WidgetInterface, TranslateMixin):
         self.scrolledwindow.add(self.textview)
         self.scrolledwindow.show_all()
 
-        self.widget.pack_start(self.scrolledwindow)
+        hbox = gtk.HBox()
+        hbox.pack_start(self.scrolledwindow)
+        self.widget.pack_end(hbox)
         self.lang = None
 
         self.button = None
         if attrs.get('translate'):
             self.button = self.translate_button()
-            self.widget.pack_start(self.button, False, False)
+            hbox.pack_start(self.button, False, False)
 
     def translate_widget(self):
         scrolledwindow = gtk.ScrolledWindow()
