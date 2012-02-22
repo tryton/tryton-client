@@ -492,7 +492,7 @@ class RichTextBox(TextBox):
             # Deactivate focus_out to not lose selection
             self.focus_out = False
             dialog = gtk.ColorSelectionDialog("Select a color %s" % tag)
-            #dialog.set_transient_for(window widget?)
+            dialog.set_transient_for(get_toplevel_window())
             dialog.set_resizable(False)
             dialog.colorsel.set_has_palette(True)
             dialog.colorsel.set_current_color(self.current_font_prop[tag])
