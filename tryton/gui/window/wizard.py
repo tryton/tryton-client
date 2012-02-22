@@ -78,14 +78,20 @@ class Wizard(object):
                         }
                 else:
                     data = {}
-                rpcprogress = common.RPCProgress('execute', ('wizard',
-                        self.action, 'execute', self.session_id, data,
-                        self.state, ctx))
-                try:
-                    result = rpcprogress.run()
-                except TrytonServerError, exception:
-                    common.process_exception(exception)
-                    self.state = self.end_state
+
+                def execute():
+                    rpcprogress = common.RPCProgress('execute', ('wizard',
+                            self.action, 'execute', self.session_id, data,
+                            self.state, ctx))
+                    try:
+                        return rpcprogress.run()
+                    except TrytonServerError, exception:
+                        if common.process_exception(exception):
+                            return execute()
+                        else:
+                            self.state = self.end_state
+                result = execute()
+                if self.state == self.end_state:
                     break
 
                 if 'view' in result:
