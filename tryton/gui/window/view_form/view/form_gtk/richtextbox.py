@@ -506,8 +506,9 @@ class RichTextBox(TextBox):
             content = self.tools[tag].child.get_active_text()
             font = self.current_font_prop[tag]
             self.current_font_prop[tag] = content
-        if self.text_buffer.get_selection_bounds():
-            start, end = self.text_buffer.get_selection_bounds()
+        bounds = self.text_buffer.get_selection_bounds()
+        if bounds:
+            start, end = bounds
             if tag in ('font_family', 'size'):
                 self.text_buffer.remove_tag(
                     self.gen_tag(font, tag), start, end)
