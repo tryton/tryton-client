@@ -491,7 +491,11 @@ class RichTextBox(TextBox):
         if tag in ['foreground', 'background']:
             # Deactivate focus_out to not lose selection
             self.focus_out = False
-            dialog = gtk.ColorSelectionDialog("Select a color %s" % tag)
+            labels = {
+                'foreground': _('Select a foreground color'),
+                'background': _('Select a background color'),
+                }
+            dialog = gtk.ColorSelectionDialog(labels[tag])
             dialog.set_transient_for(get_toplevel_window())
             dialog.set_resizable(False)
             dialog.colorsel.set_has_palette(True)
