@@ -7,6 +7,7 @@ import re
 from gettext import gettext as _
 from functools import wraps
 from textbox import TextBox
+from tryton.common import get_toplevel_window
 
 
 def formalize_text_markup(text):
@@ -86,6 +87,7 @@ class RichTextBox(TextBox):
         self.textview.set_buffer(self.text_buffer)
         self.textview.connect_after('move-cursor', self.detect_style)
         self.textview.connect('button-release-event', self.detect_style)
+        self.focus_out = True
 
         tags = ('bold', 'italic', 'underline', 'font_family', 'size', 'left',
             'center', 'right', 'fill', 'foreground', 'background', 'markup')
@@ -204,6 +206,18 @@ class RichTextBox(TextBox):
     @active_markup
     def display(self, record, field):
         super(RichTextBox, self).display(record, field)
+
+    def _focus_out(self):
+        if not self.focus_out:
+            return
+        # Popup for font_family and size should not trigger focus_out
+        # otherwise the selection is lost
+        for tag in ('font_family', 'size'):
+            tool = self.tools[tag]
+            if (hasattr(tool.child.props, 'popup_shown')
+                    and tool.child.props.popup_shown):
+                return
+        super(RichTextBox, self)._focus_out()
 
     def edit_text_markup(self, widget):
         '''on/off all buttons and call the appropriate parser'''
@@ -475,6 +489,8 @@ class RichTextBox(TextBox):
         '''
         content = None
         if tag in ['foreground', 'background']:
+            # Deactivate focus_out to not lose selection
+            self.focus_out = False
             dialog = gtk.ColorSelectionDialog("Select a color %s" % tag)
             #dialog.set_transient_for(window widget?)
             dialog.set_resizable(False)
@@ -485,6 +501,7 @@ class RichTextBox(TextBox):
                 content = dialog.colorsel.get_current_color()
                 self.current_font_prop[tag] = content
             dialog.destroy()
+            self.focus_out = True
         else:
             content = self.tools[tag].child.get_active_text()
             font = self.current_font_prop[tag]
