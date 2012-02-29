@@ -70,6 +70,12 @@ class TextBox(WidgetInterface, TranslateMixin):
         buf = textview.get_buffer()
         return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
 
+    @staticmethod
+    def translate_widget_set_readonly(widget, value):
+        textview = widget.get_child()
+        textview.set_editable(not value)
+        textview.props.sensitive = not value
+
     def grab_focus(self):
         return self.textview.grab_focus()
 

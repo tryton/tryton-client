@@ -185,8 +185,10 @@ class TranslateDialog(NoModal):
             'clicked', self.accel_group, gtk.keysyms.Return,
             gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 
+        tooltips = common.Tooltips()
+
         self.widgets = {}
-        table = gtk.Table(len(languages), 2)
+        table = gtk.Table(len(languages), 4)
         table.set_homogeneous(False)
         table.set_col_spacings(3)
         table.set_row_spacings(2)
@@ -202,6 +204,7 @@ class TranslateDialog(NoModal):
 
             context = rpc.CONTEXT.copy()
             context['language'] = language['code']
+            context['fuzzy_translation'] = False
             try:
                 value = rpc.execute('model', self.widget.record.model_name,
                     'read', self.widget.record.id, [self.widget.field_name],
@@ -209,11 +212,31 @@ class TranslateDialog(NoModal):
             except TrytonServerError, exception:
                 common.process_exception(exception)
                 return
+            context['fuzzy_translation'] = True
+            try:
+                fuzzy_value = rpc.execute('model',
+                    self.widget.record.model_name, 'read',
+                    self.widget.record.id, [self.widget.field_name],
+                    context)[self.widget.field_name]
+            except TrytonServerError, exception:
+                common.process_exception(exception)
+                return
             widget = self.widget.translate_widget()
-            self.widgets[language['code']] = (widget, value)
-            self.widget.translate_widget_set(widget, value)
+            self.widget.translate_widget_set(widget, fuzzy_value)
+            self.widget.translate_widget_set_readonly(widget, True)
             table.attach(widget, 1, 2, i, i + 1)
+            editing = gtk.CheckButton()
+            editing.connect('toggled', self.editing_toggled, widget)
+            tooltips.set_tip(editing, _('Edit'))
+            table.attach(editing, 2, 3, i, i + 1, xoptions=gtk.FILL)
+            fuzzy = gtk.CheckButton()
+            fuzzy.set_active(value != fuzzy_value)
+            fuzzy.props.sensitive = False
+            tooltips.set_tip(fuzzy, _('Fuzzy'))
+            table.attach(fuzzy, 4, 5, i, i + 1, xoptions=gtk.FILL)
+            self.widgets[language['code']] = (widget, editing, fuzzy)
 
+        tooltips.enable()
         vbox = gtk.VBox()
         vbox.pack_start(table, False, True)
         viewport = gtk.Viewport()
@@ -233,19 +256,23 @@ class TranslateDialog(NoModal):
         self.win.show_all()
         common.center_window(self.win, self.parent, self.sensible_widget)
 
+    def editing_toggled(self, editing, widget):
+        self.widget.translate_widget_set_readonly(widget,
+            not editing.get_active())
+
     def response(self, win, response):
         if response == gtk.RESPONSE_OK:
             for code, widget in self.widgets.iteritems():
-                widget, old_value = widget
-                new_value = self.widget.translate_widget_get(widget)
-                if new_value == old_value:
+                widget, editing, fuzzy = widget
+                if not editing.get_active():
                     continue
+                value = self.widget.translate_widget_get(widget)
                 context = rpc.CONTEXT.copy()
                 context['language'] = code
                 context['fuzzy_translation'] = False
                 args = ('model', self.widget.record.model_name, 'write',
                     self.widget.record.id, {
-                        self.widget.field_name: new_value,
+                        self.widget.field_name: value,
                         }, context)
                 try:
                     rpc.execute(*args)
@@ -306,4 +333,8 @@ class TranslateMixin:
 
     @staticmethod
     def translate_widget_get(widget):
+        raise NotImplemented
+
+    @staticmethod
+    def translate_widget_set_readonly(widget, value):
         raise NotImplemented

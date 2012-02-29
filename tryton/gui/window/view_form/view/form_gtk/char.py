@@ -62,6 +62,11 @@ class Char(WidgetInterface, TranslateMixin):
     def translate_widget_get(widget):
         return widget.get_text()
 
+    @staticmethod
+    def translate_widget_set_readonly(widget, value):
+        widget.set_editable(not value)
+        widget.props.sensitive = not value
+
     def _color_widget(self):
         if self.autocomplete:
             return self.entry.get_child()
