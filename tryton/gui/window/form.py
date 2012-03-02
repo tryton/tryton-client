@@ -479,7 +479,10 @@ class Form(SignalEvent, TabContent):
         self.activate_save()
 
     def _record_modified(self, screen, signal_data):
-        self.activate_save()
+        # As it is called via idle_add, the form could have been destroyed in
+        # the meantime.
+        if screen == self.screen:
+            self.activate_save()
 
     def _record_saved(self, screen, signal_data):
         self.activate_save()
