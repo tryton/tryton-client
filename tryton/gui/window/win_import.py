@@ -361,6 +361,7 @@ class WinImport(object):
             for key, val in res[1].items():
                 buf += ('\t%s: %s\n' % (str(key), str(val)))
             common.error(_('Importation Error!'),
-                    _('Error trying to import this record:\n' \
-                    '%s\nError Message:\n%s\n\n%s') % (buf, res[2], res[3]))
+                _('Error importing record %(record)s\n'
+                    '%(error_title)s\n\n%(traceback)s') %
+                {'record': buf, 'error_title': res[2], 'traceback': res[3]})
         return True
