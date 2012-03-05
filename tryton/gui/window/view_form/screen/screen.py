@@ -503,11 +503,6 @@ class Screen(SignalEvent):
         current_view = self.current_view
         if not current_view:
             return
-        elif current_view.view_type == 'tree' and not self.current_record:
-            # The widget might have been destroyed
-            if self.screen_container:
-                self.screen_container.set_cursor(new=new,
-                    reset_view=reset_view)
         elif current_view.view_type in ('tree', 'form'):
             current_view.set_cursor(new=new, reset_view=reset_view)
 

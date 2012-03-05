@@ -143,6 +143,7 @@ def replace_ending_clause(domain, clause):
 def append_ending_clause(domain, clause, deep):
     "Append clause after the ending clause"
     if not domain:
+        yield clause
         raise StopIteration
     for dom in domain[:-1]:
         yield dom

@@ -2,6 +2,7 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
+import gobject
 import tryton.common as common
 
 _ = gettext.gettext
@@ -17,7 +18,6 @@ class ScreenContainer(object):
         self.filter_vbox = None
         self.but_prev = None
         self.but_next = None
-        self.current_text = ''
         self.alternate_viewport = gtk.Viewport()
         self.alternate_viewport.set_shadow_type(gtk.SHADOW_NONE)
         self.alternate_view = False
@@ -43,10 +43,17 @@ class ScreenContainer(object):
         self.completion = gtk.EntryCompletion()
         self.completion.set_model(gtk.ListStore(str))
         self.completion.set_text_column(0)
-        self.completion.set_match_func(lambda *a: True, None)
-        self.search_entry.connect_after('activate', self.do_search)
+        self.completion.props.inline_completion = True
+        if hasattr(self.completion.props, 'inline_selection'):
+            self.completion.props.inline_selection = True
+        self.completion.props.minimum_key_length = 0
+        if hasattr(self.completion.props, 'popup_set_width'):
+            self.completion.props.popup_set_width = False
+        self.completion.connect('match-selected', self.match_selected)
+        self.search_entry.connect('activate', self.activate)
         self.search_entry.set_completion(self.completion)
-        self.search_entry.connect('changed', self.changed)
+        self.search_entry.connect('key-press-event', self.key_press)
+        self.search_entry.connect('focus-in-event', self.focus_in)
 
         hbox.pack_start(self.search_entry, expand=True, fill=True, padding=5)
 
@@ -131,9 +138,8 @@ class ScreenContainer(object):
         self.viewport.add(widget)
         self.viewport.show_all()
 
-    def changed(self, editable):
+    def update(self):
         res = self.screen.search_complete(self.get_text())
-        self.current_text = self.get_text()
         model = self.completion.get_model()
         model.clear()
         for r in res:
@@ -154,9 +160,26 @@ class ScreenContainer(object):
     def search_prev(self, widget=None):
         self.screen.search_prev(self.get_text())
 
+    def match_selected(self, completion, model, iter):
+        def callback():
+            self.update()
+            self.search_entry.emit('changed')
+        gobject.idle_add(callback)
+
+    def activate(self, widget):
+        if not self.search_entry.get_selection_bounds():
+            self.do_search(widget)
+
     def do_search(self, widget=None):
         self.screen.search_filter(self.get_text())
 
     def set_cursor(self, new=False, reset_view=True):
         if self.filter_vbox:
             self.search_entry.grab_focus()
+
+    def key_press(self, widget, event):
+        gobject.idle_add(self.update)
+
+    def focus_in(self, widget, event):
+        self.update()
+        self.search_entry.emit('changed')
