@@ -658,14 +658,7 @@ class M2O(Char):
         def search_callback(found):
             value = None
             if found:
-                args = ('model', relation, 'read', found[0], ['rec_name'],
-                        context)
-                try:
-                    res = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    res = common.process_exception(exception, *args)
-                if res:
-                    value = (found[0], res['rec_name'])
+                value = found[0]
             field.set_client(record, value)
             if callback:
                 callback()
@@ -760,7 +753,11 @@ class M2M(Char):
             return
 
         def winsearch_callback(result):
-            field.set_client(record, result or [])
+            if result:
+                result = [i for i, _ in result]
+            else:
+                result = []
+            field.set_client(record, result)
             if callback:
                 callback()
         WinSearch(relation, winsearch_callback, sel_multi=True, ids=ids,
@@ -795,7 +792,7 @@ class M2M(Char):
 
         def open_callback(result):
             if result:
-                field.set_client(record, result)
+                field.set_client(record, [i for i, _ in result])
             if callback:
                 callback()
         WinSearch(relation, open_callback, sel_multi=True, ids=ids,

@@ -270,10 +270,10 @@ class WinForm(NoModal):
             common.process_exception(exception)
             return False
 
-        def callback(ids):
+        def callback(result):
             res_id = None
-            if ids:
-                res_id = ids[0]
+            if result:
+                res_id, _ = result[0]
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
             self.screen.set_cursor()

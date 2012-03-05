@@ -150,10 +150,10 @@ class Many2One(WidgetInterface):
                     self.changed = True
                     return
 
-                def callback(ids):
-                    if ids:
+                def callback(result):
+                    if result:
                         self.field.set_client(self.record,
-                            self.value_from_id(ids[0]), force_change=True)
+                            self.value_from_id(*result[0]), force_change=True)
                     self.focus_out = True
                     self.display(self.record, self.field)
                     self.changed = True
@@ -241,10 +241,10 @@ class Many2One(WidgetInterface):
                 self.display(self.record, self.field)
                 return True
 
-            def callback(ids):
-                if ids:
+            def callback(result):
+                if result:
                     self.field.set_client(self.record,
-                        self.value_from_id(ids[0]), force_change=True)
+                        self.value_from_id(*result[0]), force_change=True)
                 self.focus_out = True
                 self.display(self.record, self.field)
                 self.changed = True

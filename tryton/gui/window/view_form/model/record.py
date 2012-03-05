@@ -91,6 +91,8 @@ class Record(SignalEvent):
             fnames.extend(('%s.rec_name' % fname for fname in fnames[:]
                     if self.group.fields[fname].attrs['type']
                     in ('many2one', 'one2one', 'reference')))
+            if 'rec_name' not in fnames:
+                fnames.append('rec_name')
             fnames.append('_timestamp')
             ctx = rpc.CONTEXT.copy()
             ctx.update(record_context)
@@ -428,6 +430,8 @@ class Record(SignalEvent):
                 self._timestamp = value
                 continue
             if fieldname not in self.group.fields:
+                if fieldname == 'rec_name':
+                    self.value['rec_name'] = value
                 continue
             if isinstance(self.group.fields[fieldname], fields.O2MField):
                 later[fieldname] = value

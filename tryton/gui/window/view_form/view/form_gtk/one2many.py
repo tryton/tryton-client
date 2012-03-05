@@ -322,10 +322,10 @@ class One2Many(WidgetInterface):
             common.process_exception(exception)
             return False
 
-        def callback(ids):
+        def callback(result):
             res_id = None
-            if ids:
-                res_id = ids[0]
+            if result:
+                res_id, = result[0]
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
             self.screen.set_cursor()
@@ -336,7 +336,7 @@ class One2Many(WidgetInterface):
                 view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
         else:
-            callback(ids)
+            callback([(i, None) for i in ids])
 
     def _sig_label(self, screen, signal_data):
         name = '_'

@@ -140,10 +140,10 @@ class Many2Many(WidgetInterface):
             self.focus_out = True
             return False
 
-        def callback(ids):
+        def callback(result):
             res_id = None
-            if ids:
-                res_id = ids[0]
+            if result:
+                res_id, _ = result[0]
             self.focus_out = True
             self.screen.load(ids, modified=True)
             self.screen.display(res_id=res_id)
@@ -155,7 +155,7 @@ class Many2Many(WidgetInterface):
                 view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
         else:
-            callback(ids)
+            callback([(i, None) for i in ids])
 
     def _sig_remove(self, *args):
         self.screen.remove(remove=True)
