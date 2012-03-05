@@ -449,7 +449,6 @@ class Record(SignalEvent):
         if modified:
             self.modified_fields.update(dict((x, None) for x in val))
             self.signal('record-modified')
-            self.signal('record-changed')
         if signal:
             self.signal('record-changed')
 
