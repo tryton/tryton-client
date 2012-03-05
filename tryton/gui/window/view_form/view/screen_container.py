@@ -5,7 +5,7 @@ import gettext
 import operator
 import gobject
 import tryton.common as common
-from tryton.common.tdp import quote
+from tryton.common.domain_parser import quote
 from tryton.translate import date_format
 from tryton.config import TRYTON_ICON
 
