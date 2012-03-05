@@ -109,7 +109,7 @@ class Group(SignalEvent, list):
         if not self.lock_signal:
             for record in self[:]:
                 self.signal('group-list-changed', ('record-removed', record))
-                self.pop(0)
+                self.pop(0).destroy()
         if not self.lock_signal:
             self.signal('group-list-changed', ('group-cleared',))
         self.__id2record = {}
@@ -399,14 +399,9 @@ class Group(SignalEvent, list):
         del self.__id2record[old_id]
 
     def destroy(self):
+        self.clear()
         super(Group, self).destroy()
         self.parent = None
-        self.fields = {}
-        self.record_deleted, self.record_removed = [], []
-        self.__id2record = None
-        for record in self:
-            record.destroy()
-        self[:] = []
 
     def get_by_path(self, path):
         'return record by path'

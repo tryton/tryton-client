@@ -548,8 +548,8 @@ class O2MField(CharField):
         group = record.value.get(self.name)
         fields = {}
         if group is not None:
-            group.signal_unconnect(group)
-            fields = group.fields
+            fields = group.fields.copy()
+            group.destroy()
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')
@@ -584,8 +584,8 @@ class O2MField(CharField):
         group = record.value.get(self.name)
         fields = {}
         if group is not None:
-            group.signal_unconnect(group)
-            fields = group.fields
+            fields = group.fields.copy()
+            group.destroy()
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         if fields:
@@ -735,8 +735,8 @@ class M2MField(O2MField):
         group = record.value.get(self.name)
         fields = {}
         if group is not None:
-            group.signal_unconnect(group)
-            fields = group.fields
+            fields = group.fields.copy()
+            group.destroy()
         elif record.model_name == self.attrs['relation']:
             fields = record.group.fields
         parent_name = self.attrs.get('relation_field', '')

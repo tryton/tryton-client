@@ -586,11 +586,11 @@ class Record(SignalEvent):
         return self.attachment_count
 
     def destroy(self):
-        super(Record, self).destroy()
-        self.group = None
         for v in self.value.itervalues():
             if hasattr(v, 'destroy'):
                 v.destroy()
+        super(Record, self).destroy()
+        self.group = None
         self.value = None
         self.next = None
         POOL[self.model_name].remove(self)

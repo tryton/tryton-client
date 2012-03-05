@@ -238,6 +238,9 @@ class Screen(SignalEvent):
         self.display()
 
     def __get_current_record(self):
+        if (self.__current_record is not None
+                and self.__current_record.group is None):
+            self.__current_record = None
         return self.__current_record
 
     def __set_current_record(self, record):
