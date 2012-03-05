@@ -50,8 +50,8 @@ class Preference(object):
         title.show()
         self.win.vbox.pack_start(title, expand=False, fill=True)
         self.screen = Screen('res.user', mode=[])
-        self.screen.new(default=False)
         self.screen.add_view(view)
+        self.screen.new(default=False)
 
         args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:
