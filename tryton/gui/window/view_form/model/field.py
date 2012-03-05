@@ -668,8 +668,7 @@ class O2MField(CharField):
         if value and value.get('add') or value.get('update', []):
             record.value[self.name].add_fields(fields, signal=False)
             for vals in value.get('add', []):
-                new_record = record.value[self.name].new(default=False,
-                        signal=False)
+                new_record = record.value[self.name].new(default=False)
                 record.value[self.name].add(new_record)
                 new_record.set(vals, modified=True, signal=False)
 

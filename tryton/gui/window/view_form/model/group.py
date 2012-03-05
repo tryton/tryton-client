@@ -276,18 +276,15 @@ class Group(SignalEvent, list):
                 else:
                     index = record[field].get(record)
 
-    def new(self, default=True, domain=None, context=None, signal=True,
-            obj_id=None):
+    def new(self, default=True, domain=None, context=None, obj_id=None):
         record = Record(self.model_name, obj_id, group=self)
-        record.signal_connect(self, 'record-changed', self._record_changed)
-        record.signal_connect(self, 'record-modified', self._record_modified)
         if default:
             ctx = {}
             ctx.update(context or {})
             ctx.update(self.context)
             record.default_get(domain, ctx)
-        if signal:
-            self.signal('group-changed', record)
+        record.signal_connect(self, 'record-changed', self._record_changed)
+        record.signal_connect(self, 'record-modified', self._record_modified)
         return record
 
     def unremove(self, record, signal=True):
