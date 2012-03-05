@@ -17,7 +17,7 @@ from tryton.config import CONFIG
 import tryton.common as common
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
-from tryton.common.tdp import DomainParser
+from tryton.common.domain_parser import DomainParser
 
 
 class Screen(SignalEvent):
@@ -134,17 +134,14 @@ class Screen(SignalEvent):
         self.search_filter(search_string=search_string)
 
     def search_complete(self, search_string):
-        parsed_tree = self.domain_parser.parse(search_string)
-        res = list(r for r in parsed_tree.complete() \
-                if r.strip() != search_string)
-        return res
+        return list(self.domain_parser.completion(search_string))
 
     def search_filter(self, search_string=None, only_ids=False):
         domain = []
 
         if self.domain_parser and not self.parent:
             if search_string is not None:
-                domain = self.domain_parser.parse(search_string or '').domain()
+                domain = self.domain_parser.parse(search_string)
             else:
                 domain = self.search_value
             self.screen_container.set_text(self.domain_parser.string(domain))

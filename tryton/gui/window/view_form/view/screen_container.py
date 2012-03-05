@@ -143,7 +143,7 @@ class ScreenContainer(object):
         self.search_entry.set_text('')
 
     def get_text(self):
-        return self.search_entry.get_text().strip().decode('utf-8')
+        return self.search_entry.get_text().decode('utf-8')
 
     def set_text(self, value):
         return self.search_entry.set_text(value)
