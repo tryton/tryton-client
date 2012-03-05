@@ -529,6 +529,9 @@ class Record(SignalEvent):
                 field_x2many.in_on_change = False
 
     def on_change_with(self, field_name):
+        fieldnames = set()
+        values = {}
+        later = set()
         for fieldname in self.group.fields:
             on_change_with = self.group.fields[fieldname].attrs.get(
                     'on_change_with')
@@ -538,18 +541,35 @@ class Record(SignalEvent):
                 continue
             if field_name == fieldname:
                 continue
-            args = self._get_on_change_args(on_change_with)
-            ctx = rpc.CONTEXT.copy()
-            ctx.update(self.context_get())
-            args = ('model', self.model_name, 'on_change_with_' + fieldname,
-                    args, ctx)
+            if fieldnames & set(on_change_with):
+                later.add(fieldname)
+                continue
+            fieldnames.add(fieldname)
+            values.update(self._get_on_change_args(on_change_with))
+        ctx = rpc.CONTEXT.copy()
+        ctx.update(self.context_get())
+        if fieldnames:
+            args = ('model', self.model_name, 'on_change_with',
+                list(fieldnames), values, ctx)
             try:
-                res = rpc.execute(*args)
+                result = rpc.execute(*args)
             except TrytonServerError, exception:
-                res = common.process_exception(exception, *args)
-                if not res:
+                result = common.process_exception(exception, *args)
+                if not result:
                     return
-            self.group.fields[fieldname].set_on_change(self, res)
+            for fieldname, value in result.items():
+                self.group.fields[fieldname].set_on_change(self, value)
+        for fieldname in later:
+            values = self._get_on_change_args(on_change_with)
+            args = ('model', self.model_name, 'on_change_with_' + fieldname,
+                    values, ctx)
+            try:
+                result = rpc.execute(*args)
+            except TrytonServerError, exception:
+                result = common.process_exception(exception, *args)
+                if not result:
+                    return
+            self.group.fields[fieldname].set_on_change(self, result)
 
     def autocomplete_with(self, field_name):
         for fieldname, fieldinfo in self.group.fields.iteritems():
