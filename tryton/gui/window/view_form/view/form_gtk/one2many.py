@@ -323,11 +323,10 @@ class One2Many(WidgetInterface):
             return False
 
         def callback(result):
-            res_id = None
             if result:
-                res_id, = result[0]
-            self.screen.load(ids, modified=True)
-            self.screen.display(res_id=res_id)
+                ids = [x[0] for x in result]
+                self.screen.load(ids, modified=True)
+                self.screen.display(res_id=ids[0])
             self.screen.set_cursor()
             self.wid_text.set_text('')
         if len(ids) != 1:
