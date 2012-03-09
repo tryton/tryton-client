@@ -234,6 +234,8 @@ class Group(SignalEvent, list):
 
     def _get_context(self):
         ctx = rpc.CONTEXT.copy()
+        if self.parent:
+            ctx.update(self.parent.context_get())
         ctx.update(self._context)
         if self.parent_datetime_field:
             ctx['_datetime'] = self.parent.get_eval(check_load=False
