@@ -398,6 +398,7 @@ class Group(SignalEvent, list):
         del self.__id2record[old_id]
 
     def destroy(self):
+        self.lock_signal = True
         self.clear()
         super(Group, self).destroy()
         self.parent = None

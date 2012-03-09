@@ -274,10 +274,9 @@ class Screen(SignalEvent):
 
     def destroy(self):
         self.save_tree_state()
+        self.group.destroy()
         for view in self.views:
             view.destroy()
-        self.group.signal_unconnect(self)
-        self.group.destroy()
         self.parent = None
         self.__group = None
         self.__current_record = None

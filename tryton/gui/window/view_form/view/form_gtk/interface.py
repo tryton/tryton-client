@@ -31,7 +31,7 @@ class WidgetInterface(object):
         self.color_name = None
 
     def __get_record(self):
-        if self.view:
+        if self.view and self.view.screen:
             return self.view.screen.current_record
 
     record = property(__get_record)
