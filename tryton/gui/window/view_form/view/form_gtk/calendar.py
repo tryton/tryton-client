@@ -5,7 +5,7 @@ import datetime
 import gtk
 import gettext
 from interface import WidgetInterface
-from tryton.common import HM_FORMAT, TRYTON_ICON
+from tryton.common import HM_FORMAT, TRYTON_ICON, timezoned_date
 from tryton.common import date_widget, Tooltips, get_toplevel_window
 from tryton.translate import date_format
 
@@ -165,6 +165,7 @@ class DateTime(Calendar):
         self.set_value(self.record, self.field)
         val = self.field.get(self.record)
         if val:
+            val = timezoned_date(val)
             widget_hour.set_value(val.hour)
             widget_minute.set_value(val.minute)
             cal.select_month(val.month - 1, val.year)
