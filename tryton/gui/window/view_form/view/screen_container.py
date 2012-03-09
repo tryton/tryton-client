@@ -68,6 +68,26 @@ class ScreenContainer(object):
 
         hbox.pack_start(self.search_entry, expand=True, fill=True)
 
+        but_find = gtk.Button()
+        tooltips.set_tip(but_find, _('Find'))
+        but_find.connect('clicked', self.do_search)
+        img_find = gtk.Image()
+        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_find.set_alignment(0.5, 0.5)
+        but_find.add(img_find)
+        but_find.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(but_find, expand=False, fill=False)
+
+        but_clear = gtk.Button()
+        tooltips.set_tip(but_clear, _('Clear'))
+        but_clear.connect('clicked', self.clear)
+        img_clear = gtk.Image()
+        img_clear.set_from_stock('tryton-clear', gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_clear.set_alignment(0.5, 0.5)
+        but_clear.add(img_clear)
+        but_clear.set_relief(gtk.RELIEF_NONE)
+        hbox.pack_start(but_clear, expand=False, fill=False)
+
         but_prev = gtk.Button()
         self.but_prev = but_prev
         tooltips.set_tip(but_prev, _('Previous'))
@@ -92,27 +112,9 @@ class ScreenContainer(object):
         but_next.set_relief(gtk.RELIEF_NONE)
         hbox.pack_start(but_next, expand=False, fill=False)
 
-        but_find = gtk.Button()
-        tooltips.set_tip(but_find, _('Find'))
-        but_find.connect('clicked', self.do_search)
-        img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        img_find.set_alignment(0.5, 0.5)
-        but_find.add(img_find)
-        but_find.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_find, expand=False, fill=False)
-
-        but_clear = gtk.Button()
-        tooltips.set_tip(but_clear, _('Clear'))
-        but_clear.connect('clicked', self.clear)
-        img_clear = gtk.Image()
-        img_clear.set_from_stock('tryton-clear', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        img_clear.set_alignment(0.5, 0.5)
-        but_clear.add(img_clear)
-        but_clear.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_clear, expand=False, fill=False)
 
         hbox.show_all()
+        hbox.set_focus_chain([self.search_entry])
         self.filter_vbox.pack_start(hbox, expand=True, fill=False)
 
         hseparator = gtk.HSeparator()
