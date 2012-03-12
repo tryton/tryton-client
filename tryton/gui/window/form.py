@@ -70,7 +70,7 @@ class Form(SignalEvent, TabContent):
         (_('_Close Tab'), 'tryton-close', 'sig_win_close',
             '<tryton>/Form/Close'),
         (None,) * 4,
-        (_('A_ttachments'), 'tryton-attachment', 'sig_attach',
+        (_('A_ttachments...'), 'tryton-attachment', 'sig_attach',
             '<tryton>/Form/Attachments'),
         (_('_Actions...'), 'tryton-executable', 'sig_action',
             '<tryton>/Form/Actions'),
