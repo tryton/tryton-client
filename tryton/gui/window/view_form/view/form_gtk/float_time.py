@@ -36,7 +36,7 @@ class FloatTime(WidgetInterface):
     def modified(self):
         if self.record and self.field:
             value = self.entry.get_text()
-            return common.text_to_float_time(self.field.get(self.record),
+            return common.float_time_to_text( self.field.get(self.record),
                 self.conv) != value
         return False
 
