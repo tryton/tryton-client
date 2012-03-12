@@ -5,7 +5,8 @@ import datetime
 import gtk
 import gettext
 from interface import WidgetInterface
-from tryton.common import HM_FORMAT, TRYTON_ICON, timezoned_date
+from tryton.common import HM_FORMAT, TRYTON_ICON, timezoned_date, \
+    untimezoned_date
 from tryton.common import date_widget, Tooltips, get_toplevel_window
 from tryton.translate import date_format
 
@@ -180,7 +181,8 @@ class DateTime(Calendar):
             year = int(cal.get_date()[0])
             month = int(cal.get_date()[1]) + 1
             day = int(cal.get_date()[2])
-            date = datetime.datetime(year, month, day, hour, minute)
+            date = untimezoned_date(datetime.datetime(year, month, day, hour,
+                    minute))
             self.field.set_client(self.record, date)
             self.display(self.record, self.field)
         self._focus_out()
