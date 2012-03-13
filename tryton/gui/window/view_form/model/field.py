@@ -816,6 +816,8 @@ class ReferenceField(CharField):
                     if not result:
                         return
                 rec_name = result['rec_name']
+        elif ref_model:
+            rec_name = ''
         else:
             rec_name = ref_id
         record.value[self.name] = ref_model, ref_id
