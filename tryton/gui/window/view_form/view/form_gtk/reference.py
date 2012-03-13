@@ -61,15 +61,13 @@ class Reference(Many2One):
 
     def set_popdown(self, selection):
         model = gtk.ListStore(gobject.TYPE_STRING)
-        lst = []
         for (i, j) in selection:
             name = str(j)
-            lst.append(name)
+            model.append((name,))
             self._selection[name] = i
             self._selection2[i] = name
         self.widget_combo.set_model(model)
         self.widget_combo.set_text_column(0)
-        return lst
 
     def _readonly_set(self, value):
         super(Reference, self)._readonly_set(value)
