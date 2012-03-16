@@ -41,6 +41,7 @@ class Record(SignalEvent):
         self.value = {}
         self.autocompletion = {}
         self.exception = False
+        self.destroyed = False
         POOL[model_name].add(self)
 
     def __getitem__(self, name, raise_exception=False):
@@ -120,7 +121,7 @@ class Record(SignalEvent):
                     if not record.exception:
                         record.exception = bool(exception)
                     value = id2value.get(id)
-                    if record and value:
+                    if record and not record.destroyed and value:
                         record.set(value, signal=False)
             else:
                 value = id2value.get(self.id)
@@ -616,4 +617,5 @@ class Record(SignalEvent):
         self.group = None
         self.value = None
         self.next = None
+        self.destroyed = True
         POOL[self.model_name].remove(self)
