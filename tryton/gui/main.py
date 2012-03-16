@@ -19,7 +19,8 @@ from tryton.config import CONFIG, TRYTON_ICON, get_config_dir
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
 from tryton.action import Action
-from tryton.exceptions import TrytonServerError, TrytonError
+from tryton.exceptions import TrytonServerError, TrytonError, \
+    TrytonServerUnavailable
 from tryton.gui.window import Window
 from tryton.gui.window.preference import Preference
 from tryton.gui.window import Limit
@@ -986,8 +987,11 @@ class Main(object):
         return True
 
     def sig_logout(self, widget=None, disconnect=True):
-        if not self.close_pages():
-            return False
+        try:
+            if not self.close_pages():
+                return False
+        except TrytonServerUnavailable:
+            pass
         self.sb_username.set_text('')
         self.sb_servername.set_text('')
         self.sb_requests.set_text('')
