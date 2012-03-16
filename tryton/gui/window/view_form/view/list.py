@@ -632,9 +632,6 @@ class ViewList(ParserView):
                 self.store.added(group, signal[1])
             elif signal[0] == 'record-removed':
                 self.store.removed(group, signal[1])
-            elif signal[0] == 'group-cleared':
-                self.store = None
-                self.widget_tree.set_model(self.store)
         self.display()
 
     def cancel(self):

@@ -100,18 +100,15 @@ class Group(SignalEvent, list):
                         self.__getitem__(idx + 1)
             else:
                 self.__getitem__(idx - 1).next[id(self)] = None
-        if not self.lock_signal:
-            self.signal('group-list-changed', ('record-removed', record))
+        self.signal('group-list-changed', ('record-removed', record))
         super(Group, self).remove(record)
         del self.__id2record[record.id]
 
     def clear(self):
-        if not self.lock_signal:
-            for record in self[:]:
-                self.signal('group-list-changed', ('record-removed', record))
-                self.pop(0).destroy()
-        if not self.lock_signal:
-            self.signal('group-list-changed', ('group-cleared',))
+        for record in self[:]:
+            self.signal('group-list-changed', ('record-removed', record))
+            record.destroy()
+            self.pop(0)
         self.__id2record = {}
         self.record_removed, self.record_deleted = [], []
 
@@ -398,7 +395,6 @@ class Group(SignalEvent, list):
         del self.__id2record[old_id]
 
     def destroy(self):
-        self.lock_signal = True
         self.clear()
         super(Group, self).destroy()
         self.parent = None
