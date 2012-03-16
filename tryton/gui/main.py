@@ -17,6 +17,7 @@ import webbrowser
 import tryton.rpc as rpc
 from tryton.config import CONFIG, TRYTON_ICON, get_config_dir
 import tryton.common as common
+from tryton.pyson import PYSONDecoder
 from tryton.action import Action
 from tryton.exceptions import TrytonServerError, TrytonError
 from tryton.gui.window import Window
@@ -405,7 +406,7 @@ class Main(object):
         image = gtk.Image()
         image.set_from_stock('tryton-start-here', gtk.ICON_SIZE_MENU)
         imagemenuitem_menu.set_image(image)
-        imagemenuitem_menu.connect('activate', self.sig_win_menu)
+        imagemenuitem_menu.connect('activate', lambda *a: self.sig_win_menu())
         imagemenuitem_menu.set_accel_path('<tryton>/User/Menu Reload')
         menu_user.add(imagemenuitem_menu)
 
@@ -415,14 +416,6 @@ class Main(object):
             lambda *a: self.menu_toggle())
         imagemenuitem_menu_toggle.set_accel_path('<tryton>/User/Menu Toggle')
         menu_user.add(imagemenuitem_menu_toggle)
-
-        imagemenuitem_home = gtk.ImageMenuItem(_('_Home'), self.accel_group)
-        image = gtk.Image()
-        image.set_from_stock('tryton-go-home', gtk.ICON_SIZE_MENU)
-        imagemenuitem_home.set_image(image)
-        imagemenuitem_home.connect('activate', self.sig_home_new)
-        imagemenuitem_home.set_accel_path('<tryton>/User/Home')
-        menu_user.add(imagemenuitem_home)
 
         menu_user.add(gtk.SeparatorMenuItem())
 
@@ -936,10 +929,13 @@ class Main(object):
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = \
                     prefs['language_direction']
-            menu_id = self.sig_win_menu(quiet=False, prefs=prefs)
-            if menu_id:
-                self.sig_home_new(quiet=True, except_id=menu_id, prefs=prefs)
+            self.sig_win_menu(prefs=prefs)
+            for action_id in prefs.get('actions', []):
+                Action.execute(action_id, {})
             self.request_set()
+            self.sb_username.set_text(prefs.get('status_bar', ''))
+            self.sb_servername.set_text('%s@%s:%d/%s'
+                % (rpc._USERNAME, rpc._HOST, rpc._PORT, rpc._DATABASE))
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
@@ -1041,19 +1037,9 @@ class Main(object):
             if self.menu_screen:
                 self.menu_screen.set_cursor()
 
-    def sig_win_menu(self, widget=None, quiet=True, prefs=None):
-        if self.pane.get_child1():
-            self.pane.remove(self.pane.get_child1())
-            if self.pane.get_position():
-                CONFIG['menu.pane'] = self.pane.get_position()
-        self.menu_screen = None
-        self.menu_toggle(nohide=True)
-        res = self.sig_win_new(widget, menu_type='menu', quiet=quiet,
-                prefs=prefs)
-        return res
+    def sig_win_menu(self, prefs=None):
+        from tryton.gui.window.view_form.screen import Screen
 
-    def sig_win_new(self, widget=None, menu_type='menu', quiet=True,
-            except_id=False, prefs=None):
         if not prefs:
             args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
             try:
@@ -1061,29 +1047,30 @@ class Main(object):
             except TrytonServerError, exception:
                 prefs = common.process_exception(exception, *args)
                 if not prefs:
-                    return False
-        self.sb_username.set_text(prefs.get('status_bar', ''))
-        self.sb_servername.set_text('%s@%s:%d/%s' % (rpc._USERNAME,
-            rpc._HOST, rpc._PORT, rpc._DATABASE))
-        if not prefs[menu_type]:
-            if quiet:
-                return False
-            common.warning(_('You can not log into the system!\n' \
-                    'Verify if you have a menu defined on your user.'),
-                    'Access Denied!')
-            rpc.logout()
-            self.refresh_ssl()
-            return False
-        act_id = prefs[menu_type]
-        if except_id and act_id == except_id:
-            return act_id
-        Action.execute(act_id, {})
-        return act_id
-
-    def sig_home_new(self, widget=None, quiet=True, except_id=False,
-            prefs=None):
-        return self.sig_win_new(widget, menu_type='action', quiet=quiet,
-                except_id=except_id, prefs=prefs)
+                    return
+        if self.pane.get_child1():
+            self.pane.remove(self.pane.get_child1())
+            if self.pane.get_position():
+                CONFIG['menu.pane'] = self.pane.get_position()
+        self.menu_screen = None
+        self.menu_toggle(nohide=True)
+        action = PYSONDecoder().decode(prefs['pyson_menu'])
+        view_ids = False
+        if action.get('views', []):
+            view_ids = [x[0] for x in action['views']]
+        elif action.get('view_id', False):
+            view_ids = [action['view_id'][0]]
+        ctx = rpc.CONTEXT.copy()
+        domain = PYSONDecoder(ctx).decode(action['pyson_domain'])
+        screen = Screen(action['res_model'], mode=['tree'],
+            view_ids=view_ids, domain=domain, readonly=True)
+        # Use alternate view to not show search box
+        screen.screen_container.alternate_view = True
+        screen.switch_view(view_type=screen.current_view.view_type)
+        self.pane.pack1(screen.screen_container.alternate_viewport)
+        screen.search_filter()
+        screen.display(set_cursor=True)
+        self.menu_screen = screen
 
     def sig_plugin_execute(self, widget):
         page = self.notebook.get_current_page()
@@ -1136,14 +1123,6 @@ class Main(object):
                     if current_page == page_num:
                         self._sig_page_changt(self.notebook, None, page_num)
                     return
-        if not self.pane.get_child1():
-            screen = page.screen
-            screen.screen_container.alternate_view = True
-            screen.switch_view(view_type=screen.current_view.view_type)
-            self.pane.pack1(screen.screen_container.alternate_viewport)
-            self.menu_screen = screen
-            screen.display(set_cursor=True)
-            return
         previous_page_id = self.notebook.get_current_page()
         previous_widget = self.notebook.get_nth_page(previous_page_id)
         if previous_widget and hide_current:
