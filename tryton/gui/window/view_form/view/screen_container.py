@@ -57,7 +57,6 @@ class ScreenContainer(object):
         self.completion.props.inline_completion = True
         if hasattr(self.completion.props, 'inline_selection'):
             self.completion.props.inline_selection = True
-        self.completion.props.minimum_key_length = 0
         if hasattr(self.completion.props, 'popup_set_width'):
             self.completion.props.popup_set_width = False
         self.completion.connect('match-selected', self.match_selected)
