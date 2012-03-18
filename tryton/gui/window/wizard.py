@@ -38,6 +38,7 @@ class Wizard(object):
         self.end_state = None
         self.screen = None
         self.screen_state = None
+        self.state = None
 
     def run(self, action, data, direct_print=False, email_print=False,
             email=None, context=None):
