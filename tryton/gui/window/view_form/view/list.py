@@ -831,7 +831,8 @@ class ViewList(ParserView):
                 ids.append(record.id)
         ids = []
         sel = self.widget_tree.get_selection()
-        sel.selected_foreach(_func_sel_get, ids)
+        if sel:
+            sel.selected_foreach(_func_sel_get, ids)
         return ids
 
     def selected_records(self):
