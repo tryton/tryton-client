@@ -340,6 +340,7 @@ class WizardDialog(Wizard, NoModal):
         common.center_window(self.dia, self.parent, self.sensible_widget)
 
     def destroy(self):
+        super(WizardDialog, self).destroy()
         self.dia.destroy()
         NoModal.destroy(self)
         main = Main.get_main()
@@ -348,7 +349,6 @@ class WizardDialog(Wizard, NoModal):
             if current_form:
                 for dialog in current_form.dialogs:
                     dialog.show()
-        super(WizardDialog, self).destroy()
         if self.page.dialogs:
             dialog = self.page.dialogs[-1]
         else:
