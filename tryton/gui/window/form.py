@@ -221,7 +221,6 @@ class Form(SignalEvent, TabContent):
         parent.present()
 
     def destroy(self):
-        self.screen.signal_unconnect(self)
         self.screen.destroy()
         self.screen = None
         self.widget = None

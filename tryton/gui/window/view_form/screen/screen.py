@@ -277,6 +277,7 @@ class Screen(SignalEvent):
         self.group.destroy()
         for view in self.views:
             view.destroy()
+        super(Screen, self).destroy()
         self.parent = None
         self.__group = None
         self.__current_record = None

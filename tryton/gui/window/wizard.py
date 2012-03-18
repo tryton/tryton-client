@@ -125,7 +125,6 @@ class Wizard(object):
 
     def destroy(self):
         if self.screen:
-            self.screen.signal_unconnect(self)
             self.screen.destroy()
             del self.screen
         del self.widget
