@@ -11,6 +11,7 @@ from tryton.gui import Main
 from tryton.exceptions import TrytonServerError
 from tryton.gui.window.nomodal import NoModal
 from tryton.common.button import Button
+from tryton.common import RPCExecute, RPCException
 _ = gettext.gettext
 
 
@@ -50,13 +51,10 @@ class Wizard(object):
         self.email_print = email_print
         self.email = email
         self.context = context
-        args = ('wizard', action, 'create', rpc.CONTEXT)
         try:
-            result = rpc.execute(*args)
-        except TrytonServerError, exception:
-            result = common.process_exception(exception, *args)
-            if not result:
-                return
+            result = RPCExecute('wizard', action, 'create')
+        except RPCException:
+            return
         self.session_id, self.start_state, self.end_state = result
         self.state = self.start_state
         self.process()
@@ -69,7 +67,6 @@ class Wizard(object):
             self.__processing = True
             while self.state != self.end_state:
                 ctx = self.context.copy()
-                ctx.update(rpc.CONTEXT)
                 ctx['active_id'] = self.id
                 ctx['active_ids'] = self.ids
                 ctx['active_model'] = self.model
@@ -79,20 +76,11 @@ class Wizard(object):
                         }
                 else:
                     data = {}
-
-                def execute():
-                    rpcprogress = common.RPCProgress('execute', ('wizard',
-                            self.action, 'execute', self.session_id, data,
-                            self.state, ctx))
-                    try:
-                        return rpcprogress.run()
-                    except TrytonServerError, exception:
-                        if common.process_exception(exception):
-                            return execute()
-                        else:
-                            self.state = self.end_state
-                result = execute()
-                if self.state == self.end_state:
+                try:
+                    result = RPCExecute('wizard', self.action, 'execute',
+                        self.session_id, data, self.state, context=ctx)
+                except RPCException:
+                    self.state = self.end_state
                     break
 
                 if 'view' in result:
@@ -131,8 +119,8 @@ class Wizard(object):
 
     def end(self):
         try:
-            rpc.execute('wizard', self.action, 'delete', self.session_id,
-                rpc.CONTEXT)
+            RPCExecute('wizard', self.action, 'delete', self.session_id,
+                process_exception=False)
             if self.action == 'ir.module.module.config_wizard':
                 rpc.context_reload()
         except TrytonServerError:

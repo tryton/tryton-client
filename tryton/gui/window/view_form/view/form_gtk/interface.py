@@ -6,10 +6,9 @@ import gettext
 
 from tryton.common import COLORS
 import tryton.common as common
-import tryton.rpc as rpc
-from tryton.exceptions import TrytonServerError
 from tryton.gui.window.nomodal import NoModal
 from tryton.common import TRYTON_ICON
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -202,24 +201,24 @@ class TranslateDialog(NoModal):
             label.set_alignment(1.0, 0.5)
             table.attach(label, 0, 1, i, i + 1, xoptions=gtk.FILL)
 
-            context = rpc.CONTEXT.copy()
-            context['language'] = language['code']
-            context['fuzzy_translation'] = False
+            context = dict(
+                language=language['code'],
+                fuzzy_translation=False,
+                )
             try:
-                value = rpc.execute('model', self.widget.record.model_name,
+                value = RPCExecute('model', self.widget.record.model_name,
                     'read', self.widget.record.id, [self.widget.field_name],
-                    context)[self.widget.field_name]
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                    context={'language': language['code']}
+                    )[self.widget.field_name]
+            except RPCException:
                 return
             context['fuzzy_translation'] = True
             try:
-                fuzzy_value = rpc.execute('model',
+                fuzzy_value = RPCExecute('model',
                     self.widget.record.model_name, 'read',
                     self.widget.record.id, [self.widget.field_name],
-                    context)[self.widget.field_name]
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                    context=context)[self.widget.field_name]
+            except RPCException:
                 return
             widget = self.widget.translate_widget()
             self.widget.translate_widget_set(widget, fuzzy_value)
@@ -267,17 +266,17 @@ class TranslateDialog(NoModal):
                 if not editing.get_active():
                     continue
                 value = self.widget.translate_widget_get(widget)
-                context = rpc.CONTEXT.copy()
-                context['language'] = code
-                context['fuzzy_translation'] = False
-                args = ('model', self.widget.record.model_name, 'write',
-                    self.widget.record.id, {
-                        self.widget.field_name: value,
-                        }, context)
+                context = dict(
+                    language=code,
+                    fuzzy_translation=False,
+                    )
                 try:
-                    rpc.execute(*args)
-                except TrytonServerError, exception:
-                    common.process_exception(exception, *args)
+                    RPCExecute('model', self.widget.record.model_name, 'write',
+                        self.widget.record.id, {
+                            self.widget.field_name: value,
+                            }, context=context)
+                except RPCException:
+                    pass
             self.widget.record.cancel()
             self.widget.view.display()
         self.destroy()
@@ -305,21 +304,19 @@ class TranslateMixin:
             return
 
         try:
-            lang_ids = rpc.execute('model', 'ir.lang', 'search', [
+            lang_ids = RPCExecute('model', 'ir.lang', 'search', [
                     ('translatable', '=', True),
-                    ], rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+                    ])
+        except RPCException:
             return
 
         if not lang_ids:
             common.message(_('No other language available!'))
             return
         try:
-            languages = rpc.execute('model', 'ir.lang', 'read', lang_ids,
-                ['code', 'name'], rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            languages = RPCExecute('model', 'ir.lang', 'read', lang_ids,
+                ['code', 'name'])
+        except RPCException:
             return
 
         TranslateDialog(self, languages)

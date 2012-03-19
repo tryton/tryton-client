@@ -4,13 +4,12 @@ import gtk
 import gobject
 import gettext
 import tryton.common as common
-import tryton.rpc as rpc
-from tryton.exceptions import TrytonServerError
 import types
 from tryton.config import TRYTON_ICON
 import csv
 import tempfile
 import os
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -234,11 +233,10 @@ class WinExport(object):
                 self.model1.insert(node, 0, [None, '', 'white'])
 
     def _get_fields(self, model):
-        args = ('model', model, 'fields_get', None, rpc.CONTEXT)
         try:
-            return rpc.execute(*args)
-        except TrytonServerError, exception:
-            return common.process_exception(exception, *args)
+            return RPCExecute('model', model, 'fields_get', None)
+        except RPCException:
+            return ''
 
     def on_row_expanded(self, treeview, iter, path):
         child = self.model1.iter_children(iter)
@@ -271,30 +269,21 @@ class WinExport(object):
         self.model2.clear()
 
     def fill_predefwin(self):
-        args = ('model', 'ir.export', 'search',
-                [('resource', '=', self.model)], 0, None, None, rpc.CONTEXT)
         try:
-            export_ids = rpc.execute(*args)
-        except TrytonServerError, exception:
-            export_ids = common.process_exception(exception, *args)
-            if not export_ids:
-                return
-        args = ('model', 'ir.export', 'read', export_ids, None, rpc.CONTEXT)
+            export_ids = RPCExecute('model', 'ir.export', 'search',
+                [('resource', '=', self.model)], 0, None, None)
+        except RPCException:
+            return
         try:
-            exports = rpc.execute(*args)
-        except TrytonServerError, exception:
-            exports = common.process_exception(exception, *args)
-            if not exports:
-                return
-        args = ('model', 'ir.export.line', 'read',
-                sum((x['export_fields'] for x in exports), []), None,
-                rpc.CONTEXT)
+            exports = RPCExecute('model', 'ir.export', 'read', export_ids,
+                None)
+        except RPCException:
+            return
         try:
-            lines = rpc.execute(*args)
-        except TrytonServerError, exception:
-            lines = common.process_exception(exception, *args)
-            if not lines:
-                return
+            lines = RPCExecute('model', 'ir.export.line', 'read',
+                sum((x['export_fields'] for x in exports), []), None)
+        except RPCException:
+            return
         id2lines = {}
         for line in lines:
             id2lines.setdefault(line['export'], []).append(line)
@@ -315,19 +304,16 @@ class WinExport(object):
             field_name = self.model2.get_value(iter, 1)
             fields.append(field_name)
             iter = self.model2.iter_next(iter)
-        args = ('model', 'ir.export', 'create', {
-            'name': name,
-            'resource': self.model,
-            'export_fields': [('create', {
-                'name': x,
-                }) for x in fields],
-            }, rpc.CONTEXT)
         try:
-            new_id = rpc.execute(*args)
-        except TrytonServerError, exception:
-            new_id = common.process_exception(exception, *args)
-            if not new_id:
-                return
+            new_id = RPCExecute('model', 'ir.export', 'create', {
+                    'name': name,
+                    'resource': self.model,
+                    'export_fields': [('create', {
+                                'name': x,
+                                }) for x in fields],
+                    })
+        except RPCException:
+            return
         self.predef_model.append((
             new_id,
             fields,
@@ -342,12 +328,10 @@ class WinExport(object):
         if not i:
             return None
         export_id = model.get_value(i, 0)
-        args = ('model', 'ir.export', 'delete', export_id, rpc.CONTEXT)
         try:
-            rpc.execute(*args)
-        except TrytonServerError, exception:
-            if not common.process_exception(exception, *args):
-                return
+            RPCExecute('model', 'ir.export', 'delete', export_id)
+        except RPCException:
+            return
         for i in range(len(self.predef_model)):
             if self.predef_model[i][0] == export_id:
                 del self.predef_model[i]
@@ -437,14 +421,9 @@ class WinExport(object):
             return False
 
     def datas_read(self, ids, model, fields, context=None):
-        if context is None:
-            context = {}
-        ctx = context.copy()
-        ctx.update(rpc.CONTEXT)
         try:
-            datas = rpc.execute('model', model,
-                    'export_data', ids, fields, ctx)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            datas = RPCExecute('model', model, 'export_data', ids, fields,
+                context=context)
+        except RPCException:
             return []
         return datas

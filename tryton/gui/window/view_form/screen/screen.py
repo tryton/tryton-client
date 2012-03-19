@@ -14,10 +14,10 @@ from tryton.gui.window.view_form.model.record import Record
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
 from tryton.signal_event import SignalEvent
 from tryton.config import CONFIG
-import tryton.common as common
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
 from tryton.common.domain_parser import DomainParser
+from tryton.common import RPCExecute, RPCException
 
 
 class Screen(SignalEvent):
@@ -89,14 +89,11 @@ class Screen(SignalEvent):
     def search_active(self, active=True):
         if active and not self.parent:
             if not self.fields_view_tree:
-                ctx = {}
-                ctx.update(rpc.CONTEXT)
-                ctx.update(self.context)
                 try:
-                    self.fields_view_tree = rpc.execute('model',
-                            self.model_name, 'fields_view_get', False,
-                            'tree', ctx)
-                except TrytonServerError:
+                    self.fields_view_tree = RPCExecute('model',
+                        self.model_name, 'fields_view_get', False, 'tree',
+                        context=self.context)
+                except RPCException:
                     return
 
             fields = self.fields_view_tree['fields']
@@ -117,10 +114,9 @@ class Screen(SignalEvent):
 
     def get_selection(self, props):
         try:
-            selection = rpc.execute('model',
-                    self.model_name, props['selection'], rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception, None)
+            selection = RPCExecute('model', self.model_name,
+                props['selection'])
+        except RPCException:
             selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))
         return selection
@@ -148,29 +144,23 @@ class Screen(SignalEvent):
         else:
             domain = [('id', 'in', [x.id for x in self.group])]
 
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx.update(self.context)
         if domain:
             if self.domain:
                 domain = ['AND', domain, self.domain]
         else:
             domain = self.domain
-        rpc_args = ('model', self.model_name, 'search', domain, self.offset,
-            self.limit, self.sort, ctx)
         try:
-            ids = rpc.execute(*rpc_args)
-        except TrytonServerError, exception:
-            ids = (common.process_exception(exception, *rpc_args) or [])
+            ids = RPCExecute('model', self.model_name, 'search', domain,
+                self.offset, self.limit, self.sort, context=self.context)
+        except RPCException:
+            ids = []
         if not only_ids:
             if len(ids) == self.limit:
-                rpc_args = ('model', self.model_name, 'search_count', domain,
-                    ctx)
                 try:
-                    self.search_count = rpc.execute(*rpc_args)
-                except TrytonServerError, exception:
-                    self.search_count = (common.process_exception(exception,
-                            *rpc_args) or 0)
+                    self.search_count = RPCExecute('model', self.model_name,
+                        'search_count', domain, context=self.context)
+                except RPCException:
+                    self.search_count = 0
             else:
                 self.search_count = len(ids)
         self.screen_container.but_prev.set_sensitive(bool(self.offset))
@@ -344,17 +334,11 @@ class Screen(SignalEvent):
         if view_type in self.views_preload:
             view = self.views_preload[view_type]
         else:
-            ctx = {}
-            ctx.update(rpc.CONTEXT)
-            ctx.update(self.context)
-            args = ('model', self.model_name, 'fields_view_get',
-                    view_id, view_type, ctx)
             try:
-                view = rpc.execute(*args)
-            except TrytonServerError, exception:
-                view = common.process_exception(exception, *args)
-                if not view:
-                    return
+                view = RPCExecute('model', self.model_name, 'fields_view_get',
+                    view_id, view_type, context=self.context)
+            except RPCException:
+                return
         return self.add_view(view, display, context=context)
 
     def add_view(self, view, display=False, context=None):
@@ -606,12 +590,12 @@ class Screen(SignalEvent):
         if expanded_nodes is None:
             json_domain = self.get_tree_domain(parent)
             try:
-                expanded_nodes = rpc.execute('model',
+                expanded_nodes = RPCExecute('model',
                     'ir.ui.view_tree_expanded_state', 'get_expanded',
                     self.model_name, json_domain,
-                    self.current_view.children_field, rpc.CONTEXT)
+                    self.current_view.children_field)
                 expanded_nodes = json.loads(expanded_nodes)
-            except TrytonServerError:
+            except RPCException:
                 expanded_nodes = []
             self.expanded_nodes[parent][view.children_field] = expanded_nodes
         view.expand_nodes(expanded_nodes)
@@ -631,9 +615,10 @@ class Screen(SignalEvent):
         json_domain = self.get_tree_domain(parent)
         json_paths = json.dumps(paths)
         try:
-            rpc.execute('model', 'ir.ui.view_tree_expanded_state',
+            RPCExecute('model', 'ir.ui.view_tree_expanded_state',
                 'set_expanded', self.model_name, json_domain,
-                self.current_view.children_field, json_paths, rpc.CONTEXT)
+                self.current_view.children_field, json_paths,
+                process_exception=False)
         except (TrytonServerError, TrytonServerUnavailable):
             pass
 
@@ -666,14 +651,14 @@ class Screen(SignalEvent):
             if self.current_view.view_type == 'calendar' and \
                     len(self.views) > 1:
                 self.switch_view()
+            self.search_active(self.current_view.view_type \
+                    in ('tree', 'graph', 'calendar'))
             for view in self.views:
                 view.display()
             self.current_view.widget.set_sensitive(
                     bool(self.group \
                             or (self.current_view.view_type != 'form') \
                             or self.current_record))
-            self.search_active(self.current_view.view_type \
-                    in ('tree', 'graph', 'calendar'))
             if set_cursor:
                 self.set_cursor(reset_view=False)
         self.set_tree_state()

@@ -15,6 +15,7 @@ except ImportError:
     import json
 import webbrowser
 import tryton.rpc as rpc
+from tryton.common import RPCExecute, RPCException
 from tryton.config import CONFIG, TRYTON_ICON, get_config_dir
 import tryton.common as common
 from tryton.pyson import PYSONDecoder
@@ -714,21 +715,20 @@ class Main(object):
             if not ids:
                 return
             try:
-                values = rpc.execute('model', self.menu_screen.model_name,
-                        'read', ids, ['rec_name'], rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                values = RPCExecute('model', self.menu_screen.model_name,
+                        'read', ids, ['rec_name'])
+            except RPCException:
                 return
             try:
                 for value in values:
-                    rpc.execute('model', 'ir.ui.view_sc', 'create', {
-                        'name': value['rec_name'],
-                        'res_id': value['id'],
-                        'user_id': rpc._USER,
-                        'resource': self.menu_screen.model_name,
-                        }, rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                    RPCExecute('model', 'ir.ui.view_sc', 'create', {
+                            'name': value['rec_name'],
+                            'res_id': value['id'],
+                            'user_id': rpc._USER,
+                            'resource': self.menu_screen.model_name,
+                            })
+            except RPCException:
+                pass
             self.shortcut_unset()
 
         def _manage_shortcut(widget):
@@ -739,9 +739,9 @@ class Main(object):
 
         user = rpc._USER
         try:
-            shortcuts = rpc.execute('model', 'ir.ui.view_sc', 'get_sc',
-                    user, 'ir.ui.menu', rpc.CONTEXT)
-        except TrytonServerError:
+            shortcuts = RPCExecute('model', 'ir.ui.view_sc', 'get_sc',
+                user, 'ir.ui.menu')
+        except RPCException:
             shortcuts = []
         menu = self.menuitem_shortcut.get_submenu()
         if not menu:
@@ -832,8 +832,11 @@ class Main(object):
         win = Preference(rpc._USER)
         if win.run():
             rpc.context_reload()
-            prefs = rpc.execute('model', 'res.user',
-                    'get_preferences', False, rpc.CONTEXT)
+            try:
+                prefs = RPCExecute('model', 'res.user', 'get_preferences',
+                    False)
+            except RPCException:
+                prefs = None
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = \
@@ -883,14 +886,14 @@ class Main(object):
             if not rpc._USER:
                 return
             if not exception:
-                res = rpc.execute('model', 'res.request', 'request_get',
-                        rpc.CONTEXT)
+                res = RPCExecute('model', 'res.request', 'request_get',
+                    process_exception=False)
                 if not res:
                     return ([], [])
                 ids, ids2 = res
             else:
-                ids, ids2 = rpc.execute('model', 'res.request', 'request_get',
-                        rpc.CONTEXT)
+                ids, ids2 = RPCExecute('model', 'res.request', 'request_get',
+                    process_exception=False)
             message = _('Waiting requests: %s received - %s sent') % (len(ids),
                         len(ids2))
             self.sb_requests.set_text(message)
@@ -921,9 +924,9 @@ class Main(object):
         self.refresh_ssl()
         if log_response > 0:
             try:
-                prefs = rpc.execute('model', 'res.user', 'get_preferences',
-                        False, rpc.CONTEXT)
-            except TrytonServerError:
+                prefs = RPCExecute('model', 'res.user', 'get_preferences',
+                    False)
+            except RPCException:
                 prefs = None
             common.ICONFACTORY.load_icons()
             if prefs and 'language_direction' in prefs:
@@ -1045,13 +1048,11 @@ class Main(object):
         from tryton.gui.window.view_form.screen import Screen
 
         if not prefs:
-            args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
             try:
-                prefs = rpc.execute(*args)
-            except TrytonServerError, exception:
-                prefs = common.process_exception(exception, *args)
-                if not prefs:
-                    return
+                prefs = RPCExecute('model', 'res.user', 'get_preferences',
+                    False)
+            except RPCException:
+                return False
         if self.pane.get_child1():
             self.pane.remove(self.pane.get_child1())
             if self.pane.get_position():
@@ -1293,7 +1294,7 @@ class Main(object):
         rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'drop',
             dbname, passwd))
         try:
-            rpcprogress.run()
+            rpcprogress.run(False)
         except TrytonServerError, exception:
             self.refresh_ssl()
             if exception.faultCode == "AccessDenied":
@@ -1324,7 +1325,7 @@ class Main(object):
             rpcprogress = common.RPCProgress('db_exec', (host, int(port),
                 'restore', dbname, passwd, buffer(data), update))
             try:
-                res = rpcprogress.run()
+                res = rpcprogress.run(False)
             except TrytonServerError, exception:
                 self.refresh_ssl()
                 if exception.faultCode == \
@@ -1365,7 +1366,7 @@ class Main(object):
         rpcprogress = common.RPCProgress('db_exec', (host, int(port), 'dump',
             dbname, passwd))
         try:
-            dump = rpcprogress.run()
+            dump = rpcprogress.run(False)
         except TrytonServerError, exception:
             if exception.faultCode == "Couldn't dump database with password":
                 common.warning(_("It is not possible to dump a password " \

@@ -11,7 +11,7 @@ import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import field as fields
 from functools import reduce
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 POOL = defaultdict(WeakSet)
 
@@ -44,7 +44,7 @@ class Record(SignalEvent):
         self.destroyed = False
         POOL[model_name].add(self)
 
-    def __getitem__(self, name, raise_exception=False):
+    def __getitem__(self, name):
         if name not in self._loaded and self.id >= 0:
             id2record = {
                 self.id: self,
@@ -95,26 +95,20 @@ class Record(SignalEvent):
             if 'rec_name' not in fnames:
                 fnames.append('rec_name')
             fnames.append('_timestamp')
-            ctx = rpc.CONTEXT.copy()
-            ctx.update(record_context)
+            ctx = record_context.copy()
             ctx.update(dict(('%s.%s' % (self.model_name, fname), 'size')
                     for fname, field in self.group.fields.iteritems()
                     if field.attrs['type'] == 'binary' and fname in fnames))
-            args = ('model', self.model_name, 'read', id2record.keys(), fnames,
-                ctx)
             exception = None
             try:
-                values = rpc.execute(*args)
-            except TrytonServerError, exception:
-                if raise_exception:
-                    raise
-                values = common.process_exception(exception, *args)
-                if not values:
-                    values = [{'id': x} for x in id2record]
-                    default_values = dict((f, False) for f in fnames)
-                    for value in values:
-                        value.update(default_values)
-                    self.exception = True
+                values = RPCExecute('model', self.model_name, 'read',
+                    id2record.keys(), fnames, context=ctx, main_iteration=False)
+            except RPCException, exception:
+                values = [{'id': x} for x in id2record]
+                default_values = dict((f, False) for f in fnames)
+                for value in values:
+                    value.update(default_values)
+                self.exception = True
             id2value = dict((value['id'], value) for value in values)
             if len(id2record) > 1:
                 for id, record in id2record.iteritems():
@@ -272,14 +266,11 @@ class Record(SignalEvent):
         if self.id < 0 or self.modified:
             if self.id < 0:
                 value = self.get(get_readonly=True)
-                args = ('model', self.model_name, 'create', value,
-                    self.context_get())
                 try:
-                    res = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    res = common.process_exception(exception, *args)
-                    if not res:
-                        return False
+                    res = RPCExecute('model', self.model_name, 'create', value,
+                        context=self.context_get())
+                except RPCException:
+                    return False
                 old_id = self.id
                 self.id = res
                 self.group.id_changed(old_id)
@@ -291,15 +282,12 @@ class Record(SignalEvent):
                     context = self.context_get()
                     context = context.copy()
                     context['_timestamp'] = self.get_timestamp()
-                    args = ('model', self.model_name, 'write', [self.id],
-                            value, context)
                     try:
-                        if not rpc.execute(*args):
+                        if not RPCExecute('model', self.model_name, 'write',
+                                [self.id], value, context=context):
                             return False
-                    except TrytonServerError, exception:
-                        res = common.process_exception(exception, *args)
-                        if not res:
-                            return False
+                    except RPCException:
+                        return False
             self._loaded.clear()
             self.modified_fields = {}
             if force_reload:
@@ -321,7 +309,6 @@ class Record(SignalEvent):
         assert all(r.group == group for r in records)
         records = [r for r in records if r.id >= 0]
         ctx = {}
-        ctx.update(rpc.CONTEXT)
         ctx.update(context or {})
         ctx['_timestamp'] = {}
         for rec in records:
@@ -330,26 +317,22 @@ class Record(SignalEvent):
         reload_ids = set(group.on_write_ids(list(record_ids)))
         reload_ids -= record_ids
         reload_ids = list(reload_ids)
-        args = ('model', record.model_name, 'delete', list(record_ids), ctx)
         try:
-            rpc.execute(*args)
-        except TrytonServerError, exception:
-            if not common.process_exception(exception, *args):
-                return False
+            RPCExecute('model', record.model_name, 'delete', list(record_ids),
+                context=ctx)
+        except RPCException:
+            return False
         if reload_ids:
             group.root_group.reload(reload_ids)
         return True
 
     def default_get(self, domain=None, context=None):
         if len(self.group.fields):
-            args = ('model', self.model_name, 'default_get',
-                    self.group.fields.keys(), context)
             try:
-                vals = rpc.execute(*args)
-            except TrytonServerError, exception:
-                vals = common.process_exception(exception, *args)
-                if not vals:
-                    return
+                vals = RPCExecute('model', self.model_name, 'default_get',
+                    self.group.fields.keys(), context=context)
+            except RPCException:
+                return
             if (self.parent
                     and self.parent_name in self.group.fields
                     and (self.group.fields[self.parent_name].attrs['relation']
@@ -362,16 +345,11 @@ class Record(SignalEvent):
             self.do_autocomplete(fieldname)
 
     def rec_name(self):
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
-        args = ('model', self.model_name, 'read', self.id, ['rec_name'], ctx)
         try:
-            res = rpc.execute(*args)
-        except TrytonServerError, exception:
-            res = common.process_exception(exception, *args)
-            if not res:
-                return ''
-        return res['rec_name']
+            return RPCExecute('model', self.model_name, 'read', self.id,
+                ['rec_name'], context=self.context_get())['rec_name']
+        except RPCException:
+            return ''
 
     def validate(self, fields=None, softvalidation=False):
         if isinstance(fields, list) and fields:
@@ -469,10 +447,11 @@ class Record(SignalEvent):
         if check_load:
             self._check_load()
         ctx = rpc.CONTEXT.copy()
+        ctx['context'] = ctx
         for name, field in self.group.fields.items():
             ctx[name] = field.get_eval(self, check_load=check_load)
 
-        ctx['context'] = self.context_get()
+        ctx['context'].update(self.context_get())
         ctx['active_id'] = self.id
         ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
@@ -498,15 +477,11 @@ class Record(SignalEvent):
         if isinstance(attr, basestring):
             attr = PYSONDecoder().decode(attr)
         args = self._get_on_change_args(attr)
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
-        args = ('model', self.model_name, 'on_change_' + fieldname, args, ctx)
         try:
-            res = rpc.execute(*args)
-        except TrytonServerError, exception:
-            res = common.process_exception(exception, *args)
-            if not res:
-                return
+            res = RPCExecute('model', self.model_name,
+                'on_change_' + fieldname, args, context=self.context_get())
+        except RPCException:
+            return
         later = {}
         for fieldname, value in res.items():
             if fieldname not in self.group.fields:
@@ -547,29 +522,22 @@ class Record(SignalEvent):
                 continue
             fieldnames.add(fieldname)
             values.update(self._get_on_change_args(on_change_with))
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
         if fieldnames:
-            args = ('model', self.model_name, 'on_change_with',
-                list(fieldnames), values, ctx)
             try:
-                result = rpc.execute(*args)
-            except TrytonServerError, exception:
-                result = common.process_exception(exception, *args)
-                if not result:
-                    return
+                result = RPCExecute('model', self.model_name, 'on_change_with',
+                    list(fieldnames), values, context=self.context_get())
+            except RPCException:
+                return
             for fieldname, value in result.items():
                 self.group.fields[fieldname].set_on_change(self, value)
         for fieldname in later:
             values = self._get_on_change_args(on_change_with)
-            args = ('model', self.model_name, 'on_change_with_' + fieldname,
-                    values, ctx)
             try:
-                result = rpc.execute(*args)
-            except TrytonServerError, exception:
-                result = common.process_exception(exception, *args)
-                if not result:
-                    return
+                result = RPCExecute('model', self.model_name,
+                    'on_change_with_' + fieldname, values,
+                    context=self.context_get())
+            except RPCException:
+                return
             self.group.fields[fieldname].set_on_change(self, result)
 
     def autocomplete_with(self, field_name):
@@ -583,29 +551,25 @@ class Record(SignalEvent):
         self.autocompletion[fieldname] = []
         autocomplete = self.group.fields[fieldname].attrs['autocomplete']
         args = self._get_on_change_args(autocomplete)
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(self.context_get())
-        args = ('model', self.model_name, 'autocomplete_' + fieldname, args,
-            ctx)
         try:
-            res = rpc.execute(*args)
-        except TrytonServerError, exception:
-            res = common.process_exception(exception, *args)
-            if not res:
-                # ensure res is a list
-                res = []
+            res = RPCExecute('model', self.model_name, 'autocomplete_' +
+                fieldname, args, context=self.context_get())
+        except RPCException:
+            # ensure res is a list
+            res = []
         self.autocompletion[fieldname] = res
 
     def get_attachment_count(self, reload=False):
         if self.id < 0:
             return 0
         if self.attachment_count < 0 or reload:
-            args = ('model', 'ir.attachment', 'search_count', [
-                ('resource', '=', '%s,%s' % (self.model_name, self.id)),
-                ], rpc.CONTEXT)
             try:
-                self.attachment_count = rpc.execute(*args)
-            except TrytonServerError:
+                self.attachment_count = RPCExecute('model', 'ir.attachment',
+                    'search_count', [
+                        ('resource', '=',
+                            '%s,%s' % (self.model_name, self.id)),
+                        ])
+            except RPCException:
                 return 0
         return self.attachment_count
 

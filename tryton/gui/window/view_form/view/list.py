@@ -7,20 +7,18 @@ try:
     import simplejson as json
 except ImportError:
     import json
-import tryton.rpc as rpc
 import locale
 from interface import ParserView
 from tryton.action import Action
 from tryton.common import message
 import gettext
-import tryton.common as common
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.pyson import PYSONEncoder
 from tryton.gui.window import Window
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -396,11 +394,10 @@ class ViewList(ParserView):
         while iter_:
             record = model.get_value(iter_, 0)
             if not record.get_loaded(fields):
-                try:
-                    for field in fields:
-                        record.__getitem__(field, True)
-                except TrytonServerError:
-                    return True
+                for field in fields:
+                    record[field]
+                    if record.exception:
+                        return True
             iter_ = model.iter_next(iter_)
         return False
 
@@ -556,13 +553,13 @@ class ViewList(ParserView):
             menu_entries.append(('gtk-copy', lambda x: self.on_copy(), 1))
             if hasattr(path[1], '_type') and path[1]._type == 'many2one':
                 value = record[path[1].name].get(record)
-                args = ('model', 'ir.action.keyword', 'get_keyword',
-                        'form_relate', (self.screen.group.fields[
-                            path[1].name].attrs['relation'], -1), rpc.CONTEXT)
                 try:
-                    relates = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    relates = common.process_exception(exception, *args)
+                    relates = RPCExecute('model', 'ir.action.keyword',
+                        'get_keyword', 'form_relate',
+                        (self.screen.group.fields[
+                                path[1].name].attrs['relation'], -1))
+                except RPCException:
+                    relates = None
                 if relates:
                     menu_entries.append((None, None, None))
                     menu_entries.append((_('Actions'),
@@ -662,9 +659,9 @@ class ViewList(ParserView):
 
         if fields and any(fields.itervalues()):
             try:
-                rpc.execute('model', 'ir.ui.view_tree_width', 'set_width',
-                        self.screen.model_name, fields, rpc.CONTEXT)
-            except TrytonServerError:
+                RPCExecute('model', 'ir.ui.view_tree_width', 'set_width',
+                    self.screen.model_name, fields)
+            except RPCException:
                 pass
 
     def destroy(self):

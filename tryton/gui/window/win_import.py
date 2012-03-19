@@ -4,10 +4,9 @@ import gtk
 import gobject
 import gettext
 import tryton.common as common
-import tryton.rpc as rpc
 import csv
 from tryton.config import TRYTON_ICON, CONFIG
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -224,11 +223,10 @@ class WinImport(object):
                     self.model1.insert(node, 0, [None, '', 'white'])
 
     def _get_fields(self, model):
-        args = ('model', model, 'fields_get', None, rpc.CONTEXT)
         try:
-            return rpc.execute(*args)
-        except TrytonServerError, exception:
-            return common.process_exception(exception, *args)
+            return RPCExecute('model', model, 'fields_get', None)
+        except RPCException:
+            return ''
 
     def on_row_expanded(self, treeview, iter, path):
         child = self.model1.iter_children(iter)
@@ -346,10 +344,8 @@ class WinImport(object):
             datas.append([x.decode(csv_data['combo']).encode('utf-8') \
                     for x in line])
         try:
-            res = rpc.execute('model', model, 'import_data', fields, datas,
-                    rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            res = RPCExecute('model', model, 'import_data', fields, datas)
+        except RPCException:
             return False
         if res[0] >= 0:
             if res[0] == 1:

@@ -4,12 +4,11 @@ import tryton.rpc as rpc
 from tryton.common import message, selection, file_open, mailto
 from tryton.gui.window import Window
 from tryton.pyson import PYSONDecoder
-from tryton.exceptions import TrytonServerError
 import gettext
 import tempfile
 import os
 import webbrowser
-import tryton.common as common
+from tryton.common import RPCProgress, RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -30,11 +29,9 @@ class Action(object):
         ctx['email_print'] = email_print
         ctx['email'] = email
         args = ('report', name, 'execute', data.get('ids', []), data, ctx)
-        rpcprogress = common.RPCProgress('execute', args)
         try:
-            res = rpcprogress.run()
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            res = RPCProgress('execute', args).run()
+        except RPCException:
             return False
         if not res:
             return False
@@ -57,26 +54,21 @@ class Action(object):
 
     @staticmethod
     def execute(act_id, data, action_type=None, context=None):
-        if context is None:
-            context = {}
-        ctx = rpc.CONTEXT.copy()
-        ctx.update(context)
         if not action_type:
             res = False
             try:
-                res = rpc.execute('model', 'ir.action', 'read', act_id,
-                        ['type'], ctx)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                res = RPCExecute('model', 'ir.action', 'read', act_id,
+                    ['type'], context=context)
+            except RPCException:
                 return
             if not res:
                 raise Exception('ActionNotFound')
             action_type = res['type']
         try:
-            res = rpc.execute('model', action_type, 'search_read',
-                    [('action', '=', act_id)], 0, 1, None, None, ctx)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            res = RPCExecute('model', action_type, 'search_read',
+                [('action', '=', act_id)], 0, 1, None, None,
+                context=context)
+        except RPCException:
             return
         Action._exec_action(res, data)
 
@@ -163,11 +155,9 @@ class Action(object):
         if 'id' in data:
             model_id = data.get('id', False)
             try:
-                actions = rpc.execute('model', 'ir.action.keyword',
-                        'get_keyword', keyword, (data['model'], model_id),
-                        rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                actions = RPCExecute('model', 'ir.action.keyword',
+                    'get_keyword', keyword, (data['model'], model_id))
+            except RPCException:
                 return False
 
         keyact = {}

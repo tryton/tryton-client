@@ -3,12 +3,11 @@
 "Preference"
 import gettext
 import gtk
-import tryton.rpc as rpc
 import copy
 from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
-from tryton.exceptions import TrytonServerError
 import tryton.common as common
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -35,16 +34,13 @@ class Preference(object):
 
         self.win.set_default_response(gtk.RESPONSE_OK)
 
-        args = ('model', 'res.user', 'get_preferences_fields_view',
-                rpc.CONTEXT)
         try:
-            view = rpc.execute(*args)
-        except TrytonServerError, exception:
-            view = common.process_exception(exception, *args)
-            if not view:
-                self.win.destroy()
-                self.win = None
-                return
+            view = RPCExecute('model', 'res.user',
+                'get_preferences_fields_view')
+        except RPCException:
+            self.win.destroy()
+            self.win = None
+            return
 
         title = gtk.Label(_('Edit User Preferences'))
         title.show()
@@ -53,14 +49,13 @@ class Preference(object):
         self.screen.add_view(view)
         self.screen.new(default=False)
 
-        args = ('model', 'res.user', 'get_preferences', False, rpc.CONTEXT)
         try:
-            preferences = rpc.execute(*args)
-        except TrytonServerError, exception:
-            preferences = common.process_exception(exception, *args)
-            if not preferences:
-                self.win.destroy()
-                raise
+            preferences = RPCExecute('model', 'res.user', 'get_preferences',
+                False)
+        except RPCException:
+            self.win.destroy()
+            self.win = None
+            return
         self.screen.current_record.set(preferences)
         self.screen.current_record.validate(softvalidation=True)
         self.screen.screen_container.set(self.screen.current_view.widget)
@@ -91,13 +86,11 @@ class Preference(object):
                             break
                     else:
                         password = False
-                    args = ('model', 'res.user', 'set_preferences', vals,
-                            password, rpc.CONTEXT)
                     try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        if not common.process_exception(exception, *args):
-                            continue
+                        RPCExecute('model', 'res.user', 'set_preferences', vals,
+                            password)
+                    except RPCException:
+                        continue
                     res = True
                     break
             else:

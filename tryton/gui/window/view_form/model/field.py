@@ -3,16 +3,15 @@
 import os
 import tempfile
 import locale
-import tryton.rpc as rpc
 from tryton.common import datetime_strftime, HM_FORMAT, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
-        merge, inverse_leaf, EvalEnvironment, RPCProgress
+        merge, inverse_leaf, EvalEnvironment
 import tryton.common as common
 import time
 import datetime
 from decimal import Decimal
-from tryton.exceptions import TrytonServerError
 from tryton.translate import date_format
+from tryton.common import RPCExecute, RPCException
 
 
 class Field(object):
@@ -379,14 +378,11 @@ class M2OField(CharField):
             else:
                 value = None
         if not rec_name and value >= 0:
-            args = ('model', self.attrs['relation'], 'read', value,
-                    ['rec_name'], rpc.CONTEXT)
             try:
-                result = rpc.execute(*args)
-            except TrytonServerError, exception:
-                result = common.process_exception(exception, *args)
-                if not result:
-                    return
+                result = RPCExecute('model', self.attrs['relation'], 'read', value,
+                    ['rec_name'])
+            except RPCException:
+                return False
             rec_name = result['rec_name'] or ''
         record.value[self.name + '.rec_name'] = rec_name
         record.value[self.name] = value
@@ -604,14 +600,11 @@ class O2MField(CharField):
                             and fieldname not in fields):
                         field_names.append(fieldname)
             if field_names:
-                args = ('model', self.attrs['relation'], 'fields_get',
-                        field_names, context)
                 try:
-                    fields.update(rpc.execute(*args))
-                except TrytonServerError, exception:
-                    fields = common.process_exception(exception, *args)
-                    if not fields:
-                        return False
+                    fields.update(RPCExecute('model', self.attrs['relation'],
+                            'fields_get', field_names, context=context))
+                except RPCException:
+                    return False
 
         parent_name = self.attrs.get('relation_field', '')
         group = Group(self.attrs['relation'], fields,
@@ -647,14 +640,11 @@ class O2MField(CharField):
                 for fieldname in val.keys():
                     if fieldname not in field_names:
                         field_names.append(fieldname)
-            args = ('model', self.attrs['relation'], 'fields_get',
-                    field_names, context)
             try:
-                fields = rpc.execute(*args)
-            except TrytonServerError, exception:
-                fields = common.process_exception(exception, *args)
-                if not fields:
-                    return False
+                fields = RPCExecute('model', self.attrs['relation'],
+                    'fields_get', field_names, context=context)
+            except RPCException:
+                return False
 
         to_remove = []
         for record2 in record.value[self.name]:
@@ -813,14 +803,11 @@ class ReferenceField(CharField):
         rec_name = record.value.get(self.name + '.rec_name') or ''
         if ref_model and ref_id >= 0:
             if not rec_name and ref_id >= 0:
-                args = ('model', ref_model, 'read', ref_id,
-                        ['rec_name'], rpc.CONTEXT)
                 try:
-                    result = rpc.execute(*args)
-                except TrytonServerError, exception:
-                    result = common.process_exception(exception, *args)
-                    if not result:
-                        return
+                    result = RPCExecute('model', ref_model, 'read', ref_id,
+                        ['rec_name'])
+                except RPCException:
+                    return
                 rec_name = result['rec_name']
         elif ref_model:
             rec_name = ''
@@ -873,14 +860,11 @@ class BinaryField(CharField):
         if not isinstance(record.value.get(self.name), (basestring, buffer)):
             if record.id < 0:
                 return ''
-            ctx = rpc.CONTEXT.copy()
-            ctx.update(record.context_get())
-            rpcprogress = RPCProgress('execute', ('model', record.model_name,
-                    'read', record.id, [self.name], ctx))
+            context = record.context_get()
             try:
-                values = rpcprogress.run()
-            except TrytonServerError, exception:
-                values = common.process_exception(exception)
+                values = RPCExecute('model', record.model_name, 'read',
+                    record.id, [self.name], context=context)
+            except RPCException:
                 return ''
             _, filename = tempfile.mkstemp(prefix='tryton_')
             with open(filename, 'wb') as fp:

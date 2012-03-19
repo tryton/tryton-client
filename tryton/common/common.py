@@ -10,6 +10,8 @@ import os
 import subprocess
 import re
 import logging
+from functools import wraps
+from threading import Semaphore
 from tryton.config import CONFIG
 from tryton.config import TRYTON_ICON, PIXMAPS_DIR
 import time
@@ -47,6 +49,7 @@ from tryton.exceptions import (TrytonServerError, TrytonError,
     TrytonServerUnavailable)
 
 _ = gettext.gettext
+
 
 
 class TrytonIconFactory(gtk.IconFactory):
@@ -1154,6 +1157,10 @@ class DBProgress(object):
         return False
 
 
+class RPCException(Exception):
+    pass
+
+
 class RPCProgress(object):
 
     def __init__(self, method, args):
@@ -1176,19 +1183,24 @@ class RPCProgress(object):
             self.error = True
         return True
 
-    def run(self):
+    def run(self, process_exception_p=True, main_iteration_p=True):
         thread.start_new_thread(self.start, ())
 
-        watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
-        self.parent.window.set_cursor(watch)
+        watch = None
         parent_sensitive = self.parent.props.sensitive
-        self.parent.props.sensitive = False
         i = 0
         win = None
         progressbar = None
         while (not self.res) and (not self.error):
             i += 1
-            if i > 10:
+            if i > 1:
+                watch = gtk.gdk.Cursor(gtk.gdk.WATCH)
+                self.parent.window.set_cursor(watch)
+                if main_iteration_p:
+                    with gtk.gdk.lock:
+                        while gtk.events_pending():
+                            gtk.main_iteration()
+            if i > 10 and main_iteration_p:
                 if not win or not progressbar:
                     win = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
                     win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
@@ -1225,22 +1237,38 @@ class RPCProgress(object):
                     win.set_modal(True)
                     win.show_all()
                     win.window.set_cursor(watch)
+                    self.parent.props.sensitive = False
                 with gtk.gdk.lock:
                     progressbar.pulse()
-            if win:
-                with gtk.gdk.lock:
-                    while gtk.events_pending():
-                        gtk.main_iteration()
             time.sleep(0.1)
         self.parent.props.sensitive = parent_sensitive
         self.parent.window.set_cursor(None)
         if win:
             win.destroy()
-            while gtk.events_pending():
-                gtk.main_iteration()
+            with gtk.gdk.lock:
+                while gtk.events_pending():
+                    gtk.main_iteration()
         if self.exception:
-            raise self.exception
+            if process_exception_p:
+                if process_exception(self.exception):
+                    self.res = None
+                    self.error = False
+                    self.exception = None
+                    return self.run(process_exception_p)
+                raise RPCException()
+            else:
+                raise self.exception
         return self.res
+
+
+def RPCExecute(*args, **kwargs):
+    rpc_context = rpc.CONTEXT.copy()
+    if kwargs.get('context'):
+        rpc_context.update(kwargs['context'])
+    args = args + (rpc_context,)
+    process_exception = kwargs.get('process_exception', True)
+    main_iteration = kwargs.get('main_iteration', True)
+    return RPCProgress('execute', args).run(process_exception, main_iteration)
 
 
 class Tooltips(object):

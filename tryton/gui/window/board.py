@@ -4,10 +4,8 @@
 import gettext
 from tryton.signal_event import SignalEvent
 from tryton.gui import Main
-import tryton.rpc as rpc
 from tryton.gui.window.view_board import ViewBoard
-import tryton.common as common
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 from tabcontent import TabContent
 
@@ -44,10 +42,9 @@ class Board(SignalEvent, TabContent):
         super(Board, self).__init__()
 
         try:
-            view = rpc.execute('model', 'ir.ui.view', 'read',
-                    view_id, ['arch'], context)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            view = RPCExecute('model', 'ir.ui.view', 'read',
+                view_id, ['arch'], context=context)
+        except RPCException:
             raise
 
         self.board = ViewBoard(view['arch'], context=context)

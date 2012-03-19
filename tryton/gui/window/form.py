@@ -5,7 +5,6 @@ import gettext
 import gtk
 import gobject
 import locale
-import tryton.rpc as rpc
 from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
 from tryton.gui import Main
@@ -16,11 +15,11 @@ from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
 from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
     timezoned_date)
-from tryton.exceptions import TrytonServerError
 import tryton.common as common
 from tryton.translate import date_format
 from tryton.common import HM_FORMAT
 from tryton.pyson import PYSONEncoder
+from tryton.common import RPCExecute, RPCException
 
 from tabcontent import TabContent
 
@@ -147,16 +146,11 @@ class Form(SignalEvent, TabContent):
             gobject.timeout_add(int(auto_refresh) * 1000, self.sig_reload)
 
     def get_toolbars(self):
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx.update(self.context)
-        args = ('model', self.model, 'view_toolbar_get', ctx)
         try:
-            toolbars = rpc.execute(*args)
-        except TrytonServerError, exception:
-            toolbars = common.process_exception(exception, *args)
-            toolbars = toolbars if toolbars else {}
-        return toolbars
+            return RPCExecute('model', self.model, 'view_toolbar_get',
+                context=self.context)
+        except RPCException:
+            return {}
 
     def widget_get(self):
         return self.screen.widget
@@ -282,16 +276,11 @@ class Form(SignalEvent, TabContent):
             ('write_date', _('Latest Modification Date:')),
         ]
 
-        ctx = self.context.copy()
-        ctx.update(rpc.CONTEXT)
-        args = ('model', self.model, 'read', [obj_id], [x[0] for x in fields],
-                ctx)
         try:
-            res = rpc.execute(*args)
-        except TrytonServerError, exception:
-            res = common.process_exception(exception, *args)
-            if not res:
-                return
+            res = RPCExecute('model', self.model, 'read', [obj_id],
+                [x[0] for x in fields], context=self.context)
+        except RPCException:
+            return
         message_str = ''
         for line in res:
             for (key, val) in fields:
@@ -348,17 +337,14 @@ class Form(SignalEvent, TabContent):
         if not self.modified_save():
             return
         res_ids = self.sel_ids_get()
-        ctx = self.context.copy()
-        ctx.update(rpc.CONTEXT)
-        args = ('model', self.model, 'copy', res_ids, {}, ctx)
         try:
-            new_ids = rpc.execute(*args)
-        except TrytonServerError, exception:
-            new_ids = common.process_exception(exception, *args)
-        if new_ids:
-            self.screen.load(new_ids)
-            self.message_info(_('Working now on the duplicated record(s)!'),
-                    'green')
+            new_ids = RPCExecute('model', self.model, 'copy', res_ids, {},
+                context=self.context)
+        except RPCException:
+            return
+        self.screen.load(new_ids)
+        self.message_info(_('Working now on the duplicated record(s)!'),
+            'green')
 
     def sig_save(self, widget=None):
         if self.screen.save_current():

@@ -15,7 +15,6 @@ import tryton.rpc as rpc
 from tryton.common import COLORS, node_attributes, \
         HM_FORMAT, file_selection, file_open
 import tryton.common as common
-from tryton.exceptions import TrytonError, TrytonServerError
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
 from tryton.common.cellrenderertext import CellRendererText
@@ -26,6 +25,7 @@ from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.action import Action
 from tryton.translate import date_format
+from tryton.common import RPCExecute, RPCException
 import gtk
 import locale
 import datetime
@@ -581,17 +581,14 @@ class M2O(Char):
                     domain]
         else:
             dom = domain
-        args = ('model', relation, 'search', dom, 0, None, None,
-                context)
         try:
-            ids = rpc.execute(*args)
-        except TrytonServerError, exception:
-            ids = common.process_exception(exception, *args)
-            if not ids:
-                field.set_client(record, '???')
-                if callback:
-                    callback()
-                return
+            ids = RPCExecute('model', relation, 'search', dom, 0, None, None,
+                context=context)
+        except RPCException:
+            field.set_client(record, '???')
+            if callback:
+                callback()
+            return
         if len(ids) != 1:
             if callback:
                 self.search_remote(record, relation, ids, domain=domain,
@@ -617,16 +614,14 @@ class M2O(Char):
                 dom = [('rec_name', 'ilike', '%' + text + '%'), domain]
             else:
                 dom = domain
-            args = ('model', relation, 'search', dom, 0, None, None, context)
             try:
-                ids = rpc.execute(*args)
-            except TrytonServerError, exception:
-                ids = common.process_exception(exception, *args)
-                if not ids:
-                    field.set_client(record, False)
-                    if callback:
-                        callback()
-                    return
+                ids = RPCExecute('model', relation, 'search', dom, 0, None,
+                    None, context=context)
+            except RPCException:
+                field.set_client(record, False)
+                if callback:
+                    callback()
+                return
             if len(ids) == 1:
                 field.set_client(record, ids[0])
                 if callback:
@@ -738,17 +733,14 @@ class M2M(Char):
                     domain]
         else:
             dom = domain
-        args = ('model', relation, 'search', dom, 0, CONFIG['client.limit'],
-                None, context)
         try:
-            ids = rpc.execute(*args)
-        except TrytonServerError, exception:
-            ids = common.process_exception(exception, *args)
-            if ids is False:
-                field.set_client(record, [])
-                if callback:
-                    callback()
-                return
+            ids = RPCExecute('model', relation, 'search', dom, 0,
+                CONFIG['client.limit'], None, context=context)
+        except RPCException:
+            field.set_client(record, [])
+            if callback:
+                callback()
+            return
         if not callback:
             return
 
@@ -773,15 +765,12 @@ class M2M(Char):
         if create:
             if text and len(text) and text[0] != '(':
                 domain.append(('name', '=', text))
-            args = ('model', relation, 'search', domain)
             try:
-                ids = rpc.execute(*args)
-            except TrytonServerError, exception:
-                ids = common.process_exception(exception, *args)
-                if ids is False:
-                    field.set_client(record, False)
-                    if callback:
-                        callback()
+                ids = RPCExecute('model', relation, 'search', domain)
+            except RPCException:
+                field.set_client(record, False)
+                if callback:
+                    callback()
             if ids and len(ids) == 1:
                 field.set_client(record, ids)
                 if callback:
@@ -809,11 +798,10 @@ class Selection(Char):
         self._domain_cache = {}
         selection = self.attrs.get('selection', [])[:]
         if not isinstance(selection, (list, tuple)):
-            args = ('model', self.model_name, selection, rpc.CONTEXT)
             try:
-                selection = rpc.execute(*args)
-            except TrytonServerError, exception:
-                selection = (common.process_exception(exception, args) or [])
+                selection = RPCExecute('model', self.model_name, selection)
+            except RPCException:
+                selection = []
         self.selection = selection[:]
         if self.attrs.get('sort', True):
             selection.sort(key=operator.itemgetter(1))
@@ -871,12 +859,11 @@ class Selection(Char):
             self.selection = self._domain_cache[str(domain)]
             self._last_domain = domain
         if domain != self._last_domain:
-            args = ('model', self.attrs['relation'], 'search_read', domain,
-                0, None, None, ['rec_name'], rpc.CONTEXT)
             try:
-                result = rpc.execute(*args)
-            except TrytonServerError, exception:
-                result = common.process_exception(exception, *args)
+                result = RPCExecute('model', self.attrs['relation'],
+                    'search_read', domain, 0, None, None, ['rec_name'])
+            except RPCException:
+                result = None
 
             if isinstance(result, list):
                 selection = [(x['id'], x['rec_name']) for x in result]
@@ -900,10 +887,8 @@ class Reference(Char):
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
             try:
-                selection = rpc.execute('model',
-                        model_name, selection, rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                selection = RPCExecute('model', model_name, selection)
+            except RPCException:
                 selection = []
         selection.sort(key=operator.itemgetter(1))
         for i, j in selection:
@@ -1006,31 +991,27 @@ class Button(object):
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm']):
                 button_type = self.attrs.get('type', 'workflow')
-                ctx = rpc.CONTEXT.copy()
-                ctx.update(record.context_get())
+                ctx = record.context_get()
                 if button_type == 'workflow':
-                    args = ('model', self.screen.model_name,
+                    try:
+                        RPCExecute('model', self.screen.model_name,
                             'workflow_trigger_validate', obj_id,
-                            self.attrs['name'], ctx)
-                    try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
+                            self.attrs['name'], context=ctx)
+                    except RPCException:
+                        pass
                 elif button_type == 'object':
-                    args = ('model', self.screen.model_name,
-                            self.attrs['name'], [obj_id], ctx)
                     try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
+                        RPCExecute('model', self.screen.model_name,
+                            self.attrs['name'], [obj_id], context=ctx)
+                    except RPCException:
+                        pass
                 elif button_type == 'action':
-                    action_id = None
-                    args = ('model', 'ir.action', 'get_action_id',
-                            int(self.attrs['name']), ctx)
                     try:
-                        action_id = rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        action_id = common.process_exception(exception, *args)
+                        action_id = RPCExecute('model', 'ir.action',
+                            'get_action_id', int(self.attrs['name']),
+                            context=ctx)
+                    except RPCException:
+                        action_id = None
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.screen.model_name,

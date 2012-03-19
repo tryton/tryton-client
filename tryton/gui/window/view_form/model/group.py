@@ -1,12 +1,10 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import tryton.rpc as rpc
 from record import Record
 from field import Field, O2MField
 from tryton.signal_event import SignalEvent
-import tryton.common as common
-from tryton.exceptions import TrytonServerError
 from tryton.common.domain_inversion import is_leaf
+from tryton.common import RPCExecute, RPCException
 
 
 class Group(SignalEvent, list):
@@ -178,14 +176,11 @@ class Group(SignalEvent, list):
             return []
         res = []
         for fnct in self.on_write:
-            args = ('model', self.model_name, fnct, ids, self.context)
             try:
-                res += rpc.execute(*args)
-            except TrytonServerError, exception:
-                res2 = common.process_exception(exception, *args)
-                if not res2:
-                    return []
-                res += res2
+                res += RPCExecute('model', self.model_name, fnct, ids,
+                    context=self.context)
+            except RPCException:
+                return []
         return list({}.fromkeys(res))
 
     def load(self, ids, display=True, modified=False, id2record=None):
@@ -230,7 +225,7 @@ class Group(SignalEvent, list):
         return True
 
     def _get_context(self):
-        ctx = rpc.CONTEXT.copy()
+        ctx = self._context.copy()
         if self.parent:
             ctx.update(self.parent.context_get())
         ctx.update(self._context)
@@ -370,14 +365,11 @@ class Group(SignalEvent, list):
 
         if len(new) and len(to_add):
             ctx.update(self.context)
-            args = ('model', self.model_name, 'default_get', to_add.keys(),
-                ctx)
             try:
-                values = rpc.execute(*args)
-            except TrytonServerError, exception:
-                values = common.process_exception(exception, *args)
-                if not values:
-                    return False
+                values = RPCExecute('model', self.model_name, 'default_get',
+                    to_add.keys(), context=ctx)
+            except RPCException:
+                return False
             for name in to_add:
                 if name not in values:
                     values[name] = False

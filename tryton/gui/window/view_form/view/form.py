@@ -4,11 +4,10 @@ import operator
 from functools import reduce
 import gtk
 import gettext
-import tryton.rpc as rpc
 import tryton.common as common
 from interface import ParserView
-from tryton.exceptions import TrytonServerError
 from tryton.action import Action
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -24,6 +23,16 @@ class ViewForm(ParserView):
         for button in self.buttons:
             if isinstance(button, gtk.Button):
                 button.connect('clicked', self.button_clicked)
+
+        # Force to display the first time it switches on a page
+        # This avoids glitch in position of widgets
+        display_done = {}
+        for notebook in notebooks:
+            def switch(notebook, page, page_num):
+                if page_num not in display_done.setdefault(notebook, []):
+                    display_done[notebook].append(page_num)
+                    self.display()
+            notebook.connect('switch-page', switch)
 
         self.widgets = children
         for widgets in self.widgets.itervalues():
@@ -163,37 +172,34 @@ class ViewForm(ParserView):
             if not attrs.get('confirm', False) or \
                     common.sur(attrs['confirm']):
                 button_type = attrs.get('type', 'workflow')
-                ctx = rpc.CONTEXT.copy()
-                ctx.update(record.context_get())
+                context = record.context_get()
                 if button_type == 'workflow':
-                    args = ('model', self.screen.model_name,
+                    try:
+                        RPCExecute('model', self.screen.model_name,
                             'workflow_trigger_validate', record_id,
-                            attrs['name'], ctx)
-                    try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
+                            attrs['name'], context=context)
+                    except RPCException:
+                        pass
                 elif button_type == 'object':
-                    args = ('model', self.screen.model_name, attrs['name'],
-                            [record_id], ctx)
                     try:
-                        rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        common.process_exception(exception, *args)
+                        RPCExecute('model', self.screen.model_name, attrs['name'],
+                            [record_id], context=context)
+                    except RPCException:
+                        pass
                 elif button_type == 'action':
                     action_id = None
-                    args = ('model', 'ir.action', 'get_action_id',
-                            int(attrs['name']), ctx)
                     try:
-                        action_id = rpc.execute(*args)
-                    except TrytonServerError, exception:
-                        action_id = common.process_exception(exception, *args)
+                        action_id = RPCExecute('model', 'ir.action',
+                            'get_action_id', int(attrs['name']),
+                            context=context)
+                    except RPCException:
+                        pass
                     if action_id:
                         Action.execute(action_id, {
                             'model': self.screen.model_name,
                             'id': record_id,
                             'ids': [record_id],
-                            }, context=ctx)
+                            }, context=context)
                 else:
                     raise Exception('Unallowed button type')
                 self.screen.reload(written=True)

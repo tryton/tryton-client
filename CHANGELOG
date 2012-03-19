@@ -1,3 +1,4 @@
+* Use RPCProgress almost everywhere
 * Add a simple search box
 * New domain parser using shlex
 * Better translation dialog box

@@ -1,17 +1,17 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
+import gobject
 import gettext
 from interface import WidgetInterface
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
-import tryton.rpc as rpc
 from tryton.action import Action
 from tryton.config import CONFIG
 from tryton.pyson import PYSONEncoder
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -124,8 +124,7 @@ class Many2One(WidgetInterface):
                                 self.record)['required'])
                             and key_press)):
                 domain = self.field.domain_get(self.record)
-                context = rpc.CONTEXT.copy()
-                context.update(self.field.context_get(self.record))
+                context = self.field.context_get(self.record)
                 self.wid_text.grab_focus()
 
                 try:
@@ -135,11 +134,10 @@ class Many2One(WidgetInterface):
                             domain]
                     else:
                         dom = domain
-                    ids = rpc.execute('model', model, 'search', dom, 0,
-                        CONFIG['client.limit'], None, context)
-                except TrytonServerError, exception:
+                    ids = RPCExecute('model', model, 'search', dom, 0,
+                        CONFIG['client.limit'], None, context=context)
+                except RPCException:
                     self.focus_out = True
-                    common.process_exception(exception)
                     self.changed = True
                     return
                 if len(ids) == 1:
@@ -216,8 +214,7 @@ class Many2One(WidgetInterface):
             return
         elif model and not self._readonly:
             domain = self.field.domain_get(self.record)
-            context = rpc.CONTEXT.copy()
-            context.update(self.field.context_get(self.record))
+            context = self.field.context_get(self.record)
             self.wid_text.grab_focus()
 
             try:
@@ -227,11 +224,10 @@ class Many2One(WidgetInterface):
                         domain]
                 else:
                     dom = domain
-                ids = rpc.execute('model', model, 'search', dom, 0,
-                    CONFIG['client.limit'], None, context)
-            except TrytonServerError, exception:
+                ids = RPCExecute('model', model, 'search', dom, 0,
+                    CONFIG['client.limit'], None, context=context)
+            except RPCException:
                 self.focus_out = True
-                common.process_exception(exception)
                 self.changed = True
                 return False
             if len(ids) == 1:
@@ -276,8 +272,11 @@ class Many2One(WidgetInterface):
             return False
         value = self.field.get(self.record)
         if self.has_target(value):
-            self.field.set_client(self.record, self.value_from_id(None, ''))
-            self.display(self.record, self.field)
+            def clean():
+                self.field.set_client(self.record,
+                    self.value_from_id(None, ''))
+                self.display(self.record, self.field)
+            gobject.idle_add(clean)
         return False
 
     def set_value(self, record, field):
@@ -311,14 +310,11 @@ class Many2One(WidgetInterface):
 
     def _populate_popup(self, widget, menu):
         value = self.field.get(self.record)
-        args = ('model', 'ir.action.keyword', 'get_keyword',
-                'form_relate', (self.attrs['relation'], -1), rpc.CONTEXT)
         try:
-            relates = rpc.execute(*args)
-        except TrytonServerError, exception:
-            relates = common.process_exception(exception)
-            if not relates:
-                return False
+            relates = RPCExecute('model', 'ir.action.keyword', 'get_keyword',
+                'form_relate', (self.attrs['relation'], -1))
+        except RPCException:
+            return False
         menu_entries = []
         menu_entries.append((None, None, None))
         menu_entries.append((None, None, None))

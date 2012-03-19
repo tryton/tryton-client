@@ -5,9 +5,7 @@ import gtk
 import gobject
 import math
 from interface import WidgetInterface
-import tryton.rpc as rpc
-import tryton.common as common
-from tryton.exceptions import TrytonServerError
+from tryton.common import RPCExecute, RPCException
 
 
 class Selection(WidgetInterface):
@@ -40,10 +38,8 @@ class Selection(WidgetInterface):
         selection = self.attrs.get('selection', [])[:]
         if not isinstance(selection, (list, tuple)):
             try:
-                selection = rpc.execute('model',
-                        self.model_name, selection, rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                selection = RPCExecute('model', self.model_name, selection)
+            except RPCException:
                 selection = []
         self.selection = selection[:]
         if self.attrs.get('sort', True):
@@ -60,12 +56,11 @@ class Selection(WidgetInterface):
         if domain == self._last_domain:
             return
 
-        args = ('model', self.attrs['relation'], 'search_read', domain, 0,
-            None, None, ['rec_name'], rpc.CONTEXT)
         try:
-            result = rpc.execute(*args)
-        except TrytonServerError, exception:
-            result = common.process_exception(exception, args)
+            result = RPCExecute('model', self.attrs['relation'], 'search_read',
+                domain, 0, None, None, ['rec_name'])
+        except RPCException:
+            result = False
         if isinstance(result, list):
             selection = [(x['id'], x['rec_name']) for x in result]
             selection.append((False, ''))

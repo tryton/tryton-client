@@ -3,13 +3,12 @@
 import gtk
 from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
-import tryton.rpc as rpc
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.config import CONFIG
-from tryton.exceptions import TrytonServerError
 import tryton.common as common
 import gettext
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -133,10 +132,9 @@ class Many2Many(WidgetInterface):
                 dom = [('rec_name', 'ilike', '%' + value + '%'), domain]
             else:
                 dom = domain
-            ids = rpc.execute('model', self.attrs['relation'], 'search',
-                dom, 0, CONFIG['client.limit'], None, context)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            ids = RPCExecute('model', self.attrs['relation'], 'search',
+                dom, 0, CONFIG['client.limit'], None, context=context)
+        except RPCException:
             self.focus_out = True
             return False
 

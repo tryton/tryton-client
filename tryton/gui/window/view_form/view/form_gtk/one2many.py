@@ -7,9 +7,8 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.config import CONFIG
-from tryton.exceptions import TrytonServerError
 import tryton.common as common
-import tryton.rpc as rpc
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -302,11 +301,9 @@ class One2Many(WidgetInterface):
     def _sig_add(self, *args):
         self.view.set_value()
         domain = self.field.domain_get(self.record)
-        context = rpc.CONTEXT.copy()
-        context.update(self.field.context_get(self.record))
+        context = self.field.context_get(self.record)
         domain = domain[:]
-        domain.extend(self.record.expr_eval(self.attrs.get('add_remove'),
-            context))
+        domain.extend(self.record.expr_eval(self.attrs.get('add_remove')))
         removed_ids = self.field.get_removed_ids(self.record)
 
         try:
@@ -316,10 +313,9 @@ class One2Many(WidgetInterface):
                     ['OR', domain, ('id', 'in', removed_ids)]]
             else:
                 dom = ['OR', domain, ('id', 'in', removed_ids)]
-            ids = rpc.execute('model', self.attrs['relation'], 'search', dom,
-                    0, CONFIG['client.limit'], None, context)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            ids = RPCExecute('model', self.attrs['relation'], 'search', dom,
+                    0, CONFIG['client.limit'], None, context=context)
+        except RPCException:
             return False
 
         def callback(result):

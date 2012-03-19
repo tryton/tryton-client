@@ -6,9 +6,8 @@ from tryton.config import CONFIG
 import gtk
 import pango
 import gettext
-from tryton.exceptions import TrytonServerError
 from tryton.gui.window.nomodal import NoModal
-import tryton.rpc as rpc
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -255,7 +254,6 @@ class WinForm(NoModal):
     def _sig_add(self, *args):
         from tryton.gui.window.win_search import WinSearch
         domain = []
-        context = rpc.CONTEXT.copy()
         model_name = self.screen.model_name
 
         try:
@@ -264,10 +262,9 @@ class WinForm(NoModal):
                         '%' + self.wid_text.get_text() + '%'), domain]
             else:
                 dom = domain
-            ids = rpc.execute('model', model_name, 'search', dom,
-                    0, CONFIG['client.limit'], None, context)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            ids = RPCExecute('model', model_name, 'search', dom,
+                    0, CONFIG['client.limit'], None)
+        except RPCException:
             return False
 
         def callback(result):
@@ -281,7 +278,7 @@ class WinForm(NoModal):
 
         if len(ids) != 1:
             WinSearch(model_name, callback, sel_multi=True,
-                ids=ids, context=context, domain=domain,
+                ids=ids, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
                 views_preload=self.attrs.get('views', {}))
         else:

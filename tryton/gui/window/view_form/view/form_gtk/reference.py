@@ -6,9 +6,7 @@ import gobject
 import gettext
 import math
 from many2one import Many2One
-from tryton.exceptions import TrytonServerError
-import tryton.rpc as rpc
-import tryton.common as common
+from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -31,10 +29,8 @@ class Reference(Many2One):
         selection = attrs.get('selection', [])
         if not isinstance(selection, (list, tuple)):
             try:
-                selection = rpc.execute('model',
-                        self.model_name, selection, rpc.CONTEXT)
-            except TrytonServerError, exception:
-                common.process_exception(exception)
+                selection = RPCExecute('model', self.model_name, selection)
+            except RPCException:
                 selection = []
         selection.sort(key=operator.itemgetter(1))
         if selection:

@@ -8,8 +8,8 @@ import tryton.common as common
 from tryton.pyson import PYSONDecoder
 import gettext
 from tryton.signal_event import SignalEvent
-from tryton.exceptions import TrytonServerError
 from tryton.gui.window.win_form import WinForm
+from tryton.common import RPCExecute, RPCException
 _ = gettext.gettext
 
 
@@ -21,10 +21,9 @@ class Action(SignalEvent):
         self.context = context or {}
 
         try:
-            self.action = rpc.execute('model', 'ir.action.act_window', 'read',
-                    self.act_id, False, rpc.CONTEXT)
-        except TrytonServerError, exception:
-            common.process_exception(exception)
+            self.action = RPCExecute('model', 'ir.action.act_window', 'read',
+                self.act_id, False)
+        except RPCException:
             raise
 
         view_ids = None

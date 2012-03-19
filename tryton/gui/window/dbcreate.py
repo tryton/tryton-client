@@ -371,7 +371,7 @@ class DBCreate(object):
                             rpcprogress = common.RPCProgress('db_exec',
                                     (host, int(port), 'create', dbname, passwd,
                                         langreal, admin_passwd.get_text()))
-                            rpcprogress.run()
+                            rpcprogress.run(False)
                         except TrytonServerError, exception:
                             if str(exception.faultCode) == "AccessDenied":
                                 common.warning(_("Sorry, wrong password for " \
