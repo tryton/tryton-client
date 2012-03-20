@@ -280,7 +280,16 @@ class Greater(PYSON):
         return set([bool])
 
     @staticmethod
+    def _convert(dct):
+        for i in ('s1', 's2'):
+            if not isinstance(dct[i], (int, long, float)):
+                dct = dct.copy()
+                dct[i] = float(dct[i])
+        return dct
+
+    @staticmethod
     def eval(dct, context):
+        dct = Greater._convert(dct)
         if dct['e']:
             return dct['s1'] >= dct['s2']
         else:
@@ -296,6 +305,7 @@ class Less(Greater):
 
     @staticmethod
     def eval(dct, context):
+        dct = Less._convert(dct)
         if dct['e']:
             return dct['s1'] <= dct['s2']
         else:
