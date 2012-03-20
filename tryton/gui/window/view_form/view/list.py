@@ -18,6 +18,7 @@ from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.pyson import PYSONEncoder
 from tryton.gui.window import Window
+from tryton.common.popup_menu import populate
 from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
@@ -547,45 +548,40 @@ class ViewList(ParserView):
                 model = selection.get_selected_rows()[0]
             if (not path) or not path[0]:
                 return False
-            record = model.group[path[0][0]]
+            group = model.group
+            record = group[path[0][0]]
 
-            menu_entries = []
-            menu_entries.append(('gtk-copy', lambda x: self.on_copy(), 1))
-            if hasattr(path[1], '_type') and path[1]._type == 'many2one':
-                value = record[path[1].name].get(record)
-                try:
-                    relates = RPCExecute('model', 'ir.action.keyword',
-                        'get_keyword', 'form_relate',
-                        (self.screen.group.fields[
-                                path[1].name].attrs['relation'], -1))
-                except RPCException:
-                    relates = None
-                if relates:
-                    menu_entries.append((None, None, None))
-                    menu_entries.append((_('Actions'),
-                        lambda x: self.click_and_action(
-                            'form_action', value, path), 0))
-                    menu_entries.append((_('Reports'),
-                        lambda x: self.click_and_action(
-                            'form_print', value, path), 0))
-                    menu_entries.append((None, None, None))
-                    for relate in relates:
-                        relate['string'] = relate['name']
-                        fct = lambda action: lambda x: \
-                                self.click_and_relate(action, value, path)
-                        menu_entries.append(
-                                ('... ' + relate['name'], fct(relate), 0))
             menu = gtk.Menu()
-            for stock_id, callback, sensitivity in menu_entries:
-                if stock_id:
-                    item = gtk.ImageMenuItem(stock_id)
-                    if callback:
-                        item.connect('activate', callback)
-                    item.set_sensitive(bool(sensitivity or value))
-                else:
-                    item = gtk.SeparatorMenuItem()
-                item.show()
-                menu.append(item)
+            copy_item = gtk.ImageMenuItem('gtk-copy')
+            copy_item.connect('activate', lambda x: self.on_copy())
+            menu.append(copy_item)
+            record_id = record.id
+            # Don't activate actions if parent is modified
+            parent = record.parent if record else None
+            while parent:
+                if parent.modified:
+                    record_id = -1
+                    break
+                parent = parent.parent
+            populate(menu, group.model_name, record_id)
+            for col in self.widget_tree.get_columns():
+                if not col.get_visible() or not col.name:
+                    continue
+                field = group.fields[col.name]
+                model = None
+                if field.attrs['type'] == 'many2one':
+                    model = field.attrs['relation']
+                    record_id = field.get(record)
+                elif field.attrs['type'] == 'reference':
+                    value = field.get(record)
+                    if value:
+                        model, record_id = value.split(',')
+                        record_id = int(record_id)
+                if not model:
+                    continue
+                label = field.attrs['string']
+                populate(menu, model, record_id, title=label)
+            menu.show_all()
             menu.popup(None, None, None, event.button, event.time)
         elif event.button == 2:
             event.button = 1

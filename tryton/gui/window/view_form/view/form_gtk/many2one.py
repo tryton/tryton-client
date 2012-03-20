@@ -8,9 +8,8 @@ import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
-from tryton.action import Action
 from tryton.config import CONFIG
-from tryton.pyson import PYSONEncoder
+from tryton.common.popup_menu import populate
 from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
@@ -310,61 +309,6 @@ class Many2One(WidgetInterface):
 
     def _populate_popup(self, widget, menu):
         value = self.field.get(self.record)
-        try:
-            relates = RPCExecute('model', 'ir.action.keyword', 'get_keyword',
-                'form_relate', (self.attrs['relation'], -1))
-        except RPCException:
-            return False
-        menu_entries = []
-        menu_entries.append((None, None, None))
-        menu_entries.append((None, None, None))
-        menu_entries.append((_('Actions'),
-            lambda x: self.click_and_action('form_action'), 0))
-        menu_entries.append((_('Reports'),
-            lambda x: self.click_and_action('form_print'), 0))
-        menu_entries.append((None, None, None))
-        for relate in relates:
-            relate['string'] = relate['name']
-            fct = lambda action: lambda x: self.click_and_relate(action)
-            menu_entries.append(
-                    ('... ' + relate['name'], fct(relate), 0))
-
-        for stock_id, callback, sensitivity in menu_entries:
-            if stock_id:
-                item = gtk.ImageMenuItem(stock_id)
-                if callback:
-                    item.connect("activate", callback)
-                item.set_sensitive(bool(sensitivity or value))
-            else:
-                item = gtk.SeparatorMenuItem()
-            item.show()
-            menu.append(item)
+        if self.has_target(value):
+            populate(menu, self.get_model(), self.id_from_value(value))
         return True
-
-    def click_and_relate(self, action):
-        data = {}
-        context = {}
-        act = action.copy()
-        obj_id = self.field.get(self.record)
-        if not obj_id:
-            common.message(_('You must select a record to use the relation!'))
-            return False
-        screen = Screen(self.attrs['relation'])
-        screen.load([obj_id])
-        encoder = PYSONEncoder()
-        act['domain'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('domain', []), check_load=False))
-        act['context'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('context', {}), check_load=False))
-        data['model'] = self.attrs['relation']
-        data['id'] = obj_id
-        data['ids'] = [obj_id]
-        return Action._exec_action(act, data, context)
-
-    def click_and_action(self, atype):
-        obj_id = self.field.get(self.record)
-        return Action.exec_keyword(atype, {
-            'model': self.attrs['relation'],
-            'id': obj_id or False,
-            'ids': [obj_id],
-            }, alwaysask=True)

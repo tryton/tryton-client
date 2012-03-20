@@ -499,30 +499,7 @@ class Form(SignalEvent, TabContent):
             return
         record_id = self.screen.id_get()
         record_ids = self.screen.sel_ids_get()
-        if atype in ('print', 'action'):
-            email = {}
-            if 'pyson_email' in action:
-                email = self.screen.current_record.expr_eval(
-                    action['pyson_email'])
-                if not email:
-                    email = {}
-            if 'subject' not in email:
-                email['subject'] = action['name'].replace('_', '')
-            action['email'] = email
-            self.screen.display()
-        elif atype == 'relate':
-            encoder = PYSONEncoder()
-            if 'pyson_domain' in action:
-                action['pyson_domain'] = encoder.encode(
-                        self.screen.current_record.expr_eval(
-                                action['pyson_domain'], check_load=False))
-            if 'pyson_context' in action:
-                action['pyson_context'] = encoder.encode(
-                        self.screen.current_record.expr_eval(
-                            action['pyson_context'], check_load=False))
-        else:
-            raise NotImplementedError("Action type '%s' is not supported" %
-                atype)
+        action = Action.evaluate(action, atype, self.screen.current_record)
         data = {
             'model': self.screen.model_name,
             'id': record_id,
