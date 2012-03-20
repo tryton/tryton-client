@@ -123,6 +123,7 @@ class Wizard(object):
                 process_exception=False)
             if self.action == 'ir.module.module.config_wizard':
                 rpc.context_reload()
+                Main.get_main().sig_win_menu()
         except TrytonServerError:
             pass
 
