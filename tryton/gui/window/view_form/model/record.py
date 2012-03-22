@@ -447,7 +447,7 @@ class Record(SignalEvent):
         if check_load:
             self._check_load()
         ctx = rpc.CONTEXT.copy()
-        ctx['context'] = ctx
+        ctx['context'] = ctx.copy()
         for name, field in self.group.fields.items():
             ctx[name] = field.get_eval(self, check_load=check_load)
 
