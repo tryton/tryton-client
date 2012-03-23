@@ -646,7 +646,8 @@ class ViewList(ParserView):
                 last_col = col
             if not hasattr(col, 'name') or not hasattr(col, 'width'):
                 continue
-            if col.get_width() != col.width and col.get_visible():
+            if (col.get_width() != col.width and col.get_visible()
+                    and not col.get_expand()):
                 fields[col.name] = col.get_width()
         #Don't set width for last visible columns
         #as it depends of the screen size

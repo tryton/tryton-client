@@ -113,12 +113,13 @@ class ParserTree(ParserInterface):
         if not self.title:
             self.title = attrs.get('string', 'Unknown')
         tooltips = common.Tooltips()
+        expandable = False
 
         for node in root_node.childNodes:
             node_attrs = node_attributes(node)
             if node.localName == 'field':
                 fname = str(node_attrs['name'])
-                for boolean_fields in ('readonly', 'required'):
+                for boolean_fields in ('readonly', 'required', 'expand'):
                     if boolean_fields in node_attrs:
                         node_attrs[boolean_fields] = \
                                 bool(int(node_attrs[boolean_fields]))
@@ -214,8 +215,9 @@ class ParserTree(ParserInterface):
                 if width > 0:
                     col.set_fixed_width(width)
                 col.set_min_width(1)
-                #XXX doesn't work well when resize columns
-                #col.set_expand(True)
+                expand = node_attrs.get('expand', False)
+                col.set_expand(expand)
+                expandable |= expand
                 if (not treeview.sequence
                         and not self.children_field
                         and fields[fname].attrs.get('sortable', True)):
@@ -271,7 +273,7 @@ class ParserTree(ParserInterface):
                 col.set_resizable(True)
                 col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
                 i = treeview.append_column(col)
-        if not bool(int(attrs.get('fill', '0'))):
+        if not expandable:
             col = gtk.TreeViewColumn()
             col.name = None
             arrow = gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN)
