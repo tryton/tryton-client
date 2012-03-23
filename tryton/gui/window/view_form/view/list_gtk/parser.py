@@ -1019,7 +1019,7 @@ class Button(object):
                             'ids': [obj_id],
                             }, context=ctx)
                 else:
-                    raise TrytonError('Unallowed button type')
+                    raise Exception('Unallowed button type')
                 self.screen.reload(written=True)
             else:
                 self.screen.display()
