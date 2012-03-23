@@ -9,6 +9,7 @@ from tryton.common import datetime_strftime, HM_FORMAT, \
 import tryton.common as common
 import time
 import datetime
+import decimal
 from decimal import Decimal
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
@@ -76,6 +77,14 @@ class CharField(object):
                 check_load=check_load))
         return context
 
+    def check_required(self, record):
+        state_attrs = self.get_state_attrs(record)
+        if bool(int(state_attrs.get('required') or 0)):
+            if (not self.get(record)
+                    and not bool(int(state_attrs.get('readonly') or 0))):
+                return False
+        return True
+
     def validate(self, record, softvalidation=False):
         if self.attrs.get('readonly'):
             return True
@@ -83,11 +92,7 @@ class CharField(object):
         self.get_state_attrs(record)['domain_readonly'] = False
         inverted_domain, domain = self.validation_domains(record)
         if not softvalidation:
-            if bool(int(self.get_state_attrs(record).get('required') or 0)):
-                if not self.get(record) \
-                        and not bool(int(self.get_state_attrs(record
-                            ).get('readonly') or 0)):
-                    res = False
+            res = res and self.check_required(record)
         if isinstance(domain, bool):
             res = res and domain
         elif domain == [('id', '=', False)]:
@@ -266,9 +271,22 @@ class TimeField(CharField):
         return ''
 
 
-class FloatField(CharField):
+class NumberField(CharField):
+    _default = None
 
-    _default = 0.0
+    def check_required(self, record):
+        state_attrs = self.get_state_attrs(record)
+        if bool(int(state_attrs.get('required') or 0)):
+            if (self.get(record) is None
+                    and not bool(int(state_attrs.get('readonly') or 0))):
+                return False
+        return True
+
+    def get(self, record, check_load=True, readonly=True, modified=False):
+        return record.value.get(self.name, self._default)
+
+
+class FloatField(NumberField):
 
     def set_client(self, record, value, force_change=False):
         if isinstance(value, basestring):
@@ -280,33 +298,35 @@ class FloatField(CharField):
             force_change=force_change)
 
     def get_client(self, record):
-        value = super(FloatField, self).get_client(record)
-        digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        return locale.format('%.' + str(digits[1]) + 'f', value, True)
+        value = record.value.get(self.name)
+        if value is not None:
+            digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
+            return locale.format('%.' + str(digits[1]) + 'f', value, True)
+        else:
+            return ''
 
 
-class NumericField(CharField):
-
-    _default = Decimal(0)
+class NumericField(NumberField):
 
     def set_client(self, record, value, force_change=False):
         if isinstance(value, basestring):
             try:
-                value = Decimal(str(locale.atof(value, Decimal)))
-            except ValueError:
+                value = locale.atof(value, Decimal)
+            except decimal.InvalidOperation:
                 value = self._default
         super(NumericField, self).set_client(record, value,
             force_change=force_change)
 
     def get_client(self, record):
-        value = super(NumericField, self).get_client(record)
-        digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
-        return locale.format('%.' + str(digits[1]) + 'f', value, True)
+        value = record.value.get(self.name)
+        if value is not None:
+            digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
+            return locale.format('%.' + str(digits[1]) + 'f', value, True)
+        else:
+            return ''
 
 
-class IntegerField(CharField):
-
-    _default = 0
+class IntegerField(NumberField):
 
     def set_client(self, record, value):
         if isinstance(value, basestring):
@@ -317,8 +337,11 @@ class IntegerField(CharField):
         super(IntegerField, self).set_client(record, value)
 
     def get_client(self, record):
-        value = super(IntegerField, self).get_client(record)
-        return locale.format('%d', value, True)
+        value = record.value.get(self.name)
+        if value is not None:
+            return locale.format('%d', value, True)
+        else:
+            return ''
 
 
 class BooleanField(CharField):

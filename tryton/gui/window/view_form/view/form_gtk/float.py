@@ -11,7 +11,7 @@ class Float(Integer):
     def __init__(self, field_name, model_name, attrs=None):
         super(Float, self).__init__(field_name, model_name, attrs=attrs)
         self.digits = (16, 2)
-        self._default_value = 0.0
+        self._default_value = ''
         self.entry.set_width_chars(sum(self.digits))
         self.entry.connect('key-press-event', self.key_press_event)
 
