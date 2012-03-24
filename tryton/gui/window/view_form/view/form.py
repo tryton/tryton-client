@@ -171,16 +171,9 @@ class ViewForm(ParserView):
         if record_id:
             if not attrs.get('confirm', False) or \
                     common.sur(attrs['confirm']):
-                button_type = attrs.get('type', 'workflow')
+                button_type = attrs.get('type', 'object')
                 context = record.context_get()
-                if button_type == 'workflow':
-                    try:
-                        RPCExecute('model', self.screen.model_name,
-                            'workflow_trigger_validate', record_id,
-                            attrs['name'], context=context)
-                    except RPCException:
-                        pass
-                elif button_type == 'object':
+                if button_type == 'object':
                     try:
                         RPCExecute('model', self.screen.model_name, attrs['name'],
                             [record_id], context=context)

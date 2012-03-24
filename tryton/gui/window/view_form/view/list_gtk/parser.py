@@ -992,16 +992,9 @@ class Button(object):
         if obj_id:
             if not self.attrs.get('confirm', False) or \
                     common.sur(self.attrs['confirm']):
-                button_type = self.attrs.get('type', 'workflow')
+                button_type = self.attrs.get('type', 'object')
                 ctx = record.context_get()
-                if button_type == 'workflow':
-                    try:
-                        RPCExecute('model', self.screen.model_name,
-                            'workflow_trigger_validate', obj_id,
-                            self.attrs['name'], context=ctx)
-                    except RPCException:
-                        pass
-                elif button_type == 'object':
+                if button_type == 'object':
                     try:
                         RPCExecute('model', self.screen.model_name,
                             self.attrs['name'], [obj_id], context=ctx)
