@@ -70,11 +70,12 @@ class TrytonIconFactory(gtk.IconFactory):
             try:
                 pixbuf = gtk.gdk.pixbuf_new_from_file(
                         os.path.join(PIXMAPS_DIR, fname).decode('utf-8'))
-            except IOError:
+            except (IOError, glib.GError):
                 continue
+            finally:
+                self._locale_icons.add(name)
             icon_set = gtk.IconSet(pixbuf)
             self.add(name, icon_set)
-            self._locale_icons.add(name)
         for name in ('ok', 'cancel'):
             icon_set = gtk.Style().lookup_icon_set('gtk-%s' % name)
             self.add('tryton-%s' % name, icon_set)
@@ -119,14 +120,18 @@ class TrytonIconFactory(gtk.IconFactory):
             fileno, path = tempfile.mkstemp()
             with os.fdopen(fileno, 'w') as svgfile:
                 svgfile.write(icon['icon'])
-            pixbuf = gtk.gdk.pixbuf_new_from_file(path.decode(
-                sys.getfilesystemencoding().encode('utf-8')))
-            os.remove(path)
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(path.decode(
+                    sys.getfilesystemencoding().encode('utf-8')))
+            except glib.GError:
+                continue
+            finally:
+                os.remove(path)
+                self._tryton_icons.remove((icon['id'], icon['name']))
+                del self._name2id[icon['name']]
+                self._loaded_icons.add(icon['name'])
             iconset = gtk.IconSet(pixbuf)
             self.add(icon['name'], iconset)
-            self._tryton_icons.remove((icon['id'], icon['name']))
-            del self._name2id[icon['name']]
-            self._loaded_icons.add(icon['name'])
 
 ICONFACTORY = TrytonIconFactory()
 ICONFACTORY.add_default()
