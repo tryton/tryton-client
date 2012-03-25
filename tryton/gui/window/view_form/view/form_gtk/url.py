@@ -44,6 +44,7 @@ class URL(Char):
         else:
             self.entry.show()
             self.widget.set_focus_chain([self.entry])
+        self.button.set_sensitive(True)
 
     def button_clicked(self, widget):
         value = self.entry.get_text()
