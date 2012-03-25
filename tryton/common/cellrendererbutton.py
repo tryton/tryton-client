@@ -12,6 +12,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
                 "Displayed text", gobject.PARAM_READWRITE),
             'visible': (gobject.TYPE_INT, 'Visible',
                 'Visible', 0, 10, 0, gobject.PARAM_READWRITE),
+            'sensitive': (gobject.TYPE_INT, 'Sensitive',
+                'Sensitive', 0, 10, 0, gobject.PARAM_READWRITE),
     }
 
     __gsignals__ = {
@@ -25,6 +27,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
         self.set_property('mode', gtk.CELL_RENDERER_MODE_EDITABLE)
         self.clicking = False
         self.visible = True
+        self.sensitive = True
 
     def do_set_property(self, pspec, value):
         setattr(self, pspec.name, value)
@@ -44,6 +47,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
         if self.clicking and flags & gtk.CELL_RENDERER_SELECTED:
             state = gtk.STATE_ACTIVE
             shadow = gtk.SHADOW_IN
+        elif not self.sensitive:
+            state = gtk.STATE_INSENSITIVE
         widget.style.paint_box(window, state, shadow,
                 None, widget, "button",
                 cell_area.x, cell_area.y,
@@ -80,7 +85,7 @@ class CellRendererButton(gtk.GenericCellRenderer):
 
     def on_start_editing(self, event, widget, path, background_area,
             cell_area, flags):
-        if not self.visible:
+        if not self.visible or not self.sensitive:
             return
         if (event is None) or ((event.type == gtk.gdk.BUTTON_PRESS) \
                 or (event.type == gtk.gdk.KEY_PRESS \

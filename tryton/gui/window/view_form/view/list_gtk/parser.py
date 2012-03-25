@@ -972,7 +972,14 @@ class Button(object):
             check_load=False)
         invisible = states.get('invisible', False)
         cell.set_property('visible', not invisible)
-        # TODO readonly
+        readonly = states.get('readonly', False)
+        cell.set_property('sensitive', not readonly)
+        parent = record.parent if record else None
+        while parent:
+            if parent.modified:
+                cell.set_property('sensitive', False)
+                break
+            parent = parent.parent
         # TODO icon
 
     def button_clicked(self, widget, path):
