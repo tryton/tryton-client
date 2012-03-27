@@ -1247,7 +1247,8 @@ class RPCProgress(object):
                     progressbar.pulse()
             time.sleep(0.1)
         self.parent.props.sensitive = parent_sensitive
-        self.parent.window.set_cursor(None)
+        if self.parent.window:
+            self.parent.window.set_cursor(None)
         if win:
             win.destroy()
             with gtk.gdk.lock:
