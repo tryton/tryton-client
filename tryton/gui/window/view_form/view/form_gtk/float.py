@@ -10,9 +10,7 @@ class Float(Integer):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Float, self).__init__(field_name, model_name, attrs=attrs)
-        self.digits = (16, 2)
         self._default_value = ''
-        self.entry.set_width_chars(sum(self.digits))
         self.entry.connect('key-press-event', self.key_press_event)
 
     def set_value(self, record, field):
@@ -23,8 +21,7 @@ class Float(Integer):
         if not field:
             self.entry.set_text('')
             return False
-        self.digits = field.attrs.get('digits', (16, 2))
-        digits = record.expr_eval(self.digits)
+        digits = field.digits(record)
         self.entry.set_width_chars(sum(digits))
         self.entry.set_text(field.get_client(record))
 
@@ -47,7 +44,7 @@ class Float(Integer):
         if new_value in ('-', decimal_point):
             return
 
-        digits = self.record.expr_eval(self.digits)
+        digits = self.field.digits(self.record)
 
         try:
             locale.atof(new_value)

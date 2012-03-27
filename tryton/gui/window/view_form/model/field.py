@@ -285,6 +285,11 @@ class NumberField(CharField):
     def get(self, record, check_load=True, readonly=True, modified=False):
         return record.value.get(self.name, self._default)
 
+    def digits(self, record):
+        default = (16, 2)
+        return tuple(x or y for x, y in zip(
+                record.expr_eval(self.attrs.get('digits', default)), default))
+
 
 class FloatField(NumberField):
 
@@ -300,7 +305,7 @@ class FloatField(NumberField):
     def get_client(self, record):
         value = record.value.get(self.name)
         if value is not None:
-            digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
+            digits = self.digits(record)
             return locale.format('%.' + str(digits[1]) + 'f', value, True)
         else:
             return ''
@@ -320,7 +325,7 @@ class NumericField(NumberField):
     def get_client(self, record):
         value = record.value.get(self.name)
         if value is not None:
-            digits = record.expr_eval(self.attrs.get('digits', (16, 2)))
+            digits = self.digits(record)
             return locale.format('%.' + str(digits[1]) + 'f', value, True)
         else:
             return ''
@@ -342,6 +347,9 @@ class IntegerField(NumberField):
             return locale.format('%d', value, True)
         else:
             return ''
+
+    def digits(self, record):
+        return (16, 0)
 
 
 class BooleanField(CharField):

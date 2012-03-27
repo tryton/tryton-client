@@ -28,7 +28,7 @@ class ProgressBar(WidgetInterface):
             self.widget.set_fraction(0.0)
             return False
         value = float(field.get(record) or 0.0)
-        digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
+        digits = field.digits(record)
         self.widget.set_text(locale.format('%.' + str(digits[1]) + 'f',
             value, True))
         self.widget.set_fraction(value / 100.0)

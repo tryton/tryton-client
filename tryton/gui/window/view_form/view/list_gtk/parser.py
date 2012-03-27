@@ -466,7 +466,7 @@ class Float(Char):
         super(Float, self).setter(column, cell, store, iter)
         record = store.get_value(iter, 0)
         field = record[self.field_name]
-        digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
+        digits = field.digits(record)
         cell.digits = digits
 
 
@@ -485,7 +485,7 @@ class FloatTime(Char):
 
     def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]
-        digits = record.expr_eval(field.attrs.get('digits', (16, 2)))
+        digits = field.digits(record)
         field.set_client(record,
             round(common.text_to_float_time(text, self.conv), digits[1]))
         if callback:
@@ -934,9 +934,10 @@ class ProgressBar(object):
     @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
+        field = record[self.field_name]
         value = float(self.get_textual_value(record) or 0.0)
         cell.set_property('value', value)
-        digit = record.expr_eval(self.attrs.get('digits', (16, 2)))[1]
+        digit = field.digits(record)[1]
         text = locale.format('%.' + str(digit) + 'f', value, True)
         cell.set_property('text', text + '%')
 
