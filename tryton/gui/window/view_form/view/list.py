@@ -555,15 +555,14 @@ class ViewList(ParserView):
             copy_item = gtk.ImageMenuItem('gtk-copy')
             copy_item.connect('activate', lambda x: self.on_copy())
             menu.append(copy_item)
-            record_id = record.id
             # Don't activate actions if parent is modified
             parent = record.parent if record else None
             while parent:
                 if parent.modified:
-                    record_id = -1
+                    record = None
                     break
                 parent = parent.parent
-            populate(menu, group.model_name, record_id)
+            populate(menu, group.model_name, record)
             for col in self.widget_tree.get_columns():
                 if not col.get_visible() or not col.name:
                     continue

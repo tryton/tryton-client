@@ -12,26 +12,37 @@ _ = gettext.gettext
 
 
 
-def populate(menu, model, record_id, title=''):
+def populate(menu, model, record, title=''):
     '''
-    Fill menu with the actions of model for the record id.
+    Fill menu with the actions of model for the record.
     If title is filled, the actions will be put in a submenu.
     '''
-    if record_id is None or record_id < 0:
+    if record is None:
+        return
+    elif isinstance(record, (int, long)):
+        if record < 0:
+            return
+    elif record.id < 0:
         return
     try:
         toolbar = RPCExecute('model', model, 'view_toolbar_get')
     except RPCException:
         return
 
+    def load(record):
+        if isinstance(record, (int, long)):
+            screen = Screen(model)
+            screen.load([record])
+            record = screen.current_record
+        return record
+
     def activate(menuitem, action, atype):
-        screen = Screen(model)
-        screen.load([record_id])
-        action = Action.evaluate(action, atype, screen.current_record)
+        rec = load(record)
+        action = Action.evaluate(action, atype, rec)
         data = {
             'model': model,
-            'id': record_id,
-            'ids': [record_id],
+            'id': rec.id,
+            'ids': [rec.id],
             }
         event = gtk.get_current_event()
         allow_similar = False
@@ -42,7 +53,7 @@ def populate(menu, model, record_id, title=''):
             Action._exec_action(action, data, {})
 
     def attachment(menuitem):
-        Attachment(model, record_id, None)
+        Attachment(model, load(record), None)
 
     if title:
         if len(menu):
