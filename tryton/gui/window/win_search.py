@@ -67,7 +67,6 @@ class WinSearch(NoModal):
         viewport.show()
         scrollwindow.add(viewport)
         scrollwindow.show()
-        self.view.widget_tree.connect('button_press_event', self.sig_button)
 
         self.model_name = model
 
@@ -88,11 +87,6 @@ class WinSearch(NoModal):
         if not self.sel_multi:
             self.win.response(gtk.RESPONSE_OK)
             return True
-        return False
-
-    def sig_button(self, view, event):
-        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
-            self.win.response(gtk.RESPONSE_OK)
         return False
 
     def destroy(self):
