@@ -1330,10 +1330,12 @@ FLOAT_TIME_SEPS = {
 }
 
 
-def text_to_float_time(text, conv=None):
+def text_to_float_time(text, conv=None, digit=2):
+    if not text:
+        return None
     try:
         try:
-            return locale.atof(text)
+            return round(locale.atof(text), digit)
         except ValueError:
             pass
         if conv:
@@ -1368,12 +1370,14 @@ def text_to_float_time(text, conv=None):
                     break
         if text.startswith('-'):
             value *= -1
-        return value
+        return round(value, digit)
     except ValueError:
         return 0.0
 
 
 def float_time_to_text(val, conv=None):
+    if val is None:
+        return ''
     if conv:
         tmp_conv = FLOAT_TIME_CONV.copy()
         tmp_conv.update(conv)
@@ -1404,7 +1408,7 @@ def float_time_to_text(val, conv=None):
         value += ' ' + locale.format('%d', weeks, True) + FLOAT_TIME_SEPS['w']
     if days:
         value += ' ' + locale.format('%d', days, True) + FLOAT_TIME_SEPS['d']
-    if hours or mins:
+    if hours or mins or not value:
         value += ' %02d:%02d' % (hours, mins)
     value = value.strip()
     return value

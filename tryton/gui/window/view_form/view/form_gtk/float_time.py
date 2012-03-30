@@ -36,22 +36,20 @@ class FloatTime(WidgetInterface):
     def modified(self):
         if self.record and self.field:
             value = self.entry.get_text()
-            return common.float_time_to_text( self.field.get(self.record),
+            return common.float_time_to_text(self.field.get(self.record),
                 self.conv) != value
         return False
 
     def set_value(self, record, field):
         value = self.entry.get_text()
-        if not value:
-            return field.set_client(record, 0.0)
         digits = field.digits(record)
         return field.set_client(record,
-                round(common.text_to_float_time(value, self.conv), digits[1]))
+            common.text_to_float_time(value, self.conv, digits[1]))
 
     def display(self, record, field):
         super(FloatTime, self).display(record, field)
         if not field:
-            self.entry.set_text('00:00')
+            self.entry.set_text('')
             return False
         val = field.get(record)
 

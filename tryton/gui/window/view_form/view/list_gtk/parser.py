@@ -487,7 +487,7 @@ class FloatTime(Char):
         field = record[self.field_name]
         digits = field.digits(record)
         field.set_client(record,
-            round(common.text_to_float_time(text, self.conv), digits[1]))
+            common.text_to_float_time(text, self.conv, digits[1]))
         if callback:
             callback()
 
