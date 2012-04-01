@@ -287,7 +287,7 @@ class NumberField(CharField):
 
     def digits(self, record):
         default = (16, 2)
-        return tuple(x or y for x, y in zip(
+        return tuple(y if x is None else x for x, y in zip(
                 record.expr_eval(self.attrs.get('digits', default)), default))
 
 
