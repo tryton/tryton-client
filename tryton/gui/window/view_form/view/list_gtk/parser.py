@@ -682,7 +682,7 @@ class O2M(Char):
 
     def get_textual_value(self, record):
         return '( ' + str(len(record[self.field_name].\
-                get_client(record))) + ' )'
+                get_eval(record))) + ' )'
 
     def value_from_text(self, record, text, callback=None):
         if callback:
@@ -705,89 +705,25 @@ class O2M(Char):
         WinForm(screen, open_callback, view_type='tree', context=context)
 
 
-class M2M(Char):
-
-    @realized
-    def setter(self, column, cell, store, iter):
-        super(M2M, self).setter(column, cell, store, iter)
-        cell.set_property('xalign', 0.5)
-
-    def get_textual_value(self, record):
-        return '( ' + str(len(record[self.field_name].\
-                get_client(record))) + ' )'
-
-    def value_from_text(self, record, text, callback=None):
-        field = record[self.field_name]
-        if not text:
-            field.set_client(record, [])
-            if callback:
-                callback()
-            return
-        if not (text[0] != '('):
-            if callback:
-                callback()
-            return
-        relation = field.attrs['relation']
-        domain = field.domain_get(record)
-        context = field.context_get(record)
-        if text:
-            dom = [('rec_name', 'ilike', '%' + text + '%'),
-                    domain]
-        else:
-            dom = domain
-        try:
-            ids = RPCExecute('model', relation, 'search', dom, 0,
-                CONFIG['client.limit'], None, context=context)
-        except RPCException:
-            field.set_client(record, [])
-            if callback:
-                callback()
-            return
-        if not callback:
-            return
-
-        def winsearch_callback(result):
-            if result:
-                result = [i for i, _ in result]
-            else:
-                result = []
-            field.set_client(record, result)
-            if callback:
-                callback()
-        WinSearch(relation, winsearch_callback, sel_multi=True, ids=ids,
-            context=context, domain=domain)
-        return
+class M2M(O2M):
 
     def open_remote(self, record, create=True, changed=False, text=None,
             callback=None):
-        field = record[self.field_name]
+        group = record.value[self.field_name]
+        field = record.group.fields[self.field_name]
         relation = field.attrs['relation']
         context = field.context_get(record)
         domain = field.domain_get(record)
-        if create:
-            if text and len(text) and text[0] != '(':
-                domain.append(('name', '=', text))
-            try:
-                ids = RPCExecute('model', relation, 'search', domain)
-            except RPCException:
-                field.set_client(record, False)
-                if callback:
-                    callback()
-            if ids and len(ids) == 1:
-                field.set_client(record, ids)
-                if callback:
-                    callback()
-                return
-        else:
-            ids = [x.id for x in field.get_client(record)]
+
+        screen = Screen(relation, mode=['tree', 'form'],
+            exclude_field=field.attrs.get('relation_field'))
+        screen.group = group
 
         def open_callback(result):
-            if result:
-                field.set_client(record, [i for i, _ in result])
             if callback:
                 callback()
-        WinSearch(relation, open_callback, sel_multi=True, ids=ids,
-            context=context, domain=domain)
+        WinForm(screen, open_callback, view_type='tree', domain=domain,
+            context=context)
 
 
 class Selection(Char):

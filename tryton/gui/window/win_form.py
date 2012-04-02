@@ -16,10 +16,11 @@ class WinForm(NoModal):
     "Form window"
 
     def __init__(self, screen, callback, view_type='form',
-            new=False, many=False, context=None):
+            new=False, many=False, domain=None, context=None):
         NoModal.__init__(self)
         self.screen = screen
         self.callback = callback
+        self.domain = domain
         self.context = context
         self.prev_view = self.screen.current_view
         self.screen.screen_container.alternate_view = True
@@ -116,6 +117,37 @@ class WinForm(NoModal):
             hbox = gtk.HBox(homogeneous=False, spacing=0)
             tooltips = common.Tooltips()
 
+            if domain is not None:
+                self.wid_text = gtk.Entry()
+                self.wid_text.set_property('width_chars', 13)
+                self.wid_text.connect('activate', self._sig_activate)
+                self.wid_text.connect('focus-out-event', self._focus_out)
+                hbox.pack_start(self.wid_text, expand=True, fill=True)
+
+                self.but_add = gtk.Button()
+                tooltips.set_tip(self.but_add, _('Add'))
+                self.but_add.connect('clicked', self._sig_add)
+                img_add = gtk.Image()
+                img_add.set_from_stock('tryton-list-add',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
+                img_add.set_alignment(0.5, 0.5)
+                self.but_add.add(img_add)
+                self.but_add.set_relief(gtk.RELIEF_NONE)
+                hbox.pack_start(self.but_add, expand=False, fill=False)
+
+                self.but_remove = gtk.Button()
+                tooltips.set_tip(self.but_remove, _('Remove <Del>'))
+                self.but_remove.connect('clicked', self._sig_remove, True)
+                img_remove = gtk.Image()
+                img_remove.set_from_stock('tryton-list-remove',
+                    gtk.ICON_SIZE_SMALL_TOOLBAR)
+                img_remove.set_alignment(0.5, 0.5)
+                self.but_remove.add(img_remove)
+                self.but_remove.set_relief(gtk.RELIEF_NONE)
+                hbox.pack_start(self.but_remove, expand=False, fill=False)
+
+                hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
+
             self.but_new = gtk.Button()
             tooltips.set_tip(self.but_new, _('Create a new record <F3>'))
             self.but_new.connect('clicked', self._sig_new)
@@ -128,7 +160,7 @@ class WinForm(NoModal):
 
             self.but_del = gtk.Button()
             tooltips.set_tip(self.but_del, _('Delete selected record <Del>'))
-            self.but_del.connect('clicked', self._sig_remove)
+            self.but_del.connect('clicked', self._sig_remove, False)
             img_del = gtk.Image()
             img_del.set_from_stock('tryton-delete',
                 gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -137,32 +169,43 @@ class WinForm(NoModal):
             self.but_del.set_relief(gtk.RELIEF_NONE)
             hbox.pack_start(self.but_del, expand=False, fill=False)
 
+            self.but_undel = gtk.Button()
+            tooltips.set_tip(self.but_undel,
+                _('Undelete selected record <Ins>'))
+            self.but_undel.connect('clicked', self._sig_undelete)
+            img_undel = gtk.Image()
+            img_undel.set_from_stock('tryton-undo', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_undel.set_alignment(0.5, 0.5)
+            self.but_undel.add(img_undel)
+            self.but_undel.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(self.but_undel, expand=False, fill=False)
+
             hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
-            but_pre = gtk.Button()
-            tooltips.set_tip(but_pre, _('Previous'))
-            but_pre.connect('clicked', self._sig_previous)
+            self.but_pre = gtk.Button()
+            tooltips.set_tip(self.but_pre, _('Previous'))
+            self.but_pre.connect('clicked', self._sig_previous)
             img_pre = gtk.Image()
             img_pre.set_from_stock('tryton-go-previous',
                 gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_pre.set_alignment(0.5, 0.5)
-            but_pre.add(img_pre)
-            but_pre.set_relief(gtk.RELIEF_NONE)
-            hbox.pack_start(but_pre, expand=False, fill=False)
+            self.but_pre.add(img_pre)
+            self.but_pre.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(self.but_pre, expand=False, fill=False)
 
             self.label = gtk.Label('(0,0)')
             hbox.pack_start(self.label, expand=False, fill=False)
 
-            but_next = gtk.Button()
-            tooltips.set_tip(but_next, _('Next'))
-            but_next.connect('clicked', self._sig_next)
+            self.but_next = gtk.Button()
+            tooltips.set_tip(self.but_next, _('Next'))
+            self.but_next.connect('clicked', self._sig_next)
             img_next = gtk.Image()
             img_next.set_from_stock('tryton-go-next',
                 gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_next.set_alignment(0.5, 0.5)
-            but_next.add(img_next)
-            but_next.set_relief(gtk.RELIEF_NONE)
-            hbox.pack_start(but_next, expand=False, fill=False)
+            self.but_next.add(img_next)
+            self.but_next.set_relief(gtk.RELIEF_NONE)
+            hbox.pack_start(self.but_next, expand=False, fill=False)
 
             hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
@@ -244,16 +287,23 @@ class WinForm(NoModal):
     def _sig_previous(self, widget):
         self.screen.display_prev()
 
-    def _sig_remove(self, widget):
-        self.screen.remove(delete=True)
+    def _sig_remove(self, widget, remove=False):
+        self.screen.remove(remove=remove)
+
+    def _sig_undelete(self, button):
+        self.screen.unremove()
 
     def _sig_activate(self, *args):
         self._sig_add()
         self.wid_text.grab_focus()
 
+    def _focus_out(self, *args):
+        if self.wid_text.get_text():
+            self._sig_add()
+
     def _sig_add(self, *args):
         from tryton.gui.window.win_search import WinSearch
-        domain = []
+        domain = self.domain[:]
         model_name = self.screen.model_name
 
         try:
@@ -263,31 +313,47 @@ class WinForm(NoModal):
             else:
                 dom = domain
             ids = RPCExecute('model', model_name, 'search', dom,
-                    0, CONFIG['client.limit'], None)
+                    0, CONFIG['client.limit'], None, context=self.context)
         except RPCException:
             return False
 
         def callback(result):
-            res_id = None
             if result:
-                res_id, _ = result[0]
-            self.screen.load(ids, modified=True)
-            self.screen.display(res_id=res_id)
+                ids = [x[0] for x in result]
+                self.screen.load(ids, modified=True)
+                self.screen.display(res_id=ids[0])
             self.screen.set_cursor()
             self.wid_text.set_text('')
-
         if len(ids) != 1:
             WinSearch(model_name, callback, sel_multi=True,
-                ids=ids, domain=domain,
-                view_ids=self.attrs.get('view_ids', '').split(','),
-                views_preload=self.attrs.get('views', {}))
+                ids=ids, context=self.context, domain=domain)
         else:
-            callback(ids)
+            callback([(i, None) for i in ids])
 
     def _sig_label(self, screen, signal_data):
         name = '_'
-        if signal_data[0] >= 0:
+        if signal_data[0] >= 1:
             name = str(signal_data[0])
+            self.but_del.set_sensitive(True)
+            if self.domain is not None:
+                self.but_remove.set_sensitive(True)
+            if signal_data[0] < signal_data[1]:
+                self.but_next.set_sensitive(True)
+            else:
+                self.but_next.set_sensitive(False)
+            if signal_data[0] > 1:
+                self.but_pre.set_sensitive(True)
+            else:
+                self.but_pre.set_sensitive(False)
+            self.but_del.set_sensitive(True)
+            self.but_undel.set_sensitive(True)
+        else:
+            self.but_del.set_sensitive(False)
+            self.but_undel.set_sensitive(False)
+            self.but_next.set_sensitive(False)
+            self.but_pre.set_sensitive(False)
+            if self.domain is not None:
+                self.but_remove.set_sensitive(False)
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 

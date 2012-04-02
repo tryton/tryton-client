@@ -559,7 +559,12 @@ class O2MField(CharField):
         return result
 
     def get_eval(self, record, check_load=True):
-        return [x.id for x in record.value.get(self.name) or []]
+        if record.value.get(self.name) is None:
+            return []
+        record_removed = record.value[self.name].record_removed
+        record_deleted = record.value[self.name].record_deleted
+        return [x.id for x in record.value[self.name]
+            if x not in record_removed and x not in record_deleted]
 
     def get_on_change_value(self, record, check_load=True):
         result = []
@@ -750,9 +755,6 @@ class M2MField(O2MField):
 
     def get_default(self, record):
         return [x.id for x in record.value.get(self.name) or [] if x.id >= 0]
-
-    def get_eval(self, record, check_load=True):
-        return [x.id for x in record.value.get(self.name) or []]
 
     def set(self, record, value, modified=False):
         from group import Group
