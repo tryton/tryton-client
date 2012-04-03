@@ -111,7 +111,6 @@ class ScreenContainer(object):
         but_next.set_relief(gtk.RELIEF_NONE)
         hbox.pack_start(but_next, expand=False, fill=False)
 
-
         hbox.show_all()
         hbox.set_focus_chain([self.search_entry])
         self.filter_vbox.pack_start(hbox, expand=True, fill=False)
@@ -270,7 +269,8 @@ class ScreenContainer(object):
                         format_ = date_format() + ' ' + common.HM_FORMAT
                     elif field['type'] == 'time':
                         format_ = common.HM_FORMAT
-                    widget = common.date_widget.ComplexEntry(format_, spacing=0)
+                    widget = common.date_widget.ComplexEntry(format_,
+                        spacing=0)
                     entry = widget.widget
                     entry.connect('activate', date_activate)
                 else:

@@ -183,7 +183,7 @@ class Action(object):
         if atype in ('print', 'action'):
             email = {}
             if 'pyson_email' in action:
-                email = record.expr_eval( action['pyson_email'])
+                email = record.expr_eval(action['pyson_email'])
                 if not email:
                     email = {}
             if 'subject' not in email:

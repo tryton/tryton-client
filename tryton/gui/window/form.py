@@ -18,7 +18,6 @@ from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
 import tryton.common as common
 from tryton.translate import date_format
 from tryton.common import HM_FORMAT
-from tryton.pyson import PYSONEncoder
 from tryton.common import RPCExecute, RPCException
 
 from tabcontent import TabContent

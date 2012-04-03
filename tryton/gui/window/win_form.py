@@ -174,7 +174,8 @@ class WinForm(NoModal):
                 _('Undelete selected record <Ins>'))
             self.but_undel.connect('clicked', self._sig_undelete)
             img_undel = gtk.Image()
-            img_undel.set_from_stock('tryton-undo', gtk.ICON_SIZE_SMALL_TOOLBAR)
+            img_undel.set_from_stock('tryton-undo',
+                gtk.ICON_SIZE_SMALL_TOOLBAR)
             img_undel.set_alignment(0.5, 0.5)
             self.but_undel.add(img_undel)
             self.but_undel.set_relief(gtk.RELIEF_NONE)

@@ -11,7 +11,6 @@ from tryton.gui.window.attachment import Attachment
 _ = gettext.gettext
 
 
-
 def populate(menu, model, record, title=''):
     '''
     Fill menu with the actions of model for the record.

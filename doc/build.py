@@ -24,4 +24,3 @@ nocolor()
 app = Sphinx(srcdir, confdir, outdir, doctreedir, buildername,
              confoverrides, status, sys.stderr, freshenv)
 app.builder.build_all()
-

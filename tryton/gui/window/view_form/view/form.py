@@ -175,8 +175,8 @@ class ViewForm(ParserView):
                 context = record.context_get()
                 if button_type == 'object':
                     try:
-                        RPCExecute('model', self.screen.model_name, attrs['name'],
-                            [record_id], context=context)
+                        RPCExecute('model', self.screen.model_name,
+                            attrs['name'], [record_id], context=context)
                     except RPCException:
                         pass
                 elif button_type == 'action':

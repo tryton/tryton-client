@@ -410,8 +410,8 @@ class M2OField(CharField):
                 value = None
         if not rec_name and value >= 0:
             try:
-                result = RPCExecute('model', self.attrs['relation'], 'read', value,
-                    ['rec_name'])
+                result = RPCExecute('model', self.attrs['relation'], 'read',
+                    value, ['rec_name'])
             except RPCException:
                 return False
             rec_name = result['rec_name'] or ''

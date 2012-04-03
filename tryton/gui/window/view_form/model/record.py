@@ -102,7 +102,8 @@ class Record(SignalEvent):
             exception = None
             try:
                 values = RPCExecute('model', self.model_name, 'read',
-                    id2record.keys(), fnames, context=ctx, main_iteration=False)
+                    id2record.keys(), fnames, context=ctx,
+                    main_iteration=False)
             except RPCException, exception:
                 values = [{'id': x} for x in id2record]
                 default_values = dict((f, None) for f in fnames)

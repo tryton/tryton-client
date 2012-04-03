@@ -8,6 +8,7 @@ import glob
 import sys
 import re
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
@@ -47,12 +48,13 @@ languages = (
     'sl_SI',
     )
 
+
 def all_languages():
     for lang in languages:
         yield lang
         yield lang.split('_')[0]
 
-data_files=[
+data_files = [
     ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
         glob.glob('share/pixmaps/tryton/*.svg')),
     ]
@@ -67,12 +69,13 @@ if os.name == 'nt':
 
     args['windows'] = [{
         'script': os.path.join('bin', 'tryton'),
-        'icon_resources': [(1, os.path.join('share', 'pixmaps', 'tryton', 'tryton.ico'))],
+        'icon_resources': [
+                (1, os.path.join('share', 'pixmaps', 'tryton', 'tryton.ico'))],
     }]
     args['options'] = {
         'py2exe': {
             'optimize': 0,
-            'bundle_files': 3, #don't bundle because gtk doesn't support it
+            'bundle_files': 3,  # don't bundle because gtk doesn't support it
             'packages': [
                 'encodings',
                 'gtk',
@@ -211,8 +214,8 @@ if os.name == 'nt':
 
         if os.path.isdir(os.path.join(dist_dir, 'plugins')):
             shutil.rmtree(os.path.join(dist_dir, 'plugins'))
-        shutil.copytree(os.path.join(os.path.dirname(__file__), 'tryton', 'plugins'),
-            os.path.join(dist_dir, 'plugins'))
+        shutil.copytree(os.path.join(os.path.dirname(__file__), 'tryton',
+                'plugins'), os.path.join(dist_dir, 'plugins'))
 
         if os.path.isdir(os.path.join(dist_dir, 'etc')):
             shutil.rmtree(os.path.join(dist_dir, 'etc'))
@@ -220,9 +223,10 @@ if os.name == 'nt':
             os.path.join(dist_dir, 'etc'))
 
         from subprocess import Popen, PIPE
-        query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
-            stdout=PIPE).stdout.read()
-        query_loaders = query_loaders.replace(gtk_dir.replace(os.sep, '/') + '/', '')
+        query_loaders = Popen(os.path.join(gtk_dir, 'bin',
+                'gdk-pixbuf-query-loaders'), stdout=PIPE).stdout.read()
+        query_loaders = query_loaders.replace(
+            gtk_dir.replace(os.sep, '/') + '/', '')
 
         loaders_path = os.path.join(dist_dir, 'etc', 'gtk-2.0',
                 'gdk-pixbuf.loaders')
@@ -245,8 +249,10 @@ if os.name == 'nt':
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
                 os.path.join(dist_dir, 'share', 'locale', lang))
 
-        if os.path.isdir(os.path.join(dist_dir, 'share', 'themes', 'MS-Windows')):
-            shutil.rmtree(os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
+        if os.path.isdir(os.path.join(dist_dir, 'share', 'themes',
+                    'MS-Windows')):
+            shutil.rmtree(os.path.join(dist_dir, 'share', 'themes',
+                    'MS-Windows'))
         shutil.copytree(os.path.join(gtk_dir, 'share', 'themes', 'MS-Windows'),
             os.path.join(dist_dir, 'share', 'themes', 'MS-Windows'))
 
@@ -260,6 +266,7 @@ if os.name == 'nt':
                 str(os.path.join(os.path.dirname(__file__),
                     'setup-single.nsi'))]).wait()
 elif sys.platform == 'darwin':
+
     def find_gtk_dir():
         for directory in os.environ['PATH'].split(':'):
             if not os.path.isdir(directory):
@@ -275,11 +282,13 @@ elif sys.platform == 'darwin':
         from itertools import chain
         from glob import iglob
         gtk_dir = find_gtk_dir()
-        gtk_binary_version = Popen(['pkg-config', '--variable=gtk_binary_version',
-            'gtk+-2.0'], stdout=PIPE).stdout.read().strip()
+        gtk_binary_version = Popen(['pkg-config',
+                '--variable=gtk_binary_version', 'gtk+-2.0'],
+            stdout=PIPE).stdout.read().strip()
 
         dist_dir = dist.command_obj['py2app'].dist_dir
-        resources_dir = os.path.join(dist_dir, 'Tryton.app', 'Contents', 'Resources')
+        resources_dir = os.path.join(dist_dir, 'Tryton.app', 'Contents',
+            'Resources')
         gtk_2_dist_dir = os.path.join(resources_dir, 'lib', 'gtk-2.0')
         pango_dist_dir = os.path.join(resources_dir, 'lib', 'pango')
 
@@ -289,7 +298,8 @@ elif sys.platform == 'darwin':
 
         query_pango = Popen(os.path.join(gtk_dir, 'bin', 'pango-querymodules'),
                 stdout=PIPE).stdout.read()
-        query_pango = query_pango.replace(gtk_dir, '@executable_path/../Resources')
+        query_pango = query_pango.replace(gtk_dir,
+            '@executable_path/../Resources')
         pango_modules_path = os.path.join(resources_dir, 'pango.modules')
         with open(pango_modules_path, 'w') as pango_modules:
             pango_modules.write(query_pango)
@@ -298,37 +308,45 @@ elif sys.platform == 'darwin':
             pangorc.write('[Pango]\n')
             pangorc.write('ModuleFiles=./pango.modules\n')
 
-        if not os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines')):
-            os.makedirs(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines'))
-        shutil.copyfile(os.path.join(gtk_dir, 'lib', 'gtk-2.0', gtk_binary_version,
-                'engines', 'libclearlooks.so'), os.path.join(gtk_2_dist_dir,
-                gtk_binary_version, 'engines', 'libclearlooks.so'))
+        if not os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                    'engines')):
+            os.makedirs(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                    'engines'))
+        shutil.copyfile(os.path.join(gtk_dir, 'lib', 'gtk-2.0',
+                gtk_binary_version, 'engines', 'libclearlooks.so'),
+            os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines',
+                'libclearlooks.so'))
 
-        query_loaders = Popen(os.path.join(gtk_dir,'bin','gdk-pixbuf-query-loaders'),
-                stdout=PIPE).stdout.read()
+        query_loaders = Popen(os.path.join(gtk_dir, 'bin',
+                'gdk-pixbuf-query-loaders'), stdout=PIPE).stdout.read()
         loader_dir, = re.findall('# LoaderDir = (.*)', query_loaders)
-        loader_pkg = (loader_dir.replace(os.path.join(gtk_dir,'lib'), '').
-                split(os.path.sep)[-3])
+        loader_pkg = (loader_dir.replace(os.path.join(gtk_dir, 'lib'),
+                '').split(os.path.sep)[-3])
         loader_dist_dir = os.path.join(resources_dir, 'lib', loader_pkg,
                 gtk_binary_version, 'loaders')
         if os.path.isdir(loader_dist_dir):
             shutil.rmtree(loader_dist_dir)
         if os.path.isdir(loader_dir):
             shutil.copytree(loader_dir, loader_dist_dir)
-        query_loaders = query_loaders.replace(gtk_dir, '@executable_path/../Resources')
+        query_loaders = query_loaders.replace(gtk_dir,
+            '@executable_path/../Resources')
 
         loaders_path = os.path.join(resources_dir, 'gdk-pixbuf.loaders')
         with open(loaders_path, 'w') as loaders:
             loaders.write(query_loaders)
 
-        if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules')):
-            shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules'))
-        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0', gtk_binary_version,
-            'immodules'), os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules'))
+        if os.path.isdir(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                    'immodules')):
+            shutil.rmtree(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                    'immodules'))
+        shutil.copytree(os.path.join(gtk_dir, 'lib', 'gtk-2.0',
+                gtk_binary_version, 'immodules'), os.path.join(gtk_2_dist_dir,
+                gtk_binary_version, 'immodules'))
 
-        query_immodules = Popen(os.path.join(gtk_dir, 'bin', 'gtk-query-immodules-2.0'),
-                stdout=PIPE).stdout.read()
-        query_immodules = query_immodules.replace(gtk_dir, '@executable_path/../Resources')
+        query_immodules = Popen(os.path.join(gtk_dir, 'bin',
+                'gtk-query-immodules-2.0'), stdout=PIPE).stdout.read()
+        query_immodules = query_immodules.replace(gtk_dir,
+            '@executable_path/../Resources')
 
         immodules_path = os.path.join(resources_dir, 'gtk.immodules')
         with open(immodules_path, 'w') as immodules:
@@ -338,17 +356,21 @@ elif sys.platform == 'darwin':
             'gtk-2.0', 'gtkrc'), os.path.join(resources_dir, 'gtkrc'))
 
         for lang in all_languages():
-            if os.path.isdir(os.path.join(resources_dir, 'share', 'locale', lang)):
-                shutil.rmtree(os.path.join(resources_dir, 'share', 'locale', lang))
+            if os.path.isdir(os.path.join(resources_dir, 'share', 'locale',
+                        lang)):
+                shutil.rmtree(os.path.join(resources_dir, 'share', 'locale',
+                        lang))
             shutil.copytree(os.path.join(gtk_dir, 'share', 'locale', lang),
                 os.path.join(resources_dir, 'share', 'locale', lang))
 
         # fix pathes within shared libraries
         for library in chain(
                 iglob(os.path.join(loader_dist_dir, '*.so')),
-                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'engines', '*.so')),
-                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version, 'immodules', '*.so')),
-                iglob(os.path.join(pango_dist_dir,'*','modules','*.so'))):
+                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                        'engines', '*.so')),
+                iglob(os.path.join(gtk_2_dist_dir, gtk_binary_version,
+                        'immodules', '*.so')),
+                iglob(os.path.join(pango_dist_dir, '*', 'modules', '*.so'))):
             libs = [lib.split('(')[0].strip()
                     for lib in Popen(['otool', '-L', library],
                             stdout=PIPE).communicate()[0].splitlines()

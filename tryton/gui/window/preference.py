@@ -87,8 +87,8 @@ class Preference(object):
                     else:
                         password = False
                     try:
-                        RPCExecute('model', 'res.user', 'set_preferences', vals,
-                            password)
+                        RPCExecute('model', 'res.user', 'set_preferences',
+                            vals, password)
                     except RPCException:
                         continue
                     res = True

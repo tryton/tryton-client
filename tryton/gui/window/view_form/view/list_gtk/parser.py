@@ -4,13 +4,18 @@
 import os
 import gobject
 import tempfile
+import gtk
+import locale
+import gettext
+import operator
+
 from functools import wraps
+
 from editabletree import EditableTreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
-from tryton.config import CONFIG
 import tryton.rpc as rpc
 from tryton.common import COLORS, node_attributes, \
         HM_FORMAT, file_selection, file_open
@@ -26,12 +31,6 @@ from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.action import Action
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
-import gtk
-import locale
-import datetime
-import time
-import gettext
-import operator
 
 _ = gettext.gettext
 

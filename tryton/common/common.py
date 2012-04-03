@@ -10,8 +10,6 @@ import os
 import subprocess
 import re
 import logging
-from functools import wraps
-from threading import Semaphore
 from tryton.config import CONFIG
 from tryton.config import TRYTON_ICON, PIXMAPS_DIR
 import time
@@ -49,7 +47,6 @@ from tryton.exceptions import (TrytonServerError, TrytonError,
     TrytonServerUnavailable)
 
 _ = gettext.gettext
-
 
 
 class TrytonIconFactory(gtk.IconFactory):
@@ -1496,6 +1493,7 @@ def timezoned_date(date, reverse=False):
         ldt = sdt.astimezone(lzone)
         date = ldt
     return date
+
 
 def untimezoned_date(date):
     return timezoned_date(date, reverse=True).replace(tzinfo=None)
