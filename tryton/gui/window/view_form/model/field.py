@@ -169,9 +169,6 @@ class CharField(object):
         record.modified_fields.setdefault(self.name)
         return self.set(record, value, modified=False)
 
-    def get_default(self, record):
-        return self.get(record)
-
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
         state_changes = record.expr_eval(self.attrs.get('states', {}),
                 check_load=False)
@@ -710,10 +707,6 @@ class O2MField(CharField):
                     record2.set(vals, modified=True, signal=False)
         return True
 
-    def get_default(self, record):
-        res = [x.get_default() for x in record.value.get(self.name) or []]
-        return res
-
     def validation_domains(self, record):
         screen_domain, attr_domain = self.domains_get(record)
         return screen_domain, screen_domain
@@ -752,9 +745,6 @@ class O2MField(CharField):
 
 
 class M2MField(O2MField):
-
-    def get_default(self, record):
-        return [x.id for x in record.value.get(self.name) or [] if x.id >= 0]
 
     def set(self, record, value, modified=False):
         from group import Group

@@ -381,12 +381,6 @@ class Record(SignalEvent):
     def context_get(self):
         return self.group.context
 
-    def get_default(self):
-        self._check_load()
-        value = dict([(name, field.get_default(self))
-                      for name, field in self.group.fields.iteritems()])
-        return value
-
     def set_default(self, val, signal=True, modified=False):
         for fieldname, value in val.items():
             if fieldname not in self.group.fields:
