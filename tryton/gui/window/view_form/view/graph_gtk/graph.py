@@ -371,7 +371,7 @@ class Graph(gtk.DrawingArea):
                     self.datas[x][key] += 1
                 else:
                     self.datas[x][key] += \
-                            float(model[yfield['name']].get(model))
+                            float(model[yfield['name']].get(model) or 0)
         if isinstance(minx, datetime.datetime):
             date = minx
             while date <= maxx:
