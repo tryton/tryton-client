@@ -638,7 +638,10 @@ class M2O(Char):
             if result and screen.save_current():
                 value = (screen.current_record.id,
                     screen.current_record.rec_name())
-                field.set_client(record, value)
+                field.set_client(record, value, force_change=True)
+            elif result:
+                screen.display()
+                return WinForm(screen, open_callback)
             if callback:
                 callback()
         if obj_id:
