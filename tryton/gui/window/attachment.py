@@ -17,6 +17,7 @@ class Attachment(WinForm):
                 'resource': self.resource,
             }, exclude_field='resource')
         screen.search_filter()
+        screen.parent = True
         super(Attachment, self).__init__(screen, self.callback,
             view_type='tree')
 
