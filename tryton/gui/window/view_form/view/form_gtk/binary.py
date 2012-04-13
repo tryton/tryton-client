@@ -124,6 +124,8 @@ class Binary(WidgetInterface):
         dtemp = tempfile.mkdtemp(prefix='tryton_')
         filename = self.filename_field.get(self.record).replace(
                 os.sep, '_').replace(os.altsep or os.sep, '_')
+        if not filename:
+            return
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
             fp.write(self.field.get_data(self.record))

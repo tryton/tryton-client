@@ -539,6 +539,8 @@ class Binary(Char):
         filename_field = record.group.fields.get(self.filename)
         filename = filename_field.get(record).replace(
             os.sep, '_').replace(os.altsep or os.sep, '_')
+        if not filename:
+            return
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
             fp.write(field.get_data(record))
