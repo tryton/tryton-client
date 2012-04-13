@@ -757,8 +757,8 @@ class ViewList(ParserView):
     def update_children(self):
         ids = self.sel_ids_get()
         for child in self.children:
-            value = 0.0
-            value_selected = 0.0
+            value = 0
+            value_selected = 0
             loaded = True
             child_fieldname = self.children[child][0]
             for record in self.screen.group:
@@ -767,15 +767,10 @@ class ViewList(ParserView):
                     break
                 field_value = record.fields_get()[child_fieldname].get(record,
                     check_load=False)
-                if record.id in ids or not ids:
-                    if not value_selected:
-                        value_selected = field_value
-                    else:
-                        value_selected += field_value
-                if not value:
-                    value = field_value
-                else:
+                if field_value is not None:
                     value += field_value
+                    if record.id in ids or not ids:
+                        value_selected += field_value
 
             if loaded:
                 label_str = locale.format(
