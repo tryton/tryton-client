@@ -144,6 +144,8 @@ class Group(SignalEvent, list):
         saved = []
         for record in self:
             saved.append(record.save(force_reload=False))
+        if self.record_deleted:
+            self.delete(self.record_deleted)
         return saved
 
     def delete(self, records, context=None):
