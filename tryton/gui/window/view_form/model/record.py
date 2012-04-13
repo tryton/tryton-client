@@ -390,6 +390,8 @@ class Record(SignalEvent):
                 field_rec_name = fieldname + '.rec_name'
                 if field_rec_name in val:
                     self.value[field_rec_name] = val[field_rec_name]
+                elif field_rec_name in self.value:
+                    del self.value[field_rec_name]
             self.group.fields[fieldname].set_default(self, value,
                 modified=modified)
             self._loaded.add(fieldname)
@@ -415,6 +417,8 @@ class Record(SignalEvent):
                 field_rec_name = fieldname + '.rec_name'
                 if field_rec_name in val:
                     self.value[field_rec_name] = val[field_rec_name]
+                elif field_rec_name in self.value:
+                    del self.value[field_rec_name]
             self.group.fields[fieldname].set(self, value, modified=False)
             self._loaded.add(fieldname)
         for fieldname, value in later.iteritems():
@@ -489,6 +493,8 @@ class Record(SignalEvent):
                 field_rec_name = fieldname + '.rec_name'
                 if field_rec_name in res:
                     self.value[field_rec_name] = res[field_rec_name]
+                elif field_rec_name in self.value:
+                    del self.value[field_rec_name]
             self.group.fields[fieldname].set_on_change(self, value)
         for fieldname, value in later.items():
             # on change recursion checking is done only for x2many
