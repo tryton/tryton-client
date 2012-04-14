@@ -452,6 +452,7 @@ class Record(SignalEvent):
 
         ctx['context'].update(self.context_get())
         ctx['active_id'] = self.id
+        ctx['id'] = self.id  # Force local id
         ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
             ctx['_parent_' + self.parent_name] = \
