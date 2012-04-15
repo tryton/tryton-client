@@ -570,25 +570,21 @@ class M2O(Char):
 
     def value_from_text(self, record, text, callback=None):
         field = record.group.fields[self.field_name]
-        if not text and not field.get_state_attrs(
-                record)['required']:
+        if not text:
+            field.set_client(record, (None, ''))
             if callback:
                 callback()
-            return False
+            return
 
         relation = record[self.field_name].attrs['relation']
         domain = record[self.field_name].domain_get(record)
         context = record[self.field_name].context_get(record)
-        if text:
-            dom = [('rec_name', 'ilike', '%' + text + '%'),
-                    domain]
-        else:
-            dom = domain
+        dom = [('rec_name', 'ilike', '%' + text + '%'), domain]
         try:
             ids = RPCExecute('model', relation, 'search', dom, 0, None, None,
                 context=context)
         except RPCException:
-            field.set_client(record, '???')
+            field.set_client(record, (None, ''))
             if callback:
                 callback()
             return
