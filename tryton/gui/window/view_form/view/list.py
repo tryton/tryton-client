@@ -336,8 +336,7 @@ class ViewList(ParserView):
 
     @property
     def modified(self):
-        return any(c.renderer.props.editing
-            for c in self.widget_tree.cells.itervalues())
+        return False
 
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]

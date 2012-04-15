@@ -390,12 +390,6 @@ class Char(object):
             callback()
 
     def editing_started(self, cell, editable, path):
-        store = self.treeview.get_model()
-        record = store.get_value(store.get_iter(path), 0)
-
-        def send():
-            record.signal('record-modified')
-        gobject.idle_add(send)
         return False
 
 
