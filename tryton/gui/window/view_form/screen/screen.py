@@ -562,6 +562,11 @@ class Screen(SignalEvent):
             for record in records:
                 if record.parent:
                     record.parent.save()
+                if record in record.group.record_deleted:
+                    record.group.record_deleted.remove(record)
+                if record in record.group.record_removed:
+                    record.group.record_removed.remove(record)
+                record.destroy()
 
         if idx > 0:
             record = top_record.group[idx - 1]
