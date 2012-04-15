@@ -12,7 +12,11 @@ class NoModal(object):
         self.parent = common.get_toplevel_window()
         self.sensible_widget = common.get_sensible_widget(self.parent)
         self.page = None
-        self.parent_focus = self.parent.get_focus()
+        self.parent_focus = []
+        focus = self.parent.get_focus()
+        while focus:
+            self.parent_focus.append(focus)
+            focus = focus.get_parent()
 
     def register(self):
         main = Main.get_main()
@@ -29,5 +33,7 @@ class NoModal(object):
             return
         self.parent.present()
         self.sensible_widget.props.sensitive = True
-        if self.parent_focus:
-            self.parent_focus.grab_focus()
+        for focus in self.parent_focus:
+            if focus and focus.is_ancestor(self.parent):
+                focus.grab_focus()
+                break
