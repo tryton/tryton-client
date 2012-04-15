@@ -1014,7 +1014,7 @@ def process_exception(exception, *args, **kwargs):
                     password = ask(_('Password:'), visibility=False)
                     if password is None:
                         Main.get_main().sig_logout()
-                        raise TrytonError('NotLogged')
+                        return False
                     res = rpc.login(rpc._USERNAME, password, hostname, port,
                             rpc._DATABASE)
                     Main.get_main().refresh_ssl()
