@@ -3,6 +3,8 @@
 import gtk
 import parser
 import gettext
+import gobject
+
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
 
@@ -103,7 +105,7 @@ class EditableTreeView(gtk.TreeView):
         self.grab_focus()
         if focus_column and (focus_column._type in ('boolean')):
             start_editing = False
-        return super(EditableTreeView, self).set_cursor(path, focus_column,
+        super(EditableTreeView, self).set_cursor(path, focus_column,
                 start_editing)
 
     def set_value(self):
@@ -153,7 +155,8 @@ class EditableTreeView(gtk.TreeView):
 
             def callback():
                 entry.handler_unblock(entry.editing_done_id)
-                self.set_cursor(path, column, True)
+                # Must wait the edited entry came back in valid state
+                gobject.idle_add(self.set_cursor, path, column, True)
             self.on_quit_cell(record, column.name, txt, callback=callback)
         if event.keyval in self.leaving_record_events:
             fields = self.cells.keys()
@@ -220,7 +223,6 @@ class EditableTreeView(gtk.TreeView):
                 else:
                     entry.set_active_text(value)
                 entry.handler_unblock(entry.editing_done_id)
-                self.set_cursor(path, column, True)
             self.on_open_remote(record, column.name,
                 create=(event.keyval == gtk.keysyms.F3), value=value,
                 callback=callback)
