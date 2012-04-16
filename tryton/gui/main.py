@@ -885,15 +885,11 @@ class Main(object):
         try:
             if not rpc._USER:
                 return
-            if not exception:
-                res = RPCExecute('model', 'res.request', 'request_get',
-                    process_exception=False)
-                if not res:
-                    return ([], [])
-                ids, ids2 = res
-            else:
-                ids, ids2 = RPCExecute('model', 'res.request', 'request_get',
-                    process_exception=False)
+            result = rpc.execute_nonblocking('model', 'res.request',
+                'request_get', rpc.CONTEXT)
+            if result is None:
+                return
+            ids, ids2 = result
             message = _('Waiting requests: %s received - %s sent') % (len(ids),
                         len(ids2))
             self.sb_requests.set_text(message)
