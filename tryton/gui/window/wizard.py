@@ -3,12 +3,14 @@
 import gtk
 import pango
 import gettext
+import socket
+
 from tryton.signal_event import SignalEvent
 import tryton.rpc as rpc
 import tryton.common as common
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui import Main
-from tryton.exceptions import TrytonServerError
+from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.gui.window.nomodal import NoModal
 from tryton.common.button import Button
 from tryton.common import RPCExecute, RPCException
@@ -124,7 +126,7 @@ class Wizard(object):
             if self.action == 'ir.module.module.config_wizard':
                 rpc.context_reload()
                 Main.get_main().sig_win_menu()
-        except TrytonServerError:
+        except (TrytonServerError, socket.error, TrytonServerUnavailable):
             pass
 
     def clean(self):
