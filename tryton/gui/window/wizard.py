@@ -81,8 +81,10 @@ class Wizard(object):
                 try:
                     result = RPCExecute('wizard', self.action, 'execute',
                         self.session_id, data, self.state, context=ctx)
-                except RPCException:
-                    self.state = self.end_state
+                except RPCException, rpc_exception:
+                    if not isinstance(rpc_exception.exception,
+                            TrytonServerError):
+                        self.state = self.end_state
                     break
 
                 if 'view' in result:

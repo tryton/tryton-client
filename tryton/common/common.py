@@ -1160,7 +1160,9 @@ class DBProgress(object):
 
 
 class RPCException(Exception):
-    pass
+
+    def __init__(self, exception):
+        self.exception = exception
 
 
 class RPCProgress(object):
@@ -1258,7 +1260,7 @@ class RPCProgress(object):
                     self.error = False
                     self.exception = None
                     return self.run(process_exception_p)
-                raise RPCException()
+                raise RPCException(self.exception)
             else:
                 raise self.exception
         return self.res
