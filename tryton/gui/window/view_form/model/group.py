@@ -157,6 +157,7 @@ class Group(SignalEvent, list):
         parent = self.parent
         while parent:
             root = parent.group
+            parent = parent.parent
         return root
 
     def written(self, ids):
