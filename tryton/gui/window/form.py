@@ -379,17 +379,17 @@ class Form(SignalEvent, TabContent):
                 pass
             else:
                 return False
-        if self.screen.current_view.view_type == 'form':
-            self.screen.cancel_current()
-            self.screen.display()
-        else:
+        self.screen.cancel_current()
+        set_cursor = False
+        if self.screen.current_view.view_type != 'form':
             obj_id = self.id_get()
             self.screen.search_filter(self.screen.screen_container.get_text())
             for record in self.screen.group:
                 if record.id == obj_id:
                     self.screen.current_record = record
-                    self.screen.display(set_cursor=True)
+                    set_cursor = True
                     break
+        self.screen.display(set_cursor=set_cursor)
         self.message_info('')
         self.activate_save()
         return True
@@ -471,7 +471,7 @@ class Form(SignalEvent, TabContent):
     def _record_saved(self, screen, signal_data):
         self.activate_save()
 
-    def modified_save(self, reload=True):
+    def modified_save(self):
         self.screen.current_view.set_value()
         if self.screen.modified():
             value = sur_3b(
@@ -479,18 +479,15 @@ class Form(SignalEvent, TabContent):
                             'do you want to save it ?'))
             if value == 'ok':
                 return self.sig_save(None)
-            elif value == 'ko':
-                if reload:
-                    self.sig_reload(test_modified=False)
-                return True
-            else:
-                return False
+            if value == 'ko':
+                return self.sig_reload(test_modified=False)
+            return False
         return True
 
     def sig_close(self, widget=None):
         for dialog in self.dialogs[:]:
             dialog.destroy()
-        return self.modified_save(reload=False)
+        return self.modified_save()
 
     def _action(self, action, atype):
         action = action.copy()
