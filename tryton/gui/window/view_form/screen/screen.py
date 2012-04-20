@@ -546,7 +546,8 @@ class Screen(SignalEvent):
                 return False
 
         top_record = records[0]
-        idx = top_record.group.index(top_record)
+        top_group = top_record.group
+        idx = top_group.index(top_record)
         path = top_record.get_path(self.group)
 
         for record in records:
@@ -561,7 +562,7 @@ class Screen(SignalEvent):
         if delete:
             for record in records:
                 if record.parent:
-                    record.parent.save()
+                    record.parent.save(force_reload=False)
                 if record in record.group.record_deleted:
                     record.group.record_deleted.remove(record)
                 if record in record.group.record_removed:
@@ -569,7 +570,7 @@ class Screen(SignalEvent):
                 record.destroy()
 
         if idx > 0:
-            record = top_record.group[idx - 1]
+            record = top_group[idx - 1]
             path = path[:-1] + ((path[-1][0], record.id,),)
         else:
             path = path[:-1]
