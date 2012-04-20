@@ -38,6 +38,7 @@ languages = (
     'ca_ES',
     'cs_CZ',
     'de_DE',
+    'es_AR',
     'es_CO',
     'es_ES',
     'fr_FR',
