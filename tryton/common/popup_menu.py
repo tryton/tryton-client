@@ -52,7 +52,7 @@ def populate(menu, model, record, title=''):
             Action._exec_action(action, data, {})
 
     def attachment(menuitem):
-        Attachment(model, load(record), None)
+        Attachment(model, load(record).id, None)
 
     if title:
         if len(menu):
