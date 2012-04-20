@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: tryton 2.4.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2012-04-17 12:09+0200\n"
-"PO-Revision-Date: 2012-04-19 11:20+0100\n"
+"PO-Revision-Date: 2012-04-21 00:40+0100\n"
 "Last-Translator: Jordi Esteve <jesteve@zikzakmedia.com>\n"
 "Language-Team:  <tryton-es@googlegroups.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -162,7 +162,7 @@ msgstr "Error"
 
 #: tryton/common/common.py:763
 msgid "Report Bug"
-msgstr "Informar de un fallo"
+msgstr "Informar de un error"
 
 #: tryton/common/common.py:770
 msgid "Application Error!"
@@ -175,11 +175,11 @@ msgstr "Error: "
 #: tryton/common/common.py:813
 #, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
-msgstr "Para informar de fallos debe tener una cuenta en <u>%s</u>"
+msgstr "Para informar de errores debe tener una cuenta en <u>%s</u>"
 
 #: tryton/common/common.py:843
 msgid "Bug Tracker"
-msgstr "Seguimiento de fallos"
+msgstr "Seguimiento de errores"
 
 #: tryton/common/common.py:861
 msgid "User:"
@@ -196,12 +196,12 @@ msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
-"El mismo fallo ya fue notificado por otro usuario.\n"
+"El mismo error ya fue notificado por otro usuario.\n"
 "Para mantenerle informado añadiremos su usuario a la lista de interesados en este asunto."
 
 #: tryton/common/common.py:929
 msgid "Created new bug with ID "
-msgstr "Se creó un nuevo fallo con ID "
+msgstr "Se creó un nuevo error con ID "
 
 #: tryton/common/common.py:937
 #: tryton/gui/main.py:952
@@ -280,7 +280,7 @@ msgstr "m"
 
 #: tryton/common/domain_parser.py:181
 msgid "y"
-msgstr "s"
+msgstr "a"
 
 #: tryton/common/domain_parser.py:181
 msgid "yes"
@@ -486,11 +486,11 @@ msgstr "Inferior"
 
 #: tryton/gui/main.py:628
 msgid "Search Limit..."
-msgstr "Límite de búsqueda..."
+msgstr "_Límite de búsqueda..."
 
 #: tryton/gui/main.py:634
 msgid "_Email..."
-msgstr "_Correo Electrónico..."
+msgstr "_Correo electrónico..."
 
 #: tryton/gui/main.py:642
 msgid "_Save Options"
@@ -591,7 +591,7 @@ msgstr ""
 #: tryton/gui/main.py:1333
 #: tryton/gui/main.py:1371
 msgid "Database is password protected!"
-msgstr "La base de datos está protegida por contraseña."
+msgstr "La base de datos está protegida con contraseña."
 
 #: tryton/gui/main.py:1335
 #: tryton/gui/main.py:1373
@@ -620,7 +620,7 @@ msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
 msgstr ""
-"No es posible hacer copia de una base de datos protegida por contraseña.\n"
+"No es posible hacer copia de una base de datos protegida con contraseña.\n"
 "La copia de seguridad y su restauración tiene que ser manual."
 
 #: tryton/gui/main.py:1378
@@ -777,7 +777,7 @@ msgstr "Contraseña del servidor Tryton:"
 #: tryton/gui/window/dbdumpdrop.py:195
 #: tryton/gui/window/dbrestore.py:109
 msgid "This is the password of the Tryton server. It doesn't belong to a real user. This password is usually defined in the trytond configuration."
-msgstr "Esta es la contraseña del servidor Tryton. No corresponde a un usuario real. Esta contraseña se suele definir en la configuración de trytond."
+msgstr "Esta es la contraseña del servidor Tryton. No corresponde a un usuario real. Esta contraseña se define en la configuración de trytond."
 
 #: tryton/gui/window/dbcreate.py:216
 msgid "New database setup:"
@@ -1147,7 +1147,7 @@ msgstr "_Buscar"
 
 #: tryton/gui/window/form.py:65
 msgid "View _Logs..."
-msgstr "Ver _Registro..."
+msgstr "Ver _registro..."
 
 #: tryton/gui/window/form.py:66
 msgid "_Go to Record ID..."
@@ -1171,7 +1171,7 @@ msgstr "_Informes..."
 
 #: tryton/gui/window/form.py:80
 msgid "_E-Mail..."
-msgstr "_Correo Electrónico..."
+msgstr "_Correo electrónico..."
 
 #: tryton/gui/window/form.py:82
 msgid "_Print..."
@@ -1248,7 +1248,7 @@ msgstr "Registros eliminados."
 
 #: tryton/gui/window/form.py:345
 msgid "Working now on the duplicated record(s)!"
-msgstr "Está trabajando ahora en el registro duplicado."
+msgstr "Ahora está trabajando en el registro duplicado."
 
 #: tryton/gui/window/form.py:350
 msgid "Record saved!"
@@ -1277,7 +1277,7 @@ msgstr "Acción"
 
 #: tryton/gui/window/form.py:526
 msgid "Launch action"
-msgstr "Lanzar acción"
+msgstr "Ejecutar acción"
 
 #: tryton/gui/window/form.py:527
 msgid "Relate"
@@ -1437,7 +1437,7 @@ msgstr ""
 "Ejemplos:\n"
 "\"+21d\" incrementa la fecha en 21 días\n"
 "\"=11m\" establece la fecha al mes 11 del año\n"
-"\"-2s\" decrementa en 2 semanas la fecha"
+"\"-2s\" decrementa la fecha en 2 semanas"
 
 #: tryton/gui/window/shortcuts.py:61
 msgid "Edition Widgets"
@@ -1681,7 +1681,7 @@ msgstr "Se ha producido un error al procesar el archivo en el campo %s."
 #: tryton/gui/window/win_import.py:352
 #, python-format
 msgid "%d record imported!"
-msgstr "%d registro importado."
+msgstr "Se ha importado %d registro."
 
 #: tryton/gui/window/win_import.py:354
 #, python-format
@@ -1911,3 +1911,4 @@ msgstr "Elija una extensión"
 #: tryton/plugins/translation/__init__.py:18
 msgid "Translate view"
 msgstr "Traducir vista"
+
