@@ -177,28 +177,35 @@ def convert_value(field, value):
     "Convert value for field"
 
     def convert_boolean():
-        return any(test.lower().startswith(value.lower())
-            for test in (_('y'), _('yes'), _('true'), _('t'), '1'))
+        if isinstance(value, basestring):
+            return any(test.lower().startswith(value.lower())
+                for test in (_('y'), _('yes'), _('true'), _('t'), '1'))
+        else:
+            return bool(value)
 
     def convert_float():
         try:
             return locale.atof(value)
-        except ValueError:
-            return 0.0
+        except (ValueError, AttributeError):
+            return
 
     def convert_integer():
-        return int(convert_float())
+        try:
+            return int(locale.atof(value))
+        except (ValueError, AttributeError):
+            return
 
     def convert_numeric():
         try:
             return locale.atof(value, Decimal)
-        except decimal.InvalidOperation:
-            return Decimal(0)
+        except (decimal.InvalidOperation, AttributeError):
+            return
 
     def convert_selection():
-        for key, text in field['selection']:
-            if value.lower() == text.lower():
-                return key
+        if isinstance(value, basestring):
+            for key, text in field['selection']:
+                if value.lower() == text.lower():
+                    return key
         return value
 
     def convert_datetime():
@@ -210,19 +217,21 @@ def convert_value(field, value):
                 return untimezoned_date(datetime.datetime(*time.strptime(value,
                             date_format())[:6]))
             except ValueError:
-                return False
+                return
+        except TypeError:
+            return
 
     def convert_date():
         try:
             return datetime.date(*time.strptime(value, date_format())[:3])
-        except ValueError:
-            return False
+        except (ValueError, TypeError):
+            return
 
     def convert_time():
         try:
             return datetime.time(*time.strptime(value, HM_FORMAT)[3:6])
-        except ValueError:
-            return False
+        except (ValueError, TypeError):
+            return
 
     converts = {
         'boolean': convert_boolean,
@@ -251,6 +260,7 @@ def test_convert_boolean():
             ('False', False),
             ('no', False),
             ('0', False),
+            (None, False),
             ):
         assert convert_value(field, value) == result
 
@@ -262,8 +272,9 @@ def test_convert_float():
     for value, result in (
             ('1', 1.0),
             ('1.5', 1.5),
-            ('', 0.0),
-            ('test', 0.0),
+            ('', None),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -275,8 +286,9 @@ def test_convert_integer():
     for value, result in (
             ('1', 1),
             ('1.5', 1),
-            ('', 0),
-            ('test', 0),
+            ('', None),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -288,8 +300,9 @@ def test_convert_numeric():
     for value, result in (
             ('1', Decimal(1)),
             ('1.5', Decimal('1.5')),
-            ('', Decimal(0)),
-            ('test', Decimal(0)),
+            ('', None),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -306,6 +319,7 @@ def test_convert_selection():
             ('Male', 'male'),
             ('male', 'male'),
             ('test', 'test'),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -317,7 +331,8 @@ def test_convert_datetime():
     for value, result in (
             ('12/04/2002', datetime.datetime(2002, 12, 4)),
             ('12/04/2002 12:30:00', datetime.datetime(2002, 12, 4, 12, 30)),
-            ('test', False),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -328,7 +343,8 @@ def test_convert_date():
         }
     for value, result in (
             ('12/04/2002', datetime.date(2002, 12, 4)),
-            ('test', False),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -339,7 +355,8 @@ def test_convert_time():
         }
     for value, result in (
             ('12:30:00', datetime.time(12, 30, 0)),
-            ('test', False),
+            ('test', None),
+            (None, None),
             ):
         assert convert_value(field, value) == result
 
@@ -407,6 +424,7 @@ def test_format_boolean():
     for value, result in (
             (True, 'True'),
             (False, 'False'),
+            (None, 'False'),
             ):
         assert format_value(field, value) == result
 
@@ -421,6 +439,7 @@ def test_format_integer():
             (0, '0'),
             (0.0, '0'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -436,6 +455,7 @@ def test_format_float():
             (0, '0.00'),
             (0.0, '0.00'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -451,6 +471,7 @@ def test_format_numeric():
             (Decimal(0), '0.00'),
             (Decimal('0.0'), '0.00'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -467,6 +488,7 @@ def test_format_selection():
             ('male', 'Male'),
             ('test', 'test'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -480,6 +502,7 @@ def test_format_datetime():
             (datetime.datetime(2002, 12, 4), '12/04/2002'),
             (datetime.datetime(2002, 12, 4, 12, 30), '"12/04/2002 12:30:00"'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -491,6 +514,7 @@ def test_format_date():
     for value, result in (
             (datetime.date(2002, 12, 4), '12/04/2002'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
@@ -502,6 +526,7 @@ def test_format_time():
     for value, result in (
             (datetime.time(12, 30, 0), '"12:30:00"'),
             (False, ''),
+            (None, ''),
             ):
         assert format_value(field, value) == result
 
