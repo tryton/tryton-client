@@ -8,10 +8,10 @@
 !endif
 !define CURLANG ${LANG_CATALAN}
 
-LangString LicenseText ${CURLANG} "Tryton està alliberat sota la llicència «GNU General Public License» publicada per la Free Software Foundation, o bé la versió 3 de la llicència, o (sota la vostra elecció) qualsevol versió posterior. Llegeixi detingudament la llicència. Premi «Següent» per continuar."
+LangString LicenseText ${CURLANG} "Tryton està alliberat sota la llicència «GNU General Public License» publicada per la Free Software Foundation, o bé la versió 3 de la llicència, o (sota la vostra elecció) qualsevol versió posterior. Llegiu detingudament la llicència. Premeu «Següent» per continuar."
 LangString LicenseNext ${CURLANG} "&Següent"
-LangString PreviousInstall ${CURLANG} "Desinstal·li la versió anterior de Tryton"
+LangString PreviousInstall ${CURLANG} "Desinstal·leu la versió anterior de Tryton"
 LangString SecTrytonName ${CURLANG} "Tryton"
 LangString SecTrytonDesc ${CURLANG} "Instal·la tryton.exe i altres fitxers necessaris"
-LangString SecStartMenuName ${CURLANG} "Menú d'inici i els accessos directes de l'escriptori"
-LangString SecStartMenuDesc ${CURLANG} "Crear accesos directes al menú d'inici i a l'escriptori"
+LangString SecStartMenuName ${CURLANG} "Accessos directes al menú d'inici i a l'escriptori"
+LangString SecStartMenuDesc ${CURLANG} "Crea accesos directes al menú d'inici i a l'escriptori"
