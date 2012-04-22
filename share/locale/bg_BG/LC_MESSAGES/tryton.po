@@ -47,7 +47,7 @@ msgstr "укажете адреса на сървъра"
 
 #: tryton/config.py:128
 msgid "Too much arguments"
-msgstr ""
+msgstr "Твърде много аргументи"
 
 #: tryton/config.py:131
 #, python-format
@@ -119,7 +119,6 @@ msgid "Concurrency Exception"
 msgstr "Грешка при достъп"
 
 #: tryton/common/common.py:736
-#, fuzzy
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
 "\n"
@@ -163,7 +162,6 @@ msgid "Error: "
 msgstr "Грешка: "
 
 #: tryton/common/common.py:830
-#, fuzzy, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
 msgstr "За да съобщите за грешка трябва да имате сметка на "
 
@@ -272,12 +270,10 @@ msgid "y"
 msgstr ""
 
 #: tryton/common/tdp.py:47
-#, fuzzy
 msgid "yes"
-msgstr "байта"
+msgstr "да"
 
 #: tryton/common/tdp.py:47
-#, fuzzy
 msgid "true"
 msgstr "Истина"
 
@@ -291,7 +287,7 @@ msgstr "Истина"
 
 #: tryton/common/tdp.py:251
 msgid "N"
-msgstr ""
+msgstr "Н"
 
 #: tryton/common/tdp.py:252
 msgid "No"
@@ -362,7 +358,6 @@ msgid "_Preferences..."
 msgstr "Предпочитания..."
 
 #: tryton/gui/main.py:406
-#, fuzzy
 msgid "_Menu Reload"
 msgstr "Презареждане"
 
@@ -464,7 +459,7 @@ msgstr "Отдолу"
 
 #: tryton/gui/main.py:627
 msgid "Search Limit..."
-msgstr ""
+msgstr "Ограничение при търсене..."
 
 #: tryton/gui/main.py:633
 msgid "File _Actions..."
@@ -495,13 +490,12 @@ msgid "_About..."
 msgstr "Относно..."
 
 #: tryton/gui/main.py:757
-#, fuzzy
 msgid "Add Shortcut"
 msgstr "Бързи клавиши"
 
 #: tryton/gui/main.py:760
 msgid "Manage Shortcut"
-msgstr ""
+msgstr "Управление на бързи клавиши"
 
 #: tryton/gui/main.py:899
 #, python-format
@@ -518,6 +512,8 @@ msgid ""
 "The following action requires to close all tabs.\n"
 "Do you want to continue?"
 msgstr ""
+"Следващите действия изискват затваряне на всички прозорци.\n"
+"Искате ли да продължите?"
 
 #: tryton/gui/main.py:1008
 msgid "SSL connection"
@@ -540,7 +536,7 @@ msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
 msgstr ""
-"Ще изтерете Tryton база данни.\n"
+"Ще изтриете Tryton база данни.\n"
 "Сигурни ли сте че искате да продължите?"
 
 #: tryton/gui/main.py:1311
@@ -626,7 +622,7 @@ msgstr "Базата данни архивирана успешно!"
 
 #: tryton/gui/window/board.py:23 tryton/gui/window/form.py:36
 msgid "New"
-msgstr ""
+msgstr "Нов"
 
 #: tryton/gui/window/board.py:23 tryton/gui/window/form.py:36
 #: tryton/gui/window/win_form.py:120
@@ -639,11 +635,11 @@ msgstr "Създаване на нов запис"
 #: tryton/gui/window/board.py:24 tryton/gui/window/form.py:38
 #: tryton/gui/window/win_export.py:142
 msgid "Save"
-msgstr "Запис"
+msgstr "Съхраняване"
 
 #: tryton/gui/window/board.py:24 tryton/gui/window/form.py:38
 msgid "Save this record"
-msgstr "Запис на този запис"
+msgstr "Съхраняване на този запис"
 
 #: tryton/gui/window/board.py:25 tryton/gui/window/form.py:40
 #: tryton/gui/window/win_form.py:167 tryton/gui/window/view_board/action.py:129
@@ -669,7 +665,7 @@ msgstr "Нов"
 
 #: tryton/gui/window/board.py:33 tryton/gui/window/form.py:55
 msgid "_Save"
-msgstr "Запис"
+msgstr "Съхраняване"
 
 #: tryton/gui/window/board.py:34 tryton/gui/window/form.py:64
 msgid "_Switch View"
@@ -688,14 +684,13 @@ msgid "_Close Tab"
 msgstr "Затваряне на таб"
 
 #: tryton/gui/window/dbcreate.py:31
-#, fuzzy
 msgid ""
 "This is the URL of the Tryton server. Use server 'localhost' and port "
 "'8000' if the server is installed on this computer. Click on 'Change' to "
 "change the address."
 msgstr ""
 "Това е URL адреса на Tryton сървъра. Използвайте за сървър 'localhost' и "
-"порт'8070' ако сървъра е инсталиран на този компютър. Натиснете 'Промяна'"
+"порт'8000' ако сървъра е инсталиран на този компютър. Натиснете 'Промяна'"
 " за да промените адреса."
 
 #: tryton/gui/window/dbcreate.py:44
@@ -703,7 +698,6 @@ msgid "No connection!"
 msgstr "Няма връзка!"
 
 #: tryton/gui/window/dbcreate.py:47
-#, fuzzy
 msgid ""
 "Can not connect to the server!\n"
 "1. Try to check if the server is running.\n"
@@ -716,7 +710,7 @@ msgstr ""
 "1. Проверете дали сървъра е пуснат.\n"
 "2. Проверете на кой адрес и порт приема връзки.\n"
 "3. Ако има защитна  стена между сървъра и този клиент уверете се че "
-"адреса на сървъра и порта(обикновенно 8070) не са блокирани.\n"
+"адреса на сървъра и порта(обикновенно 8000) не са блокирани.\n"
 "Натиснете на 'Промяна' за да смените адреса."
 
 #: tryton/gui/window/dbcreate.py:137
@@ -741,14 +735,13 @@ msgstr "Връзка към сървъра:"
 
 #: tryton/gui/window/dbcreate.py:179 tryton/gui/window/dbdumpdrop.py:139
 #: tryton/gui/window/dbrestore.py:85
-#, fuzzy
 msgid ""
 "This is the URL of the server. Use server 'localhost' and port '8000' if "
 "the server is installed on this computer. Click on 'Change' to change the"
 " address."
 msgstr ""
 "Това е URL адреса на Tryton сървъра. Използвайте за сървър 'localhost' и "
-"порт'8070' ако сървъра е инсталиран на този компютър. Натиснете 'Промяна'"
+"порт'8000' ако сървъра е инсталиран на този компютър. Натиснете 'Промяна'"
 " за да промените адреса."
 
 #: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:146
@@ -886,7 +879,7 @@ msgid ""
 "Error message:\n"
 msgstr ""
 "По неизвестна причина не базата данни не може да бъде създадена.\n"
-"Ако има така създадена база данни вероятно е с грешки. Може да изтерете "
+"Ако има така създадена база данни вероятно е с грешки. Може да изтриете "
 "тази база данни! За повече информация вижте съобщинието за грешка.\n"
 "Съобщение за грешка:\n"
 
@@ -949,11 +942,11 @@ msgstr "База данни:"
 
 #: tryton/gui/window/dblogin.py:33
 msgid "Profile Editor"
-msgstr ""
+msgstr "Редактор на профили"
 
 #: tryton/gui/window/dblogin.py:49
 msgid "Profile"
-msgstr ""
+msgstr "Профил"
 
 #: tryton/gui/window/dblogin.py:55 tryton/gui/window/win_export.py:65
 #: tryton/gui/window/win_import.py:47
@@ -966,32 +959,26 @@ msgid "_Remove"
 msgstr "Изтриване"
 
 #: tryton/gui/window/dblogin.py:73
-#, fuzzy
 msgid "Hostname:"
-msgstr "Потребителско име:"
+msgstr "Име на хост:"
 
 #: tryton/gui/window/dblogin.py:109
-#, fuzzy
 msgid "Create"
 msgstr "Създаване"
 
 #: tryton/gui/window/dblogin.py:112
-#, fuzzy
 msgid "Fetching databases list"
-msgstr "Настройка на нова база данни:"
+msgstr "Вземане на списъка с бази данни:"
 
 #: tryton/gui/window/dblogin.py:130
-#, fuzzy
 msgid "Username:"
 msgstr "Потребителско име:"
 
 #: tryton/gui/window/dblogin.py:315
-#, fuzzy
 msgid "Could not connect to the server"
 msgstr "Не може да се свърже със сървъра!"
 
 #: tryton/gui/window/dblogin.py:317 tryton/gui/window/dblogin.py:640
-#, fuzzy
 msgid "Incompatible version of the server"
 msgstr "Несъвместима версия на сървъра!"
 
@@ -1017,20 +1004,19 @@ msgstr "Свързване с Tryton сървъра"
 
 #: tryton/gui/window/dblogin.py:425
 msgid "Profile:"
-msgstr ""
+msgstr "Профил:"
 
 #: tryton/gui/window/dblogin.py:429
 msgid "_Manage profiles"
-msgstr ""
+msgstr "Управление на профили"
 
 #: tryton/gui/window/dblogin.py:439
 msgid "Host / Database information"
-msgstr ""
+msgstr "Информация за Хост / База данни"
 
 #: tryton/gui/window/dblogin.py:442
-#, fuzzy
 msgid "Host:"
-msgstr "Порт:"
+msgstr "Хост:"
 
 #: tryton/gui/window/dblogin.py:473
 msgid "User name:"
@@ -1202,17 +1188,14 @@ msgid "_Actions..."
 msgstr "Действия..."
 
 #: tryton/gui/window/form.py:78
-#, fuzzy
 msgid "_Relate..."
-msgstr "Изтриване..."
+msgstr "Свързани..."
 
 #: tryton/gui/window/form.py:80
-#, fuzzy
 msgid "_Report..."
-msgstr "Вмъкване на данни..."
+msgstr "Справки..."
 
 #: tryton/gui/window/form.py:82
-#, fuzzy
 msgid "_E-Mail..."
 msgstr "Email..."
 
@@ -1319,49 +1302,43 @@ msgstr "Действие"
 
 #: tryton/gui/window/form.py:552
 msgid "Launch action"
-msgstr ""
+msgstr "Започване на действие"
 
 #: tryton/gui/window/form.py:553
-#, fuzzy
 msgid "Relate"
-msgstr "Създаване"
+msgstr "Свързани"
 
 #: tryton/gui/window/form.py:553
-#, fuzzy
 msgid "Open related records"
-msgstr "Отваряне на запис"
+msgstr "Отваряне на свързани записи"
 
 #: tryton/gui/window/form.py:555
-#, fuzzy
 msgid "Report"
 msgstr "Справки"
 
 #: tryton/gui/window/form.py:555
-#, fuzzy
 msgid "Open report"
-msgstr "Отваряне на запис"
+msgstr "Отваряне на справка"
 
 #: tryton/gui/window/form.py:556
-#, fuzzy
 msgid "E-Mail"
 msgstr "Email"
 
 #: tryton/gui/window/form.py:556
 msgid "E-Mail report"
-msgstr ""
+msgstr "Изращане на справка по Email"
 
 #: tryton/gui/window/form.py:557
 msgid "Print report"
-msgstr ""
+msgstr "Отпечатване на справка"
 
 #: tryton/gui/window/limit.py:17
-#, fuzzy
 msgid "Limit"
-msgstr "Ограничение:"
+msgstr "Ограничение"
 
 #: tryton/gui/window/limit.py:26
 msgid "Search Limit Settings"
-msgstr ""
+msgstr "Настройки на органичения за търсене"
 
 #: tryton/gui/window/limit.py:29
 msgid "Limit:"
@@ -1424,27 +1401,24 @@ msgid "Open/Search relation"
 msgstr "Отваряне/Търсене на връзка"
 
 #: tryton/gui/window/shortcuts.py:37
-#, fuzzy
 msgid "List Entries Shortcuts"
-msgstr "Текстови бързи клавиши"
+msgstr "Списък бързи клавиши"
 
 #: tryton/gui/window/shortcuts.py:38
-#, fuzzy
 msgid "Create new line"
-msgstr "Създаване на нова връзка"
+msgstr "Създаване на нов ред"
 
 #: tryton/gui/window/shortcuts.py:39
-#, fuzzy
 msgid "Open relation"
-msgstr "Отваряне/Търсене на връзка"
+msgstr "Отваряне на връзка"
 
 #: tryton/gui/window/shortcuts.py:40
 msgid "Mark line for deletion"
-msgstr ""
+msgstr "Отбелязване на ред за изтриване"
 
 #: tryton/gui/window/shortcuts.py:41
 msgid "Unmark line for deletion"
-msgstr ""
+msgstr "Изчистване на ред за изтриване"
 
 #: tryton/gui/window/shortcuts.py:42
 msgid "Date/Datetime Entries Shortcuts"
@@ -1501,7 +1475,6 @@ msgstr ""
 "\n"
 
 #: tryton/gui/window/tips.py:21
-#, fuzzy
 msgid ""
 "<b>Do you know Triton, one of the namesakes for our project?</b>\n"
 "\n"
@@ -1518,7 +1491,7 @@ msgid ""
 msgstr ""
 "<b>Познавате Triton, един от псевдонимите на нашия проект?</b>\n"
 "\n"
-"Triton (изрича се /ËtraÉªtÉn/ TRYE-tÉn, на гръцки Î¤ÏÎ¯ÏÏÎ½) е\n"
+"Triton (изрича се /ˈtraɪtən/ TRYE-tən, на гръцки Τρίτων) е\n"
 "най-голямата луна на планетата Нептун, открита на 10 Октомври 1846\n"
 "от Уилям Ласел. В Слънчевата система тя е най-голямата луна\n"
 "с ретроградна орбита, това е орбита с противоположна посока\n"
@@ -1547,6 +1520,9 @@ msgid ""
 "\n"
 "You can save any graphs in PNG file with right-click on it.\n"
 msgstr ""
+"<b>Извличане на графики</b>\n"
+"\n"
+"Може да съхраните всяка графика като PNG файл като кликнете върху нея.\n"
 
 #: tryton/gui/window/tips.py:46
 msgid "Tips"
@@ -1662,7 +1638,6 @@ msgid "CSV Parameters"
 msgstr "CSV параметри"
 
 #: tryton/gui/window/win_import.py:125
-#, fuzzy
 msgid "Field Separator:"
 msgstr "Разделител на полета"
 
@@ -1691,7 +1666,6 @@ msgid "Error opening CSV file"
 msgstr "Грешка при отваряне на CSV файл"
 
 #: tryton/gui/window/win_import.py:291
-#, fuzzy, python-format
 msgid "Error processing the file at field %s."
 msgstr "Грешка при обработка на файл при поле %s"
 
@@ -1764,7 +1738,6 @@ msgid "Find"
 msgstr "Търсене"
 
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:51
-#, fuzzy
 msgid "Select a File..."
 msgstr "Избор на файл"
 
@@ -1791,12 +1764,11 @@ msgstr "Минута:"
 
 #: tryton/gui/window/view_form/view/form_gtk/char.py:104
 msgid "Show plain text"
-msgstr ""
+msgstr "Показване само на текст"
 
 #: tryton/gui/window/view_form/view/form_gtk/image.py:51
-#, fuzzy
 msgid "Select an Image..."
-msgstr "Избор на файл"
+msgstr "Избор на картинка"
 
 #: tryton/gui/window/view_form/view/form_gtk/image.py:118
 msgid "All files"
@@ -1830,15 +1802,14 @@ msgid "Edit selected record"
 msgstr "Редактиране на избрания запис"
 
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:99
-#, fuzzy
 msgid "Undelete selected record"
-msgstr "Изтриване на избрания запис"
+msgstr "Възтановяване на избрания запис"
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:24
 #: tryton/gui/window/view_form/view/list_gtk/parser.py:222
 #: tryton/gui/window/view_form/view/list_gtk/parser.py:912
 msgid "Unknown"
-msgstr "Неисвестен"
+msgstr "Неизвестен"
 
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:38
 msgid "Wrong icon for the button!"
