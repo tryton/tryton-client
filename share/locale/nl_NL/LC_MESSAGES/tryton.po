@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Tryton 1.8\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2011-03-08 00:13+0100\n"
-"PO-Revision-Date: 2011-10-24 01:06+0200\n"
+"PO-Revision-Date: 2012-04-23 11:07+0200\n"
 "Last-Translator: Bram van der Sar <avdsar@telfort.nl>\n"
 "Language-Team: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -13,44 +13,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: tryton/config.py:110
+#: tryton/config.py:86
 msgid "specify alternate config file"
 msgstr "specificeer een vervangend configuratiebestand"
 
-#: tryton/config.py:113
+#: tryton/config.py:89
 msgid "logging everything at INFO level"
 msgstr "logboek bijhouden op INFO niveau"
 
-#: tryton/config.py:115
+#: tryton/config.py:91
 msgid "specify channels to log"
 msgstr "specificeer kanalen voor het logboek"
 
-#: tryton/config.py:117
+#: tryton/config.py:93
 msgid "specify the log level: INFO, DEBUG, WARNING, ERROR, CRITICAL"
 msgstr "specificeer het logboek niveau: INFO, DEBUG, WARNING, ERROR, CRITICAL"
 
-#: tryton/config.py:120
+#: tryton/config.py:96
 msgid "specify the login user"
 msgstr "specificeer de inlog gebruiker"
 
-#: tryton/config.py:122
+#: tryton/config.py:98
 msgid "specify the server port"
 msgstr " Stel de serverpoort in"
 
-#: tryton/config.py:124
+#: tryton/config.py:100
 msgid "specify the server hostname"
 msgstr "Stel de servernaam in"
 
-#: tryton/config.py:128
+#: tryton/config.py:104
 msgid "Too much arguments"
 msgstr ""
 
-#: tryton/config.py:131
+#: tryton/config.py:107
 #, python-format
 msgid "File \"%s\" not found"
 msgstr "Bestand \"%s\" niet gevonden"
 
-#: tryton/config.py:158
+#: tryton/config.py:135
 #, python-format
 msgid "Unable to write config file %s!"
 msgstr "Kan configuratiebestand %s niet opslaan! "
@@ -60,61 +60,62 @@ msgstr "Kan configuratiebestand %s niet opslaan! "
 msgid "Unable to set locale %s"
 msgstr "Kan omgeving %s niet instellen"
 
-#: tryton/action/main.py:44
-msgid "Nothing to print!"
-msgstr "Geen gegevens om af te drukken!"
-
-#: tryton/action/main.py:191
+#: tryton/action/main.py:168
 msgid "Select your action"
 msgstr "Selecteer je handeling."
 
-#: tryton/action/main.py:197
+#: tryton/action/main.py:174
 msgid "No action defined!"
 msgstr "Geen handeling gedefinieerd!"
 
-#: tryton/common/common.py:186
+#: tryton/common/common.py:197
 msgid "Tryton Connection"
 msgstr "Tryton verbinding"
 
-#: tryton/common/common.py:197
+#: tryton/common/common.py:208
 msgid "Server:"
 msgstr "Server:"
 
-#: tryton/common/common.py:215 tryton/gui/window/dblogin.py:82
+#: tryton/common/common.py:226 tryton/gui/window/dblogin.py:79
 msgid "Port:"
 msgstr "Poort:"
 
-#: tryton/common/common.py:280
+#: tryton/common/common.py:295
 msgid "Selection"
 msgstr "Selectie"
 
-#: tryton/common/common.py:289
+#: tryton/common/common.py:304
 msgid "Your selection:"
 msgstr "Uw selectie:"
 
-#: tryton/common/common.py:413 tryton/common/common.py:448
-#: tryton/gui/main.py:1401 tryton/gui/window/win_export.py:401
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:73
+#: tryton/common/common.py:424 tryton/gui/main.py:1391
+#: tryton/gui/window/win_export.py:386
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:71
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:141
-#: tryton/gui/window/view_form/view/form_gtk/image.py:72
-#: tryton/gui/window/view_form/view/form_gtk/image.py:155
-#: tryton/gui/window/view_form/view/graph_gtk/parser.py:104
+#: tryton/gui/window/view_form/view/form_gtk/image.py:74
+#: tryton/gui/window/view_form/view/form_gtk/image.py:158
+#: tryton/gui/window/view_form/view/graph_gtk/parser.py:105
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:552
 msgid "Save As..."
 msgstr "Opslaan als..."
 
-#: tryton/common/common.py:595
+#: tryton/common/common.py:575
 msgid "Always ignore this warning."
 msgstr "Altijd deze waarschuwing negeren."
 
-#: tryton/common/common.py:616
+#: tryton/common/common.py:580
+msgid "Do you want to proceed?"
+msgstr ""
+
+#: tryton/common/common.py:599
 msgid "Confirmation"
 msgstr "Bevestiging"
 
-#: tryton/common/common.py:722 tryton/common/common.py:1021
+#: tryton/common/common.py:705 tryton/common/common.py:1004
 msgid "Concurrency Exception"
 msgstr "Simultaan gebruik"
 
-#: tryton/common/common.py:736
+#: tryton/common/common.py:719
 #, fuzzy
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
@@ -133,50 +134,50 @@ msgstr ""
 " - \"Vergelijk\" om de verschillen te vergelijken;\n"
 " - \"Toch opslaan\" om deze versie op te slaan. "
 
-#: tryton/common/common.py:745
+#: tryton/common/common.py:728
 msgid "Compare"
 msgstr "Vergelijk"
 
-#: tryton/common/common.py:750
+#: tryton/common/common.py:733
 msgid "Write Anyway"
 msgstr "Overschrijven"
 
-#: tryton/common/common.py:776 tryton/gui/window/win_export.py:435
-#: tryton/gui/window/win_import.py:262 tryton/gui/window/win_import.py:292
+#: tryton/common/common.py:759 tryton/gui/window/win_export.py:420
+#: tryton/gui/window/win_import.py:255 tryton/gui/window/win_import.py:283
 msgid "Error"
 msgstr "Fout"
 
-#: tryton/common/common.py:780
+#: tryton/common/common.py:763
 msgid "Report Bug"
 msgstr "Programmafout melden"
 
-#: tryton/common/common.py:787
+#: tryton/common/common.py:770
 msgid "Application Error!"
 msgstr "Programmafout"
 
-#: tryton/common/common.py:810
+#: tryton/common/common.py:793
 msgid "Error: "
 msgstr "Fout: "
 
-#: tryton/common/common.py:830
+#: tryton/common/common.py:813
 #, fuzzy, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
-msgstr "Om programmafouten aan te melden moet je een account hebben bij"
+msgstr "Om programmafouten aan te melden moet je een account hebben bij <u>%s</u>"
 
-#: tryton/common/common.py:859
+#: tryton/common/common.py:843
 msgid "Bug Tracker"
 msgstr "Foutrapportage"
 
-#: tryton/common/common.py:877
+#: tryton/common/common.py:861
 msgid "User:"
 msgstr "Gebruiker:"
 
-#: tryton/common/common.py:885 tryton/common/common.py:1031
-#: tryton/gui/window/dblogin.py:468
+#: tryton/common/common.py:869 tryton/common/common.py:1014
+#: tryton/gui/window/dblogin.py:466
 msgid "Password:"
 msgstr "Wachtwoord:"
 
-#: tryton/common/common.py:939
+#: tryton/common/common.py:918
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
@@ -185,11 +186,11 @@ msgstr ""
 "Om je op de hoogte te houden is je gebuikersnaam toegevoegd aan de lijst "
 "van belangstellenden"
 
-#: tryton/common/common.py:950
+#: tryton/common/common.py:929
 msgid "Created new bug with ID "
 msgstr "Nieuwe foutmelding gemaakt met ID "
 
-#: tryton/common/common.py:957 tryton/gui/main.py:955
+#: tryton/common/common.py:937 tryton/gui/main.py:956
 msgid ""
 "Connection error!\n"
 "Bad username or password!"
@@ -197,11 +198,11 @@ msgstr ""
 "Geen verbinding!\n"
 "Verkeerde gebruikersnaam of wachtwoord!"
 
-#: tryton/common/common.py:962
+#: tryton/common/common.py:942
 msgid "Exception:"
 msgstr "Uitzondering:"
 
-#: tryton/common/common.py:974
+#: tryton/common/common.py:957
 msgid ""
 "The server fingerprint has changed since last connection!\n"
 "The application will stop connecting to this server until its fingerprint"
@@ -212,12 +213,12 @@ msgstr ""
 "Het programma maakt geen verbinding meer met de server totdat de "
 "identificatiecode is hersteld."
 
-#: tryton/common/common.py:976
+#: tryton/common/common.py:959
 msgid "Security risk!"
 msgstr "Beveiligingsrisico!"
 
-#: tryton/common/common.py:982 tryton/common/common.py:1039
-#: tryton/gui/main.py:952
+#: tryton/common/common.py:965 tryton/common/common.py:1022
+#: tryton/gui/main.py:953
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
@@ -225,7 +226,7 @@ msgstr ""
 "Verbinding mislukt!\n"
 "Verbinden met de server niet mogelijk!"
 
-#: tryton/common/common.py:1053
+#: tryton/common/common.py:1036
 msgid "Network Error!"
 msgstr "Netwerkfout."
 
@@ -241,89 +242,113 @@ msgstr ""
 "Een moment a.u.b.\n"
 "Deze handeling kost even tijd..."
 
-#: tryton/common/common.py:1308 tryton/common/tdp.py:251
+#: tryton/common/common.py:1323
 msgid "Y"
 msgstr " J"
 
-#: tryton/common/common.py:1309
+#: tryton/common/common.py:1324
 msgid "M"
 msgstr "M"
 
-#: tryton/common/common.py:1310
+#: tryton/common/common.py:1325
 msgid "w"
 msgstr "w"
 
-#: tryton/common/common.py:1311
+#: tryton/common/common.py:1326
 msgid "d"
 msgstr " d"
 
-#: tryton/common/common.py:1312
+#: tryton/common/common.py:1327
 msgid "h"
 msgstr "u"
 
-#: tryton/common/common.py:1313
+#: tryton/common/common.py:1328
 msgid "m"
 msgstr "m"
 
-#: tryton/common/tdp.py:46
+#: tryton/common/domain_parser.py:182
 msgid "y"
 msgstr ""
 
-#: tryton/common/tdp.py:47
+#: tryton/common/domain_parser.py:182
 #, fuzzy
 msgid "yes"
 msgstr "bytes"
 
-#: tryton/common/tdp.py:47
+#: tryton/common/domain_parser.py:182
 #, fuzzy
 msgid "true"
 msgstr "Waar"
 
-#: tryton/common/tdp.py:251
-msgid "Yes"
-msgstr "Ja"
+#: tryton/common/domain_parser.py:182
+msgid "t"
+msgstr ""
 
-#: tryton/common/tdp.py:251 tryton/common/tdp.py:620 tryton/common/tdp.py:764
+#: tryton/common/domain_parser.py:368
+#: tryton/gui/window/view_form/view/screen_container.py:259
 msgid "True"
 msgstr "Waar"
 
-#: tryton/common/tdp.py:251
-msgid "N"
-msgstr ""
-
-#: tryton/common/tdp.py:252
-msgid "No"
-msgstr "Nee"
-
-#: tryton/common/tdp.py:252 tryton/common/tdp.py:620 tryton/common/tdp.py:764
+#: tryton/common/domain_parser.py:368
+#: tryton/gui/window/view_form/view/screen_container.py:259
 msgid "False"
 msgstr "Niet waar"
 
-#: tryton/gui/main.py:208
+#: tryton/common/popup_menu.py:71
+#, fuzzy
+msgid "Attachments..."
+msgstr "Bijlage:"
+
+#: tryton/common/popup_menu.py:76
+#, fuzzy
+msgid "Actions..."
+msgstr "_Acties.."
+
+#: tryton/common/popup_menu.py:77
+#, fuzzy
+msgid "Relate..."
+msgstr "Verwijderen... "
+
+#: tryton/common/popup_menu.py:78
+#, fuzzy
+msgid "Report..."
+msgstr "_Importeer gegevens... "
+
+#: tryton/common/popup_menu.py:79
+#, fuzzy
+msgid "E-Mail..."
+msgstr "E-mail"
+
+#: tryton/common/popup_menu.py:80
+#, fuzzy
+msgid "Print..."
+msgstr "Afdrukken"
+
+#: tryton/gui/main.py:204
 msgid "_File"
 msgstr "_Bestand"
 
-#: tryton/gui/main.py:216
+#: tryton/gui/main.py:212
 msgid "_User"
 msgstr "_Gebruiker"
 
-#: tryton/gui/main.py:230
+#: tryton/gui/main.py:226
 msgid "_Options"
 msgstr "_Opties"
 
-#: tryton/gui/main.py:238
+#: tryton/gui/main.py:234
 msgid "_Plugins"
 msgstr "_Plugins"
 
-#: tryton/gui/main.py:252
+#: tryton/gui/main.py:248
 msgid "_Shortcuts"
 msgstr "_Snelkoppelingen"
 
-#: tryton/gui/main.py:267
+#: tryton/gui/main.py:264
 msgid "_Help"
 msgstr "_Help"
 
-#: tryton/gui/main.py:319
+#: tryton/gui/main.py:318
 msgid "_Connect..."
 msgstr "_Verbinden..."
 
@@ -339,52 +364,48 @@ msgstr "Data_base"
 msgid "_New Database..."
 msgstr "_Nieuwe database..."
 
-#: tryton/gui/main.py:356
+#: tryton/gui/main.py:357
 msgid "_Restore Database..."
 msgstr "_Herstel database..."
 
-#: tryton/gui/main.py:364
+#: tryton/gui/main.py:366
 msgid "_Backup Database..."
 msgstr "Reservekopie van database..."
 
-#: tryton/gui/main.py:372
+#: tryton/gui/main.py:375
 msgid "Dro_p Database..."
 msgstr "Verwijder database..."
 
-#: tryton/gui/main.py:381
+#: tryton/gui/main.py:384
 msgid "_Quit..."
 msgstr "Afsluiten"
 
-#: tryton/gui/main.py:395
+#: tryton/gui/main.py:399
 msgid "_Preferences..."
 msgstr "_Voorkeuren..."
 
-#: tryton/gui/main.py:406
+#: tryton/gui/main.py:410
 #, fuzzy
 msgid "_Menu Reload"
 msgstr "He_rladen"
 
-#: tryton/gui/main.py:414
+#: tryton/gui/main.py:419
 msgid "_Menu Toggle"
 msgstr ""
 
-#: tryton/gui/main.py:421
-msgid "_Home"
-msgstr "_Thuis"
-
-#: tryton/gui/main.py:431
+#: tryton/gui/main.py:428
 msgid "_Send a Request"
 msgstr "Verzend een verzoek"
 
-#: tryton/gui/main.py:439
+#: tryton/gui/main.py:437
 msgid "_Read my Requests"
 msgstr "Lees mijn aanvragen"
 
-#: tryton/gui/main.py:451
+#: tryton/gui/main.py:450
 msgid "_Toolbar"
 msgstr "_Werkbalk"
 
-#: tryton/gui/main.py:459
+#: tryton/gui/main.py:458
 msgid "_Default"
 msgstr "_Standaard"
 
@@ -428,51 +449,47 @@ msgstr "Formulier"
 msgid "Statusbar"
 msgstr "Statusbalk"
 
-#: tryton/gui/main.py:551
+#: tryton/gui/main.py:553
 msgid "Save Width/Height"
 msgstr "Bewaar breedte/hoogte"
 
-#: tryton/gui/main.py:562
+#: tryton/gui/main.py:564
 msgid "Save Tree Expanded State"
 msgstr ""
 
-#: tryton/gui/main.py:574
+#: tryton/gui/main.py:576
 msgid "Spell Checking"
 msgstr "Spellingscontrole uitvoeren"
 
-#: tryton/gui/main.py:584
+#: tryton/gui/main.py:586
 msgid "Tabs Position"
 msgstr "Positie tabbladeren"
 
-#: tryton/gui/main.py:592
+#: tryton/gui/main.py:594
 msgid "Top"
 msgstr "Bovenkant"
 
-#: tryton/gui/main.py:601
+#: tryton/gui/main.py:603
 msgid "Left"
 msgstr "Links"
 
-#: tryton/gui/main.py:610
+#: tryton/gui/main.py:613
 msgid "Right"
 msgstr "Rechts"
 
-#: tryton/gui/main.py:619
+#: tryton/gui/main.py:623
 msgid "Bottom"
 msgstr "Onderkant"
 
-#: tryton/gui/main.py:627
+#: tryton/gui/main.py:632
 msgid "Search Limit..."
 msgstr "Zoek limiet..."
 
-#: tryton/gui/main.py:633
-msgid "File _Actions..."
-msgstr "Acties bestanden..."
-
-#: tryton/gui/main.py:639
+#: tryton/gui/main.py:638
 msgid "_Email..."
 msgstr "E-mail"
 
-#: tryton/gui/main.py:647
+#: tryton/gui/main.py:646
 msgid "_Save Options"
 msgstr "_Sla opties op"
 
@@ -480,60 +497,47 @@ msgstr "_Sla opties op"
 msgid "_Execute a Plugin"
 msgstr "Installeer een plugin"
 
-#: tryton/gui/main.py:672
+#: tryton/gui/main.py:673
 msgid "_Tips..."
 msgstr "_Tips..."
 
-#: tryton/gui/main.py:680
+#: tryton/gui/main.py:682
 msgid "_Keyboard Shortcuts..."
 msgstr "Sneltoetsen"
 
-#: tryton/gui/main.py:689
+#: tryton/gui/main.py:691
 msgid "_About..."
 msgstr "I_nfo..."
 
-#: tryton/gui/main.py:757
+#: tryton/gui/main.py:758
 #, fuzzy
 msgid "Add Shortcut"
 msgstr "Snelkoppelingen"
 
-#: tryton/gui/main.py:760
+#: tryton/gui/main.py:761
 msgid "Manage Shortcut"
 msgstr ""
 
-#: tryton/gui/main.py:899
-#, python-format
-msgid "Requests (%s/%s)"
-msgstr "Aanvragen (%s/%s)"
-
-#: tryton/gui/main.py:900
+#: tryton/gui/main.py:897
 #, python-format
 msgid "Waiting requests: %s received - %s sent"
 msgstr "Openstaande verzoeken: %s ontvangen - %s verzonden"
 
-#: tryton/gui/main.py:970
+#: tryton/gui/main.py:971
 msgid ""
 "The following action requires to close all tabs.\n"
 "Do you want to continue?"
 msgstr ""
 
-#: tryton/gui/main.py:1008
+#: tryton/gui/main.py:1012
 msgid "SSL connection"
 msgstr "SSL verbinding"
 
-#: tryton/gui/main.py:1069
-msgid ""
-"You can not log into the system!\n"
-"Verify if you have a menu defined on your user."
-msgstr ""
-"U heeft geen toegang tot het systeem!\n"
-"Controleer of er een menu is gedefinieerd voor deze gebruiker."
-
-#: tryton/gui/main.py:1183
+#: tryton/gui/main.py:1173
 msgid "Close Tab"
 msgstr "Tabblad sluiten"
 
-#: tryton/gui/main.py:1300
+#: tryton/gui/main.py:1290
 msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
@@ -541,7 +545,7 @@ msgstr ""
 "U gaat een Tryton database verwijderen.\n"
 "Weet u zeker dat u door wil gaan?"
 
-#: tryton/gui/main.py:1311
+#: tryton/gui/main.py:1301
 msgid ""
 "Wrong Tryton Server Password\n"
 "Please try again."
@@ -549,28 +553,28 @@ msgstr ""
 "Verkeerde wachtwoord voor de Tryton server\n"
 "Probeer het opnieuw."
 
-#: tryton/gui/main.py:1313 tryton/gui/main.py:1351 tryton/gui/main.py:1389
-#: tryton/gui/window/dbcreate.py:377
+#: tryton/gui/main.py:1303 tryton/gui/main.py:1341 tryton/gui/main.py:1379
+#: tryton/gui/window/dbcreate.py:379
 msgid "Access denied!"
 msgstr "Geen toegang!"
 
-#: tryton/gui/main.py:1316
+#: tryton/gui/main.py:1306
 msgid "Database drop failed with error message:\n"
 msgstr "Verwijderen database is mislukt met foutmelding:\n"
 
-#: tryton/gui/main.py:1317
+#: tryton/gui/main.py:1307
 msgid "Database drop failed!"
 msgstr "Database kan niet worden verwijderd."
 
-#: tryton/gui/main.py:1320
+#: tryton/gui/main.py:1310
 msgid "Database dropped successfully!"
 msgstr "Database succesvol verwijderd!"
 
-#: tryton/gui/main.py:1325
+#: tryton/gui/main.py:1315
 msgid "Open Backup File to Restore..."
 msgstr "Open reservekopie om te herstellen..."
 
-#: tryton/gui/main.py:1343
+#: tryton/gui/main.py:1333
 msgid ""
 "It is not possible to restore a password protected database.\n"
 "Backup and restore needed to be proceed manual."
@@ -578,11 +582,11 @@ msgstr ""
 "Een met een wachtwoord beveiligde database kan niet terug gezet worden.\n"
 "Voer deze handeling handmatig uit."
 
-#: tryton/gui/main.py:1347 tryton/gui/main.py:1385
+#: tryton/gui/main.py:1337 tryton/gui/main.py:1375
 msgid "Database is password protected!"
 msgstr "Database beveiligd met een wachtwoord!"
 
-#: tryton/gui/main.py:1349 tryton/gui/main.py:1387
+#: tryton/gui/main.py:1339 tryton/gui/main.py:1377
 msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
@@ -590,19 +594,19 @@ msgstr ""
 "Verkeerde wachtwoord voor de Tryton server\n"
 "Probeer het opnieuw."
 
-#: tryton/gui/main.py:1354
+#: tryton/gui/main.py:1344
 msgid "Database restore failed with error message:\n"
 msgstr "Herstellen database is mislukt met foutmelding:\n"
 
-#: tryton/gui/main.py:1356 tryton/gui/main.py:1362
+#: tryton/gui/main.py:1346 tryton/gui/main.py:1352
 msgid "Database restore failed!"
 msgstr "Database terugzetten mislukt!"
 
-#: tryton/gui/main.py:1360
+#: tryton/gui/main.py:1350
 msgid "Database restored successfully!"
 msgstr "Database succesvol teruggezet!"
 
-#: tryton/gui/main.py:1382
+#: tryton/gui/main.py:1372
 msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
@@ -610,82 +614,78 @@ msgstr ""
 "Een met een wachtwoord beveiligde database kan niet verwijderd worden.\n"
 "Voer deze handeling handmatig uit."
 
-#: tryton/gui/main.py:1392
+#: tryton/gui/main.py:1382
 msgid "Database dump failed with error message:\n"
 msgstr "Verwijderen database is mislukt met foutmelding:\n"
 
-#: tryton/gui/main.py:1394
+#: tryton/gui/main.py:1384
 msgid "Database dump failed!"
 msgstr "Database verwijderen mislukt!"
 
-#: tryton/gui/main.py:1408
+#: tryton/gui/main.py:1398
 msgid "Database backuped successfully!"
 msgstr "Reservekopie van database gemaakt!"
 
-#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:36
+#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:32
 msgid "New"
 msgstr ""
 
-#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:36
-#: tryton/gui/window/win_form.py:120
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:65
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:69
-#: tryton/gui/window/view_form/view/form_gtk/reference.py:73
+#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:32
 msgid "Create a new record"
 msgstr "Maak een nieuw item"
 
-#: tryton/gui/window/board.py:24 tryton/gui/window/form.py:38
-#: tryton/gui/window/win_export.py:142
+#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:34
+#: tryton/gui/window/win_export.py:139
 msgid "Save"
 msgstr "Opslaan"
 
-#: tryton/gui/window/board.py:24 tryton/gui/window/form.py:38
+#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:34
 msgid "Save this record"
 msgstr "Bewaar dit item"
 
-#: tryton/gui/window/board.py:25 tryton/gui/window/form.py:40
-#: tryton/gui/window/win_form.py:167 tryton/gui/window/view_board/action.py:129
+#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:36
+#: tryton/gui/window/win_form.py:214
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:136
 msgid "Switch"
 msgstr "Omschakelen"
 
-#: tryton/gui/window/board.py:25 tryton/gui/window/form.py:40
+#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:36
 msgid "Switch view"
 msgstr "Wijzig beeld"
 
-#: tryton/gui/window/board.py:27 tryton/gui/window/form.py:42
+#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:38
 msgid "_Reload"
 msgstr "He_rladen"
 
-#: tryton/gui/window/board.py:27 tryton/gui/window/form.py:42
+#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:38
 msgid "Reload"
 msgstr "Herladen"
 
-#: tryton/gui/window/board.py:32 tryton/gui/window/form.py:54
+#: tryton/gui/window/board.py:28 tryton/gui/window/form.py:50
 msgid "_New"
 msgstr "_Nieuw"
 
-#: tryton/gui/window/board.py:33 tryton/gui/window/form.py:55
+#: tryton/gui/window/board.py:29 tryton/gui/window/form.py:51
 msgid "_Save"
 msgstr "Op_slaan"
 
-#: tryton/gui/window/board.py:34 tryton/gui/window/form.py:64
+#: tryton/gui/window/board.py:30 tryton/gui/window/form.py:52
 msgid "_Switch View"
 msgstr "Wijzig beeld"
 
-#: tryton/gui/window/board.py:36 tryton/gui/window/form.py:73
+#: tryton/gui/window/board.py:32 tryton/gui/window/form.py:54
 msgid "_Reload/Undo"
 msgstr "_Ongedaan maken"
 
-#: tryton/gui/window/board.py:38 tryton/gui/window/form.py:58
+#: tryton/gui/window/board.py:34 tryton/gui/window/form.py:58
 msgid "_Delete..."
 msgstr "Verwijderen... "
 
-#: tryton/gui/window/board.py:39 tryton/gui/window/form.py:67
+#: tryton/gui/window/board.py:36 tryton/gui/window/form.py:68
 msgid "_Close Tab"
 msgstr "Tabblad sluiten"
 
-#: tryton/gui/window/dbcreate.py:31
+#: tryton/gui/window/dbcreate.py:32
 #, fuzzy
 msgid ""
 "This is the URL of the Tryton server. Use server 'localhost' and port "
@@ -696,11 +696,11 @@ msgstr ""
 "als de server op deze computer is geïnstalleerd. Klik op 'Wijzig' om het "
 "adres aan te passen."
 
-#: tryton/gui/window/dbcreate.py:44
+#: tryton/gui/window/dbcreate.py:45
 msgid "No connection!"
 msgstr "Geen verbinding met server"
 
-#: tryton/gui/window/dbcreate.py:47
+#: tryton/gui/window/dbcreate.py:48
 #, fuzzy
 msgid ""
 "Can not connect to the server!\n"
@@ -722,7 +722,7 @@ msgstr ""
 msgid "Create new database"
 msgstr "Maak een nieuwe Database."
 
-#: tryton/gui/window/dbcreate.py:148
+#: tryton/gui/window/dbcreate.py:147
 msgid "C_reate"
 msgstr "Aan_maken"
 
@@ -738,8 +738,8 @@ msgstr "Server instelling:"
 msgid "Server connection:"
 msgstr "Server verbinding:"
 
-#: tryton/gui/window/dbcreate.py:179 tryton/gui/window/dbdumpdrop.py:139
-#: tryton/gui/window/dbrestore.py:85
+#: tryton/gui/window/dbcreate.py:180 tryton/gui/window/dbdumpdrop.py:141
+#: tryton/gui/window/dbrestore.py:86
 #, fuzzy
 msgid ""
 "This is the URL of the server. Use server 'localhost' and port '8000' if "
@@ -750,22 +750,22 @@ msgstr ""
 "als de server op deze computer is geïnstalleerd. Klik op 'Wijzig' om het "
 "adres aan te passen."
 
-#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:146
-#: tryton/gui/window/dbrestore.py:90
+#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:148
+#: tryton/gui/window/dbrestore.py:91
 msgid "C_hange"
 msgstr "_Wijzigen"
 
-#: tryton/gui/window/dbcreate.py:190 tryton/gui/window/dbrestore.py:96
+#: tryton/gui/window/dbcreate.py:192 tryton/gui/window/dbrestore.py:97
 msgid "Setup the server connection..."
 msgstr "Verbinden met server..."
 
-#: tryton/gui/window/dbcreate.py:194 tryton/gui/window/dbdumpdrop.py:183
-#: tryton/gui/window/dbrestore.py:99
+#: tryton/gui/window/dbcreate.py:195 tryton/gui/window/dbdumpdrop.py:185
+#: tryton/gui/window/dbrestore.py:100
 msgid "Tryton Server Password:"
 msgstr "Wachtwoord Tryton server:"
 
-#: tryton/gui/window/dbcreate.py:204 tryton/gui/window/dbdumpdrop.py:193
-#: tryton/gui/window/dbrestore.py:108
+#: tryton/gui/window/dbcreate.py:205 tryton/gui/window/dbdumpdrop.py:195
+#: tryton/gui/window/dbrestore.py:109
 msgid ""
 "This is the password of the Tryton server. It doesn't belong to a real "
 "user. This password is usually defined in the trytond configuration."
@@ -774,15 +774,15 @@ msgstr ""
 "van een gebruiker. Dit wachtwoord is doorgaans gedefinieerd in de trytond"
 " configuratie."
 
-#: tryton/gui/window/dbcreate.py:215
+#: tryton/gui/window/dbcreate.py:216
 msgid "New database setup:"
 msgstr "Maak een nieuwe database:"
 
-#: tryton/gui/window/dbcreate.py:221
+#: tryton/gui/window/dbcreate.py:222
 msgid "Database name:"
 msgstr "Naam database:"
 
-#: tryton/gui/window/dbcreate.py:232
+#: tryton/gui/window/dbcreate.py:234
 msgid ""
 "Choose the name of the new database.\n"
 "Allowed characters are alphanumerical or _ (underscore)\n"
@@ -793,11 +793,11 @@ msgstr ""
 "Toegestane tekens zijn alfa-numeriek of _ (underscore).\n"
 "Vermijd alle accenten, spaties en speciale tekens! Voorbeeld: tryton."
 
-#: tryton/gui/window/dbcreate.py:240
+#: tryton/gui/window/dbcreate.py:241
 msgid "Default language:"
 msgstr "Standaardtaal:"
 
-#: tryton/gui/window/dbcreate.py:250
+#: tryton/gui/window/dbcreate.py:251
 msgid ""
 "Choose the default language that will be installed for this database. You"
 " will be able to install new languages after installation through the "
@@ -806,11 +806,11 @@ msgstr ""
 "Kies de standaardtaal welke geïnstalleerd wordt voor deze database. Het "
 "is mogelijk de taal te wijzigen na installatie in het Systeembeheer menu."
 
-#: tryton/gui/window/dbcreate.py:254
+#: tryton/gui/window/dbcreate.py:255
 msgid "Admin password:"
 msgstr "Admin wachtwoord:"
 
-#: tryton/gui/window/dbcreate.py:263
+#: tryton/gui/window/dbcreate.py:265
 msgid ""
 "Choose a password for the admin user of the new database. With these "
 "credentials you will be later able to login into the database:\n"
@@ -822,15 +822,15 @@ msgstr ""
 "Gebruikersnaam: admin\n"
 "Wachtwoord: <het wachtwoord dat je hier ingeeft>"
 
-#: tryton/gui/window/dbcreate.py:271
+#: tryton/gui/window/dbcreate.py:273
 msgid "Confirm admin password:"
 msgstr "Bevestig admin wachtwoord:"
 
-#: tryton/gui/window/dbcreate.py:280
+#: tryton/gui/window/dbcreate.py:282
 msgid "Type the Admin password again"
 msgstr "Admin wachtwoord opnieuw invoeren"
 
-#: tryton/gui/window/dbcreate.py:328
+#: tryton/gui/window/dbcreate.py:330
 msgid ""
 "The database name is restricted to alpha-nummerical characters and \"_\" "
 "(underscore). Avoid all accents, space and any other special characters."
@@ -839,29 +839,29 @@ msgstr ""
 "(underscore). Vermijd alle accenten, spaties en andere bijzondere "
 "karakters."
 
-#: tryton/gui/window/dbcreate.py:332
+#: tryton/gui/window/dbcreate.py:334
 msgid "Wrong characters in database name!"
 msgstr "Ongeldige tekens in database naam!"
 
-#: tryton/gui/window/dbcreate.py:336
+#: tryton/gui/window/dbcreate.py:338
 msgid "The new admin password doesn't match the confirmation field.\n"
 msgstr "Het nieuwe wachtwoord voor admin komt niet overeen met de bevestiging.\n"
 
-#: tryton/gui/window/dbcreate.py:338
+#: tryton/gui/window/dbcreate.py:340
 msgid "Passwords doesn't match!"
 msgstr "Wachtwoorden komen niet overeen!"
 
-#: tryton/gui/window/dbcreate.py:341
+#: tryton/gui/window/dbcreate.py:343
 msgid "Admin password and confirmation are required to create a new database."
 msgstr ""
 "Admin wachtwoord en bevestiging zijn nodig om een nieuwe database te "
 "maken."
 
-#: tryton/gui/window/dbcreate.py:343
+#: tryton/gui/window/dbcreate.py:345
 msgid "Missing admin password!"
 msgstr "Wachtwoord admin ontbreekt!"
 
-#: tryton/gui/window/dbcreate.py:358
+#: tryton/gui/window/dbcreate.py:360
 msgid ""
 "A database with the same name already exists.\n"
 "Try another database name."
@@ -869,15 +869,15 @@ msgstr ""
 "Een database met deze naam bestaat al.\n"
 "Probeer een andere database naam. "
 
-#: tryton/gui/window/dbcreate.py:361
+#: tryton/gui/window/dbcreate.py:363
 msgid "This database name already exist!"
 msgstr "Deze database bestaat al!"
 
-#: tryton/gui/window/dbcreate.py:375
+#: tryton/gui/window/dbcreate.py:377
 msgid "Sorry, wrong password for the Tryton server. Please try again."
 msgstr "Sorry, verkeerde wachtwoord voor de Tryton server. Probeer het opnieuw. "
 
-#: tryton/gui/window/dbcreate.py:382
+#: tryton/gui/window/dbcreate.py:384
 msgid ""
 "Can't create the database, caused by an unknown reason.\n"
 "If there is a database created, it could be broken. Maybe drop this "
@@ -890,7 +890,7 @@ msgstr ""
 "informatie.\n"
 "Foutmelding:\n"
 
-#: tryton/gui/window/dbcreate.py:390
+#: tryton/gui/window/dbcreate.py:392
 msgid "Error creating database!"
 msgstr "Database maken mislukt!"
 
@@ -904,149 +904,149 @@ msgstr ""
 "Deze software versie kan niet gebruik worden in combinatie met de versie "
 "op de server! "
 
-#: tryton/gui/window/dbdumpdrop.py:36
+#: tryton/gui/window/dbdumpdrop.py:37
 msgid "No database found, you must create one!"
 msgstr "Geen database aanwezig; maak een nieuwe aan!"
 
-#: tryton/gui/window/dbdumpdrop.py:77
+#: tryton/gui/window/dbdumpdrop.py:78
 msgid "Backup a database"
 msgstr "Reservekopie van database"
 
-#: tryton/gui/window/dbdumpdrop.py:78
+#: tryton/gui/window/dbdumpdrop.py:79
 msgid "Backup"
 msgstr "Reservekopie"
 
-#: tryton/gui/window/dbdumpdrop.py:79
+#: tryton/gui/window/dbdumpdrop.py:80
 msgid "Backup the choosen database."
 msgstr "Maak reservekopie van deze database."
 
-#: tryton/gui/window/dbdumpdrop.py:81
+#: tryton/gui/window/dbdumpdrop.py:82
 msgid "Choose a Tryton database to backup:"
 msgstr "Kies een Tryton database voor een reservekopie:"
 
-#: tryton/gui/window/dbdumpdrop.py:83
+#: tryton/gui/window/dbdumpdrop.py:84
 msgid "Delete a database"
 msgstr "Verwijder een database"
 
-#: tryton/gui/window/dbdumpdrop.py:84
+#: tryton/gui/window/dbdumpdrop.py:85
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: tryton/gui/window/dbdumpdrop.py:85
+#: tryton/gui/window/dbdumpdrop.py:86
 msgid "Delete the choosen database."
 msgstr "Verwijder de gekozen database."
 
-#: tryton/gui/window/dbdumpdrop.py:87
+#: tryton/gui/window/dbdumpdrop.py:88
 msgid "Choose a Tryton database to delete:"
 msgstr "Kies een Tryton database om te verwijderen:"
 
-#: tryton/gui/window/dbdumpdrop.py:129 tryton/gui/window/dbrestore.py:74
+#: tryton/gui/window/dbdumpdrop.py:131 tryton/gui/window/dbrestore.py:75
 msgid "Server Connection:"
 msgstr "Verbinding met server:"
 
-#: tryton/gui/window/dbdumpdrop.py:155 tryton/gui/window/dblogin.py:92
-#: tryton/gui/window/dblogin.py:451
+#: tryton/gui/window/dbdumpdrop.py:157 tryton/gui/window/dblogin.py:89
+#: tryton/gui/window/dblogin.py:448
 msgid "Database:"
 msgstr "Database:"
 
-#: tryton/gui/window/dblogin.py:33
+#: tryton/gui/window/dblogin.py:31
 msgid "Profile Editor"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:49
+#: tryton/gui/window/dblogin.py:46
 msgid "Profile"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:55 tryton/gui/window/win_export.py:65
-#: tryton/gui/window/win_import.py:47
+#: tryton/gui/window/dblogin.py:52 tryton/gui/window/win_export.py:62
+#: tryton/gui/window/win_import.py:46
 msgid "_Add"
 msgstr "_Toevoegen"
 
-#: tryton/gui/window/dblogin.py:60 tryton/gui/window/win_export.py:73
-#: tryton/gui/window/win_import.py:55
+#: tryton/gui/window/dblogin.py:57 tryton/gui/window/win_export.py:70
+#: tryton/gui/window/win_import.py:54
 msgid "_Remove"
 msgstr "_Verwijderen"
 
-#: tryton/gui/window/dblogin.py:73
+#: tryton/gui/window/dblogin.py:70
 #, fuzzy
 msgid "Hostname:"
 msgstr "Gebruikersnaam:"
 
-#: tryton/gui/window/dblogin.py:109
+#: tryton/gui/window/dblogin.py:107
 #, fuzzy
 msgid "Create"
 msgstr "Aan_maken"
 
-#: tryton/gui/window/dblogin.py:112
+#: tryton/gui/window/dblogin.py:110
 #, fuzzy
 msgid "Fetching databases list"
 msgstr "Maak een nieuwe database:"
 
-#: tryton/gui/window/dblogin.py:130
+#: tryton/gui/window/dblogin.py:128
 #, fuzzy
 msgid "Username:"
 msgstr "Gebruikersnaam:"
 
-#: tryton/gui/window/dblogin.py:315
+#: tryton/gui/window/dblogin.py:310
 #, fuzzy
 msgid "Could not connect to the server"
 msgstr "Geen verbinding met de server!"
 
-#: tryton/gui/window/dblogin.py:317 tryton/gui/window/dblogin.py:640
+#: tryton/gui/window/dblogin.py:312 tryton/gui/window/dblogin.py:635
 #, fuzzy
 msgid "Incompatible version of the server"
 msgstr "Deze versie is onverenigbaar met de server! "
 
-#: tryton/gui/window/dblogin.py:377
+#: tryton/gui/window/dblogin.py:373
 msgid "Login"
 msgstr "Inlognaam"
 
-#: tryton/gui/window/dblogin.py:384
+#: tryton/gui/window/dblogin.py:380
 msgid "_Cancel"
 msgstr " _Annuleren"
 
-#: tryton/gui/window/dblogin.py:389
+#: tryton/gui/window/dblogin.py:385
 msgid "Cancel connection to the Tryton server"
 msgstr "Verbreek verbinding met Tryton server"
 
-#: tryton/gui/window/dblogin.py:391
+#: tryton/gui/window/dblogin.py:387
 msgid "C_onnect"
 msgstr "_Verbinden"
 
-#: tryton/gui/window/dblogin.py:396
+#: tryton/gui/window/dblogin.py:392
 msgid "Connect the Tryton server"
 msgstr "Verbind met Tryton server"
 
-#: tryton/gui/window/dblogin.py:425
+#: tryton/gui/window/dblogin.py:421
 msgid "Profile:"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:429
+#: tryton/gui/window/dblogin.py:425
 msgid "_Manage profiles"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:439
+#: tryton/gui/window/dblogin.py:435
 msgid "Host / Database information"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:442
+#: tryton/gui/window/dblogin.py:438
 #, fuzzy
 msgid "Host:"
 msgstr "Poort:"
 
-#: tryton/gui/window/dblogin.py:473
+#: tryton/gui/window/dblogin.py:471
 msgid "User name:"
 msgstr "Gebruikersnaam:"
 
-#: tryton/gui/window/dbrestore.py:63
+#: tryton/gui/window/dbrestore.py:64
 msgid "Restore Database"
 msgstr "Database terug zetten"
 
-#: tryton/gui/window/dbrestore.py:116
+#: tryton/gui/window/dbrestore.py:117
 msgid "File to Restore:"
 msgstr "Terug te zetten bestand:"
 
-#: tryton/gui/window/dbrestore.py:130
+#: tryton/gui/window/dbrestore.py:131
 msgid ""
 "Choose the name of the database to be restored.\n"
 "Allowed characters are alphanumerical or _ (underscore)\n"
@@ -1058,15 +1058,15 @@ msgstr ""
 "Vermijd alle accenten, spaties en speciale tekens!\n"
 "Voorbeeld: tryton "
 
-#: tryton/gui/window/dbrestore.py:136
+#: tryton/gui/window/dbrestore.py:137
 msgid "New Database Name:"
 msgstr "Naam nieuwe database:"
 
-#: tryton/gui/window/dbrestore.py:139
+#: tryton/gui/window/dbrestore.py:140
 msgid "Update Database:"
 msgstr "Database bijwerken:"
 
-#: tryton/gui/window/dbrestore.py:143
+#: tryton/gui/window/dbrestore.py:144
 msgid ""
 "Check for an automatic database update after restoring a database from a "
 "previous Tryton version."
@@ -1074,11 +1074,11 @@ msgstr ""
 "Inschakelen voor het automatisch bijwerken van de database uit een vorige"
 " Tryton versie."
 
-#: tryton/gui/window/dbrestore.py:153
+#: tryton/gui/window/dbrestore.py:154
 msgid "Restore"
 msgstr "Herstellen"
 
-#: tryton/gui/window/dbrestore.py:161
+#: tryton/gui/window/dbrestore.py:163
 msgid "Restore the database from file."
 msgstr "Herstel database uit bestand."
 
@@ -1118,64 +1118,33 @@ msgstr "Bericht:"
 msgid "Attachment:"
 msgstr "Bijlage:"
 
-#: tryton/gui/window/fileactions.py:17
-msgid "File Actions"
-msgstr "Actie bestanden"
-
-#: tryton/gui/window/fileactions.py:25
-msgid "Edit Files Actions"
-msgstr "Wijzig actie bestanden"
-
-#: tryton/gui/window/fileactions.py:32
-msgid "File Type"
-msgstr "Bestandstype"
-
-#: tryton/gui/window/fileactions.py:32 tryton/gui/window/win_export.py:141
-#: tryton/gui/window/view_board/action.py:89
-msgid "Open"
-msgstr "Open"
-
-#: tryton/gui/window/fileactions.py:32 tryton/gui/window/form.py:557
-msgid "Print"
-msgstr "Afdrukken"
-
-#: tryton/gui/window/fileactions.py:49
-#, python-format
-msgid "%s file"
-msgstr "%s bestand"
-
-#: tryton/gui/window/fileactions.py:62
-#, python-format
-msgid "Use \"%s\" as a placeholder for the file name"
-msgstr "Gebruik \"%s\" als sjabloon voor de bestandsnaam."
-
-#: tryton/gui/window/form.py:45 tryton/gui/window/tips.py:74
-#: tryton/gui/window/win_form.py:142 tryton/gui/window/view_board/action.py:102
-#: tryton/gui/window/view_form/view/screen_container.py:54
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:111
+#: tryton/gui/window/form.py:41 tryton/gui/window/tips.py:74
+#: tryton/gui/window/win_form.py:187
+#: tryton/gui/window/view_form/view/screen_container.py:92
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:110
 msgid "Previous"
 msgstr "Vorige"
 
-#: tryton/gui/window/form.py:46
+#: tryton/gui/window/form.py:42
 msgid "Previous Record"
 msgstr "Vorige item"
 
-#: tryton/gui/window/form.py:47 tryton/gui/window/tips.py:81
-#: tryton/gui/window/win_form.py:155 tryton/gui/window/view_board/action.py:116
-#: tryton/gui/window/view_form/view/screen_container.py:66
+#: tryton/gui/window/form.py:43 tryton/gui/window/tips.py:81
+#: tryton/gui/window/win_form.py:201
+#: tryton/gui/window/view_form/view/screen_container.py:104
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:124
 msgid "Next"
 msgstr "Volgende"
 
-#: tryton/gui/window/form.py:47
+#: tryton/gui/window/form.py:43
 msgid "Next Record"
 msgstr "Volgende item"
 
-#: tryton/gui/window/form.py:50
+#: tryton/gui/window/form.py:46
 msgid "Attachment(0)"
 msgstr "Bijlage"
 
-#: tryton/gui/window/form.py:51
+#: tryton/gui/window/form.py:47
 msgid "Add an attachment to the record"
 msgstr "Voeg een bijlage aan dit item toe"
 
@@ -1184,126 +1153,136 @@ msgid "_Duplicate"
 msgstr "_Dupliceren"
 
 #: tryton/gui/window/form.py:61
-msgid "_Next"
-msgstr "_Volgende"
-
-#: tryton/gui/window/form.py:62
 msgid "_Previous"
 msgstr "V_orige"
 
-#: tryton/gui/window/form.py:70
+#: tryton/gui/window/form.py:63
+msgid "_Next"
+msgstr "_Volgende"
+
+#: tryton/gui/window/form.py:64
+#, fuzzy
+msgid "_Search"
+msgstr "Zoeken"
+
+#: tryton/gui/window/form.py:65
 msgid "View _Logs..."
 msgstr "Bekijk logregister"
 
-#: tryton/gui/window/form.py:71
+#: tryton/gui/window/form.py:66
 msgid "_Go to Record ID..."
 msgstr "Ga naar item ID..."
 
-#: tryton/gui/window/form.py:76
+#: tryton/gui/window/form.py:71
+#, fuzzy
+msgid "A_ttachments..."
+msgstr "Bijlage:"
+
+#: tryton/gui/window/form.py:73
 msgid "_Actions..."
 msgstr "_Acties.."
 
-#: tryton/gui/window/form.py:78
+#: tryton/gui/window/form.py:75
 #, fuzzy
 msgid "_Relate..."
 msgstr "Verwijderen... "
 
-#: tryton/gui/window/form.py:80
+#: tryton/gui/window/form.py:78
 #, fuzzy
 msgid "_Report..."
 msgstr "_Importeer gegevens... "
 
-#: tryton/gui/window/form.py:82
+#: tryton/gui/window/form.py:80
 #, fuzzy
 msgid "_E-Mail..."
 msgstr "E-mail"
 
-#: tryton/gui/window/form.py:84
+#: tryton/gui/window/form.py:82
 msgid "_Print..."
 msgstr "Afdrukken"
 
-#: tryton/gui/window/form.py:87
+#: tryton/gui/window/form.py:85
 msgid "_Export Data..."
 msgstr "_Exporteer gegevens... "
 
-#: tryton/gui/window/form.py:89
+#: tryton/gui/window/form.py:87
 msgid "_Import Data..."
 msgstr "_Importeer gegevens... "
 
-#: tryton/gui/window/form.py:184
+#: tryton/gui/window/form.py:177
 msgid "Go to ID"
 msgstr "Ga naar item-ID"
 
-#: tryton/gui/window/form.py:193
+#: tryton/gui/window/form.py:186
 msgid "Go to ID:"
 msgstr "Ga naar item-ID:"
 
-#: tryton/gui/window/form.py:244
+#: tryton/gui/window/form.py:239
 msgid "No record selected!"
 msgstr "Geen item geselecteerd!"
 
-#: tryton/gui/window/form.py:257
+#: tryton/gui/window/form.py:252
 #, python-format
 msgid "Attachment(%d)"
 msgstr "Bijlage (%d)"
 
-#: tryton/gui/window/form.py:272
+#: tryton/gui/window/form.py:267
 msgid "You have to select one record!"
 msgstr "Je moet één item selecteren!"
 
-#: tryton/gui/window/form.py:276
+#: tryton/gui/window/form.py:271
 msgid "ID:"
 msgstr "ID:"
 
-#: tryton/gui/window/form.py:277
+#: tryton/gui/window/form.py:272
 msgid "Creation User:"
 msgstr "Aangemaakt door:"
 
-#: tryton/gui/window/form.py:278
+#: tryton/gui/window/form.py:273
 msgid "Creation Date:"
 msgstr "Aanmaakdatum"
 
-#: tryton/gui/window/form.py:279
+#: tryton/gui/window/form.py:274
 msgid "Latest Modification by:"
 msgstr "Laatste wijziging door:"
 
-#: tryton/gui/window/form.py:280
+#: tryton/gui/window/form.py:275
 msgid "Latest Modification Date:"
 msgstr "Laatste wijzigingsdatum:"
 
-#: tryton/gui/window/form.py:303
+#: tryton/gui/window/form.py:293
 msgid "Model:"
 msgstr "Model:"
 
-#: tryton/gui/window/form.py:309
+#: tryton/gui/window/form.py:299
 msgid "Are you sure to remove this record?"
 msgstr "Weet je zeker dat je dit item wilt verwijderen?"
 
-#: tryton/gui/window/form.py:311
+#: tryton/gui/window/form.py:301
 msgid "Are you sure to remove those records?"
 msgstr "Weet je zeker dat je deze items wilt verwijderen?"
 
-#: tryton/gui/window/form.py:314
+#: tryton/gui/window/form.py:304
 msgid "Records not removed!"
 msgstr "Items niet verwijderd!"
 
-#: tryton/gui/window/form.py:316
+#: tryton/gui/window/form.py:306
 msgid "Records removed!"
 msgstr "Items verwijderd!"
 
-#: tryton/gui/window/form.py:358
+#: tryton/gui/window/form.py:345
 msgid "Working now on the duplicated record(s)!"
 msgstr "Je werkt nu met het gekopieerde item!"
 
-#: tryton/gui/window/form.py:363
+#: tryton/gui/window/form.py:350
 msgid "Record saved!"
 msgstr "Item opgeslagen!"
 
-#: tryton/gui/window/form.py:366
+#: tryton/gui/window/form.py:353
 msgid "Invalid form!"
 msgstr "Ongeldige invoer in formulier!"
 
-#: tryton/gui/window/form.py:385 tryton/gui/window/form.py:481
+#: tryton/gui/window/form.py:374 tryton/gui/window/form.py:478
 msgid ""
 "This record has been modified\n"
 "do you want to save it ?"
@@ -1311,48 +1290,52 @@ msgstr ""
 "Item is aangepast.\n"
 "Wil je de wijzigingen opslaan?"
 
-#: tryton/gui/window/form.py:466
+#: tryton/gui/window/form.py:460
 msgid " of "
 msgstr " van "
 
-#: tryton/gui/window/form.py:552
+#: tryton/gui/window/form.py:523
 msgid "Action"
 msgstr "Actie"
 
-#: tryton/gui/window/form.py:552
+#: tryton/gui/window/form.py:523
 msgid "Launch action"
 msgstr ""
 
-#: tryton/gui/window/form.py:553
+#: tryton/gui/window/form.py:524
 #, fuzzy
 msgid "Relate"
 msgstr "Aan_maken"
 
-#: tryton/gui/window/form.py:553
+#: tryton/gui/window/form.py:524
 #, fuzzy
 msgid "Open related records"
 msgstr "Item openen"
 
-#: tryton/gui/window/form.py:555
+#: tryton/gui/window/form.py:526
 #, fuzzy
 msgid "Report"
 msgstr "Rapporten"
 
-#: tryton/gui/window/form.py:555
+#: tryton/gui/window/form.py:526
 #, fuzzy
 msgid "Open report"
 msgstr "Item openen"
 
-#: tryton/gui/window/form.py:556
+#: tryton/gui/window/form.py:527
 #, fuzzy
 msgid "E-Mail"
 msgstr "E-mail"
 
-#: tryton/gui/window/form.py:556
+#: tryton/gui/window/form.py:527
 msgid "E-Mail report"
 msgstr ""
 
-#: tryton/gui/window/form.py:557
+#: tryton/gui/window/form.py:528
+msgid "Print"
+msgstr "Afdrukken"
+
+#: tryton/gui/window/form.py:528
 msgid "Print report"
 msgstr ""
 
@@ -1368,19 +1351,19 @@ msgstr "Zoek limiet instellen"
 msgid "Limit:"
 msgstr " Limiet:"
 
-#: tryton/gui/window/preference.py:21
+#: tryton/gui/window/preference.py:20
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: tryton/gui/window/preference.py:49
+#: tryton/gui/window/preference.py:45
 msgid "Edit User Preferences"
 msgstr "Voorkeuren gebruiker aanpassen"
 
-#: tryton/gui/window/preference.py:71
+#: tryton/gui/window/preference.py:66
 msgid "Preference"
 msgstr "Voorkeur"
 
-#: tryton/gui/window/preference.py:88
+#: tryton/gui/window/preference.py:83
 msgid "Current Password:"
 msgstr "Huidig Wachtwoord:"
 
@@ -1533,7 +1516,7 @@ msgstr ""
 "omvangrijker\n"
 "dan de 159 nu bekende kleinere manen van het zonnestelsel bij elkaar.\n"
 
-#: tryton/gui/window/tips.py:33
+#: tryton/gui/window/tips.py:34
 msgid ""
 "<b>Export list records</b>\n"
 "\n"
@@ -1545,7 +1528,7 @@ msgstr ""
 "Kopieer gegevens van elke lijst met Ctrl + C\n"
 "en plak ze in elke toepassing met Ctrl + V\n"
 
-#: tryton/gui/window/tips.py:38
+#: tryton/gui/window/tips.py:39
 msgid ""
 "<b>Export graphs</b>\n"
 "\n"
@@ -1563,64 +1546,68 @@ msgstr "Tips"
 msgid "_Display a new tip next time"
 msgstr "Volgende keer een tip"
 
-#: tryton/gui/window/win_export.py:24
+#: tryton/gui/window/win_export.py:22
 msgid "Export to CSV"
 msgstr "Exporteer naar CSV"
 
-#: tryton/gui/window/win_export.py:39
+#: tryton/gui/window/win_export.py:36
 msgid "<b>Predefined exports</b>"
 msgstr "<b>Voorgedefinieerde exportinstellingen</b>"
 
-#: tryton/gui/window/win_export.py:51 tryton/gui/window/win_import.py:38
+#: tryton/gui/window/win_export.py:48 tryton/gui/window/win_import.py:37
 msgid "<b>All fields</b>"
 msgstr "<b>Alle velden</b>"
 
-#: tryton/gui/window/win_export.py:82 tryton/gui/window/win_import.py:64
-#: tryton/gui/window/view_form/view/screen_container.py:87
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:82
-#: tryton/gui/window/view_form/view/form_gtk/image.py:81
+#: tryton/gui/window/win_export.py:79 tryton/gui/window/win_import.py:63
+#: tryton/gui/window/view_form/view/screen_container.py:81
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:80
+#: tryton/gui/window/view_form/view/form_gtk/image.py:84
 msgid "Clear"
 msgstr "Wissen"
 
-#: tryton/gui/window/win_export.py:94
+#: tryton/gui/window/win_export.py:91
 msgid "Save Export"
 msgstr "Exportgegevens opslaan"
 
-#: tryton/gui/window/win_export.py:103
+#: tryton/gui/window/win_export.py:100
 msgid "Delete Export"
 msgstr "Exportgegevens verwijderen"
 
-#: tryton/gui/window/win_export.py:114
+#: tryton/gui/window/win_export.py:111
 msgid "<b>Fields to export</b>"
 msgstr "<b>Velden om te exporteren</b>"
 
-#: tryton/gui/window/win_export.py:131
+#: tryton/gui/window/win_export.py:128
 msgid "<b>Options</b>"
 msgstr "<b>Opties</b>"
 
-#: tryton/gui/window/win_export.py:146
+#: tryton/gui/window/win_export.py:138
+msgid "Open"
+msgstr "Open"
+
+#: tryton/gui/window/win_export.py:143
 msgid "Add _field names"
 msgstr "Voeg veldnamen toe"
 
-#: tryton/gui/window/win_export.py:204
+#: tryton/gui/window/win_export.py:201
 msgid "Name"
 msgstr "Naam"
 
-#: tryton/gui/window/win_export.py:311
+#: tryton/gui/window/win_export.py:298
 msgid "What is the name of this export?"
 msgstr "Wat is de naam voor deze export?"
 
-#: tryton/gui/window/win_export.py:429
+#: tryton/gui/window/win_export.py:414
 #, python-format
 msgid "%d record saved!"
 msgstr "%d item opgeslagen!"
 
-#: tryton/gui/window/win_export.py:431
+#: tryton/gui/window/win_export.py:416
 #, python-format
 msgid "%d records saved!"
 msgstr "%d items opgeslagen!"
 
-#: tryton/gui/window/win_export.py:434
+#: tryton/gui/window/win_export.py:419
 #, python-format
 msgid ""
 "Operation failed!\n"
@@ -1631,172 +1618,180 @@ msgstr ""
 "Foutmelding:\n"
 "%s"
 
-#: tryton/gui/window/win_form.py:36
+#: tryton/gui/window/win_form.py:37
 msgid "Link"
 msgstr "Koppeling"
 
-#: tryton/gui/window/win_form.py:130
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:89
-msgid "Delete selected record"
+#: tryton/gui/window/win_form.py:128
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:43
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:44
+msgid "Add"
+msgstr "Toevoegen"
+
+#: tryton/gui/window/win_form.py:139
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:54
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:55
+msgid "Remove <Del>"
+msgstr ""
+
+#: tryton/gui/window/win_form.py:152
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:64
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:68
+#, fuzzy
+msgid "Create a new record <F3>"
+msgstr "Maak een nieuw item"
+
+#: tryton/gui/window/win_form.py:162
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:88
+#, fuzzy
+msgid "Delete selected record <Del>"
 msgstr "Geselecteerd item verwijderen"
 
-#: tryton/gui/window/win_import.py:21
+#: tryton/gui/window/win_form.py:174
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:98
+#, fuzzy
+msgid "Undelete selected record <Ins>"
+msgstr "Geselecteerd item verwijderen"
+
+#: tryton/gui/window/win_import.py:20
 msgid "Import from CSV"
 msgstr "Importeer uit CSV"
 
-#: tryton/gui/window/win_import.py:76
+#: tryton/gui/window/win_import.py:75
 msgid "Auto-Detect"
 msgstr "Automatisch"
 
-#: tryton/gui/window/win_import.py:93
+#: tryton/gui/window/win_import.py:92
 msgid "<b>Fields to import</b>"
 msgstr "<b>Velden om te importeren</b>"
 
-#: tryton/gui/window/win_import.py:109
+#: tryton/gui/window/win_import.py:108
 msgid "File to Import:"
 msgstr "Bestand om te importeren:"
 
-#: tryton/gui/window/win_import.py:111
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:61
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:115
-#: tryton/gui/window/view_form/view/form_gtk/image.py:61
-#: tryton/gui/window/view_form/view/form_gtk/image.py:128
+#: tryton/gui/window/win_import.py:110
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:59
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:113
+#: tryton/gui/window/view_form/view/form_gtk/image.py:62
+#: tryton/gui/window/view_form/view/form_gtk/image.py:131
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:520
 msgid "Open..."
 msgstr "Openen..."
 
-#: tryton/gui/window/win_import.py:117
+#: tryton/gui/window/win_import.py:116
 msgid "CSV Parameters"
 msgstr "CSV parameters"
 
-#: tryton/gui/window/win_import.py:125
+#: tryton/gui/window/win_import.py:124
 #, fuzzy
 msgid "Field Separator:"
 msgstr "Veldscheidingsteken:"
 
-#: tryton/gui/window/win_import.py:134
+#: tryton/gui/window/win_import.py:133
 msgid "Text Delimiter:"
 msgstr "Tekstscheidingsteken:"
 
-#: tryton/gui/window/win_import.py:142
+#: tryton/gui/window/win_import.py:141
 msgid "Encoding:"
 msgstr "Codering:"
 
-#: tryton/gui/window/win_import.py:153
+#: tryton/gui/window/win_import.py:149
 msgid "Lines to Skip:"
 msgstr "Regels overslaan:"
 
-#: tryton/gui/window/win_import.py:188 tryton/gui/window/win_import.py:193
+#: tryton/gui/window/win_import.py:184 tryton/gui/window/win_import.py:189
 msgid "Field name"
 msgstr "Veldnaam"
 
-#: tryton/gui/window/win_import.py:248
+#: tryton/gui/window/win_import.py:243
 msgid "You must select an import file first!"
 msgstr "U moet eerst een import bestand selecteren!"
 
-#: tryton/gui/window/win_import.py:261
+#: tryton/gui/window/win_import.py:255
 msgid "Error opening CSV file"
 msgstr "Fout bij openen CSV-bestand"
 
-#: tryton/gui/window/win_import.py:291
+#: tryton/gui/window/win_import.py:282
 #, fuzzy, python-format
 msgid "Error processing the file at field %s."
 msgstr "Fout bij inlezen van bestand bij veld%s"
 
-#: tryton/gui/window/win_import.py:363
+#: tryton/gui/window/win_import.py:352
 #, python-format
 msgid "%d record imported!"
 msgstr "%d item geïmporteerd!"
 
-#: tryton/gui/window/win_import.py:365
+#: tryton/gui/window/win_import.py:354
 #, python-format
 msgid "%d records imported!"
 msgstr "%d items geïmporteerd!"
 
-#: tryton/gui/window/win_import.py:370
+#: tryton/gui/window/win_import.py:359
 msgid "Importation Error!"
 msgstr "Fout bij importeren!"
 
-#: tryton/gui/window/win_import.py:371
+#: tryton/gui/window/win_import.py:360
 #, python-format
 msgid ""
-"Error trying to import this record:\n"
-"%s\n"
-"Error Message:\n"
-"%s\n"
+"Error importing record %(record)s\n"
+"%(error_title)s\n"
 "\n"
-"%s"
+"%(traceback)s"
 msgstr ""
-"Fout bij het importeren van deze gegevens:\n"
-"%s\n"
-"Foutmelding:\n"
-"%s\n"
-"\n"
-"%s"
 
-#: tryton/gui/window/win_search.py:27 tryton/gui/window/view_board/action.py:78
-#: tryton/gui/window/view_form/view/screen_container.py:36
+#: tryton/gui/window/win_search.py:26
 msgid "Search"
 msgstr "Zoeken"
 
-#: tryton/gui/window/wizard.py:303
+#: tryton/gui/window/wizard.py:290
 msgid "Wizard"
 msgstr "Assistent"
 
-#: tryton/gui/window/view_board/parser.py:76
-#: tryton/gui/window/view_board/parser.py:78
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:387
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:391
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:779
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:781
-msgid ":"
-msgstr ":"
+#: tryton/gui/window/view_board/parser.py:108
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:384
+msgid "No String Attr."
+msgstr "Lege opdracht"
 
-#: tryton/gui/window/view_form/view/list.py:558
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:282
-msgid "Actions"
-msgstr "Acties"
-
-#: tryton/gui/window/view_form/view/list.py:561
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:284
-msgid "Reports"
-msgstr "Rapporten"
-
-#: tryton/gui/window/view_form/view/list.py:595
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:311
+#: tryton/gui/window/view_form/view/list.py:596
 msgid "You must select a record to use the relation!"
 msgstr "Eerst een regel selecteren voordat deze optie gebruikt kan worden!"
 
-#: tryton/gui/window/view_form/view/screen_container.py:77
+#: tryton/gui/window/view_form/view/screen_container.py:46
+#, fuzzy
+msgid "F_ilters"
+msgstr "_Bestand"
+
+#: tryton/gui/window/view_form/view/screen_container.py:71
+#: tryton/gui/window/view_form/view/screen_container.py:287
 msgid "Find"
 msgstr "Vind"
 
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:51
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:49
 #, fuzzy
 msgid "Select a File..."
 msgstr "Kies een bestand"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:45
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:163
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:43
 msgid "Open the calendar"
 msgstr "Open de kalender"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:103
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:95
 msgid "Date Selection"
 msgstr "Datum selecteren"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:222
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:138
 msgid "Date Time Selection"
 msgstr "Datum-tijd selecteren"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:231
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:147
 msgid "Hour:"
 msgstr "Uur:"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:234
+#: tryton/gui/window/view_form/view/form_gtk/calendar.py:150
 msgid "Minute:"
 msgstr "Minuut:"
 
-#: tryton/gui/window/view_form/view/form_gtk/char.py:104
+#: tryton/gui/window/view_form/view/form_gtk/char.py:141
 msgid "Show plain text"
 msgstr ""
 
@@ -1805,73 +1800,115 @@ msgstr ""
 msgid "Select an Image..."
 msgstr "Kies een bestand"
 
-#: tryton/gui/window/view_form/view/form_gtk/image.py:118
+#: tryton/gui/window/view_form/view/form_gtk/image.py:121
 msgid "All files"
 msgstr "Alle bestanden"
 
-#: tryton/gui/window/view_form/view/form_gtk/image.py:122
+#: tryton/gui/window/view_form/view/form_gtk/image.py:125
 msgid "Images"
 msgstr "Afbeeldingen"
 
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:43
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:47
-msgid "Add"
-msgstr "Toevoegen"
-
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:55
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:57
-msgid "Remove"
-msgstr "Verwijderen"
-
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:66
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:263
-msgid "Open a record"
-msgstr "Item openen"
-
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:266
-msgid "Search a record"
-msgstr "Item zoeken"
-
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:79
-msgid "Edit selected record"
-msgstr "Geselecteerd item aanpassen"
-
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:99
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:173
 #, fuzzy
-msgid "Undelete selected record"
-msgstr "Geselecteerd item verwijderen"
+msgid "Translation"
+msgstr "Voeg vertaling toe"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:24
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:222
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:912
-msgid "Unknown"
-msgstr "Onbekend"
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:197
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:199
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:282
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:286
+msgid ":"
+msgstr ":"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:38
-msgid "Wrong icon for the button!"
-msgstr "Verkeerde pictogram voor de knop!"
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:229
+msgid "Edit"
+msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:489
-msgid "No String Attr."
-msgstr "Lege opdracht"
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:234
+msgid "Fuzzy"
+msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:664
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:303
 msgid "You need to save the record before adding translations!"
 msgstr "Gegevens eerst opslaan voordat u een vertaling toevoegt! "
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:677
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:314
 msgid "No other language available!"
 msgstr "Geen andere taal beschikbaar!"
 
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:741
-msgid "Add Translation"
-msgstr "Voeg vertaling toe"
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:65
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:304
+#, fuzzy
+msgid "Open a record <F2>"
+msgstr "Item openen"
 
-#: tryton/gui/window/view_form/view/form_gtk/reference.py:72
-msgid "Search / Open a record"
-msgstr "Zoek / open een item"
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:307
+#, fuzzy
+msgid "Search a record <F2>"
+msgstr "Item zoeken"
 
-#: tryton/gui/window/view_form/view/graph_gtk/parser.py:25
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:78
+#, fuzzy
+msgid "Edit selected record <F2>"
+msgstr "Geselecteerd item aanpassen"
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:170
+msgid "Change text to bold"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:171
+msgid "Change text to italic"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:172
+msgid "Change text to underline"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:173
+msgid "Choose font-family"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:174
+msgid "Choose font-size"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:175
+msgid "Justify of line to the left"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:177
+msgid "Justify of line to the center"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:178
+msgid "Justify of line to the right"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:180
+msgid "Justify of line to fill window"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:182
+msgid "Change the foreground text"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:184
+msgid "Change the background text"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:185
+msgid "Change the markup text view"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:495
+msgid "Select a foreground color"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:496
+msgid "Select a background color"
+msgstr ""
+
+#: tryton/gui/window/view_form/view/graph_gtk/parser.py:26
 msgid "Save As"
 msgstr "Opslaan als"
 
@@ -1895,26 +1932,24 @@ msgstr "PNG afbeelding (*.png)"
 msgid "Image size too large!"
 msgstr "Afbeelding te groot!"
 
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:209
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:234
 msgid ": "
 msgstr ":"
 
-#: tryton/plugins/__init__.py:36
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:247
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:893
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: tryton/plugins/__init__.py:38
 msgid "No available plugin for this resource!"
 msgstr "Geen beschikbare plugin voor deze hulpbron!"
 
-#: tryton/plugins/__init__.py:38
+#: tryton/plugins/__init__.py:40
 msgid "Choose a Plugin"
 msgstr "Kies een plugin"
 
-#: tryton/plugins/translation/__init__.py:16
+#: tryton/plugins/translation/__init__.py:18
 msgid "Translate view"
 msgstr "Vertaal aanzicht"
 
-#: tryton/plugins/workflow/__init__.py:22
-msgid "Print Workflow"
-msgstr "Procedure afdrukken"
-
-#: tryton/plugins/workflow/__init__.py:23
-msgid "Print Workflow (Complex)"
-msgstr "Procedure afdrukken (uitgebreid)"
