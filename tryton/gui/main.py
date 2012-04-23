@@ -178,6 +178,10 @@ class Main(object):
         # not be set when there is no buttons
         gtk.Button()
         try:
+            settings.set_property('gtk-button-images', True)
+        except TypeError:
+            pass
+        try:
             settings.set_property('gtk-can-change-accels',
                 CONFIG['client.can_change_accelerators'])
         except TypeError:
