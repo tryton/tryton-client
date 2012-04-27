@@ -13,7 +13,7 @@ from tryton.gui import Main
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.gui.window.nomodal import NoModal
 from tryton.common.button import Button
-from tryton.common import RPCExecute, RPCException
+from tryton.common import RPCExecute, RPCException, TRYTON_ICON
 _ = gettext.gettext
 
 
@@ -293,6 +293,7 @@ class WizardDialog(Wizard, NoModal):
         self.dia = gtk.Dialog(self.name, self.parent,
             gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+        self.dia.set_icon(TRYTON_ICON)
         if hasattr(self.dia, 'set_deletable'):
             self.dia.set_deletable(False)
         self.dia.connect('close', self.close)
