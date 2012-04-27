@@ -82,8 +82,9 @@ class Wizard(object):
                     result = RPCExecute('wizard', self.action, 'execute',
                         self.session_id, data, self.state, context=ctx)
                 except RPCException, rpc_exception:
-                    if not isinstance(rpc_exception.exception,
-                            TrytonServerError):
+                    if (not isinstance(rpc_exception.exception,
+                            TrytonServerError)
+                            or not self.screen):
                         self.state = self.end_state
                     break
 
