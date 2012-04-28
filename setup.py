@@ -62,7 +62,7 @@ data_files = [
 for lang in languages:
     data_files += [
         ('share/locale/%s/LC_MESSAGES' % lang,
-            glob.glob('share/locale/%s/LC_MESSAGES/*.mo')),
+            glob.glob('share/locale/%s/LC_MESSAGES/*.mo' % lang)),
         ]
 
 if os.name == 'nt':
