@@ -230,15 +230,11 @@ class Form(SignalEvent, TabContent):
         return self.screen.id_get()
 
     def sig_attach(self, widget=None):
-        obj_id = self.id_get()
-        if obj_id >= 0 and obj_id is not False:
-            def callback():
-                self.update_attachment_count(reload=True)
-            Attachment(self.model, obj_id, callback)
-        else:
-            self.message_info(_('No record selected!'))
-        self.update_attachment_count(reload=True)
-        return True
+        record_id = self.id_get()
+        if record_id is False or record_id < 0:
+            return
+        Attachment(self.model, record_id,
+            lambda: self.update_attachment_count(reload=True))
 
     def update_attachment_count(self, reload=False):
         record = self.screen.current_record
@@ -255,6 +251,9 @@ class Form(SignalEvent, TabContent):
             self.buttons['attach'].set_stock_id('tryton-attachment-hi')
         else:
             self.buttons['attach'].set_stock_id('tryton-attachment')
+        record_id = self.id_get()
+        self.buttons['attach'].props.sensitive = bool(
+            record_id >= 0 and record_id is not False)
 
     def sig_switch(self, widget=None):
         if not self.modified_save():
@@ -470,6 +469,7 @@ class Form(SignalEvent, TabContent):
 
     def _record_saved(self, screen, signal_data):
         self.activate_save()
+        self.update_attachment_count()
 
     def modified_save(self):
         self.screen.current_view.set_value()
