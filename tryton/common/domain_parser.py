@@ -233,6 +233,11 @@ def convert_value(field, value):
         except (ValueError, TypeError):
             return
 
+    def convert_many2one():
+        if value == '':
+            return None
+        return value
+
     converts = {
         'boolean': convert_boolean,
         'float': convert_float,
@@ -243,6 +248,7 @@ def convert_value(field, value):
         'datetime': convert_datetime,
         'date': convert_date,
         'time': convert_time,
+        'many2one': convert_many2one,
         }
     return converts.get(field['type'], lambda: value)()
 
@@ -401,6 +407,11 @@ def format_value(field, value):
             return ''
         return datetime.time.strftime(value, HM_FORMAT)
 
+    def format_many2one():
+        if value is None:
+            return ''
+        return value
+
     converts = {
         'boolean': format_boolean,
         'integer': format_integer,
@@ -411,6 +422,7 @@ def format_value(field, value):
         'datetime': format_datetime,
         'date': format_datetime,
         'time': format_time,
+        'many2one': format_many2one,
         }
     if isinstance(value, (list, tuple)):
         return ';'.join(format_value(field, x) for x in value)
