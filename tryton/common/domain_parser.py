@@ -11,7 +11,8 @@ import time
 import io
 
 from tryton.translate import date_format
-from tryton.common import HM_FORMAT, untimezoned_date, datetime_strftime
+from tryton.common import untimezoned_date, datetime_strftime
+from tryton.pyson import PYSONDecoder
 
 __all__ = ['DomainParser']
 
@@ -173,6 +174,10 @@ def negate_operator(operator):
         return 'not in'
 
 
+def time_format(field):
+    return PYSONDecoder({}).decode(field['format'])
+
+
 def convert_value(field, value):
     "Convert value for field"
 
@@ -211,7 +216,7 @@ def convert_value(field, value):
     def convert_datetime():
         try:
             return untimezoned_date(datetime.datetime(*time.strptime(value,
-                        date_format() + ' ' + HM_FORMAT)[:6]))
+                        date_format() + ' ' + time_format(field))[:6]))
         except ValueError:
             try:
                 return untimezoned_date(datetime.datetime(*time.strptime(value,
@@ -229,7 +234,8 @@ def convert_value(field, value):
 
     def convert_time():
         try:
-            return datetime.time(*time.strptime(value, HM_FORMAT)[3:6])
+            return datetime.time(*time.strptime(value,
+                    time_format(field))[3:6])
         except (ValueError, TypeError):
             return
 
@@ -333,6 +339,7 @@ def test_convert_selection():
 def test_convert_datetime():
     field = {
         'type': 'datetime',
+        'format': '"%H:%M:%S"',
         }
     for value, result in (
             ('12/04/2002', datetime.datetime(2002, 12, 4)),
@@ -358,6 +365,7 @@ def test_convert_date():
 def test_convert_time():
     field = {
         'type': 'time',
+        'format': '"%H:%M:%S"',
         }
     for value, result in (
             ('12:30:00', datetime.time(12, 30, 0)),
@@ -396,16 +404,21 @@ def format_value(field, value):
     def format_datetime():
         if not value:
             return ''
-        format_ = date_format() + ' ' + HM_FORMAT
+        format_ = date_format() + ' ' + time_format(field)
         if (not isinstance(value, datetime.datetime)
                 or value.time() == datetime.time.min):
             format_ = date_format()
         return datetime_strftime(value, format_)
 
+    def format_date():
+        if not value:
+            return ''
+        return datetime_strftime(value, date_format())
+
     def format_time():
         if not value:
             return ''
-        return datetime.time.strftime(value, HM_FORMAT)
+        return datetime.time.strftime(value, time_format(field))
 
     def format_many2one():
         if value is None:
@@ -420,7 +433,7 @@ def format_value(field, value):
         'selection': format_selection,
         'reference': format_selection,
         'datetime': format_datetime,
-        'date': format_datetime,
+        'date': format_date,
         'time': format_time,
         'many2one': format_many2one,
         }
@@ -508,6 +521,7 @@ def test_format_selection():
 def test_format_datetime():
     field = {
         'type': 'datetime',
+        'format': '"%H:%M:%S"',
         }
     for value, result in (
             (datetime.date(2002, 12, 4), '12/04/2002'),
@@ -534,6 +548,7 @@ def test_format_date():
 def test_format_time():
     field = {
         'type': 'time',
+        'format': '"%H:%M:%S"',
         }
     for value, result in (
             (datetime.time(12, 30, 0), '"12:30:00"'),
@@ -565,7 +580,7 @@ def complete_value(field, value):
         yield datetime.date.today()
 
     def complete_time():
-        yield datetime.time()
+        yield datetime.datetime.now().time()
 
     completes = {
         'boolean': complete_boolean,

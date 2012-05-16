@@ -17,7 +17,6 @@ from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
     timezoned_date)
 import tryton.common as common
 from tryton.translate import date_format
-from tryton.common import HM_FORMAT
 from tryton.common import RPCExecute, RPCException
 
 from tabcontent import TabContent
@@ -285,7 +284,7 @@ class Form(SignalEvent, TabContent):
                 value = str(line.get(key, False) or '/')
                 if line.get(key, False) \
                         and key in ('create_date', 'write_date'):
-                    display_format = date_format() + ' ' + HM_FORMAT
+                    display_format = date_format() + ' %H:%M:%S'
                     date = timezoned_date(line[key])
                     value = common.datetime_strftime(date, display_format)
                 message_str += val + ' ' + value + '\n'

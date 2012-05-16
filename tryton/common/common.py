@@ -1308,8 +1308,6 @@ COLORS = {
     'required': '#d2d2ff',
 }
 
-HM_FORMAT = '%H:%M:%S'
-
 FLOAT_TIME_CONV = {
     'Y': 8760,
     'M': 672,

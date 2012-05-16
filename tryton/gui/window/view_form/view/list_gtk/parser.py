@@ -18,7 +18,7 @@ from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
 import tryton.rpc as rpc
 from tryton.common import COLORS, node_attributes, \
-        HM_FORMAT, file_selection, file_open
+        file_selection, file_open
 import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
@@ -435,7 +435,14 @@ class Datetime(Date):
     def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Datetime, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
-        self.renderer.format = date_format() + ' ' + HM_FORMAT
+
+    @realized
+    def setter(self, column, cell, store, iter):
+        super(Datetime, self).setter(column, cell, store, iter)
+        record = store.get_value(iter, 0)
+        field = record[self.field_name]
+        time_format = field.time_format(record)
+        self.renderer.format = date_format() + ' ' + time_format
 
 
 class Time(Date):
@@ -443,7 +450,14 @@ class Time(Date):
     def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Time, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
-        self.renderer.format = HM_FORMAT
+
+    @realized
+    def setter(self, column, cell, store, iter):
+        super(Time, self).setter(column, cell, store, iter)
+        record = store.get_value(iter, 0)
+        field = record[self.field_name]
+        time_format = field.time_format(record)
+        self.renderer.format = time_format
 
 
 class Float(Char):

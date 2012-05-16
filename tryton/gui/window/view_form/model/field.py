@@ -3,7 +3,7 @@
 import os
 import tempfile
 import locale
-from tryton.common import datetime_strftime, HM_FORMAT, \
+from tryton.common import datetime_strftime, \
         domain_inversion, eval_domain, localize_domain, unlocalize_domain, \
         merge, inverse_leaf, EvalEnvironment
 import tryton.common as common
@@ -214,7 +214,7 @@ class DateTimeField(CharField):
         if not isinstance(value, datetime.datetime):
             try:
                 value = datetime.datetime(*time.strptime(value,
-                        date_format() + ' ' + HM_FORMAT)[:6])
+                        date_format() + ' ' + self.time_format(record))[:6])
                 value = common.untimezoned_date(value)
             except ValueError:
                 value = self._default
@@ -225,8 +225,12 @@ class DateTimeField(CharField):
         value = super(DateTimeField, self).get_client(record)
         if value:
             value = common.timezoned_date(value)
-            return datetime_strftime(value, date_format() + ' ' + HM_FORMAT)
+            return datetime_strftime(value, date_format() + ' ' +
+                self.time_format(record))
         return ''
+
+    def time_format(self, record):
+        return record.expr_eval(self.attrs['format'])
 
 
 class DateField(CharField):
@@ -255,7 +259,8 @@ class TimeField(CharField):
     def set_client(self, record, value, force_change=False):
         if not isinstance(value, datetime.time):
             try:
-                value = datetime.time(*time.strptime(value, HM_FORMAT)[3:6])
+                value = datetime.time(*time.strptime(value,
+                        self.time_format(record))[3:6])
             except ValueError:
                 value = None
         super(TimeField, self).set_client(record, value,
@@ -264,8 +269,11 @@ class TimeField(CharField):
     def get_client(self, record):
         value = super(TimeField, self).get_client(record)
         if value:
-            return value.strftime(HM_FORMAT)
+            return value.strftime(self.time_format(record))
         return ''
+
+    def time_format(self, record):
+        return record.expr_eval(self.attrs['format'])
 
 
 class NumberField(CharField):

@@ -8,6 +8,7 @@ import tryton.common as common
 from tryton.common.domain_parser import quote
 from tryton.translate import date_format
 from tryton.config import TRYTON_ICON
+from tryton.pyson import PYSONDecoder
 
 _ = gettext.gettext
 
@@ -265,10 +266,10 @@ class ScreenContainer(object):
                 elif field['type'] in ('date', 'datetime', 'time'):
                     if field['type'] == 'date':
                         format_ = date_format()
-                    elif field['type'] == 'datetime':
-                        format_ = date_format() + ' ' + common.HM_FORMAT
-                    elif field['type'] == 'time':
-                        format_ = common.HM_FORMAT
+                    elif field['type'] in ('datetime', 'time'):
+                        format_ = PYSONDecoder({}).decode(field['format'])
+                        if field['type'] == 'datetime':
+                            format_ = date_format() + ' ' + format_
                     widget = common.date_widget.ComplexEntry(format_,
                         spacing=0)
                     entry = widget.widget

@@ -31,18 +31,7 @@ class DateEntry(gtk.Entry):
         super(DateEntry, self).__init__()
         self.modify_font(pango.FontDescription("monospace"))
 
-        self.format = format
-        self.regex = self.initial_value = format
-        for key, val in mapping.items():
-            self.regex = self.regex.replace(key, val[1])
-            self.initial_value = self.initial_value.replace(key, val[0])
-
-        self.regex = re.compile(self.regex)
-
-        assert self.regex.match(self.initial_value), \
-                'Error, the initial value should be validated by regex'
-        self.set_width_chars(len(self.initial_value))
-        self.set_max_length(len(self.initial_value))
+        self.set_format(format)
 
         self.connect('key-press-event', self._on_key_press)
         self.connect('insert-text', self._on_insert_text)
@@ -56,6 +45,20 @@ class DateEntry(gtk.Entry):
         self._interactive_input = True
         self.mode_cmd = False
         self.idle_set_position(0)
+
+    def set_format(self, format):
+        self.format = format
+        self.regex = self.initial_value = format
+        for key, val in mapping.items():
+            self.regex = self.regex.replace(key, val[1])
+            self.initial_value = self.initial_value.replace(key, val[0])
+
+        self.regex = re.compile(self.regex)
+
+        assert self.regex.match(self.initial_value), \
+                'Error, the initial value should be validated by regex'
+        self.set_width_chars(len(self.initial_value))
+        self.set_max_length(len(self.initial_value))
 
     def idle_set_position(self, value):
         def idle_func():
