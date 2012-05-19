@@ -134,6 +134,42 @@ ICONFACTORY = TrytonIconFactory()
 ICONFACTORY.add_default()
 
 
+class ModelAccess(object):
+
+    batchnum = 100
+    _access = {}
+    _models = []
+
+    def load_models(self, refresh=False):
+        if not refresh:
+            self._access.clear()
+        del self._models[:]
+
+        try:
+            self._models = rpc.execute('model', 'ir.model', 'list_models',
+                rpc.CONTEXT)
+        except TrytonServerError:
+            pass
+
+    def __getitem__(self, model):
+        if model in self._access:
+            return self._access[model]
+        if model not in self._models:
+            self.load_models(refresh=True)
+        idx = self._models.index(model)
+        to_load = slice(max(0, idx - self.batchnum // 2),
+            idx + self.batchnum // 2)
+        try:
+            access = rpc.execute('model', 'ir.model.access', 'get_access',
+                self._models[to_load], rpc.CONTEXT)
+        except TrytonServerError:
+            access = {}
+        self._access.update(access)
+        return self._access[model]
+
+MODELACCESS = ModelAccess()
+
+
 def find_in_path(name):
     if os.name == "nt":
         sep = ';'

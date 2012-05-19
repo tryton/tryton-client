@@ -121,6 +121,14 @@ class Form(SignalEvent, TabContent):
             self.name = name
 
         self.create_tabcontent()
+
+        access = common.MODELACCESS[self.model]
+        for button, access_type in (
+                ('new', 'create'),
+                ('save', 'write'),
+                ):
+            self.buttons[button].props.sensitive = access[access_type]
+
         self.screen.signal_connect(self, 'record-message',
             self._record_message)
         self.screen.signal_connect(self, 'record-modified',
@@ -293,6 +301,8 @@ class Form(SignalEvent, TabContent):
         return True
 
     def sig_remove(self, widget=None):
+        if not common.MODELACCESS[self.model]['delete']:
+            return
         if self.screen.current_view.view_type == 'form':
             msg = _('Are you sure to remove this record?')
         else:
@@ -323,6 +333,8 @@ class Form(SignalEvent, TabContent):
         win.run()
 
     def sig_new(self, widget=None, autosave=True):
+        if not common.MODELACCESS[self.model]['create']:
+            return
         if autosave:
             if not self.modified_save():
                 return
@@ -331,6 +343,8 @@ class Form(SignalEvent, TabContent):
         self.activate_save()
 
     def sig_copy(self, widget=None):
+        if not common.MODELACCESS[self.model]['create']:
+            return
         if not self.modified_save():
             return
         res_ids = self.sel_ids_get()
@@ -344,6 +358,8 @@ class Form(SignalEvent, TabContent):
             'green')
 
     def sig_save(self, widget=None):
+        if not common.MODELACCESS[self.model]['write']:
+            return
         if self.screen.save_current():
             self.message_info(_('Record saved!'), 'green')
             return True

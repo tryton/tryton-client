@@ -228,6 +228,8 @@ class One2Many(WidgetInterface):
             self.but_remove.set_sensitive(not value)
 
     def _sig_new(self, widget):
+        if not common.MODELACCESS[self.screen.model_name]['create']:
+            return
         self.view.set_value()
         record = self.screen.current_record
         if record:
@@ -255,6 +257,8 @@ class One2Many(WidgetInterface):
                 many=True, context=ctx)
 
     def _sig_edit(self, widget=None):
+        if not common.MODELACCESS[self.screen.model_name]['read']:
+            return
         self.view.set_value()
         record = self.screen.current_record
         if record:
@@ -285,6 +289,13 @@ class One2Many(WidgetInterface):
         self.screen.display_prev()
 
     def _sig_remove(self, widget, remove=False):
+        access = common.MODELACCESS[self.screen.model_name]
+        if remove:
+            if not access['write'] or not access['read']:
+                return
+        else:
+            if not access['delete']:
+                return
         self.screen.remove(remove=remove)
 
     def _sig_undelete(self, button):
@@ -299,6 +310,9 @@ class One2Many(WidgetInterface):
             self._sig_add()
 
     def _sig_add(self, *args):
+        access = common.MODELACCESS[self.screen.model_name]
+        if not access['write'] or not access['read']:
+            return
         self.view.set_value()
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
@@ -364,6 +378,20 @@ class One2Many(WidgetInterface):
 
     def display(self, record, field):
         super(One2Many, self).display(record, field)
+
+        access = common.MODELACCESS[self.screen.model_name]
+        if not access['create']:
+            self.but_new.set_sensitive(False)
+        if not access['write'] or not access['read']:
+            if hasattr(self, 'but_add'):
+                self.but_add.set_sensitive(False)
+            if hasattr(self, 'but_remove'):
+                self.but_remove.set_sensitive(False)
+        if not access['read']:
+            self.but_open.set_sensitive(False)
+        if not access['delete']:
+            self.but_del.set_sensitive(False)
+
         if field is None:
             self.screen.new_group()
             self.screen.current_record = None
@@ -383,7 +411,8 @@ class One2Many(WidgetInterface):
                 domain = field.domain_get(record)
             if self.screen.domain != domain:
                 self.screen.domain = domain
-            self.screen.group.readonly = readonly
+            if not self.screen.group.readonly and readonly:
+                self.screen.group.readonly = readonly
         self.screen.display()
         return True
 

@@ -116,6 +116,7 @@ class WinForm(NoModal):
         if view_type == 'tree':
             hbox = gtk.HBox(homogeneous=False, spacing=0)
             tooltips = common.Tooltips()
+            access = common.MODELACCESS[screen.model_name]
 
             if domain is not None:
                 self.wid_text = gtk.Entry()
@@ -134,6 +135,8 @@ class WinForm(NoModal):
                 self.but_add.add(img_add)
                 self.but_add.set_relief(gtk.RELIEF_NONE)
                 hbox.pack_start(self.but_add, expand=False, fill=False)
+                if not access['read']:
+                    self.but_add.set_sensitive(False)
 
                 self.but_remove = gtk.Button()
                 tooltips.set_tip(self.but_remove, _('Remove <Del>'))
@@ -145,6 +148,8 @@ class WinForm(NoModal):
                 self.but_remove.add(img_remove)
                 self.but_remove.set_relief(gtk.RELIEF_NONE)
                 hbox.pack_start(self.but_remove, expand=False, fill=False)
+                if not access['read']:
+                    self.but_remove.set_sensitive(False)
 
                 hbox.pack_start(gtk.VSeparator(), expand=False, fill=True)
 
@@ -157,6 +162,8 @@ class WinForm(NoModal):
             self.but_new.add(img_new)
             self.but_new.set_relief(gtk.RELIEF_NONE)
             hbox.pack_start(self.but_new, expand=False, fill=False)
+            if not access['create']:
+                self.but_new.set_sensitive(False)
 
             self.but_del = gtk.Button()
             tooltips.set_tip(self.but_del, _('Delete selected record <Del>'))
@@ -168,6 +175,8 @@ class WinForm(NoModal):
             self.but_del.add(img_del)
             self.but_del.set_relief(gtk.RELIEF_NONE)
             hbox.pack_start(self.but_del, expand=False, fill=False)
+            if not access['delete']:
+                self.but_del.set_sensitive(False)
 
             self.but_undel = gtk.Button()
             tooltips.set_tip(self.but_undel,

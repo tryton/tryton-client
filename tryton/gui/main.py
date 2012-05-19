@@ -929,6 +929,7 @@ class Main(object):
             except RPCException:
                 prefs = None
             common.ICONFACTORY.load_icons()
+            common.MODELACCESS.load_models()
             if prefs and 'language_direction' in prefs:
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = \

@@ -9,7 +9,7 @@ from record import Record
 from field import Field, O2MField
 from tryton.signal_event import SignalEvent
 from tryton.common.domain_inversion import is_leaf
-from tryton.common import RPCExecute, RPCException
+from tryton.common import RPCExecute, RPCException, MODELACCESS
 
 
 class Group(SignalEvent, list):
@@ -35,9 +35,12 @@ class Group(SignalEvent, list):
         self.load(ids)
         self.record_deleted, self.record_removed = [], []
         self.on_write = set()
-        self.readonly = readonly
         if self._context.get('_datetime'):
             self.readonly = True
+        elif not MODELACCESS[self.model_name]['write']:
+            self.readonly = True
+        else:
+            self.readonly = readonly
         self.__id2record = {}
         self.__field_childs = None
         self.exclude_field = None

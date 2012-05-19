@@ -17,7 +17,7 @@ from tryton.config import CONFIG
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
 from tryton.common.domain_parser import DomainParser
-from tryton.common import RPCExecute, RPCException
+from tryton.common import RPCExecute, RPCException, MODELACCESS
 
 
 class Screen(SignalEvent):
@@ -43,6 +43,8 @@ class Screen(SignalEvent):
         super(Screen, self).__init__()
 
         self.readonly = readonly
+        if not MODELACCESS[model_name]['write']:
+            self.readonly = True
         self.search_count = 0
         if not row_activate:
             self.row_activate = self.default_row_activate

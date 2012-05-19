@@ -610,6 +610,12 @@ class M2O(Char):
         field = record.group.fields[self.field_name]
         relation = field.attrs['relation']
 
+        access = common.MODELACCESS[relation]
+        if create and not access['create']:
+            return
+        elif not access['read']:
+            return
+
         domain = field.domain_get(record)
         context = field.context_get(record)
         if create:
@@ -702,6 +708,10 @@ class O2M(Char):
         field = record.group.fields[self.field_name]
         relation = field.attrs['relation']
         context = field.context_get(record)
+
+        access = common.MODELACCESS[relation]
+        if not access['read']:
+            return
 
         screen = Screen(relation, mode=['tree', 'form'],
             exclude_field=field.attrs.get('relation_field'))
