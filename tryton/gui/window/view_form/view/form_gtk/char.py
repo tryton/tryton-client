@@ -34,13 +34,16 @@ class Char(WidgetInterface, TranslateMixin):
             focus_entry = self.entry
 
         focus_entry.set_property('activates_default', True)
-        focus_entry.set_width_chars(10)
+        focus_entry.set_width_chars(int(attrs.get('size', -1)))
         focus_entry.set_max_length(int(attrs.get('size', 0)))
         focus_entry.connect('activate', self.sig_activate)
         focus_entry.connect('focus-in-event', lambda x, y: self._focus_in())
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
         focus_entry.connect('key-press-event', self.send_modified)
-        self.widget.pack_start(self.entry)
+        expand, fill = True, True
+        if attrs.get('size'):
+            expand, fill = False, False
+        self.widget.pack_start(self.entry, expand=expand, fill=fill)
 
         self.button = None
         if attrs.get('translate'):
@@ -50,7 +53,7 @@ class Char(WidgetInterface, TranslateMixin):
     def translate_widget(self):
         entry = gtk.Entry()
         entry.set_property('activates_default', True)
-        entry.set_width_chars(10)
+        entry.set_width_chars(int(self.attrs.get('size', -1)))
         entry.set_max_length(int(self.attrs.get('size', 0)))
         return entry
 
