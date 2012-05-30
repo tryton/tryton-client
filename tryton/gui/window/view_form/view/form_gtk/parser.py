@@ -256,7 +256,6 @@ class ParserForm(ParserInterface):
                 button_list.append(vbox)
                 if text:
                     label = gtk.Label(text)
-                    label.set_use_markup(True)
                     label.set_alignment(float(attrs.get('xalign', 0.0)), 0.5)
                     vbox.pack_start(label)
                 vbox.pack_start(gtk.HSeparator())
@@ -297,7 +296,6 @@ class ParserForm(ParserInterface):
                     continue
                 label = Label(text, attrs)
                 button_list.append(label)
-                label.set_use_markup(True)
                 if CONFIG['client.modepda']:
                     attrs['xalign'] = 0.0
                 label.set_alignment(float(attrs.get('xalign', 1.0)),

@@ -172,9 +172,8 @@ class Wizard(object):
             self._record_modified)
 
         title = gtk.Label()
-        title.set_use_markup(True)
-        title.modify_font(pango.FontDescription("14"))
-        title.set_label('<b>' + self.screen.current_view.title + '</b>')
+        title.modify_font(pango.FontDescription("bold 14"))
+        title.set_label(self.screen.current_view.title)
         title.set_padding(20, 4)
         title.set_alignment(0.0, 0.5)
         title.modify_fg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#000000"))
