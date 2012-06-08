@@ -336,10 +336,14 @@ class Record(SignalEvent):
             except RPCException:
                 return
             if (self.parent
-                    and self.parent_name in self.group.fields
-                    and (self.group.fields[self.parent_name].attrs['relation']
-                        == self.group.parent.model_name)):
-                vals[self.parent_name] = self.parent.id
+                    and self.parent_name in self.group.fields):
+                parent_field = self.group.fields[self.parent_name]
+                if isinstance(parent_field, fields.ReferenceField):
+                    vals[self.parent_name] = (
+                        self.parent.model_name, self.parent.id)
+                elif (self.group.fields[self.parent_name].attrs['relation']
+                        == self.group.parent.model_name):
+                    vals[self.parent_name] = self.parent.id
             self.set_default(vals)
         for fieldname, fieldinfo in self.group.fields.iteritems():
             if not fieldinfo.attrs.get('autocomplete'):
