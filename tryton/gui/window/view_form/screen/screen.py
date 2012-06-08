@@ -116,7 +116,7 @@ class Screen(SignalEvent):
                 self.fields_view_tree['arch'])
             root_node, = xml_dom.childNodes
             xml_fields = [node_attributes(node).get('name')
-                for node in root_node.childNodes]
+                for node in root_node.childNodes if node.nodeName == 'field']
             if hasattr(collections, 'OrderedDict'):
                 odict = collections.OrderedDict
             else:
