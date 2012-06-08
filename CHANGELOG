@@ -1,3 +1,4 @@
+* Search only on fields in XML view
 * Cache action keyword
 * Always use cached views
 * Manage model access

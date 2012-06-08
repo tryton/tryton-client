@@ -17,7 +17,8 @@ from tryton.config import CONFIG
 from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
 from tryton.common.domain_parser import DomainParser
-from tryton.common import RPCExecute, RPCException, MODELACCESS
+from tryton.common import RPCExecute, RPCException, MODELACCESS, \
+    node_attributes
 
 
 class Screen(SignalEvent):
@@ -110,8 +111,19 @@ class Screen(SignalEvent):
                     continue
                 props['selection'] = self.get_selection(props)
 
-            self.domain_parser = DomainParser(
-                self.fields_view_tree['fields'])
+            # Filter only fields in XML view
+            xml_dom = xml.dom.minidom.parseString(
+                self.fields_view_tree['arch'])
+            root_node, = xml_dom.childNodes
+            xml_fields = [node_attributes(node).get('name')
+                for node in root_node.childNodes]
+            if hasattr(collections, 'OrderedDict'):
+                odict = collections.OrderedDict
+            else:
+                odict = dict
+            fields = odict((name, fields[name]) for name in  xml_fields)
+
+            self.domain_parser = DomainParser(fields)
 
             self.screen_container.set_screen(self)
             self.screen_container.show_filter()

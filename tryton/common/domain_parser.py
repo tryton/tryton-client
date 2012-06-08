@@ -9,6 +9,7 @@ from decimal import Decimal
 import datetime
 import time
 import io
+import collections
 
 from tryton.translate import date_format
 from tryton.common import untimezoned_date, datetime_strftime
@@ -693,7 +694,11 @@ class DomainParser(object):
     "A parser for domain"
 
     def __init__(self, fields):
-        self.fields = dict((name, f)
+        if hasattr(collections, 'OrderedDict'):
+            odict = collections.OrderedDict
+        else:
+            odict = dict
+        self.fields = odict((name, f)
             for name, f in fields.iteritems()
             if f.get('searchable', True))
         self.strings = dict((f['string'].lower(), f)
