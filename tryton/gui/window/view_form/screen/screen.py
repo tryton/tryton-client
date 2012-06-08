@@ -23,6 +23,10 @@ from tryton.common import RPCExecute, RPCException, MODELACCESS
 class Screen(SignalEvent):
     "Screen"
 
+    # Width of tree columns per model
+    # It is shared with all connection but it is the price for speed.
+    tree_column_width = collections.defaultdict(lambda: {})
+
     def __init__(self, model_name, view_ids=None, mode=None, context=None,
             views_preload=None, domain=None, row_activate=None, limit=None,
             readonly=False, exclude_field=None, sort=None, search_value=None,

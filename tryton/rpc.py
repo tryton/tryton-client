@@ -1,7 +1,6 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import httplib
-import itertools
 import logging
 import socket
 import os
@@ -23,6 +22,7 @@ _DATABASE = ''
 CONTEXT = {}
 _VIEW_CACHE = {}
 _TOOLBAR_CACHE = {}
+_KEYWORD_CACHE = {}
 TIMEZONE = 'utc'
 _SEMAPHORE = Semaphore()
 _CA_CERTS = os.path.join(get_config_dir(), 'ca_certs')
@@ -72,9 +72,10 @@ def server_version(host, port):
 
 def login(username, password, host, port, database):
     global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE
-    global _VIEW_CACHE, _TOOLBAR_CACHE
+    global _VIEW_CACHE, _TOOLBAR_CACHE, _KEYWORD_CACHE
     _VIEW_CACHE = {}
     _TOOLBAR_CACHE = {}
+    _KEYWORD_CACHE = {}
     try:
         _SEMAPHORE.acquire()
         try:
@@ -107,7 +108,7 @@ def login(username, password, host, port, database):
 
 def logout():
     global CONNECTION, _USER, _USERNAME, _SESSION, _HOST, _PORT, _DATABASE
-    global _VIEW_CACHE, _TOOLBAR_CACHE
+    global _VIEW_CACHE, _TOOLBAR_CACHE, _KEYWORD_CACHE
     if IPCServer.instance:
         IPCServer.instance.stop()
     if CONNECTION is not None:
@@ -130,6 +131,7 @@ def logout():
     _DATABASE = ''
     _VIEW_CACHE = {}
     _TOOLBAR_CACHE = {}
+    _KEYWORD_CACHE = {}
 
 
 def context_reload():
@@ -155,23 +157,20 @@ def _execute(blocking, *args):
     if CONNECTION is None:
         raise TrytonServerError('NotLogged')
     key = False
+    model = args[1]
     method = args[2]
     if method == 'fields_view_get':
-        args, ctx = args[:-1], args[-1]
-        # Make sure all the arguments are present
-        args = tuple(arg if arg is not None else default
-            for arg, default in itertools.izip_longest(args,
-                ('', '', 'fields_view_get', None, 'form'),
-                fillvalue=None))
-        key = str(args + (ctx,))
-        if key in _VIEW_CACHE and _VIEW_CACHE[key][0]:
-            args += (_VIEW_CACHE[key][0], ctx)
-        else:
-            args += (ctx,)
+        key = str(args)
+        if key in _VIEW_CACHE:
+            return _VIEW_CACHE[key]
     elif method == 'view_toolbar_get':
         key = str(args)
         if key in _TOOLBAR_CACHE:
             return _TOOLBAR_CACHE[key]
+    elif model == 'ir.action.keyword' and method == 'get_keyword':
+        key = str(args)
+        if key in _KEYWORD_CACHE:
+            return _KEYWORD_CACHE[key]
     res = _SEMAPHORE.acquire(blocking)
     if not res:
         return
@@ -185,12 +184,11 @@ def _execute(blocking, *args):
     finally:
         _SEMAPHORE.release()
     if key and method == 'fields_view_get':
-        if result is True and key in _VIEW_CACHE:
-            result = _VIEW_CACHE[key][1]
-        else:
-            _VIEW_CACHE[key] = (result['md5'], result)
+        _VIEW_CACHE[key] = result
     elif key and method == 'view_toolbar_get':
         _TOOLBAR_CACHE[key] = result
+    elif key and model == 'ir.action.keyword' and method == 'get_keyword':
+        _KEYWORD_CACHE[key] = result
     logging.getLogger('rpc.result').debug(repr(result))
     return result
 

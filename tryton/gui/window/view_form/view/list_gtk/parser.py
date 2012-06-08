@@ -206,10 +206,12 @@ class ParserTree(ParserInterface):
                     'boolean': 20,
                     'binary': 200,
                 }
-                if 'width' in node_attrs:
-                    width = int(node_attrs['width'])
-                else:
-                    width = twidth.get(fields[fname].attrs['type'], 100)
+                width = self.screen.tree_column_width[model_name].get(fname)
+                if not width:
+                    if 'width' in node_attrs:
+                        width = int(node_attrs['width'])
+                    else:
+                        width = twidth.get(fields[fname].attrs['type'], 100)
                 col.width = width
                 if width > 0:
                     col.set_fixed_width(width)

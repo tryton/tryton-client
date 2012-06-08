@@ -1,3 +1,5 @@
+* Cache action keyword
+* Always use cached views
 * Manage model access
 * Manage time format
 * Deactivate attachment button when record is not created

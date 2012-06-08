@@ -653,11 +653,13 @@ class ViewList(ParserView):
             del fields[last_col.name]
 
         if fields and any(fields.itervalues()):
+            model_name = self.screen.model_name
             try:
                 RPCExecute('model', 'ir.ui.view_tree_width', 'set_width',
-                    self.screen.model_name, fields)
+                    model_name, fields)
             except RPCException:
                 pass
+            self.screen.tree_column_width[model_name].update(fields)
 
     def destroy(self):
         self.save_width_height()
