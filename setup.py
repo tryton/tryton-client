@@ -181,7 +181,8 @@ if os.name == 'nt':
         return None
 
     def find_makensis():
-        for directory in os.environ['PATH'].split(';'):
+        default_path = os.path.join(os.environ['PROGRAMFILES'], 'NSIS')
+        for directory in os.environ['PATH'].split(';') + [default_path]:
             if not os.path.isdir(directory):
                 continue
             path = os.path.join(directory, 'makensis.exe')
@@ -267,6 +268,9 @@ if os.name == 'nt':
             Popen([makensis, "/DVERSION=" + VERSION,
                 str(os.path.join(os.path.dirname(__file__),
                     'setup-single.nsi'))]).wait()
+        else:
+            print "makensis.exe not found: installers can not be created, "\
+                    "skip setup.nsi and setup-single.nsi"
 elif sys.platform == 'darwin':
 
     def find_gtk_dir():
