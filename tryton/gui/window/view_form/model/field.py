@@ -742,8 +742,8 @@ class O2MField(CharField):
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
         self._set_default_value(record)
         super(O2MField, self).state_set(record, states=states)
-        if self.get_state_attrs(record).get('readonly', False):
-            record.value[self.name].readonly = True
+        record.value[self.name].readonly = self.get_state_attrs(record).get(
+            'readonly', False)
 
     def get_removed_ids(self, record):
         return [x.id for x in record.value[self.name].record_removed]

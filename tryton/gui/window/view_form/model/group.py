@@ -35,16 +35,22 @@ class Group(SignalEvent, list):
         self.load(ids)
         self.record_deleted, self.record_removed = [], []
         self.on_write = set()
-        if self._context.get('_datetime'):
-            self.readonly = True
-        elif not MODELACCESS[self.model_name]['write']:
-            self.readonly = True
-        else:
-            self.readonly = readonly
+        self.__readonly = None
         self.__id2record = {}
         self.__field_childs = None
         self.exclude_field = None
         self.pool = WeakSet()
+
+    @property
+    def readonly(self):
+        if (self._context.get('_datetime')
+                or not MODELACCESS[self.model_name]['write']):
+            return True
+        return self.__readonly
+
+    @readonly.setter
+    def readonly(self, value):
+        self.__readonly = value
 
     @property
     def domain(self):
