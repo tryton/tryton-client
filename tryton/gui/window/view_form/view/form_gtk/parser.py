@@ -114,8 +114,8 @@ class Alignment(gtk.Alignment):
         super(Alignment, self).__init__(
             float(attrs.get('xalign', 0.0)),
             float(attrs.get('yalign', 0.5)),
-            abs(1 - float(attrs.get('xalign', 0.0))),
-            abs(1 - float(attrs.get('yalign', 0.0))))
+            float(attrs.get('xexpand', 1.0)),
+            float(attrs.get('yexpand', 1.0)))
         self.add(widget)
         widget.connect('show', lambda *a: self.show())
         widget.connect('hide', lambda *a: self.hide())
