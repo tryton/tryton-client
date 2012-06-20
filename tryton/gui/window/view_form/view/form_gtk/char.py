@@ -34,8 +34,6 @@ class Char(WidgetInterface, TranslateMixin):
             focus_entry = self.entry
 
         focus_entry.set_property('activates_default', True)
-        focus_entry.set_width_chars(int(attrs.get('size', -1)))
-        focus_entry.set_max_length(int(attrs.get('size', 0)))
         focus_entry.connect('activate', self.sig_activate)
         focus_entry.connect('focus-in-event', lambda x, y: self._focus_in())
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
@@ -102,6 +100,20 @@ class Char(WidgetInterface, TranslateMixin):
                     self.entry_store.append((row,))
         elif self.autocomplete:
             self.entry_store.clear()
+
+        # Set size
+        if self.autocomplete:
+            size_entry = self.entry.get_child()
+        else:
+            size_entry = self.entry
+        if record:
+            field_size = record.expr_eval(self.attrs.get('size'))
+            size_entry.set_width_chars(field_size or -1)
+            size_entry.set_max_length(field_size or 0)
+        else:
+            size_entry.set_width_chars(-1)
+            size_entry.set_max_length(0)
+
         if not field:
             value = ''
         else:

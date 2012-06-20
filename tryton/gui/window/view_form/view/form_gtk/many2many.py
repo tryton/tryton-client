@@ -181,6 +181,15 @@ class Many2Many(WidgetInterface):
         self.but_add.set_sensitive(not value)
 
     def _sig_label(self, screen, signal_data):
+        if self.record and self.field:
+            field_size = self.record.expr_eval(self.attrs.get('size'))
+            m2m_size = len(self.field.get_eval(self.record))
+            size_limit = (field_size is not None
+                and m2m_size >= field_size >= 0)
+        else:
+            size_limit = False
+
+        self.but_add.set_sensitive(not size_limit)
         if signal_data[0] >= 1:
             self.but_remove.set_sensitive(not self._readonly)
         else:

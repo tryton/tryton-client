@@ -16,11 +16,12 @@ class WinForm(NoModal):
     "Form window"
 
     def __init__(self, screen, callback, view_type='form',
-            new=False, many=False, domain=None, context=None,
+            new=False, many=0, domain=None, context=None,
             save_current=False):
         NoModal.__init__(self)
         self.screen = screen
         self.callback = callback
+        self.many = many
         self.domain = domain
         self.context = context
         self.save_current = save_current
@@ -56,7 +57,7 @@ class WinForm(NoModal):
 
         self.but_ok = self.win.add_button(gtk.STOCK_OK,
             gtk.RESPONSE_OK)
-        if new and many:
+        if new and self.many:
             self.but_ok.add_accelerator('clicked',
                 self.accel_group, gtk.keysyms.Return,
                 gtk.gdk.CONTROL_MASK | gtk.gdk.SHIFT_MASK,
@@ -401,6 +402,10 @@ class WinForm(NoModal):
         self.screen.new(context=self.context)
         self.screen.current_view.display()
         self.screen.set_cursor(new=True)
+        self.many -= 1
+        if self.many == 0:
+            self.but_new.set_sensitive(False)
+            self.win.set_default_response(gtk.RESPONSE_OK)
 
     def destroy(self):
         self.screen.screen_container.alternate_view = False

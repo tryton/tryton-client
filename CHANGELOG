@@ -1,3 +1,4 @@
+* Add dynamic size limit on the One2Many, Many2Many and Char
 * Search only on fields in XML view
 * Cache action keyword
 * Always use cached views

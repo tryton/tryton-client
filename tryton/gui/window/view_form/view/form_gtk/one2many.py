@@ -253,8 +253,10 @@ class One2Many(WidgetInterface):
             self.screen.current_view.widget.set_sensitive(True)
             update_sequence()
         else:
+            field_size = self.record.expr_eval(self.attrs.get('size')) or -1
+            field_size -= len(self.field.get_eval(self.record)) + 1
             WinForm(self.screen, lambda a: update_sequence(), new=True,
-                many=True, context=ctx)
+                many=field_size, context=ctx)
 
     def _sig_edit(self, widget=None):
         if not common.MODELACCESS[self.screen.model_name]['read']:
@@ -349,12 +351,23 @@ class One2Many(WidgetInterface):
 
     def _sig_label(self, screen, signal_data):
         name = '_'
+        if self.record and self.field:
+            field_size = self.record.expr_eval(self.attrs.get('size'))
+            o2m_size = len(self.field.get_eval(self.record))
+            size_limit = (field_size is not None
+                and o2m_size >= field_size >= 0)
+        else:
+            size_limit = False
+
+        self.but_new.set_sensitive(not size_limit)
         if signal_data[0] >= 1:
             name = str(signal_data[0])
             self.but_open.set_sensitive(True)
             self.but_del.set_sensitive(not self._readonly)
             if self.attrs.get('add_remove'):
                 self.but_remove.set_sensitive(not self._readonly)
+                self.but_add.set_sensitive(not self._readonly
+                    and not size_limit)
             if signal_data[0] < signal_data[1]:
                 self.but_next.set_sensitive(True)
             else:
@@ -364,15 +377,17 @@ class One2Many(WidgetInterface):
             else:
                 self.but_pre.set_sensitive(False)
             self.but_del.set_sensitive(not self._readonly)
-            self.but_undel.set_sensitive(not self._readonly)
+            self.but_undel.set_sensitive(not self._readonly and not size_limit)
         else:
             self.but_open.set_sensitive(False)
             self.but_del.set_sensitive(False)
-            self.but_undel.set_sensitive(False)
+            self.but_undel.set_sensitive(not size_limit)
             self.but_next.set_sensitive(False)
             self.but_pre.set_sensitive(False)
             if self.attrs.get('add_remove'):
                 self.but_remove.set_sensitive(False)
+                self.but_add.set_sensitive(not size_limit)
+
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
 
@@ -399,6 +414,7 @@ class One2Many(WidgetInterface):
             self.screen.display()
             return False
         new_group = field.get_client(record)
+
         if id(self.screen.group) != id(new_group):
             self.screen.group = new_group
             if (self.screen.current_view.view_type == 'tree') \
