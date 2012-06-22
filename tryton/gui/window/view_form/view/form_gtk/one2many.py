@@ -32,6 +32,7 @@ class One2Many(WidgetInterface):
 
         tooltips = common.Tooltips()
 
+        self.focus_out = True
         if attrs.get('add_remove'):
 
             self.wid_text = gtk.Entry()
@@ -312,6 +313,8 @@ class One2Many(WidgetInterface):
             self._sig_add()
 
     def _sig_add(self, *args):
+        if not self.focus_out:
+            return
         access = common.MODELACCESS[self.screen.model_name]
         if not access['write'] or not access['read']:
             return
@@ -322,6 +325,7 @@ class One2Many(WidgetInterface):
         domain.extend(self.record.expr_eval(self.attrs.get('add_remove')))
         removed_ids = self.field.get_removed_ids(self.record)
 
+        self.focus_out = False
         try:
             if self.wid_text.get_text():
                 dom = [('rec_name', 'ilike',
@@ -332,9 +336,11 @@ class One2Many(WidgetInterface):
             ids = RPCExecute('model', self.attrs['relation'], 'search', dom,
                     0, CONFIG['client.limit'], None, context=context)
         except RPCException:
+            self.focus_out = True
             return False
 
         def callback(result):
+            self.focus_out = True
             if result:
                 ids = [x[0] for x in result]
                 self.screen.load(ids, modified=True)
