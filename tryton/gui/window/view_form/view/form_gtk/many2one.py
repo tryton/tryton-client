@@ -76,7 +76,8 @@ class Many2One(WidgetInterface):
     def _readonly_set(self, value):
         self._readonly = value
         self.wid_text.set_editable(not value)
-        self.but_new.set_sensitive(not value)
+        self.but_new.set_sensitive(not value
+            and self.attrs.get('create', True))
         if value:
             self.widget.set_focus_chain([])
         else:
@@ -160,7 +161,8 @@ class Many2One(WidgetInterface):
                 WinSearch(model, callback, sel_multi=False,
                     ids=ids, context=context, domain=domain,
                     view_ids=self.attrs.get('view_ids', '').split(','),
-                    views_preload=self.attrs.get('views', {}))
+                    views_preload=self.attrs.get('views', {}),
+                    new=self.but_new.get_property('sensitive'))
                 return
         self.focus_out = True
         self.display(self.record, self.field)
@@ -249,7 +251,8 @@ class Many2One(WidgetInterface):
             WinSearch(model, callback, sel_multi=False,
                 ids=ids, context=context, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
-                views_preload=self.attrs.get('views', {}))
+                views_preload=self.attrs.get('views', {}),
+                new=self.but_new.get_property('sensitive'))
             return
         self.focus_out = True
         self.display(self.record, self.field)
@@ -258,10 +261,13 @@ class Many2One(WidgetInterface):
 
     def sig_key_press(self, widget, event, *args):
         editable = self.wid_text.get_editable()
-        if event.keyval == gtk.keysyms.F3 and editable:
+        if (event.keyval == gtk.keysyms.F3
+                and editable
+                and self.but_new.get_property('sensitive')):
             self.sig_new(widget, event)
             return True
-        elif event.keyval == gtk.keysyms.F2:
+        elif (event.keyval == gtk.keysyms.F2
+                and self.but_open.get_property('sensitive')):
             self.sig_edit(widget)
             return True
         elif (event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return)
@@ -297,7 +303,7 @@ class Many2One(WidgetInterface):
         model = self.get_model()
         if model:
             access = common.MODELACCESS[model]
-            if not access['create']:
+            if not access['create'] or not self.attrs.get('create', True):
                 self.but_new.set_sensitive(False)
             if not access['read']:
                 self.but_open.set_sensitive(False)

@@ -150,7 +150,8 @@ class Many2Many(WidgetInterface):
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
-                views_preload=self.attrs.get('views', {}))
+                views_preload=self.attrs.get('views', {}),
+                new=self.attrs.get('create', True))
         else:
             callback([(i, None) for i in ids])
 

@@ -187,8 +187,9 @@ class One2Many(WidgetInterface):
                 and widget == self.screen.widget:
             self._sig_edit(widget)
             return False
-        if event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete) \
-                and widget == self.screen.widget:
+        if (event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete)
+                and widget == self.screen.widget
+                and self.but_del.get_property('sensitive')):
             self._sig_remove(widget)
             return False
         if event.keyval == gtk.keysyms.Insert and widget == self.screen.widget:
@@ -220,8 +221,10 @@ class One2Many(WidgetInterface):
 
     def _readonly_set(self, value):
         self._readonly = value
-        self.but_new.set_sensitive(not value)
-        self.but_del.set_sensitive(not value)
+        self.but_new.set_sensitive(not value
+            and self.attrs.get('create', True))
+        self.but_del.set_sensitive(not value
+            and self.attrs.get('delete', True))
         self.but_undel.set_sensitive(not value)
         if self.attrs.get('add_remove'):
             self.wid_text.set_sensitive(not value)
@@ -351,7 +354,8 @@ class One2Many(WidgetInterface):
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
-                views_preload=self.attrs.get('views', {}))
+                views_preload=self.attrs.get('views', {}),
+                new=self.but_new.get_property('sensitive'))
         else:
             callback([(i, None) for i in ids])
 
@@ -369,7 +373,8 @@ class One2Many(WidgetInterface):
         if signal_data[0] >= 1:
             name = str(signal_data[0])
             self.but_open.set_sensitive(True)
-            self.but_del.set_sensitive(not self._readonly)
+            self.but_del.set_sensitive(not self._readonly
+                and self.attrs.get('delete', True))
             if self.attrs.get('add_remove'):
                 self.but_remove.set_sensitive(not self._readonly)
                 self.but_add.set_sensitive(not self._readonly
@@ -401,7 +406,7 @@ class One2Many(WidgetInterface):
         super(One2Many, self).display(record, field)
 
         access = common.MODELACCESS[self.screen.model_name]
-        if not access['create']:
+        if not access['create'] or not self.attrs.get('create', True):
             self.but_new.set_sensitive(False)
         if not access['write'] or not access['read']:
             if hasattr(self, 'but_add'):
@@ -410,7 +415,7 @@ class One2Many(WidgetInterface):
                 self.but_remove.set_sensitive(False)
         if not access['read']:
             self.but_open.set_sensitive(False)
-        if not access['delete']:
+        if not access['delete'] or not self.attrs.get('delete', True):
             self.but_del.set_sensitive(False)
 
         if field is None:

@@ -439,7 +439,7 @@ class ParserForm(ParserInterface):
                 for attr_name in ('relation', 'domain', 'selection',
                         'relation_field', 'string', 'views', 'invisible',
                         'add_remove', 'sort', 'context', 'size', 'filename',
-                        'autocomplete', 'translate'):
+                        'autocomplete', 'translate', 'create', 'delete'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]

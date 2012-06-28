@@ -14,7 +14,7 @@ _ = gettext.gettext
 class WinSearch(NoModal):
 
     def __init__(self, model, callback, sel_multi=True, ids=None, context=None,
-            domain=None, view_ids=None, views_preload=None):
+            domain=None, view_ids=None, views_preload=None, new=True):
         NoModal.__init__(self)
         if views_preload is None:
             views_preload = {}
@@ -39,7 +39,9 @@ class WinSearch(NoModal):
         self.but_ok = self.win.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.but_ok.add_accelerator('clicked', self.accel_group,
                 gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
-        self.but_new = self.win.add_button(gtk.STOCK_NEW, gtk.RESPONSE_ACCEPT)
+        if new and common.MODELACCESS[model]['create']:
+            self.but_new = self.win.add_button(gtk.STOCK_NEW,
+                gtk.RESPONSE_ACCEPT)
 
         hbox = gtk.HBox()
         hbox.show()
