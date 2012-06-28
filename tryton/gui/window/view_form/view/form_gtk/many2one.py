@@ -27,7 +27,7 @@ class Many2One(WidgetInterface):
         self.wid_text.set_property('width-chars', 13)
         self.wid_text.set_property('activates_default', True)
         self.wid_text.connect('key-press-event', self.send_modified)
-        self.wid_text.connect_after('key_press_event', self.sig_key_press)
+        self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('populate-popup', self._populate_popup)
         self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
         self.wid_text.connect('focus-out-event',
@@ -273,6 +273,10 @@ class Many2One(WidgetInterface):
         elif (event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return)
                 and editable):
             self.sig_activate(widget, event, key_press=True)
+        elif (self.has_target(self.field.get(self.record))
+                and event.keyval in (gtk.keysyms.Delete,
+                    gtk.keysyms.BackSpace)):
+            self.wid_text.set_text('')
         return False
 
     def sig_changed(self, *args):
@@ -281,9 +285,14 @@ class Many2One(WidgetInterface):
         value = self.field.get(self.record)
         if self.has_target(value):
             def clean():
+                text = self.wid_text.get_text()
+                position = self.wid_text.get_position()
                 self.field.set_client(self.record,
                     self.value_from_id(None, ''))
                 self.display(self.record, self.field)
+                # Restore text and position after display
+                self.wid_text.set_text(text)
+                self.wid_text.set_position(position)
             gobject.idle_add(clean)
         return False
 
