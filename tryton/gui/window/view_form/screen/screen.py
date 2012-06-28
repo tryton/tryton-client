@@ -306,6 +306,10 @@ class Screen(SignalEvent):
             self.switch_view(view_type='form')
             return True
 
+    @property
+    def number_of_views(self):
+        return len(self.views) + len(self.view_to_load)
+
     def switch_view(self, view_type=None, default=True, context=None):
         if not self.parent and self.modified():
             return
@@ -320,7 +324,7 @@ class Screen(SignalEvent):
             self.current_view.display()
             return
         if not view_type or self.current_view.view_type != view_type:
-            for i in xrange(len(self.views) + len(self.view_to_load)):
+            for i in xrange(self.number_of_views):
                 if len(self.view_to_load):
                     self.load_view_to_load()
                     self.__current_view = len(self.views) - 1

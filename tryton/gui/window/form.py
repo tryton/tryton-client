@@ -468,11 +468,13 @@ class Form(SignalEvent, TabContent):
         if signal_data[0]:
             name = str(signal_data[0])
         for button_id in ('print', 'action', 'relate', 'email', 'open', 'save',
-                'switch', 'attach'):
+                'attach'):
             button = self.buttons[button_id]
             can_be_sensitive = getattr(button, '_can_be_sensitive', True)
             button.props.sensitive = (bool(signal_data[0])
                 and can_be_sensitive)
+        button_switch = self.buttons['switch']
+        button_switch.props.sensitive = self.screen.number_of_views > 1
 
         msg = name + ' / ' + str(signal_data[1])
         if signal_data[1] < signal_data[2]:

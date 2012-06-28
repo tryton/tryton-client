@@ -233,6 +233,8 @@ class WinForm(NoModal):
             but_switch.set_relief(gtk.RELIEF_NONE)
             hbox.pack_start(but_switch, expand=False, fill=False)
 
+            but_switch.props.sensitive = screen.number_of_views > 1
+
             tooltips.enable()
 
             alignment = gtk.Alignment(1.0)

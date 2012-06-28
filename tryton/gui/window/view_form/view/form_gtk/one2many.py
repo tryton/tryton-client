@@ -170,6 +170,8 @@ class One2Many(WidgetInterface):
         if self.attrs.get('add_remove'):
             self.wid_text.connect('key_press_event', self.on_keypress)
 
+        but_switch.props.sensitive = self.screen.number_of_views > 1
+
     def _color_widget(self):
         if hasattr(self.screen.current_view, 'widget_tree'):
             return self.screen.current_view.widget_tree
