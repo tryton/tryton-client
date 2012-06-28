@@ -670,6 +670,15 @@ class Screen(SignalEvent):
     def display(self, res_id=None, set_cursor=False):
         if res_id:
             self.current_record = self.group.get(res_id)
+        else:
+            if (self.current_record
+                    and self.current_record in self.current_record.group):
+                # Force record-message signal
+                self.current_record = self.current_record
+            elif self.group:
+                self.current_record = self.group[0]
+            else:
+                self.current_record = None
         if self.views:
             #XXX To remove when calendar will be implemented
             if self.current_view.view_type == 'calendar' and \
