@@ -151,12 +151,24 @@ class EditableTreeView(gtk.TreeView):
                 txt = entry.get_text()
             else:
                 txt = entry.get_active_text()
+            keyval = event.keyval
             entry.handler_block(entry.editing_done_id)
 
             def callback():
                 entry.handler_unblock(entry.editing_done_id)
+                field = record[column.name]
                 # Must wait the edited entry came back in valid state
-                gobject.idle_add(self.set_cursor, path, column, True)
+                if field.validate(record):
+                    if (keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter)
+                            or (keyval == gtk.keysyms.Right and leaving)):
+                        gobject.idle_add(self.set_cursor, path,
+                            self.__next_column(column), True)
+                    elif (keyval == gtk.keysyms.ISO_Left_Tab
+                            or (keyval == gtk.keysyms.Left and leaving)):
+                        gobject.idle_add(self.set_cursor, path,
+                            self.__prev_column(column), True)
+                else:
+                    gobject.idle_add(self.set_cursor, path, column, True)
             self.on_quit_cell(record, column.name, txt, callback=callback)
         if event.keyval in self.leaving_record_events:
             fields = self.cells.keys()
