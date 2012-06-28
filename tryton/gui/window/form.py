@@ -319,8 +319,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinImport(self.model)
-        win.run()
+        WinImport(self.model)
 
     def sig_save_as(self, widget=None):
         while self.screen.view_to_load:
@@ -328,9 +327,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        win = WinExport(self.model, self.ids_get(),
-                context=self.context)
-        win.run()
+        WinExport(self.model, self.ids_get(), context=self.context)
 
     def sig_new(self, widget=None, autosave=True):
         if not common.MODELACCESS[self.model]['create']:

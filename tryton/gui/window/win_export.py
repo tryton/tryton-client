@@ -10,19 +10,22 @@ import csv
 import tempfile
 import os
 from tryton.common import RPCExecute, RPCException
+from tryton.gui.window.nomodal import NoModal
 
 _ = gettext.gettext
 
 
-class WinExport(object):
+class WinExport(NoModal):
     "Window export"
 
     def __init__(self, model, ids, context=None):
-        self.parent = common.get_toplevel_window()
+        super(WinExport, self).__init__()
+
         self.dialog = gtk.Dialog(title=_("Export to CSV"), parent=self.parent,
-            flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT |
-            gtk.WIN_POS_CENTER_ON_PARENT)
+            flags=gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
+        self.dialog.connect('response', self.response)
 
         vbox = gtk.VBox()
         frame_predef_exports = gtk.Frame()
@@ -153,7 +156,6 @@ class WinExport(object):
         button_ok.set_flags(gtk.CAN_DEFAULT)
 
         self.dialog.vbox.pack_start(vbox)
-        self.dialog.show_all()
 
         self.ids = ids
         self.model = model
@@ -189,8 +191,6 @@ class WinExport(object):
 
         self.view1.set_model(self.model1)
         self.view2.set_model(self.model2)
-        self.view1.show_all()
-        self.view2.show_all()
 
         self.wid_action = combo_saveas
         self.wid_write_field_names = checkbox_add_field_names
@@ -204,13 +204,20 @@ class WinExport(object):
 
         self.pref_export.connect("row-activated", self.sel_predef)
 
-        # Fill the predefined export tree view and show everything
+        # Fill the predefined export tree view
         self.predef_model = gtk.ListStore(
                 gobject.TYPE_INT,
                 gobject.TYPE_PYOBJECT,
                 gobject.TYPE_STRING)
         self.fill_predefwin()
-        self.pref_export.show_all()
+
+        sensible_allocation = self.sensible_widget.get_allocation()
+        self.dialog.set_default_size(int(sensible_allocation.width * 0.9),
+            int(sensible_allocation.height * 0.9))
+        self.dialog.show_all()
+        common.center_window(self.dialog, self.parent, self.sensible_widget)
+
+        self.register()
 
     def model_populate(self, fields, parent_node=None, prefix_field='',
             prefix_name=''):
@@ -361,9 +368,18 @@ class WinExport(object):
                 continue
             self.model2.append((self.fields_data[field]['string'], field))
 
-    def run(self):
-        button = self.dialog.run()
-        if button == gtk.RESPONSE_OK:
+    def destroy(self):
+        super(WinExport, self).destroy()
+        self.dialog.destroy()
+
+    def show(self):
+        self.dialog.show()
+
+    def hide(self):
+        self.dialog.hide()
+
+    def response(self, dialog, response):
+        if response == gtk.RESPONSE_OK:
             fields = []
             fields2 = []
             iter = self.model2.get_iter_root()
@@ -372,8 +388,7 @@ class WinExport(object):
                 fields2.append(self.model2.get_value(iter, 0))
                 iter = self.model2.iter_next(iter)
             action = self.wid_action.get_active()
-            self.parent.present()
-            self.dialog.destroy()
+            self.destroy()
             result = self.datas_read(self.ids, self.model, fields,
                     context=self.context)
 
@@ -391,8 +406,7 @@ class WinExport(object):
                             self.wid_write_field_names.get_active())
             return True
         else:
-            self.parent.present()
-            self.dialog.destroy()
+            self.destroy()
             return False
 
     def export_csv(self, fname, fields, result, write_title=False, popup=True):

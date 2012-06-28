@@ -7,20 +7,21 @@ import tryton.common as common
 import csv
 from tryton.config import TRYTON_ICON, CONFIG
 from tryton.common import RPCExecute, RPCException
+from tryton.gui.window.nomodal import NoModal
 
 _ = gettext.gettext
 
 
-class WinImport(object):
+class WinImport(NoModal):
     "Window import"
 
     def __init__(self, model):
-        self.parent = common.get_toplevel_window()
-        self.dialog = gtk.Dialog(
-                title=_("Import from CSV"), parent=self.parent,
-                flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT
-                | gtk.WIN_POS_CENTER_ON_PARENT)
+        super(WinImport, self).__init__()
+        self.dialog = gtk.Dialog(title=_("Import from CSV"),
+            parent=self.parent, flags=gtk.DIALOG_DESTROY_WITH_PARENT)
+        self.dialog.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dialog.set_icon(TRYTON_ICON)
+        self.dialog.connect('response', self.response)
 
         dialog_vbox = gtk.VBox()
         hbox_mapping = gtk.HBox(True)
@@ -111,7 +112,6 @@ class WinImport(object):
         hbox_csv_import.pack_start(self.import_csv_file, True, True, 0)
 
         expander_csv_import = gtk.Expander(None)
-        expander_csv_import.set_expanded(True)
         vbox_csv_param.pack_start(expander_csv_import, False, True, 0)
         label_import_csv_param = gtk.Label(_("CSV Parameters"))
         expander_csv_import.set_label_widget(label_import_csv_param)
@@ -144,6 +144,7 @@ class WinImport(object):
         self.import_csv_enc = gtk.combo_box_new_text()
         self.import_csv_enc.append_text("UTF-8")
         self.import_csv_enc.append_text("Latin1")
+        self.import_csv_enc.set_active(0)
         table.attach(self.import_csv_enc, 1, 2, 1, 2)
 
         label_import_csv_skip = gtk.Label(_("Lines to Skip:"))
@@ -167,7 +168,6 @@ class WinImport(object):
         self.model = model
         self.fields_data = {}
 
-        self.dialog.show_all()
         self.import_csv_file.set_current_folder(CONFIG['client.default_path'])
 
         self.view1 = gtk.TreeView()
@@ -200,8 +200,14 @@ class WinImport(object):
 
         self.view1.set_model(self.model1)
         self.view2.set_model(self.model2)
-        self.view1.show_all()
-        self.view2.show_all()
+
+        sensible_allocation = self.sensible_widget.get_allocation()
+        self.dialog.set_default_size(int(sensible_allocation.width * 0.9),
+            int(sensible_allocation.height * 0.9))
+        self.dialog.show_all()
+        common.center_window(self.dialog, self.parent, self.sensible_widget)
+
+        self.register()
 
     def model_populate(self, fields, parent_node=None, prefix_field='',
             prefix_name=''):
@@ -305,9 +311,18 @@ class WinImport(object):
     def sig_unsel_all(self, widget=None):
         self.model2.clear()
 
-    def run(self):
-        button = self.dialog.run()
-        if button == gtk.RESPONSE_OK:
+    def destroy(self):
+        super(WinImport, self).destroy()
+        self.dialog.destroy()
+
+    def show(self):
+        self.dialog.show()
+
+    def hide(self):
+        self.dialog.hide()
+
+    def response(self, dialog, response):
+        if response == gtk.RESPONSE_OK:
             fields = []
             iter = self.model2.get_iter_root()
             while iter:
@@ -321,14 +336,12 @@ class WinImport(object):
                 'skip': self.import_csv_skip.get_value(),
                 'combo': self.import_csv_enc.get_active_text() or 'UTF-8'
             }
-            self.parent.present()
-            self.dialog.destroy()
+            self.destroy()
             if csv_data['fname']:
                 return self.import_csv(csv_data, fields, self.model)
             return False
         else:
-            self.parent.present()
-            self.dialog.destroy()
+            self.destroy()
             return False
 
     def import_csv(self, csv_data, fields, model):

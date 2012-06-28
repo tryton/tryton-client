@@ -1,3 +1,4 @@
+* Make Import/Export Data no-modal
 * Deactivate switch view button when there is only 1 view
 * Manage create/delete field access
 * Add dynamic size limit on the One2Many, Many2Many and Char
