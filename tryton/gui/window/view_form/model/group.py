@@ -35,7 +35,7 @@ class Group(SignalEvent, list):
         self.load(ids)
         self.record_deleted, self.record_removed = [], []
         self.on_write = set()
-        self.__readonly = None
+        self.__readonly = readonly
         self.__id2record = {}
         self.__field_childs = None
         self.exclude_field = None
