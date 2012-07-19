@@ -20,6 +20,7 @@ class Many2Many(WidgetInterface):
 
         self.widget = gtk.VBox(homogeneous=False, spacing=5)
         self._readonly = True
+        self._position = 0
 
         hbox = gtk.HBox(homogeneous=False, spacing=0)
         hbox.set_border_width(2)
@@ -176,12 +177,9 @@ class Many2Many(WidgetInterface):
 
     def _readonly_set(self, value):
         self._readonly = value
-        self.wid_text.set_editable(not value)
-        self.wid_text.set_sensitive(not value)
-        self.but_remove.set_sensitive(not value)
-        self.but_add.set_sensitive(not value)
+        self._set_button_sensitive()
 
-    def _sig_label(self, screen, signal_data):
+    def _set_button_sensitive(self):
         if self.record and self.field:
             field_size = self.record.expr_eval(self.attrs.get('size'))
             m2m_size = len(self.field.get_eval(self.record))
@@ -190,11 +188,17 @@ class Many2Many(WidgetInterface):
         else:
             size_limit = False
 
-        self.but_add.set_sensitive(not size_limit)
-        if signal_data[0] >= 1:
-            self.but_remove.set_sensitive(not self._readonly)
-        else:
-            self.but_remove.set_sensitive(False)
+        self.wid_text.set_sensitive(not self._readonly)
+        self.but_add.set_sensitive(bool(
+                not self._readonly
+                and not size_limit))
+        self.but_remove.set_sensitive(bool(
+                not self._readonly
+                and self._position))
+
+    def _sig_label(self, screen, signal_data):
+        self._position = signal_data[0]
+        self._set_button_sensitive()
 
     def display(self, record, field):
         super(Many2Many, self).display(record, field)

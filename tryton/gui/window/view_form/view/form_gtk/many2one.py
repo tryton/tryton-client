@@ -75,13 +75,28 @@ class Many2One(WidgetInterface):
 
     def _readonly_set(self, value):
         self._readonly = value
-        self.wid_text.set_editable(not value)
-        self.but_new.set_sensitive(not value
-            and self.attrs.get('create', True))
+        self._set_button_sensitive()
         if value:
             self.widget.set_focus_chain([])
         else:
             self.widget.set_focus_chain([self.wid_text])
+
+    def _set_button_sensitive(self):
+        model = self.get_model()
+        if model:
+            access = common.MODELACCESS[model]
+        else:
+            access = {
+                'create': True,
+                'read': True,
+                }
+        self.wid_text.set_editable(not self._readonly)
+        self.but_new.set_sensitive(bool(
+                not self._readonly
+                and self.attrs.get('create', True)
+                and access['create']))
+        self.but_open.set_sensitive(bool(
+                access['read']))
 
     @property
     def modified(self):
@@ -310,13 +325,7 @@ class Many2One(WidgetInterface):
         self.changed = False
         super(Many2One, self).display(record, field)
 
-        model = self.get_model()
-        if model:
-            access = common.MODELACCESS[model]
-            if not access['create'] or not self.attrs.get('create', True):
-                self.but_new.set_sensitive(False)
-            if not access['read']:
-                self.but_open.set_sensitive(False)
+        self._set_button_sensitive()
 
         if not field:
             self.wid_text.set_text('')

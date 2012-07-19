@@ -20,6 +20,8 @@ class One2Many(WidgetInterface):
 
         self.widget = gtk.VBox(homogeneous=False, spacing=2)
         self._readonly = True
+        self._position = 0
+        self._length = 0
 
         hbox = gtk.HBox(homogeneous=False, spacing=0)
         hbox.set_border_width(2)
@@ -223,15 +225,53 @@ class One2Many(WidgetInterface):
 
     def _readonly_set(self, value):
         self._readonly = value
-        self.but_new.set_sensitive(not value
-            and self.attrs.get('create', True))
-        self.but_del.set_sensitive(not value
-            and self.attrs.get('delete', True))
-        self.but_undel.set_sensitive(not value)
+        self._set_button_sensitive()
+
+    def _set_button_sensitive(self):
+        access = common.MODELACCESS[self.screen.model_name]
+        if self.record and self.field:
+            field_size = self.record.expr_eval(self.attrs.get('size'))
+            o2m_size = len(self.field.get_eval(self.record))
+            size_limit = (field_size is not None
+                and o2m_size >= field_size >= 0)
+        else:
+            size_limit = False
+
+        self.but_new.set_sensitive(bool(
+                not self._readonly
+                and self.attrs.get('create', True)
+                and not size_limit
+                and access['create']))
+        self.but_del.set_sensitive(bool(
+                not self._readonly
+                and self.attrs.get('delete', True)
+                and self._position
+                and access['delete']))
+        self.but_undel.set_sensitive(bool(
+                not self._readonly
+                and not size_limit
+                and self._position))
+        self.but_open.set_sensitive(bool(
+                self._position
+                and access['read']))
+        self.but_next.set_sensitive(bool(
+                self._position
+                and self._position < self._length))
+        self.but_pre.set_sensitive(bool(
+                self._position
+                and self._position > 1))
         if self.attrs.get('add_remove'):
-            self.wid_text.set_sensitive(not value)
-            self.but_add.set_sensitive(not value)
-            self.but_remove.set_sensitive(not value)
+            self.wid_text.set_sensitive(not self._readonly)
+            self.but_add.set_sensitive(bool(
+                    not self._readonly
+                    and not size_limit
+                    and access['write']
+                    and access['read']))
+            self.but_remove.set_sensitive(bool(
+                    not self._readonly
+                    and self._position
+                    and access['write']
+                    and access['read']))
 
     def _sig_new(self, widget):
         if not common.MODELACCESS[self.screen.model_name]['create']:
@@ -362,63 +402,20 @@ class One2Many(WidgetInterface):
             callback([(i, None) for i in ids])
 
     def _sig_label(self, screen, signal_data):
-        name = '_'
-        if self.record and self.field:
-            field_size = self.record.expr_eval(self.attrs.get('size'))
-            o2m_size = len(self.field.get_eval(self.record))
-            size_limit = (field_size is not None
-                and o2m_size >= field_size >= 0)
+        self._position = signal_data[0]
+        self._length = signal_data[1]
+        if self._position >= 1:
+            name = str(self._position)
         else:
-            size_limit = False
-
-        self.but_new.set_sensitive(not size_limit)
-        if signal_data[0] >= 1:
-            name = str(signal_data[0])
-            self.but_open.set_sensitive(True)
-            self.but_del.set_sensitive(not self._readonly
-                and self.attrs.get('delete', True))
-            if self.attrs.get('add_remove'):
-                self.but_remove.set_sensitive(not self._readonly)
-                self.but_add.set_sensitive(not self._readonly
-                    and not size_limit)
-            if signal_data[0] < signal_data[1]:
-                self.but_next.set_sensitive(True)
-            else:
-                self.but_next.set_sensitive(False)
-            if signal_data[0] > 1:
-                self.but_pre.set_sensitive(True)
-            else:
-                self.but_pre.set_sensitive(False)
-            self.but_del.set_sensitive(not self._readonly)
-            self.but_undel.set_sensitive(not self._readonly and not size_limit)
-        else:
-            self.but_open.set_sensitive(False)
-            self.but_del.set_sensitive(False)
-            self.but_undel.set_sensitive(not size_limit)
-            self.but_next.set_sensitive(False)
-            self.but_pre.set_sensitive(False)
-            if self.attrs.get('add_remove'):
-                self.but_remove.set_sensitive(False)
-                self.but_add.set_sensitive(not size_limit)
-
-        line = '(%s/%s)' % (name, signal_data[1])
+            name = '_'
+        line = '(%s/%s)' % (name, self._length)
         self.label.set_text(line)
+        self._set_button_sensitive()
 
     def display(self, record, field):
         super(One2Many, self).display(record, field)
 
-        access = common.MODELACCESS[self.screen.model_name]
-        if not access['create'] or not self.attrs.get('create', True):
-            self.but_new.set_sensitive(False)
-        if not access['write'] or not access['read']:
-            if hasattr(self, 'but_add'):
-                self.but_add.set_sensitive(False)
-            if hasattr(self, 'but_remove'):
-                self.but_remove.set_sensitive(False)
-        if not access['read']:
-            self.but_open.set_sensitive(False)
-        if not access['delete'] or not self.attrs.get('delete', True):
-            self.but_del.set_sensitive(False)
+        self._set_button_sensitive()
 
         if field is None:
             self.screen.new_group()

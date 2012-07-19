@@ -67,9 +67,11 @@ class Reference(Many2One):
 
     def _readonly_set(self, value):
         super(Reference, self)._readonly_set(value)
-        self.widget_combo.set_sensitive(not value)
         if not value:
             self.widget.set_focus_chain([self.widget_combo, self.wid_text])
+
+    def _set_button_sensitive(self):
+        self.widget_combo.set_sensitive(not self._readonly)
 
     @property
     def modified(self):
