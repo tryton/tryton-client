@@ -68,6 +68,18 @@ def eval_leaf(part, context, boolop=operator.and_):
             context_field = datetime.datetime.min
         else:
             context_field = datetime.date.min
+    if (isinstance(context_field, basestring)
+            and isinstance(value, (list, tuple))):
+        try:
+            value = '%s,%s' % value
+        except TypeError:
+            pass
+    elif (isinstance(context_field, (list, tuple))
+            and isinstance(value, basestring)):
+        try:
+            context_field = '%s,%s' % context_field
+        except TypeError:
+            pass
     return OPERATORS[operand](context_field, value)
 
 
@@ -469,6 +481,18 @@ def test_evaldomain():
     assert not eval_domain(domain, {'x': 3})
     assert not eval_domain(domain, {'x': 5})
     assert not eval_domain(domain, {'x': 11})
+
+    domain = [['x', '=', 'test,1']]
+    assert eval_domain(domain, {'x': ('test', 1)})
+    assert eval_domain(domain, {'x': 'test,1'})
+    assert not eval_domain(domain, {'x': ('test', 2)})
+    assert not eval_domain(domain, {'x': 'test,2'})
+
+    domain = [['x', '=', ('test', 1)]]
+    assert eval_domain(domain, {'x': ('test', 1)})
+    assert eval_domain(domain, {'x': 'test,1'})
+    assert not eval_domain(domain, {'x': ('test', 2)})
+    assert not eval_domain(domain, {'x': 'test,2'})
 
 
 def test_localize():

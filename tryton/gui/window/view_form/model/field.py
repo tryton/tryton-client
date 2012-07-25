@@ -805,12 +805,16 @@ class ReferenceField(CharField):
             return None
 
     def get(self, record, check_load=True, readonly=True, modified=False):
-        if record.value.get(self.name):
+        if (record.value.get(self.name)
+                and record.value[self.name][0]
+                and record.value[self.name][1] >= 0):
             return ','.join(map(str, record.value[self.name]))
         return None
 
     def set_client(self, record, value, force_change=False):
         if value:
+            if isinstance(value, basestring):
+                value = value.split(',')
             ref_model, ref_id = value
             if isinstance(ref_id, (tuple, list)):
                 ref_id, rec_name = ref_id
