@@ -1,3 +1,4 @@
+* Add constant interpolation on line graph
 * Make Import/Export Data no-modal
 * Deactivate switch view button when there is only 1 view
 * Manage create/delete field access

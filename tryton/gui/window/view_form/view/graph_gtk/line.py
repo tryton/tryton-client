@@ -47,19 +47,50 @@ class Line(Graph):
 
     def drawGraph(self, cr, width, height):
         key2fill = {}
+        key2interpolation = {}
         for yfield in self.yfields:
-            key2fill[yfield.get('key', yfield['name'])] = \
-                    bool(safe_eval(yfield.get('fill', '0')))
+            key = yfield.get('key', yfield['name'])
+            key2fill[key] = bool(safe_eval(yfield.get('fill', '0')))
+            key2interpolation[key] = yfield.get('interpolation', 'linear')
 
         def preparePath(key):
+            interpolation = key2interpolation[key]
+            points = (p for p in self.points if p.yname == key)
+            zero = 1.0 + self.minyval * self.yscale
             cr.new_path()
-            cr.move_to(self.area.x, self.area.y + self.area.h)
-            for point in self.points:
-                if point.yname == key:
+
+            cr.move_to(self.area.x, zero * self.area.h + self.area.y)
+            if interpolation == 'linear':
+                for point in points:
                     cr.line_to(point.x * self.area.w + self.area.x,
-                            point.y * self.area.h + self.area.y)
-            cr.line_to(self.area.x + self.area.w, self.area.y + self.area.h)
-            cr.move_to(self.area.x, self.area.y + self.area.h)
+                        point.y * self.area.h + self.area.y)
+            else:
+                previous = Point(0, zero, None, None, None, None)
+
+                def breakage(previous, point):
+                    if interpolation == 'constant-center':
+                        return previous.x + ((point.x - previous.x) / 2.0)
+                    elif interpolation == 'constant-left':
+                        return point.x
+                    elif interpolation == 'constant-right':
+                        return previous.x
+                for point in points:
+                    cr.line_to(
+                        breakage(previous, point) * self.area.w + self.area.x,
+                        previous.y * self.area.h + self.area.y)
+                    cr.line_to(
+                        breakage(previous, point) * self.area.w + self.area.x,
+                        point.y * self.area.h + self.area.y)
+                    cr.line_to(point.x * self.area.w + self.area.x,
+                        point.y * self.area.h + self.area.y)
+                    previous = point
+                cr.line_to(breakage(previous,
+                        Point(1, zero, None, None, None, None))
+                    * self.area.w + self.area.x,
+                    previous.y * self.area.h + self.area.y)
+            cr.line_to(self.area.w + self.area.x,
+                zero * self.area.h + self.area.y)
+            cr.move_to(self.area.x, zero * self.area.h + self.area.y)
 
             if key2fill[key]:
                 cr.close_path()
