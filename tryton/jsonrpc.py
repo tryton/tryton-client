@@ -179,6 +179,8 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
             self._connection = host, httplib.HTTPConnection(host,
                 timeout=CONNECT_TIMEOUT)
             self._connection[1].connect()
+            sock = self._connection[1].sock
+            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
         def https_connection():
             self._connection = host, HTTPSConnection(host,
@@ -186,6 +188,7 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
             try:
                 self._connection[1].connect()
                 sock = self._connection[1].sock
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 try:
                     peercert = sock.getpeercert(True)
                 except socket.error:
