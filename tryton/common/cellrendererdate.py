@@ -3,7 +3,8 @@
 import gtk
 import gobject
 import pango
-from date_widget import DateEntry, compute_date
+
+from date_widget import DateEntry
 
 
 class CellRendererDate(gtk.GenericCellRenderer):
@@ -84,7 +85,7 @@ class CellRendererDate(gtk.GenericCellRenderer):
             cell_area, flags):
         if not self.visible:
             return
-        editable = DateEntry(self.format, self._date_cb, self._process_cb)
+        editable = DateEntry(self.format)
         editable.set_property('shadow-type', gtk.SHADOW_NONE)
 
         colormap = editable.get_colormap()
@@ -115,26 +116,5 @@ class CellRendererDate(gtk.GenericCellRenderer):
         editable.grab_focus()
         editable.show()
         return editable
-
-    def _date_cb(self, event):
-        if event.keyval in (gtk.keysyms.BackSpace,):
-            self.cmd = self.cmd[:-1]
-            return True
-        if event.keyval < 250:
-            value = chr(event.keyval)
-            self.cmd += value
-        return True
-
-    def _process_cb(self, ok, widget, event=None):
-        if ok:
-            self._date_cb(event)
-        else:
-            if (hasattr(event, 'keyval')
-                    and not event.keyval == gtk.keysyms.Escape):
-                dt = widget.date_get()
-                res = compute_date(self.cmd, dt, widget.format)
-                if res:
-                    widget.date_set(res)
-            self.cmd = ''
 
 gobject.type_register(CellRendererDate)

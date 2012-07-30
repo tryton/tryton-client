@@ -1,3 +1,4 @@
+* Refactorize date widgets
 * Manage tuple on Reference
 * Add constant interpolation on line graph
 * Make Import/Export Data no-modal

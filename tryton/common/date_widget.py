@@ -6,13 +6,20 @@ import gobject
 import pango
 import gtk
 import re
-
 import time
 import datetime
-from dateutil.relativedelta import relativedelta
-from datetime_strftime import datetime_strftime
+import gettext
 
-mapping = {
+from dateutil.relativedelta import relativedelta
+
+from datetime_strftime import datetime_strftime
+from common import TRYTON_ICON
+
+_ = gettext.gettext
+
+__all__ = ['DateEntry']
+
+MAPPING = {
     '%y': ('__', '([_ 0-9][_ 0-9])'),
     '%Y': ('____', '([_ 0-9][_ 0-9][_ 0-9][_ 0-9])'),
     '%m': ('__', '([_ 0-9][_ 0-9])'),
@@ -22,12 +29,28 @@ mapping = {
     '%M': ('__', '([_ 0-9][_ 0-9])'),
     '%S': ('__', '([_ 0-9][_ 0-9])'),
     '%p': ('__', '([_ AP][_ M])'),
-}
+    }
+OPERATORS = {
+    gtk.keysyms.S: relativedelta(seconds=-1),
+    gtk.keysyms.s: relativedelta(seconds=1),
+    gtk.keysyms.I: relativedelta(minutes=-1),
+    gtk.keysyms.i: relativedelta(minutes=1),
+    gtk.keysyms.H: relativedelta(hours=-1),
+    gtk.keysyms.h: relativedelta(hours=1),
+    gtk.keysyms.D: relativedelta(days=-1),
+    gtk.keysyms.d: relativedelta(days=1),
+    gtk.keysyms.W: relativedelta(weeks=-1),
+    gtk.keysyms.w: relativedelta(weeks=1),
+    gtk.keysyms.M: relativedelta(months=-1),
+    gtk.keysyms.m: relativedelta(months=1),
+    gtk.keysyms.Y: relativedelta(years=-1),
+    gtk.keysyms.y: relativedelta(years=1),
+    }
 
 
 class DateEntry(gtk.Entry):
 
-    def __init__(self, format, callback=None, callback_process=None):
+    def __init__(self, format):
         super(DateEntry, self).__init__()
         self.modify_font(pango.FontDescription("monospace"))
 
@@ -39,17 +62,20 @@ class DateEntry(gtk.Entry):
 
         self.connect('focus-in-event', self._focus_in)
         self.connect('focus-out-event', self._focus_out)
-        self.callback = callback
-        self.callback_process = callback_process
+
+        if hasattr(self, 'set_icon_from_stock'):
+            self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, 'tryton-find')
+            self.set_icon_tooltip_text(gtk.ENTRY_ICON_SECONDARY,
+                _('Open the calendar <F2>'))
+            self.connect('icon-press', DateEntry.cal_open)
 
         self._interactive_input = True
-        self.mode_cmd = False
         self.idle_set_position(0)
 
     def set_format(self, format):
         self.format = format
         self.regex = self.initial_value = format
-        for key, val in mapping.items():
+        for key, val in MAPPING.items():
             self.regex = self.regex.replace(key, val[1])
             self.initial_value = self.initial_value.replace(key, val[0])
 
@@ -57,7 +83,7 @@ class DateEntry(gtk.Entry):
 
         assert self.regex.match(self.initial_value), \
                 'Error, the initial value should be validated by regex'
-        self.set_width_chars(len(self.initial_value))
+        self.set_width_chars(len(self.initial_value) + 3)  # space for icon
         self.set_max_length(len(self.initial_value))
 
     def idle_set_position(self, value):
@@ -69,12 +95,6 @@ class DateEntry(gtk.Entry):
 
     def _on_insert_text(self, editable, value, length, position):
         if not self._interactive_input:
-            return
-
-        if self.mode_cmd:
-            if self.callback:
-                self.callback(value)
-            self.stop_emission('insert-text')
             return
 
         pos = self.get_position()
@@ -130,10 +150,6 @@ class DateEntry(gtk.Entry):
             self.set_text(self.initial_value)
 
     def _focus_out(self, editable, event):
-        if self.mode_cmd:
-            self.mode_cmd = False
-            if self.callback_process:
-                self.callback_process(False, self, event)
         if self.get_text() == self.initial_value or not self.date_get():
             self.set_text('')
 
@@ -232,119 +248,69 @@ class DateEntry(gtk.Entry):
     def _on_key_press(self, editable, event):
         if not self.get_editable():
             return False
-        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Escape,
-                gtk.keysyms.Return, gtk.keysyms.KP_Enter):
-            if self.mode_cmd:
-                self.mode_cmd = False
-                if self.callback_process:
-                    self.callback_process(False, self, event)
-                self.stop_emission("key-press-event")
-                return True
-            else:
-                if self.get_text() != self.initial_value:
-                    if not self.date_get():
-                        self.stop_emission("key-press-event")
-                        return True
-        elif event.keyval in (gtk.keysyms.KP_Add, gtk.keysyms.plus,
-                gtk.keysyms.KP_Subtract, gtk.keysyms.minus,
-                gtk.keysyms.KP_Equal, gtk.keysyms.equal):
-            self.mode_cmd = True
-            self.date_get()
-            if self.callback_process:
-                self.callback_process(True, self, event)
+        if event.keyval in (gtk.keysyms.KP_Equal, gtk.keysyms.equal):
+            now = datetime.datetime.now()
+            self.date_set(now)
             self.stop_emission("key-press-event")
             return True
-        elif self.mode_cmd:
-            if self.callback:
-                self.callback(event)
+        elif event.keyval == gtk.keysyms.F2:
+            DateEntry.cal_open(editable)
+            self.stop_emission("key-press-event")
+            return True
+        elif event.keyval in OPERATORS:
+            date = self.date_get()
+            if date:
+                self.date_set(date + OPERATORS[event.keyval])
+            self.stop_emission("key-press-event")
             return True
         return False
 
+    def cal_open(self, *args):
+        parent = self.get_toplevel()
+        dialog = gtk.Dialog(_('Date Selection'), parent,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                gtk.STOCK_OK, gtk.RESPONSE_OK))
+        dialog.set_has_separator(True)
+        dialog.set_icon(TRYTON_ICON)
+        dialog.set_default_response(gtk.RESPONSE_OK)
 
-class CmdEntry(gtk.Label):
-    pass
+        calendar = gtk.Calendar()
+        calendar.set_display_options(
+            gtk.CALENDAR_SHOW_HEADING |
+            gtk.CALENDAR_SHOW_DAY_NAMES |
+            gtk.CALENDAR_SHOW_WEEK_NUMBERS |
+            gtk.CALENDAR_WEEK_START_MONDAY)
+        calendar.connect('day-selected-double-click',
+            lambda *x: dialog.response(gtk.RESPONSE_OK))
+        dialog.vbox.pack_start(calendar, expand=True, fill=True)
 
-
-class ComplexEntry(gtk.HBox):
-    def __init__(self, format, *args, **argv):
-        super(ComplexEntry, self).__init__(*args, **argv)
-        self.widget = DateEntry(
-            format,
-            self._date_cb,
-            self._process_cb
-        )
-        self.widget.set_position(0)
-        self.widget.select_region(0, 0)
-        self.widget_cmd = CmdEntry()
-        self.widget_cmd.hide()
-        self.pack_start(self.widget, expand=False, fill=False)
-        self.pack_start(self.widget_cmd, expand=False, fill=True)
-
-    def _date_cb(self, event):
-        if event.keyval in (gtk.keysyms.BackSpace,):
-            text = self.widget_cmd.get_text()[:-1]
-            self.widget_cmd.set_text(text)
-            return True
-        text = self.widget_cmd.get_text()
-        self.widget_cmd.set_text(text + event.string)
-        return True
-
-    def _process_cb(self, ok, widget, event=None):
-        if ok:
-            self.widget_cmd.show()
-            self._date_cb(event)
+        date = self.date_get()
+        if date:
+            calendar.select_month(date.month - 1, date.year)
+            calendar.select_day(date.day)
         else:
-            if (hasattr(event, 'keyval')
-                    and not event.keyval == gtk.keysyms.Escape):
-                cmd = self.widget_cmd.get_text()
-                dt = self.widget.date_get() or datetime.datetime.now()
-                res = compute_date(cmd, dt, self.widget.format)
-                if res:
-                    self.widget.date_set(res)
-            self.widget_cmd.set_text('')
-            self.widget_cmd.hide()
+            date = datetime.datetime.now()
 
+        x, y = self.window.get_origin()
+        allocation = self.get_allocation()
+        dialog.move(x, y + allocation.height)
 
-def compute_date(cmd, dt, format):
-    lst = {
-        '^=(\d+)d$': lambda dt, r: dt + \
-                relativedelta(day=int(r.group(1))),
-        '^=(\d+)m$': lambda dt, r: dt + \
-                relativedelta(month=int(r.group(1))),
-        '^=(\d\d)y$': lambda dt, r: dt + \
-                relativedelta(year=int(str(dt.year)[:-2] + r.group(1))),
-        '^=(\d+)y$': lambda dt, r: dt + \
-                relativedelta(year=int(r.group(1))),
-        '^=(\d+)h$': lambda dt, r: dt + \
-                relativedelta(hour=int(r.group(1))),
-        '^([\\+-]\d+)h$': lambda dt, r: dt + \
-                relativedelta(hours=int(r.group(1))),
-        '^([\\+-]\d+)w$': lambda dt, r: dt + \
-                relativedelta(weeks=int(r.group(1))),
-        '^([\\+-]\d+)d$': lambda dt, r: dt + \
-                relativedelta(days=int(r.group(1))),
-        '^([\\+-]\d+)$': lambda dt, r: dt + \
-                relativedelta(days=int(r.group(1))),
-        '^([\\+-]\d+)m$': lambda dt, r: dt + \
-                relativedelta(months=int(r.group(1))),
-        '^([\\+-]\d+)y$': lambda dt, r: dt + \
-                relativedelta(years=int(r.group(1))),
-        '^=$': lambda dt, r: datetime.datetime.now(),
-        '^-$': lambda dt, r: False
-    }
-    for r, f in lst.items():
-        groups = re.match(r, cmd)
-        if groups:
-            if not dt:
-                dt = datetime.datetime.now()
-            try:
-                return f(dt, groups)
-            except ValueError:
-                continue
+        dialog.show_all()
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            year, month, day = calendar.get_date()
+            date += relativedelta(year=year, month=month + 1, day=day)
+            self.date_set(date)
+
+        parent.present()
+        self.grab_focus()
+        dialog.destroy()
 
 if __name__ == '__main__':
     win = gtk.Window()
-    win.set_title('gtk.Entry subclass')
+    win.set_title('DateEntry')
 
     def cb(window, event):
         gtk.main_quit()
@@ -362,7 +328,7 @@ if __name__ == '__main__':
             '%d/%m/%Y',
             '%Y-%m-%d',
             ):
-        widget = ComplexEntry(format)
+        widget = DateEntry(format)
         vbox.pack_start(widget, False, False)
 
     win.show_all()

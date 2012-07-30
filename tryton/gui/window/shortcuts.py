@@ -39,24 +39,7 @@ class Shortcuts(object):
             ('<F2>', _('Open relation')),
             ('<Del>', _('Mark line for deletion')),
             ('<Ins>', _('Unmark line for deletion')),
-            (_('Date/Datetime Entries Shortcuts'),),
-            (_('''You can use special operators:
-* + to increase the date
-* - to decrease the date or clear
-* = to set the date or the current date
-
-Available variables are:
-h for hours
-d for days
-w for weeks (only with +/-)
-m for months
-y for years
-
-Examples:
-"+21d" increase of 21 days the date
-"=11m" set the date to the 11th month of the year
-"-2w" decrease of 2 weeks the date'''),),
-        ]
+            ]
         notebook.append_page(self._fill_table(shortcuts),
                 gtk.Label(_('Edition Widgets')))
 

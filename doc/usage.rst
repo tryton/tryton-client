@@ -825,6 +825,21 @@ Widgets
 There are a several widgets used on Tryton in client side. The follow sections
 will explains some of them.
 
+
+Date/DateTime/Time Widgets
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Those widgets has several key shortucts to quickly modify the value. Each key
+increases if lower case or decreases if upper case:
+
+    - `y`: by one year
+    - `m`: by one month
+    - `w`: by one week
+    - `d`: by one day
+    - `h`: by one hour
+    - `i`: by one minute
+    - `s`: by one second
+
 Search Widget
 ^^^^^^^^^^^^^
 
