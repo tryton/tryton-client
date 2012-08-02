@@ -267,7 +267,6 @@ class ScreenContainer(object):
                         selections = tuple(x[1] for x in field['selection'])
                     for selection in selections:
                         entry.append_text(selection)
-                    widget = entry
                 elif field['type'] in ('date', 'datetime', 'time'):
                     if field['type'] == 'date':
                         format_ = date_format()
@@ -275,15 +274,12 @@ class ScreenContainer(object):
                         format_ = PYSONDecoder({}).decode(field['format'])
                         if field['type'] == 'datetime':
                             format_ = date_format() + ' ' + format_
-                    widget = common.date_widget.ComplexEntry(format_,
-                        spacing=0)
-                    entry = widget.widget
+                    entry = common.date_widget.DateEntry(format_)
                     entry.connect('activate', date_activate)
                 else:
                     entry = gtk.Entry()
-                    widget = entry
                     entry.connect('activate', lambda *a: search())
-                self.search_table.attach(widget, 1, 2, i, i + 1)
+                self.search_table.attach(entry, 1, 2, i, i + 1)
                 self.search_table.fields.append((field['string'] + ':', entry))
 
             scrolled = gtk.ScrolledWindow()
