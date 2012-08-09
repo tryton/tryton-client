@@ -123,7 +123,8 @@ class Many2One(WidgetInterface):
         return value
 
     def sig_activate(self, widget=None, event=None, key_press=False):
-        if not common.MODELACCESS[self.get_model()]['read']:
+        model = self.get_model()
+        if not model or not common.MODELACCESS[model]['read']:
             return
         if not self.focus_out or not self.field:
             return
@@ -192,7 +193,8 @@ class Many2One(WidgetInterface):
             views_preload=self.attrs.get('views', {}), readonly=self._readonly)
 
     def sig_new(self, *args):
-        if not common.MODELACCESS[self.get_model()]['create']:
+        model = self.get_model()
+        if not model or not common.MODELACCESS[model]['create']:
             return
         self.focus_out = False
         screen = self.get_screen()
@@ -207,7 +209,8 @@ class Many2One(WidgetInterface):
         WinForm(screen, callback, new=True, save_current=True)
 
     def sig_edit(self, widget):
-        if not common.MODELACCESS[self.get_model()]['read']:
+        model = self.get_model()
+        if not model or not common.MODELACCESS[model]['read']:
             return
         if not self.focus_out or not self.field:
             return
