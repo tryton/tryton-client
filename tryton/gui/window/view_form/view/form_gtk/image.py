@@ -48,6 +48,7 @@ class Image(WidgetInterface):
             self.but_add.set_image(img_add)
             self.but_add.set_relief(gtk.RELIEF_NONE)
             self.but_add.connect('clicked', self.sig_add)
+            self.but_add.connect('enter-notify-event', self.enter)
             self.tooltips.set_tip(self.but_add, _('Select an Image...'))
             hbox.pack_start(self.but_add, expand=False, fill=False)
 
@@ -59,6 +60,7 @@ class Image(WidgetInterface):
                 self.but_open.set_image(img_open)
                 self.but_open.set_relief(gtk.RELIEF_NONE)
                 self.but_open.connect('clicked', self.sig_open)
+                self.but_open.connect('enter-notify-event', self.enter)
                 self.tooltips.set_tip(self.but_open, _('Open...'))
                 hbox.pack_start(self.but_open, expand=False, fill=False)
             else:
@@ -71,6 +73,7 @@ class Image(WidgetInterface):
             self.but_save_as.set_image(img_save_as)
             self.but_save_as.set_relief(gtk.RELIEF_NONE)
             self.but_save_as.connect('clicked', self.sig_save_as)
+            self.but_save_as.connect('enter-notify-event', self.enter)
             self.tooltips.set_tip(self.but_save_as, _('Save As...'))
             hbox.pack_start(self.but_save_as, expand=False, fill=False)
 
@@ -81,6 +84,7 @@ class Image(WidgetInterface):
             self.but_remove.set_image(img_remove)
             self.but_remove.set_relief(gtk.RELIEF_NONE)
             self.but_remove.connect('clicked', self.sig_remove)
+            self.but_remove.connect('enter-notify-event', self.enter)
             self.tooltips.set_tip(self.but_remove, _('Clear'))
             hbox.pack_start(self.but_remove, expand=False, fill=False)
 

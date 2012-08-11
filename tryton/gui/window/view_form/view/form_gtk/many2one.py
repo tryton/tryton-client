@@ -44,6 +44,7 @@ class Many2One(WidgetInterface):
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_edit)
+        self.but_open.connect('enter-notify-event', self.enter)
         self.but_open.set_alignment(0.5, 0.5)
 
         self.but_new = gtk.Button()
@@ -52,6 +53,7 @@ class Many2One(WidgetInterface):
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
+        self.but_new.connect('enter-notify-event', self.enter)
         self.but_new.set_alignment(0.5, 0.5)
 
         self.widget.pack_end(self.but_new, expand=False, fill=False)

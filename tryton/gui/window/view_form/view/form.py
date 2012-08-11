@@ -23,6 +23,7 @@ class ViewForm(ParserView):
         for button in self.buttons:
             if isinstance(button, gtk.Button):
                 button.connect('clicked', self.button_clicked)
+                button.set_focus_on_click(False)
 
         # Force to display the first time it switches on a page
         # This avoids glitch in position of widgets
@@ -43,6 +44,7 @@ class ViewForm(ParserView):
         vbox = gtk.VBox()
         vp = gtk.Viewport()
         vp.set_shadow_type(gtk.SHADOW_NONE)
+        vp.connect('leave-notify-event', self.leave)
         vp.add(self.widget)
         scroll = gtk.ScrolledWindow()
         scroll.add(vp)
@@ -164,6 +166,9 @@ class ViewForm(ParserView):
                     if focus_widget.widget.is_ancestor(child):
                         notebook.set_current_page(i)
             focus_widget.grab_focus()
+
+    def leave(self, widget, event):
+        self.set_value()
 
     def button_clicked(self, widget):
         record_id = self.screen.save_current()

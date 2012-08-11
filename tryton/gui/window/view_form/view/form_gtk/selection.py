@@ -14,6 +14,8 @@ class Selection(WidgetInterface):
         super(Selection, self).__init__(field_name, model_name, attrs=attrs)
 
         self.widget = gtk.HBox(spacing=3)
+        ev_box = gtk.EventBox()
+        ev_box.connect('enter-notify-event', self.enter)
         self.entry = gtk.ComboBoxEntry()
         child = self.entry.child
         child.set_property('activates_default', True)
@@ -25,7 +27,8 @@ class Selection(WidgetInterface):
         child.connect_after('focus-out-event', self.sig_activate)
         child.connect('changed', self.send_modified)
         self.entry.connect('notify::active', lambda *a: self._focus_out())
-        self.widget.pack_start(self.entry)
+        ev_box.add(self.entry)
+        self.widget.pack_start(ev_box)
         self.widget.set_focus_chain([child])
 
         self._selection = {}

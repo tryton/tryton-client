@@ -19,6 +19,7 @@ class URL(Char):
         self.button.set_image(img)
         self.button.set_relief(gtk.RELIEF_NONE)
         self.button.connect('clicked', self.button_clicked)
+        self.button.connect('enter-notify-event', self.enter)
         self.button.set_alignment(0.5, 0.5)
         self.widget.pack_start(self.button, expand=False, fill=False)
         self.widget.set_focus_chain([self.entry])

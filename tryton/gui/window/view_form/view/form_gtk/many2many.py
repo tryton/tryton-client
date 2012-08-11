@@ -43,6 +43,7 @@ class Many2Many(WidgetInterface):
         self.but_add = gtk.Button()
         tooltips.set_tip(self.but_add, _('Add'))
         self.but_add.connect('clicked', self._sig_add)
+        self.but_add.connect('enter-notify-event', self.enter)
         img_add = gtk.Image()
         img_add.set_from_stock('tryton-list-add',
             gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -54,6 +55,7 @@ class Many2Many(WidgetInterface):
         self.but_remove = gtk.Button()
         tooltips.set_tip(self.but_remove, _('Remove <Del>'))
         self.but_remove.connect('clicked', self._sig_remove)
+        self.but_remove.connect('enter-notify-event', self.enter)
         img_remove = gtk.Image()
         img_remove.set_from_stock('tryton-list-remove',
             gtk.ICON_SIZE_SMALL_TOOLBAR)

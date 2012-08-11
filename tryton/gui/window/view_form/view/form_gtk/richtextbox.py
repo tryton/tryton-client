@@ -187,6 +187,7 @@ class RichTextBox(TextBox):
         self.tools['markup'].set_tooltip_text(_('Change the markup text view'))
         # Packing widgets
         tool_bar = gtk.Toolbar()
+        tool_bar.connect('enter-notify-event', self.enter)
 
         tool_bar.set_style(gtk.TOOLBAR_ICONS)
         for tag in tags:
