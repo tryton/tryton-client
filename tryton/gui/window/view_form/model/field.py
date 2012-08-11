@@ -579,7 +579,8 @@ class O2MField(CharField):
             return []
         for record2 in record.value[self.name]:
             if not (record2.deleted or record2.removed):
-                result.append(record2.get_eval(check_load=check_load))
+                result.append(
+                    record2.get_on_change_value(check_load=check_load))
         return result
 
     def set(self, record, value, modified=False):
@@ -790,6 +791,15 @@ class M2MField(O2MField):
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
             record.signal('record-changed')
+
+    def get_on_change_value(self, record, check_load=True):
+        result = []
+        if record.value.get(self.name) is None:
+            return []
+        for record2 in record.value[self.name]:
+            if not (record2.deleted or record2.removed):
+                result.append(record2.get_eval(check_load=check_load))
+        return result
 
 
 class ReferenceField(CharField):
