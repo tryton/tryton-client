@@ -203,6 +203,6 @@ class ViewForm(ParserView):
                             }, context=context)
                 else:
                     raise Exception('Unallowed button type')
-                self.screen.reload([record_id], written=True)
+                self.screen.reload([record.id], written=True)
         else:
             self.screen.display()
