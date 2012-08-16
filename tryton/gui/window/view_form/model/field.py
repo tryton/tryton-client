@@ -398,7 +398,10 @@ class M2OField(CharField):
         if isinstance(value, (tuple, list)):
             value, rec_name = value
         else:
-            rec_name = ''
+            if value == self.get(record):
+                rec_name = record.value.get(self.name + '.rec_name', '')
+            else:
+                rec_name = ''
         record.value[self.name + '.rec_name'] = rec_name
         super(M2OField, self).set_client(record, value,
             force_change=force_change)
@@ -829,7 +832,10 @@ class ReferenceField(CharField):
             if isinstance(ref_id, (tuple, list)):
                 ref_id, rec_name = ref_id
             else:
-                rec_name = ''
+                if ','.join(map(str(ref_model, ref_id))) == self.get(record):
+                    rec_name = record.value.get(self.name + '.rec_name', '')
+                else:
+                    rec_name = ''
             record.value[self.name + '.rec_name'] = rec_name
             value = (ref_model, ref_id)
         super(ReferenceField, self).set_client(record, value,
