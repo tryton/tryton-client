@@ -315,6 +315,7 @@ class DBCreate(object):
             self.button_create.set_sensitive(False)
 
         while True:
+            self.dialog.props.sensitive = True
             res = self.dialog.run()
             dbname = self.entry_dbname.get_text()
             url = self.entry_server_connection.get_text()
@@ -367,6 +368,7 @@ class DBCreate(object):
                     else:  # Everything runs fine, break the block here
                         host = url_m.group(1)
                         port = url_m.group(2)
+                        self.dialog.props.sensitive = False
                         try:
                             rpcprogress = common.RPCProgress('db_exec',
                                     (host, int(port), 'create', dbname, passwd,

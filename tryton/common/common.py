@@ -1228,10 +1228,7 @@ class RPCProgress(object):
         thread.start_new_thread(self.start, ())
 
         watch = None
-        parent_sensitive = self.parent.props.sensitive
         i = 0
-        win = None
-        progressbar = None
         while (not self.res) and (not self.error):
             i += 1
             if i > 1:
@@ -1241,55 +1238,9 @@ class RPCProgress(object):
                     with gtk.gdk.lock:
                         while gtk.events_pending():
                             gtk.main_iteration()
-            if i > 10 and main_iteration_p:
-                if not win or not progressbar:
-                    win = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
-                    win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
-                    if hasattr(win, 'set_deletable'):
-                        win.set_deletable(False)
-                    win.set_decorated(False)
-                    vbox = gtk.VBox(False, 0)
-                    hbox = gtk.HBox(False, 13)
-                    hbox.set_border_width(10)
-                    img = gtk.Image()
-                    img.set_from_stock('tryton-dialog-information',
-                            gtk.ICON_SIZE_DIALOG)
-                    hbox.pack_start(img, expand=True, fill=False)
-                    vbox2 = gtk.VBox(False, 0)
-                    label = gtk.Label()
-                    label.set_markup(
-                        '<b>' + _('Operation in progress') + '</b>')
-                    label.set_alignment(0.0, 0.5)
-                    vbox2.pack_start(label, expand=True, fill=False)
-                    vbox2.pack_start(gtk.HSeparator(), expand=True, fill=True)
-                    vbox2.pack_start(gtk.Label(_("Please wait,\n" \
-                            "this operation may take a while...")),
-                            expand=True, fill=False)
-                    hbox.pack_start(vbox2, expand=True, fill=True)
-                    vbox.pack_start(hbox)
-                    progressbar = gtk.ProgressBar()
-                    progressbar.set_orientation(gtk.PROGRESS_LEFT_TO_RIGHT)
-                    vbox.pack_start(progressbar, expand=True, fill=False)
-                    viewport = gtk.Viewport()
-                    viewport.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-                    viewport.add(vbox)
-                    win.add(viewport)
-                    win.set_transient_for(self.parent)
-                    win.set_modal(True)
-                    win.show_all()
-                    win.window.set_cursor(watch)
-                    self.parent.props.sensitive = False
-                with gtk.gdk.lock:
-                    progressbar.pulse()
             time.sleep(0.1)
-        self.parent.props.sensitive = parent_sensitive
         if self.parent.window:
             self.parent.window.set_cursor(None)
-        if win:
-            win.destroy()
-            with gtk.gdk.lock:
-                while gtk.events_pending():
-                    gtk.main_iteration()
         if self.exception:
             if process_exception_p:
                 if process_exception(self.exception):

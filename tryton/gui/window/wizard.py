@@ -347,8 +347,8 @@ class WizardDialog(Wizard, NoModal):
             dialog = self.page.dialogs[-1]
         else:
             dialog = self.page
-        if hasattr(dialog, 'screen'):
-            dialog.screen.reload(written=True)
+        if hasattr(dialog, 'screen') and dialog.screen.current_record:
+            dialog.screen.reload(self.ids, written=True)
 
     def end(self):
         super(WizardDialog, self).end()

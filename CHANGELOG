@@ -1,3 +1,4 @@
+* Remove "Please wait" box
 * Refactorize date widgets
 * Manage tuple on Reference
 * Add constant interpolation on line graph

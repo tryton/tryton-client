@@ -974,7 +974,7 @@ class Button(object):
                             }, context=ctx)
                 else:
                     raise Exception('Unallowed button type')
-                self.screen.reload(written=True)
+                self.screen.reload([obj_id], written=True)
             else:
                 self.screen.display()
 

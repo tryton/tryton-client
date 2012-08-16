@@ -540,8 +540,7 @@ class Screen(SignalEvent):
             return True
         return False
 
-    def reload(self, written=False):
-        ids = self.sel_ids_get()
+    def reload(self, ids, written=False):
         self.group.reload(ids)
         if written:
             self.group.written(ids)
