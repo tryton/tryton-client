@@ -180,7 +180,7 @@ def setlang(lang=None, locale_dict=None):
             os.environ['LANG'] = lang + '.' + encoding
             locale.setlocale(locale.LC_ALL, lang2 + '.' + encoding)
         except locale.Error:
-            logging.getLogger('translate').info(
+            logging.getLogger(__name__).info(
                     _('Unable to set locale %s') % lang2 + '.' + encoding)
 
     if os.path.isdir(locale_dir):

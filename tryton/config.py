@@ -49,9 +49,6 @@ class ConfigManager(object):
             'login.expanded': False,
             'tip.autostart': False,
             'tip.position': 0,
-            'logging.logger': '',
-            'logging.level': 'ERROR',
-            'logging.default': 'ERROR',
             'form.toolbar': True,
             'form.statusbar': True,
             'client.default_width': 900,
@@ -84,14 +81,15 @@ class ConfigManager(object):
                 usage="Usage: %prog [options] [url]")
         parser.add_option("-c", "--config", dest="config",
                 help=_("specify alternate config file"))
+        parser.add_option("-d", "--dev", action="store_true",
+                default=False, dest="dev",
+                help=_("development mode"))
         parser.add_option("-v", "--verbose", action="store_true",
                 default=False, dest="verbose",
                 help=_("logging everything at INFO level"))
-        parser.add_option("-d", "--log", dest="log_logger", default='',
-                help=_("specify channels to log"))
         parser.add_option("-l", "--log-level", dest="log_level",
                 help=_("specify the log level: " \
-                        "INFO, DEBUG, WARNING, ERROR, CRITICAL"))
+                    "DEBUG, INFO, WARNING, ERROR, CRITICAL"))
         parser.add_option("-u", "--user", dest="login",
                 help=_("specify the login user"))
         parser.add_option("-p", "--port", dest="port",
@@ -109,11 +107,21 @@ class ConfigManager(object):
             get_config_dir(), 'tryton.conf')
         self.load()
 
-        for arg in ('log_level', 'log_logger'):
-            if getattr(opt, arg):
-                self.options['logging.' + arg[4:]] = getattr(opt, arg)
-        if opt.verbose:
-            self.options['logging.default'] = 'INFO'
+        self.options['dev'] = opt.dev
+        logging.basicConfig()
+        loglevels = {
+            'DEBUG': logging.DEBUG,
+            'INFO': logging.INFO,
+            'WARNING': logging.WARNING,
+            'ERROR': logging.ERROR,
+            'CRITICAL': logging.CRITICAL,
+            }
+        if not opt.log_level:
+            if opt.verbose:
+                opt.log_level = 'INFO'
+            else:
+                opt.log_level = 'ERROR'
+        logging.getLogger().setLevel(loglevels[opt.log_level.upper()])
 
         for arg in ('login', 'port', 'server'):
             if getattr(opt, arg):
@@ -131,9 +139,9 @@ class ConfigManager(object):
                 configparser.set(section, name, self.config[entry])
             configparser.write(open(self.rcfile, 'wb'))
         except IOError:
-            logging.getLogger('common.options').warn(
-                    _('Unable to write config file %s!') % \
-                            (self.rcfile,))
+            logging.getLogger(__name__).warn(
+                _('Unable to write config file %s!')
+                % (self.rcfile,))
             return False
         return True
 

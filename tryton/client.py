@@ -18,7 +18,6 @@ pygtk.require('2.0')
 import gtk
 import gobject
 gobject.threads_init()
-import logging
 from urlparse import urlparse
 import threading
 
@@ -67,24 +66,8 @@ class TrytonClient(object):
                 CONFIG['login.port'] = port
                 CONFIG['login.db'] = database
                 CONFIG['login.expanded'] = True
-        logging.basicConfig()
         translate.set_language_direction(CONFIG['client.language_direction'])
         translate.setlang(CONFIG['client.lang'])
-        loglevel = {
-                'DEBUG': logging.DEBUG,
-                'INFO': logging.INFO,
-                'WARNING': logging.WARNING,
-                'ERROR': logging.ERROR,
-                'CRITICAL': logging.CRITICAL,
-                }
-        for logger in CONFIG['logging.logger'].split(','):
-            if logger:
-                log = logging.getLogger(logger)
-                log.setLevel(loglevel[CONFIG['logging.level'].upper()])
-        if CONFIG['logging.default']:
-            logging.getLogger().setLevel(
-                    loglevel[CONFIG['logging.default'].upper()])
-
         self.quit_client = (threading.Event()
             if sys.platform == 'win32' else None)
         common.ICONFACTORY.load_client_icons()

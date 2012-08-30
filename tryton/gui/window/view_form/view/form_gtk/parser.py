@@ -429,7 +429,7 @@ class ParserForm(ParserInterface):
                     continue
                 if name not in fields:
                     container.empty_add(int(attrs.get('colspan', 1)))
-                    log = logging.getLogger('view')
+                    log = logging.getLogger(__name__)
                     log.error('Unknown field "%s"' % str(name))
                     continue
                 ftype = attrs.get('widget', fields[name].attrs['type'])

@@ -35,11 +35,12 @@ Options
 
 -c FILE, --config=FILE               Specify alternate `configuration file`_
 
+-d, --dev                            Enable development mode, which deactivates
+                                     client side caching
+
 -v, --verbose                        Enable basic debugging
 
--d LOG_LOGGER, --log=LOG_LOGGER      Specify channels to log (ex: rpc.request, rpc.result, ...)
-
--l LOG_LEVEL, --log-level=LOG_LEVEL  Specify the log level: INFO, DEBUG,
+-l LOG_LEVEL, --log-level=LOG_LEVEL  Specify the log level: DEBUG, INFO,
                                      WARNING, ERROR, CRITICAL
 
 -u LOGIN, --user=LOGIN               Specify the login user

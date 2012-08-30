@@ -864,7 +864,7 @@ class ErrorDialog(UniqueDialog):
     def __call__(self, title, details):
         if title == details:
             title = ''
-        log = logging.getLogger('common.message')
+        log = logging.getLogger(__name__)
         log.error(details + '\n' + title)
 
         response = super(ErrorDialog, self).__call__(title, details)
