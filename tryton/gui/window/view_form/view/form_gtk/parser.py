@@ -92,6 +92,7 @@ class Frame(gtk.Frame):
             for widgets in self.widgets.itervalues():
                 for widget in widgets:
                     widget._readonly_set(True)
+                    widget.color_set('readonly')
 
 
 class ScrolledWindow(gtk.ScrolledWindow):
