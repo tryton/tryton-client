@@ -68,11 +68,12 @@ class Image(gtk.Image):
 
 class Frame(gtk.Frame):
 
-    def __init__(self, label=None, attrs=None):
+    def __init__(self, label=None, attrs=None, widgets=None):
         if not label:  # label must be None to have no label widget
             label = None
         super(Frame, self).__init__(label=label)
         self.attrs = attrs or {}
+        self.widgets = widgets or {}
         if not label:
             self.set_shadow_type(gtk.SHADOW_NONE)
         self.set_border_width(0)
@@ -87,6 +88,10 @@ class Frame(gtk.Frame):
             self.hide()
         else:
             self.show()
+        if state_changes.get('readonly', self.attrs.get('readonly')):
+            for widgets in self.widgets.itervalues():
+                for widget in widgets:
+                    widget._readonly_set(True)
 
 
 class ScrolledWindow(gtk.ScrolledWindow):
@@ -469,9 +474,9 @@ class ParserForm(ParserInterface):
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                for widget_name, widgets in widgets.iteritems():
+                for widget_name, lwidgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
-                    dict_widget[widget_name].extend(widgets)
+                    dict_widget[widget_name].extend(lwidgets)
                 button_list += buttons
                 text = ''
                 if 'name' in attrs and attrs['name'] in fields:
@@ -486,7 +491,7 @@ class ParserForm(ParserInterface):
                 if attrs.get('string'):
                     text = attrs['string']
 
-                frame = Frame(text, attrs)
+                frame = Frame(text, attrs, widgets=widgets)
                 frame.add(widget)
                 button_list.append(frame)
                 container.wid_add(frame,
