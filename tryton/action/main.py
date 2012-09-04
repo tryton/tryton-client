@@ -95,6 +95,7 @@ class Action(object):
 
             action.setdefault('pyson_domain', '[]')
             ctx = {
+                'active_model': data.get('res_model'),
                 'active_id': data.get('id', False),
                 'active_ids': data.get('ids', []),
             }

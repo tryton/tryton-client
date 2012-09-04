@@ -456,6 +456,7 @@ class Record(SignalEvent):
         for name, field in self.group.fields.items():
             ctx[name] = field.get_eval(self, check_load=check_load)
 
+        ctx['active_model'] = self.model_name
         ctx['active_id'] = self.id
         ctx['id'] = self.id  # Force local id
         ctx['_user'] = rpc._USER
