@@ -17,12 +17,12 @@ class Action(SignalEvent):
 
     def __init__(self, attrs=None, context=None):
         super(Action, self).__init__()
-        self.act_id = int(attrs['name'])
+        self.name = attrs['name']
         self.context = context or {}
 
         try:
-            self.action = RPCExecute('model', 'ir.action.act_window', 'read',
-                self.act_id, False)
+            self.action = RPCExecute('model', 'ir.action.act_window', 'get',
+                self.name)
         except RPCException:
             raise
 
@@ -121,7 +121,7 @@ class Action(SignalEvent):
         domain_ctx['_user'] = rpc._USER
         for action in actions:
             if action.active:
-                domain_ctx['_active_%s' % action.act_id] = action.active
+                domain_ctx[action.name] = action.active
         new_domain = PYSONDecoder(domain_ctx).decode(
                 self.action['pyson_domain'])
         if self.domain == new_domain:
