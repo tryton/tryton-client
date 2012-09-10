@@ -676,8 +676,7 @@ class Screen(SignalEvent):
         else:
             if (self.current_record
                     and self.current_record in self.current_record.group):
-                # Force record-message signal
-                self.current_record = self.current_record
+                pass
             elif self.group:
                 self.current_record = self.group[0]
             else:
@@ -698,6 +697,8 @@ class Screen(SignalEvent):
             if set_cursor:
                 self.set_cursor(reset_view=False)
         self.set_tree_state()
+        # Force record-message signal
+        self.current_record = self.current_record
 
     def display_next(self):
         view = self.current_view
