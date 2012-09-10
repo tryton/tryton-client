@@ -142,7 +142,6 @@ class Selection(WidgetInterface):
         if not self.field:
             return
         self.field.set_client(self.record, self.value_get())
-        self.display(self.record, self.field)
 
     @property
     def modified(self):

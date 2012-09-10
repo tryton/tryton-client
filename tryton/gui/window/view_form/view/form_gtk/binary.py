@@ -120,7 +120,6 @@ class Binary(WidgetInterface):
             if self.filename_field:
                 self.filename_field.set_client(self.record,
                         os.path.basename(filename))
-            self.display(self.record, self.field)
 
     def sig_open(self, widget=None):
         if not self.filename_field:
@@ -150,7 +149,6 @@ class Binary(WidgetInterface):
 
     def sig_remove(self, widget=None):
         self.field.set_client(self.record, False)
-        self.display(self.record, self.field)
 
     def sig_key_press(self, widget, event, *args):
         editable = self.wid_text and self.wid_text.get_editable()

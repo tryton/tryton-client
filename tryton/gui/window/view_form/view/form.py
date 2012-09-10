@@ -85,10 +85,6 @@ class ViewForm(ParserView):
                     field = record.group.fields[name]
                     for widget in widgets:
                         widget.set_value(record, field)
-        # The states of group must be restored as some widgets could call
-        # display in set_value
-        for button in self.buttons:
-            button.state_set(record)
 
     def sel_ids_get(self):
         if self.screen.current_record:

@@ -164,7 +164,6 @@ class Many2One(WidgetInterface):
                     self.field.set_client(self.record,
                         self.value_from_id(ids[0]), force_change=True)
                     self.focus_out = True
-                    self.display(self.record, self.field)
                     self.changed = True
                     return
 
@@ -173,7 +172,6 @@ class Many2One(WidgetInterface):
                         self.field.set_client(self.record,
                             self.value_from_id(*result[0]), force_change=True)
                     self.focus_out = True
-                    self.display(self.record, self.field)
                     self.changed = True
 
                 WinSearch(model, callback, sel_multi=False,
@@ -183,7 +181,6 @@ class Many2One(WidgetInterface):
                     new=self.but_new.get_property('sensitive'))
                 return
         self.focus_out = True
-        self.display(self.record, self.field)
         self.changed = True
         return
 
@@ -206,7 +203,6 @@ class Many2One(WidgetInterface):
                 self.field.set_client(self.record,
                     self.value_from_id(screen.current_record.id,
                         screen.current_record.rec_name()))
-                self.display(self.record, self.field)
             self.focus_out = True
         WinForm(screen, callback, new=True, save_current=True)
 
@@ -232,7 +228,6 @@ class Many2One(WidgetInterface):
                             screen.current_record.rec_name()),
                         force_change=True)
                 self.focus_out = True
-                self.display(self.record, self.field)
                 self.changed = True
             WinForm(screen, callback, save_current=True)
             return
@@ -258,7 +253,6 @@ class Many2One(WidgetInterface):
                 self.field.set_client(self.record, self.value_from_id(ids[0]),
                     force_change=True)
                 self.focus_out = True
-                self.display(self.record, self.field)
                 return True
 
             def callback(result):
@@ -266,7 +260,6 @@ class Many2One(WidgetInterface):
                     self.field.set_client(self.record,
                         self.value_from_id(*result[0]), force_change=True)
                 self.focus_out = True
-                self.display(self.record, self.field)
                 self.changed = True
             WinSearch(model, callback, sel_multi=False,
                 ids=ids, context=context, domain=domain,
@@ -275,7 +268,6 @@ class Many2One(WidgetInterface):
                 new=self.but_new.get_property('sensitive'))
             return
         self.focus_out = True
-        self.display(self.record, self.field)
         self.changed = True
         return
 
@@ -309,7 +301,6 @@ class Many2One(WidgetInterface):
                 position = self.wid_text.get_position()
                 self.field.set_client(self.record,
                     self.value_from_id(None, ''))
-                self.display(self.record, self.field)
                 # Restore text and position after display
                 self.wid_text.set_text(text)
                 self.wid_text.set_position(position)
