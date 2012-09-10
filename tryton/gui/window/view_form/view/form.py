@@ -4,6 +4,7 @@ import operator
 from functools import reduce
 import gtk
 import gettext
+import gobject
 import tryton.common as common
 from interface import ParserView
 from tryton.action import Action
@@ -172,7 +173,8 @@ class ViewForm(ParserView):
             focus_widget.grab_focus()
 
     def leave(self, widget, event):
-        self.set_value()
+        # leave could be called during event process
+        gobject.idle_add(self.set_value)
 
     def button_clicked(self, widget):
         record = self.screen.current_record
