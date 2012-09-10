@@ -15,16 +15,16 @@ _ = gettext.gettext
 
 class ViewForm(ParserView):
 
-    def __init__(self, screen, widget, children=None, buttons=None,
+    def __init__(self, screen, widget, children=None, state_widgets=None,
             notebooks=None, cursor_widget='', children_field=None):
-        super(ViewForm, self).__init__(screen, widget, children, buttons,
+        super(ViewForm, self).__init__(screen, widget, children, state_widgets,
             notebooks, cursor_widget, children_field)
         self.view_type = 'form'
 
-        for button in self.buttons:
-            if isinstance(button, gtk.Button):
-                button.connect('clicked', self.button_clicked)
-                button.set_focus_on_click(False)
+        for widget in self.state_widgets:
+            if isinstance(widget, gtk.Button):
+                widget.connect('clicked', self.button_clicked)
+                widget.set_focus_on_click(False)
 
         # Force to display the first time it switches on a page
         # This avoids glitch in position of widgets
@@ -70,7 +70,7 @@ class ViewForm(ParserView):
         self.widget = None
         self.widgets = None
         self.screen = None
-        self.buttons = None
+        self.state_widgets = None
 
     def cancel(self):
         for widgets in self.widgets.itervalues():
@@ -136,8 +136,8 @@ class ViewForm(ParserView):
                 field.state_set(record)
             for widget in widgets:
                 widget.display(record, field)
-        for button in self.buttons:
-            button.state_set(record)
+        for widget in self.state_widgets:
+            widget.state_set(record)
         return True
 
     def set_cursor(self, new=False, reset_view=True):

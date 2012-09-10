@@ -10,21 +10,21 @@ class ParserInterface(object):
         self.parent = parent
         self.attrs = attrs
         self.title = None
-        self.buttons = {}
+        self.state_widgets = {}
         self.screen = screen
         self.children_field = children_field
 
 
 class ParserView(object):
 
-    def __init__(self, screen, widget, children=None, buttons=None,
+    def __init__(self, screen, widget, children=None, state_widgets=None,
             notebooks=None, cursor_widget=None, children_field=None):
         self.screen = screen
         self.widget = widget
         self.children = children
-        if buttons is None:
-            buttons = []
-        self.buttons = buttons
+        if state_widgets is None:
+            state_widgets = []
+        self.state_widgets = state_widgets
         if notebooks is None:
             notebooks = []
         self.notebooks = notebooks

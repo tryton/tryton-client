@@ -5,10 +5,10 @@ from interface import ParserView
 
 class ViewGraph(ParserView):
 
-    def __init__(self, screen, widget, children=None, buttons=None,
+    def __init__(self, screen, widget, children=None, state_widgets=None,
             notebooks=None, cursor_widget=None, children_field=None):
-        super(ViewGraph, self).__init__(screen, widget, children, buttons,
-            notebooks, cursor_widget, children_field)
+        super(ViewGraph, self).__init__(screen, widget, children,
+            state_widgets, notebooks, cursor_widget, children_field)
         self.view_type = 'graph'
         self.widgets = children
 
@@ -22,7 +22,7 @@ class ViewGraph(ParserView):
             del self.widgets[widget]
         self.widget = None
         self.screen = None
-        self.buttons = None
+        self.state_widgets = None
 
     def cancel(self):
         pass

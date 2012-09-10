@@ -11,29 +11,11 @@ from tryton.common.button import Button
 _ = gettext.gettext
 
 
-class Label(gtk.Label):
+class StateMixin(object):
 
-    def __init__(self, str=None, attrs=None):
-        super(Label, self).__init__(str=str)
-        self.attrs = attrs or {}
-
-    def state_set(self, record):
-        if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
-        else:
-            state_changes = {}
-        if state_changes.get('invisible', self.attrs.get('invisible')):
-            self.hide()
-        else:
-            self.show()
-
-
-class VBox(gtk.VBox):
-
-    def __init__(self, homogeneous=False, spacing=0, attrs=None):
-        super(VBox, self).__init__(homogeneous, spacing)
-        self.attrs = attrs or {}
+    def __init__(self, *args, **kwargs):
+        self.attrs = kwargs.pop('attrs')
+        super(StateMixin, self).__init__(*args, **kwargs)
 
     def state_set(self, record):
         if record:
@@ -47,47 +29,43 @@ class VBox(gtk.VBox):
             self.show()
 
 
-class Image(gtk.Image):
-
-    def __init__(self, attrs=None):
-        super(Image, self).__init__()
-        self.attrs = attrs or {}
-
-    def state_set(self, record):
-        if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
-        else:
-            state_changes = {}
-        if state_changes.get('invisible', self.attrs.get('invisible')):
-            self.hide()
-        else:
-            self.show()
-        state_changes = self.attrs.get('states', {})
+class Label(StateMixin, gtk.Label):
+    pass
 
 
-class Frame(gtk.Frame):
+class VBox(StateMixin, gtk.VBox):
+    pass
+
+
+class Image(StateMixin, gtk.Image):
+    pass
+
+
+class Frame(StateMixin, gtk.Frame):
 
     def __init__(self, label=None, attrs=None, widgets=None):
         if not label:  # label must be None to have no label widget
             label = None
-        super(Frame, self).__init__(label=label)
-        self.attrs = attrs or {}
+        super(Frame, self).__init__(label=label, attrs=attrs)
         self.widgets = widgets or {}
         if not label:
             self.set_shadow_type(gtk.SHADOW_NONE)
         self.set_border_width(0)
 
+
+class ScrolledWindow(StateMixin, gtk.ScrolledWindow):
+    pass
+
+
+class Notebook(StateMixin, gtk.Notebook):
+
     def state_set(self, record):
+        super(Notebook, self).state_set(record)
         if record:
             state_changes = record.expr_eval(self.attrs.get('states', {}),
                     check_load=False)
         else:
             state_changes = {}
-        if state_changes.get('invisible', self.attrs.get('invisible')):
-            self.hide()
-        else:
-            self.show()
         if state_changes.get('readonly', self.attrs.get('readonly')):
             for widgets in self.widgets.itervalues():
                 for widget in widgets:
@@ -209,7 +187,7 @@ class ParserForm(ParserInterface):
     def parse(self, model_name, root_node, fields, notebook=None, paned=None,
             tooltips=None):
         dict_widget = {}
-        button_list = []
+        state_widgets = []
         notebook_list = []
         attrs = common.node_attributes(root_node)
         on_write = attrs.get('on_write', '')
@@ -240,8 +218,8 @@ class ParserForm(ParserInterface):
             colspan = int(attrs.get('colspan', 1))
             if node.localName == 'image':
                 common.ICONFACTORY.register_icon(attrs['name'])
-                icon = Image(attrs)
-                button_list.append(icon)
+                icon = Image(attrs=attrs)
+                state_widgets.append(icon)
                 icon.set_from_stock(attrs['name'], gtk.ICON_SIZE_DIALOG)
                 container.wid_add(icon,
                     help_tip=attrs.get('help', False),
@@ -259,7 +237,7 @@ class ParserForm(ParserInterface):
                     if not text:
                         text = fields[attrs['name']].attrs['string']
                 vbox = VBox(attrs=attrs)
-                button_list.append(vbox)
+                state_widgets.append(vbox)
                 if text:
                     label = gtk.Label(text)
                     label.set_alignment(float(attrs.get('xalign', 0.0)), 0.5)
@@ -300,8 +278,8 @@ class ParserForm(ParserInterface):
                 if not text:
                     container.empty_add(int(attrs.get('colspan', 1)))
                     continue
-                label = Label(text, attrs)
-                button_list.append(label)
+                label = Label(text, attrs=attrs)
+                state_widgets.append(label)
                 if CONFIG['client.modepda']:
                     attrs['xalign'] = 0.0
                 label.set_alignment(float(attrs.get('xalign', 1.0)),
@@ -319,7 +297,7 @@ class ParserForm(ParserInterface):
 
             elif node.localName == 'button':
                 button = Button(attrs)
-                button_list.append(button)
+                state_widgets.append(button)
                 container.wid_add(button,
                     help_tip=attrs.get('help', False),
                     colspan=colspan,
@@ -327,7 +305,8 @@ class ParserForm(ParserInterface):
                     xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'notebook':
-                notebook = gtk.Notebook()
+                notebook = Notebook(attrs=attrs)
+                state_widgets.append(notebook)
                 notebook.set_scrollable(True)
                 notebook_list.append(notebook)
                 if CONFIG['client.form_tab'] == 'top':
@@ -347,13 +326,13 @@ class ParserForm(ParserInterface):
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill,
                     xexpand=xexpand, xfill=xfill)
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
-                    = self.parse(model_name, node, fields, notebook,
-                        tooltips=tooltips)
+                (widget, widgets, state_widgets2, spam, notebook_list2,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        notebook, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                button_list += buttons
+                state_widgets += state_widgets2
                 for widget_name, widgets in widgets.items():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
@@ -404,13 +383,13 @@ class ParserForm(ParserInterface):
                     else:
                         tab_box.pack_start(icon)
                 tab_box.show_all()
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
-                    = self.parse(model_name, node, fields, notebook,
-                        tooltips=tooltips)
+                (widget, widgets, state_widgets2, spam, notebook_list2,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        notebook, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                button_list += buttons
+                state_widgets += state_widgets2
                 for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
@@ -425,7 +404,7 @@ class ParserForm(ParserInterface):
                         gtk.POLICY_AUTOMATIC)
                 scrolledwindow.add(viewport)
 
-                button_list.append(scrolledwindow)
+                state_widgets.append(scrolledwindow)
                 notebook.append_page(scrolledwindow, tab_box)
 
             elif node.localName == 'field':
@@ -470,15 +449,16 @@ class ParserForm(ParserInterface):
                     xexpand=xexpand, xfill=xfill)
 
             elif node.localName == 'group':
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
-                    = self.parse(model_name, node, fields, tooltips=tooltips)
+                (widget, widgets, state_widgets2, spam, notebook_list2,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
                 for widget_name, lwidgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(lwidgets)
-                button_list += buttons
+                state_widgets += state_widgets2
                 text = ''
                 if 'name' in attrs and attrs['name'] in fields:
                     if attrs['name'] == self.screen.exclude_field:
@@ -492,9 +472,9 @@ class ParserForm(ParserInterface):
                 if attrs.get('string'):
                     text = attrs['string']
 
-                frame = Frame(text, attrs, widgets=widgets)
+                frame = Frame(text, attrs=attrs, widgets=widgets)
                 frame.add(widget)
-                button_list.append(frame)
+                state_widgets.append(frame)
                 container.wid_add(frame,
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill, ypadding=0,
@@ -503,13 +483,13 @@ class ParserForm(ParserInterface):
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
                         yexpand=True, yfill=True)
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
-                    = self.parse(model_name, node, fields, paned=hpaned,
-                        tooltips=tooltips)
+                (widget, widgets, state_widgets, spam, notebook_list2,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        paned=hpaned, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                button_list += buttons
+                state_widgets += state_widgets
                 for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
@@ -519,26 +499,26 @@ class ParserForm(ParserInterface):
                 vpaned = gtk.VPaned()
                 container.wid_add(vpaned, colspan=int(attrs.get('colspan', 4)),
                         yexpand=True, yfill=True)
-                widget, widgets, buttons, spam, notebook_list, cursor_widget2\
-                    = self.parse(model_name, node, fields, paned=vpaned,
-                        tooltips=tooltips)
+                (widget, widgets, state_widgets2, spam, notebook_list,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        paned=vpaned, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                button_list += buttons
+                state_widgets += state_widgets2
                 for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
                 if 'position' in attrs:
                     vpaned.set_position(int(attrs['position']))
             elif node.localName == 'child':
-                widget, widgets, buttons, spam, notebook_list2, cursor_widget2\
-                    = self.parse(model_name, node, fields, paned=paned,
-                        tooltips=tooltips)
+                (widget, widgets, state_widgets2, spam, notebook_list2,
+                    cursor_widget2) = self.parse(model_name, node, fields,
+                        paned=paned, tooltips=tooltips)
                 if not cursor_widget:
                     cursor_widget = cursor_widget2
                 notebook_list.extend(notebook_list2)
-                button_list += buttons
+                state_widgets += state_widgets2
                 for widget_name, widgets in widgets.iteritems():
                     dict_widget.setdefault(widget_name, [])
                     dict_widget[widget_name].extend(widgets)
@@ -546,7 +526,7 @@ class ParserForm(ParserInterface):
                     paned.pack1(widget, resize=True, shrink=True)
                 elif not paned.get_child2():
                     paned.pack2(widget, resize=True, shrink=True)
-        return container.pop(), dict_widget, button_list, on_write, \
+        return container.pop(), dict_widget, state_widgets, on_write, \
                 notebook_list, cursor_widget
 
 from calendar import Calendar, DateTime, Time

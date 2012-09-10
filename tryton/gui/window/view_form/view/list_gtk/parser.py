@@ -92,7 +92,7 @@ class ParserTree(ParserInterface):
 
     def parse(self, model_name, root_node, fields):
         dict_widget = {}
-        button_list = []
+        state_widgets = []
         attrs = node_attributes(root_node)
         on_write = attrs.get('on_write', '')
         editable = attrs.get('editable', False)
@@ -242,7 +242,7 @@ class ParserTree(ParserInterface):
             elif node.localName == 'button':
                 #TODO add shortcut
                 cell = Button(treeview, self.screen, node_attrs)
-                button_list.append(cell)
+                state_widgets.append(cell)
                 renderer = cell.renderer
                 string = node_attrs.get('string', _('Unknown'))
                 col = gtk.TreeViewColumn(string, renderer)
@@ -282,7 +282,7 @@ class ParserTree(ParserInterface):
             col.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
             treeview.append_column(col)
         treeview.set_fixed_height_mode(True)
-        return treeview, dict_widget, button_list, on_write, [], None
+        return treeview, dict_widget, state_widgets, on_write, [], None
 
     def set_selection(self, treeview, direction):
         selection = treeview.get_selection()
