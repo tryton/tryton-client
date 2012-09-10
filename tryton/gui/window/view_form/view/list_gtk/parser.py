@@ -28,7 +28,6 @@ from tryton.common.cellrenderercombo import CellRendererCombo
 from tryton.common.cellrendererinteger import CellRendererInteger
 from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.common.cellrendererbinary import CellRendererBinary
-from tryton.action import Action
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
 
@@ -945,38 +944,7 @@ class Button(object):
         if state_changes.get('invisible') \
                 or state_changes.get('readonly'):
             return True
-
-        self.screen.current_record = record
-        obj_id = self.screen.save_current()
-        if obj_id:
-            if not self.attrs.get('confirm', False) or \
-                    common.sur(self.attrs['confirm']):
-                button_type = self.attrs.get('type', 'object')
-                ctx = record.context_get()
-                if button_type == 'object':
-                    try:
-                        RPCExecute('model', self.screen.model_name,
-                            self.attrs['name'], [obj_id], context=ctx)
-                    except RPCException:
-                        pass
-                elif button_type == 'action':
-                    try:
-                        action_id = RPCExecute('model', 'ir.action',
-                            'get_action_id', int(self.attrs['name']),
-                            context=ctx)
-                    except RPCException:
-                        action_id = None
-                    if action_id:
-                        Action.execute(action_id, {
-                            'model': self.screen.model_name,
-                            'id': obj_id,
-                            'ids': [obj_id],
-                            }, context=ctx)
-                else:
-                    raise Exception('Unallowed button type')
-                self.screen.reload([obj_id], written=True)
-            else:
-                self.screen.display()
+        self.screen.button(self.attrs)
 
 CELLTYPES = {
     'char': Char,

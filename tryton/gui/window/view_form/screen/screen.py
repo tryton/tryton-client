@@ -18,7 +18,8 @@ from tryton.exceptions import TrytonServerError, TrytonServerUnavailable
 from tryton.jsonrpc import JSONEncoder
 from tryton.common.domain_parser import DomainParser
 from tryton.common import RPCExecute, RPCException, MODELACCESS, \
-    node_attributes
+    node_attributes, sur
+from tryton.action import Action
 
 
 class Screen(SignalEvent):
@@ -797,3 +798,23 @@ class Screen(SignalEvent):
         if self.model_name == 'res.request':
             from tryton.gui.main import Main
             Main.get_main().request_set()
+
+    def button(self, button):
+        'Execute button on the current record'
+        if button.get('confirm', False) and not sur(button['confirm']):
+            return
+        record = self.current_record
+        record.save(force_reload=False)
+        context = record.context_get()
+        try:
+            action_id = RPCExecute('model', self.model_name, button['name'],
+                [record.id], context=context)
+        except RPCException:
+            action_id = None
+        if action_id:
+            Action.execute(action_id, {
+                    'model': self.model_name,
+                    'id': record.id,
+                    'ids': [record.id],
+                    }, context=context)
+        self.reload([record.id], written=True)

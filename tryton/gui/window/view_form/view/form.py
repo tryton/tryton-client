@@ -5,10 +5,7 @@ from functools import reduce
 import gtk
 import gettext
 import gobject
-import tryton.common as common
 from interface import ParserView
-from tryton.action import Action
-from tryton.common import RPCExecute, RPCException
 
 _ = gettext.gettext
 
@@ -174,37 +171,9 @@ class ViewForm(ParserView):
 
     def button_clicked(self, widget):
         record = self.screen.current_record
-        attrs = widget.attrs
         fields = self.get_fields()
-        if record.validate(fields):
-            # Don't reload as it will be done after the RPC call
-            record.save(force_reload=False)
-            if not attrs.get('confirm', False) or \
-                    common.sur(attrs['confirm']):
-                button_type = attrs.get('type', 'object')
-                context = record.context_get()
-                if button_type == 'object':
-                    try:
-                        RPCExecute('model', self.screen.model_name,
-                            attrs['name'], [record.id], context=context)
-                    except RPCException:
-                        pass
-                elif button_type == 'action':
-                    action_id = None
-                    try:
-                        action_id = RPCExecute('model', 'ir.action',
-                            'get_action_id', int(attrs['name']),
-                            context=context)
-                    except RPCException:
-                        pass
-                    if action_id:
-                        Action.execute(action_id, {
-                            'model': self.screen.model_name,
-                            'id': record.id,
-                            'ids': [record.id],
-                            }, context=context)
-                else:
-                    raise Exception('Unallowed button type')
-                self.screen.reload([record.id], written=True)
-        else:
+        if not record.validate(fields):
             self.screen.display()
+            return
+        else:
+            self.screen.button(widget.attrs)
