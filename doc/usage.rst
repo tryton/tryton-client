@@ -948,14 +948,14 @@ text formatting. The features are:
   * Underline: On/off style of underline text
   * Choose font family: Choice from a combo box the desired font family
   * Choose font size: Choice from a combo box the desired size font
-  * Text justify: Choice between four options for alignment of the line (left, 
+  * Text justify: Choice between four options for alignment of the line (left,
     right, center, fill)
   * Background color: Choose the background color of text from a color palette
   * Foreground color: Choose the foreground color of text from a color palette
 
-Besides these features, it can change and edit text markup. The text markup 
-feature has a similar HTML tags and is used to describe the format specified by 
-the user and is a way of storing this format for future opening of a correct 
+Besides these features, it can change and edit text markup. The text markup
+feature has a similar HTML tags and is used to describe the format specified by
+the user and is a way of storing this format for future opening of a correct
 formatted text. The tags are explain follows:
 
   * Bold: Tag `b` is used, i.e. <b>text</b>
