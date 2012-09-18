@@ -133,16 +133,18 @@ class TextBox(WidgetInterface, TranslateMixin):
     def set_value(self, record, field):
         field.set_client(record, self.get_value())
 
-    def display(self, record, field):
-        super(TextBox, self).display(record, field)
-        value = field and field.get(record)
-        if not value:
-            value = ''
+    def set_buffer(self, value):
         buf = self.textview.get_buffer()
         buf.delete(buf.get_start_iter(), buf.get_end_iter())
         iter_start = buf.get_start_iter()
         buf.insert(iter_start, value)
 
+    def display(self, record, field):
+        super(TextBox, self).display(record, field)
+        value = field and field.get(record)
+        if not value:
+            value = ''
+        self.set_buffer(value)
         if gtkspell:
             spell = None
             try:
