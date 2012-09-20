@@ -38,6 +38,7 @@ class Fault(xmlrpclib.Fault):
             (repr(self.faultCode), repr(self.faultString))
             )
 
+
 class ProtocolError(xmlrpclib.ProtocolError):
     pass
 
