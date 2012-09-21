@@ -50,7 +50,7 @@ class WinForm(NoModal):
         self.but_cancel = None
         self.but_ok = None
         self.but_new = None
-        if new:
+        if new or self.save_current:
             icon_cancel = gtk.STOCK_CANCEL
             self.but_cancel = self.win.add_button(icon_cancel,
                     gtk.RESPONSE_CANCEL)
@@ -62,8 +62,18 @@ class WinForm(NoModal):
             self.but_new.set_focus_on_click(False)
             self.but_new.set_accel_path('<tryton>/Form/New', self.accel_group)
 
-        self.but_ok = self.win.add_button(gtk.STOCK_OK,
-            gtk.RESPONSE_OK)
+        if self.save_current:
+            self.but_ok = gtk.Button(_('_Save'))
+            img_save = gtk.Image()
+            img_save.set_from_stock('tryton-save', gtk.ICON_SIZE_BUTTON)
+            self.but_ok.set_image(img_save)
+            self.but_ok.set_accel_path('<tryton>/Form/Save', self.accel_group)
+            self.but_ok.set_can_default(True)
+            self.but_ok.show()
+            self.win.add_action_widget(self.but_ok, gtk.RESPONSE_OK)
+        else:
+            self.but_ok = self.win.add_button(gtk.STOCK_OK,
+                gtk.RESPONSE_OK)
         self.but_ok.set_focus_on_click(False)
         self.but_ok.add_accelerator('clicked', self.accel_group,
             gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
@@ -255,6 +265,12 @@ class WinForm(NoModal):
             self.screen.screen_container.alternate_viewport.connect(
                     'key-press-event', self.on_keypress)
 
+        if self.save_current:
+            self.screen.signal_connect(self, 'record-message',
+                self.activate_save)
+            self.screen.signal_connect(self, 'record-modified',
+                self.activate_save)
+
         self.register()
         self.win.show()
 
@@ -365,6 +381,12 @@ class WinForm(NoModal):
                 self.but_remove.set_sensitive(False)
         line = '(%s/%s)' % (name, signal_data[1])
         self.label.set_text(line)
+
+    def activate_save(self, *args):
+        modified = self.screen.modified()
+        self.but_ok.props.sensitive = modified
+        self.win.set_default_response(
+            gtk.RESPONSE_OK if modified else gtk.RESPONSE_CANCEL)
 
     def response(self, win, response_id):
         validate = False
