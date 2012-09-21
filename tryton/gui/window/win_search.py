@@ -120,6 +120,8 @@ class WinSearch(NoModal):
                     record = screen.current_record
                     res = [(record.id, record.value.get('rec_name', ''))]
                     self.callback(res)
+                else:
+                    self.callback(None)
             self.destroy()
             WinForm(screen, callback, new=True)
             return

@@ -286,6 +286,7 @@ class Many2One(WidgetInterface):
                 and editable):
             self.sig_activate(widget, event, key_press=True)
         elif (self.has_target(self.field.get(self.record))
+                and editable
                 and event.keyval in (gtk.keysyms.Delete,
                     gtk.keysyms.BackSpace)):
             self.wid_text.set_text('')
