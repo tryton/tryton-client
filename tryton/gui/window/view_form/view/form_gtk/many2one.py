@@ -171,6 +171,8 @@ class Many2One(WidgetInterface):
                     if result:
                         self.field.set_client(self.record,
                             self.value_from_id(*result[0]), force_change=True)
+                    else:
+                        self.wid_text.set_text('')
                     self.focus_out = True
                     self.changed = True
 
