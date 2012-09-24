@@ -58,7 +58,7 @@ class Action(object):
         if not action_type:
             res = False
             try:
-                res = RPCExecute('model', 'ir.action', 'read', act_id,
+                res, = RPCExecute('model', 'ir.action', 'read', [act_id],
                     ['type'], context=context)
             except RPCException:
                 return
@@ -66,7 +66,7 @@ class Action(object):
                 raise Exception('ActionNotFound')
             action_type = res['type']
         try:
-            res = RPCExecute('model', action_type, 'search_read',
+            res, = RPCExecute('model', action_type, 'search_read',
                 [('action', '=', act_id)], 0, 1, None, None,
                 context=context)
         except RPCException:

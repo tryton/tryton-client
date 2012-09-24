@@ -42,8 +42,8 @@ class Board(SignalEvent, TabContent):
         super(Board, self).__init__()
 
         try:
-            view = RPCExecute('model', 'ir.ui.view', 'read',
-                view_id, ['arch'], context=context)
+            view, = RPCExecute('model', 'ir.ui.view', 'read',
+                [view_id], ['arch'], context=context)
         except RPCException:
             raise
 

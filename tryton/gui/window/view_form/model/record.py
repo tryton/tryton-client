@@ -285,9 +285,8 @@ class Record(SignalEvent):
                     context = context.copy()
                     context['_timestamp'] = self.get_timestamp()
                     try:
-                        if not RPCExecute('model', self.model_name, 'write',
-                                [self.id], value, context=context):
-                            return False
+                        RPCExecute('model', self.model_name, 'write',
+                            [self.id], value, context=context)
                     except RPCException:
                         return False
             self._loaded.clear()
@@ -352,8 +351,8 @@ class Record(SignalEvent):
 
     def rec_name(self):
         try:
-            return RPCExecute('model', self.model_name, 'read', self.id,
-                ['rec_name'], context=self.context_get())['rec_name']
+            return RPCExecute('model', self.model_name, 'read', [self.id],
+                ['rec_name'], context=self.context_get())[0]['rec_name']
         except RPCException:
             return ''
 
@@ -533,7 +532,7 @@ class Record(SignalEvent):
         if fieldnames:
             try:
                 result = RPCExecute('model', self.model_name, 'on_change_with',
-                    list(fieldnames), values, context=self.context_get())
+                    values, list(fieldnames), context=self.context_get())
             except RPCException:
                 return
             for fieldname, value in result.items():

@@ -211,17 +211,17 @@ class TranslateDialog(NoModal):
                 )
             try:
                 value = RPCExecute('model', self.widget.record.model_name,
-                    'read', self.widget.record.id, [self.widget.field_name],
+                    'read', [self.widget.record.id], [self.widget.field_name],
                     context={'language': language['code']}
-                    )[self.widget.field_name]
+                    )[0][self.widget.field_name]
             except RPCException:
                 return
             context['fuzzy_translation'] = True
             try:
                 fuzzy_value = RPCExecute('model',
                     self.widget.record.model_name, 'read',
-                    self.widget.record.id, [self.widget.field_name],
-                    context=context)[self.widget.field_name]
+                    [self.widget.record.id], [self.widget.field_name],
+                    context=context)[0][self.widget.field_name]
             except RPCException:
                 return
             widget = self.widget.translate_widget()
@@ -276,7 +276,7 @@ class TranslateDialog(NoModal):
                     )
                 try:
                     RPCExecute('model', self.widget.record.model_name, 'write',
-                        self.widget.record.id, {
+                        [self.widget.record.id], {
                             self.widget.field_name: value,
                             }, context=context)
                 except RPCException:

@@ -420,8 +420,8 @@ class M2OField(CharField):
                 value = None
         if not rec_name and value >= 0:
             try:
-                result = RPCExecute('model', self.attrs['relation'], 'read',
-                    value, ['rec_name'])
+                result, = RPCExecute('model', self.attrs['relation'], 'read',
+                    [value], ['rec_name'])
             except RPCException:
                 return False
             rec_name = result['rec_name'] or ''
@@ -543,7 +543,7 @@ class O2MField(CharField):
                     get_readonly=readonly, get_modifiedonly=modified)
                 values.pop(parent_name, None)
                 if record2.modified and values:
-                    result.append(('write', record2.id, values))
+                    result.append(('write', [record2.id], values))
                 result[0][1].append(record2.id)
             else:
                 values = record2.get(check_load=check_load,
@@ -854,7 +854,7 @@ class ReferenceField(CharField):
         if ref_model and ref_id >= 0:
             if not rec_name and ref_id >= 0:
                 try:
-                    result = RPCExecute('model', ref_model, 'read', ref_id,
+                    result, = RPCExecute('model', ref_model, 'read', [ref_id],
                         ['rec_name'])
                 except RPCException:
                     return
