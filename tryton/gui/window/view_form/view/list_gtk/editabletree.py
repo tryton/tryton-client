@@ -7,6 +7,7 @@ import gobject
 
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
+from tryton.common import MODELACCESS
 
 _ = gettext.gettext
 
@@ -52,6 +53,9 @@ class EditableTreeView(gtk.TreeView):
             pass
 
     def on_create_line(self):
+        access = MODELACCESS[self.screen.model_name]
+        if not access['create']:
+            return
         model = self.get_model()
         if self.editable == 'top':
             method = model.prepend
