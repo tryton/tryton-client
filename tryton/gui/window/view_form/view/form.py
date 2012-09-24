@@ -74,14 +74,16 @@ class ViewForm(ParserView):
             for widget in widgets:
                 widget.cancel()
 
-    def set_value(self):
+    def set_value(self, focused_widget=False):
         record = self.screen.current_record
         if record:
             for name, widgets in self.widgets.iteritems():
                 if name in record.group.fields:
                     field = record.group.fields[name]
                     for widget in widgets:
-                        widget.set_value(record, field)
+                        if (not focused_widget
+                                or widget.widget.get_focus_child()):
+                            widget.set_value(record, field)
 
     def sel_ids_get(self):
         if self.screen.current_record:
@@ -167,7 +169,7 @@ class ViewForm(ParserView):
 
     def leave(self, widget, event):
         # leave could be called during event process
-        gobject.idle_add(self.set_value)
+        gobject.idle_add(self.set_value, True)
 
     def button_clicked(self, widget):
         record = self.screen.current_record

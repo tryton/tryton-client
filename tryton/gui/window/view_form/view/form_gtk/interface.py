@@ -166,7 +166,7 @@ class WidgetInterface(object):
 
     def enter(self, widget, event):
         if self.view:
-            self.view.set_value()
+            self.view.set_value(focused_widget=True)
 
 
 class TranslateDialog(NoModal):
