@@ -349,6 +349,7 @@ class WizardDialog(Wizard, NoModal):
             dialog = self.page
         if (hasattr(dialog, 'screen')
                 and dialog.screen.current_record
+                and self.sensible_widget != main.window
                 and self.ids):
             dialog.screen.reload(self.ids, written=True)
 
