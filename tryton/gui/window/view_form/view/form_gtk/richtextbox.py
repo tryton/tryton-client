@@ -151,7 +151,8 @@ class RichTextBox(TextBox):
                 self.action_prop_font, tag)
         self.tool_ids['markup'] = self.tools['markup'].connect('toggled',
             self.edit_text_markup)
-        self.text_buffer.connect_after('insert-text', self.persist_style)
+        self.insert_text_id = self.text_buffer.connect_after('insert-text',
+            self.persist_style)
         # Tooltip text
         self.tools['bold'].set_tooltip_text(_('Change text to bold'))
         self.tools['italic'].set_tooltip_text(_('Change text to italic'))
@@ -170,15 +171,15 @@ class RichTextBox(TextBox):
             _('Change the background text'))
         self.tools['markup'].set_tooltip_text(_('Change the markup text view'))
         # Packing widgets
-        tool_bar = gtk.Toolbar()
+        self.tool_bar = gtk.Toolbar()
 
-        tool_bar.set_style(gtk.TOOLBAR_ICONS)
+        self.tool_bar.set_style(gtk.TOOLBAR_ICONS)
         for tag in tags:
-            tool_bar.insert(self.tools[tag], -1)
+            self.tool_bar.insert(self.tools[tag], -1)
         separator = gtk.SeparatorToolItem
         for local in (3, 6, 11, 14):
-            tool_bar.insert(separator(), local)
-        self.widget.pack_start(tool_bar, False)
+            self.tool_bar.insert(separator(), local)
+        self.widget.pack_start(self.tool_bar, False)
         self.widget.connect('enter-notify-event', self.enter)
 
     def get_value_markup(self):
@@ -195,10 +196,18 @@ class RichTextBox(TextBox):
         return False
 
     def set_value(self, record, field):
+        # Popup for font_family and size should not trigger set_value from
+        # Form.leave otherwise the selection is lost
+        for tag in ('font_family', 'size'):
+            tool = self.tools[tag]
+            if (hasattr(tool.child.props, 'popup_shown')
+                    and tool.child.props.popup_shown):
+                return
         if self.modified:
             field.set_client(record, self.get_value_markup())
 
     def set_buffer(self, value):
+        self.text_buffer.handler_block(self.insert_text_id)
         if self.tools['markup'].get_active():
             super(RichTextBox, self).set_buffer(value)
         else:
@@ -208,6 +217,7 @@ class RichTextBox(TextBox):
                 text_buffer.serialize(text_buffer,
                     "application/x-gtk-text-buffer-rich-text",
                     text_buffer.get_start_iter(), text_buffer.get_end_iter()))
+        self.text_buffer.handler_unblock(self.insert_text_id)
 
     def _focus_out(self):
         if not self.focus_out:
@@ -220,6 +230,12 @@ class RichTextBox(TextBox):
                     and tool.child.props.popup_shown):
                 return
         super(RichTextBox, self)._focus_out()
+
+    def _readonly_set(self, value):
+        super(RichTextBox, self)._readonly_set(value)
+        self.tool_bar.set_sensitive(not value)
+        if value and self.tools['markup'].get_active():
+            self.tools['markup'].set_active(False)
 
     def edit_text_markup(self, widget):
         '''on/off all buttons and call the appropriate parser'''
@@ -234,7 +250,7 @@ class RichTextBox(TextBox):
             for tag in tags:
                 self.tools[tag].set_sensitive(True)
             text = self.text_buffer.get_text(self.text_buffer.get_start_iter(),
-                self.text_buffer.get_end_iter())
+                self.text_buffer.get_end_iter()).decode('utf-8')
         self.set_buffer(text)
 
     def parser_to_text_markup(self, buffer_):
@@ -288,7 +304,7 @@ class RichTextBox(TextBox):
             if not imark.forward_to_tag_toggle(None):
                 break
         text = text_buffer.get_text(text_buffer.get_start_iter(),
-            text_buffer.get_end_iter())
+            text_buffer.get_end_iter()).decode('utf-8')
         return formalize_text_markup(text)
 
     def parser_from_text_markup(self, text):

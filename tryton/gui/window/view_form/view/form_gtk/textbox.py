@@ -68,7 +68,8 @@ class TextBox(WidgetInterface, TranslateMixin):
     def translate_widget_get(widget):
         textview = widget.get_child()
         buf = textview.get_buffer()
-        return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+        return buf.get_text(buf.get_start_iter(), buf.get_end_iter(),
+            False).decode('utf-8')
 
     @staticmethod
     def translate_widget_set_readonly(widget, value):
@@ -128,7 +129,7 @@ class TextBox(WidgetInterface, TranslateMixin):
         buf = self.textview.get_buffer()
         iter_start = buf.get_start_iter()
         iter_end = buf.get_end_iter()
-        return buf.get_text(iter_start, iter_end, False)
+        return buf.get_text(iter_start, iter_end, False).decode('utf-8')
 
     def set_value(self, record, field):
         field.set_client(record, self.get_value())
