@@ -246,6 +246,9 @@ class Group(SignalEvent, list):
         ctx = self._context.copy()
         if self.parent:
             ctx.update(self.parent.context_get())
+            if self.child_name in self.parent.group.fields:
+                field = self.parent.group.fields[self.child_name]
+                ctx.update(field.context_get(self.parent))
         ctx.update(self._context)
         if self.parent_datetime_field:
             ctx['_datetime'] = self.parent.get_eval(check_load=False
