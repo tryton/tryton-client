@@ -346,6 +346,10 @@ class ViewList(ParserView):
                 and event.state & gtk.gdk.CONTROL_MASK):
             self.on_copy()
             return False
+        if (event.keyval == gtk.keysyms.v
+                and event.state & gtk.gdk.CONTROL_MASK):
+            self.on_paste()
+            return False
         if event.keyval in (gtk.keysyms.Down, gtk.keysyms.Up):
             path, column = widget.get_cursor()
             if not path:
@@ -446,6 +450,53 @@ class ViewList(ParserView):
     def copy_clear_func(self, clipboard, selection):
         del selection
         return
+
+    def on_paste(self):
+        if (not hasattr(self.widget_tree, 'editable')
+                or not self.widget_tree.editable):
+            return
+
+        def unquote(value):
+            if value[:1] == '"' and value[-1:] == '"':
+                return value[1:-1]
+            return value
+        data = []
+        for clipboard_type in (gtk.gdk.SELECTION_CLIPBOARD,
+                gtk.gdk.SELECTION_PRIMARY):
+            clipboard = self.widget_tree.get_clipboard(clipboard_type)
+            text = clipboard.wait_for_text()
+            if not text:
+                continue
+            data = [[unquote(v) for v in l.split('\t')]
+                for l in text.splitlines()]
+            break
+        col = self.widget_tree.get_cursor()[1]
+        columns = [c for c in self.widget_tree.get_columns()
+            if c.get_visible() and c.name]
+        if col in columns:
+            idx = columns.index(col)
+            columns = columns[idx:]
+        record = self.screen.current_record
+        group = record.group
+        idx = group.index(record)
+        for line in data:
+            record = group[idx]
+            for col, value in zip(columns, line):
+                cell = self.widget_tree.cells[col.name]
+                if cell.get_textual_value(record) != value:
+                    cell.value_from_text(record, value)
+                    if cell.get_textual_value(record) != value:
+                        # Stop setting value if a value is correctly set
+                        idx = len(group)
+                        break
+            if not record.validate():
+                break
+            idx += 1
+            if idx >= len(group):
+                # TODO create new record
+                break
+        self.screen.current_record = record
+        self.screen.display(set_cursor=True)
 
     def drag_begin(self, treeview, context):
         return True
@@ -556,6 +607,9 @@ class ViewList(ParserView):
                 copy_item = gtk.ImageMenuItem('gtk-copy')
                 copy_item.connect('activate', lambda x: self.on_copy())
                 menu.append(copy_item)
+                paste_item = gtk.ImageMenuItem('gtk-paste')
+                paste_item.connect('activate', lambda x: self.on_paste())
+                menu.append(paste_item)
                 # Don't activate actions if parent is modified
                 parent = record.parent if record else None
                 while parent:

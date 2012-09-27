@@ -596,9 +596,8 @@ class M2O(Char):
                 callback()
             return
         if len(ids) != 1:
-            if callback:
-                self.search_remote(record, relation, ids, domain=domain,
-                    context=context, callback=callback)
+            self.search_remote(record, relation, ids, domain=domain,
+                context=context, callback=callback)
             return
         field.set_client(record, ids[0])
         if callback:

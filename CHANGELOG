@@ -1,3 +1,4 @@
+* Allow to paste in editable list view
 * Manage readonly state on group
 * Remove "Please wait" box
 * Refactorize date widgets
