@@ -268,7 +268,7 @@ class TimeField(CharField):
 
     def get_client(self, record):
         value = super(TimeField, self).get_client(record)
-        if value:
+        if value is not None:
             return value.strftime(self.time_format(record))
         return ''
 
