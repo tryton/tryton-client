@@ -398,6 +398,8 @@ class WinForm(NoModal):
                 and self.screen.current_record is not None):
             validate = self.screen.current_record.validate(
                 self.screen.current_view.get_fields())
+            if validate and self.screen.pre_validate:
+                validate = self.screen.current_record.pre_validate()
             if validate and self.save_current:
                 if not self.screen.save_current():
                     validate = False

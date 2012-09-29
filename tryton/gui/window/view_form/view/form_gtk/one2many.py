@@ -173,6 +173,7 @@ class One2Many(WidgetInterface):
             views_preload=attrs.get('views', {}),
             row_activate=self._on_activate,
             exclude_field=attrs.get('relation_field', None))
+        self.screen.pre_validate = bool(int(attrs.get('pre_validate', 0)))
         self.screen.signal_connect(self, 'record-message', self._sig_label)
 
         self.widget.pack_start(self.screen.widget, expand=True, fill=True)
@@ -282,16 +283,23 @@ class One2Many(WidgetInterface):
                     and access['write']
                     and access['read']))
 
-    def _sig_new(self, widget):
-        if not common.MODELACCESS[self.screen.model_name]['create']:
-            return
+    def _validate(self):
         self.view.set_value()
         record = self.screen.current_record
         if record:
             fields = self.screen.current_view.get_fields()
             if not record.validate(fields):
                 self.screen.display()
-                return
+                return False
+            if self.screen.pre_validate and not record.pre_validate():
+                return False
+        return True
+
+    def _sig_new(self, widget):
+        if not common.MODELACCESS[self.screen.model_name]['create']:
+            return
+        if not self._validate():
+            return
         ctx = {}
         ctx.update(self.field.context_get(self.record))
         sequence = None
@@ -316,33 +324,20 @@ class One2Many(WidgetInterface):
     def _sig_edit(self, widget=None):
         if not common.MODELACCESS[self.screen.model_name]['read']:
             return
-        self.view.set_value()
+        if not self._validate():
+            return
         record = self.screen.current_record
         if record:
-            fields = self.screen.current_view.get_fields()
-            if not record.validate(fields):
-                self.screen.display()
-                return
             WinForm(self.screen, lambda a: None)
 
     def _sig_next(self, widget):
-        self.view.set_value()
-        record = self.screen.current_record
-        if record:
-            fields = self.screen.current_view.get_fields()
-            if not record.validate(fields):
-                self.screen.display()
-                return
+        if not self._validate():
+            return
         self.screen.display_next()
 
     def _sig_previous(self, widget):
-        self.view.set_value()
-        record = self.screen.current_record
-        if record:
-            fields = self.screen.current_view.get_fields()
-            if not record.validate(fields):
-                self.screen.display()
-                return
+        if not self._validate():
+            return
         self.screen.display_prev()
 
     def _sig_remove(self, widget, remove=False):

@@ -264,6 +264,15 @@ class Record(SignalEvent):
             result.update(field.get_timestamp(self))
         return result
 
+    def pre_validate(self):
+        values = self.get()
+        try:
+            RPCExecute('model', self.model_name, 'pre_validate', values,
+                context=self.context_get())
+        except RPCException:
+            return False
+        return True
+
     def save(self, force_reload=True):
         if self.id < 0 or self.modified:
             if self.id < 0:

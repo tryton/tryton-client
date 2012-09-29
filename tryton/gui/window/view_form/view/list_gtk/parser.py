@@ -710,6 +710,7 @@ class O2M(Char):
 
         screen = Screen(relation, mode=['tree', 'form'],
             exclude_field=field.attrs.get('relation_field'))
+        screen.pre_validate = bool(int(self.attrs.get('pre_validate', 0)))
         screen.group = group
 
         def open_callback(result):

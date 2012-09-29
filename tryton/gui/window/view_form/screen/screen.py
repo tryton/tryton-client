@@ -81,6 +81,7 @@ class Screen(SignalEvent):
         self.expanded_nodes = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
         self.domain_parser = None
+        self.pre_validate = False
 
         if mode:
             self.view_to_load = mode[1:]

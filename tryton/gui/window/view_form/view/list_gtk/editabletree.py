@@ -184,6 +184,9 @@ class EditableTreeView(gtk.TreeView):
                         break
                 self.set_cursor(path, col, True)
                 return True
+            if self.screen.pre_validate:
+                if not record.pre_validate():
+                    return True
             if not self.screen.parent:
                 obj_id = record.save()
                 if not obj_id:

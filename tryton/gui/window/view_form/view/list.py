@@ -762,14 +762,14 @@ class ViewList(ParserView):
             else:
                 self.screen.current_record = None
 
-        if hasattr(self.widget_tree, 'editable') \
-                and self.widget_tree.editable \
-                and not self.screen.parent \
-                and previous_record != self.screen.current_record:
-            if previous_record:
-                def go_previous():
-                    self.screen.current_record = previous_record
-                    self.set_cursor()
+        if (hasattr(self.widget_tree, 'editable')
+                and self.widget_tree.editable
+                and previous_record):
+            def go_previous():
+                self.screen.current_record = previous_record
+                self.set_cursor()
+            if (not self.screen.parent
+                    and previous_record != self.screen.current_record):
 
                 def save():
                     if not previous_record.destroyed:
@@ -781,6 +781,15 @@ class ViewList(ParserView):
                     return True
                 # Delay the save to let GTK process the current event
                 gobject.idle_add(save)
+            elif (previous_record != self.screen.current_record
+                    and self.screen.pre_validate):
+
+                def pre_validate():
+                    if not previous_record.destroyed:
+                        if not previous_record.pre_validate():
+                            go_previous()
+                # Delay the pre_validate to let GTK process the current event
+                gobject.idle_add(pre_validate)
         self.update_children()
 
     def set_value(self):
