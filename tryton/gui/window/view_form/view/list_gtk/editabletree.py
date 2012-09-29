@@ -4,15 +4,45 @@ import gtk
 import parser
 import gettext
 import gobject
+from itertools import islice, cycle
 
-from tryton.common.cellrendererbutton import CellRendererButton
-from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common import MODELACCESS
 
 _ = gettext.gettext
 
 
-class EditableTreeView(gtk.TreeView):
+class TreeView(gtk.TreeView):
+
+    def __init__(self):
+        super(TreeView, self).__init__()
+        self.cells = {}
+
+    def next_column(self, path, column=None, _sign=1):
+        columns = self.get_columns()
+        if column is None:
+            column = columns[-1 * _sign]
+        model = self.get_model()
+        record = model.get_value(model.get_iter(path), 0)
+        if _sign < 0:
+            columns.reverse()
+        current_idx = columns.index(column) + 1
+        for column in islice(cycle(columns), current_idx,
+                len(columns) + current_idx):
+            if not column.name:
+                continue
+            field = record[column.name]
+            field.state_set(record, states=('readonly', 'invisible'))
+            invisible = field.get_state_attrs(record).get('invisible', False)
+            readonly = field.get_state_attrs(record).get('readonly', False)
+            if not (invisible or readonly):
+                break
+        return column
+
+    def prev_column(self, path, column=None):
+        return self.next_column(path, column=column, _sign=-1)
+
+
+class EditableTreeView(TreeView):
     leaving_record_events = (gtk.keysyms.Up, gtk.keysyms.Down,
             gtk.keysyms.Return)
     leaving_events = leaving_record_events + (gtk.keysyms.Tab,
@@ -21,7 +51,6 @@ class EditableTreeView(gtk.TreeView):
     def __init__(self, position):
         super(EditableTreeView, self).__init__()
         self.editable = position
-        self.cells = {}
 
     def on_quit_cell(self, current_record, fieldname, value, callback=None):
         field = current_record[fieldname]
@@ -32,6 +61,8 @@ class EditableTreeView(gtk.TreeView):
         # The value has not changed and is valid ... do nothing.
         if value == cell.get_textual_value(current_record) \
                 and field.validate(current_record):
+            if callback:
+                callback()
             return
 
         try:
@@ -66,44 +97,6 @@ class EditableTreeView(gtk.TreeView):
                 context=ctx)
         res = method(new_record)
         return res
-
-    def __next_column(self, col):
-        cols = self.get_columns()
-        current = cols.index(col)
-        for i in xrange(len(cols)):
-            idx = (current + i + 1) % len(cols)
-            if not cols[idx].get_cell_renderers():
-                continue
-            renderer = cols[idx].get_cell_renderers()[-1]
-            if isinstance(renderer, CellRendererToggle):
-                editable = renderer.get_property('activatable')
-            elif isinstance(renderer,
-                    (gtk.CellRendererProgress, CellRendererButton)):
-                editable = False
-            else:
-                editable = renderer.get_property('editable')
-            if cols[idx].get_visible() and editable:
-                break
-        return cols[idx]
-
-    def __prev_column(self, col):
-        cols = self.get_columns()
-        current = cols.index(col)
-        for i in xrange(len(cols)):
-            idx = (current - (i + 1)) % len(cols)
-            if not cols[idx].get_cell_renderers():
-                continue
-            renderer = cols[idx].get_cell_renderers()[-1]
-            if isinstance(renderer, CellRendererToggle):
-                editable = renderer.get_property('activatable')
-            elif isinstance(renderer,
-                    (gtk.CellRendererProgress, CellRendererButton)):
-                editable = False
-            else:
-                editable = renderer.get_property('editable')
-            if cols[idx].get_visible() and editable:
-                break
-        return cols[idx]
 
     def set_cursor(self, path, focus_column=None, start_editing=False):
         self.grab_focus()
@@ -166,67 +159,45 @@ class EditableTreeView(gtk.TreeView):
                     if (keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter)
                             or (keyval == gtk.keysyms.Right and leaving)):
                         gobject.idle_add(self.set_cursor, path,
-                            self.__next_column(column), True)
+                            self.next_column(path, column), True)
                     elif (keyval == gtk.keysyms.ISO_Left_Tab
                             or (keyval == gtk.keysyms.Left and leaving)):
                         gobject.idle_add(self.set_cursor, path,
-                            self.__prev_column(column), True)
+                            self.prev_column(path, column), True)
+                    elif keyval in self.leaving_record_events:
+                        fields = self.cells.keys()
+                        if not record.validate(fields):
+                            invalid_fields = record.invalid_fields
+                            col = None
+                            for col in self.get_columns():
+                                if col.name in invalid_fields:
+                                    break
+                            gobject.idle_add(self.set_cursor, path, col, True)
+                            return
+                        if ((self.screen.pre_validate
+                                    and not record.pre_validate())
+                                or (not self.screen.parent
+                                    and not record.save())):
+                            gobject.idle_add(self.set_cursor, path, column,
+                                True)
+                            return
+                        entry.handler_block(entry.editing_done_id)
+                        if keyval == gtk.keysyms.Up:
+                            self._key_up(path, model, column)
+                        elif keyval == gtk.keysyms.Down:
+                            self._key_down(path, model, column)
+                        elif keyval == gtk.keysyms.Return:
+                            if self.editable == 'top':
+                                new_path = self._key_up(path, model)
+                            else:
+                                new_path = self._key_down(path, model)
+                            gobject.idle_add(self.set_cursor, new_path,
+                                self.next_column(new_path), True)
+                        entry.handler_unblock(entry.editing_done_id)
                 else:
                     gobject.idle_add(self.set_cursor, path, column, True)
             self.on_quit_cell(record, column.name, txt, callback=callback)
-        if event.keyval in self.leaving_record_events:
-            fields = self.cells.keys()
-            if not record.validate(fields):
-                invalid_fields = record.invalid_fields
-                col = None
-                for col in self.get_columns():
-                    if col.name in invalid_fields:
-                        break
-                self.set_cursor(path, col, True)
-                return True
-            if self.screen.pre_validate:
-                if not record.pre_validate():
-                    return True
-            if not self.screen.parent:
-                obj_id = record.save()
-                if not obj_id:
-                    return True
-        if event.keyval in (gtk.keysyms.Tab, gtk.keysyms.KP_Enter) \
-                or (event.keyval == gtk.keysyms.Right and leaving):
-            new_col = self.__next_column(column)
-            self.set_cursor(path, new_col, True)
-        elif event.keyval == gtk.keysyms.ISO_Left_Tab \
-                or (event.keyval == gtk.keysyms.Left and leaving):
-            new_col = self.__prev_column(column)
-            self.set_cursor(path, new_col, True)
-        elif event.keyval == gtk.keysyms.Up:
-            entry.handler_block(entry.editing_done_id)
-            self._key_up(path, model, column)
-            entry.handler_unblock(entry.editing_done_id)
-        elif event.keyval == gtk.keysyms.Down:
-            entry.handler_block(entry.editing_done_id)
-            self._key_down(path, model, column)
-            entry.handler_unblock(entry.editing_done_id)
-        elif event.keyval in (gtk.keysyms.Return,):
-            col = None
-            for column in self.get_columns():
-                renderer = column.get_cell_renderers()[-1]
-                if isinstance(renderer, CellRendererToggle):
-                    editable = renderer.get_property('activatable')
-                elif isinstance(renderer,
-                        (gtk.CellRendererProgress, CellRendererButton)):
-                    editable = False
-                else:
-                    editable = renderer.get_property('editable')
-                if column.get_visible() and editable:
-                    col = column
-                    break
-            entry.handler_block(entry.editing_done_id)
-            if self.editable == 'top':
-                self._key_up(path, model, col)
-            else:
-                self._key_down(path, model, column)
-            entry.handler_unblock(entry.editing_done_id)
+            return True
         elif event.keyval in (gtk.keysyms.F3, gtk.keysyms.F2):
             if isinstance(entry, gtk.Entry):
                 value = entry.get_text()
@@ -257,20 +228,24 @@ class EditableTreeView(gtk.TreeView):
 
         return True
 
-    def _key_down(self, path, model, column):
+    def _key_down(self, path, model, column=None):
         if path[0] == len(model) - 1 and self.editable == 'bottom':
             self.on_create_line()
         new_path = (path[0] + 1) % len(model)
+        if not column:
+            column = self.next_column(new_path)
         self.set_cursor(new_path, column, True)
         self.scroll_to_cell(new_path)
         return new_path
 
-    def _key_up(self, path, model, column):
+    def _key_up(self, path, model, column=None):
         if path[0] == 0 and self.editable == 'top':
             self.on_create_line()
             new_path = 0
         else:
             new_path = (path[0] - 1) % len(model)
+        if not column:
+            column = self.next_column(new_path)
         self.set_cursor(new_path, column, True)
         self.scroll_to_cell(new_path)
         return new_path

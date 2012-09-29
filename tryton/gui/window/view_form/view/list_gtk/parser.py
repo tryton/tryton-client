@@ -11,7 +11,7 @@ import operator
 
 from functools import wraps
 
-from editabletree import EditableTreeView
+from editabletree import EditableTreeView, TreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
 from tryton.gui.window.win_search import WinSearch
 from tryton.gui.window.win_form import WinForm
@@ -98,7 +98,7 @@ class ParserTree(ParserInterface):
         if editable:
             treeview = EditableTreeView(editable)
         else:
-            treeview = gtk.TreeView()
+            treeview = TreeView()
             treeview.cells = {}
         treeview.sequence = attrs.get('sequence', False)
         treeview.colors = attrs.get('colors', '"black"')

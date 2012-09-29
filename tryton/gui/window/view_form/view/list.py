@@ -15,7 +15,6 @@ import gettext
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
-from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.pyson import PYSONEncoder
 from tryton.gui.window import Window
 from tryton.common.popup_menu import populate
@@ -865,23 +864,7 @@ class ViewList(ParserView):
             path = self.store.on_get_path(self.screen.current_record)
             if self.store.get_flags() & gtk.TREE_MODEL_LIST_ONLY:
                 path = (path[0],)
-            focus_column = None
-            for column in self.widget_tree.get_columns():
-                renderers = column.get_cell_renderers()
-                if not renderers:
-                    continue
-                renderer = renderers[0]
-                if isinstance(renderer, CellRendererToggle):
-                    editable = renderer.get_property('activatable')
-                elif isinstance(renderer,
-                        (gtk.CellRendererProgress, CellRendererButton,
-                            gtk.CellRendererPixbuf, CellRendererBinary)):
-                    editable = False
-                else:
-                    editable = renderer.get_property('editable')
-                if column.get_visible() and editable:
-                    focus_column = column
-                    break
+            focus_column = self.widget_tree.next_column(path)
             if path[:-1]:
                 self.widget_tree.expand_to_path(path[:-1])
             self.widget_tree.scroll_to_cell(path, focus_column,
