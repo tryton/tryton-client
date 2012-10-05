@@ -145,6 +145,8 @@ class ViewForm(ParserView):
                 notebook.set_current_page(0)
             if self.cursor_widget in self.widgets:
                 self.widgets[self.cursor_widget][0].grab_focus()
+        elif not self.widget.has_focus():
+            self.widgets[self.cursor_widget][0].grab_focus()
         record = self.screen.current_record
         position = reduce(lambda x, y: x + len(y), self.widgets, 0)
         focus_widget = None

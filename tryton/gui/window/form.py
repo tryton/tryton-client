@@ -597,4 +597,4 @@ class Form(SignalEvent, TabContent):
 
     def set_cursor(self):
         if self.screen:
-            self.screen.set_cursor()
+            self.screen.set_cursor(reset_view=False)
