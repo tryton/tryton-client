@@ -912,8 +912,8 @@ class BinaryField(CharField):
                 return ''
             context = record.context_get()
             try:
-                values = RPCExecute('model', record.model_name, 'read',
-                    record.id, [self.name], context=context)
+                values, = RPCExecute('model', record.model_name, 'read',
+                    [record.id], [self.name], context=context)
             except RPCException:
                 return ''
             _, filename = tempfile.mkstemp(prefix='tryton_')
