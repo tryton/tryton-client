@@ -100,13 +100,6 @@ class TrytonClient(object):
             main.sig_tips()
         main.sig_login()
 
-        #XXX psyco breaks report printing
-        #try:
-        #    import psyco
-        #    psyco.full()
-        #except ImportError:
-        #    pass
-
         if sys.platform == 'win32':
             # http://faq.pygtk.org/index.py?req=show&file=faq21.003.htp
             def sleeper():
