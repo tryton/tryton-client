@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 
-from tryton.gui.main import Main
 import tryton.common as common
 
 
@@ -19,6 +18,7 @@ class NoModal(object):
             focus = focus.get_parent()
 
     def register(self):
+        from tryton.gui.main import Main
         main = Main.get_main()
         self.page = main.get_page()
         if not self.page:

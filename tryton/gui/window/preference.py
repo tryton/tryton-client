@@ -8,17 +8,19 @@ from tryton.gui.window.view_form.screen import Screen
 from tryton.config import TRYTON_ICON
 import tryton.common as common
 from tryton.common import RPCExecute, RPCException
+from tryton.gui.window.nomodal import NoModal
 
 _ = gettext.gettext
 
 
-class Preference(object):
+class Preference(NoModal):
     "Preference window"
 
-    def __init__(self, user):
-        self.parent = common.get_toplevel_window()
+    def __init__(self, user, callback):
+        NoModal.__init__(self)
+        self.callback = callback
         self.win = gtk.Dialog(_('Preferences'), self.parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+            gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_has_separator(False)
         self.win.set_icon(TRYTON_ICON)
@@ -33,6 +35,7 @@ class Preference(object):
                 gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
 
         self.win.set_default_response(gtk.RESPONSE_OK)
+        self.win.connect('response', self.response)
 
         try:
             view = RPCExecute('model', 'res.user',
@@ -68,33 +71,30 @@ class Preference(object):
         width, height = self.parent.get_size()
         self.win.set_default_size(int(width * 0.9), int(height * 0.9))
 
+        self.register()
         self.win.show()
 
-    def run(self):
-        "Run the window"
-        if not self.win:
-            return False
-        res = False
-        while True:
-            if self.win.run() == gtk.RESPONSE_OK:
-                if self.screen.current_record.validate():
-                    vals = copy.copy(self.screen.get(get_modifiedonly=True))
-                    if 'password' in vals:
-                        password = common.ask(_('Current Password:'),
-                            visibility=False)
-                        if not password:
-                            break
-                    else:
-                        password = False
-                    try:
-                        RPCExecute('model', 'res.user', 'set_preferences',
-                            vals, password)
-                    except RPCException:
-                        continue
-                    res = True
-                    break
-            else:
-                break
+    def response(self, win, response_id):
+        if response_id == gtk.RESPONSE_OK:
+            if self.screen.current_record.validate():
+                vals = copy.copy(self.screen.get(get_modifiedonly=True))
+                if 'password' in vals:
+                    password = common.ask(_('Current Password:'),
+                        visibility=False)
+                    if not password:
+                        return
+                else:
+                    password = False
+                try:
+                    RPCExecute('model', 'res.user', 'set_preferences',
+                        vals, password)
+                except RPCException:
+                    return
         self.parent.present()
+        self.destroy()
+        self.callback()
+
+    def destroy(self):
+        self.screen.destroy()
         self.win.destroy()
-        return res
+        NoModal.destroy(self)

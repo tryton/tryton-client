@@ -833,8 +833,8 @@ class Main(object):
     def sig_user_preferences(self, widget):
         if not self.close_pages():
             return False
-        win = Preference(rpc._USER)
-        if win.run():
+
+        def callback():
             rpc.context_reload()
             try:
                 prefs = RPCExecute('model', 'res.user', 'get_preferences',
@@ -856,8 +856,8 @@ class Main(object):
                     self.sig_win_menu()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
-        self.sig_win_menu()
-        return True
+            self.sig_win_menu()
+        Preference(rpc._USER, callback)
 
     def sig_win_close(self, widget):
         self._sig_remove_book(widget,
