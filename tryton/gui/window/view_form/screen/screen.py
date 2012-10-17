@@ -418,8 +418,6 @@ class Screen(SignalEvent):
         return False
 
     def new(self, default=True, context=None):
-        if self.group.readonly:
-            return
         if context is None:
             context = {}
         if self.current_view and \

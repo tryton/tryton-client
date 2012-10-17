@@ -49,6 +49,10 @@ class Preference(NoModal):
         title.show()
         self.win.vbox.pack_start(title, expand=False, fill=True)
         self.screen = Screen('res.user', mode=[])
+        # Reset readonly set automaticly by MODELACCESS
+        self.screen.readonly = False
+        self.screen.group.readonly = False
+        self.screen.group.skip_model_access = True
         self.screen.add_view(view)
         self.screen.new(default=False)
 

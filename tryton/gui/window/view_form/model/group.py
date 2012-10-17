@@ -40,11 +40,14 @@ class Group(SignalEvent, list):
         self.__field_childs = None
         self.exclude_field = None
         self.pool = WeakSet()
+        self.skip_model_access = False
 
     @property
     def readonly(self):
+        # Must skip res.user for Preference windows
         if (self._context.get('_datetime')
-                or not MODELACCESS[self.model_name]['write']):
+                or (not MODELACCESS[self.model_name]['write']
+                    and not self.skip_model_access)):
             return True
         return self.__readonly
 
