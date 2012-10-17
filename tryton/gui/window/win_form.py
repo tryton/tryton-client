@@ -403,6 +403,15 @@ class WinForm(NoModal):
             if validate and self.save_current:
                 if not self.screen.save_current():
                     validate = False
+            elif validate and self.screen.current_view.view_type == 'form':
+                view = self.screen.current_view
+                for widgets in view.widgets.itervalues():
+                    for widget in widgets:
+                        if (hasattr(widget, 'screen')
+                                and widget.screen.pre_validate):
+                            record = widget.screen.current_record
+                            if record:
+                                validate = record.pre_validate()
             if not validate:
                 self.screen.set_cursor()
                 self.screen.display()
