@@ -42,6 +42,9 @@ class WinForm(NoModal):
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.win.set_icon(TRYTON_ICON)
         self.win.set_has_separator(False)
+        if hasattr(self.win, 'set_deletable'):
+            self.win.set_deletable(False)
+        self.win.connect('close', self.close)
         self.win.connect('response', self.response)
 
         self.accel_group = gtk.AccelGroup()
@@ -387,6 +390,10 @@ class WinForm(NoModal):
         self.but_ok.props.sensitive = modified
         self.win.set_default_response(
             gtk.RESPONSE_OK if modified else gtk.RESPONSE_CANCEL)
+
+    def close(self, widget):
+        widget.emit_stop_by_name('close')
+        return True
 
     def response(self, win, response_id):
         validate = False
