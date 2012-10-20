@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 2.5.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2012-10-20 19:18+0200\n"
+"POT-Creation-Date: 2012-10-20 18:34-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -605,7 +605,7 @@ msgid "Save this record"
 msgstr ""
 
 #: tryton/gui/window/board.py:21 tryton/gui/window/form.py:35
-#: tryton/gui/window/win_form.py:233
+#: tryton/gui/window/win_form.py:232
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:147
 msgid "Switch"
 msgstr ""
@@ -1026,7 +1026,7 @@ msgid "Attachment:"
 msgstr ""
 
 #: tryton/gui/window/form.py:40 tryton/gui/window/tips.py:74
-#: tryton/gui/window/win_form.py:206
+#: tryton/gui/window/win_form.py:205
 #: tryton/gui/window/view_form/view/screen_container.py:95
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:119
 msgid "Previous"
@@ -1037,7 +1037,7 @@ msgid "Previous Record"
 msgstr ""
 
 #: tryton/gui/window/form.py:42 tryton/gui/window/tips.py:81
-#: tryton/gui/window/win_form.py:220
+#: tryton/gui/window/win_form.py:219
 #: tryton/gui/window/view_form/view/screen_container.py:107
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:134
 msgid "Next"
@@ -1441,30 +1441,30 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:139
+#: tryton/gui/window/win_form.py:138
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:44
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:47
 msgid "Add"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:152
+#: tryton/gui/window/win_form.py:151
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:56
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:59
 msgid "Remove <Del>"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:167
+#: tryton/gui/window/win_form.py:166
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:66
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:73
 msgid "Create a new record <F3>"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:179
+#: tryton/gui/window/win_form.py:178
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:95
 msgid "Delete selected record <Del>"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:193
+#: tryton/gui/window/win_form.py:192
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:106
 msgid "Undelete selected record <Ins>"
 msgstr ""
