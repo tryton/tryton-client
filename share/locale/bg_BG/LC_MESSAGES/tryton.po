@@ -197,7 +197,7 @@ msgid ""
 "Connection error!\n"
 "Bad username or password!"
 msgstr ""
-"Грешка при свтрзване!\n"
+"Грешка при свързване!\n"
 "Грешно потребителско име или парола!"
 
 #: tryton/common/common.py:942
