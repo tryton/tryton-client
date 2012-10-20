@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
 "POT-Creation-Date: 2010-04-07 11:34+0200\n"
 "PO-Revision-Date: 2012-04-23 11:06+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Nickolay Kolev <nickyk@gmx.net>\n"
 "Language-Team: bg_BG <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -197,7 +197,7 @@ msgid ""
 "Connection error!\n"
 "Bad username or password!"
 msgstr ""
-"Грешка при свтрзване!\n"
+"Грешка при свързване!\n"
 "Грешно потребителско име или парола!"
 
 #: tryton/common/common.py:942
@@ -269,7 +269,7 @@ msgstr "м"
 
 #: tryton/common/domain_parser.py:182
 msgid "y"
-msgstr ""
+msgstr "г"
 
 #: tryton/common/domain_parser.py:182
 msgid "yes"
@@ -294,12 +294,10 @@ msgid "False"
 msgstr "Лъжа"
 
 #: tryton/common/popup_menu.py:71
-#, fuzzy
 msgid "Attachments..."
 msgstr "Прикачен файл:"
 
 #: tryton/common/popup_menu.py:76
-#, fuzzy
 msgid "Actions..."
 msgstr "Действия..."
 
@@ -309,17 +307,14 @@ msgid "Relate..."
 msgstr "Свързани..."
 
 #: tryton/common/popup_menu.py:78
-#, fuzzy
 msgid "Report..."
 msgstr "Справки..."
 
 #: tryton/common/popup_menu.py:79
-#, fuzzy
 msgid "E-Mail..."
 msgstr "Email..."
 
 #: tryton/common/popup_menu.py:80
-#, fuzzy
 msgid "Print..."
 msgstr "Печат..."
 
@@ -389,7 +384,7 @@ msgstr "Презареждане"
 
 #: tryton/gui/main.py:419
 msgid "_Menu Toggle"
-msgstr ""
+msgstr "Превключване на меню"
 
 #: tryton/gui/main.py:428
 msgid "_Send a Request"
@@ -453,7 +448,7 @@ msgstr "Запазване на ширина/височина"
 
 #: tryton/gui/main.py:564
 msgid "Save Tree Expanded State"
-msgstr ""
+msgstr "Запазване на състояние разгърнато дърво"
 
 #: tryton/gui/main.py:576
 msgid "Spell Checking"
@@ -1602,26 +1597,23 @@ msgstr "Добавяне"
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:54
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:55
 msgid "Remove <Del>"
-msgstr ""
+msgstr "Изтриване <Del>"
 
 #: tryton/gui/window/win_form.py:152
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:64
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:68
-#, fuzzy
 msgid "Create a new record <F3>"
-msgstr "Създаване на нов запис"
+msgstr "Създаване на нов запис <F3>"
 
 #: tryton/gui/window/win_form.py:162
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:88
-#, fuzzy
 msgid "Delete selected record <Del>"
-msgstr "Възтановяване на избрания запис"
+msgstr "Изтриване на избрания запис <Del>"
 
 #: tryton/gui/window/win_form.py:174
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:98
-#, fuzzy
 msgid "Undelete selected record <Ins>"
-msgstr "Възтановяване на избрания запис"
+msgstr "Възтановяване на избрания запис <Ins>"
 
 #: tryton/gui/window/win_import.py:20
 msgid "Import from CSV"
@@ -1726,9 +1718,8 @@ msgid "You must select a record to use the relation!"
 msgstr "Трябва за изберете запис за използвате връзката! "
 
 #: tryton/gui/window/view_form/view/screen_container.py:46
-#, fuzzy
 msgid "F_ilters"
-msgstr "Файл"
+msgstr "Филтри"
 
 #: tryton/gui/window/view_form/view/screen_container.py:71
 #: tryton/gui/window/view_form/view/screen_container.py:287
@@ -1789,11 +1780,11 @@ msgstr ":"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:229
 msgid "Edit"
-msgstr ""
+msgstr "Редактиране"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:234
 msgid "Fuzzy"
-msgstr ""
+msgstr "Неясно"
 
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:303
 msgid "You need to save the record before adding translations!"
@@ -1805,63 +1796,60 @@ msgstr "Няма наличен друг език!"
 
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:65
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:304
-#, fuzzy
 msgid "Open a record <F2>"
 msgstr "Отваряне на запис"
 
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:307
-#, fuzzy
 msgid "Search a record <F2>"
 msgstr "Тъсене на запис"
 
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:78
-#, fuzzy
 msgid "Edit selected record <F2>"
 msgstr "Редактиране на избрания запис"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:170
 msgid "Change text to bold"
-msgstr ""
+msgstr "Промяна на текста на удебелен"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:171
 msgid "Change text to italic"
-msgstr ""
+msgstr "Промяна на текста на наклонен"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:172
 msgid "Change text to underline"
-msgstr ""
+msgstr "Промяна на тек на подчертан"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:173
 msgid "Choose font-family"
-msgstr ""
+msgstr "Избор на фамилия на шрифт"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:174
 msgid "Choose font-size"
-msgstr ""
+msgstr "Избор на размер на шрифт"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:175
 msgid "Justify of line to the left"
-msgstr ""
+msgstr "Подравняване на редовете отляво"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:177
 msgid "Justify of line to the center"
-msgstr ""
+msgstr "Подравняване на редовете в център"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:178
 msgid "Justify of line to the right"
-msgstr ""
+msgstr "Подравняване на редовете отдясно"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:180
 msgid "Justify of line to fill window"
-msgstr ""
+msgstr "Подравняване на редовете да запълни прозореца"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:182
 msgid "Change the foreground text"
-msgstr ""
+msgstr "Избот на цвят на текста"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:184
 msgid "Change the background text"
-msgstr ""
+msgstr "Избор на фон на текста"
 
 #: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:185
 msgid "Change the markup text view"
