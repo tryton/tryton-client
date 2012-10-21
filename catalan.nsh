@@ -14,4 +14,4 @@ LangString PreviousInstall ${CURLANG} "Desinstal·leu la versió anterior de Tryto
 LangString SecTrytonName ${CURLANG} "Tryton"
 LangString SecTrytonDesc ${CURLANG} "Instal·la tryton.exe i altres fitxers necessaris"
 LangString SecStartMenuName ${CURLANG} "Accessos directes al menú d'inici i a l'escriptori"
-LangString SecStartMenuDesc ${CURLANG} "Crea accesos directes al menú d'inici i a l'escriptori"
+LangString SecStartMenuDesc ${CURLANG} "Crea accessos directes al menú d'inici i a l'escriptori"
