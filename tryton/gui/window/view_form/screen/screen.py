@@ -375,12 +375,12 @@ class Screen(SignalEvent):
                 self.fields_view_tree = view
             break
 
-        # Ensure that loading is always eager for fields on tree view
-        # and always lazy for fields only on form view
-        if node.localName == 'tree':
-            loading = 'eager'
-        else:
+        # Ensure that loading is always lazy for fields on form view
+        # and always eager for fields on tree or graph view
+        if node.localName == 'form':
             loading = 'lazy'
+        else:
+            loading = 'eager'
         for field in fields:
             if field not in self.group.fields or loading == 'eager':
                 fields[field]['loading'] = loading
