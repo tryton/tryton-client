@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2012-10-20 19:18+0200\n"
+"POT-Creation-Date: 2012-10-22 15:35+0200\n"
 "PO-Revision-Date: 2012-10-20 19:33+0200\n"
 "Last-Translator: Bertrand Chenal <bch@b2ck.com>\n"
 "Language-Team: fr_FR\n"
@@ -641,7 +641,7 @@ msgid "Save this record"
 msgstr "Sauver cet enregistrement"
 
 #: tryton/gui/window/board.py:21 tryton/gui/window/form.py:35
-#: tryton/gui/window/win_form.py:233
+#: tryton/gui/window/win_form.py:232
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:147
 msgid "Switch"
 msgstr "Basculer"
@@ -1112,7 +1112,7 @@ msgid "Attachment:"
 msgstr "Attachement :"
 
 #: tryton/gui/window/form.py:40 tryton/gui/window/tips.py:74
-#: tryton/gui/window/win_form.py:206
+#: tryton/gui/window/win_form.py:205
 #: tryton/gui/window/view_form/view/screen_container.py:95
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:119
 msgid "Previous"
@@ -1123,7 +1123,7 @@ msgid "Previous Record"
 msgstr "Enregistrement précédent"
 
 #: tryton/gui/window/form.py:42 tryton/gui/window/tips.py:81
-#: tryton/gui/window/win_form.py:220
+#: tryton/gui/window/win_form.py:219
 #: tryton/gui/window/view_form/view/screen_container.py:107
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:134
 msgid "Next"
@@ -1554,30 +1554,30 @@ msgstr ""
 msgid "Link"
 msgstr "Lien"
 
-#: tryton/gui/window/win_form.py:139
+#: tryton/gui/window/win_form.py:138
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:44
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:47
 msgid "Add"
 msgstr "Ajouter"
 
-#: tryton/gui/window/win_form.py:152
+#: tryton/gui/window/win_form.py:151
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:56
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:59
 msgid "Remove <Del>"
 msgstr "Supprimer <Del>"
 
-#: tryton/gui/window/win_form.py:167
+#: tryton/gui/window/win_form.py:166
 #: tryton/gui/window/view_form/view/form_gtk/many2one.py:66
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:73
 msgid "Create a new record <F3>"
 msgstr "Créer un nouvel enregistrement<F3>"
 
-#: tryton/gui/window/win_form.py:179
+#: tryton/gui/window/win_form.py:178
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:95
 msgid "Delete selected record <Del>"
 msgstr "Supprimer l'enregistrement sélectionné<Del>"
 
-#: tryton/gui/window/win_form.py:193
+#: tryton/gui/window/win_form.py:192
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:106
 msgid "Undelete selected record <Ins>"
 msgstr "Restaurer l'enregistrement sélectionné<Ins>"
@@ -1857,70 +1857,4 @@ msgstr "Choisissez un plugin"
 #: tryton/plugins/translation/__init__.py:18
 msgid "Translate view"
 msgstr "Traduire la vue"
-
-#~ msgid "specify channels to log"
-#~ msgstr "spécifier les canaux à logger"
-
-#~ msgid "specify the log level: INFO, DEBUG, WARNING, ERROR, CRITICAL"
-#~ msgstr "spécifier le niveau de log: INFO, DEBUG, WARNING, ERROR, CRITICAL"
-
-#~ msgid "Operation in progress"
-#~ msgstr "Opération en cours"
-
-#~ msgid ""
-#~ "Please wait,\n"
-#~ "this operation may take a while..."
-#~ msgstr ""
-#~ "Patientez,\n"
-#~ "cette opération peut prendre du temps..."
-
-#~ msgid "No record selected!"
-#~ msgstr "Pas d'enregistrement sélectionné !"
-
-#~ msgid "Date/Datetime Entries Shortcuts"
-#~ msgstr "Raccourcis des champs Date/Date Heure"
-
-#~ msgid ""
-#~ "You can use special operators:\n"
-#~ "* + to increase the date\n"
-#~ "* - to decrease the date or clear\n"
-#~ "* = to set the date or the current date\n"
-#~ "\n"
-#~ "Available variables are:\n"
-#~ "h for hours\n"
-#~ "d for days\n"
-#~ "w for weeks (only with +/-)\n"
-#~ "m for months\n"
-#~ "y for years\n"
-#~ "\n"
-#~ "Examples:\n"
-#~ "\"+21d\" increase of 21 days the date\n"
-#~ "\"=11m\" set the date to the 11th month of the year\n"
-#~ "\"-2w\" decrease of 2 weeks the date"
-#~ msgstr ""
-#~ "Vous pouvez utiliser les opérateurs spéciaux:\n"
-#~ "* + pour augmenter la date\n"
-#~ "* - pour diminuer la date\n"
-#~ "* = pour choisir une date ou la date courante\n"
-#~ "\n"
-#~ "Les variables disponibles sont :\n"
-#~ "h pour les heures\n"
-#~ "d pour les jours\n"
-#~ "w pour les semaines (seulement pour +/-)\n"
-#~ "m pour les mois\n"
-#~ "y pour les années\n"
-#~ "\n"
-#~ "Examples :\n"
-#~ "\"+21d\" augmente de 21 jours la date\n"
-#~ "\"=23w\" mets la date à la 23ième semaine de l'année\n"
-#~ "\"-10m\" diminue de 10 mois la date"
-
-#~ msgid "Date Time Selection"
-#~ msgstr "Sélection de la date et de l'heure"
-
-#~ msgid "Hour:"
-#~ msgstr "Heure :"
-
-#~ msgid "Minute:"
-#~ msgstr "Minute :"
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2008-12-24 18:53+0100\n"
+"POT-Creation-Date: 2012-10-22 15:35+0200\n"
 "PO-Revision-Date: 2012-04-23 11:06+0200\n"
 "Last-Translator: Dan Horák <dan@danny.cz>\n"
 "Language-Team: Czech\n"
@@ -12,46 +12,46 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 0.9.4\n"
+"Generated-By: Babel 0.9.6\n"
 
-#: tryton/config.py:86
+#: tryton/config.py:83
 msgid "specify alternate config file"
 msgstr "zadejte alternativní konfigurační soubor"
+
+#: tryton/config.py:86
+msgid "development mode"
+msgstr ""
 
 #: tryton/config.py:89
 msgid "logging everything at INFO level"
 msgstr ""
 
 #: tryton/config.py:91
-msgid "specify channels to log"
-msgstr "zadejte kanály pro logování"
+msgid "specify the log level: DEBUG, INFO, WARNING, ERROR, CRITICAL"
+msgstr ""
 
-#: tryton/config.py:93
-msgid "specify the log level: INFO, DEBUG, WARNING, ERROR, CRITICAL"
-msgstr "určete logovací úroveň: INFO, DEBUG, WARNING, ERROR, CRITICAL"
-
-#: tryton/config.py:96
+#: tryton/config.py:94
 msgid "specify the login user"
 msgstr "zadejte uživatelské jméno"
 
-#: tryton/config.py:98
+#: tryton/config.py:96
 msgid "specify the server port"
 msgstr "zadejte číslo portu síťového serveru"
 
-#: tryton/config.py:100
+#: tryton/config.py:98
 msgid "specify the server hostname"
 msgstr "zadejte název hostitele pro server"
 
-#: tryton/config.py:104
+#: tryton/config.py:102
 msgid "Too much arguments"
 msgstr ""
 
-#: tryton/config.py:107
+#: tryton/config.py:105
 #, python-format
 msgid "File \"%s\" not found"
 msgstr ""
 
-#: tryton/config.py:135
+#: tryton/config.py:143
 #, python-format
 msgid "Unable to write config file %s!"
 msgstr "Nelze zapsat konfigurační soubor %s!"
@@ -61,62 +61,62 @@ msgstr "Nelze zapsat konfigurační soubor %s!"
 msgid "Unable to set locale %s"
 msgstr "Nemohu nastavit lokalizaci %s"
 
-#: tryton/action/main.py:168
+#: tryton/action/main.py:169
 msgid "Select your action"
 msgstr "Vyberte akci"
 
-#: tryton/action/main.py:174
+#: tryton/action/main.py:175
 msgid "No action defined!"
 msgstr "Žádná akce není definována!"
 
-#: tryton/common/common.py:197
+#: tryton/common/common.py:233
 msgid "Tryton Connection"
 msgstr "Tryton spojení"
 
-#: tryton/common/common.py:208
+#: tryton/common/common.py:244
 msgid "Server:"
 msgstr "Server:"
 
-#: tryton/common/common.py:226 tryton/gui/window/dblogin.py:79
+#: tryton/common/common.py:262 tryton/gui/window/dblogin.py:79
 msgid "Port:"
 msgstr "Port:"
 
-#: tryton/common/common.py:295
+#: tryton/common/common.py:332
 msgid "Selection"
 msgstr "Výběr"
 
-#: tryton/common/common.py:304
+#: tryton/common/common.py:341
 msgid "Your selection:"
 msgstr "Váš výběr:"
 
-#: tryton/common/common.py:424 tryton/gui/main.py:1391
-#: tryton/gui/window/win_export.py:386
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:71
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:141
-#: tryton/gui/window/view_form/view/form_gtk/image.py:74
-#: tryton/gui/window/view_form/view/form_gtk/image.py:158
+#: tryton/common/common.py:461 tryton/gui/main.py:1394
+#: tryton/gui/window/win_export.py:402
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:74
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:144
+#: tryton/gui/window/view_form/view/form_gtk/image.py:77
+#: tryton/gui/window/view_form/view/form_gtk/image.py:162
 #: tryton/gui/window/view_form/view/graph_gtk/parser.py:105
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:552
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:565
 msgid "Save As..."
 msgstr "Uložit jako..."
 
-#: tryton/common/common.py:575
+#: tryton/common/common.py:612
 msgid "Always ignore this warning."
 msgstr "zadejte alternativní konfigurační soubor"
 
-#: tryton/common/common.py:580
+#: tryton/common/common.py:617
 msgid "Do you want to proceed?"
 msgstr ""
 
-#: tryton/common/common.py:599
+#: tryton/common/common.py:636
 msgid "Confirmation"
 msgstr "Potvrzení"
 
-#: tryton/common/common.py:705 tryton/common/common.py:1004
+#: tryton/common/common.py:742 tryton/common/common.py:1045
 msgid "Concurrency Exception"
 msgstr "Výjimka při souběhu"
 
-#: tryton/common/common.py:719
+#: tryton/common/common.py:756
 #, fuzzy
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
@@ -135,50 +135,50 @@ msgstr ""
 "  - \"Porovnat\" pro zobrazení změněné verze,\n"
 "  - \"Přesto zapsat\" pro zapsání vaší verze."
 
-#: tryton/common/common.py:728
+#: tryton/common/common.py:765
 msgid "Compare"
 msgstr "Porovnat"
 
-#: tryton/common/common.py:733
+#: tryton/common/common.py:770
 msgid "Write Anyway"
 msgstr "Přesto zapsat"
 
-#: tryton/common/common.py:759 tryton/gui/window/win_export.py:420
-#: tryton/gui/window/win_import.py:255 tryton/gui/window/win_import.py:283
+#: tryton/common/common.py:796 tryton/gui/window/win_export.py:435
+#: tryton/gui/window/win_import.py:261 tryton/gui/window/win_import.py:289
 msgid "Error"
 msgstr "Chyba"
 
-#: tryton/common/common.py:763
+#: tryton/common/common.py:800
 msgid "Report Bug"
 msgstr "Nahlásit chybu"
 
-#: tryton/common/common.py:770
+#: tryton/common/common.py:807
 msgid "Application Error!"
 msgstr "Chyba aplikace!"
 
-#: tryton/common/common.py:793
+#: tryton/common/common.py:830
 msgid "Error: "
 msgstr "Chyba:"
 
-#: tryton/common/common.py:813
+#: tryton/common/common.py:850
 #, fuzzy, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
 msgstr "Pro hlášení chyb musíte mít účet na <u>%s</u>"
 
-#: tryton/common/common.py:843
+#: tryton/common/common.py:880
 msgid "Bug Tracker"
 msgstr "Sledování chyb"
 
-#: tryton/common/common.py:861
+#: tryton/common/common.py:898
 msgid "User:"
 msgstr "Uživatel:"
 
-#: tryton/common/common.py:869 tryton/common/common.py:1014
+#: tryton/common/common.py:906 tryton/common/common.py:1055
 #: tryton/gui/window/dblogin.py:466
 msgid "Password:"
 msgstr "Heslo:"
 
-#: tryton/common/common.py:918
+#: tryton/common/common.py:955
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
@@ -186,11 +186,11 @@ msgstr ""
 "Ta samá chyba již byla nahlášena jiným uživatelem.\n"
 "Vaše uživatelské jméno bylo přidáno na její seznam."
 
-#: tryton/common/common.py:929
+#: tryton/common/common.py:966
 msgid "Created new bug with ID "
 msgstr "Založena nová chyba s ID"
 
-#: tryton/common/common.py:937 tryton/gui/main.py:956
+#: tryton/common/common.py:974 tryton/gui/main.py:957
 msgid ""
 "Connection error!\n"
 "Bad username or password!"
@@ -198,23 +198,23 @@ msgstr ""
 "Chyba při spojení!\n"
 "Špatné uživatelské jméno nebo heslo!"
 
-#: tryton/common/common.py:942
+#: tryton/common/common.py:979
 msgid "Exception:"
 msgstr "Výjimka:"
 
-#: tryton/common/common.py:957
+#: tryton/common/common.py:996
 msgid ""
 "The server fingerprint has changed since last connection!\n"
 "The application will stop connecting to this server until its fingerprint"
 " is fixed."
 msgstr ""
 
-#: tryton/common/common.py:959
+#: tryton/common/common.py:998
 msgid "Security risk!"
 msgstr ""
 
-#: tryton/common/common.py:965 tryton/common/common.py:1022
-#: tryton/gui/main.py:953
+#: tryton/common/common.py:1004 tryton/common/common.py:1063
+#: tryton/gui/main.py:954
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
@@ -222,71 +222,68 @@ msgstr ""
 "Chyba spojení!\n"
 "Nelze se připojit k serveru!"
 
-#: tryton/common/common.py:1036
+#: tryton/common/common.py:1078
 msgid "Network Error!"
 msgstr "Chyba sítě!"
 
-#: tryton/common/common.py:1224
-msgid "Operation in progress"
-msgstr "Operace probíhá"
-
-#: tryton/common/common.py:1228
-msgid ""
-"Please wait,\n"
-"this operation may take a while..."
-msgstr ""
-"Prosím čekejte,\n"
-"tato operace bude nějakou dobu trvat..."
-
-#: tryton/common/common.py:1323
+#: tryton/common/common.py:1316
 msgid "Y"
 msgstr ""
 
-#: tryton/common/common.py:1324
+#: tryton/common/common.py:1317
 msgid "M"
 msgstr ""
 
-#: tryton/common/common.py:1325
+#: tryton/common/common.py:1318
 msgid "w"
 msgstr ""
 
-#: tryton/common/common.py:1326
+#: tryton/common/common.py:1319
 msgid "d"
 msgstr ""
 
-#: tryton/common/common.py:1327
+#: tryton/common/common.py:1320
 msgid "h"
 msgstr ""
 
-#: tryton/common/common.py:1328
+#: tryton/common/common.py:1321
 msgid "m"
 msgstr ""
 
-#: tryton/common/domain_parser.py:182
+#: tryton/common/date_widget.py:69
+#, fuzzy
+msgid "Open the calendar <F2>"
+msgstr "Otevřít kalendář"
+
+#: tryton/common/date_widget.py:270
+msgid "Date Selection"
+msgstr "Výběr datumu"
+
+#: tryton/common/domain_parser.py:188
 msgid "y"
 msgstr ""
 
-#: tryton/common/domain_parser.py:182
+#: tryton/common/domain_parser.py:188
 #, fuzzy
 msgid "yes"
 msgstr "bajtů"
 
-#: tryton/common/domain_parser.py:182
+#: tryton/common/domain_parser.py:188
 #, fuzzy
 msgid "true"
 msgstr "Pravda"
 
-#: tryton/common/domain_parser.py:182
+#: tryton/common/domain_parser.py:188
 msgid "t"
 msgstr ""
 
-#: tryton/common/domain_parser.py:368
-#: tryton/gui/window/view_form/view/screen_container.py:259
+#: tryton/common/domain_parser.py:383
+#: tryton/gui/window/view_form/view/screen_container.py:265
 msgid "True"
 msgstr "Pravda"
 
-#: tryton/common/domain_parser.py:368
-#: tryton/gui/window/view_form/view/screen_container.py:259
+#: tryton/common/domain_parser.py:383
+#: tryton/gui/window/view_form/view/screen_container.py:265
 msgid "False"
 msgstr "Nepravda"
 
@@ -520,21 +517,21 @@ msgstr ""
 msgid "Waiting requests: %s received - %s sent"
 msgstr ""
 
-#: tryton/gui/main.py:971
+#: tryton/gui/main.py:972
 msgid ""
 "The following action requires to close all tabs.\n"
 "Do you want to continue?"
 msgstr ""
 
-#: tryton/gui/main.py:1012
+#: tryton/gui/main.py:1013
 msgid "SSL connection"
 msgstr "SSL spojení"
 
-#: tryton/gui/main.py:1173
+#: tryton/gui/main.py:1174
 msgid "Close Tab"
 msgstr "Zavřít záložku"
 
-#: tryton/gui/main.py:1290
+#: tryton/gui/main.py:1293
 msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
@@ -542,7 +539,7 @@ msgstr ""
 "Bude smazána Tryton databáze.\n"
 "Opravdu chcete pokračovat?"
 
-#: tryton/gui/main.py:1301
+#: tryton/gui/main.py:1304
 msgid ""
 "Wrong Tryton Server Password\n"
 "Please try again."
@@ -550,28 +547,28 @@ msgstr ""
 "Špatné heslo Tryton serveru\n"
 "Zkuste to znovu."
 
-#: tryton/gui/main.py:1303 tryton/gui/main.py:1341 tryton/gui/main.py:1379
-#: tryton/gui/window/dbcreate.py:379
+#: tryton/gui/main.py:1306 tryton/gui/main.py:1344 tryton/gui/main.py:1382
+#: tryton/gui/window/dbcreate.py:381
 msgid "Access denied!"
 msgstr "Přístup odepřen!"
 
-#: tryton/gui/main.py:1306
+#: tryton/gui/main.py:1309
 msgid "Database drop failed with error message:\n"
 msgstr "Odstranění databáze selhalo s chybovou zprávou:\n"
 
-#: tryton/gui/main.py:1307
+#: tryton/gui/main.py:1310
 msgid "Database drop failed!"
 msgstr "Odstranění databáze selhalo!"
 
-#: tryton/gui/main.py:1310
+#: tryton/gui/main.py:1313
 msgid "Database dropped successfully!"
 msgstr "Databáze úspěšné odstraněna!"
 
-#: tryton/gui/main.py:1315
+#: tryton/gui/main.py:1318
 msgid "Open Backup File to Restore..."
 msgstr "Otevřít soubor se zálohou pro obnovu..."
 
-#: tryton/gui/main.py:1333
+#: tryton/gui/main.py:1336
 msgid ""
 "It is not possible to restore a password protected database.\n"
 "Backup and restore needed to be proceed manual."
@@ -579,11 +576,11 @@ msgstr ""
 "Není možné obnovit databázi chráněnou heslem.\n"
 "Záloha a obnova musí být provedeny ručně."
 
-#: tryton/gui/main.py:1337 tryton/gui/main.py:1375
+#: tryton/gui/main.py:1340 tryton/gui/main.py:1378
 msgid "Database is password protected!"
 msgstr "Databáze je chráněna heslem!"
 
-#: tryton/gui/main.py:1339 tryton/gui/main.py:1377
+#: tryton/gui/main.py:1342 tryton/gui/main.py:1380
 msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
@@ -591,19 +588,19 @@ msgstr ""
 "Špatné heslo Tryton serveru\n"
 "Zkuste to znovu."
 
-#: tryton/gui/main.py:1344
+#: tryton/gui/main.py:1347
 msgid "Database restore failed with error message:\n"
 msgstr "Obnovení databáze selhalo s chybovou zprávou:\n"
 
-#: tryton/gui/main.py:1346 tryton/gui/main.py:1352
+#: tryton/gui/main.py:1349 tryton/gui/main.py:1355
 msgid "Database restore failed!"
 msgstr "Obnova databáze selhala!"
 
-#: tryton/gui/main.py:1350
+#: tryton/gui/main.py:1353
 msgid "Database restored successfully!"
 msgstr "Databáze úspěšně obnovena!"
 
-#: tryton/gui/main.py:1372
+#: tryton/gui/main.py:1375
 msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
@@ -611,75 +608,76 @@ msgstr ""
 "Není možné zálohovat databázi chráněnou heslem.\n"
 "Záloha a obnova musí být provedeny ručně."
 
-#: tryton/gui/main.py:1382
+#: tryton/gui/main.py:1385
 msgid "Database dump failed with error message:\n"
 msgstr "Záloha databáze selhala s chybovou zprávou:\n"
 
-#: tryton/gui/main.py:1384
+#: tryton/gui/main.py:1387
 msgid "Database dump failed!"
 msgstr "Záloha databáze selhala!"
 
-#: tryton/gui/main.py:1398
+#: tryton/gui/main.py:1401
 msgid "Database backuped successfully!"
 msgstr "Databáze úspěšně zazálohována!"
 
-#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:32
+#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:31
 msgid "New"
 msgstr ""
 
-#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:32
+#: tryton/gui/window/board.py:19 tryton/gui/window/form.py:31
 msgid "Create a new record"
 msgstr "Vytvořit nový záznam"
 
-#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:34
-#: tryton/gui/window/win_export.py:139
+#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:33
+#: tryton/gui/window/win_export.py:142
 #, fuzzy
 msgid "Save"
 msgstr "_Uložit"
 
-#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:34
+#: tryton/gui/window/board.py:20 tryton/gui/window/form.py:33
 msgid "Save this record"
 msgstr "Uložit tento záznam"
 
-#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:36
-#: tryton/gui/window/win_form.py:214
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:136
+#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:35
+#: tryton/gui/window/win_form.py:232
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:147
 msgid "Switch"
 msgstr "Přepnout"
 
-#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:36
+#: tryton/gui/window/board.py:21 tryton/gui/window/form.py:35
 msgid "Switch view"
 msgstr "Přepnout pohled"
 
-#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:38
+#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:37
 msgid "_Reload"
 msgstr "_Obnovit"
 
-#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:38
+#: tryton/gui/window/board.py:23 tryton/gui/window/form.py:37
 msgid "Reload"
 msgstr "Obnovit"
 
-#: tryton/gui/window/board.py:28 tryton/gui/window/form.py:50
+#: tryton/gui/window/board.py:28 tryton/gui/window/form.py:49
 msgid "_New"
 msgstr "_Nový"
 
-#: tryton/gui/window/board.py:29 tryton/gui/window/form.py:51
+#: tryton/gui/window/board.py:29 tryton/gui/window/form.py:50
+#: tryton/gui/window/win_form.py:69
 msgid "_Save"
 msgstr "_Uložit"
 
-#: tryton/gui/window/board.py:30 tryton/gui/window/form.py:52
+#: tryton/gui/window/board.py:30 tryton/gui/window/form.py:51
 msgid "_Switch View"
 msgstr "Přepnout pohled"
 
-#: tryton/gui/window/board.py:32 tryton/gui/window/form.py:54
+#: tryton/gui/window/board.py:32 tryton/gui/window/form.py:53
 msgid "_Reload/Undo"
 msgstr "Obnovit/Zpět"
 
-#: tryton/gui/window/board.py:34 tryton/gui/window/form.py:58
+#: tryton/gui/window/board.py:34 tryton/gui/window/form.py:57
 msgid "_Delete..."
 msgstr "_Odstranit..."
 
-#: tryton/gui/window/board.py:36 tryton/gui/window/form.py:68
+#: tryton/gui/window/board.py:36 tryton/gui/window/form.py:67
 msgid "_Close Tab"
 msgstr "_Zavřít kartu"
 
@@ -828,7 +826,7 @@ msgstr "Potvrzení hesla správce:"
 msgid "Type the Admin password again"
 msgstr "Zadejte znovu heslo správce"
 
-#: tryton/gui/window/dbcreate.py:330
+#: tryton/gui/window/dbcreate.py:331
 #, fuzzy
 msgid ""
 "The database name is restricted to alpha-nummerical characters and \"_\" "
@@ -838,27 +836,27 @@ msgstr ""
 "začínat písmenem a být maximálně 63 znaků dlouhý.\n"
 "Nepoužívejte znaky s akcenty, mezeru nebo jiné speciální znaky."
 
-#: tryton/gui/window/dbcreate.py:334
+#: tryton/gui/window/dbcreate.py:335
 msgid "Wrong characters in database name!"
 msgstr "Neplatný znak v názvu databáze!"
 
-#: tryton/gui/window/dbcreate.py:338
+#: tryton/gui/window/dbcreate.py:339
 msgid "The new admin password doesn't match the confirmation field.\n"
 msgstr "Heslo správce a jeho zopakování nejsou shodné.\n"
 
-#: tryton/gui/window/dbcreate.py:340
+#: tryton/gui/window/dbcreate.py:341
 msgid "Passwords doesn't match!"
 msgstr "Hesla nesouhlasí!"
 
-#: tryton/gui/window/dbcreate.py:343
+#: tryton/gui/window/dbcreate.py:344
 msgid "Admin password and confirmation are required to create a new database."
 msgstr "Heslo správce a jeho zopakování jsou nutné pro vytvoření nové databáze."
 
-#: tryton/gui/window/dbcreate.py:345
+#: tryton/gui/window/dbcreate.py:346
 msgid "Missing admin password!"
 msgstr "Chybí heslo administrátora!"
 
-#: tryton/gui/window/dbcreate.py:360
+#: tryton/gui/window/dbcreate.py:361
 msgid ""
 "A database with the same name already exists.\n"
 "Try another database name."
@@ -866,15 +864,15 @@ msgstr ""
 "Databáze se stejným názvem již existuje.\n"
 "Použijte jiný název."
 
-#: tryton/gui/window/dbcreate.py:363
+#: tryton/gui/window/dbcreate.py:364
 msgid "This database name already exist!"
 msgstr "Databáze s tímto názvem již existuje!"
 
-#: tryton/gui/window/dbcreate.py:377
+#: tryton/gui/window/dbcreate.py:379
 msgid "Sorry, wrong password for the Tryton server. Please try again."
 msgstr "Zadali jste špatné heslo pro Tryton server. Zkuste to znovu."
 
-#: tryton/gui/window/dbcreate.py:384
+#: tryton/gui/window/dbcreate.py:386
 msgid ""
 "Can't create the database, caused by an unknown reason.\n"
 "If there is a database created, it could be broken. Maybe drop this "
@@ -886,7 +884,7 @@ msgstr ""
 " Zkontrolujte chybové hlášení pro případné další informace.\n"
 "Chybová zpráva:\n"
 
-#: tryton/gui/window/dbcreate.py:392
+#: tryton/gui/window/dbcreate.py:394
 msgid "Error creating database!"
 msgstr "Chyba při vytváření databáze!"
 
@@ -951,13 +949,13 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: tryton/gui/window/dblogin.py:52 tryton/gui/window/win_export.py:62
-#: tryton/gui/window/win_import.py:46
+#: tryton/gui/window/dblogin.py:52 tryton/gui/window/win_export.py:65
+#: tryton/gui/window/win_import.py:47
 msgid "_Add"
 msgstr "_Přidat"
 
-#: tryton/gui/window/dblogin.py:57 tryton/gui/window/win_export.py:70
-#: tryton/gui/window/win_import.py:54
+#: tryton/gui/window/dblogin.py:57 tryton/gui/window/win_export.py:73
+#: tryton/gui/window/win_import.py:55
 msgid "_Remove"
 msgstr "_Odstranit"
 
@@ -1111,171 +1109,167 @@ msgstr "Tělo:"
 msgid "Attachment:"
 msgstr "Příloha:"
 
-#: tryton/gui/window/form.py:41 tryton/gui/window/tips.py:74
-#: tryton/gui/window/win_form.py:187
-#: tryton/gui/window/view_form/view/screen_container.py:92
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:110
+#: tryton/gui/window/form.py:40 tryton/gui/window/tips.py:74
+#: tryton/gui/window/win_form.py:205
+#: tryton/gui/window/view_form/view/screen_container.py:95
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:119
 msgid "Previous"
 msgstr "Předchozí"
 
-#: tryton/gui/window/form.py:42
+#: tryton/gui/window/form.py:41
 msgid "Previous Record"
 msgstr "Předchozí záznam"
 
-#: tryton/gui/window/form.py:43 tryton/gui/window/tips.py:81
-#: tryton/gui/window/win_form.py:201
-#: tryton/gui/window/view_form/view/screen_container.py:104
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:124
+#: tryton/gui/window/form.py:42 tryton/gui/window/tips.py:81
+#: tryton/gui/window/win_form.py:219
+#: tryton/gui/window/view_form/view/screen_container.py:107
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:134
 msgid "Next"
 msgstr "Další"
 
-#: tryton/gui/window/form.py:43
+#: tryton/gui/window/form.py:42
 msgid "Next Record"
 msgstr "Následující záznam"
 
-#: tryton/gui/window/form.py:46
+#: tryton/gui/window/form.py:45
 msgid "Attachment(0)"
 msgstr "Přílohy(0)"
 
-#: tryton/gui/window/form.py:47
+#: tryton/gui/window/form.py:46
 msgid "Add an attachment to the record"
 msgstr "Přidat přílohu k záznamu"
 
-#: tryton/gui/window/form.py:56
+#: tryton/gui/window/form.py:55
 msgid "_Duplicate"
 msgstr "_Duplikovat"
 
-#: tryton/gui/window/form.py:61
+#: tryton/gui/window/form.py:60
 msgid "_Previous"
 msgstr "_Předchozí"
 
-#: tryton/gui/window/form.py:63
+#: tryton/gui/window/form.py:62
 msgid "_Next"
 msgstr "_Následující"
 
-#: tryton/gui/window/form.py:64
+#: tryton/gui/window/form.py:63
 #, fuzzy
 msgid "_Search"
 msgstr "Hledat"
 
-#: tryton/gui/window/form.py:65
+#: tryton/gui/window/form.py:64
 msgid "View _Logs..."
 msgstr "Zobrazit záznamy..."
 
-#: tryton/gui/window/form.py:66
+#: tryton/gui/window/form.py:65
 msgid "_Go to Record ID..."
 msgstr "Přejít na záznam ID..."
 
-#: tryton/gui/window/form.py:71
+#: tryton/gui/window/form.py:70
 #, fuzzy
 msgid "A_ttachments..."
 msgstr "Příloha:"
 
-#: tryton/gui/window/form.py:73
+#: tryton/gui/window/form.py:72
 msgid "_Actions..."
 msgstr "Akce..."
 
-#: tryton/gui/window/form.py:75
+#: tryton/gui/window/form.py:74
 #, fuzzy
 msgid "_Relate..."
 msgstr "_Odstranit..."
 
-#: tryton/gui/window/form.py:78
+#: tryton/gui/window/form.py:77
 #, fuzzy
 msgid "_Report..."
 msgstr "Importovat data..."
 
-#: tryton/gui/window/form.py:80
+#: tryton/gui/window/form.py:79
 #, fuzzy
 msgid "_E-Mail..."
 msgstr "_Email..."
 
-#: tryton/gui/window/form.py:82
+#: tryton/gui/window/form.py:81
 msgid "_Print..."
 msgstr "_Tisk..."
 
-#: tryton/gui/window/form.py:85
+#: tryton/gui/window/form.py:84
 msgid "_Export Data..."
 msgstr "Exportovat data"
 
-#: tryton/gui/window/form.py:87
+#: tryton/gui/window/form.py:86
 msgid "_Import Data..."
 msgstr "Importovat data..."
 
-#: tryton/gui/window/form.py:177
+#: tryton/gui/window/form.py:184
 msgid "Go to ID"
 msgstr "Přejít na ID"
 
-#: tryton/gui/window/form.py:186
+#: tryton/gui/window/form.py:193
 msgid "Go to ID:"
 msgstr "Přejít na ID:"
 
-#: tryton/gui/window/form.py:239
-msgid "No record selected!"
-msgstr "Žádný záznam není vybrán!"
-
-#: tryton/gui/window/form.py:252
+#: tryton/gui/window/form.py:255
 #, python-format
 msgid "Attachment(%d)"
 msgstr "Příloha(%d)"
 
-#: tryton/gui/window/form.py:267
+#: tryton/gui/window/form.py:273
 msgid "You have to select one record!"
 msgstr "Musíte vybrat právě jeden záznam!"
 
-#: tryton/gui/window/form.py:271
+#: tryton/gui/window/form.py:277
 msgid "ID:"
 msgstr "ID:"
 
-#: tryton/gui/window/form.py:272
+#: tryton/gui/window/form.py:278
 msgid "Creation User:"
 msgstr "Vytvořeno uživatelem:"
 
-#: tryton/gui/window/form.py:273
+#: tryton/gui/window/form.py:279
 msgid "Creation Date:"
 msgstr "Datum vytvoření:"
 
-#: tryton/gui/window/form.py:274
+#: tryton/gui/window/form.py:280
 msgid "Latest Modification by:"
 msgstr "Poslední úpravu provedl:"
 
-#: tryton/gui/window/form.py:275
+#: tryton/gui/window/form.py:281
 msgid "Latest Modification Date:"
 msgstr "Datum poslední úpravy:"
 
-#: tryton/gui/window/form.py:293
+#: tryton/gui/window/form.py:299
 msgid "Model:"
 msgstr "Model:"
 
-#: tryton/gui/window/form.py:299
+#: tryton/gui/window/form.py:307
 msgid "Are you sure to remove this record?"
 msgstr "Opravdu chcete odstranit tento záznam?"
 
-#: tryton/gui/window/form.py:301
+#: tryton/gui/window/form.py:309
 msgid "Are you sure to remove those records?"
 msgstr "Opravdu chcete odstranit tyto záznamy?"
 
-#: tryton/gui/window/form.py:304
+#: tryton/gui/window/form.py:312
 msgid "Records not removed!"
 msgstr "Záznamy neodstraněny!"
 
-#: tryton/gui/window/form.py:306
+#: tryton/gui/window/form.py:314
 msgid "Records removed!"
 msgstr "Záznamy odstraněny!"
 
-#: tryton/gui/window/form.py:345
+#: tryton/gui/window/form.py:354
 msgid "Working now on the duplicated record(s)!"
 msgstr "Nyní pracujete s duplicitním záznamem!"
 
-#: tryton/gui/window/form.py:350
+#: tryton/gui/window/form.py:361
 msgid "Record saved!"
 msgstr "Záznam uložen!"
 
-#: tryton/gui/window/form.py:353
+#: tryton/gui/window/form.py:364
 msgid "Invalid form!"
 msgstr "Neplatný formulář!"
 
-#: tryton/gui/window/form.py:374 tryton/gui/window/form.py:478
+#: tryton/gui/window/form.py:385 tryton/gui/window/form.py:497
 msgid ""
 "This record has been modified\n"
 "do you want to save it ?"
@@ -1283,52 +1277,52 @@ msgstr ""
 "Tento záznam byl upraven\n"
 "chcete ho uložit?"
 
-#: tryton/gui/window/form.py:460
+#: tryton/gui/window/form.py:478
 msgid " of "
 msgstr " z "
 
-#: tryton/gui/window/form.py:523
+#: tryton/gui/window/form.py:542
 msgid "Action"
 msgstr "Akce"
 
-#: tryton/gui/window/form.py:523
+#: tryton/gui/window/form.py:542
 msgid "Launch action"
 msgstr ""
 
-#: tryton/gui/window/form.py:524
+#: tryton/gui/window/form.py:543
 #, fuzzy
 msgid "Relate"
 msgstr "_Vytvořit"
 
-#: tryton/gui/window/form.py:524
+#: tryton/gui/window/form.py:543
 #, fuzzy
 msgid "Open related records"
 msgstr "Otevřít záznam"
 
-#: tryton/gui/window/form.py:526
+#: tryton/gui/window/form.py:545
 #, fuzzy
 msgid "Report"
 msgstr "Sestavy"
 
-#: tryton/gui/window/form.py:526
+#: tryton/gui/window/form.py:545
 #, fuzzy
 msgid "Open report"
 msgstr "Otevřít záznam"
 
-#: tryton/gui/window/form.py:527
+#: tryton/gui/window/form.py:546
 #, fuzzy
 msgid "E-Mail"
 msgstr "Email"
 
-#: tryton/gui/window/form.py:527
+#: tryton/gui/window/form.py:546
 msgid "E-Mail report"
 msgstr ""
 
-#: tryton/gui/window/form.py:528
+#: tryton/gui/window/form.py:547
 msgid "Print"
 msgstr "Tisk"
 
-#: tryton/gui/window/form.py:528
+#: tryton/gui/window/form.py:547
 msgid "Print report"
 msgstr ""
 
@@ -1346,19 +1340,19 @@ msgstr ""
 msgid "Limit:"
 msgstr "Omezit:"
 
-#: tryton/gui/window/preference.py:20
+#: tryton/gui/window/preference.py:22
 msgid "Preferences"
 msgstr "Nastavení"
 
-#: tryton/gui/window/preference.py:45
+#: tryton/gui/window/preference.py:48
 msgid "Edit User Preferences"
 msgstr "Upravit uživatelské nastavení"
 
-#: tryton/gui/window/preference.py:66
+#: tryton/gui/window/preference.py:73
 msgid "Preference"
 msgstr "Nastavení"
 
-#: tryton/gui/window/preference.py:83
+#: tryton/gui/window/preference.py:86
 #, fuzzy
 msgid "Current Password:"
 msgstr "Heslo správce:"
@@ -1426,47 +1420,7 @@ msgstr ""
 msgid "Unmark line for deletion"
 msgstr ""
 
-#: tryton/gui/window/shortcuts.py:42
-msgid "Date/Datetime Entries Shortcuts"
-msgstr "Zkratky pro data/data a čas"
-
-#: tryton/gui/window/shortcuts.py:43
-msgid ""
-"You can use special operators:\n"
-"* + to increase the date\n"
-"* - to decrease the date or clear\n"
-"* = to set the date or the current date\n"
-"\n"
-"Available variables are:\n"
-"h for hours\n"
-"d for days\n"
-"w for weeks (only with +/-)\n"
-"m for months\n"
-"y for years\n"
-"\n"
-"Examples:\n"
-"\"+21d\" increase of 21 days the date\n"
-"\"=11m\" set the date to the 11th month of the year\n"
-"\"-2w\" decrease of 2 weeks the date"
-msgstr ""
-"Můžete použít speciální operátory:\n"
-"* + pro zvýšení data\n"
-"* - pro snížení data\n"
-"* = pro nastavení data nebo pro aktuální den\n"
-"\n"
-"Dostupné proměnné:\n"
-"h pro hodiny\n"
-"d pro dny\n"
-"w pro týdny\n"
-"m pro měsíce\n"
-"y pro roky\n"
-"\n"
-"Příklady:\n"
-"\"+21d\" přidání 21 dní k datu\n"
-"\"=11m\" nastavení data na 11. měsíc roku\n"
-"\"-2w\" snížení data o 2 týdny"
-
-#: tryton/gui/window/shortcuts.py:61
+#: tryton/gui/window/shortcuts.py:44
 msgid "Edition Widgets"
 msgstr "Editovací prvky"
 
@@ -1532,46 +1486,46 @@ msgstr "Tipy"
 msgid "_Display a new tip next time"
 msgstr "Zobrazit příště další tip"
 
-#: tryton/gui/window/win_export.py:22
+#: tryton/gui/window/win_export.py:24
 msgid "Export to CSV"
 msgstr "Exportovat do CSV souboru"
 
-#: tryton/gui/window/win_export.py:36
+#: tryton/gui/window/win_export.py:39
 msgid "<b>Predefined exports</b>"
 msgstr "<b>Předdefinované exporty</b>"
 
-#: tryton/gui/window/win_export.py:48 tryton/gui/window/win_import.py:37
+#: tryton/gui/window/win_export.py:51 tryton/gui/window/win_import.py:38
 msgid "<b>All fields</b>"
 msgstr "<b>Všechna pole</b>"
 
-#: tryton/gui/window/win_export.py:79 tryton/gui/window/win_import.py:63
-#: tryton/gui/window/view_form/view/screen_container.py:81
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:80
-#: tryton/gui/window/view_form/view/form_gtk/image.py:84
+#: tryton/gui/window/win_export.py:82 tryton/gui/window/win_import.py:64
+#: tryton/gui/window/view_form/view/screen_container.py:84
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:84
+#: tryton/gui/window/view_form/view/form_gtk/image.py:88
 msgid "Clear"
 msgstr "Vymazat"
 
-#: tryton/gui/window/win_export.py:91
+#: tryton/gui/window/win_export.py:94
 msgid "Save Export"
 msgstr "Uložit exportu"
 
-#: tryton/gui/window/win_export.py:100
+#: tryton/gui/window/win_export.py:103
 msgid "Delete Export"
 msgstr "Smazat exportu"
 
-#: tryton/gui/window/win_export.py:111
+#: tryton/gui/window/win_export.py:114
 msgid "<b>Fields to export</b>"
 msgstr "<b>Pole pro export</b>"
 
-#: tryton/gui/window/win_export.py:128
+#: tryton/gui/window/win_export.py:131
 msgid "<b>Options</b>"
 msgstr "<b>Možnosti</b>"
 
-#: tryton/gui/window/win_export.py:138
+#: tryton/gui/window/win_export.py:141
 msgid "Open"
 msgstr "Otevřít"
 
-#: tryton/gui/window/win_export.py:143
+#: tryton/gui/window/win_export.py:146
 msgid "Add _field names"
 msgstr "Přidat jména polí"
 
@@ -1579,21 +1533,21 @@ msgstr "Přidat jména polí"
 msgid "Name"
 msgstr ""
 
-#: tryton/gui/window/win_export.py:298
+#: tryton/gui/window/win_export.py:306
 msgid "What is the name of this export?"
 msgstr ""
 
-#: tryton/gui/window/win_export.py:414
+#: tryton/gui/window/win_export.py:429
 #, python-format
 msgid "%d record saved!"
 msgstr "%d záznam uložen!"
 
-#: tryton/gui/window/win_export.py:416
+#: tryton/gui/window/win_export.py:431
 #, python-format
 msgid "%d records saved!"
 msgstr "%d záznamů uloženo!"
 
-#: tryton/gui/window/win_export.py:419
+#: tryton/gui/window/win_export.py:434
 #, python-format
 msgid ""
 "Operation failed!\n"
@@ -1604,37 +1558,37 @@ msgstr ""
 "Chybová zpráva:\n"
 "%s"
 
-#: tryton/gui/window/win_form.py:37
+#: tryton/gui/window/win_form.py:40
 msgid "Link"
 msgstr "Odkaz"
 
-#: tryton/gui/window/win_form.py:128
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:43
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:44
+#: tryton/gui/window/win_form.py:138
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:44
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:47
 msgid "Add"
 msgstr "Přidat"
 
-#: tryton/gui/window/win_form.py:139
-#: tryton/gui/window/view_form/view/form_gtk/many2many.py:54
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:55
+#: tryton/gui/window/win_form.py:151
+#: tryton/gui/window/view_form/view/form_gtk/many2many.py:56
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:59
 msgid "Remove <Del>"
 msgstr ""
 
-#: tryton/gui/window/win_form.py:152
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:64
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:68
+#: tryton/gui/window/win_form.py:166
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:66
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:73
 #, fuzzy
 msgid "Create a new record <F3>"
 msgstr "Vytvořit nový záznam"
 
-#: tryton/gui/window/win_form.py:162
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:88
+#: tryton/gui/window/win_form.py:178
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:95
 #, fuzzy
 msgid "Delete selected record <Del>"
 msgstr "Smazat vybraný záznam"
 
-#: tryton/gui/window/win_form.py:174
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:98
+#: tryton/gui/window/win_form.py:192
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:106
 #, fuzzy
 msgid "Undelete selected record <Ins>"
 msgstr "Smazat vybraný záznam"
@@ -1643,24 +1597,24 @@ msgstr "Smazat vybraný záznam"
 msgid "Import from CSV"
 msgstr "Import CSV souboru"
 
-#: tryton/gui/window/win_import.py:75
+#: tryton/gui/window/win_import.py:76
 msgid "Auto-Detect"
 msgstr "Automatická detekce"
 
-#: tryton/gui/window/win_import.py:92
+#: tryton/gui/window/win_import.py:93
 msgid "<b>Fields to import</b>"
 msgstr "<b>Pole pro import</b>"
 
-#: tryton/gui/window/win_import.py:108
+#: tryton/gui/window/win_import.py:109
 msgid "File to Import:"
 msgstr "Soubor k importu:"
 
-#: tryton/gui/window/win_import.py:110
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:59
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:113
-#: tryton/gui/window/view_form/view/form_gtk/image.py:62
-#: tryton/gui/window/view_form/view/form_gtk/image.py:131
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:520
+#: tryton/gui/window/win_import.py:111
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:61
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:117
+#: tryton/gui/window/view_form/view/form_gtk/image.py:64
+#: tryton/gui/window/view_form/view/form_gtk/image.py:135
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:533
 msgid "Open..."
 msgstr "Otevřít..."
 
@@ -1681,7 +1635,7 @@ msgstr "Oddělovač textu:"
 msgid "Encoding:"
 msgstr "Kódování:"
 
-#: tryton/gui/window/win_import.py:149
+#: tryton/gui/window/win_import.py:150
 msgid "Lines to Skip:"
 msgstr "Vynechané řádky:"
 
@@ -1689,34 +1643,34 @@ msgstr "Vynechané řádky:"
 msgid "Field name"
 msgstr "Jméno pole"
 
-#: tryton/gui/window/win_import.py:243
+#: tryton/gui/window/win_import.py:249
 msgid "You must select an import file first!"
 msgstr "Nejprve je nutné vybrat soubor pro import!"
 
-#: tryton/gui/window/win_import.py:255
+#: tryton/gui/window/win_import.py:261
 msgid "Error opening CSV file"
 msgstr "Chyba při otevírání CSV souboru"
 
-#: tryton/gui/window/win_import.py:282
+#: tryton/gui/window/win_import.py:288
 #, fuzzy, python-format
 msgid "Error processing the file at field %s."
 msgstr "Chyba při zpracování souboru u pole %s.\n"
 
-#: tryton/gui/window/win_import.py:352
+#: tryton/gui/window/win_import.py:365
 #, python-format
 msgid "%d record imported!"
 msgstr "%d záznam načten!"
 
-#: tryton/gui/window/win_import.py:354
+#: tryton/gui/window/win_import.py:367
 #, python-format
 msgid "%d records imported!"
 msgstr "%d záznamů načteno!"
 
-#: tryton/gui/window/win_import.py:359
+#: tryton/gui/window/win_import.py:372
 msgid "Importation Error!"
 msgstr "Chyba načítání!"
 
-#: tryton/gui/window/win_import.py:360
+#: tryton/gui/window/win_import.py:373
 #, python-format
 msgid ""
 "Error importing record %(record)s\n"
@@ -1734,163 +1688,143 @@ msgid "Wizard"
 msgstr "Průvodce"
 
 #: tryton/gui/window/view_board/parser.py:108
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:384
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:367
 msgid "No String Attr."
 msgstr "Žádný řetězcový atribut"
 
-#: tryton/gui/window/view_form/view/list.py:596
+#: tryton/gui/window/view_form/view/list.py:648
 msgid "You must select a record to use the relation!"
 msgstr "Musíte vybrat záznam před použitím relace!"
 
-#: tryton/gui/window/view_form/view/screen_container.py:46
+#: tryton/gui/window/view_form/view/screen_container.py:49
 #, fuzzy
 msgid "F_ilters"
 msgstr "_Soubor"
 
-#: tryton/gui/window/view_form/view/screen_container.py:71
-#: tryton/gui/window/view_form/view/screen_container.py:287
+#: tryton/gui/window/view_form/view/screen_container.py:74
+#: tryton/gui/window/view_form/view/screen_container.py:289
 msgid "Find"
 msgstr "Najít"
 
-#: tryton/gui/window/view_form/view/form_gtk/binary.py:49
+#: tryton/gui/window/view_form/view/form_gtk/binary.py:50
 #, fuzzy
 msgid "Select a File..."
 msgstr "Vyberte soubor"
 
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:43
-msgid "Open the calendar"
-msgstr "Otevřít kalendář"
-
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:95
-msgid "Date Selection"
-msgstr "Výběr datumu"
-
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:138
-msgid "Date Time Selection"
-msgstr "Výběr data a času"
-
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:147
-msgid "Hour:"
-msgstr "Hodina:"
-
-#: tryton/gui/window/view_form/view/form_gtk/calendar.py:150
-msgid "Minute:"
-msgstr "Minuta:"
-
-#: tryton/gui/window/view_form/view/form_gtk/char.py:141
+#: tryton/gui/window/view_form/view/form_gtk/char.py:156
 msgid "Show plain text"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/image.py:51
+#: tryton/gui/window/view_form/view/form_gtk/image.py:52
 #, fuzzy
 msgid "Select an Image..."
 msgstr "Vyberte soubor"
 
-#: tryton/gui/window/view_form/view/form_gtk/image.py:121
+#: tryton/gui/window/view_form/view/form_gtk/image.py:125
 msgid "All files"
 msgstr "Všechny soubory"
 
-#: tryton/gui/window/view_form/view/form_gtk/image.py:125
+#: tryton/gui/window/view_form/view/form_gtk/image.py:129
 msgid "Images"
 msgstr "Obrázky"
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:173
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:177
 #, fuzzy
 msgid "Translation"
 msgstr "Přidat překlad"
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:197
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:199
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:282
-#: tryton/gui/window/view_form/view/form_gtk/parser.py:286
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:201
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:203
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:265
+#: tryton/gui/window/view_form/view/form_gtk/parser.py:269
 msgid ":"
 msgstr ":"
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:229
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:233
 msgid "Edit"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:234
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:238
 msgid "Fuzzy"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:303
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:308
 msgid "You need to save the record before adding translations!"
 msgstr "Musíte uložit záznam před přidáváním překladů!"
 
-#: tryton/gui/window/view_form/view/form_gtk/interface.py:314
+#: tryton/gui/window/view_form/view/form_gtk/interface.py:319
 msgid "No other language available!"
 msgstr "Jiný jazyk není k dispozici!"
 
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:65
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:304
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:67
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:340
 #, fuzzy
 msgid "Open a record <F2>"
 msgstr "Otevřít záznam"
 
-#: tryton/gui/window/view_form/view/form_gtk/many2one.py:307
+#: tryton/gui/window/view_form/view/form_gtk/many2one.py:343
 #, fuzzy
 msgid "Search a record <F2>"
 msgstr "Hledat záznam"
 
-#: tryton/gui/window/view_form/view/form_gtk/one2many.py:78
+#: tryton/gui/window/view_form/view/form_gtk/one2many.py:84
 #, fuzzy
 msgid "Edit selected record <F2>"
 msgstr "Upravit vybraný záznam"
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:170
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:157
 msgid "Change text to bold"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:171
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:158
 msgid "Change text to italic"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:172
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:159
 msgid "Change text to underline"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:173
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:160
 msgid "Choose font-family"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:174
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:161
 msgid "Choose font-size"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:175
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:162
 msgid "Justify of line to the left"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:177
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:164
 msgid "Justify of line to the center"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:178
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:165
 msgid "Justify of line to the right"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:180
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:167
 msgid "Justify of line to fill window"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:182
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:169
 msgid "Change the foreground text"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:184
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:171
 msgid "Change the background text"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:185
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:172
 msgid "Change the markup text view"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:495
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:508
 msgid "Select a foreground color"
 msgstr ""
 
-#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:496
+#: tryton/gui/window/view_form/view/form_gtk/richtextbox.py:509
 msgid "Select a background color"
 msgstr ""
 
@@ -1918,13 +1852,13 @@ msgstr "Obrázek PNG (*.png)"
 msgid "Image size too large!"
 msgstr "Rozměry obrázku jsou příliš velké!"
 
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:234
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:233
 #, fuzzy
 msgid ": "
 msgstr ":"
 
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:247
-#: tryton/gui/window/view_form/view/list_gtk/parser.py:893
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:246
+#: tryton/gui/window/view_form/view/list_gtk/parser.py:913
 msgid "Unknown"
 msgstr "Neznámý"
 
