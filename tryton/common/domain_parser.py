@@ -747,7 +747,9 @@ class DomainParser(object):
                             operator = '!'
                         value = value.replace('%%', '%')
                 def_operator = default_operator(field)
-                if def_operator in operator:
+                if (def_operator == operator.strip()
+                        or (def_operator in operator
+                            and 'not' in operator)):
                     operator = operator.rstrip(def_operator
                         ).replace('not', '!').strip()
                 if operator.endswith('in'):
@@ -956,6 +958,10 @@ def test_string():
                 'string': '(Sur)Name',
                 'type': 'char',
                 },
+            'date': {
+                'string': 'Date',
+                'type': 'date',
+                },
             })
     assert dom.string([('name', '=', 'Doe')]) == 'Name: =Doe'
     assert dom.string([('name', 'ilike', '%Doe%')]) == 'Name: Doe'
@@ -983,6 +989,8 @@ def test_string():
                     'Name: Doe (Name: John or Name: Jane)'
     assert dom.string([]) == ''
     assert dom.string([('surname', 'ilike', '%Doe%')]) == '"(Sur)Name": Doe'
+    assert dom.string([('date', '>=', datetime.date(2012, 10, 24))]) == \
+        'Date: >=10/24/2012'
 
 
 def test_group():
