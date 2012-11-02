@@ -569,9 +569,15 @@ def complete_value(field, value):
             yield True
 
     def complete_selection():
+        test_value = value
+        if isinstance(value, list):
+            test_value = value[-1]
         for svalue, test in field['selection']:
-            if test.lower().startswith(value.lower()):
-                yield svalue
+            if test.lower().startswith(test_value.lower()):
+                if test_value == value:
+                    yield svalue
+                else:
+                    yield value[:-1] + [svalue]
 
     def complete_datetime():
         yield datetime.date.today()
@@ -592,6 +598,23 @@ def complete_value(field, value):
         'time': complete_time,
         }
     return completes.get(field['type'], lambda: [])()
+
+
+def test_complete_selection():
+    field = {
+        'type': 'selection',
+        'selection': [
+            ('male', 'Male'),
+            ('female', 'Female'),
+            ],
+        }
+    for value, result in (
+            ('m', ['male']),
+            ('test', []),
+            ('', ['male', 'female']),
+            (['male', 'f'], [['male', 'female']]),
+            ):
+        assert list(complete_value(field, value)) == result
 
 
 def parenthesize(tokens):
@@ -944,7 +967,10 @@ class DomainParser(object):
                                     (field['name'], '<', rvalue),
                                     ])
                             continue
-                    value = convert_value(field, value)
+                    if isinstance(value, list):
+                        value = [convert_value(field, v) for v in value]
+                    else:
+                        value = convert_value(field, value)
                     yield field['name'], operator, value
 
 
@@ -1077,6 +1103,15 @@ def test_parse_clause():
                 'name': 'integer',
                 'type': 'integer',
                 },
+            'selection': {
+                'string': 'Selection',
+                'name': 'selection',
+                'type': 'selection',
+                'selection': [
+                    ('male', 'Male'),
+                    ('female', 'Female'),
+                    ],
+                },
             })
     assert rlist(dom.parse_clause([('John',)])) == [
         ('rec_name', 'ilike', '%John%')]
@@ -1090,6 +1125,10 @@ def test_parse_clause():
     assert rlist(dom.parse_clause([('Name', '!', ['John', 'Jane'])])) == [
         ('name', 'not in', ['John', 'Jane']),
         ]
+    assert rlist(dom.parse_clause([('Selection', None, ['Male', 'Female'])])) \
+        == [
+            ('selection', 'in', ['male', 'female'])
+            ]
     assert rlist(dom.parse_clause([('Integer', None, '3..5')])) == [[
             ('integer', '>=', 3),
             ('integer', '<', 5),
