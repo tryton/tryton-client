@@ -7,6 +7,7 @@ import gobject
 from itertools import islice, cycle
 
 from tryton.common import MODELACCESS
+from tryton.common.date_widget import DateEntry
 
 _ = gettext.gettext
 
@@ -145,6 +146,8 @@ class EditableTreeView(TreeView):
 
         if event.keyval in self.leaving_events or leaving:
             if isinstance(entry, gtk.Entry):
+                if isinstance(entry, DateEntry):
+                    entry.date_get()
                 txt = entry.get_text()
             else:
                 txt = entry.get_active_text()
@@ -257,6 +260,8 @@ class EditableTreeView(TreeView):
         model = self.get_model()
         record = model.get_value(model.get_iter(path), 0)
         if isinstance(entry, gtk.Entry):
+            if isinstance(entry, DateEntry):
+                entry.date_get()
             self.on_quit_cell(record, column.name, entry.get_text())
         elif isinstance(entry, (gtk.ComboBoxEntry, gtk.ComboBox)):
             self.on_quit_cell(record, column.name, entry.get_active_text())
