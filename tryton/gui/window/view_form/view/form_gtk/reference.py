@@ -71,6 +71,7 @@ class Reference(Many2One):
             self.widget.set_focus_chain([self.widget_combo, self.wid_text])
 
     def _set_button_sensitive(self):
+        super(Reference, self)._set_button_sensitive()
         self.widget_combo.set_sensitive(not self._readonly)
 
     @property
