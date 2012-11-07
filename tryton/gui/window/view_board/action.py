@@ -129,4 +129,6 @@ class Action(SignalEvent):
         del self.domain[:]
         self.domain.extend(new_domain)
         if hasattr(self, 'screen'):  # Catch early update
-            self.display()
+            # Using idle_add to prevent corruption of the event who triggered
+            # the update.
+            gtk.idle_add(self.display)
