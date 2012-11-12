@@ -9,6 +9,7 @@ from tryton.config import CONFIG
 import tryton.common as common
 import gettext
 from tryton.common import RPCExecute, RPCException
+from tryton.common.placeholder_entry import PlaceholderEntry
 
 _ = gettext.gettext
 
@@ -33,7 +34,8 @@ class Many2Many(WidgetInterface):
 
         tooltips = common.Tooltips()
 
-        self.wid_text = gtk.Entry()
+        self.wid_text = PlaceholderEntry()
+        self.wid_text.set_placeholder_text(_('Search'))
         self.wid_text.set_property('width_chars', 13)
         self.wid_text.connect('activate', self._sig_activate)
         self.wid_text.connect('focus-out-event', self._focus_out)
@@ -41,7 +43,7 @@ class Many2Many(WidgetInterface):
         hbox.pack_start(self.wid_text, expand=True, fill=True)
 
         self.but_add = gtk.Button()
-        tooltips.set_tip(self.but_add, _('Add'))
+        tooltips.set_tip(self.but_add, _('Add existing record'))
         self.but_add.connect('clicked', self._sig_add)
         self.but_add.connect('enter-notify-event', self.enter)
         img_add = gtk.Image()
@@ -53,7 +55,7 @@ class Many2Many(WidgetInterface):
         hbox.pack_start(self.but_add, expand=False, fill=False)
 
         self.but_remove = gtk.Button()
-        tooltips.set_tip(self.but_remove, _('Remove <Del>'))
+        tooltips.set_tip(self.but_remove, _('Remove selected record <Del>'))
         self.but_remove.connect('clicked', self._sig_remove)
         self.but_remove.connect('enter-notify-event', self.enter)
         img_remove = gtk.Image()

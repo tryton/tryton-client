@@ -8,6 +8,7 @@ import collections
 
 import tryton.common as common
 from tryton.common.domain_parser import quote
+from tryton.common.placeholder_entry import PlaceholderEntry
 from tryton.translate import date_format
 from tryton.config import TRYTON_ICON
 from tryton.pyson import PYSONDecoder
@@ -105,7 +106,8 @@ class ScreenContainer(object):
         self.filter_button.connect('toggled', self.search_box)
         hbox.pack_start(self.filter_button, expand=False, fill=False)
 
-        self.search_entry = gtk.Entry()
+        self.search_entry = PlaceholderEntry()
+        self.search_entry.set_placeholder_text(_('Search'))
         self.search_entry.set_alignment(0.0)
         self.completion = gtk.EntryCompletion()
         self.completion.set_model(gtk.ListStore(str))
