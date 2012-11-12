@@ -15,6 +15,30 @@ from tryton.pyson import PYSONDecoder
 _ = gettext.gettext
 
 
+class Dates(gtk.HBox):
+
+    def __init__(self, format_):
+        super(Dates, self).__init__()
+        self.from_ = common.date_widget.DateEntry(format_)
+        self.pack_start(self.from_, expand=True, fill=True)
+        self.pack_start(gtk.Label(_('..')), expand=False, fill=False)
+        self.to = common.date_widget.DateEntry(format_)
+        self.pack_start(self.to, expand=True, fill=True)
+
+    def get_value(self):
+        from_ = self.from_.get_text()
+        to = self.to.get_text()
+        if from_ and to:
+            if from_ != to:
+                return '%s..%s' % (quote(from_), quote(to))
+            else:
+                return quote(from_)
+        elif from_:
+            return '>=%s' % quote(from_)
+        elif to:
+            return '<%s' % quote(to)
+
+
 class Selection(gtk.ScrolledWindow):
 
     def __init__(self, selections):
@@ -243,7 +267,7 @@ class ScreenContainer(object):
             for label, entry in self.search_table.fields:
                 if isinstance(entry, gtk.ComboBox):
                     value = quote(entry.get_active_text())
-                elif isinstance(entry, Selection):
+                elif isinstance(entry, (Dates, Selection)):
                     value = entry.get_value()
                 else:
                     value = quote(entry.get_text())
@@ -308,8 +332,9 @@ class ScreenContainer(object):
                         format_ = PYSONDecoder({}).decode(field['format'])
                         if field['type'] == 'datetime':
                             format_ = date_format() + ' ' + format_
-                    entry = common.date_widget.DateEntry(format_)
-                    entry.connect('activate', date_activate)
+                    entry = Dates(format_)
+                    entry.from_.connect('activate', date_activate)
+                    entry.to.connect('activate', date_activate)
                 else:
                     entry = gtk.Entry()
                     entry.connect('activate', lambda *a: search())

@@ -957,7 +957,8 @@ class DomainParser(object):
                         operator = negate_operator(default_operator(field))
                     if 'like' in operator:
                         value = likify(value)
-                    if field['type'] in ('integer', 'float', 'numeric'):
+                    if field['type'] in ('integer', 'float', 'numeric',
+                            'datetime', 'date', 'time'):
                         if '..' in value:
                             lvalue, rvalue = value.split('..', 1)
                             lvalue = convert_value(field, lvalue)
