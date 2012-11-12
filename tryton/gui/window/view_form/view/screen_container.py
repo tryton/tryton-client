@@ -15,6 +15,35 @@ from tryton.pyson import PYSONDecoder
 _ = gettext.gettext
 
 
+class Selection(gtk.ScrolledWindow):
+
+    def __init__(self, selections):
+        super(Selection, self).__init__()
+        self.treeview = gtk.TreeView()
+        model = gtk.ListStore(gobject.TYPE_STRING)
+        for selection in selections:
+            model.append((selection,))
+        self.treeview.set_model(model)
+
+        column = gtk.TreeViewColumn()
+        cell = gtk.CellRendererText()
+        column.pack_start(cell)
+        column.add_attribute(cell, 'text', 0)
+        self.treeview.append_column(column)
+        self.treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        self.treeview.set_headers_visible(False)
+        self.add(self.treeview)
+        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+    def get_value(self):
+        values = []
+        model, paths = self.treeview.get_selection().get_selected_rows()
+        for path in paths:
+            iter_ = model.get_iter(path)
+            values.append(model.get_value(iter_, 0))
+        return ';'.join(quote(v) for v in values)
+
+
 class ScreenContainer(object):
 
     def __init__(self):
@@ -213,11 +242,13 @@ class ScreenContainer(object):
             text = ''
             for label, entry in self.search_table.fields:
                 if isinstance(entry, gtk.ComboBox):
-                    value = entry.get_active_text()
+                    value = quote(entry.get_active_text())
+                elif isinstance(entry, Selection):
+                    value = entry.get_value()
                 else:
-                    value = entry.get_text()
+                    value = quote(entry.get_text())
                 if value:
-                    text += label + ' ' + quote(value) + ' '
+                    text += label + ' ' + value + ' '
             self.set_text(text)
             self.do_search()
 
@@ -245,6 +276,7 @@ class ScreenContainer(object):
                         collections.OrderedDict)):
                 fields.sort(key=operator.itemgetter('string'))
             self.search_table = gtk.Table(rows=len(fields), columns=2)
+            self.search_table.set_homogeneous(False)
             self.search_table.set_border_width(5)
             self.search_table.set_row_spacings(2)
             self.search_table.set_col_spacings(2)
@@ -254,19 +286,21 @@ class ScreenContainer(object):
             for i, field in enumerate(fields):
                 label = gtk.Label(field['string'])
                 label.set_alignment(0.0, 0.5)
-                self.search_table.attach(label, 0, 1, i, i + 1)
-                if field['type'] in ('boolean', 'selection'):
+                self.search_table.attach(label, 0, 1, i, i + 1, yoptions=False)
+                yoptions = False
+                if field['type'] == 'boolean':
                     if hasattr(gtk, 'ComboBoxText'):
                         entry = gtk.ComboBoxText()
                     else:
                         entry = gtk.combo_box_new_text()
                     entry.append_text('')
-                    if field['type'] == 'boolean':
-                        selections = (_('True'), _('False'))
-                    else:
-                        selections = tuple(x[1] for x in field['selection'])
+                    selections = (_('True'), _('False'))
                     for selection in selections:
                         entry.append_text(selection)
+                elif field['type'] == 'selection':
+                    selections = tuple(x[1] for x in field['selection'])
+                    entry = Selection(selections)
+                    yoptions = gtk.FILL | gtk.EXPAND
                 elif field['type'] in ('date', 'datetime', 'time'):
                     if field['type'] == 'date':
                         format_ = date_format()
@@ -279,7 +313,8 @@ class ScreenContainer(object):
                 else:
                     entry = gtk.Entry()
                     entry.connect('activate', lambda *a: search())
-                self.search_table.attach(entry, 1, 2, i, i + 1)
+                self.search_table.attach(entry, 1, 2, i, i + 1,
+                    yoptions=yoptions)
                 self.search_table.fields.append((field['string'] + ':', entry))
 
             scrolled = gtk.ScrolledWindow()
