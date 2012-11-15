@@ -89,7 +89,7 @@ class Form(SignalEvent, TabContent):
 
     def __init__(self, model, res_id=False, domain=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
-            auto_refresh=False, search_value=None):
+            auto_refresh=False, search_value=None, tab_domain=None):
         super(Form, self).__init__()
 
         if not mode:
@@ -112,7 +112,8 @@ class Form(SignalEvent, TabContent):
 
         self.screen = Screen(self.model, mode=mode, context=self.context,
             view_ids=view_ids, domain=domain, limit=limit,
-            readonly=bool(auto_refresh), search_value=search_value)
+            readonly=bool(auto_refresh), search_value=search_value,
+            tab_domain=tab_domain)
         self.screen.widget.show()
 
         if not name:

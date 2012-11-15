@@ -119,6 +119,12 @@ class Action(object):
             search_value = PYSONDecoder(search_context).decode(
                     action['pyson_search_value'] or '[]')
 
+            tab_domain_context = ctx.copy()
+            tab_domain_context['context'] = ctx
+            tab_domain_context['_user'] = rpc._USER
+            decoder = PYSONDecoder(tab_domain_context)
+            tab_domain = [(n, decoder.decode(d)) for n, d in action['domains']]
+
             name = False
             if action.get('window_name', True):
                 name = action.get('name', False)
@@ -131,7 +137,8 @@ class Action(object):
                     limit=action.get('limit'),
                     auto_refresh=action.get('auto_refresh'),
                     search_value=search_value,
-                    icon=(action.get('icon.rec_name') or ''))
+                    icon=(action.get('icon.rec_name') or ''),
+                    tab_domain=tab_domain)
         elif action['type'] == 'ir.action.wizard':
             Window.create_wizard(action['wiz_name'], data,
                 direct_print=action.get('direct_print', False),

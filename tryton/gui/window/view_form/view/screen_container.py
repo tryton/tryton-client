@@ -71,30 +71,19 @@ class Selection(gtk.ScrolledWindow):
 
 class ScreenContainer(object):
 
-    def __init__(self):
+    def __init__(self, tab_domain):
         self.viewport = gtk.Viewport()
         self.viewport.set_shadow_type(gtk.SHADOW_NONE)
         self.vbox = gtk.VBox(spacing=3)
-        self.vbox.pack_end(self.viewport)
-        self.filter_vbox = None
-        self.filter_button = None
-        self.but_prev = None
-        self.but_next = None
         self.alternate_viewport = gtk.Viewport()
         self.alternate_viewport.set_shadow_type(gtk.SHADOW_NONE)
         self.alternate_view = False
         self.search_window = None
         self.search_table = None
-
-    def widget_get(self):
-        return self.vbox
-
-    def set_screen(self, screen):
-        self.screen = screen
+        self.tab_domain = tab_domain or []
 
         tooltips = common.Tooltips()
-        if self.filter_vbox is not None:
-            return
+
         self.filter_vbox = gtk.VBox(spacing=0)
         self.filter_vbox.set_border_width(0)
         hbox = gtk.HBox(homogeneous=False, spacing=0)
@@ -171,22 +160,56 @@ class ScreenContainer(object):
 
         hbox.show_all()
         hbox.set_focus_chain([self.search_entry])
-        self.filter_vbox.pack_start(hbox, expand=True, fill=False)
+        self.filter_vbox.pack_start(hbox, expand=False, fill=False)
 
         hseparator = gtk.HSeparator()
         hseparator.show()
-        self.filter_vbox.pack_start(hseparator, expand=True, fill=False)
+        self.filter_vbox.pack_start(hseparator, expand=False, fill=False)
 
-        self.vbox.pack_start(self.filter_vbox, expand=False, fill=True)
+        if self.tab_domain:
+            self.notebook = gtk.Notebook()
+            self.notebook.props.homogeneous = True
+            self.notebook.set_scrollable(True)
+            for name, domain in self.tab_domain:
+                label = gtk.Label('_' + name)
+                label.set_use_underline(True)
+                self.notebook.append_page(gtk.VBox(), label)
+            self.filter_vbox.pack_start(self.notebook, expand=True, fill=True)
+            self.notebook.show_all()
+            # Set the current page before connecting to switch-page to not
+            # trigger the search a second times.
+            self.notebook.set_current_page(0)
+            self.notebook.get_nth_page(0).pack_end(self.viewport)
+            self.notebook.connect('switch-page', self.switch_page)
+            self.notebook.connect_after('switch-page', self.switch_page_after)
+            filter_expand = True
+        else:
+            self.notebook = None
+            self.vbox.pack_end(self.viewport)
+            filter_expand = False
+
+        self.vbox.pack_start(self.filter_vbox, expand=filter_expand, fill=True)
 
         self.but_next.set_sensitive(False)
         self.but_prev.set_sensitive(False)
 
         tooltips.enable()
 
+    def widget_get(self):
+        return self.vbox
+
+    def set_screen(self, screen):
+        self.screen = screen
+
     def show_filter(self):
         if self.filter_vbox:
             self.filter_vbox.show()
+        if self.notebook:
+            self.notebook.set_show_tabs(True)
+            if self.viewport in self.vbox.get_children():
+                self.vbox.remove(self.viewport)
+                self.notebook.get_nth_page(self.notebook.get_current_page()
+                    ).pack_end(self.viewport)
 
     def hide_filter(self):
         if self.filter_vbox:
@@ -194,6 +217,12 @@ class ScreenContainer(object):
         if self.filter_button and self.filter_button.get_active():
             self.filter_button.set_active(False)
             self.filter_button.toggled()
+        if self.notebook:
+            self.notebook.set_show_tabs(False)
+            if self.viewport not in self.vbox.get_children():
+                self.notebook.get_nth_page(self.notebook.get_current_page()
+                    ).remove(self.viewport)
+                self.vbox.pack_end(self.viewport)
 
     def set(self, widget):
         if self.alternate_view:
@@ -231,6 +260,25 @@ class ScreenContainer(object):
 
     def search_prev(self, widget=None):
         self.screen.search_prev(self.get_text())
+
+    def switch_page(self, notebook, page, page_num):
+        current_page = notebook.get_nth_page(notebook.get_current_page())
+        current_page.remove(self.viewport)
+
+        new_page = notebook.get_nth_page(page_num)
+        new_page.pack_end(self.viewport)
+
+    def switch_page_after(self, notebook, page, page_num):
+        self.do_search()
+        notebook.grab_focus()
+
+    def get_tab_domain(self):
+        if not self.notebook:
+            return []
+        idx = self.notebook.get_current_page()
+        if idx < 0:
+            return []
+        return self.tab_domain[idx][1]
 
     def match_selected(self, completion, model, iter):
         def callback():

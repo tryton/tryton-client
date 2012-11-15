@@ -32,7 +32,7 @@ class Screen(SignalEvent):
     def __init__(self, model_name, view_ids=None, mode=None, context=None,
             views_preload=None, domain=None, row_activate=None, limit=None,
             readonly=False, exclude_field=None, sort=None, search_value=None,
-            alternate_view=False):
+            tab_domain=None, alternate_view=False):
         if view_ids is None:
             view_ids = []
         if mode is None:
@@ -70,7 +70,7 @@ class Screen(SignalEvent):
         self.new_group()
         self.__current_record = None
         self.current_record = None
-        self.screen_container = ScreenContainer()
+        self.screen_container = ScreenContainer(tab_domain)
         self.screen_container.alternate_view = alternate_view
         self.widget = self.screen_container.widget_get()
         self.__current_view = 0
@@ -169,6 +169,11 @@ class Screen(SignalEvent):
                 domain = ['AND', domain, self.domain]
         else:
             domain = self.domain
+
+        tab_domain = self.screen_container.get_tab_domain()
+        if tab_domain:
+            domain = ['AND', domain, tab_domain]
+
         try:
             ids = RPCExecute('model', self.model_name, 'search', domain,
                 self.offset, self.limit, self.sort, context=self.context)

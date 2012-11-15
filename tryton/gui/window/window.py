@@ -21,7 +21,7 @@ class Window(object):
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None,
             context=None, mode=None, name=False, limit=None,
-            auto_refresh=False, search_value=None, icon=None):
+            auto_refresh=False, search_value=None, icon=None, tab_domain=None):
         from tryton.gui import Main
         if context is None:
             context = {}
@@ -31,7 +31,7 @@ class Window(object):
             win = Form(model, res_id, domain, mode=mode,
                 view_ids=(view_ids or []), context=context, name=name,
                 limit=limit, auto_refresh=auto_refresh,
-                search_value=search_value)
+                search_value=search_value, tab_domain=tab_domain)
         else:
             from board import Board
             win = Board(model, view_ids and view_ids[0] or None,
