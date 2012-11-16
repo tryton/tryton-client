@@ -1,6 +1,8 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import gtk
+import gobject
+
 from tryton.gui.window.view_form.screen import Screen
 from interface import WidgetInterface
 from tryton.gui.window.win_search import WinSearch
@@ -10,6 +12,7 @@ import tryton.common as common
 import gettext
 from tryton.common import RPCExecute, RPCException
 from tryton.common.placeholder_entry import PlaceholderEntry
+from tryton.common.completion import get_completion, update_completion
 
 _ = gettext.gettext
 
@@ -37,15 +40,24 @@ class Many2Many(WidgetInterface):
         self.wid_text = PlaceholderEntry()
         self.wid_text.set_placeholder_text(_('Search'))
         self.wid_text.set_property('width_chars', 13)
-        self.wid_text.connect('activate', self._sig_activate)
-        self.wid_text.connect('focus-out-event', self._focus_out)
+        self.wid_text.connect('focus-out-event', lambda *a: self._focus_out())
         self.focus_out = True
         hbox.pack_start(self.wid_text, expand=True, fill=True)
+
+        if int(self.attrs.get('completion', 1)):
+            self.wid_completion = get_completion()
+            self.wid_completion.connect('match-selected',
+                self._completion_match_selected)
+            self.wid_completion.connect('action-activated',
+                self._completion_action_activated)
+            self.wid_text.set_completion(self.wid_completion)
+            self.wid_text.connect('changed', self._update_completion)
+        else:
+            self.wid_completion = None
 
         self.but_add = gtk.Button()
         tooltips.set_tip(self.but_add, _('Add existing record'))
         self.but_add.connect('clicked', self._sig_add)
-        self.but_add.connect('enter-notify-event', self.enter)
         img_add = gtk.Image()
         img_add.set_from_stock('tryton-list-add',
             gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -57,7 +69,6 @@ class Many2Many(WidgetInterface):
         self.but_remove = gtk.Button()
         tooltips.set_tip(self.but_remove, _('Remove selected record <Del>'))
         self.but_remove.connect('clicked', self._sig_remove)
-        self.but_remove.connect('enter-notify-event', self.enter)
         img_remove = gtk.Image()
         img_remove.set_from_stock('tryton-list-remove',
             gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -95,6 +106,10 @@ class Many2Many(WidgetInterface):
         return self.wid_text.grab_focus()
 
     def on_keypress(self, widget, event):
+        editable = self.wid_text.get_editable()
+        activate_keys = [gtk.keysyms.Tab, gtk.keysyms.ISO_Left_Tab]
+        if not self.wid_completion:
+            activate_keys.append(gtk.keysyms.Return)
         if event.keyval == gtk.keysyms.F3:
             self._sig_add()
             return False
@@ -105,6 +120,13 @@ class Many2Many(WidgetInterface):
                 and widget == self.screen.widget:
             self._sig_remove()
             return False
+        if (widget == self.wid_text
+                and event.keyval in activate_keys
+                and editable
+                and self.wid_text.get_text()):
+            self._sig_add()
+            self.wid_text.grab_focus()
+        return False
 
     def destroy(self):
         self.screen.destroy()
@@ -120,11 +142,7 @@ class Many2Many(WidgetInterface):
             widget.modify_text(gtk.STATE_INSENSITIVE,
                     self.colors['text_color_insensitive'])
 
-    def _focus_out(self, *args):
-        if self.wid_text.get_text():
-            self._sig_add()
-
-    def _sig_add(self, *args):
+    def _sig_add(self, *args, **kwargs):
         if not self.focus_out:
             return
         domain = self.field.domain_get(self.record)
@@ -151,7 +169,7 @@ class Many2Many(WidgetInterface):
                 self.screen.display(res_id=ids[0])
             self.screen.set_cursor()
             self.wid_text.set_text('')
-        if len(ids) != 1 or not value:
+        if len(ids) != 1 or not value or kwargs.get('win_search', False):
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
@@ -162,10 +180,6 @@ class Many2Many(WidgetInterface):
 
     def _sig_remove(self, *args):
         self.screen.remove(remove=True)
-
-    def _sig_activate(self, *args):
-        self._sig_add()
-        self.wid_text.grab_focus()
 
     def _on_activate(self):
         self._sig_edit()
@@ -222,3 +236,44 @@ class Many2Many(WidgetInterface):
         self.screen.save_tree_state()
         self.screen.current_view.set_value()
         return True
+
+    def _completion_match_selected(self, completion, model, iter_):
+        record_id, = model.get(iter_, 1)
+        self.screen.load([record_id], modified=True)
+        self.wid_text.set_text('')
+        self.wid_text.grab_focus()
+
+        completion_model = self.wid_completion.get_model()
+        completion_model.clear()
+        completion_model.search_text = self.wid_text.get_text()
+        return True
+
+    def _update_completion(self, widget):
+        if self._readonly:
+            return
+        if not self.record:
+            return
+        model = self.attrs['relation']
+        update_completion(self.wid_text, self.record, self.field, model)
+
+    def _completion_action_activated(self, completion, index):
+        if index == 0:
+            self._sig_add(win_search=True)
+            self.wid_text.grab_focus()
+        elif index == 1:
+            model = self.attrs['relation']
+            domain = self.field.domain_get(self.record)
+            context = self.field.context_get(self.record)
+
+            screen = Screen(model, domain, context=context, mode=['form'])
+
+            def callback(result):
+                self.focus_out = True
+                if result:
+                    record = screen.current_record
+                    self.screen.load([record.id], modified=True)
+                self.wid_text.set_text('')
+                self.wid_text.grab_focus()
+
+            self.focus_out = False
+            WinForm(screen, callback, new=True, save_current=True)

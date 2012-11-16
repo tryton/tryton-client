@@ -57,12 +57,10 @@ class WinForm(NoModal):
             icon_cancel = gtk.STOCK_CANCEL
             self.but_cancel = self.win.add_button(icon_cancel,
                     gtk.RESPONSE_CANCEL)
-            self.but_cancel.set_focus_on_click(False)
 
         if new and self.many:
             self.but_new = self.win.add_button(gtk.STOCK_NEW,
                 gtk.RESPONSE_ACCEPT)
-            self.but_new.set_focus_on_click(False)
             self.but_new.set_accel_path('<tryton>/Form/New', self.accel_group)
 
         if self.save_current:
@@ -77,7 +75,6 @@ class WinForm(NoModal):
         else:
             self.but_ok = self.win.add_button(gtk.STOCK_OK,
                 gtk.RESPONSE_OK)
-        self.but_ok.set_focus_on_click(False)
         self.but_ok.add_accelerator('clicked', self.accel_group,
             gtk.keysyms.Return, gtk.gdk.CONTROL_MASK, gtk.ACCEL_VISIBLE)
         self.win.set_default_response(gtk.RESPONSE_OK)

@@ -4,7 +4,6 @@ import operator
 from functools import reduce
 import gtk
 import gettext
-import gobject
 from interface import ParserView
 
 _ = gettext.gettext
@@ -21,7 +20,6 @@ class ViewForm(ParserView):
         for widget in self.state_widgets:
             if isinstance(widget, gtk.Button):
                 widget.connect('clicked', self.button_clicked)
-                widget.set_focus_on_click(False)
 
         # Force to display the first time it switches on a page
         # This avoids glitch in position of widgets
@@ -42,7 +40,6 @@ class ViewForm(ParserView):
         vbox = gtk.VBox()
         vp = gtk.Viewport()
         vp.set_shadow_type(gtk.SHADOW_NONE)
-        vp.connect('leave-notify-event', self.leave)
         vp.add(self.widget)
         scroll = gtk.ScrolledWindow()
         scroll.add(vp)
@@ -170,10 +167,6 @@ class ViewForm(ParserView):
                     if focus_widget.widget.is_ancestor(child):
                         notebook.set_current_page(i)
             focus_widget.grab_focus()
-
-    def leave(self, widget, event):
-        # leave could be called during event process
-        gobject.idle_add(self.set_value, True)
 
     def button_clicked(self, widget):
         record = self.screen.current_record

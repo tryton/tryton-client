@@ -22,7 +22,8 @@ from tryton.common import COLORS, node_attributes, \
 import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
-from tryton.common.cellrenderertext import CellRendererText
+from tryton.common.cellrenderertext import CellRendererText, \
+    CellRendererTextCompletion
 from tryton.common.cellrenderertoggle import CellRendererToggle
 from tryton.common.cellrenderercombo import CellRendererCombo
 from tryton.common.cellrendererinteger import CellRendererInteger
@@ -30,6 +31,7 @@ from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.common.cellrendererbinary import CellRendererBinary
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
+from tryton.common.completion import get_completion, update_completion
 
 _ = gettext.gettext
 
@@ -391,6 +393,12 @@ class Char(object):
     def editing_started(self, cell, editable, path):
         return False
 
+    def _get_record_field(self, path):
+        store = self.treeview.get_model()
+        record = store.get_value(store.get_iter(path), 0)
+        field = record.group.fields[self.field_name]
+        return record, field
+
 
 class Int(Char):
 
@@ -523,12 +531,6 @@ class Binary(Char):
         size = record[self.field_name].get_size(record)
         cell.set_property('size', common.humanize(size) if size else '')
 
-    def _get_record_field(self, path):
-        store = self.treeview.get_model()
-        record = store.get_value(store.get_iter(path), 0)
-        field = record.group.fields[self.field_name]
-        return record, field
-
     def new_binary(self, renderer, path):
         filename = file_selection(_('Open...'))
         record, field = self._get_record_field(path)
@@ -574,6 +576,13 @@ class Binary(Char):
 
 
 class M2O(Char):
+
+    def __init__(self, field_name, model_name, treeview, attrs=None):
+        super(M2O, self).__init__(field_name, model_name, treeview,
+            attrs=attrs)
+        if int(attrs.get('completion', 1)):
+            self.renderer = CellRendererTextCompletion(self.set_completion)
+            self.renderer.connect('editing-started', self.editing_started)
 
     def value_from_text(self, record, text, callback=None):
         field = record.group.fields[self.field_name]
@@ -670,6 +679,57 @@ class M2O(Char):
                 callback()
         WinSearch(relation, search_callback, sel_multi=False, ids=ids,
             context=context, domain=domain)
+
+    def set_completion(self, entry, path):
+        if entry.get_completion():
+            entry.set_completion(None)
+        completion = get_completion()
+        completion.connect('match-selected', self._completion_match_selected,
+            path)
+        completion.connect('action-activated',
+            self._completion_action_activated, path)
+        entry.set_completion(completion)
+        entry.connect('key-press-event', self._key_press, path)
+        entry.connect('changed', self._update_completion, path)
+
+    def _key_press(self, entry, event, path):
+        record, field = self._get_record_field(path)
+        if (field.get(record) is not None
+                and event.keyval in (gtk.keysyms.Delete,
+                    gtk.keysyms.BackSpace)):
+            entry.set_text('')
+            field.set_client(record, None)
+        return False
+
+    def _completion_match_selected(self, completion, model, iter_, path):
+        record, field = self._get_record_field(path)
+        rec_name, record_id = model.get(iter_, 0, 1)
+        field.set_client(record, (record_id, rec_name))
+
+        completion.get_entry().set_text(rec_name)
+        completion_model = completion.get_model()
+        completion_model.clear()
+        completion_model.search_text = rec_name
+        return True
+
+    def _update_completion(self, entry, path):
+        record, field = self._get_record_field(path)
+        if field.get(record) is not None:
+            return
+        model = field.attrs['relation']
+        update_completion(entry, record, field, model)
+
+    def _completion_action_activated(self, completion, index, path):
+        record, field = self._get_record_field(path)
+        entry = completion.get_entry()
+
+        def callback():
+            entry.set_text(field.get_client(record))
+        if index == 0:
+            self.open_remote(record, create=False, changed=True,
+                text=entry.get_text(), callback=callback)
+        elif index == 1:
+            self.open_remote(record, create=True, callback=callback)
 
 
 class O2O(M2O):

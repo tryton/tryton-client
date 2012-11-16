@@ -1,3 +1,4 @@
+* Add completion on Many2One, Many2Many and One2Many
 * Add bookmark on search widget
 * Manage domains on Action Window
 * Use range for Date/Time fields in filter box

@@ -2,6 +2,8 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
+import gobject
+
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen
 from tryton.gui.window.win_search import WinSearch
@@ -10,6 +12,7 @@ from tryton.config import CONFIG
 import tryton.common as common
 from tryton.common import RPCExecute, RPCException
 from tryton.common.placeholder_entry import PlaceholderEntry
+from tryton.common.completion import get_completion, update_completion
 
 _ = gettext.gettext
 
@@ -36,19 +39,28 @@ class One2Many(WidgetInterface):
         tooltips = common.Tooltips()
 
         self.focus_out = True
+        self.wid_completion = None
         if attrs.get('add_remove'):
 
             self.wid_text = PlaceholderEntry()
             self.wid_text.set_placeholder_text(_('Search'))
             self.wid_text.set_property('width_chars', 13)
-            self.wid_text.connect('activate', self._sig_activate)
-            self.wid_text.connect('focus-out-event', self._focus_out)
+            self.wid_text.connect('focus-out-event',
+                lambda *a: self._focus_out())
             hbox.pack_start(self.wid_text, expand=True, fill=True)
+
+            if int(self.attrs.get('completion', 1)):
+                self.wid_completion = get_completion()
+                self.wid_completion.connect('match-selected',
+                    self._completion_match_selected)
+                self.wid_completion.connect('action-activated',
+                    self._completion_action_activated)
+                self.wid_text.set_completion(self.wid_completion)
+                self.wid_text.connect('changed', self._update_completion)
 
             self.but_add = gtk.Button()
             tooltips.set_tip(self.but_add, _('Add existing record'))
             self.but_add.connect('clicked', self._sig_add)
-            self.but_add.connect('enter-notify-event', self.enter)
             img_add = gtk.Image()
             img_add.set_from_stock('tryton-list-add',
                 gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -61,7 +73,6 @@ class One2Many(WidgetInterface):
             tooltips.set_tip(self.but_remove,
                 _('Remove selected record'))
             self.but_remove.connect('clicked', self._sig_remove, True)
-            self.but_remove.connect('enter-notify-event', self.enter)
             img_remove = gtk.Image()
             img_remove.set_from_stock('tryton-list-remove',
                 gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -75,7 +86,6 @@ class One2Many(WidgetInterface):
         self.but_new = gtk.Button()
         tooltips.set_tip(self.but_new, _('Create a new record <F3>'))
         self.but_new.connect('clicked', self._sig_new)
-        self.but_new.connect('enter-notify-event', self.enter)
         img_new = gtk.Image()
         img_new.set_from_stock('tryton-new', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_new.set_alignment(0.5, 0.5)
@@ -86,7 +96,6 @@ class One2Many(WidgetInterface):
         self.but_open = gtk.Button()
         tooltips.set_tip(self.but_open, _('Edit selected record <F2>'))
         self.but_open.connect('clicked', self._sig_edit)
-        self.but_open.connect('enter-notify-event', self.enter)
         img_open = gtk.Image()
         img_open.set_from_stock('tryton-open', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_open.set_alignment(0.5, 0.5)
@@ -97,7 +106,6 @@ class One2Many(WidgetInterface):
         self.but_del = gtk.Button()
         tooltips.set_tip(self.but_del, _('Delete selected record <Del>'))
         self.but_del.connect('clicked', self._sig_remove, False)
-        self.but_del.connect('enter-notify-event', self.enter)
         img_del = gtk.Image()
         img_del.set_from_stock('tryton-delete', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_del.set_alignment(0.5, 0.5)
@@ -108,7 +116,6 @@ class One2Many(WidgetInterface):
         self.but_undel = gtk.Button()
         tooltips.set_tip(self.but_undel, _('Undelete selected record <Ins>'))
         self.but_undel.connect('clicked', self._sig_undelete)
-        self.but_undel.connect('enter-notify-event', self.enter)
         img_undel = gtk.Image()
         img_undel.set_from_stock('tryton-undo', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_undel.set_alignment(0.5, 0.5)
@@ -121,7 +128,6 @@ class One2Many(WidgetInterface):
         self.but_pre = gtk.Button()
         tooltips.set_tip(self.but_pre, _('Previous'))
         self.but_pre.connect('clicked', self._sig_previous)
-        self.but_pre.connect('enter-notify-event', self.enter)
         img_pre = gtk.Image()
         img_pre.set_from_stock('tryton-go-previous',
             gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -136,7 +142,6 @@ class One2Many(WidgetInterface):
         self.but_next = gtk.Button()
         tooltips.set_tip(self.but_next, _('Next'))
         self.but_next.connect('clicked', self._sig_next)
-        self.but_next.connect('enter-notify-event', self.enter)
         img_next = gtk.Image()
         img_next.set_from_stock('tryton-go-next', gtk.ICON_SIZE_SMALL_TOOLBAR)
         img_next.set_alignment(0.5, 0.5)
@@ -149,7 +154,6 @@ class One2Many(WidgetInterface):
         but_switch = gtk.Button()
         tooltips.set_tip(but_switch, _('Switch'))
         but_switch.connect('clicked', self.switch_view)
-        but_switch.connect('enter-notify-event', self.enter)
         img_switch = gtk.Image()
         img_switch.set_from_stock('tryton-fullscreen',
             gtk.ICON_SIZE_SMALL_TOOLBAR)
@@ -212,6 +216,18 @@ class One2Many(WidgetInterface):
         if event.keyval == gtk.keysyms.Insert and widget == self.screen.widget:
             self._sig_undelete(widget)
             return False
+        if self.attrs.get('add_remove'):
+            editable = self.wid_text.get_editable()
+            activate_keys = [gtk.keysyms.Tab, gtk.keysyms.ISO_Left_Tab]
+            if not self.wid_completion:
+                activate_keys.append(gtk.keysyms.Return)
+            if (widget == self.wid_text
+                    and event.keyval in activate_keys
+                    and editable
+                    and self.wid_text.get_text()):
+                self._sig_add()
+                self.wid_text.grab_focus()
+        return False
 
     def destroy(self):
         self.screen.destroy()
@@ -298,7 +314,7 @@ class One2Many(WidgetInterface):
                 return False
         return True
 
-    def _sig_new(self, widget):
+    def _sig_new(self, widget=None):
         if not common.MODELACCESS[self.screen.model_name]['create']:
             return
         if not self._validate():
@@ -356,15 +372,7 @@ class One2Many(WidgetInterface):
     def _sig_undelete(self, button):
         self.screen.unremove()
 
-    def _sig_activate(self, *args):
-        self._sig_add()
-        self.wid_text.grab_focus()
-
-    def _focus_out(self, *args):
-        if self.wid_text.get_text():
-            self._sig_add()
-
-    def _sig_add(self, *args):
+    def _sig_add(self, *args, **kwargs):
         if not self.focus_out:
             return
         access = common.MODELACCESS[self.screen.model_name]
@@ -399,7 +407,7 @@ class One2Many(WidgetInterface):
                 self.screen.display(res_id=ids[0])
             self.screen.set_cursor()
             self.wid_text.set_text('')
-        if len(ids) != 1:
+        if len(ids) != 1 or kwargs.get('win_search', False):
             WinSearch(self.attrs['relation'], callback, sel_multi=True,
                 ids=ids, context=context, domain=domain,
                 view_ids=self.attrs.get('view_ids', '').split(','),
@@ -456,3 +464,35 @@ class One2Many(WidgetInterface):
             record.modified_fields.setdefault(field.name)
             record.signal('record-modified')
         return True
+
+    def _completion_match_selected(self, completion, model, iter_):
+        record_id, = model.get(iter_, 1)
+        self.screen.load([record_id], modified=True)
+        self.wid_text.set_text('')
+        self.wid_text.grab_focus()
+
+        completion_model = self.wid_completion.get_model()
+        completion_model.clear()
+        completion_model.search_text = self.wid_text.get_text()
+        return True
+
+    def _update_completion(self, widget):
+        if self._readonly:
+            return
+        if not self.record:
+            return
+        model = self.attrs['relation']
+        domain = self.field.domain_get(self.record)
+        domain = domain[:]
+        domain.extend(self.record.expr_eval(self.attrs.get('add_remove')))
+        removed_ids = self.field.get_removed_ids(self.record)
+        domain = ['OR', domain, ('id', 'in', removed_ids)]
+        update_completion(self.wid_text, self.record, self.field, model,
+            domain=domain)
+
+    def _completion_action_activated(self, completion, index):
+        if index == 0:
+            self._sig_add(win_search=True)
+            self.wid_text.grab_focus()
+        elif index == 1:
+            self._sig_new()

@@ -113,4 +113,20 @@ class CellRendererText(gtk.GenericCellRenderer):
         editable.show()
         return editable
 
+
+class CellRendererTextCompletion(CellRendererText):
+
+    def __init__(self, set_completion):
+        super(CellRendererTextCompletion, self).__init__()
+        self.set_completion = set_completion
+
+    def on_start_editing(self, event, widget, path, background_area, cell_area,
+            flags):
+        editable = super(CellRendererTextCompletion,
+            self).on_start_editing(event, widget, path, background_area,
+                cell_area, flags)
+        self.set_completion(editable, path)
+        return editable
+
 gobject.type_register(CellRendererText)
+gobject.type_register(CellRendererTextCompletion)

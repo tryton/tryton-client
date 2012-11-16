@@ -164,10 +164,6 @@ class WidgetInterface(object):
     def cancel(self):
         pass
 
-    def enter(self, widget, event):
-        if self.view:
-            self.view.set_value(focused_widget=True)
-
 
 class TranslateDialog(NoModal):
 
@@ -299,7 +295,6 @@ class TranslateMixin:
         button.set_image(img)
         button.set_relief(gtk.RELIEF_NONE)
         button.connect('clicked', self.translate)
-        button.connect('enter-notify-event', self.enter)
         return button
 
     def translate(self, widget):

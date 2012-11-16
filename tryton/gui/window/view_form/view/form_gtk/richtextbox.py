@@ -180,7 +180,6 @@ class RichTextBox(TextBox):
         for local in (3, 6, 11, 14):
             self.tool_bar.insert(separator(), local)
         self.widget.pack_start(self.tool_bar, False)
-        self.widget.connect('enter-notify-event', self.enter)
 
     def get_value_markup(self):
         if self.tools['markup'].get_active():

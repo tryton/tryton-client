@@ -11,6 +11,7 @@ from tryton.gui.window.win_form import WinForm
 from tryton.config import CONFIG
 from tryton.common.popup_menu import populate
 from tryton.common import RPCExecute, RPCException
+from tryton.common.completion import get_completion, update_completion
 
 _ = gettext.gettext
 
@@ -34,9 +35,18 @@ class Many2One(WidgetInterface):
             lambda x, y: self._focus_out())
         self.wid_text.connect_after('changed', self.sig_changed)
         self.changed = True
-        self.wid_text.connect('activate', self.sig_activate)
-        self.wid_text.connect_after('focus-out-event', self.sig_activate)
         self.focus_out = True
+
+        if int(self.attrs.get('completion', 1)):
+            self.wid_completion = get_completion()
+            self.wid_completion.connect('match-selected',
+                self._completion_match_selected)
+            self.wid_completion.connect('action-activated',
+                self._completion_action_activated)
+            self.wid_text.set_completion(self.wid_completion)
+            self.wid_text.connect('changed', self._update_completion)
+        else:
+            self.wid_completion = None
 
         self.but_open = gtk.Button()
         img_find = gtk.Image()
@@ -44,7 +54,6 @@ class Many2One(WidgetInterface):
         self.but_open.set_image(img_find)
         self.but_open.set_relief(gtk.RELIEF_NONE)
         self.but_open.connect('clicked', self.sig_edit)
-        self.but_open.connect('enter-notify-event', self.enter)
         self.but_open.set_alignment(0.5, 0.5)
 
         self.but_new = gtk.Button()
@@ -53,7 +62,6 @@ class Many2One(WidgetInterface):
         self.but_new.set_image(img_new)
         self.but_new.set_relief(gtk.RELIEF_NONE)
         self.but_new.connect('clicked', self.sig_new)
-        self.but_new.connect('enter-notify-event', self.enter)
         self.but_new.set_alignment(0.5, 0.5)
 
         self.widget.pack_end(self.but_new, expand=False, fill=False)
@@ -124,7 +132,7 @@ class Many2One(WidgetInterface):
     def id_from_value(value):
         return value
 
-    def sig_activate(self, widget=None, event=None, key_press=False):
+    def sig_activate(self):
         model = self.get_model()
         if not model or not common.MODELACCESS[model]['read']:
             return
@@ -136,13 +144,10 @@ class Many2One(WidgetInterface):
 
         self.focus_out = False
         if model and not self.has_target(value):
-            if not key_press and not event and widget:
-                widget.emit_stop_by_name('activate')
             if (not self._readonly
                     and (self.wid_text.get_text()
-                        or (self.field.get_state_attrs(
-                                self.record)['required'])
-                            and key_press)):
+                        or self.field.get_state_attrs(
+                            self.record)['required'])):
                 domain = self.field.domain_get(self.record)
                 context = self.field.context_get(self.record)
                 self.wid_text.grab_focus()
@@ -208,7 +213,7 @@ class Many2One(WidgetInterface):
             self.focus_out = True
         WinForm(screen, callback, new=True, save_current=True)
 
-    def sig_edit(self, widget):
+    def sig_edit(self, *args):
         model = self.get_model()
         if not model or not common.MODELACCESS[model]['read']:
             return
@@ -275,6 +280,9 @@ class Many2One(WidgetInterface):
 
     def sig_key_press(self, widget, event, *args):
         editable = self.wid_text.get_editable()
+        activate_keys = [gtk.keysyms.Tab, gtk.keysyms.ISO_Left_Tab]
+        if not self.wid_completion:
+            activate_keys.append(gtk.keysyms.Return)
         if (event.keyval == gtk.keysyms.F3
                 and editable
                 and self.but_new.get_property('sensitive')):
@@ -284,9 +292,9 @@ class Many2One(WidgetInterface):
                 and self.but_open.get_property('sensitive')):
             self.sig_edit(widget)
             return True
-        elif (event.keyval in (gtk.keysyms.Tab, gtk.keysyms.Return)
+        elif (event.keyval in activate_keys
                 and editable):
-            self.sig_activate(widget, event, key_press=True)
+            self.sig_activate()
         elif (self.has_target(self.field.get(self.record))
                 and editable
                 and event.keyval in (gtk.keysyms.Delete,
@@ -311,8 +319,9 @@ class Many2One(WidgetInterface):
         return False
 
     def set_value(self, record, field):
-        # Simulate a focus-out
-        self.sig_activate()
+        if field.get_client(record) != self.wid_text.get_text():
+            field.set_client(record, self.value_from_id(None, ''))
+            self.wid_text.set_text('')
 
     def set_text(self, value):
         if not value:
@@ -350,3 +359,29 @@ class Many2One(WidgetInterface):
             gobject.idle_add(populate, menu, self.get_model(),
                 self.id_from_value(value))
         return True
+
+    def _completion_match_selected(self, completion, model, iter_):
+        rec_name, record_id = model.get(iter_, 0, 1)
+        self.field.set_client(self.record,
+            self.value_from_id(record_id, rec_name), force_change=True)
+
+        completion_model = self.wid_completion.get_model()
+        completion_model.clear()
+        completion_model.search_text = self.wid_text.get_text()
+        return True
+
+    def _update_completion(self, widget):
+        if self._readonly:
+            return
+        if not self.record:
+            return
+        if self.field.get(self.record) is not None:
+            return
+        model = self.get_model()
+        update_completion(self.wid_text, self.record, self.field, model)
+
+    def _completion_action_activated(self, completion, index):
+        if index == 0:
+            self.sig_edit()
+        elif index == 1:
+            self.sig_new()
