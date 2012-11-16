@@ -111,28 +111,54 @@ class ScreenContainer(object):
         self.search_entry.set_completion(self.completion)
         self.search_entry.connect('key-press-event', self.key_press)
         self.search_entry.connect('focus-in-event', self.focus_in)
+        self.search_entry.connect('icon-press', self.icon_press)
 
         hbox.pack_start(self.search_entry, expand=True, fill=True)
 
-        but_find = gtk.Button()
-        tooltips.set_tip(but_find, _('Find'))
-        but_find.connect('clicked', self.do_search)
-        img_find = gtk.Image()
-        img_find.set_from_stock('tryton-find', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        img_find.set_alignment(0.5, 0.5)
-        but_find.add(img_find)
-        but_find.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_find, expand=False, fill=False)
+        def popup(widget):
+            menu = widget._menu
+            for child in menu.children():
+                menu.remove(child)
+            if not widget.props.active:
+                menu.popdown()
+                return
 
-        but_clear = gtk.Button()
-        tooltips.set_tip(but_clear, _('Clear'))
-        but_clear.connect('clicked', self.clear)
-        img_clear = gtk.Image()
-        img_clear.set_from_stock('tryton-clear', gtk.ICON_SIZE_SMALL_TOOLBAR)
-        img_clear.set_alignment(0.5, 0.5)
-        but_clear.add(img_clear)
-        but_clear.set_relief(gtk.RELIEF_NONE)
-        hbox.pack_start(but_clear, expand=False, fill=False)
+            def menu_position(menu):
+                x, y = widget.window.get_origin()
+                widget_allocation = widget.get_allocation()
+                return (
+                    widget_allocation.x + x,
+                    widget_allocation.y + widget_allocation.height + y,
+                    False
+                )
+
+            for id_, name, domain in common.VIEW_SEARCH[
+                    self.screen.model_name]:
+                menuitem = gtk.MenuItem(name)
+                menuitem.connect('activate', self.bookmark_activate, domain)
+                menu.add(menuitem)
+
+            menu.show_all()
+            menu.popup(None, None, menu_position, 0, 0)
+
+        def deactivate(menuitem, togglebutton):
+            togglebutton.props.active = False
+
+        but_bookmark = gtk.ToggleButton()
+        self.but_bookmark = but_bookmark
+        tooltips.set_tip(but_bookmark, _('Show bookmarks of filters'))
+        img_bookmark = gtk.Image()
+        img_bookmark.set_from_stock('tryton-bookmark',
+            gtk.ICON_SIZE_SMALL_TOOLBAR)
+        img_bookmark.set_alignment(0.5, 0.5)
+        but_bookmark.add(img_bookmark)
+        but_bookmark.set_relief(gtk.RELIEF_NONE)
+        menu = gtk.Menu()
+        menu.set_property('reserve-toggle-size', False)
+        menu.connect('deactivate', deactivate, but_bookmark)
+        but_bookmark._menu = menu
+        but_bookmark.connect('toggled', popup)
+        hbox.pack_start(but_bookmark, expand=False, fill=False)
 
         but_prev = gtk.Button()
         self.but_prev = but_prev
@@ -200,6 +226,9 @@ class ScreenContainer(object):
 
     def set_screen(self, screen):
         self.screen = screen
+        self.but_bookmark.set_sensitive(
+            bool(common.VIEW_SEARCH[screen.model_name]))
+        self.bookmark_match()
 
     def show_filter(self):
         if self.filter_vbox:
@@ -248,12 +277,47 @@ class ScreenContainer(object):
 
     def clear(self, widget=None):
         self.search_entry.set_text('')
+        self.bookmark_match()
 
     def get_text(self):
         return self.search_entry.get_text().decode('utf-8')
 
     def set_text(self, value):
-        return self.search_entry.set_text(value)
+        self.search_entry.set_text(value)
+        self.bookmark_match()
+
+    def bookmark_activate(self, menuitem, domain):
+        self.set_text(self.screen.domain_parser.string(domain))
+        self.do_search()
+
+    def bookmark_match(self):
+        current_text = self.get_text()
+        current_domain = self.screen.domain_parser.parse(current_text)
+        self.search_entry.set_icon_activatable(gtk.ENTRY_ICON_SECONDARY,
+            bool(current_text))
+        self.search_entry.set_icon_sensitive(gtk.ENTRY_ICON_SECONDARY,
+            bool(current_text))
+        icon_stock = self.search_entry.get_icon_stock(gtk.ENTRY_ICON_SECONDARY)
+        for id_, name, domain in common.VIEW_SEARCH[self.screen.model_name]:
+            text = self.screen.domain_parser.string(domain)
+            domain = self.screen.domain_parser.parse(text.decode('utf-8'))
+            if (text == current_text
+                    or domain == current_domain):
+                if icon_stock != 'tryton-star':
+                    self.search_entry.set_icon_from_stock(
+                        gtk.ENTRY_ICON_SECONDARY, 'tryton-star')
+                self.search_entry.set_icon_tooltip_text(
+                    gtk.ENTRY_ICON_SECONDARY, _('Remove this bookmark'))
+                return id_
+        if icon_stock != 'tryton-unstar':
+            self.search_entry.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY,
+                'tryton-unstar')
+        if current_text:
+            self.search_entry.set_icon_tooltip_text(gtk.ENTRY_ICON_SECONDARY,
+                _('Bookmark this filter'))
+        else:
+            self.search_entry.set_icon_tooltip_text(gtk.ENTRY_ICON_SECONDARY,
+                None)
 
     def search_next(self, widget=None):
         self.screen.search_next(self.get_text())
@@ -299,6 +363,29 @@ class ScreenContainer(object):
 
     def key_press(self, widget, event):
         gobject.idle_add(self.update)
+        gobject.idle_add(self.bookmark_match)
+
+    def icon_press(self, widget, icon_pos, event):
+        if icon_pos == 1:
+            icon_stock = self.search_entry.get_icon_stock(icon_pos)
+            model_name = self.screen.model_name
+            if icon_stock == 'tryton-unstar':
+                text = self.get_text()
+                if not text:
+                    return
+                name = common.ask(_('Bookmark Name:'))
+                if not name:
+                    return
+                domain = self.screen.domain_parser.parse(text)
+                common.VIEW_SEARCH.add(model_name, name, domain)
+                self.set_text(self.screen.domain_parser.string(domain))
+            elif icon_stock == 'tryton-star':
+                id_ = self.bookmark_match()
+                common.VIEW_SEARCH.remove(model_name, id_)
+            # Refresh icon and bookmark button
+            self.bookmark_match()
+            self.but_bookmark.set_sensitive(
+                bool(common.VIEW_SEARCH[model_name]))
 
     def focus_in(self, widget, event):
         self.update()

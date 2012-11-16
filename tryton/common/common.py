@@ -45,6 +45,7 @@ except ImportError:
 
 from tryton.exceptions import (TrytonServerError, TrytonError,
     TrytonServerUnavailable)
+from tryton.pyson import PYSONEncoder
 
 _ = gettext.gettext
 
@@ -168,6 +169,50 @@ class ModelAccess(object):
         return self._access[model]
 
 MODELACCESS = ModelAccess()
+
+
+class ViewSearch(object):
+    searches = None
+
+    def load_searches(self, refresh=False):
+        if not refresh:
+            self.searches = None
+        if self.searches is not None:
+            return
+        try:
+            self.searches = rpc.execute('model', 'ir.ui.view_search',
+                'get_search', rpc.CONTEXT)
+        except TrytonServerError:
+            self.searches = {}
+
+    def __getitem__(self, model):
+        self.load_searches()
+        return self.searches.get(model, [])
+
+    def add(self, model, name, domain):
+        domain = PYSONEncoder().encode(domain)
+        try:
+            id_ = RPCExecute('model', 'ir.ui.view_search',
+                'create', {
+                    'model': model,
+                    'name': name,
+                    'domain': domain,
+                    })
+        except RPCException:
+            return
+        self.searches.setdefault(model, []).append((id_, name, domain))
+
+    def remove(self, model, id_):
+        try:
+            RPCExecute('model', 'ir.ui.view_search', 'delete', [id_])
+        except RPCException:
+            return
+        for i, domain in enumerate(self.searches[model]):
+            if domain[0] == id_:
+                del self.searches[model][i]
+                break
+
+VIEW_SEARCH = ViewSearch()
 
 
 def find_in_path(name):
