@@ -18,6 +18,7 @@ from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
 import tryton.common as common
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
+from tryton import plugins
 
 from tabcontent import TabContent
 
@@ -555,7 +556,7 @@ class Form(SignalEvent, TabContent):
                 tbutton.connect('toggled', self.action_popup)
                 self.tooltips.set_tip(tbutton, tooltip)
                 self.buttons[special_action] = tbutton
-                tbutton._can_be_sensitive = bool(toolbars.get(action_type))
+                tbutton._can_be_sensitive = bool(tbutton._menu.get_children())
             else:
                 tbutton = gtk.SeparatorToolItem()
             gtktoolbar.insert(tbutton, -1)
@@ -580,7 +581,18 @@ class Form(SignalEvent, TabContent):
             menuitem.connect('activate', self._popup_menu_selected, widget,
                 new_action, keyword)
             menu.add(menuitem)
-
+        if keyword == 'action':
+            menu.add(gtk.SeparatorMenuItem())
+            for plugin in plugins.MODULES:
+                for name, func in plugin.get_plugins(self.model):
+                    menuitem = gtk.MenuItem('_' + name)
+                    menuitem.set_use_underline(True)
+                    menuitem.connect('activate', lambda *a: func({
+                                'model': self.model,
+                                'ids': self.id_get(),
+                                'id': self.id_get(),
+                                }))
+                    menu.add(menuitem)
         return menu
 
     def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):

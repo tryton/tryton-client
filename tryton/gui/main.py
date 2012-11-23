@@ -138,7 +138,6 @@ class Main(object):
         self.status_hbox = None
         self.menubar = None
         self.menuitem_user = None
-        self.menuitem_plugins = None
         self.menuitem_shortcut = None
 
         if self.macapp is not None:
@@ -189,6 +188,9 @@ class Main(object):
 
         self.sig_statusbar_show()
 
+        # Register plugins
+        tryton.plugins.register()
+
         # Adding a timer the check to requests
         gobject.timeout_add(5 * 60 * 1000, self.request_set)
         _MAIN.append(self)
@@ -231,20 +233,6 @@ class Main(object):
         menu_options.set_accel_group(self.accel_group)
         menu_options.set_accel_path('<tryton>/Options')
 
-        menuitem_plugins = gtk.MenuItem(_('_Plugins'))
-        if self.menuitem_plugins:
-            menuitem_plugins.set_sensitive(
-                    self.menuitem_plugins.get_property('sensitive'))
-        else:
-            menuitem_plugins.set_sensitive(False)
-        self.menuitem_plugins = menuitem_plugins
-        menubar.add(menuitem_plugins)
-
-        menu_plugins = self._set_menu_plugins()
-        menuitem_plugins.set_submenu(menu_plugins)
-        menu_plugins.set_accel_group(self.accel_group)
-        menu_plugins.set_accel_path('<tryton>/Plugins')
-
         menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
         if self.menuitem_shortcut:
             menuitem_shortcut.set_sensitive(
@@ -276,7 +264,6 @@ class Main(object):
             menuitem_file.show_all()
             menuitem_user.show_all()
             menuitem_options.show_all()
-            menuitem_plugins.show_all()
             menuitem_shortcut.show_all()
             menuitem_help.show_all()
         else:
@@ -652,21 +639,6 @@ class Main(object):
         menu_options.add(imagemenuitem_opt_save)
         return menu_options
 
-    def _set_menu_plugins(self):
-        menu_plugins = gtk.Menu()
-
-        imagemenuitem_plugin_execute = gtk.ImageMenuItem(
-            _('_Execute a Plugin'))
-        image = gtk.Image()
-        image.set_from_stock('tryton-executable', gtk.ICON_SIZE_MENU)
-        imagemenuitem_plugin_execute.set_image(image)
-        imagemenuitem_plugin_execute.connect('activate',
-            self.sig_plugin_execute)
-        imagemenuitem_plugin_execute.set_accel_path(
-            '<tryton>/Plugins/Execute a Plugin')
-        menu_plugins.add(imagemenuitem_plugin_execute)
-        return menu_plugins
-
     def _set_menu_help(self):
         menu_help = gtk.Menu()
 
@@ -961,7 +933,6 @@ class Main(object):
         self.shortcut_unset()
         self.menuitem_shortcut.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
-        self.menuitem_plugins.set_sensitive(True)
         if CONFIG.arguments:
             url = CONFIG.arguments.pop()
             self.open_url(url)
@@ -1003,7 +974,6 @@ class Main(object):
         self.shortcut_unset()
         self.menuitem_shortcut.set_sensitive(False)
         self.menuitem_user.set_sensitive(False)
-        self.menuitem_plugins.set_sensitive(False)
         if disconnect:
             rpc.logout()
         self.refresh_ssl()
@@ -1078,17 +1048,6 @@ class Main(object):
         screen.search_filter()
         screen.display(set_cursor=True)
         self.menu_screen = screen
-
-    def sig_plugin_execute(self, widget):
-        page = self.notebook.get_current_page()
-        if page == -1:
-            return
-        datas = {
-                'model': self.pages[page].model,
-                'ids': self.pages[page].ids_get(),
-                'id': self.pages[page].id_get(),
-                }
-        tryton.plugins.execute(datas)
 
     @classmethod
     def sig_quit(cls, widget=None):

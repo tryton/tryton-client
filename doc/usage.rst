@@ -84,7 +84,7 @@ Figure: Tryton client application::
   Client Window       ________________________________________________________________
                      |                      Tryton                               _ o x|
                      |----------------------------------------------------------------|
-  Menu bar           | File User Options Plugins Shortcuts Help                       |
+  Menu bar           | File User Options Shortcuts Help                               |
                      |________________________________________________________________|
                      |             |          ______                                  |
   Tabs               | Menu        |  [Tab1] |[Tab2]| [Tab3]...                       |
@@ -610,24 +610,6 @@ Email...:
 
 Save Options:
   Saves all the options.
-
-
-Plug-ins
-^^^^^^^^
-Plug-ins are client side add-ons for Tryton. There are some included plug-ins
-with the standard client.
-
-Execute a Plug-in
-+++++++++++++++++
-Translate View:
-  Creates a translation table of the current view.
-
-Print Workflow:
-  Creates a graph which shows the work flow of the current view.
-
-Print Workflow (complex):
-  Like 'Print Workflow', with additional sub work flows inherited by the
-  current view.
 
 
 Shortcuts

@@ -1,3 +1,4 @@
+* Move Plugins into toolbar Actions
 * Add url to list view
 * Add dynamic icon for url
 * Add completion on Many2One, Many2Many and One2Many
