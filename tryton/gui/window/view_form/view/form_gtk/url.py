@@ -26,6 +26,16 @@ class URL(Char):
     def display(self, record, field):
         super(URL, self).display(record, field)
         self.set_tooltips()
+        if record and 'icon' in self.attrs:
+            icon = self.attrs['icon']
+            if icon in record.group.fields:
+                value = record[icon].get_client(record) or 'tryton-web-browser'
+            else:
+                value = icon
+            common.ICONFACTORY.register_icon(value)
+            img = gtk.Image()
+            img.set_from_stock(value, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            self.button.set_image(img)
 
     def set_tooltips(self):
         value = self.entry.get_text()

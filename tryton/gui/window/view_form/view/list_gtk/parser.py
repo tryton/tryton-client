@@ -8,6 +8,7 @@ import gtk
 import locale
 import gettext
 import operator
+import webbrowser
 
 from functools import wraps
 
@@ -29,6 +30,8 @@ from tryton.common.cellrenderercombo import CellRendererCombo
 from tryton.common.cellrendererinteger import CellRendererInteger
 from tryton.common.cellrendererfloat import CellRendererFloat
 from tryton.common.cellrendererbinary import CellRendererBinary
+from tryton.common.cellrendererclickablepixbuf import \
+    CellRendererClickablePixbuf
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
 from tryton.common.completion import get_completion, update_completion
@@ -129,8 +132,9 @@ class ParserTree(ParserInterface):
                     if attr_name in fields[fname].attrs and \
                             not attr_name in node_attrs:
                         node_attrs[attr_name] = fields[fname].attrs[attr_name]
-                cell = CELLTYPES.get(node_attrs.get('widget',
-                    fields[fname].attrs['type']))(fname, model_name,
+                cell_type = node_attrs.get('widget',
+                    fields[fname].attrs['type'])
+                cell = CELLTYPES.get(cell_type)(fname, model_name,
                     treeview, node_attrs)
                 treeview.cells[fname] = cell
                 renderer = cell.renderer
@@ -151,22 +155,50 @@ class ParserTree(ParserInterface):
 
                 col = gtk.TreeViewColumn(fields[fname].attrs['string'])
 
-                if 'icon' in node_attrs:
-                    render_pixbuf = gtk.CellRendererPixbuf()
-                    col.pack_start(render_pixbuf, expand=False)
-                    icon = node_attrs['icon']
+                uri_types = ('url', 'email', 'callto', 'sip')
+                if ('icon' in node_attrs
+                        or cell_type in uri_types):
+                    if cell_type in uri_types:
+                        render_pixbuf = CellRendererClickablePixbuf()
 
-                    def setter(column, cell, store, iter):
+                        def clicked(renderer, path, fname, protocol):
+                            store = self.treeview.get_model()
+                            record = store.get_value(store.get_iter(path), 0)
+                            value = record[fname].get(record)
+                            if value:
+                                if protocol == 'email':
+                                    value = 'mailto:%s' % value
+                                elif protocol == 'callto':
+                                    value = 'callto:%s' % value
+                                elif protocol == 'sip':
+                                    value = 'sip:%s' % value
+                                webbrowser.open(value, new=2)
+                        render_pixbuf.connect('clicked', clicked, fname,
+                            cell_type)
+                    else:
+                        render_pixbuf = gtk.CellRendererPixbuf()
+                    col.pack_start(render_pixbuf, expand=False)
+                    icon = node_attrs.get('icon', 'tryton-web-browser')
+
+                    def setter(column, cell, store, iter, fname):
                         if (hasattr(self.treeview, 'get_realized')
                                 and not self.treeview.get_realized()):
                             return
                         record = store.get_value(iter, 0)
-                        value = record[icon].get_client(record) or ''
+                        field = record[fname]
+                        field.state_set(record, states=('invisible',))
+                        invisible = field.get_state_attrs(record
+                            ).get('invisible', False)
+                        cell.set_property('visible', not invisible)
+                        if icon in record.group.fields:
+                            value = record[icon].get_client(record) or ''
+                        else:
+                            value = icon
                         common.ICONFACTORY.register_icon(value)
                         pixbuf = treeview.render_icon(stock_id=value,
                                 size=gtk.ICON_SIZE_BUTTON, detail=None)
                         cell.set_property('pixbuf', pixbuf)
-                    col.set_cell_data_func(render_pixbuf, setter)
+                    col.set_cell_data_func(render_pixbuf, setter, fname)
 
                 col.pack_start(renderer, expand=True)
                 col.name = fname
@@ -426,6 +458,18 @@ class Boolean(Int):
             record[self.field_name].set_client(record, int(not value))
             self.treeview.set_cursor(path)
         return True
+
+
+class URL(Char):
+
+    @realized
+    def setter(self, column, cell, store, iter):
+        super(URL, self).setter(column, cell, store, iter)
+        record = store.get_value(iter, 0)
+        field = record[self.field_name]
+        field.state_set(record, states=('readonly',))
+        readonly = field.get_state_attrs(record).get('readonly', False)
+        cell.set_property('visible', not readonly)
 
 
 class Date(Char):
@@ -1022,10 +1066,10 @@ CELLTYPES = {
     'time': Time,
     'boolean': Boolean,
     'text': Char,
-    'url': Char,
-    'email': Char,
-    'callto': Char,
-    'sip': Char,
+    'url': URL,
+    'email': URL,
+    'callto': URL,
+    'sip': URL,
     'progressbar': ProgressBar,
     'reference': Reference,
     'one2one': O2O,
