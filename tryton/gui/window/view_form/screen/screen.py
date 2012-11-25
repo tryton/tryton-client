@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 "Screen"
+import copy
 import gobject
 try:
     import simplejson as json
@@ -105,27 +106,29 @@ class Screen(SignalEvent):
                 except RPCException:
                     return
 
-            fields = self.fields_view_tree['fields']
-            for name, props in fields.iteritems():
-                if props['type'] not in ('selection', 'reference'):
-                    continue
-                if isinstance(props['selection'], (tuple, list)):
-                    continue
-                props['selection'] = self.get_selection(props)
+            if not self.domain_parser:
+                fields = copy.deepcopy(self.fields_view_tree['fields'])
+                for name, props in fields.iteritems():
+                    if props['type'] not in ('selection', 'reference'):
+                        continue
+                    if isinstance(props['selection'], (tuple, list)):
+                        continue
+                    props['selection'] = self.get_selection(props)
 
-            # Filter only fields in XML view
-            xml_dom = xml.dom.minidom.parseString(
-                self.fields_view_tree['arch'])
-            root_node, = xml_dom.childNodes
-            xml_fields = [node_attributes(node).get('name')
-                for node in root_node.childNodes if node.nodeName == 'field']
-            if hasattr(collections, 'OrderedDict'):
-                odict = collections.OrderedDict
-            else:
-                odict = dict
-            fields = odict((name, fields[name]) for name in  xml_fields)
+                # Filter only fields in XML view
+                xml_dom = xml.dom.minidom.parseString(
+                    self.fields_view_tree['arch'])
+                root_node, = xml_dom.childNodes
+                xml_fields = [node_attributes(node).get('name')
+                    for node in root_node.childNodes
+                    if node.nodeName == 'field']
+                if hasattr(collections, 'OrderedDict'):
+                    odict = collections.OrderedDict
+                else:
+                    odict = dict
+                fields = odict((name, fields[name]) for name in xml_fields)
 
-            self.domain_parser = DomainParser(fields)
+                self.domain_parser = DomainParser(fields)
 
             self.screen_container.set_screen(self)
             self.screen_container.show_filter()
