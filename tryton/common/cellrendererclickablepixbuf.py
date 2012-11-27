@@ -17,7 +17,8 @@ class CellRendererClickablePixbuf(gtk.CellRendererPixbuf):
 
     def do_activate(self, event, widget, path, background_area, cell_area,
             flags):
-        if (cell_area.x <= event.x <= cell_area.x + cell_area.width
+        if (event
+                and cell_area.x <= event.x <= cell_area.x + cell_area.width
                 and cell_area.y <= event.y <= cell_area.y + cell_area.height):
             self.emit('clicked', path)
 

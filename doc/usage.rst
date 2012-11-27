@@ -84,7 +84,7 @@ Figure: Tryton client application::
   Client Window       ________________________________________________________________
                      |                      Tryton                               _ o x|
                      |----------------------------------------------------------------|
-  Menu bar           | File User Options Shortcuts Help                               |
+  Menu bar           | File User Options Favorites Help                               |
                      |________________________________________________________________|
                      |             |          ______                                  |
   Tabs               | Menu        |  [Tab1] |[Tab2]| [Tab3]...                       |
@@ -612,9 +612,9 @@ Save Options:
   Saves all the options.
 
 
-Shortcuts
+Favorites
 ^^^^^^^^^
-A collection of user defined shortcuts for specific resources.
+A collection of user defined menu favorites.
 
 
 Help

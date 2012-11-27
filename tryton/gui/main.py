@@ -33,6 +33,8 @@ from tryton.gui.window.tips import Tips
 from tryton.gui.window.about import About
 from tryton.gui.window.shortcuts import Shortcuts
 from tryton.gui.window.dbrestore import DBRestore
+from tryton.common.cellrendererclickablepixbuf import \
+    CellRendererClickablePixbuf
 import tryton.translate as translate
 import tryton.plugins
 import pango
@@ -138,7 +140,7 @@ class Main(object):
         self.status_hbox = None
         self.menubar = None
         self.menuitem_user = None
-        self.menuitem_shortcut = None
+        self.menuitem_favorite = None
 
         if self.macapp is not None:
             self.macapp.ready()
@@ -233,21 +235,21 @@ class Main(object):
         menu_options.set_accel_group(self.accel_group)
         menu_options.set_accel_path('<tryton>/Options')
 
-        menuitem_shortcut = gtk.MenuItem(_('_Shortcuts'))
-        if self.menuitem_shortcut:
-            menuitem_shortcut.set_sensitive(
-                self.menuitem_shortcut.get_property('sensitive'))
+        menuitem_favorite = gtk.MenuItem(_('Fa_vorites'))
+        if self.menuitem_favorite:
+            menuitem_favorite.set_sensitive(
+                self.menuitem_favorite.get_property('sensitive'))
         else:
-            menuitem_shortcut.set_sensitive(False)
-        self.menuitem_shortcut = menuitem_shortcut
-        menubar.add(menuitem_shortcut)
-        menuitem_shortcut.set_accel_path('<tryton>/Shortcuts')
+            menuitem_favorite.set_sensitive(False)
+        self.menuitem_favorite = menuitem_favorite
+        menubar.add(menuitem_favorite)
+        menuitem_favorite.set_accel_path('<tryton>/Favorites')
 
-        def shortcut_activate(widget):
-            if (not menuitem_shortcut.get_submenu()
-                    or not menuitem_shortcut.get_submenu().get_children()):
-                self.shortcut_set()
-        menuitem_shortcut.connect('select', shortcut_activate)
+        def favorite_activate(widget):
+            if (not menuitem_favorite.get_submenu()
+                    or not menuitem_favorite.get_submenu().get_children()):
+                self.favorite_set()
+        menuitem_favorite.connect('select', favorite_activate)
 
         menuitem_help = gtk.MenuItem(_('_Help'))
         menubar.add(menuitem_help)
@@ -264,7 +266,7 @@ class Main(object):
             menuitem_file.show_all()
             menuitem_user.show_all()
             menuitem_options.show_all()
-            menuitem_shortcut.show_all()
+            menuitem_favorite.show_all()
             menuitem_help.show_all()
         else:
             self.menubar.show_all()
@@ -677,69 +679,47 @@ class Main(object):
     def get_main():
         return _MAIN[0]
 
-    def shortcut_set(self):
-        def _action_shortcut(widget, action):
+    def favorite_set(self):
+        def _action_favorite(widget, id_):
             Action.exec_keyword('tree_open', {
-                'model': 'ir.ui.menu',
-                'id': action,
-                'ids': [action],
+                'model': self.menu_screen.model_name,
+                'id': id_,
+                'ids': [id_],
                 })
-            self.shortcut_unset()
 
-        def _add_shortcut(widget):
-            ids = self.menu_screen.sel_ids_get()
-            if not ids:
-                return
-            try:
-                values = RPCExecute('model', self.menu_screen.model_name,
-                        'read', ids, ['rec_name'])
-            except RPCException:
-                return
-            try:
-                for value in values:
-                    RPCExecute('model', 'ir.ui.view_sc', 'create', {
-                            'name': value['rec_name'],
-                            'res_id': value['id'],
-                            'user_id': rpc._USER,
-                            'resource': self.menu_screen.model_name,
-                            })
-            except RPCException:
-                pass
-            self.shortcut_unset()
-
-        def _manage_shortcut(widget):
-            Window.create(False, 'ir.ui.view_sc', False,
-                    domain=[('user_id', '=', rpc._USER)],
-                    mode=['tree', 'form'])
-            self.shortcut_unset()
-
-        user = rpc._USER
+        def _manage_favorites(widget):
+            Window.create(False, self.menu_screen.model_name + '.favorite',
+                False, mode=['tree', 'form'])
         try:
-            shortcuts = RPCExecute('model', 'ir.ui.view_sc', 'get_sc',
-                user, 'ir.ui.menu')
+            favorites = RPCExecute('model',
+                self.menu_screen.model_name + '.favorite', 'get')
         except RPCException:
-            shortcuts = []
-        menu = self.menuitem_shortcut.get_submenu()
+            favorites = []
+        menu = self.menuitem_favorite.get_submenu()
         if not menu:
             menu = gtk.Menu()
-        for shortcut in shortcuts:
-            menuitem = gtk.MenuItem(shortcut['name'])
-            menuitem.connect('activate', _action_shortcut, shortcut['res_id'])
+        for id_, name, icon in favorites:
+            if icon:
+                common.ICONFACTORY.register_icon(icon)
+                menuitem = gtk.ImageMenuItem(name)
+                image = gtk.Image()
+                image.set_from_stock(icon, gtk.ICON_SIZE_MENU)
+                menuitem.set_image(image)
+            else:
+                menuitem = gtk.MenuItem(name)
+            menuitem.connect('activate', _action_favorite, id_)
             menu.add(menuitem)
-        menu.add(gtk.MenuItem())
-        add_shortcut = gtk.MenuItem(_('Add Shortcut'))
-        add_shortcut.connect('activate', _add_shortcut)
-        menu.add(add_shortcut)
-        manage_shortcut = gtk.MenuItem(_('Manage Shortcut'))
-        manage_shortcut.connect('activate', _manage_shortcut)
-        menu.add(manage_shortcut)
+        menu.add(gtk.SeparatorMenuItem())
+        manage_favorites = gtk.MenuItem(_('Manage Favorites'))
+        manage_favorites.connect('activate', _manage_favorites)
+        menu.add(manage_favorites)
         menu.show_all()
-        self.menuitem_shortcut.set_submenu(menu)
+        self.menuitem_favorite.set_submenu(menu)
 
-    def shortcut_unset(self):
-        self.menuitem_shortcut.remove_submenu()
+    def favorite_unset(self):
+        self.menuitem_favorite.remove_submenu()
         # Set a submenu to get keyboard shortcut working
-        self.menuitem_shortcut.set_submenu(gtk.Menu())
+        self.menuitem_favorite.set_submenu(gtk.Menu())
 
     def sig_accel_change(self, value):
         CONFIG['client.can_change_accelerators'] = value
@@ -822,7 +802,7 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.shortcut_unset()
+                    self.favorite_unset()
                     self.set_statusbar()
                     self.request_set()
                     self.sig_win_menu()
@@ -918,7 +898,7 @@ class Main(object):
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
-                    self.shortcut_unset()
+                    self.favorite_unset()
                     self.set_statusbar()
                     self.request_set()
                 CONFIG['client.lang'] = prefs['language']
@@ -930,8 +910,8 @@ class Main(object):
             common.message(_('Connection error!\n' \
                     'Bad username or password!'))
             return self.sig_login()
-        self.shortcut_unset()
-        self.menuitem_shortcut.set_sensitive(True)
+        self.favorite_unset()
+        self.menuitem_favorite.set_sensitive(True)
         self.menuitem_user.set_sensitive(True)
         if CONFIG.arguments:
             url = CONFIG.arguments.pop()
@@ -971,8 +951,8 @@ class Main(object):
         self.sb_username.set_text('')
         self.sb_servername.set_text('')
         self.sb_requests.set_text('')
-        self.shortcut_unset()
-        self.menuitem_shortcut.set_sensitive(False)
+        self.favorite_unset()
+        self.menuitem_favorite.set_sensitive(False)
         self.menuitem_user.set_sensitive(False)
         if disconnect:
             rpc.logout()
@@ -1045,9 +1025,57 @@ class Main(object):
         screen.screen_container.alternate_view = True
         screen.switch_view(view_type=screen.current_view.view_type)
         self.pane.pack1(screen.screen_container.alternate_viewport)
+
+        # Favorite column
+        treeview = screen.current_view.widget_tree
+        column = gtk.TreeViewColumn()
+        column.name = None
+        column._type = None
+        favorite_renderer = CellRendererClickablePixbuf()
+        column.pack_start(favorite_renderer, expand=False)
+
+        def favorite_setter(column, cell, store, iter_):
+            menu = store.get_value(iter_, 0)
+            favorite = menu.value.get('favorite')
+            if favorite:
+                stock_id = 'tryton-star'
+            elif favorite is False:
+                stock_id = 'tryton-unstar'
+            else:
+                stock_id = ''
+            pixbuf = treeview.render_icon(stock_id=stock_id,
+                size=gtk.ICON_SIZE_MENU, detail=None)
+            cell.set_property('pixbuf', pixbuf)
+        column.set_cell_data_func(favorite_renderer, favorite_setter)
+        favorite_renderer.connect('clicked',
+            lambda *a: gobject.idle_add(self.toggle_favorite, *a), treeview)
+        # Unset fixed height mode to add column
+        treeview.set_fixed_height_mode(False)
+        treeview.append_column(column)
+
         screen.search_filter()
         screen.display(set_cursor=True)
         self.menu_screen = screen
+
+    def toggle_favorite(self, renderer, path, treeview):
+        store = treeview.get_model()
+        menu = store.get_value(store.get_iter(path), 0)
+        favorite = menu.value.get('favorite')
+        if favorite:
+            value = False
+            method = 'unset'
+        elif favorite is False:
+            value = True
+            method = 'set'
+        else:
+            return
+        try:
+            RPCExecute('model', self.menu_screen.model_name + '.favorite',
+                method, menu.id)
+        except RPCException:
+            return
+        menu.value['favorite'] = value
+        self.favorite_unset()
 
     @classmethod
     def sig_quit(cls, widget=None):
