@@ -286,13 +286,22 @@ class Group(SignalEvent, list):
 
     def set_sequence(self, field='sequence'):
         index = 0
+        changed = False
         for record in self:
             if record[field]:
                 if index >= record[field].get(record):
                     index += 1
-                    record[field].set_client(record, index)
+                    record.signal_unconnect(self, 'record-changed')
+                    try:
+                        record[field].set_client(record, index)
+                    finally:
+                        record.signal_connect(self, 'record-changed',
+                            self._record_changed)
+                    changed = record
                 else:
                     index = record[field].get(record)
+        if changed:
+            self.signal('group-changed', changed)
 
     def new(self, default=True, domain=None, context=None, obj_id=None):
         record = Record(self.model_name, obj_id, group=self)
