@@ -148,7 +148,20 @@ class Main(object):
         self.buttons = {}
 
         self.pane = gtk.HPaned()
+        self.pane.connect('button-press-event',
+            self.on_paned_button_press_event)
+
         self.menu_screen = None
+        self.menu_expander = gtk.Expander()
+        self.menu_expander.connect('notify::expanded', self.menu_expanded)
+        if self.menu_expander.get_direction() == gtk.TEXT_DIR_RTL:
+            self.menu_expander.set_direction(gtk.TEXT_DIR_LTR)
+        else:
+            self.menu_expander.set_direction(gtk.TEXT_DIR_RTL)
+        self.menu_expander.show()
+        self.menu_expander.set_expanded(CONFIG['menu.expanded'])
+        self.pane.add(self.menu_expander)
+
         self.vbox.pack_start(self.pane, True, True)
 
         self.notebook = gtk.Notebook()
@@ -933,13 +946,10 @@ class Main(object):
                 res = self._win_del()
             else:
                 res = False
-        if self.pane.get_child1():
-            self.pane.remove(self.pane.get_child1())
-            if self.pane.get_position():
-                CONFIG['menu.pane'] = self.pane.get_position()
         if self.menu_screen:
             self.menu_screen.destroy()
             self.menu_screen = None
+        self.menu_expander_clear()
         return True
 
     def sig_logout(self, widget=None, disconnect=True):
@@ -976,25 +986,40 @@ class Main(object):
     def sig_shortcuts(self, widget):
         Shortcuts().run()
 
-    def menu_toggle(self, nohide=False):
-        has_focus = True
-        if (self.menu_screen
-                and self.menu_screen.current_view.view_type == 'tree'):
-            try:
-                has_focus = \
-                    self.menu_screen.current_view.widget_tree.has_focus()
-            except AttributeError:
-                has_focus = (self.menu_screen.current_view.widget_tree.flags()
-                        & gtk.HAS_FOCUS)
-        if self.pane.get_position() and has_focus:
-            CONFIG['menu.pane'] = self.pane.get_position()
-            if not nohide:
-                self.pane.set_position(0)
-                self.notebook.grab_focus()
-        else:
+    def menu_toggle(self):
+        expander = self.pane.get_child1()
+        if expander:
+            expander.set_expanded(not expander.get_expanded())
+
+    @property
+    def menu_expander_size(self):
+        return self.menu_expander.style_get_property('expander-size')
+
+    def menu_expanded(self, expander, *args):
+        expanded = expander.get_expanded()
+        CONFIG['menu.expanded'] = expanded
+        if expanded:
             self.pane.set_position(int(CONFIG['menu.pane']))
             if self.menu_screen:
                 self.menu_screen.set_cursor()
+        else:
+            CONFIG['menu.pane'] = self.pane.get_position()
+            self.pane.set_position(self.menu_expander_size)
+            self.notebook.grab_focus()
+
+    def menu_expander_clear(self):
+        if self.menu_expander.get_child():
+            self.menu_expander.remove(self.menu_expander.get_child())
+            expanded = self.menu_expander.get_expanded()
+            CONFIG['menu.expanded'] = expanded
+            if expanded:
+                CONFIG['menu.pane'] = self.pane.get_position()
+
+    def on_paned_button_press_event(self, paned, event):
+        expander = self.pane.get_child1()
+        if expander:
+            return not expander.get_expanded()
+        return False
 
     def sig_win_menu(self, prefs=None):
         from tryton.gui.window.view_form.screen import Screen
@@ -1005,12 +1030,8 @@ class Main(object):
                     False)
             except RPCException:
                 return False
-        if self.pane.get_child1():
-            self.pane.remove(self.pane.get_child1())
-            if self.pane.get_position():
-                CONFIG['menu.pane'] = self.pane.get_position()
         self.menu_screen = None
-        self.menu_toggle(nohide=True)
+        self.menu_expander_clear()
         action = PYSONDecoder().decode(prefs['pyson_menu'])
         view_ids = False
         if action.get('views', []):
@@ -1024,7 +1045,7 @@ class Main(object):
         # Use alternate view to not show search box
         screen.screen_container.alternate_view = True
         screen.switch_view(view_type=screen.current_view.view_type)
-        self.pane.pack1(screen.screen_container.alternate_viewport)
+        self.menu_expander.add(screen.screen_container.alternate_viewport)
 
         # Favorite column
         treeview = screen.current_view.widget_tree
