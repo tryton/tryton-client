@@ -631,6 +631,18 @@ class Main(object):
         if (CONFIG['client.form_tab'] or 'left') == 'bottom':
             radiomenuitem_bottom.set_active(True)
 
+        imagemenuitem_win_prev = gtk.ImageMenuItem(_('_Previous Tab'),
+            self.accel_group)
+        imagemenuitem_win_prev.connect('activate', self.sig_win_prev)
+        imagemenuitem_win_prev.set_accel_path('<tryton>/Form/Previous Tab')
+        menu_form.add(imagemenuitem_win_prev)
+
+        imagemenuitem_win_next = gtk.ImageMenuItem(_('_Next Tab'),
+            self.accel_group)
+        imagemenuitem_win_next.connect('activate', self.sig_win_next)
+        imagemenuitem_win_next.set_accel_path('<tryton>/Form/Next Tab')
+        menu_form.add(imagemenuitem_win_next)
+
         menuitem_limit = gtk.MenuItem(_('Search Limit...'))
         self.menuitem_limit = menuitem_limit
         menuitem_limit.connect('activate', self.sig_limit)
