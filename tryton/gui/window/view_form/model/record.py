@@ -104,17 +104,12 @@ class Record(SignalEvent):
                     value.update(default_values)
                 self.exception = True
             id2value = dict((value['id'], value) for value in values)
-            if len(id2record) > 1:
-                for id, record in id2record.iteritems():
-                    if not record.exception:
-                        record.exception = bool(exception)
-                    value = id2value.get(id)
-                    if record and not record.destroyed and value:
-                        record.set(value, signal=False)
-            else:
-                value = id2value.get(self.id)
-                if value:
-                    self.set(value, signal=False)
+            for id, record in id2record.iteritems():
+                if not record.exception:
+                    record.exception = bool(exception)
+                value = id2value.get(id)
+                if record and not record.destroyed and value:
+                    record.set(value, signal=False)
         return self.group.fields.get(name, False)
 
     def __repr__(self):
