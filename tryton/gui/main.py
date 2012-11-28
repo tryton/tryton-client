@@ -787,10 +787,6 @@ class Main(object):
             page = self.get_page(page_idx)
             page.toolbar.set_style(barstyle)
 
-    @staticmethod
-    def sig_form_tab(option):
-        CONFIG['client.form_tab'] = option
-
     def sig_limit(self, widget):
         Limit().run()
 
