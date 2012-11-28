@@ -35,8 +35,6 @@ class CharField(object):
     def __init__(self, attrs):
         self.attrs = attrs
         self.name = attrs['name']
-        self.internal = False
-        self.default_attrs = {}
 
     def sig_changed(self, record):
         if self.get_state_attrs(record).get('readonly', False):
