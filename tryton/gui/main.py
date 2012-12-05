@@ -37,6 +37,7 @@ from tryton.common.cellrendererclickablepixbuf import \
     CellRendererClickablePixbuf
 import tryton.translate as translate
 import tryton.plugins
+from tryton.common.placeholder_entry import PlaceholderEntry
 import pango
 import time
 try:
@@ -95,6 +96,8 @@ class Main(object):
                     gtk.gdk.MOD1_MASK)
         gtk.accel_map_add_entry('<tryton>/User/Menu Toggle', gtk.keysyms.T,
                 gtk.gdk.CONTROL_MASK)
+        gtk.accel_map_add_entry('<tryton>/User/Global Search', gtk.keysyms.K,
+            gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/User/Home', gtk.keysyms.H,
                 gtk.gdk.CONTROL_MASK)
 
@@ -139,6 +142,7 @@ class Main(object):
 
         self.status_hbox = None
         self.menubar = None
+        self.global_search_entry = None
         self.menuitem_user = None
         self.menuitem_favorite = None
 
@@ -215,6 +219,7 @@ class Main(object):
             self.menubar.destroy()
         menubar = gtk.MenuBar()
         self.menubar = menubar
+
         self.vbox.pack_start(menubar, False, True)
         self.vbox.reorder_child(menubar, 0)
 
@@ -283,6 +288,88 @@ class Main(object):
             menuitem_help.show_all()
         else:
             self.menubar.show_all()
+
+    def set_global_search(self):
+        self.global_search_entry = PlaceholderEntry()
+        self.global_search_entry.set_placeholder_text(_('Search'))
+        global_search_completion = gtk.EntryCompletion()
+        global_search_completion.set_match_func(lambda *a: True)
+        global_search_completion.set_model(gtk.ListStore(
+                gtk.gdk.Pixbuf, str, str, int))
+        pixbuf_cell = gtk.CellRendererPixbuf()
+        global_search_completion.pack_start(pixbuf_cell, False)
+        global_search_completion.add_attribute(pixbuf_cell, 'pixbuf', 0)
+        text_cell = gtk.CellRendererText()
+        global_search_completion.pack_start(text_cell)
+        global_search_completion.add_attribute(text_cell, "markup", 1)
+        if hasattr(global_search_completion.props, 'popup_set_width'):
+            global_search_completion.props.popup_set_width = True
+        self.global_search_entry.set_completion(global_search_completion)
+        self.global_search_entry.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY,
+            'gtk-find')
+
+        def match_selected(completion, model, iter_):
+            model, record_id = model.get(iter_, 2, 3)
+            if model == self.menu_screen.model_name:
+                Action.exec_keyword('tree_open', {
+                        'model': model,
+                        'id': record_id,
+                        'ids': [record_id],
+                        }, context=self.menu_screen.context.copy())
+            else:
+                Window.create(False, model, res_id=record_id,
+                    mode=['form', 'tree'])
+            self.global_search_entry.set_text('')
+            return True
+
+        global_search_completion.connect('match-selected', match_selected)
+
+        def changed(widget):
+            def update(search_text):
+                if search_text != widget.get_text().decode('utf-8'):
+                    return False
+                gmodel = global_search_completion.get_model()
+                if not search_text or not gmodel:
+                    gmodel.clear()
+                    gmodel.search_text = search_text
+                    return False
+                if getattr(gmodel, 'search_text', None) == search_text:
+                    return False
+                try:
+                    result = RPCExecute('model', 'ir.model', 'global_search',
+                        search_text, CONFIG['client.limit'],
+                        process_exception=False)
+                except (TrytonError, TrytonServerError):
+                    result = []
+                if search_text != widget.get_text().decode('utf-8'):
+                    return False
+                gmodel.clear()
+                for r in result:
+                    _, model, model_name, record_id, record_name, icon = r
+                    if icon:
+                        text = common.to_xml(record_name)
+                        common.ICONFACTORY.register_icon(icon)
+                        pixbuf = widget.render_icon(stock_id=icon,
+                            size=gtk.ICON_SIZE_BUTTON, detail=None)
+                    else:
+                        text = '<b>%s:</b>\n %s' % (
+                            common.to_xml(model_name),
+                            common.to_xml(record_name))
+                        pixbuf = None
+                    gmodel.append([pixbuf, text, model, record_id])
+                gmodel.search_text = search_text
+                # Force display of popup
+                widget.emit('changed')
+                return False
+            search_text = widget.get_text().decode('utf-8')
+            gobject.timeout_add(300, update, search_text)
+        self.global_search_entry.connect('changed', changed)
+        self.global_search_entry.connect('activate',
+            lambda w: w.emit('changed'))
+
+    def show_global_search(self):
+        self.pane.get_child1().set_expanded(True)
+        self.global_search_entry.grab_focus()
 
     def set_statusbar(self):
         update = True
@@ -424,6 +511,17 @@ class Main(object):
             lambda *a: self.menu_toggle())
         imagemenuitem_menu_toggle.set_accel_path('<tryton>/User/Menu Toggle')
         menu_user.add(imagemenuitem_menu_toggle)
+
+        imagemenuitem_global_search = gtk.ImageMenuItem(_('_Global Search'),
+            self.accel_group)
+        image = gtk.Image()
+        image.set_from_stock('gtk-find', gtk.ICON_SIZE_MENU)
+        imagemenuitem_global_search.set_image(image)
+        imagemenuitem_global_search.connect('activate', lambda *a:
+            self.show_global_search())
+        imagemenuitem_global_search.set_accel_path(
+            '<tryton>/User/Global Search')
+        menu_user.add(imagemenuitem_global_search)
 
         menu_user.add(gtk.SeparatorMenuItem())
 
@@ -1038,6 +1136,13 @@ class Main(object):
                     False)
             except RPCException:
                 return False
+
+        vbox = gtk.VBox()
+
+        self.set_global_search()
+        vbox.pack_start(self.global_search_entry, False, False)
+        vbox.show_all()
+
         self.menu_screen = None
         self.menu_expander_clear()
         action = PYSONDecoder().decode(prefs['pyson_menu'])
@@ -1053,7 +1158,11 @@ class Main(object):
         # Use alternate view to not show search box
         screen.screen_container.alternate_view = True
         screen.switch_view(view_type=screen.current_view.view_type)
-        self.menu_expander.add(screen.screen_container.alternate_viewport)
+
+        vbox.pack_start(screen.screen_container.alternate_viewport, True, True)
+        screen.current_view.widget_tree.set_headers_visible(False)
+
+        self.menu_expander.add(vbox)
 
         # Favorite column
         treeview = screen.current_view.widget_tree
