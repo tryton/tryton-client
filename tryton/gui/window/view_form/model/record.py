@@ -222,7 +222,7 @@ class Record(SignalEvent):
             get_modifiedonly=False):
         if check_load:
             self._check_load()
-        value = []
+        value = {}
         for name, field in self.group.fields.iteritems():
             if field.attrs.get('readonly'):
                 continue
@@ -232,9 +232,8 @@ class Record(SignalEvent):
             if (field.name not in self.modified_fields
                     and get_modifiedonly):
                 continue
-            value.append((name, field.get(self, check_load=check_load,
-                readonly=get_readonly, modified=get_modifiedonly)))
-        value = dict(value)
+            value[name] = field.get(self, check_load=check_load,
+                readonly=get_readonly, modified=get_modifiedonly)
         if includeid:
             value['id'] = self.id
         return value
