@@ -375,10 +375,7 @@ class Group(SignalEvent, list):
             return None
         return self[self.current_idx]
 
-    def add_fields(self, fields, context=None, signal=True):
-        if context is None:
-            context = {}
-
+    def add_fields(self, fields, signal=True):
         to_add = {}
         for name, attr in fields.iteritems():
             if name not in self.fields:
@@ -394,13 +391,11 @@ class Group(SignalEvent, list):
         for record in self:
             if record.id < 0:
                 new.append(record)
-        ctx = context.copy()
 
         if len(new) and len(to_add):
-            ctx.update(self.context)
             try:
                 values = RPCExecute('model', self.model_name, 'default_get',
-                    to_add.keys(), context=ctx)
+                    to_add.keys(), context=self.context)
             except RPCException:
                 return False
             for name in to_add:

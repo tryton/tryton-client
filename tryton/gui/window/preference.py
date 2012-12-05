@@ -65,7 +65,6 @@ class Preference(NoModal):
             return
         self.screen.current_record.set(preferences)
         self.screen.current_record.validate(softvalidation=True)
-        self.screen.screen_container.set(self.screen.current_view.widget)
         self.screen.display(set_cursor=True)
 
         self.screen.widget.show()

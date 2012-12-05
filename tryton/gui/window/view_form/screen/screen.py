@@ -83,14 +83,8 @@ class Screen(SignalEvent):
             lambda: collections.defaultdict(lambda: None))
         self.domain_parser = None
         self.pre_validate = False
-
-        if mode:
-            self.view_to_load = mode[1:]
-            view_id = False
-            if self.view_ids:
-                view_id = self.view_ids.pop(0)
-            view = self.add_view_id(view_id, mode[0])
-            self.screen_container.set(view.widget)
+        self.view_to_load = mode[:]
+        self.load_view_to_load()
         self.display()
 
     def __repr__(self):
@@ -356,13 +350,12 @@ class Screen(SignalEvent):
         if len(self.view_to_load):
             if self.view_ids:
                 view_id = self.view_ids.pop(0)
-                view_type = self.view_to_load.pop(0)
             else:
                 view_id = False
-                view_type = self.view_to_load.pop(0)
+            view_type = self.view_to_load.pop(0)
             self.add_view_id(view_id, view_type)
 
-    def add_view_id(self, view_id, view_type, display=False, context=None):
+    def add_view_id(self, view_id, view_type):
         if view_type in self.views_preload:
             view = self.views_preload[view_type]
         else:
@@ -371,9 +364,9 @@ class Screen(SignalEvent):
                     view_id, view_type, context=self.context)
             except RPCException:
                 return
-        return self.add_view(view, display, context=context)
+        return self.add_view(view)
 
-    def add_view(self, view, display=False, context=None):
+    def add_view(self, view):
         arch = view['arch']
         fields = view['fields']
 
@@ -399,7 +392,7 @@ class Screen(SignalEvent):
         children_field = view.get('field_childs')
 
         from tryton.gui.window.view_form.view.widget_parse import WidgetParse
-        self.group.add_fields(fields, context=context)
+        self.group.add_fields(fields)
 
         parser = WidgetParse(parent=self.parent)
         view = parser.parse(self, xml_dom, self.group.fields,
@@ -407,16 +400,8 @@ class Screen(SignalEvent):
 
         self.views.append(view)
 
-        if display:
-            self.__current_view = len(self.views) - 1
-            self.screen_container.set(self.current_view.widget)
-            fields = self.current_view.get_fields()
-            if (not self.current_record
-                and self.current_view.view_type == 'form'):
-                self.new()
-            self.set_cursor()
-            self.current_view.cancel()
-            self.display()
+        self.__current_view = len(self.views) - 1
+        self.screen_container.set(self.current_view.widget)
         return view
 
     def editable_get(self):
