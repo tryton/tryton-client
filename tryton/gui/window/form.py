@@ -587,11 +587,11 @@ class Form(SignalEvent, TabContent):
                 for name, func in plugin.get_plugins(self.model):
                     menuitem = gtk.MenuItem('_' + name)
                     menuitem.set_use_underline(True)
-                    menuitem.connect('activate', lambda *a: func({
+                    menuitem.connect('activate', lambda m, func: func({
                                 'model': self.model,
                                 'ids': self.id_get(),
                                 'id': self.id_get(),
-                                }))
+                                }), func)
                     menu.add(menuitem)
         return menu
 
