@@ -36,6 +36,11 @@ if os.name == 'mac' or \
         os.environ['PANGO_RC_FILE'] = pangorc
         os.environ['GTK_IM_MODULE_FILE'] = immodules
 
+# Disable dbusmenu to show second menu in tabs
+os.environ['UBUNTU_MENUPROXY'] = '0'
+# overlay-scrollbar breaks treeview height
+os.environ['LIBOVERLAY_SCROLLBAR'] = '0'
+
 import tryton
 if '--profile' in sys.argv:
     import profile
