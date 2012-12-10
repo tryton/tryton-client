@@ -375,7 +375,8 @@ class Char(object):
 
         if hasattr(self.treeview, 'editable') \
                 and self.treeview.editable:
-            readonly = field.get_state_attrs(record).get('readonly', False)
+            readonly = self.attrs.get('readonly',
+                field.get_state_attrs(record).get('readonly', False))
             if invisible:
                 readonly = True
 
@@ -453,7 +454,8 @@ class Boolean(Int):
         store = self.treeview.get_model()
         record = store.get_value(store.get_iter(path), 0)
         field = record[self.field_name]
-        if not field.get_state_attrs(record).get('readonly', False):
+        if not self.attr.get('readonly',
+                field.get_state_attrs(record).get('readonly', False)):
             value = record[self.field_name].get_client(record)
             record[self.field_name].set_client(record, int(not value))
             self.treeview.set_cursor(path)
