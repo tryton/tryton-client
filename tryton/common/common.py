@@ -174,11 +174,7 @@ MODELACCESS = ModelAccess()
 class ViewSearch(object):
     searches = None
 
-    def load_searches(self, refresh=False):
-        if not refresh:
-            self.searches = None
-        if self.searches is not None:
-            return
+    def load_searches(self):
         try:
             self.searches = rpc.execute('model', 'ir.ui.view_search',
                 'get_search', rpc.CONTEXT)
@@ -186,7 +182,6 @@ class ViewSearch(object):
             self.searches = {}
 
     def __getitem__(self, model):
-        self.load_searches()
         return self.searches.get(model, [])
 
     def add(self, model, name, domain):
