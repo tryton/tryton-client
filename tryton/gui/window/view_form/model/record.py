@@ -218,24 +218,16 @@ class Record(SignalEvent):
 
     loaded = property(get_loaded)
 
-    def get(self, get_readonly=True, includeid=False, check_load=True,
-            get_modifiedonly=False):
+    def get(self, check_load=True):
         if check_load:
             self._check_load()
         value = {}
         for name, field in self.group.fields.iteritems():
             if field.attrs.get('readonly'):
                 continue
-            if (field.get_state_attrs(self).get('readonly', False)
-                    and not get_readonly):
+            if field.name not in self.modified_fields and self.id >= 0:
                 continue
-            if (field.name not in self.modified_fields
-                    and get_modifiedonly):
-                continue
-            value[name] = field.get(self, check_load=check_load,
-                readonly=get_readonly, modified=get_modifiedonly)
-        if includeid:
-            value['id'] = self.id
+            value[name] = field.get(self, check_load=check_load)
         return value
 
     def get_eval(self, check_load=True):
@@ -281,7 +273,7 @@ class Record(SignalEvent):
     def save(self, force_reload=True):
         if self.id < 0 or self.modified:
             if self.id < 0:
-                value = self.get(get_readonly=True)
+                value = self.get()
                 try:
                     res = RPCExecute('model', self.model_name, 'create', value,
                         context=self.context_get())
@@ -292,8 +284,7 @@ class Record(SignalEvent):
                 self.group.id_changed(old_id)
             elif self.modified:
                 self._check_load()
-                value = self.get(get_readonly=True, get_modifiedonly=True,
-                        check_load=False)
+                value = self.get(check_load=False)
                 if value:
                     context = self.context_get()
                     context = context.copy()

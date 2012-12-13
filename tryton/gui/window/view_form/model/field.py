@@ -132,12 +132,11 @@ class CharField(object):
             record.signal('record-changed')
         return True
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         return record.value.get(self.name) or self._default
 
     def get_eval(self, record, check_load=True):
-        return self.get(record, check_load=check_load, readonly=True,
-                modified=False)
+        return self.get(record, check_load=check_load)
 
     def get_on_change_value(self, record, check_load=True):
         return self.get_eval(record, check_load=check_load)
@@ -285,7 +284,7 @@ class NumberField(CharField):
                 return False
         return True
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         return record.value.get(self.name, self._default)
 
     def digits(self, record):
@@ -364,7 +363,7 @@ class BooleanField(CharField):
         super(BooleanField, self).set_client(record, value,
             force_change=force_change)
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         return bool(record.value.get(self.name))
 
     def get_client(self, record):
@@ -378,7 +377,7 @@ class M2OField(CharField):
 
     _default = None
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         value = record.value.get(self.name)
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
@@ -526,7 +525,7 @@ class O2MField(CharField):
         self._set_default_value(record)
         return record.value.get(self.name)
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         if record.value.get(self.name) is None:
             return []
         record_removed = record.value[self.name].record_removed
@@ -537,15 +536,13 @@ class O2MField(CharField):
             if record2 in record_removed or record2 in record_deleted:
                 continue
             if record2.id >= 0:
-                values = record2.get(check_load=check_load,
-                    get_readonly=readonly, get_modifiedonly=modified)
+                values = record2.get(check_load=check_load)
                 values.pop(parent_name, None)
                 if record2.modified and values:
                     result.append(('write', [record2.id], values))
                 result[0][1].append(record2.id)
             else:
-                values = record2.get(check_load=check_load,
-                    get_readonly=readonly)
+                values = record2.get(check_load=check_load)
                 values.pop(parent_name, None)
                 result.append(('create', values))
         if not result[0][1]:
@@ -809,7 +806,7 @@ class ReferenceField(CharField):
         else:
             return None
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         if (record.value.get(self.name)
                 and record.value[self.name][0]
                 and record.value[self.name][1] >= 0):
@@ -872,7 +869,7 @@ class BinaryField(CharField):
 
     _default = None
 
-    def get(self, record, check_load=True, readonly=True, modified=False):
+    def get(self, record, check_load=True):
         result = record.value.get(self.name) or self._default
         if isinstance(result, basestring):
             try:

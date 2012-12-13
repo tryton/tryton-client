@@ -80,7 +80,7 @@ class Preference(NoModal):
     def response(self, win, response_id):
         if response_id == gtk.RESPONSE_OK:
             if self.screen.current_record.validate():
-                vals = copy.copy(self.screen.get(get_modifiedonly=True))
+                vals = copy.copy(self.screen.get())
                 if 'password' in vals:
                     password = common.ask(_('Current Password:'),
                         visibility=False)
