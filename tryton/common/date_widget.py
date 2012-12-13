@@ -52,7 +52,6 @@ class DateEntry(gtk.Entry):
 
     def __init__(self, format):
         super(DateEntry, self).__init__()
-        self.modify_font(pango.FontDescription("monospace"))
 
         self.set_format(format)
 
