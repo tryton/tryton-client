@@ -635,16 +635,15 @@ class O2MField(CharField):
                 for fname, field in fields.iteritems())
         if value and len(value):
             context = self.context_get(record)
-            field_names = []
+            field_names = set()
             for val in value:
                 for fieldname in val.keys():
-                    if (fieldname not in field_names
-                            and fieldname not in fields):
-                        field_names.append(fieldname)
+                    if fieldname not in fields:
+                        field_names.add(fieldname)
             if field_names:
                 try:
                     fields.update(RPCExecute('model', self.attrs['relation'],
-                            'fields_get', field_names, context=context))
+                            'fields_get', list(field_names), context=context))
                 except RPCException:
                     return False
 
@@ -680,16 +679,20 @@ class O2MField(CharField):
 
         if value and (value.get('add') or value.get('update')):
             context = self.context_get(record)
-            field_names = []
+            field_names = set()
+            fields = record.value[self.name].fields
             for val in (value.get('add', []) + value.get('update', [])):
                 for fieldname in val.keys():
-                    if fieldname not in field_names:
-                        field_names.append(fieldname)
-            try:
-                fields = RPCExecute('model', self.attrs['relation'],
-                    'fields_get', field_names, context=context)
-            except RPCException:
-                return False
+                    if fieldname not in fields and fieldname != 'id':
+                        field_names.add(fieldname)
+            if field_names:
+                try:
+                    fields = RPCExecute('model', self.attrs['relation'],
+                        'fields_get', list(field_names), context=context)
+                except RPCException:
+                    return False
+            else:
+                fields = {}
 
         to_remove = []
         for record2 in record.value[self.name]:
