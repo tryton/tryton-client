@@ -30,7 +30,6 @@ class CellRendererDate(gtk.GenericCellRenderer):
     def __init__(self, format):
         self.__gobject_init__()
         self._renderer = gtk.CellRendererText()
-        self._renderer.set_property('family', 'Monospace')
         self.set_property("mode", self._renderer.get_property("mode"))
 
         self.format = format
