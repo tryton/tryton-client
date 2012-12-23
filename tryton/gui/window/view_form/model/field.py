@@ -712,14 +712,14 @@ class O2MField(CharField):
             for vals in value.get('add', []):
                 new_record = record.value[self.name].new(default=False)
                 record.value[self.name].add(new_record)
-                new_record.set(vals, modified=True, signal=False)
+                new_record.set_on_change(vals)
 
             for vals in value.get('update', []):
                 if 'id' not in vals:
                     continue
                 record2 = record.value[self.name].get(vals['id'])
                 if record2 is not None:
-                    record2.set(vals, modified=True, signal=False)
+                    record2.set_on_change(vals)
         return True
 
     def validation_domains(self, record):

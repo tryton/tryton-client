@@ -439,6 +439,31 @@ class Record(SignalEvent):
         if signal:
             self.signal('record-changed')
 
+    def set_on_change(self, values):
+        later = {}
+        for fieldname, value in values.items():
+            if fieldname not in self.group.fields:
+                continue
+            if isinstance(self.group.fields[fieldname], fields.O2MField):
+                later[fieldname] = value
+                continue
+            if isinstance(self.group.fields[fieldname], (fields.M2OField,
+                        fields.ReferenceField)):
+                field_rec_name = fieldname + '.rec_name'
+                if field_rec_name in values:
+                    self.value[field_rec_name] = values[field_rec_name]
+                elif field_rec_name in self.value:
+                    del self.value[field_rec_name]
+            self.group.fields[fieldname].set_on_change(self, value)
+        for fieldname, value in later.items():
+            # on change recursion checking is done only for x2many
+            field_x2many = self.group.fields[fieldname]
+            try:
+                field_x2many.in_on_change = True
+                field_x2many.set_on_change(self, value)
+            finally:
+                field_x2many.in_on_change = False
+
     def reload(self, fields=None):
         if self.id < 0:
             return
@@ -492,29 +517,7 @@ class Record(SignalEvent):
                 'on_change_' + fieldname, args, context=self.context_get())
         except RPCException:
             return
-        later = {}
-        for fieldname, value in res.items():
-            if fieldname not in self.group.fields:
-                continue
-            if isinstance(self.group.fields[fieldname], fields.O2MField):
-                later[fieldname] = value
-                continue
-            if isinstance(self.group.fields[fieldname], (fields.M2OField,
-                        fields.ReferenceField)):
-                field_rec_name = fieldname + '.rec_name'
-                if field_rec_name in res:
-                    self.value[field_rec_name] = res[field_rec_name]
-                elif field_rec_name in self.value:
-                    del self.value[field_rec_name]
-            self.group.fields[fieldname].set_on_change(self, value)
-        for fieldname, value in later.items():
-            # on change recursion checking is done only for x2many
-            field_x2many = self.group.fields[fieldname]
-            try:
-                field_x2many.in_on_change = True
-                field_x2many.set_on_change(self, value)
-            finally:
-                field_x2many.in_on_change = False
+        self.set_on_change(res)
 
     def on_change_with(self, field_name):
         fieldnames = set()
@@ -545,8 +548,7 @@ class Record(SignalEvent):
                     values, list(fieldnames), context=self.context_get())
             except RPCException:
                 return
-            for fieldname, value in result.items():
-                self.group.fields[fieldname].set_on_change(self, value)
+            self.set_on_change(result)
         for fieldname in later:
             on_change_with = self.group.fields[fieldname].attrs.get(
                     'on_change_with')
