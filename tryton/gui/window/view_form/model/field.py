@@ -416,7 +416,7 @@ class M2OField(CharField):
         if not rec_name and value >= 0:
             try:
                 result, = RPCExecute('model', self.attrs['relation'], 'read',
-                    [value], ['rec_name'])
+                    [value], ['rec_name'], main_iteration=False)
             except RPCException:
                 return False
             rec_name = result['rec_name'] or ''
@@ -641,7 +641,8 @@ class O2MField(CharField):
             if field_names:
                 try:
                     fields.update(RPCExecute('model', self.attrs['relation'],
-                            'fields_get', list(field_names), context=context))
+                            'fields_get', list(field_names),
+                            main_iteration=False, context=context))
                 except RPCException:
                     return False
 
@@ -686,7 +687,8 @@ class O2MField(CharField):
             if field_names:
                 try:
                     fields = RPCExecute('model', self.attrs['relation'],
-                        'fields_get', list(field_names), context=context)
+                        'fields_get', list(field_names), main_iteration=False,
+                        context=context)
                 except RPCException:
                     return False
             else:
@@ -851,7 +853,7 @@ class ReferenceField(CharField):
             if not rec_name and ref_id >= 0:
                 try:
                     result, = RPCExecute('model', ref_model, 'read', [ref_id],
-                        ['rec_name'])
+                        ['rec_name'], main_iteration=False)
                 except RPCException:
                     return
                 rec_name = result['rec_name']
@@ -909,7 +911,8 @@ class BinaryField(CharField):
             context = record.context_get()
             try:
                 values, = RPCExecute('model', record.model_name, 'read',
-                    [record.id], [self.name], context=context)
+                    [record.id], [self.name], main_iteration=False,
+                    context=context)
             except RPCException:
                 return ''
             _, filename = tempfile.mkstemp(prefix='tryton_')
