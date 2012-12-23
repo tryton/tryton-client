@@ -19,8 +19,7 @@ class StateMixin(object):
 
     def state_set(self, record):
         if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
+            state_changes = record.expr_eval(self.attrs.get('states', {}))
         else:
             state_changes = {}
         if state_changes.get('invisible', self.attrs.get('invisible')):
@@ -62,8 +61,7 @@ class Notebook(StateMixin, gtk.Notebook):
     def state_set(self, record):
         super(Notebook, self).state_set(record)
         if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
+            state_changes = record.expr_eval(self.attrs.get('states', {}))
         else:
             state_changes = {}
         if state_changes.get('readonly', self.attrs.get('readonly')):
@@ -82,8 +80,7 @@ class ScrolledWindow(gtk.ScrolledWindow):
 
     def state_set(self, record):
         if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}),
-                    check_load=False)
+            state_changes = record.expr_eval(self.attrs.get('states', {}))
         else:
             state_changes = {}
         if state_changes.get('invisible', self.attrs.get('invisible')):

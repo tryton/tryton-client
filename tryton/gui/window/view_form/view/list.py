@@ -31,8 +31,7 @@ def path_convert_id2pos(model, id_path):
         current_id = id_path.pop(0)
         try:
             record = group.get(current_id)
-            group = record.children_group(model.children_field,
-                check_load=True)
+            group = record.children_group(model.children_field)
         except (KeyError, AttributeError):
             return None
     return model.on_get_path(record)
@@ -114,7 +113,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
     def move_into(self, record, path):
         iter_ = self.get_iter(path)
         parent = self.get_value(iter_, 0)
-        group = parent.children_group(self.children_field, check_load=True)
+        group = parent.children_group(self.children_field)
         if group is not record.group:
             record.group.remove(record, remove=True, force_remove=True)
             # Don't remove record from previous group
@@ -195,7 +194,7 @@ class AdaptModelGroup(gtk.GenericTreeModel):
             record = group[i]
             if not self.children_field:
                 break
-            group = record.children_group(self.children_field, check_load=True)
+            group = record.children_group(self.children_field)
         return record
 
     def on_get_value(self, record, column):
@@ -210,6 +209,8 @@ class AdaptModelGroup(gtk.GenericTreeModel):
         if record is None or not self.children_field:
             return False
         children = record.children_group(self.children_field)
+        if children is None:
+            return True
         length = len(children)
         if self.__removed and self.__removed in children:
             length -= 1
@@ -653,9 +654,9 @@ class ViewList(ParserView):
         screen.load([value])
         encoder = PYSONEncoder()
         act['domain'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('domain', []), check_load=False))
+            act.get('domain', [])))
         act['context'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('context', {}), check_load=False))
+            act.get('context', {})))
         data['model'] = self.screen.model_name
         data['id'] = value
         data['ids'] = [value]
@@ -836,8 +837,7 @@ class ViewList(ParserView):
                 if not record.get_loaded([child_fieldname]):
                     loaded = False
                     break
-                field_value = record.fields_get()[child_fieldname].get(record,
-                    check_load=False)
+                field_value = record.fields_get()[child_fieldname].get(record)
                 if field_value is not None:
                     value += field_value
                     if record.id in ids or not ids:

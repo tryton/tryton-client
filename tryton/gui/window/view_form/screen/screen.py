@@ -505,17 +505,17 @@ class Screen(SignalEvent):
         elif current_view.view_type in ('tree', 'form'):
             current_view.set_cursor(new=new, reset_view=reset_view)
 
-    def get(self, check_load=True):
+    def get(self):
         if not self.current_record:
             return None
         self.current_view.set_value()
-        return self.current_record.get(check_load=check_load)
+        return self.current_record.get()
 
-    def get_on_change_value(self, check_load=True):
+    def get_on_change_value(self):
         if not self.current_record:
             return None
         self.current_view.set_value()
-        return self.current_record.get_on_change_value(check_load=check_load)
+        return self.current_record.get_on_change_value()
 
     def modified(self):
         if self.current_view.view_type != 'tree':

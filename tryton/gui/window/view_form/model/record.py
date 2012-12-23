@@ -148,14 +148,13 @@ class Record(SignalEvent):
         if value:
             self.signal('record-modified')
 
-    def children_group(self, field_name, check_load=True):
+    def children_group(self, field_name):
         if not field_name:
             return []
-        if check_load:
-            self._check_load([field_name])
+        self._check_load([field_name])
         group = self.value.get(field_name)
         if group is None:
-            return []
+            return None
 
         if id(group.fields) != id(self.group.fields):
             self.group.fields.update(group.fields)
@@ -218,36 +217,29 @@ class Record(SignalEvent):
 
     loaded = property(get_loaded)
 
-    def get(self, check_load=True):
-        if check_load:
-            self._check_load()
+    def get(self):
         value = {}
         for name, field in self.group.fields.iteritems():
             if field.attrs.get('readonly'):
                 continue
             if field.name not in self.modified_fields and self.id >= 0:
                 continue
-            value[name] = field.get(self, check_load=check_load)
+            value[name] = field.get(self)
         return value
 
-    def get_eval(self, check_load=True):
-        if check_load:
-            self._check_load()
+    def get_eval(self):
         value = {}
         for name, field in self.group.fields.iteritems():
             if name not in self._loaded and self.id >= 0:
                 continue
-            value[name] = field.get_eval(self, check_load=check_load)
+            value[name] = field.get_eval(self)
         value['id'] = self.id
         return value
 
-    def get_on_change_value(self, check_load=True):
-        if check_load:
-            self._check_load()
+    def get_on_change_value(self):
         value = {}
         for name, field in self.group.fields.iteritems():
-            value[name] = field.get_on_change_value(self,
-                check_load=check_load)
+            value[name] = field.get_on_change_value(self)
         value['id'] = self.id
         return value
 
@@ -283,8 +275,7 @@ class Record(SignalEvent):
                 self.id = res
                 self.group.id_changed(old_id)
             elif self.modified:
-                self._check_load()
-                value = self.get(check_load=False)
+                value = self.get()
                 if value:
                     context = self.context_get()
                     context = context.copy()
@@ -474,30 +465,25 @@ class Record(SignalEvent):
                 self[field]
         self.validate(fields or [])
 
-    def expr_eval(self, expr, check_load=False):
+    def expr_eval(self, expr):
         if not isinstance(expr, basestring):
             return expr
-        if check_load:
-            self._check_load()
         ctx = rpc.CONTEXT.copy()
         ctx['context'] = ctx.copy()
         ctx['context'].update(self.context_get())
-        for name, field in self.group.fields.items():
-            ctx[name] = field.get_eval(self, check_load=check_load)
-
+        ctx.update(self.get_eval())
         ctx['active_model'] = self.model_name
         ctx['active_id'] = self.id
-        ctx['id'] = self.id  # Force local id
         ctx['_user'] = rpc._USER
         if self.parent and self.parent_name:
             ctx['_parent_' + self.parent_name] = \
-                    common.EvalEnvironment(self.parent, check_load)
+                common.EvalEnvironment(self.parent)
         val = PYSONDecoder(ctx).decode(expr)
         return val
 
     def _get_on_change_args(self, args):
         res = {}
-        values = common.EvalEnvironment(self, True, 'on_change')
+        values = common.EvalEnvironment(self, 'on_change')
         for arg in args:
             scope = values
             for i in arg.split('.'):
