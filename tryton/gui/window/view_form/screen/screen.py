@@ -244,7 +244,8 @@ class Screen(SignalEvent):
         self.signal('record-modified')
 
     def _group_changed(self, group, record):
-        self.display()
+        if not self.parent:
+            self.display()
 
     def __get_current_record(self):
         if (self.__current_record is not None
