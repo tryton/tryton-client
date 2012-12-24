@@ -112,14 +112,15 @@ class Many2Many(WidgetInterface):
             activate_keys.append(gtk.keysyms.Return)
         if event.keyval == gtk.keysyms.F3:
             self._sig_add()
-            return False
+            return True
         if event.keyval == gtk.keysyms.F2 \
                 and widget == self.screen.widget:
             self._sig_edit()
+            return True
         if event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete) \
                 and widget == self.screen.widget:
             self._sig_remove()
-            return False
+            return True
         if (widget == self.wid_text
                 and event.keyval in activate_keys
                 and editable

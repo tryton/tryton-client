@@ -201,11 +201,10 @@ class Action(object):
             encoder = PYSONEncoder()
             if 'pyson_domain' in action:
                 action['pyson_domain'] = encoder.encode(
-                    record.expr_eval(action['pyson_domain'], check_load=False))
+                    record.expr_eval(action['pyson_domain']))
             if 'pyson_context' in action:
                 action['pyson_context'] = encoder.encode(
-                    record.expr_eval(action['pyson_context'],
-                        check_load=False))
+                    record.expr_eval(action['pyson_context']))
 
         else:
             raise NotImplementedError("Action type '%s' is not supported" %

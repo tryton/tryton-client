@@ -111,7 +111,7 @@ class Action(SignalEvent):
 
     def _get_active(self):
         if self.screen and self.screen.current_record:
-            return common.EvalEnvironment(self.screen.current_record, False)
+            return common.EvalEnvironment(self.screen.current_record)
 
     active = property(_get_active)
 

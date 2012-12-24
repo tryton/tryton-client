@@ -3,7 +3,7 @@
 #This code is inspired by the pycha project
 #(http://www.lorenzogil.com/projects/pycha/)
 from graph import Graph
-from tryton.common import hex2rgb, float_time_to_text, safe_eval
+from tryton.common import hex2rgb, float_time_to_text
 import locale
 import math
 import cairo
@@ -34,7 +34,7 @@ class Line(Graph):
                 if self.xrange == 0:
                     x = 1.0
 
-                if (not bool(safe_eval(yfield2attrs[yfield].get('empty', '1')))
+                if (not bool(int(yfield2attrs[yfield].get('empty', 1)))
                         and yval == 0):
                     continue
 
@@ -50,7 +50,7 @@ class Line(Graph):
         key2interpolation = {}
         for yfield in self.yfields:
             key = yfield.get('key', yfield['name'])
-            key2fill[key] = bool(safe_eval(yfield.get('fill', '0')))
+            key2fill[key] = bool(int(yfield.get('fill', 0)))
             key2interpolation[key] = yfield.get('interpolation', 'linear')
 
         def preparePath(key):

@@ -203,19 +203,19 @@ class One2Many(WidgetInterface):
         if (event.keyval == gtk.keysyms.F3) \
                 and self.but_new.get_property('sensitive'):
             self._sig_new(widget)
-            return False
+            return True
         if event.keyval == gtk.keysyms.F2 \
                 and widget == self.screen.widget:
             self._sig_edit(widget)
-            return False
+            return True
         if (event.keyval in (gtk.keysyms.Delete, gtk.keysyms.KP_Delete)
                 and widget == self.screen.widget
                 and self.but_del.get_property('sensitive')):
             self._sig_remove(widget)
-            return False
+            return True
         if event.keyval == gtk.keysyms.Insert and widget == self.screen.widget:
             self._sig_undelete(widget)
-            return False
+            return True
         if self.attrs.get('add_remove'):
             editable = self.wid_text.get_editable()
             activate_keys = [gtk.keysyms.Tab, gtk.keysyms.ISO_Left_Tab]

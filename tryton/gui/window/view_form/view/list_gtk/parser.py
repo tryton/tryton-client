@@ -406,7 +406,7 @@ class Char(object):
         cell.set_property('xalign', align)
 
     def get_color(self, record):
-        return record.expr_eval(self.treeview.colors, check_load=False)
+        return record.expr_eval(self.treeview.colors)
 
     def open_remote(self, record, create, changed=False, text=None,
             callback=None):
@@ -1025,8 +1025,7 @@ class Button(object):
     @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
-        states = record.expr_eval(self.attrs.get('states', {}),
-            check_load=False)
+        states = record.expr_eval(self.attrs.get('states', {}))
         invisible = states.get('invisible', False)
         cell.set_property('visible', not invisible)
         readonly = states.get('readonly', False)
@@ -1046,7 +1045,7 @@ class Button(object):
         record = store.get_value(store.get_iter(path), 0)
 
         state_changes = record.expr_eval(
-            self.attrs.get('states', {}), check_load=False)
+            self.attrs.get('states', {}))
         if state_changes.get('invisible') \
                 or state_changes.get('readonly'):
             return True

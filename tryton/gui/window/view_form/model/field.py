@@ -46,7 +46,7 @@ class CharField(object):
 
     def domains_get(self, record):
         screen_domain = domain_inversion(record.group.domain4inversion,
-            self.name, EvalEnvironment(record, False))
+            self.name, EvalEnvironment(record))
         if isinstance(screen_domain, bool) and not screen_domain:
             screen_domain = [('id', '=', False)]
         elif isinstance(screen_domain, bool) and screen_domain:
@@ -66,13 +66,12 @@ class CharField(object):
         else:
             return screen_domain, screen_domain
 
-    def context_get(self, record, check_load=True, eval_context=True):
+    def context_get(self, record, eval_context=True):
         context = record.context_get().copy()
         if record.parent:
             context.update(record.parent.context_get())
         if eval_context:
-            context.update(record.expr_eval(self.attrs.get('context', {}),
-                check_load=check_load))
+            context.update(record.expr_eval(self.attrs.get('context', {})))
         return context
 
     def check_required(self, record):
@@ -120,7 +119,7 @@ class CharField(object):
                 if setdefault:
                     self.set_client(record, value)
                     self.get_state_attrs(record)['domain_readonly'] = True
-            res = res and eval_domain(domain, EvalEnvironment(record, False))
+            res = res and eval_domain(domain, EvalEnvironment(record))
         self.get_state_attrs(record)['valid'] = res
         return res
 
@@ -132,14 +131,14 @@ class CharField(object):
             record.signal('record-changed')
         return True
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         return record.value.get(self.name) or self._default
 
-    def get_eval(self, record, check_load=True):
-        return self.get(record, check_load=check_load)
+    def get_eval(self, record):
+        return self.get(record)
 
-    def get_on_change_value(self, record, check_load=True):
-        return self.get_eval(record, check_load=check_load)
+    def get_on_change_value(self, record):
+        return self.get_eval(record)
 
     def set_client(self, record, value, force_change=False):
         previous_value = self.get(record)
@@ -167,8 +166,7 @@ class CharField(object):
         return self.set(record, value, modified=False)
 
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
-        state_changes = record.expr_eval(self.attrs.get('states', {}),
-                check_load=False)
+        state_changes = record.expr_eval(self.attrs.get('states', {}))
         for key in states:
             if key == 'readonly' and self.attrs.get(key, False):
                 continue
@@ -284,7 +282,7 @@ class NumberField(CharField):
                 return False
         return True
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         return record.value.get(self.name, self._default)
 
     def digits(self, record):
@@ -363,7 +361,7 @@ class BooleanField(CharField):
         super(BooleanField, self).set_client(record, value,
             force_change=force_change)
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         return bool(record.value.get(self.name))
 
     def get_client(self, record):
@@ -377,7 +375,7 @@ class M2OField(CharField):
 
     _default = None
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         value = record.value.get(self.name)
         if (record.parent_name == self.name
                 and self.attrs['relation'] == record.group.parent.model_name):
@@ -418,7 +416,7 @@ class M2OField(CharField):
         if not rec_name and value >= 0:
             try:
                 result, = RPCExecute('model', self.attrs['relation'], 'read',
-                    [value], ['rec_name'])
+                    [value], ['rec_name'], main_iteration=False)
             except RPCException:
                 return False
             rec_name = result['rec_name'] or ''
@@ -434,12 +432,12 @@ class M2OField(CharField):
             record.signal('record-modified')
             record.signal('record-changed')
 
-    def context_get(self, record, check_load=True, eval_context=True):
+    def context_get(self, record, eval_context=True):
         context = super(M2OField, self).context_get(record,
-                check_load=check_load, eval_context=eval_context)
+            eval_context=eval_context)
         if eval_context and self.attrs.get('datetime_field'):
             context['_datetime'] = record.get_eval(
-                    check_load=check_load)[self.attrs.get('datetime_field')]
+                )[self.attrs.get('datetime_field')]
         return context
 
     def validation_domains(self, record):
@@ -525,7 +523,7 @@ class O2MField(CharField):
         self._set_default_value(record)
         return record.value.get(self.name)
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         if record.value.get(self.name) is None:
             return []
         record_removed = record.value[self.name].record_removed
@@ -536,13 +534,13 @@ class O2MField(CharField):
             if record2 in record_removed or record2 in record_deleted:
                 continue
             if record2.id >= 0:
-                values = record2.get(check_load=check_load)
+                values = record2.get()
                 values.pop(parent_name, None)
                 if record2.modified and values:
                     result.append(('write', [record2.id], values))
                 result[0][1].append(record2.id)
             else:
-                values = record2.get(check_load=check_load)
+                values = record2.get()
                 values.pop(parent_name, None)
                 result.append(('create', values))
         if not result[0][1]:
@@ -563,7 +561,7 @@ class O2MField(CharField):
             result.update(record2.get_timestamp())
         return result
 
-    def get_eval(self, record, check_load=True):
+    def get_eval(self, record):
         if record.value.get(self.name) is None:
             return []
         record_removed = record.value[self.name].record_removed
@@ -571,14 +569,14 @@ class O2MField(CharField):
         return [x.id for x in record.value[self.name]
             if x not in record_removed and x not in record_deleted]
 
-    def get_on_change_value(self, record, check_load=True):
+    def get_on_change_value(self, record):
         result = []
         if record.value.get(self.name) is None:
             return []
         for record2 in record.value[self.name]:
             if not (record2.deleted or record2.removed):
                 result.append(
-                    record2.get_on_change_value(check_load=check_load))
+                    record2.get_on_change_value())
         return result
 
     def set(self, record, value, modified=False):
@@ -643,7 +641,8 @@ class O2MField(CharField):
             if field_names:
                 try:
                     fields.update(RPCExecute('model', self.attrs['relation'],
-                            'fields_get', list(field_names), context=context))
+                            'fields_get', list(field_names),
+                            main_iteration=False, context=context))
                 except RPCException:
                     return False
 
@@ -688,7 +687,8 @@ class O2MField(CharField):
             if field_names:
                 try:
                     fields = RPCExecute('model', self.attrs['relation'],
-                        'fields_get', list(field_names), context=context)
+                        'fields_get', list(field_names), main_iteration=False,
+                        context=context)
                 except RPCException:
                     return False
             else:
@@ -712,14 +712,14 @@ class O2MField(CharField):
             for vals in value.get('add', []):
                 new_record = record.value[self.name].new(default=False)
                 record.value[self.name].add(new_record)
-                new_record.set(vals, modified=True, signal=False)
+                new_record.set_on_change(vals)
 
             for vals in value.get('update', []):
                 if 'id' not in vals:
                     continue
                 record2 = record.value[self.name].get(vals['id'])
                 if record2 is not None:
-                    record2.set(vals, modified=True, signal=False)
+                    record2.set_on_change(vals)
         return True
 
     def validation_domains(self, record):
@@ -793,8 +793,8 @@ class M2MField(O2MField):
             record.signal('record-modified')
             record.signal('record-changed')
 
-    def get_on_change_value(self, record, check_load=True):
-        return self.get_eval(record, check_load=check_load)
+    def get_on_change_value(self, record):
+        return self.get_eval(record)
 
 
 class ReferenceField(CharField):
@@ -809,7 +809,7 @@ class ReferenceField(CharField):
         else:
             return None
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         if (record.value.get(self.name)
                 and record.value[self.name][0]
                 and record.value[self.name][1] >= 0):
@@ -853,7 +853,7 @@ class ReferenceField(CharField):
             if not rec_name and ref_id >= 0:
                 try:
                     result, = RPCExecute('model', ref_model, 'read', [ref_id],
-                        ['rec_name'])
+                        ['rec_name'], main_iteration=False)
                 except RPCException:
                     return
                 rec_name = result['rec_name']
@@ -872,7 +872,7 @@ class BinaryField(CharField):
 
     _default = None
 
-    def get(self, record, check_load=True):
+    def get(self, record):
         result = record.value.get(self.name) or self._default
         if isinstance(result, basestring):
             try:
@@ -911,7 +911,8 @@ class BinaryField(CharField):
             context = record.context_get()
             try:
                 values, = RPCExecute('model', record.model_name, 'read',
-                    [record.id], [self.name], context=context)
+                    [record.id], [self.name], main_iteration=False,
+                    context=context)
             except RPCException:
                 return ''
             _, filename = tempfile.mkstemp(prefix='tryton_')

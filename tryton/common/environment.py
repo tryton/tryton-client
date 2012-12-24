@@ -4,10 +4,9 @@
 
 class EvalEnvironment(dict):
 
-    def __init__(self, parent, check_load, eval_type='eval'):
+    def __init__(self, parent, eval_type='eval'):
         super(EvalEnvironment, self).__init__()
         self.parent = parent
-        self.check_load = check_load
         assert eval_type in ('eval', 'on_change')
         self.eval_type = eval_type
 
@@ -15,13 +14,13 @@ class EvalEnvironment(dict):
         if item == 'id':
             return self.parent.id
         if item == '_parent_' + self.parent.parent_name and self.parent.parent:
-            return EvalEnvironment(self.parent.parent, self.check_load,
+            return EvalEnvironment(self.parent.parent,
                 eval_type=self.eval_type)
         if self.eval_type == 'eval':
-            return self.parent.get_eval(check_load=self.check_load)[item]
+            return self.parent.get_eval()[item]
         else:
             return self.parent.group.fields[item].get_on_change_value(
-                self.parent, check_load=self.check_load)
+                self.parent)
 
     def __getattr__(self, item):
         try:
@@ -50,6 +49,6 @@ class EvalEnvironment(dict):
         if item == '_parent_' + self.parent.parent_name and self.parent.parent:
             return True
         if self.eval_type == 'eval':
-            return item in self.parent.get_eval(check_load=self.check_load)
+            return item in self.parent.get_eval()
         else:
             return item in self.parent.group.fields

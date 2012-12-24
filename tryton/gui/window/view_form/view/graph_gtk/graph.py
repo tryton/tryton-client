@@ -363,8 +363,7 @@ class Graph(gtk.DrawingArea):
                     context['context'] = context.copy()
                     context['_user'] = rpc._USER
                     for field in model.group.fields:
-                        context[field] = model[field].get(model,
-                            check_load=False)
+                        context[field] = model[field].get(model)
                     if not PYSONDecoder(context).decode(yfield['domain']):
                         continue
                 if yfield['name'] == '#':

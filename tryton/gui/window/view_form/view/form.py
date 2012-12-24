@@ -125,7 +125,7 @@ class ViewForm(ParserView):
                     for name, field in record.group.fields.iteritems()]
             fields.sort(key=operator.itemgetter(1), reverse=True)
             for field, _ in fields:
-                record[field].get(record, check_load=False)
+                record[field].get(record)
         for name, widgets in self.widgets.iteritems():
             field = None
             if record:
