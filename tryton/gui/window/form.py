@@ -4,7 +4,6 @@
 import gettext
 import gtk
 import gobject
-import locale
 from tryton.gui.window.view_form.screen import Screen
 from tryton.action import Action
 from tryton.gui import Main
@@ -13,8 +12,7 @@ from tryton.gui.window.win_export import WinExport
 from tryton.gui.window.win_import import WinImport
 from tryton.gui.window.attachment import Attachment
 from tryton.signal_event import SignalEvent
-from tryton.common import (TRYTON_ICON, message, sur, sur_3b, COLOR_SCHEMES,
-    timezoned_date)
+from tryton.common import message, sur, sur_3b, COLOR_SCHEMES, timezoned_date
 import tryton.common as common
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
@@ -63,7 +61,6 @@ class Form(SignalEvent, TabContent):
         (_('_Next'), 'tryton-go-next', 'sig_next', '<tryton>/Form/Next'),
         (_('_Search'), 'tryton-find', 'sig_search', '<tryton>/Form/Search'),
         (_('View _Logs...'), None, 'sig_logs', None),
-        (_('_Go to Record ID...'), None, 'sig_goto', '<tryton>/Form/Goto'),
         (None,) * 4,
         (_('_Close Tab'), 'tryton-close', 'sig_win_close',
             '<tryton>/Form/Close'),
@@ -178,49 +175,6 @@ class Form(SignalEvent, TabContent):
             and self.screen.limit == value.screen.limit
             and self.auto_refresh == value.auto_refresh
             and self.screen.search_value == value.screen.search_value)
-
-    def sig_goto(self, widget=None):
-        if not self.modified_save():
-            return
-        parent = common.get_toplevel_window()
-        win = gtk.Dialog(_('Go to ID'), parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK,
-                gtk.RESPONSE_OK))
-        win.set_icon(TRYTON_ICON)
-        win.set_has_separator(True)
-        win.set_default_response(gtk.RESPONSE_OK)
-
-        table = gtk.Table(2, 2)
-        table.attach(gtk.Label(_('Go to ID:')), 1, 2, 0, 1, gtk.FILL)
-        img = gtk.Image()
-        img.set_from_stock('tryton-go-jump', gtk.ICON_SIZE_DIALOG)
-        table.attach(img, 0, 1, 0, 2, gtk.FILL)
-
-        entry = gtk.Entry()
-        entry.set_property('activates_default', True)
-        entry.set_max_length(0)
-        entry.set_alignment(1.0)
-
-        def sig_insert_text(widget, new_text, new_text_length, position):
-            value = widget.get_text()
-            position = widget.get_position()
-            new_value = value[:position] + new_text + value[position:]
-            try:
-                locale.atoi(new_value)
-            except ValueError:
-                widget.stop_emission('insert-text')
-        entry.connect('insert_text', sig_insert_text)
-        table.attach(entry, 1, 2, 1, 2)
-
-        win.vbox.pack_start(table, expand=True, fill=True)
-        win.show_all()
-
-        response = win.run()
-        if response == gtk.RESPONSE_OK:
-            self.screen.display(locale.atoi(entry.get_text()), set_cursor=True)
-        win.destroy()
-        parent.present()
 
     def destroy(self):
         self.screen.destroy()

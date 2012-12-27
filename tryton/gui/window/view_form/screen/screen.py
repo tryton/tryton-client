@@ -9,6 +9,8 @@ except ImportError:
     import json
 import collections
 import xml.dom.minidom
+import gettext
+
 import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.model.record import Record
@@ -21,6 +23,8 @@ from tryton.common.domain_parser import DomainParser
 from tryton.common import RPCExecute, RPCException, MODELACCESS, \
     node_attributes, sur
 from tryton.action import Action
+
+_ = gettext.gettext
 
 
 class Screen(SignalEvent):
@@ -121,6 +125,12 @@ class Screen(SignalEvent):
                 else:
                     odict = dict
                 fields = odict((name, fields[name]) for name in xml_fields)
+                if 'id' not in fields:
+                    fields['id'] = {
+                        'string': _('ID'),
+                        'name': 'id',
+                        'type': 'integer',
+                        }
 
                 self.domain_parser = DomainParser(fields)
 

@@ -121,8 +121,6 @@ class Main(object):
             gtk.keysyms.Page_Up, gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Next Tab',
             gtk.keysyms.Page_Down, gtk.gdk.CONTROL_MASK)
-        gtk.accel_map_add_entry('<tryton>/Form/Goto', gtk.keysyms.G,
-                gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Reload', gtk.keysyms.R,
                 gtk.gdk.CONTROL_MASK)
         gtk.accel_map_add_entry('<tryton>/Form/Actions', gtk.keysyms.E,
