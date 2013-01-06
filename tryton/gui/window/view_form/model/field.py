@@ -530,6 +530,7 @@ class O2MField(CharField):
         record_deleted = record.value[self.name].record_deleted
         result = [('add', [])]
         parent_name = self.attrs.get('relation_field', '')
+        to_create = []
         for record2 in record.value[self.name]:
             if record2 in record_removed or record2 in record_deleted:
                 continue
@@ -542,7 +543,9 @@ class O2MField(CharField):
             else:
                 values = record2.get()
                 values.pop(parent_name, None)
-                result.append(('create', values))
+                to_create.append(values)
+        if to_create:
+            result.append(('create', to_create))
         if not result[0][1]:
             del result[0]
         if record_removed:

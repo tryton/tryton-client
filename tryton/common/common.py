@@ -187,12 +187,12 @@ class ViewSearch(object):
     def add(self, model, name, domain):
         domain = PYSONEncoder().encode(domain)
         try:
-            id_ = RPCExecute('model', 'ir.ui.view_search',
-                'create', {
-                    'model': model,
-                    'name': name,
-                    'domain': domain,
-                    })
+            id_, = RPCExecute('model', 'ir.ui.view_search',
+                'create', [{
+                        'model': model,
+                        'name': name,
+                        'domain': domain,
+                        }])
         except RPCException:
             return
         self.searches.setdefault(model, []).append((id_, name, domain))
@@ -1049,11 +1049,11 @@ def process_exception(exception, *args, **kwargs):
             name, msg, description = exception.args
             res = userwarning(description, msg)
             if res in ('always', 'ok'):
-                args2 = ('model', 'res.user.warning', 'create', {
-                        'user': rpc._USER,
-                        'name': name,
-                        'always': (res == 'always'),
-                        }, rpc.CONTEXT)
+                args2, = ('model', 'res.user.warning', 'create', [{
+                            'user': rpc._USER,
+                            'name': name,
+                            'always': (res == 'always'),
+                            }], rpc.CONTEXT)
                 try:
                     rpc_execute(*args2)
                 except TrytonServerError, exception:

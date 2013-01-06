@@ -267,8 +267,8 @@ class Record(SignalEvent):
             if self.id < 0:
                 value = self.get()
                 try:
-                    res = RPCExecute('model', self.model_name, 'create', value,
-                        context=self.context_get())
+                    res, = RPCExecute('model', self.model_name, 'create',
+                        [value], context=self.context_get())
                 except RPCException:
                     return False
                 old_id = self.id

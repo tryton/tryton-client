@@ -313,13 +313,13 @@ class WinExport(NoModal):
             fields.append(field_name)
             iter = self.model2.iter_next(iter)
         try:
-            new_id = RPCExecute('model', 'ir.export', 'create', {
+            new_id, = RPCExecute('model', 'ir.export', 'create', [{
                     'name': name,
                     'resource': self.model,
-                    'export_fields': [('create', {
+                    'export_fields': ('create', [{
                                 'name': x,
-                                }) for x in fields],
-                    })
+                                } for x in fields]),
+                    }])
         except RPCException:
             return
         self.predef_model.append((
