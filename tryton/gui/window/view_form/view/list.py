@@ -844,12 +844,11 @@ class ViewList(ParserView):
                         value_selected += field_value
 
             if loaded:
-                label_str = locale.format(
-                    '%.' + str(self.children[child][3]) + 'f', value_selected,
-                    True)
+                label_str = locale.format('%.*f',
+                    (self.children[child][3], value_selected), True)
                 label_str += ' / '
-                label_str += locale.format(
-                    '%.' + str(self.children[child][3]) + 'f', value, True)
+                label_str += locale.format('%.*f',
+                    (self.children[child][3], value), True)
             else:
                 label_str = '-'
             self.children[child][2].set_text(label_str)

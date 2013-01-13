@@ -994,7 +994,7 @@ class ProgressBar(object):
         value = float(self.get_textual_value(record) or 0.0)
         cell.set_property('value', value)
         digit = field.digits(record)[1]
-        text = locale.format('%.' + str(digit) + 'f', value, True)
+        text = locale.format('%.*f', (digit, value), True)
         cell.set_property('text', text + '%')
 
     def open_remote(self, record, create, changed=False, text=None,

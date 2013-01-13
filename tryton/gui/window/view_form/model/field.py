@@ -308,7 +308,7 @@ class FloatField(NumberField):
         value = record.value.get(self.name)
         if value is not None:
             digits = self.digits(record)
-            return locale.format('%.' + str(digits[1]) + 'f', value, True)
+            return locale.format('%.*f', (digits[1], value), True)
         else:
             return ''
 
@@ -328,7 +328,7 @@ class NumericField(NumberField):
         value = record.value.get(self.name)
         if value is not None:
             digits = self.digits(record)
-            return locale.format('%.' + str(digits[1]) + 'f', value, True)
+            return locale.format('%.*f', (digits[1], value), True)
         else:
             return ''
 

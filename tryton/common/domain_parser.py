@@ -396,7 +396,7 @@ def format_value(field, value):
             digit = int(field.get('digits', (16, 2))[1])
         except ValueError:
             digit = 2
-        return locale.format('%.' + str(digit) + 'f', value or 0.0, True)
+        return locale.format('%.*f', (digit, value or 0.0), True)
 
     def format_selection():
         selections = dict(field['selection'])
