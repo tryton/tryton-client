@@ -66,12 +66,11 @@ class CharField(object):
         else:
             return screen_domain, screen_domain
 
-    def context_get(self, record, eval_context=True):
+    def context_get(self, record):
         context = record.context_get().copy()
         if record.parent:
             context.update(record.parent.context_get())
-        if eval_context:
-            context.update(record.expr_eval(self.attrs.get('context', {})))
+        context.update(record.expr_eval(self.attrs.get('context', {})))
         return context
 
     def check_required(self, record):
@@ -434,10 +433,9 @@ class M2OField(CharField):
             record.signal('record-modified')
             record.signal('record-changed')
 
-    def context_get(self, record, eval_context=True):
-        context = super(M2OField, self).context_get(record,
-            eval_context=eval_context)
-        if eval_context and self.attrs.get('datetime_field'):
+    def context_get(self, record):
+        context = super(M2OField, self).context_get(record)
+        if self.attrs.get('datetime_field'):
             context['_datetime'] = record.get_eval(
                 )[self.attrs.get('datetime_field')]
         return context
