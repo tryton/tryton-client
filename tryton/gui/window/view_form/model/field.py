@@ -176,10 +176,6 @@ class CharField(object):
         if (record.group.readonly
             or self.get_state_attrs(record).get('domain_readonly')):
             self.get_state_attrs(record)['readonly'] = True
-        if 'value' in state_changes:
-            value = state_changes['value']
-            if value:
-                self.set(record, value, modified=True)
 
     def get_state_attrs(self, record):
         if self.name not in record.state_attrs:
