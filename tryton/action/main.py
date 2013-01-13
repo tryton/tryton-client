@@ -161,13 +161,12 @@ class Action(object):
     def exec_keyword(keyword, data=None, context=None, warning=True,
             alwaysask=False):
         actions = []
-        if 'id' in data:
-            model_id = data.get('id', False)
-            try:
-                actions = RPCExecute('model', 'ir.action.keyword',
-                    'get_keyword', keyword, (data['model'], model_id))
-            except RPCException:
-                return False
+        model_id = data.get('id', False)
+        try:
+            actions = RPCExecute('model', 'ir.action.keyword',
+                'get_keyword', keyword, (data['model'], model_id))
+        except RPCException:
+            return False
 
         keyact = {}
         for action in actions:
