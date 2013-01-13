@@ -331,7 +331,7 @@ class One2Many(WidgetInterface):
 
         if (self.screen.current_view.view_type == 'form') \
                 or self.screen.editable_get():
-            self.screen.new(context=ctx)
+            self.screen.new()
             self.screen.current_view.widget.set_sensitive(True)
             update_sequence()
         else:

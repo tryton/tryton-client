@@ -93,9 +93,7 @@ class EditableTreeView(TreeView):
             method = model.prepend
         else:
             method = model.append
-        ctx = self.screen.context.copy()
-        new_record = model.group.new(domain=self.screen.domain,
-                context=ctx)
+        new_record = model.group.new()
         res = method(new_record)
         return res
 

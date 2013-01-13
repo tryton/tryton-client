@@ -36,7 +36,7 @@ class WinForm(NoModal):
         else:
             self.screen.switch_view(view_type=view_type, context=context)
         if new and not switch_new:
-            self.screen.new(context=self.context)
+            self.screen.new()
         self.win = gtk.Dialog(_('Link'), self.parent,
                 gtk.DIALOG_DESTROY_WITH_PARENT)
         self.win.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
@@ -302,7 +302,7 @@ class WinForm(NoModal):
         self.screen.switch_view()
 
     def _sig_new(self, widget):
-        self.screen.new(context=self.context)
+        self.screen.new()
         self.screen.current_view.widget.set_sensitive(True)
 
     def _sig_next(self, widget):
@@ -435,7 +435,7 @@ class WinForm(NoModal):
         self.destroy()
 
     def new(self):
-        self.screen.new(context=self.context)
+        self.screen.new()
         self.screen.current_view.display()
         self.screen.set_cursor(new=True)
         self.many -= 1

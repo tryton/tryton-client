@@ -352,7 +352,7 @@ class Screen(SignalEvent):
                     break
         self.screen_container.set(self.current_view.widget)
         if not self.current_record and self.current_view.view_type == 'form':
-            self.new(default=default, context=context)
+            self.new(default=default)
         self.current_view.cancel()
         self.display()
         self.set_cursor()
@@ -421,9 +421,7 @@ class Screen(SignalEvent):
                 return self.current_view.widget_tree.editable
         return False
 
-    def new(self, default=True, context=None):
-        if context is None:
-            context = {}
+    def new(self, default=True):
         if self.current_view and \
                 ((self.current_view.view_type == 'tree' \
                 and not (hasattr(self.current_view.widget_tree, 'editable') \
@@ -439,15 +437,11 @@ class Screen(SignalEvent):
             if not prev_current_record and self.current_record:
                 # new already called in switch_view
                 return self.current_record
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx.update(self.context)
-        ctx.update(context)
         if self.current_record:
             group = self.current_record.group
         else:
             group = self.group
-        record = group.new(default, self.domain, ctx)
+        record = group.new(default)
         group.add(record, self.new_model_position())
         self.current_record = record
         self.display()

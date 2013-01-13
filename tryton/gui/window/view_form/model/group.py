@@ -303,13 +303,10 @@ class Group(SignalEvent, list):
         if changed:
             self.signal('group-changed', changed)
 
-    def new(self, default=True, domain=None, context=None, obj_id=None):
+    def new(self, default=True, obj_id=None):
         record = Record(self.model_name, obj_id, group=self)
         if default:
-            ctx = {}
-            ctx.update(context or {})
-            ctx.update(self.context)
-            record.default_get(domain, ctx)
+            record.default_get()
         record.signal_connect(self, 'record-changed', self._record_changed)
         record.signal_connect(self, 'record-modified', self._record_modified)
         return record
