@@ -421,7 +421,8 @@ class ParserForm(ParserInterface):
                 for attr_name in ('relation', 'domain', 'selection',
                         'relation_field', 'string', 'views', 'invisible',
                         'add_remove', 'sort', 'context', 'size', 'filename',
-                        'autocomplete', 'translate', 'create', 'delete'):
+                        'autocomplete', 'translate', 'create', 'delete',
+                        'schema_model'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
@@ -544,6 +545,7 @@ from image import Image as Image2
 from progressbar import ProgressBar
 from one2one import One2One
 from richtextbox import RichTextBox
+from dictionary import DictWidget
 
 
 WIDGETS_TYPE = {
@@ -573,4 +575,5 @@ WIDGETS_TYPE = {
     'progressbar': (ProgressBar, 1, False, False),
     'one2one': (One2One, 1, False, False),
     'richtext': (RichTextBox, 1, True, True),
+    'dict': (DictWidget, 1, False, False),
 }

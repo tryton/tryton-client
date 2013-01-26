@@ -920,6 +920,19 @@ class BinaryField(CharField):
             self.set(record, filename)
         return self.get(record)
 
+
+class DictField(CharField):
+
+    _default = {}
+
+    def validation_domains(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return screen_domain, screen_domain
+
+    def domain_get(self, record):
+        screen_domain, attr_domain = self.domains_get(record)
+        return localize_domain(inverse_leaf(screen_domain)) + attr_domain
+
 TYPES = {
     'char': CharField,
     'sha': CharField,
@@ -939,4 +952,5 @@ TYPES = {
     'time': TimeField,
     'one2one': O2OField,
     'binary': BinaryField,
+    'dict': DictField,
 }
