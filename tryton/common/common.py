@@ -185,13 +185,12 @@ class ViewSearch(object):
         return self.searches.get(model, [])
 
     def add(self, model, name, domain):
-        domain = PYSONEncoder().encode(domain)
         try:
             id_, = RPCExecute('model', 'ir.ui.view_search',
                 'create', [{
                         'model': model,
                         'name': name,
-                        'domain': domain,
+                        'domain': PYSONEncoder().encode(domain),
                         }])
         except RPCException:
             return
