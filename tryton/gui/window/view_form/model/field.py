@@ -632,11 +632,7 @@ class O2MField(CharField):
                 for fname, field in fields.iteritems())
         if value and len(value):
             context = self.context_get(record)
-            field_names = set()
-            for val in value:
-                for fieldname in val.keys():
-                    if fieldname not in fields:
-                        field_names.add(fieldname)
+            field_names = set(f for v in value for f in v if f not in fields)
             if field_names:
                 try:
                     fields.update(RPCExecute('model', self.attrs['relation'],
@@ -677,12 +673,10 @@ class O2MField(CharField):
 
         if value and (value.get('add') or value.get('update')):
             context = self.context_get(record)
-            field_names = set()
             fields = record.value[self.name].fields
-            for val in (value.get('add', []) + value.get('update', [])):
-                for fieldname in val.keys():
-                    if fieldname not in fields and fieldname != 'id':
-                        field_names.add(fieldname)
+            field_names = set(f for v in (
+                    value.get('add', []) + value.get('update', []))
+                for f in v if f not in fields and f != 'id')
             if field_names:
                 try:
                     fields = RPCExecute('model', self.attrs['relation'],
