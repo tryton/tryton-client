@@ -32,7 +32,7 @@ class WinForm(NoModal):
             switch_new = True
         if view_type not in (x.view_type for x in self.screen.views) and \
                 view_type not in self.screen.view_to_load:
-            self.screen.add_view_id(False, view_type)
+            self.screen.add_view_id(None, view_type)
         else:
             self.screen.switch_view(view_type=view_type, context=context)
         if new and not switch_new:

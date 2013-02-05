@@ -367,12 +367,14 @@ class Screen(SignalEvent):
             if self.view_ids:
                 view_id = self.view_ids.pop(0)
             else:
-                view_id = False
+                view_id = None
             view_type = self.view_to_load.pop(0)
             self.add_view_id(view_id, view_type)
 
     def add_view_id(self, view_id, view_type):
-        if view_type in self.views_preload:
+        if view_id and str(view_id) in self.views_preload:
+            view = self.views_preload[str(view_id)]
+        elif not view_id and view_type in self.views_preload:
             view = self.views_preload[view_type]
         else:
             try:
