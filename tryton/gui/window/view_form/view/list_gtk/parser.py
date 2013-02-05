@@ -35,6 +35,7 @@ from tryton.common.cellrendererclickablepixbuf import \
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
 from tryton.common.completion import get_completion, update_completion
+from tryton.common.selection import SelectionMixin
 
 _ = gettext.gettext
 
@@ -128,7 +129,8 @@ class ParserTree(ParserInterface):
                     continue
                 for attr_name in ('relation', 'domain', 'selection',
                         'relation_field', 'string', 'views', 'invisible',
-                        'add_remove', 'sort', 'context', 'filename'):
+                        'add_remove', 'sort', 'context', 'filename',
+                        'selection_change_with'):
                     if attr_name in fields[fname].attrs and \
                             not attr_name in node_attrs:
                         node_attrs[attr_name] = fields[fname].attrs[attr_name]
@@ -846,24 +848,14 @@ class M2M(O2M):
             context=context)
 
 
-class Selection(Char):
+class Selection(Char, SelectionMixin):
 
     def __init__(self, *args):
         super(Selection, self).__init__(*args)
         self.renderer = CellRendererCombo()
         self.renderer.connect('editing-started', self.editing_started)
-        self._last_domain = None
-        self._domain_cache = {}
-        selection = self.attrs.get('selection', [])[:]
-        if not isinstance(selection, (list, tuple)):
-            try:
-                selection = RPCExecute('model', self.model_name, selection)
-            except RPCException:
-                selection = []
-        self.selection = selection[:]
-        if self.attrs.get('sort', True):
-            selection.sort(key=operator.itemgetter(1))
-        self.renderer.set_property('model', self.get_model(selection))
+        self.init_selection()
+        self.renderer.set_property('model', self.get_model(self.selection))
         self.renderer.set_property('text-column', 0)
 
     def get_model(self, selection):
@@ -879,7 +871,8 @@ class Selection(Char):
         return model
 
     def get_textual_value(self, record):
-        self.update_selection(record)
+        field = record[self.field_name]
+        self.update_selection(record, field)
         value = record[self.field_name].get(record)
         return dict(self.selection).get(value, '')
 
@@ -893,7 +886,8 @@ class Selection(Char):
         super(Selection, self).editing_started(cell, editable, path)
         store = self.treeview.get_model()
         record = store.get_value(store.get_iter(path), 0)
-        self.update_selection(record)
+        field = record[self.field_name]
+        self.update_selection(record, field)
         model = self.get_model(self.selection)
         editable.set_model(model)
         # GTK 2.24 and above use a ComboBox instead of a ComboBoxEntry
@@ -908,49 +902,14 @@ class Selection(Char):
         completion.set_text_column(0)
         return False
 
-    def update_selection(self, record):
-        if 'relation' not in self.attrs:
-            return
-        field = record[self.field_name]
-        domain = field.domain_get(record)
-        if str(domain) in self._domain_cache:
-            self.selection = self._domain_cache[str(domain)]
-            self._last_domain = domain
-        if domain != self._last_domain:
-            try:
-                result = RPCExecute('model', self.attrs['relation'],
-                    'search_read', domain, 0, None, None, ['rec_name'])
-            except RPCException:
-                result = None
 
-            if isinstance(result, list):
-                selection = [(x['id'], x['rec_name']) for x in result]
-                selection.append((False, ''))
-                self._last_domain = domain
-                self._domain_cache[str(domain)] = selection
-            else:
-                selection = []
-                self._last_domain = None
-        else:
-            selection = self.selection
-        self.selection = selection[:]
-
-
-class Reference(Char):
+class Reference(Char, SelectionMixin):
 
     def __init__(self, field_name, model_name, treeview, attrs=None):
         super(Reference, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
-        self._selection = {}
-        selection = attrs.get('selection', [])
-        if not isinstance(selection, (list, tuple)):
-            try:
-                selection = RPCExecute('model', model_name, selection)
-            except RPCException:
-                selection = []
-        selection.sort(key=operator.itemgetter(1))
-        for i, j in selection:
-            self._selection[i] = str(j)
+        self.init_selection()
+        self._selection = dict(self.selection)
 
     def get_textual_value(self, record):
         value = record[self.field_name].get_client(record)

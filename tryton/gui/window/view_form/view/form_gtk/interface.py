@@ -16,6 +16,7 @@ _ = gettext.gettext
 class WidgetInterface(object):
 
     def __init__(self, field_name, model_name, attrs=None):
+        super(WidgetInterface, self).__init__()
         self.field_name = field_name
         self.model_name = model_name
         self.view = None  # Filled by ViewForm

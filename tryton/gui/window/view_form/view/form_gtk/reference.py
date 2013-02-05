@@ -1,17 +1,16 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import operator
 import gtk
-import gobject
 import gettext
-import math
+
 from many2one import Many2One
-from tryton.common import RPCExecute, RPCException
+from .selection import PopdownMixin
+from tryton.common.selection import SelectionMixin
 
 _ = gettext.gettext
 
 
-class Reference(Many2One):
+class Reference(Many2One, SelectionMixin, PopdownMixin):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Reference, self).__init__(field_name, model_name, attrs=attrs)
@@ -24,26 +23,8 @@ class Reference(Many2One):
 
         self.widget.pack_start(gtk.Label('-'), expand=False, fill=False)
 
-        self._selection = {}
-        self._selection2 = {}
-        selection = attrs.get('selection', [])
-        if not isinstance(selection, (list, tuple)):
-            try:
-                selection = RPCExecute('model', self.model_name, selection)
-            except RPCException:
-                selection = []
-        selection.sort(key=operator.itemgetter(1))
-        if selection:
-            pop = sorted((len(x) for x in selection), reverse=True)
-            average = sum(pop) / len(pop)
-            deviation = int(math.sqrt(sum((x - average) ** 2 for x in pop) /
-                    len(pop)))
-            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
-        else:
-            width = 10
-        child.set_width_chars(width)
-
-        self.set_popdown(selection)
+        self.init_selection()
+        self.set_popdown(self.selection, self.widget_combo)
 
         self.widget.set_focus_chain([self.widget_combo, self.wid_text])
 
@@ -54,16 +35,6 @@ class Reference(Many2One):
         child = self.widget_combo.get_child()
         res = child.get_text()
         return self._selection.get(res, False)
-
-    def set_popdown(self, selection):
-        model = gtk.ListStore(gobject.TYPE_STRING)
-        for (i, j) in selection:
-            name = str(j)
-            model.append((name,))
-            self._selection[name] = i
-            self._selection2[i] = name
-        self.widget_combo.set_model(model)
-        self.widget_combo.set_text_column(0)
 
     def _readonly_set(self, value):
         super(Reference, self)._readonly_set(value)
@@ -141,9 +112,16 @@ class Reference(Many2One):
             model, value = None, None
         super(Reference, self).set_text(value)
         child = self.widget_combo.get_child()
+        reverse_selection = dict((v, k)
+            for k, v in self._selection.iteritems())
         if model:
-            child.set_text(self._selection2[model])
-            child.set_position(len(self._selection2[model]))
+            child.set_text(reverse_selection[model])
+            child.set_position(len(reverse_selection[model]))
         else:
             child.set_text('')
             child.set_position(0)
+
+    def display(self, record, field):
+        self.update_selection(record, field)
+        self.set_popdown(self.selection, self.widget_combo)
+        super(Reference, self).display(record, field)

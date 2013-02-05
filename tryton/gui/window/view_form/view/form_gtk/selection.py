@@ -1,14 +1,50 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
-import operator
 import gtk
 import gobject
 import math
 from interface import WidgetInterface
-from tryton.common import RPCExecute, RPCException
+from tryton.common.selection import SelectionMixin
 
 
-class Selection(WidgetInterface):
+class PopdownMixin(object):
+
+    def __init__(self, *args, **kwargs):
+        super(PopdownMixin, self).__init__()
+        self._selection = {}
+
+    def set_popdown(self, selection, entry):
+        model = gtk.ListStore(gobject.TYPE_STRING)
+        self._selection.clear()
+        for (value, name) in selection:
+            name = str(name)
+            self._selection[name] = value
+            model.append((name,))
+        entry.set_model(model)
+        entry.set_text_column(0)
+        completion = gtk.EntryCompletion()
+        #Only available in PyGTK 2.6 and above.
+        if hasattr(completion, 'set_inline_selection'):
+            completion.set_inline_selection(True)
+        completion.set_model(model)
+        entry.child.set_completion(completion)
+        if self._selection:
+            pop = sorted((len(x) for x in self._selection), reverse=True)
+            average = sum(pop) / len(pop)
+            deviation = int(math.sqrt(sum((x - average) ** 2 for x in pop) /
+                    len(pop)))
+            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
+        else:
+            width = 10
+        entry.child.set_width_chars(width)
+        if self._selection:
+            entry.child.set_max_length(
+                max(len(x) for x in self._selection))
+        completion.set_text_column(0)
+        completion.connect('match-selected', lambda *a: self._focus_out())
+
+
+class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Selection, self).__init__(field_name, model_name, attrs=attrs)
@@ -31,82 +67,11 @@ class Selection(WidgetInterface):
         self._selection = {}
         self.selection = attrs.get('selection', [])[:]
         self.attrs = attrs
-        self._last_domain = None
         self.init_selection()
-
-    def init_selection(self):
-        selection = self.attrs.get('selection', [])[:]
-        if not isinstance(selection, (list, tuple)):
-            try:
-                selection = RPCExecute('model', self.model_name, selection)
-            except RPCException:
-                selection = []
-        self.selection = selection[:]
-        if self.attrs.get('sort', True):
-            selection.sort(key=operator.itemgetter(1))
-        self.set_popdown(selection)
-
-    def update_selection(self, record):
-        if not self.field:
-            return
-        if 'relation' not in self.attrs:
-            return
-
-        domain = self.field.domain_get(record)
-        if domain == self._last_domain:
-            return
-
-        try:
-            result = RPCExecute('model', self.attrs['relation'], 'search_read',
-                domain, 0, None, None, ['rec_name'])
-        except RPCException:
-            result = False
-        if isinstance(result, list):
-            selection = [(x['id'], x['rec_name']) for x in result]
-            selection.append((False, ''))
-            self._last_domain = domain
-        else:
-            selection = []
-            self._last_domain = None
-        self.selection = selection[:]
-        self.set_popdown(selection)
+        self.set_popdown(self.selection, self.entry)
 
     def grab_focus(self):
         return self.entry.grab_focus()
-
-    def set_popdown(self, selection):
-        model = gtk.ListStore(gobject.TYPE_STRING)
-        self._selection = {}
-        lst = []
-        for (value, name) in selection:
-            name = str(name)
-            lst.append(name)
-            self._selection[name] = value
-            i = model.append()
-            model.set(i, 0, name)
-        self.entry.set_model(model)
-        self.entry.set_text_column(0)
-        completion = gtk.EntryCompletion()
-        #Only available in PyGTK 2.6 and above.
-        if hasattr(completion, 'set_inline_selection'):
-            completion.set_inline_selection(True)
-        completion.set_model(model)
-        self.entry.child.set_completion(completion)
-        if self._selection:
-            pop = sorted((len(x) for x in self._selection), reverse=True)
-            average = sum(pop) / len(pop)
-            deviation = int(math.sqrt(sum((x - average) ** 2 for x in pop) /
-                    len(pop)))
-            width = max(next((x for x in pop if x < (deviation * 4)), 10), 10)
-        else:
-            width = 10
-        self.entry.child.set_width_chars(width)
-        if self._selection:
-            self.entry.child.set_max_length(
-                max(len(x) for x in self._selection))
-        completion.set_text_column(0)
-        completion.connect('match-selected', lambda *a: self._focus_out())
-        return lst
 
     def _readonly_set(self, value):
         super(Selection, self)._readonly_set(value)
@@ -154,7 +119,8 @@ class Selection(WidgetInterface):
         super(Selection, self)._menu_sig_default_set(reset=reset)
 
     def display(self, record, field):
-        self.update_selection(record)
+        self.update_selection(record, field)
+        self.set_popdown(self.selection, self.entry)
         child = self.entry.child
         if not field:
             child.set_text('')

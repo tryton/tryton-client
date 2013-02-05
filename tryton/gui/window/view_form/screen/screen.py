@@ -141,8 +141,13 @@ class Screen(SignalEvent):
 
     def get_selection(self, props):
         try:
-            selection = RPCExecute('model', self.model_name,
-                props['selection'])
+            change_with = props.get('selection_change_with')
+            if change_with:
+                selection = RPCExecute('model', self.model_name,
+                    props['selection'], {p: None for p in change_with})
+            else:
+                selection = RPCExecute('model', self.model_name,
+                    props['selection'])
         except RPCException:
             selection = []
         selection.sort(lambda x, y: cmp(x[1], y[1]))

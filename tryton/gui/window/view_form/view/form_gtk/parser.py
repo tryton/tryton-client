@@ -422,7 +422,7 @@ class ParserForm(ParserInterface):
                         'relation_field', 'string', 'views', 'invisible',
                         'add_remove', 'sort', 'context', 'size', 'filename',
                         'autocomplete', 'translate', 'create', 'delete',
-                        'schema_model'):
+                        'selection_change_with', 'schema_model'):
                     if attr_name in fields[name].attrs and \
                             not attr_name in attrs:
                         attrs[attr_name] = fields[name].attrs[attr_name]
