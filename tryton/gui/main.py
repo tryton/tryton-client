@@ -1195,7 +1195,8 @@ class Main(object):
 
     def toggle_favorite(self, renderer, path, treeview):
         store = treeview.get_model()
-        menu = store.get_value(store.get_iter(path), 0)
+        iter_ = store.get_iter(path)
+        menu = store.get_value(iter_, 0)
         favorite = menu.value.get('favorite')
         if favorite:
             value = False
@@ -1211,6 +1212,7 @@ class Main(object):
         except RPCException:
             return
         menu.value['favorite'] = value
+        store.emit('row-changed', path, iter_)
         self.favorite_unset()
 
     @classmethod
