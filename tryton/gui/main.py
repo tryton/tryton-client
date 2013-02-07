@@ -160,7 +160,6 @@ class Main(object):
             self.menu_expander.set_direction(gtk.TEXT_DIR_LTR)
         else:
             self.menu_expander.set_direction(gtk.TEXT_DIR_RTL)
-        self.menu_expander.show()
         self.menu_expander.set_expanded(CONFIG['menu.expanded'])
         self.pane.add(self.menu_expander)
 
@@ -1112,6 +1111,7 @@ class Main(object):
             self.notebook.grab_focus()
 
     def menu_expander_clear(self):
+        self.menu_expander.hide()
         if self.menu_expander.get_child():
             self.menu_expander.remove(self.menu_expander.get_child())
             expanded = self.menu_expander.get_expanded()
@@ -1161,6 +1161,7 @@ class Main(object):
         screen.current_view.widget_tree.set_headers_visible(False)
 
         self.menu_expander.add(vbox)
+        self.menu_expander.show()
 
         # Favorite column
         treeview = screen.current_view.widget_tree
