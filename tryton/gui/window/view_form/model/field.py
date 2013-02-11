@@ -122,13 +122,8 @@ class CharField(object):
         self.get_state_attrs(record)['valid'] = res
         return res
 
-    def set(self, record, value, modified=False):
+    def set(self, record, value):
         record.value[self.name] = value
-        if modified:
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            record.signal('record-changed')
-        return True
 
     def get(self, record):
         return record.value.get(self.name) or self._default
@@ -156,13 +151,13 @@ class CharField(object):
     def get_client(self, record):
         return record.value.get(self.name) or self._default
 
-    def set_default(self, record, value, modified=False):
-        res = self.set(record, value, modified=modified)
-        return res
+    def set_default(self, record, value):
+        self.set(record, value)
+        record.modified_fields.setdefault(self.name)
 
     def set_on_change(self, record, value):
         record.modified_fields.setdefault(self.name)
-        return self.set(record, value, modified=False)
+        return self.set(record, value)
 
     def state_set(self, record, states=('readonly', 'required', 'invisible')):
         state_changes = record.expr_eval(self.attrs.get('states', {}))
@@ -398,7 +393,7 @@ class M2OField(CharField):
         super(M2OField, self).set_client(record, value,
             force_change=force_change)
 
-    def set(self, record, value, modified=False):
+    def set(self, record, value):
         rec_name = record.value.get(self.name + '.rec_name') or ''
         if value is False:
             value = None
@@ -424,10 +419,6 @@ class M2OField(CharField):
             if record.parent:
                 if 'rec_name' not in record.parent.value:
                     record.parent.value['rec_name'] = rec_name
-        if modified:
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            record.signal('record-changed')
 
     def context_get(self, record):
         context = super(M2OField, self).context_get(record)
@@ -578,7 +569,7 @@ class O2MField(CharField):
                     record2.get_on_change_value())
         return result
 
-    def set(self, record, value, modified=False):
+    def set(self, record, value):
         from group import Group
         group = record.value.get(self.name)
         fields = {}
@@ -603,20 +594,18 @@ class O2MField(CharField):
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         group.signal_connect(group, 'record-modified', self._record_modified)
-        if modified:
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            record.signal('record-changed')
 
     def set_client(self, record, value, force_change=False):
         pass
 
-    def set_default(self, record, value, modified=False):
+    def set_default(self, record, value):
         from group import Group
 
         # value is a list of id
         if value and len(value) and isinstance(value[0], (int, long)):
-            return self.set(record, value, modified=modified)
+            self.set(record, value)
+            record.modified_fields.setdefault(self.name)
+            return
 
         group = record.value.get(self.name)
         fields = {}
@@ -654,7 +643,7 @@ class O2MField(CharField):
         record.value[self.name] = group
         for vals in (value or []):
             new_record = record.value[self.name].new(default=False)
-            new_record.set_default(vals, modified=modified)
+            new_record.set_default(vals)
             group.add(new_record)
         group.signal_connect(group, 'group-changed', self._group_changed)
         group.signal_connect(group, 'group-list-changed',
@@ -666,7 +655,7 @@ class O2MField(CharField):
     def set_on_change(self, record, value):
         self._set_default_value(record)
         if isinstance(value, (list, tuple)):
-            self.set(record, value, modified=False)
+            self.set(record, value)
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
             return True
@@ -752,7 +741,7 @@ class O2MField(CharField):
 
 class M2MField(O2MField):
 
-    def set(self, record, value, modified=False):
+    def set(self, record, value):
         from group import Group
         group = record.value.get(self.name)
         fields = {}
@@ -781,10 +770,6 @@ class M2MField(O2MField):
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         group.signal_connect(group, 'record-modified', self._record_modified)
-        if modified:
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
-            record.signal('record-changed')
 
     def get_on_change_value(self, record):
         return self.get_eval(record)
@@ -826,7 +811,7 @@ class ReferenceField(CharField):
         super(ReferenceField, self).set_client(record, value,
             force_change=force_change)
 
-    def set(self, record, value, modified=False):
+    def set(self, record, value):
         if not value:
             record.value[self.name] = self._default
             return
@@ -856,9 +841,6 @@ class ReferenceField(CharField):
             rec_name = ref_id
         record.value[self.name] = ref_model, ref_id
         record.value[self.name + '.rec_name'] = rec_name
-        if modified:
-            record.modified_fields.setdefault(self.name)
-            record.signal('record-modified')
 
 
 class BinaryField(CharField):

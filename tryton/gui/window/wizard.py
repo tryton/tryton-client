@@ -226,7 +226,7 @@ class Wizard(object):
         self.widget.pack_start(self.scrolledwindow)
 
         self.screen.new(default=False)
-        self.screen.current_record.set_default(defaults, modified=True)
+        self.screen.current_record.set_default(defaults)
         self.screen.set_cursor()
 
 

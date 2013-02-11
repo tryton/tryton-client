@@ -204,7 +204,7 @@ class Group(SignalEvent, list):
                 return []
         return list({}.fromkeys(res))
 
-    def load(self, ids, display=True, modified=False, id2record=None):
+    def load(self, ids, display=True, modified=False):
         if not ids:
             return True
 
@@ -260,7 +260,7 @@ class Group(SignalEvent, list):
 
     context = property(_get_context)
 
-    def add(self, record, position=-1, modified=True):
+    def add(self, record, position=-1):
         if record.group is not self:
             record.signal_unconnect(record.group)
             record.group = self
@@ -278,9 +278,8 @@ class Group(SignalEvent, list):
             if record_del.id == record.id:
                 self.record_deleted.remove(record)
         self.current_idx = position
-        if modified:
-            record.modified_fields.setdefault('id')
-            record.signal('record-modified')
+        record.modified_fields.setdefault('id')
+        record.signal('record-modified')
         self.signal('group-changed', record)
         return record
 

@@ -381,7 +381,7 @@ class Record(SignalEvent):
     def context_get(self):
         return self.group.context
 
-    def set_default(self, val, signal=True, modified=False):
+    def set_default(self, val, signal=True):
         for fieldname, value in val.items():
             if fieldname not in self.group.fields:
                 continue
@@ -392,14 +392,13 @@ class Record(SignalEvent):
                     self.value[field_rec_name] = val[field_rec_name]
                 elif field_rec_name in self.value:
                     del self.value[field_rec_name]
-            self.group.fields[fieldname].set_default(self, value,
-                modified=modified)
+            self.group.fields[fieldname].set_default(self, value)
             self._loaded.add(fieldname)
         self.validate(softvalidation=True)
         if signal:
             self.signal('record-changed')
 
-    def set(self, val, modified=False, signal=True):
+    def set(self, val, signal=True):
         later = {}
         for fieldname, value in val.iteritems():
             if fieldname == '_timestamp':
@@ -419,14 +418,11 @@ class Record(SignalEvent):
                     self.value[field_rec_name] = val[field_rec_name]
                 elif field_rec_name in self.value:
                     del self.value[field_rec_name]
-            self.group.fields[fieldname].set(self, value, modified=False)
+            self.group.fields[fieldname].set(self, value)
             self._loaded.add(fieldname)
         for fieldname, value in later.iteritems():
-            self.group.fields[fieldname].set(self, value, modified=False)
+            self.group.fields[fieldname].set(self, value)
             self._loaded.add(fieldname)
-        if modified:
-            self.modified_fields.update(dict((x, None) for x in val))
-            self.signal('record-modified')
         if signal:
             self.signal('record-changed')
 
