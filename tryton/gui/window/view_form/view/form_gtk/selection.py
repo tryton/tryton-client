@@ -14,6 +14,10 @@ class PopdownMixin(object):
         self._selection = {}
 
     def set_popdown(self, selection, entry):
+        # Don't update popdown if not changed
+        if (list(x[0] for x in entry.get_model() or [])
+                == [x[1] for x in selection]):
+            return
         model = gtk.ListStore(gobject.TYPE_STRING)
         self._selection.clear()
         for (value, name) in selection:
