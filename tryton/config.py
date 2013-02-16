@@ -89,8 +89,8 @@ class ConfigManager(object):
                 default=False, dest="verbose",
                 help=_("logging everything at INFO level"))
         parser.add_option("-l", "--log-level", dest="log_level",
-                help=_("specify the log level: " \
-                    "DEBUG, INFO, WARNING, ERROR, CRITICAL"))
+                help=_("specify the log level: "
+                "DEBUG, INFO, WARNING, ERROR, CRITICAL"))
         parser.add_option("-u", "--user", dest="login",
                 help=_("specify the login user"))
         parser.add_option("-p", "--port", dest="port",

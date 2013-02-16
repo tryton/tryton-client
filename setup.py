@@ -56,7 +56,7 @@ def all_languages():
         yield lang.split('_')[0]
 
 data_files = [
-    ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') + \
+    ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') +
         glob.glob('share/pixmaps/tryton/*.svg')),
     ]
 for lang in languages:
@@ -103,8 +103,8 @@ elif sys.platform == 'darwin':
     args['options'] = {
         'py2app': {
             'argv_emulation': True,
-            'includes': 'pygtk, gtk, glib, cairo, pango, pangocairo, atk, ' \
-                    'gobject, gio, gtk.keysyms',
+            'includes': ('pygtk, gtk, glib, cairo, pango, pangocairo, atk, '
+                'gobject, gio, gtk.keysyms'),
             'resources': 'tryton/plugins',
             'frameworks': 'librsvg-2.2.dylib',
             'plist': {
@@ -128,8 +128,8 @@ dist = setup(name=PACKAGE,
     long_description=read('README'),
     author='Tryton',
     url=WEBSITE,
-    download_url="http://downloads.tryton.org/" + \
-            VERSION.rsplit('.', 1)[0] + '/',
+    download_url=("http://downloads.tryton.org/" +
+        VERSION.rsplit('.', 1)[0] + '/'),
     packages=find_packages(),
     data_files=data_files,
     scripts=['bin/tryton'],
@@ -274,7 +274,7 @@ if os.name == 'nt':
                     'setup-single.nsi'))]).wait()
         else:
             print "makensis.exe not found: installers can not be created, "\
-                    "skip setup.nsi and setup-single.nsi"
+                "skip setup.nsi and setup-single.nsi"
 elif sys.platform == 'darwin':
 
     def find_gtk_dir():

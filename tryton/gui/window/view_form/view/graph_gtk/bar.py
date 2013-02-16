@@ -146,7 +146,7 @@ class VerticalBar(Bar):
                 yval = self.datas[xfield][yfield]
 
                 x = (xval - self.minxval) * self.xscale + \
-                        barMargin + (j * barWidthForSet)
+                    barMargin + (j * barWidthForSet)
                 y = 1.0 - (yval - self.minyval) * self.yscale
                 w = barWidthForSet
                 h = yval * self.yscale
@@ -169,7 +169,7 @@ class VerticalBar(Bar):
     def YLabels(self):
         ylabels = super(VerticalBar, self).YLabels()
         if len([x.get('key', x['name']) for x in self.yfields
-            if x.get('widget')]) == len(self.yfields):
+                    if x.get('widget')]) == len(self.yfields):
 
             def format(val):
                 val = locale.atof(val)
@@ -206,7 +206,7 @@ class HorizontalBar(Bar):
 
                 x = - self.minyval * self.yscale
                 y = (xval - self.minxval) * self.xscale + \
-                        barMargin + (j * barWidthForSet)
+                    barMargin + (j * barWidthForSet)
                 w = yval * self.yscale
                 h = barWidthForSet
 
@@ -228,7 +228,7 @@ class HorizontalBar(Bar):
     def XLabels(self):
         ylabels = super(HorizontalBar, self).YLabels()
         if len([x.get('key', x['name']) for x in self.yfields
-            if x.get('widget')]) == len(self.yfields):
+                    if x.get('widget')]) == len(self.yfields):
             conv = None
             float_time = reduce(lambda x, y: x == y and x or False,
                     [x.get('float_time') for x in self.yfields])
@@ -243,7 +243,7 @@ class HorizontalBar(Bar):
 
     def _getLegendPosition(self, width, height):
         return self.area.x + self.area.w * 0.95 - width, \
-                self.area.y + self.area.h * 0.05
+            self.area.y + self.area.h * 0.05
 
     def drawLines(self, cr, width, height):
         for w, label in self.XLabels():

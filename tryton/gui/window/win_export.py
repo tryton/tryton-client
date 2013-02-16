@@ -67,7 +67,7 @@ class WinExport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
         button_select.set_image(img_button)
-        button_select.connect_after('clicked',  self.sig_sel)
+        button_select.connect_after('clicked', self.sig_sel)
         vbox_buttons.pack_start(button_select, False, False, 0)
 
         button_unselect = gtk.Button(_("_Remove"), stock=None,
@@ -76,7 +76,7 @@ class WinExport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
         button_unselect.set_image(img_button)
-        button_unselect.connect_after('clicked',  self.sig_unsel)
+        button_unselect.connect_after('clicked', self.sig_unsel)
         vbox_buttons.pack_start(button_unselect, False, False, 0)
 
         button_unselect_all = gtk.Button(_("Clear"), stock=None,
@@ -85,7 +85,7 @@ class WinExport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
         button_unselect_all.set_image(img_button)
-        button_unselect_all.connect_after('clicked',  self.sig_unsel_all)
+        button_unselect_all.connect_after('clicked', self.sig_unsel_all)
         vbox_buttons.pack_start(button_unselect_all, False, False, 0)
 
         hseparator_buttons = gtk.HSeparator()
@@ -97,7 +97,7 @@ class WinExport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-save', gtk.ICON_SIZE_BUTTON)
         button_save_export.set_image(img_button)
-        button_save_export.connect_after('clicked',  self.add_predef)
+        button_save_export.connect_after('clicked', self.add_predef)
         vbox_buttons.pack_start(button_save_export, False, False, 0)
 
         button_del_export = gtk.Button(_("Delete Export"), stock=None,
@@ -106,7 +106,7 @@ class WinExport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-delete', gtk.ICON_SIZE_BUTTON)
         button_del_export.set_image(img_button)
-        button_del_export.connect_after('clicked',  self.remove_predef)
+        button_del_export.connect_after('clicked', self.remove_predef)
         vbox_buttons.pack_start(button_del_export, False, False, 0)
 
         frame_export = gtk.Frame()
@@ -418,7 +418,7 @@ class WinExport(NoModal):
             for data in result:
                 row = []
                 for val in data:
-                    if type(val) == types.StringType:
+                    if isinstance(type(val), types.StringType):
                         row.append(val.replace('\n', ' ').replace('\t', ' '))
                     else:
                         row.append(val)
@@ -431,8 +431,8 @@ class WinExport(NoModal):
                     common.message(_('%d records saved!') % len(result))
             return True
         except IOError, exception:
-            common.warning(_("Operation failed!\nError message:\n%s") \
-                     % (exception.faultCode,), _('Error'))
+            common.warning(_("Operation failed!\nError message:\n%s")
+                % (exception.faultCode,), _('Error'))
             return False
 
     def datas_read(self, ids, model, fields, context=None):

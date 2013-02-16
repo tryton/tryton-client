@@ -36,7 +36,6 @@ try:
     import ssl
 except ImportError:
     ssl = None
-import dis
 from threading import Lock
 try:
     import pytz
@@ -474,7 +473,7 @@ def file_selection(title, filename='',
             filepath = filepath.decode('utf-8')
             try:
                 CONFIG['client.default_path'] = \
-                        os.path.dirname(filepath)
+                    os.path.dirname(filepath)
                 CONFIG.save()
             except IOError:
                 pass
@@ -487,7 +486,7 @@ def file_selection(title, filename='',
             filenames = [x.decode('utf-8') for x in filenames]
             try:
                 CONFIG['client.default_path'] = \
-                        os.path.dirname(filenames[0])
+                    os.path.dirname(filenames[0])
             except IOError:
                 pass
         parent.present()
@@ -1002,8 +1001,8 @@ def send_bugtracker(title, msg):
                 # second create issue with this message
                 issue_id = server.create('issue', *['messages=' + str(msg_id),
                     'nosy=' + user, 'title=' + title, 'priority=bug'])
-                message(_('Created new bug with ID ') + \
-                        'issue%s' % issue_id)
+                message(_('Created new bug with ID ')
+                    + 'issue%s' % issue_id)
             webbrowser.open(CONFIG['roundup.url'] + 'issue%s' % issue_id,
                 new=2)
         except (socket.error, xmlrpclib.Fault), exception:
@@ -1040,7 +1039,7 @@ def process_exception(exception, *args, **kwargs):
             sys.exit()
         elif exception.faultCode == 'NotLogged':
             if rpc.CONNECTION is None:
-                message(_('Connection error!\n' \
+                message(_('Connection error!\n'
                         'Unable to connect to the server!'))
                 return False
     elif isinstance(exception, TrytonServerError):
@@ -1099,7 +1098,7 @@ def process_exception(exception, *args, **kwargs):
                             rpc._DATABASE)
                     Main.get_main().refresh_ssl()
                     if res == -1:
-                        message(_('Connection error!\n' \
+                        message(_('Connection error!\n'
                                 'Unable to connect to the server!'))
                         return False
                     if res < 0:

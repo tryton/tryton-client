@@ -145,10 +145,10 @@ def simplify(domain):
     elif domain in ('OR', 'AND'):
         return domain
     elif (isinstance(domain, list) and len(domain) == 1
-        and not is_leaf(domain[0])):
+            and not is_leaf(domain[0])):
         return simplify(domain[0])
     elif (isinstance(domain, list) and len(domain) == 2
-        and domain[0] in ('AND', 'OR')):
+            and domain[0] in ('AND', 'OR')):
         return [simplify(domain[1])]
     else:
         return [simplify(branch) for branch in domain]
@@ -226,8 +226,8 @@ class And(object):
             else:
                 field = part[0]
                 if (field not in context
-                    or field in context
-                    and eval_leaf(part, context, operator.and_)):
+                        or field in context
+                        and eval_leaf(part, context, operator.and_)):
                     result.append(True)
                 else:
                     return False
@@ -245,7 +245,7 @@ class Or(And):
         result = []
         known_variables = set(context.keys())
         if (symbol not in self.variables
-            and not known_variables >= self.variables):
+                and not known_variables >= self.variables):
             # In this case we don't know anything about this OR part, we
             # consider it to be True (because people will have the constraint
             # on this part later).
@@ -289,10 +289,10 @@ def test_simple_inversion():
     assert domain_inversion(domain, 'x') == [['x', '=', 3]]
 
     domain = []
-    assert domain_inversion(domain, 'x') == True
-    assert domain_inversion(domain, 'y') == True
-    assert domain_inversion(domain, 'x', {'x': 5}) == True
-    assert domain_inversion(domain, 'z', {'x': 7}) == True
+    assert domain_inversion(domain, 'x') is True
+    assert domain_inversion(domain, 'y') is True
+    assert domain_inversion(domain, 'x', {'x': 5}) is True
+    assert domain_inversion(domain, 'z', {'x': 7}) is True
 
     domain = [['x.id', '>', 5]]
     assert domain_inversion(domain, 'x') == [['x.id', '>', 5]]
@@ -301,12 +301,12 @@ def test_simple_inversion():
 def test_and_inversion():
     domain = [['x', '=', 3], ['y', '>', 5]]
     assert domain_inversion(domain, 'x') == [['x', '=', 3]]
-    assert domain_inversion(domain, 'x', {'y': 4}) == False
+    assert domain_inversion(domain, 'x', {'y': 4}) is False
     assert domain_inversion(domain, 'x', {'y': 6}) == [['x', '=', 3]]
 
     domain = [['x', '=', 3], ['y', '=', 5]]
-    assert domain_inversion(domain, 'z') == True
-    assert domain_inversion(domain, 'z', {'x': 2, 'y': 7}) == True
+    assert domain_inversion(domain, 'z') is True
+    assert domain_inversion(domain, 'z', {'x': 2, 'y': 7}) is True
     assert domain_inversion(domain, 'x', {'y': False}) == [['x', '=', 3]]
 
     domain = [['x.id', '>', 5], ['y', '<', 3]]
@@ -321,21 +321,21 @@ def test_or_inversion():
     assert domain_inversion(domain, 'x', {'y': 4}) == [['x', '=', 3]]
     assert domain_inversion(domain, 'x', {'y': 4, 'z': 'ab'}) ==\
         [['x', '=', 3]]
-    assert domain_inversion(domain, 'x', {'y': 7}) == True
-    assert domain_inversion(domain, 'x', {'y': 7, 'z': 'b'}) == True
-    assert domain_inversion(domain, 'x', {'z': 'abc'}) == True
-    assert domain_inversion(domain, 'x', {'y': 4, 'z': 'abc'}) == True
+    assert domain_inversion(domain, 'x', {'y': 7}) is True
+    assert domain_inversion(domain, 'x', {'y': 7, 'z': 'b'}) is True
+    assert domain_inversion(domain, 'x', {'z': 'abc'}) is True
+    assert domain_inversion(domain, 'x', {'y': 4, 'z': 'abc'}) is True
 
     domain = ['OR', ['x', '=', 3], ['y', '=', 5]]
     assert domain_inversion(domain, 'x', {'y': False}) == [['x', '=', 3]]
 
     domain = ['OR', ['x', '=', 3], ['y', '>', 5]]
-    assert domain_inversion(domain, 'z') == True
+    assert domain_inversion(domain, 'z') is True
 
     domain = ['OR', ['x.id', '>', 5], ['y', '<', 3]]
     assert domain_inversion(domain, 'y') == [['y', '<', 3]]
     assert domain_inversion(domain, 'y', {'z': 4}) == [['y', '<', 3]]
-    assert domain_inversion(domain, 'y', {'x': 3}) == True
+    assert domain_inversion(domain, 'y', {'x': 3}) is True
 
     domain = [u'OR', [u'length', u'>', 5], [u'language.code', u'=', u'de_DE']]
     assert domain_inversion(domain, 'length', {'length': 0, 'name': 'n'}) ==\
@@ -345,26 +345,26 @@ def test_or_inversion():
 def test_orand_inversion():
     domain = ['OR', [['x', '=', 3], ['y', '>', 5], ['z', '=', 'abc']],
         [['x', '=', 4]], [['y', '>', 6]]]
-    assert domain_inversion(domain, 'x') == True
+    assert domain_inversion(domain, 'x') is True
     assert domain_inversion(domain, 'x', {'y': 4}) == [[['x', '=', 4]]]
-    assert domain_inversion(domain, 'x', {'z': 'abc', 'y': 7}) == True
-    assert domain_inversion(domain, 'x', {'y': 7}) == True
-    assert domain_inversion(domain, 'x', {'z': 'ab'}) == True
+    assert domain_inversion(domain, 'x', {'z': 'abc', 'y': 7}) is True
+    assert domain_inversion(domain, 'x', {'y': 7}) is True
+    assert domain_inversion(domain, 'x', {'z': 'ab'}) is True
 
 
 def test_andor_inversion():
     domain = [['OR', ['x', '=', 4], ['y', '>', 6]], ['z', '=', 3]]
     assert domain_inversion(domain, 'z') == [['z', '=', 3]]
     assert domain_inversion(domain, 'z', {'x': 5}) == [['z', '=', 3]]
-    assert domain_inversion(domain, 'z', {'x': 5, 'y': 5}) == False
+    assert domain_inversion(domain, 'z', {'x': 5, 'y': 5}) is False
     assert domain_inversion(domain, 'z', {'x': 5, 'y': 7}) == [['z', '=', 3]]
 
 
 def test_andand_inversion():
     domain = [[['x', '=', 4], ['y', '>', 6]], ['z', '=', 3]]
     assert domain_inversion(domain, 'z') == [['z', '=', 3]]
-    assert domain_inversion(domain, 'z', {'x': 5}) == False
-    assert domain_inversion(domain, 'z', {'y': 5}) == False
+    assert domain_inversion(domain, 'z', {'x': 5}) is False
+    assert domain_inversion(domain, 'z', {'y': 5}) is False
     assert domain_inversion(domain, 'z', {'x': 4, 'y': 7}) == [['z', '=', 3]]
 
     domain = [[['x', '=', 4], ['y', '>', 6], ['z', '=', 2]], [['w', '=', 2]]]
@@ -375,18 +375,18 @@ def test_oror_inversion():
     domain = ['OR', ['OR', ['x', '=', 3], ['y', '>', 5]],
         ['OR', ['x', '=', 2], ['z', '=', 'abc']],
         ['OR', ['y', '=', 8], ['z', '=', 'y']]]
-    assert domain_inversion(domain, 'x') == True
-    assert domain_inversion(domain, 'x', {'y': 4}) == True
-    assert domain_inversion(domain, 'x', {'z': 'ab'}) == True
-    assert domain_inversion(domain, 'x', {'y': 7}) == True
-    assert domain_inversion(domain, 'x', {'z': 'abc'}) == True
-    assert domain_inversion(domain, 'x', {'z': 'y'}) == True
-    assert domain_inversion(domain, 'x', {'y': 8}) == True
-    assert domain_inversion(domain, 'x', {'y': 8, 'z': 'b'}) == True
-    assert domain_inversion(domain, 'x', {'y': 4, 'z': 'y'}) == True
-    assert domain_inversion(domain, 'x', {'y': 7, 'z': 'abc'}) == True
+    assert domain_inversion(domain, 'x') is True
+    assert domain_inversion(domain, 'x', {'y': 4}) is True
+    assert domain_inversion(domain, 'x', {'z': 'ab'}) is True
+    assert domain_inversion(domain, 'x', {'y': 7}) is True
+    assert domain_inversion(domain, 'x', {'z': 'abc'}) is True
+    assert domain_inversion(domain, 'x', {'z': 'y'}) is True
+    assert domain_inversion(domain, 'x', {'y': 8}) is True
+    assert domain_inversion(domain, 'x', {'y': 8, 'z': 'b'}) is True
+    assert domain_inversion(domain, 'x', {'y': 4, 'z': 'y'}) is True
+    assert domain_inversion(domain, 'x', {'y': 7, 'z': 'abc'}) is True
     assert domain_inversion(domain, 'x', {'y': 4, 'z': 'b'}) == \
-            ['OR', [['x', '=', 3]], [['x', '=', 2]]]
+        ['OR', [['x', '=', 3]], [['x', '=', 2]]]
 
 
 def test_parse():
@@ -504,7 +504,7 @@ def test_localize():
 
     domain = ['OR', ['AND', ['x', '>', 7], ['x', '<', 15]], ['x.code', '=', 8]]
     assert localize_domain(domain, 'x') == \
-            ['OR', ['AND', ['id', '>', 7], ['id', '<', 15]], ['code', '=', 8]]
+        ['OR', ['AND', ['id', '>', 7], ['id', '<', 15]], ['code', '=', 8]]
 
     domain = [['x', 'child_of', [1]]]
     assert localize_domain(domain, 'x') == [['x', 'child_of', [1]]]

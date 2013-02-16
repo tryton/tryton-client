@@ -3,7 +3,6 @@
 "Date Widget"
 
 import gobject
-import pango
 import gtk
 import re
 import time
@@ -81,7 +80,7 @@ class DateEntry(gtk.Entry):
         self.regex = re.compile(self.regex)
 
         assert self.regex.match(self.initial_value), \
-                'Error, the initial value should be validated by regex'
+            'Error, the initial value should be validated by regex'
         self.set_width_chars(len(self.initial_value) + 3)  # space for icon
         self.set_max_length(len(self.initial_value))
 

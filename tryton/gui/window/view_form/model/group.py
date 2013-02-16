@@ -113,7 +113,7 @@ class Group(SignalEvent, list):
         if idx >= 1:
             if idx + 1 < self.__len__():
                 self.__getitem__(idx - 1).next[id(self)] = \
-                        self.__getitem__(idx + 1)
+                    self.__getitem__(idx + 1)
             else:
                 self.__getitem__(idx - 1).next[id(self)] = None
         self.signal('group-list-changed', ('record-removed', record))

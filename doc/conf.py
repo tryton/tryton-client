@@ -174,8 +174,8 @@ htmlhelp_basename = 'trytonddoc'
 # (source start file, target name, title, author, documentclass [howto/manual])
 latex_documents = [
     ('index', 'tryton.tex', 'tryton Documentation',
-        u'Anne Krings, Bertrand Chenal, Cédric Krier, Mathias Behrle, ' \
-            'Tobias Paepke, Udo Spallek', 'manual'),
+        u'Anne Krings, Bertrand Chenal, Cédric Krier, Mathias Behrle, '
+        'Tobias Paepke, Udo Spallek', 'manual'),
     ]
 
 # The name of an image file (relative to this directory) to place at the top of

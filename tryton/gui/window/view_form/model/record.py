@@ -54,8 +54,8 @@ class Record(SignalEvent):
                 idx = self.group.index(self)
                 length = len(self.group)
                 n = 1
-                while len(id2record) < 80 and (idx - n >= 0 or \
-                        idx + n < length) and n < 100:
+                while len(id2record) < 80 and (idx - n >= 0
+                        or idx + n < length) and n < 100:
                     if idx - n >= 0:
                         record = self.group[idx - n]
                         if name not in record._loaded and record.id >= 0:

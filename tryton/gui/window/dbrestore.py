@@ -83,18 +83,18 @@ class DBRestore(object):
         self.entry_server_url.set_editable(False)
         self.entry_server_url.set_activates_default(True)
         self.entry_server_url.set_width_chars(16)
-        self.tooltips.set_tip(self.entry_server_url, _("This is the URL of " \
-                "the server. Use server 'localhost' and port '8000' if " \
-                "the server is installed on this computer. Click on " \
+        self.tooltips.set_tip(self.entry_server_url, _("This is the URL of "
+                "the server. Use server 'localhost' and port '8000' if "
+                "the server is installed on this computer. Click on "
                 "'Change' to change the address."))
         table.attach(self.entry_server_url, 1, 2, 0, 1, yoptions=gtk.FILL)
-        self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
-                use_underline=True)
+        self.button_server_change = gtk.Button(_("C_hange"), stock=None,
+            use_underline=True)
         img_button_server_change = gtk.Image()
-        img_button_server_change.set_from_stock( \
-                'tryton-preferences-system', gtk.ICON_SIZE_BUTTON)
+        img_button_server_change.set_from_stock(
+            'tryton-preferences-system', gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
-        self.tooltips.set_tip(self.button_server_change, _("Setup the " \
+        self.tooltips.set_tip(self.button_server_change, _("Setup the "
                 "server connection..."))
         table.attach(self.button_server_change, 2, 3, 0, 1, yoptions=gtk.FILL)
         self.label_server_password = gtk.Label(_("Tryton Server Password:"))
@@ -106,9 +106,9 @@ class DBRestore(object):
         self.entry_server_password.set_visibility(False)
         self.entry_server_password.set_activates_default(True)
         self.entry_server_password.set_width_chars(16)
-        self.tooltips.set_tip(self.entry_server_password, _("This is the " \
-                "password of the Tryton server. It doesn't belong to a " \
-                "real user. This password is usually defined in the trytond " \
+        self.tooltips.set_tip(self.entry_server_password, _("This is the "
+                "password of the Tryton server. It doesn't belong to a "
+                "real user. This password is usually defined in the trytond "
                 "configuration."))
         table.attach(self.entry_server_password, 1, 3, 1, 2, yoptions=gtk.FILL)
         self.hseparator = gtk.HSeparator()
@@ -125,13 +125,13 @@ class DBRestore(object):
         self.entry_db_name.set_activates_default(True)
         self.entry_db_name.set_width_chars(16)
         self.entry_db_name.set_max_length(63)
-        handlerid = self.entry_db_name.connect("insert-text", \
-                self.entry_insert_text)
+        handlerid = self.entry_db_name.connect("insert-text",
+            self.entry_insert_text)
         self.entry_db_name.set_data('handlerid', handlerid)
-        self.tooltips.set_tip(self.entry_db_name, _("Choose the name of " \
-                "the database to be restored.\n" \
-                "Allowed characters are alphanumerical or _ (underscore)\n" \
-                "You need to avoid all accents, space or special " \
+        self.tooltips.set_tip(self.entry_db_name, _("Choose the name of "
+                "the database to be restored.\n"
+                "Allowed characters are alphanumerical or _ (underscore)\n"
+                "You need to avoid all accents, space or special "
                 "characters! \nExample: tryton"))
         table.attach(self.entry_db_name, 1, 3, 4, 5, yoptions=gtk.FILL)
         label_db_name = gtk.Label(_("New Database Name:"))
@@ -141,23 +141,23 @@ class DBRestore(object):
         label_db_update.set_alignment(1, 0.5)
         table.attach(label_db_update, 0, 1, 5, 6, yoptions=gtk.FILL)
         self.check_update = gtk.CheckButton()
-        self.tooltips.set_tip(self.check_update, _('Check for an automatic ' \
-            'database update after restoring a database from a previous ' \
-            'Tryton version.'))
+        self.tooltips.set_tip(self.check_update, _('Check for an automatic '
+                'database update after restoring a database from a previous '
+                'Tryton version.'))
         self.check_update.set_active(True)
         table.attach(self.check_update, 1, 3, 5, 6, yoptions=gtk.FILL)
         # Buttons and events
-        self.dialog.connect("key-press-event", \
-                self.event_show_button_restore)
-        self.dialog.add_button("gtk-cancel", \
-                gtk.RESPONSE_CANCEL)
+        self.dialog.connect("key-press-event",
+            self.event_show_button_restore)
+        self.dialog.add_button("gtk-cancel",
+            gtk.RESPONSE_CANCEL)
         self.button_restore = gtk.Button(_('Restore'))
         self.button_restore.set_flags(gtk.CAN_DEFAULT)
         self.button_restore.set_flags(gtk.HAS_DEFAULT)
         self.button_restore.set_sensitive(False)
         img_restore = gtk.Image()
-        img_restore.set_from_stock('tryton-folder-saved-search', \
-                gtk.ICON_SIZE_BUTTON)
+        img_restore.set_from_stock('tryton-folder-saved-search',
+            gtk.ICON_SIZE_BUTTON)
         self.button_restore.set_image(img_restore)
         self.tooltips.set_tip(self.button_restore,
             _('Restore the database from file.'))

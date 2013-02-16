@@ -338,7 +338,7 @@ class Form(SignalEvent, TabContent):
         if not hasattr(self, 'screen'):
             return False
         if test_modified and self.screen.modified():
-            res = sur_3b(_('This record has been modified\n' \
+            res = sur_3b(_('This record has been modified\n'
                     'do you want to save it ?'))
             if res == 'ok':
                 self.sig_save(None)
@@ -450,8 +450,8 @@ class Form(SignalEvent, TabContent):
         self.screen.current_view.set_value()
         if self.screen.modified():
             value = sur_3b(
-                    _('This record has been modified\n' \
-                            'do you want to save it ?'))
+                _('This record has been modified\n'
+                    'do you want to save it ?'))
             if value == 'ok':
                 return self.sig_save(None)
             if value == 'ko':

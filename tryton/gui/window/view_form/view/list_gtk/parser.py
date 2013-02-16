@@ -7,7 +7,6 @@ import tempfile
 import gtk
 import locale
 import gettext
-import operator
 import webbrowser
 
 from functools import wraps
@@ -124,7 +123,7 @@ class ParserTree(ParserInterface):
                 for boolean_fields in ('readonly', 'required', 'expand'):
                     if boolean_fields in node_attrs:
                         node_attrs[boolean_fields] = \
-                                bool(int(node_attrs[boolean_fields]))
+                            bool(int(node_attrs[boolean_fields]))
                 if fname not in fields:
                     continue
                 for attr_name in ('relation', 'domain', 'selection',
@@ -265,7 +264,7 @@ class ParserTree(ParserInterface):
                 i = treeview.append_column(col)
                 if 'sum' in node_attrs and fields[fname].attrs['type'] \
                         in ('integer', 'biginteger', 'float', 'numeric',
-                                'float_time'):
+                            'float_time'):
                     label = gtk.Label(node_attrs['sum'] + _(': '))
                     label_sum = gtk.Label()
                     if isinstance(fields[fname].attrs.get('digits'),
@@ -347,7 +346,7 @@ class Char(object):
         else:
             cell.set_sensitive(not (record.deleted or record.removed))
             if isinstance(cell,
-                (CellRendererText, CellRendererDate, CellRendererCombo)):
+                    (CellRendererText, CellRendererDate, CellRendererCombo)):
                 cell.set_property('strikethrough', record.deleted)
             cell.set_property('text', text)
             fg_color = self.get_color(record)
@@ -798,8 +797,8 @@ class O2M(Char):
         cell.set_property('xalign', 0.5)
 
     def get_textual_value(self, record):
-        return '( ' + str(len(record[self.field_name].\
-                get_eval(record))) + ' )'
+        return '( ' + str(len(record[self.field_name]
+                .get_eval(record))) + ' )'
 
     def value_from_text(self, record, text, callback=None):
         if callback:

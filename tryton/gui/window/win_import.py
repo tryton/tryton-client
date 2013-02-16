@@ -49,7 +49,7 @@ class WinImport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-add', gtk.ICON_SIZE_BUTTON)
         button_add.set_image(img_button)
-        button_add.connect_after('clicked',  self.sig_sel)
+        button_add.connect_after('clicked', self.sig_sel)
         vbox_buttons.pack_start(button_add, False, False, 0)
 
         button_remove = gtk.Button(_("_Remove"), stock=None,
@@ -58,7 +58,7 @@ class WinImport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-list-remove', gtk.ICON_SIZE_BUTTON)
         button_remove.set_image(img_button)
-        button_remove.connect_after('clicked',  self.sig_unsel)
+        button_remove.connect_after('clicked', self.sig_unsel)
         vbox_buttons.pack_start(button_remove, False, False, 0)
 
         button_remove_all = gtk.Button(_("Clear"), stock=None,
@@ -67,7 +67,7 @@ class WinImport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-clear', gtk.ICON_SIZE_BUTTON)
         button_remove_all.set_image(img_button)
-        button_remove_all.connect_after('clicked',  self.sig_unsel_all)
+        button_remove_all.connect_after('clicked', self.sig_unsel_all)
         vbox_buttons.pack_start(button_remove_all, False, False, 0)
 
         hseparator_buttons = gtk.HSeparator()
@@ -79,7 +79,7 @@ class WinImport(NoModal):
         img_button = gtk.Image()
         img_button.set_from_stock('tryton-find', gtk.ICON_SIZE_BUTTON)
         button_autodetect.set_image(img_button)
-        button_autodetect.connect_after('clicked',  self.sig_autodetect)
+        button_autodetect.connect_after('clicked', self.sig_autodetect)
         vbox_buttons.pack_start(button_autodetect, False, False, 0)
 
         frame_import = gtk.Frame()
@@ -250,8 +250,7 @@ class WinImport(NoModal):
             return True
         csvsep = self.import_csv_sep.get_text()
         csvdel = self.import_csv_del.get_text()
-        csvcode = self.import_csv_enc.get_active_text() \
-                or 'UTF-8'
+        csvcode = self.import_csv_enc.get_active_text() or 'UTF-8'
 
         self.import_csv_skip.set_value(1)
         try:
@@ -354,7 +353,7 @@ class WinImport(NoModal):
         for line in data:
             if not line:
                 continue
-            datas.append([x.decode(csv_data['combo']).encode('utf-8') \
+            datas.append([x.decode(csv_data['combo']).encode('utf-8')
                     for x in line])
         try:
             res = RPCExecute('model', model, 'import_data', fields, datas)

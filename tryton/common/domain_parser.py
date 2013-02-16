@@ -695,7 +695,7 @@ def test_operatorize():
             (['a', 'or', iter(['b', 'c'])], [['OR', 'a', ['b', 'c']]]),
             (['a', 'or', iter(['b', 'c']), 'd'],
                 [['OR', 'a', ['b', 'c']], 'd']),
-            (['a', iter(['b', 'c']),  'or', 'd'],
+            (['a', iter(['b', 'c']), 'or', 'd'],
                 ['a', ['OR', ['b', 'c'], 'd']]),
             (['a', 'or', iter(['b', 'or', 'c'])],
                 [['OR', 'a', [['OR', 'b', 'c']]]]),
@@ -1013,7 +1013,7 @@ def test_string():
             ['OR',
                 ('name', 'ilike', '%John%'),
                 ('name', 'ilike', '%Jane%')]]) == \
-                    'Name: Doe (Name: John or Name: Jane)'
+        'Name: Doe (Name: John or Name: Jane)'
     assert dom.string([]) == ''
     assert dom.string([('surname', 'ilike', '%Doe%')]) == '"(Sur)Name": Doe'
     assert dom.string([('date', '>=', datetime.date(2012, 10, 24))]) == \

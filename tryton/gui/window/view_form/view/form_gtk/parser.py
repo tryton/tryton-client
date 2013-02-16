@@ -260,10 +260,10 @@ class ParserForm(ParserInterface):
                         if gtk.widget_get_default_direction() == \
                                 gtk.TEXT_DIR_RTL:
                             text = _(':') + \
-                                    fields[attrs['name']].attrs['string']
+                                fields[attrs['name']].attrs['string']
                         else:
                             text = fields[attrs['name']].attrs['string'] + \
-                                    _(':')
+                                _(':')
                     if 'xalign' not in attrs:
                         attrs['xalign'] = 1.0
                 elif not text:
@@ -357,7 +357,7 @@ class ParserForm(ParserInterface):
                     for attr_name in ('states', 'invisible'):
                         if attr_name in fields[attrs['name']].attrs:
                             attrs[attr_name] = \
-                                    fields[attrs['name']].attrs[attr_name]
+                                fields[attrs['name']].attrs[attr_name]
                     if not text:
                         text = fields[attrs['name']].attrs['string']
                 if not text:
@@ -476,7 +476,7 @@ class ParserForm(ParserInterface):
                 container.wid_add(frame,
                     colspan=colspan,
                     yexpand=yexpand, yfill=yfill, ypadding=0,
-                    xexpand=xexpand, xfill=xfill,  xpadding=0)
+                    xexpand=xexpand, xfill=xfill, xpadding=0)
             elif node.localName == 'hpaned':
                 hpaned = gtk.HPaned()
                 container.wid_add(hpaned, colspan=int(attrs.get('colspan', 4)),
@@ -525,7 +525,7 @@ class ParserForm(ParserInterface):
                 elif not paned.get_child2():
                     paned.pack2(widget, resize=True, shrink=True)
         return container.pop(), dict_widget, state_widgets, on_write, \
-                notebook_list, cursor_widget
+            notebook_list, cursor_widget
 
 from calendar import Calendar, DateTime, Time
 from float import Float

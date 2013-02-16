@@ -2,7 +2,6 @@
 #this repository contains the full copyright notices and license terms.
 import gtk
 import gettext
-import gobject
 
 from interface import WidgetInterface
 from tryton.gui.window.view_form.screen import Screen

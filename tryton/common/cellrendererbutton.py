@@ -87,8 +87,8 @@ class CellRendererButton(gtk.GenericCellRenderer):
             cell_area, flags):
         if not self.visible or not self.sensitive:
             return
-        if (event is None) or ((event.type == gtk.gdk.BUTTON_PRESS) \
-                or (event.type == gtk.gdk.KEY_PRESS \
+        if (event is None) or ((event.type == gtk.gdk.BUTTON_PRESS)
+                or (event.type == gtk.gdk.KEY_PRESS
                     and event.keyval == gtk.keysyms.space)):
             self.clicking = True
             widget.queue_draw()

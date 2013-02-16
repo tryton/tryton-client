@@ -25,9 +25,9 @@ class Pie(Graph):
             normalisedAngle = slice.normalisedAngle()
 
             labelx = self.centerx + \
-                    math.sin(normalisedAngle) * (self.radius + 10)
+                math.sin(normalisedAngle) * (self.radius + 10)
             labely = self.centery - \
-                    math.cos(normalisedAngle) * (self.radius + 10)
+                math.cos(normalisedAngle) * (self.radius + 10)
 
             label = '%s (%s%%)' % (self.labels[slice.xname],
                     locale.format('%.2f', slice.fraction * 100))

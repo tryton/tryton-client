@@ -258,8 +258,8 @@ class RichTextBox(TextBox):
         deserial = text_buffer.register_deserialize_tagset()
         text_buffer.deserialize(text_buffer, deserial,
             text_buffer.get_start_iter(), buffer_.serialize(
-            buffer_, "application/x-gtk-text-buffer-rich-text",
-            buffer_.get_start_iter(), buffer_.get_end_iter()))
+                buffer_, "application/x-gtk-text-buffer-rich-text",
+                buffer_.get_start_iter(), buffer_.get_end_iter()))
         locks = {'bold': False, 'italic': False, 'underline': False,
             'left': False, 'right': False, 'center': False, 'fill': False}
         for prop in self.font_props:
@@ -324,14 +324,14 @@ class RichTextBox(TextBox):
             text = re.sub(open_re, '', text, 1)
             text_buffer.delete(text_buffer.get_iter_at_offset(
                 data_open.start()), text_buffer.get_iter_at_offset(
-                data_open.end()))
+                    data_open.end()))
             close_re = '</%s>' % tag
             data_close = re.search(close_re, text)
             if data_close:
                 text = re.sub(close_re, '', text, 1)
                 text_buffer.delete(text_buffer.get_iter_at_offset(
                     data_close.start()), text_buffer.get_iter_at_offset(
-                    data_close.end()))
+                        data_close.end()))
                 start = create_mark(data_open.start())
                 end = create_mark(data_close.start())
                 if tag in ('b', 'i', 'u'):

@@ -41,14 +41,14 @@ class Action(object):
             print_p = True
         dtemp = tempfile.mkdtemp(prefix='tryton_')
         fp_name = os.path.join(dtemp,
-                name.replace(os.sep, '_').replace(os.altsep or os.sep, '_') \
-                        + os.extsep + type)
+            name.replace(os.sep, '_').replace(os.altsep or os.sep, '_')
+            + os.extsep + type)
         with open(fp_name, 'wb') as file_d:
             file_d.write(data)
         if email_print:
             mailto(to=email.get('to'), cc=email.get('cc'),
-                    subject=email.get('subject'), body=email.get('body'),
-                    attachment=fp_name)
+                subject=email.get('subject'), body=email.get('body'),
+                attachment=fp_name)
         else:
             file_open(fp_name, type, print_p=print_p)
         return True

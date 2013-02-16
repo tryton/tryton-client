@@ -580,8 +580,8 @@ class DBLogin(object):
         if can_use_profile:
             for (configname, sectionname) in (('login.server', 'host'),
                     ('login.port', 'port'), ('login.db', 'database')):
-                if (self.profiles.get(profile_name, sectionname) != \
-                        CONFIG[configname]):
+                if (self.profiles.get(profile_name, sectionname)
+                        != CONFIG[configname]):
                     can_use_profile = False
                     break
 

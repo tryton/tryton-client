@@ -33,8 +33,8 @@ class DBBackupDrop(object):
                 db_widget.hide()
                 label.show()
             elif dbs == 0:
-                label.set_label('<b>' + \
-                        _('No database found, you must create one!') + '</b>')
+                label.set_label('<b>'
+                    + _('No database found, you must create one!') + '</b>')
                 db_widget.hide()
                 label.show()
             else:
@@ -97,8 +97,8 @@ class DBBackupDrop(object):
         self.dialog.set_icon(TRYTON_ICON)
         self.dialog.connect("key-press-event", self.event_show_button_ok)
         self.tooltips = common.Tooltips()
-        self.dialog.add_button("gtk-cancel", \
-                gtk.RESPONSE_CANCEL)
+        self.dialog.add_button("gtk-cancel",
+            gtk.RESPONSE_CANCEL)
         self.button_ok = gtk.Button(button_ok_text)
         self.button_ok.set_flags(gtk.CAN_DEFAULT)
         self.button_ok.set_flags(gtk.HAS_DEFAULT)
@@ -138,18 +138,18 @@ class DBBackupDrop(object):
         self.entry_server_connection.set_sensitive(False)
         self.entry_server_connection.unset_flags(gtk.CAN_FOCUS)
         self.entry_server_connection.set_editable(False)
-        self.tooltips.set_tip(self.entry_server_connection, _("This is the " \
-                "URL of the server. Use server 'localhost' and port '8000' " \
-                "if the server is installed on this computer. " \
+        self.tooltips.set_tip(self.entry_server_connection, _("This is the "
+                "URL of the server. Use server 'localhost' and port '8000' "
+                "if the server is installed on this computer. "
                 "Click on 'Change' to change the address."))
         table.attach(self.entry_server_connection, 1, 2, 2, 3,
                 yoptions=gtk.FILL)
 
-        self.button_server_change = gtk.Button(_("C_hange"), stock=None, \
-                use_underline=True)
+        self.button_server_change = gtk.Button(_("C_hange"), stock=None,
+            use_underline=True)
         img_button_server_change = gtk.Image()
-        img_button_server_change.set_from_stock('tryton-preferences-system', \
-                gtk.ICON_SIZE_BUTTON)
+        img_button_server_change.set_from_stock('tryton-preferences-system',
+            gtk.ICON_SIZE_BUTTON)
         self.button_server_change.set_image(img_button_server_change)
         table.attach(self.button_server_change, 2, 3, 2, 3, yoptions=False)
 
@@ -192,9 +192,9 @@ class DBBackupDrop(object):
         self.entry_serverpasswd = gtk.Entry()
         self.entry_serverpasswd.set_visibility(False)
         self.entry_serverpasswd.set_activates_default(True)
-        self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
-                "password of the Tryton server. It doesn't belong to a " \
-                "real user. This password is usually defined in the trytond " \
+        self.tooltips.set_tip(self.entry_serverpasswd, _("This is the "
+                "password of the Tryton server. It doesn't belong to a "
+                "real user. This password is usually defined in the trytond "
                 "configuration."))
         table.attach(self.entry_serverpasswd, 1, 3, 4, 5, yoptions=False)
 

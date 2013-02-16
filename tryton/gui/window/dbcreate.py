@@ -26,7 +26,7 @@ class DBCreate(object):
             self.entry_dbname.set_sensitive(True)
             self.entry_adminpasswd.set_sensitive(True)
             self.entry_adminpasswd2.set_sensitive(True)
-            self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
+            self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE,
                 gtk.gdk.color_parse(common.COLOR_SCHEMES["black"]))
             self.tooltips.set_tip(self.entry_server_connection,
                 _("This is the URL of the Tryton server. Use server "
@@ -40,19 +40,19 @@ class DBCreate(object):
             self.entry_adminpasswd2.set_sensitive(False)
             self.entry_server_connection.set_editable(False)
             self.entry_server_connection.set_sensitive(False)
-            self.entry_server_connection.set_text( \
+            self.entry_server_connection.set_text(
                 self.entry_server_connection.get_text()
                 + "  " + _("No connection!"))
-            self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE, \
+            self.entry_server_connection.modify_text(gtk.STATE_INSENSITIVE,
                 gtk.gdk.color_parse(common.COLORS["invalid"]))
-            self.tooltips.set_tip(self.entry_server_connection, _( \
-                "Can not connect to the server!\n" \
-                "1. Try to check if the server is running.\n" \
-                "2. Find out on which address and port it is listening.\n" \
-                "3. If there is a firewall between the server and this " \
-                "client, make sure that the server address and port " \
-                "(usually 8000) are not blocked.\n" \
-                "Click on 'Change' to change the address."))
+            self.tooltips.set_tip(self.entry_server_connection, _(
+                    "Can not connect to the server!\n"
+                    "1. Try to check if the server is running.\n"
+                    "2. Find out on which address and port it is listening.\n"
+                    "3. If there is a firewall between the server and this "
+                    "client, make sure that the server address and port "
+                    "(usually 8000) are not blocked.\n"
+                    "Click on 'Change' to change the address."))
         return state
 
     def server_change(self, widget):
@@ -79,8 +79,8 @@ class DBCreate(object):
         This event method clear the text in a widget if CTRL-u
         is pressed.
         """
-        if  (event.keyval == gtk.keysyms.u) \
-            and (event.state & gtk.gdk.CONTROL_MASK):
+        if ((event.keyval == gtk.keysyms.u)
+                and (event.state & gtk.gdk.CONTROL_MASK)):
             widget.set_text("")
 
     def event_show_button_create(self, widget, event, data=None):
@@ -90,7 +90,7 @@ class DBCreate(object):
         must be filled, then the Create button is set to sensitive. This
         event method doesn't check the valid of single entrys.
         """
-        if  (self.entry_server_connection.get_text() != ""
+        if (self.entry_server_connection.get_text() != ""
                 and self.entry_serverpasswd.get_text() != ""
                 and self.entry_dbname.get_text() != ""
                 and self.combo_language.get_active() != -1
@@ -142,7 +142,7 @@ class DBCreate(object):
         # This event is needed for controlling the button_create
         self.dialog.connect("key-press-event", self.event_show_button_create)
         self.tooltips = common.Tooltips()
-        self.dialog.add_button("gtk-cancel", \
+        self.dialog.add_button("gtk-cancel",
             gtk.RESPONSE_CANCEL)
         self.button_create = gtk.Button(_('C_reate'))
         self.button_create.set_flags(gtk.CAN_DEFAULT)
@@ -202,11 +202,11 @@ class DBCreate(object):
         self.entry_serverpasswd.set_visibility(False)
         self.entry_serverpasswd.set_activates_default(True)
         table.attach(self.entry_serverpasswd, 1, 3, 2, 3, yoptions=gtk.FILL)
-        self.tooltips.set_tip(self.entry_serverpasswd, _("This is the " \
-            "password of the Tryton server. It doesn't belong to a " \
-            "real user. This password is usually defined in the trytond " \
-            "configuration."))
-        self.entry_serverpasswd.connect("key-press-event", \
+        self.tooltips.set_tip(self.entry_serverpasswd, _("This is the "
+                "password of the Tryton server. It doesn't belong to a "
+                "real user. This password is usually defined in the trytond "
+                "configuration."))
+        self.entry_serverpasswd.connect("key-press-event",
             self.event_passwd_clear)
 
         self.hseparator = gtk.HSeparator()
@@ -248,10 +248,10 @@ class DBCreate(object):
         self.combo_language = gtk.combo_box_new_text()
         eventbox_language.add(self.combo_language)
         table.attach(eventbox_language, 1, 3, 6, 7, yoptions=gtk.FILL)
-        self.tooltips.set_tip(eventbox_language, _("Choose the default " \
-            "language that will be installed for this database. You will " \
-            "be able to install new languages after installation through " \
-            "the administration menu."))
+        self.tooltips.set_tip(eventbox_language, _("Choose the default "
+                "language that will be installed for this database. You will "
+                "be able to install new languages after installation through "
+                "the administration menu."))
         label_adminpasswd = gtk.Label(_("Admin password:"))
         label_adminpasswd.set_justify(gtk.JUSTIFY_RIGHT)
         label_adminpasswd.set_padding(3, 3)
@@ -268,7 +268,7 @@ class DBCreate(object):
                 "User name: admin\n"
                 "Password: <The password you set here>"))
         table.attach(self.entry_adminpasswd, 1, 3, 7, 8, yoptions=gtk.FILL)
-        self.entry_adminpasswd.connect("key-press-event", \
+        self.entry_adminpasswd.connect("key-press-event",
             self.event_passwd_clear)
         label_adminpasswd2 = gtk.Label(_("Confirm admin password:"))
         label_adminpasswd2.set_justify(gtk.JUSTIFY_RIGHT)
@@ -279,10 +279,10 @@ class DBCreate(object):
         self.entry_adminpasswd2 = gtk.Entry()
         self.entry_adminpasswd2.set_visibility(False)
         self.entry_adminpasswd2.set_activates_default(True)
-        self.tooltips.set_tip(self.entry_adminpasswd2, _("Type the Admin " \
-            "password again"))
+        self.tooltips.set_tip(self.entry_adminpasswd2, _("Type the Admin "
+                "password again"))
         table.attach(self.entry_adminpasswd2, 1, 3, 8, 9, yoptions=gtk.FILL)
-        self.entry_adminpasswd2.connect("key-press-event", \
+        self.entry_adminpasswd2.connect("key-press-event",
             self.event_passwd_clear)
         self.entry_serverpasswd.grab_focus()
         dialog_vbox.pack_start(table)
@@ -319,30 +319,30 @@ class DBCreate(object):
             res = self.dialog.run()
             dbname = self.entry_dbname.get_text()
             url = self.entry_server_connection.get_text()
-            url_m = re.match('^([\w.\-]+):(\d{1,5})', \
-                url or '')
+            url_m = re.match('^([\w.\-]+):(\d{1,5})', url or '')
             langidx = self.combo_language.get_active_iter()
             langreal = langidx \
                 and self.combo_language.get_model().get_value(langidx, 1)
             passwd = pass_widget.get_text()
             if res == gtk.RESPONSE_OK:
-                if (not dbname) \
-                    or (not re.match('^[a-zA-Z0-9_]+$', dbname)):
-                    common.warning(_('The database name is restricted to ' \
-                        'alpha-nummerical characters and "_" (underscore). ' \
-                        'Avoid all accents, space ' \
-                        'and any other special characters.'),
+                if (not dbname
+                        or not re.match('^[a-zA-Z0-9_]+$', dbname)):
+                    common.warning(_('The database name is restricted to '
+                            'alpha-nummerical characters '
+                            'and "_" (underscore). '
+                            'Avoid all accents, space '
+                            'and any other special characters.'),
                         _('Wrong characters in database name!'))
                     continue
                 elif admin_passwd.get_text() != admin_passwd2.get_text():
                     common.warning(
-                        _("The new admin password " \
-                              "doesn't match the confirmation field.\n"),
+                        _("The new admin password "
+                            "doesn't match the confirmation field.\n"),
                         _("Passwords doesn't match!"))
                     continue
                 elif not admin_passwd.get_text():
-                    common.warning(_("Admin password and confirmation are " \
-                        "required to create a new database."), \
+                    common.warning(_("Admin password and confirmation are "
+                            "required to create a new database."),
                         _('Missing admin password!'))
                     continue
                 elif url_m.group(1) \
@@ -376,8 +376,9 @@ class DBCreate(object):
                             rpcprogress.run(False)
                         except TrytonServerError, exception:
                             if str(exception.faultCode) == "AccessDenied":
-                                common.warning(_("Sorry, wrong password for " \
-                                    "the Tryton server. Please try again."),
+                                common.warning(_("Sorry, wrong password for "
+                                        "the Tryton server. "
+                                        "Please try again."),
                                     _("Access denied!"))
                                 self.entry_serverpasswd.set_text("")
                                 self.entry_serverpasswd.grab_focus()

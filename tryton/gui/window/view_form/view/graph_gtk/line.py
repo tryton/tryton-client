@@ -127,8 +127,8 @@ class Line(Graph):
             cr.move_to(point.x * self.area.w + self.area.x,
                     point.y * self.area.h + self.area.y)
             cr.arc(point.x * self.area.w + self.area.x,
-                    point.y * self.area.h + self.area.y,
-                    3, 0, 2 * math.pi)
+                point.y * self.area.h + self.area.y,
+                3, 0, 2 * math.pi)
             cr.fill()
 
         cr.restore()
@@ -143,13 +143,13 @@ class Line(Graph):
                 cr.move_to(point.x * self.area.w + self.area.x,
                         point.y * self.area.h + self.area.y)
                 cr.arc(point.x * self.area.w + self.area.x,
-                        point.y * self.area.h + self.area.y,
-                        3, 0, 2 * math.pi)
+                    point.y * self.area.h + self.area.y,
+                    3, 0, 2 * math.pi)
                 cr.stroke()
                 cr.set_source_rgb(*self.colorScheme['__highlight'])
                 cr.arc(point.x * self.area.w + self.area.x,
-                        point.y * self.area.h + self.area.y,
-                        3, 0, 2 * math.pi)
+                    point.y * self.area.h + self.area.y,
+                    3, 0, 2 * math.pi)
                 cr.fill()
         cr.restore()
 
@@ -244,7 +244,7 @@ class Line(Graph):
     def YLabels(self):
         ylabels = super(Line, self).YLabels()
         if len([x.get('key', x['name']) for x in self.yfields
-            if x.get('widget')]) == len(self.yfields):
+                    if x.get('widget')]) == len(self.yfields):
             conv = None
             float_time = reduce(lambda x, y: x == y and x or False,
                     [x.get('float_time') for x in self.yfields])

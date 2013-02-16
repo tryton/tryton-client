@@ -1020,10 +1020,10 @@ class Main(object):
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
-            common.message(_('Connection error!\n' \
+            common.message(_('Connection error!\n'
                     'Unable to connect to the server!'))
         elif log_response == -2:
-            common.message(_('Connection error!\n' \
+            common.message(_('Connection error!\n'
                     'Bad username or password!'))
             return self.sig_login()
         self.favorite_unset()
@@ -1417,7 +1417,7 @@ class Main(object):
             return
 
         host, port = url.rsplit(':', 1)
-        sure = common.sur_3b(_("You are going to delete a Tryton " \
+        sure = common.sur_3b(_("You are going to delete a Tryton "
                 "database.\nAre you really sure to proceed?"))
         if sure == "ko" or sure == "cancel":
             return
@@ -1428,8 +1428,8 @@ class Main(object):
         except TrytonServerError, exception:
             self.refresh_ssl()
             if exception.faultCode == "AccessDenied":
-                common.warning(_("Wrong Tryton Server Password" \
-                        "\nPlease try again."),
+                common.warning(_("Wrong Tryton Server Password\n"
+                        "Please try again."),
                         _('Access denied!'))
                 self.sig_db_drop()
             else:
@@ -1460,20 +1460,20 @@ class Main(object):
                 self.refresh_ssl()
                 if exception.faultCode == \
                         "Couldn't restore database with password":
-                    common.warning(_("It is not possible to restore a " \
-                            "password protected database.\n" \
-                            "Backup and restore needed to be proceed " \
+                    common.warning(_("It is not possible to restore a "
+                            "password protected database.\n"
+                            "Backup and restore needed to be proceed "
                             "manual."),
                             _('Database is password protected!'))
                 elif exception.faultCode == "AccessDenied":
-                    common.warning(_("Wrong Tryton Server Password.\n" \
+                    common.warning(_("Wrong Tryton Server Password.\n"
                             "Please try again."),
                             _('Access denied!'))
                     self.sig_db_restore()
                 else:
-                    common.warning(_('Database restore failed with ' \
-                            'error message:\n') + str(exception.faultCode), \
-                            _('Database restore failed!'))
+                    common.warning(_('Database restore failed with '
+                            'error message:\n') + str(exception.faultCode),
+                        _('Database restore failed!'))
                 return
             self.refresh_ssl()
             if res:
@@ -1499,19 +1499,19 @@ class Main(object):
             dump = rpcprogress.run(False)
         except TrytonServerError, exception:
             if exception.faultCode == "Couldn't dump database with password":
-                common.warning(_("It is not possible to dump a password " \
-                        "protected Database.\nBackup and restore " \
+                common.warning(_("It is not possible to dump a password "
+                        "protected Database.\nBackup and restore "
                         "needed to be proceed manual."),
-                        _('Database is password protected!'))
+                    _('Database is password protected!'))
             elif exception.faultCode == "AccessDenied":
-                common.warning(_("Wrong Tryton Server Password.\n" \
+                common.warning(_("Wrong Tryton Server Password.\n"
                         "Please try again."),
-                        _('Access denied!'))
+                    _('Access denied!'))
                 self.sig_db_dump()
             else:
-                common.warning(_('Database dump failed with ' \
+                common.warning(_('Database dump failed with '
                         'error message:\n') + str(exception.faultCode),
-                        _('Database dump failed!'))
+                    _('Database dump failed!'))
             rpc.logout()
             Main.get_main().refresh_ssl()
             return

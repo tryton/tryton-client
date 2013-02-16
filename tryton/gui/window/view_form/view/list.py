@@ -141,8 +141,8 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 pos += 1
             except KeyError:
                 continue
-        self.group.sort(lambda x, y: \
-                cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
+        self.group.sort(lambda x, y:
+            cmp(new_order[ids2pos[x.id]], new_order[ids2pos[y.id]]))
         prev = None
         for record in self.group:
             if prev:
@@ -799,10 +799,10 @@ class ViewList(ParserView):
     # self.widget.set_model(self.store) could be removed if the store
     # has not changed -> better ergonomy. To test
     def display(self):
-        if self.reload \
-                or (not self.widget_tree.get_model()) \
-                    or self.screen.group != \
-                        self.widget_tree.get_model().group:
+        if (self.reload
+                or not self.widget_tree.get_model()
+                or (self.screen.group !=
+                    self.widget_tree.get_model().group)):
             self.store = AdaptModelGroup(self.screen.group,
                     self.children_field)
             self.widget_tree.set_model(self.store)

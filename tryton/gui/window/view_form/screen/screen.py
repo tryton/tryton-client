@@ -11,7 +11,6 @@ import collections
 import xml.dom.minidom
 import gettext
 
-import tryton.rpc as rpc
 from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.model.record import Record
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
@@ -313,8 +312,6 @@ class Screen(SignalEvent):
         self.widget = None
 
     def default_row_activate(self):
-        from tryton.action import Action
-
         if (self.current_view.view_type == 'tree' and
                 self.current_view.widget_tree.keyword_open):
             return Action.exec_keyword('tree_open', {
@@ -429,11 +426,12 @@ class Screen(SignalEvent):
         return False
 
     def new(self, default=True):
-        if self.current_view and \
-                ((self.current_view.view_type == 'tree' \
-                and not (hasattr(self.current_view.widget_tree, 'editable') \
-                    and self.current_view.widget_tree.editable)) \
-                or self.current_view.view_type == 'graph'):
+        if (self.current_view
+                and ((self.current_view.view_type == 'tree'
+                        and not (hasattr(self.current_view.widget_tree,
+                                'editable')
+                            and self.current_view.widget_tree.editable))
+                    or self.current_view.view_type == 'graph')):
             prev_current_record = self.current_record
             for i in xrange(len(self.views)):
                 self.switch_view()
@@ -458,9 +456,9 @@ class Screen(SignalEvent):
 
     def new_model_position(self):
         position = -1
-        if self.current_view and self.current_view.view_type == 'tree' \
-                and hasattr(self.current_view.widget_tree, 'editable') \
-                    and self.current_view.widget_tree.editable == 'top':
+        if (self.current_view and self.current_view.view_type == 'tree'
+                and hasattr(self.current_view.widget_tree, 'editable')
+                and self.current_view.widget_tree.editable == 'top'):
             position = 0
         return position
 
@@ -690,14 +688,14 @@ class Screen(SignalEvent):
             if self.current_view.view_type == 'calendar' and \
                     len(self.views) > 1:
                 self.switch_view()
-            self.search_active(self.current_view.view_type \
-                    in ('tree', 'graph', 'calendar'))
+            self.search_active(self.current_view.view_type
+                in ('tree', 'graph', 'calendar'))
             for view in self.views:
                 view.display()
             self.current_view.widget.set_sensitive(
-                    bool(self.group \
-                            or (self.current_view.view_type != 'form') \
-                            or self.current_record))
+                bool(self.group
+                    or (self.current_view.view_type != 'form')
+                    or self.current_record))
             if set_cursor:
                 self.set_cursor(reset_view=False)
         self.set_tree_state()

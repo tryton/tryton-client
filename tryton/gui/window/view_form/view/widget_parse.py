@@ -15,14 +15,14 @@ PARSERS = {
     'form': form_gtk.ParserForm,
     'tree': list_gtk.ParserTree,
     'graph': graph_gtk.ParserGraph,
-#    'calendar': calendar_gtk.parser_calendar,
+    #'calendar': calendar_gtk.parser_calendar,
 }
 
 PARSERS2 = {
     'form': ViewForm,
     'tree': ViewList,
     'graph': ViewGraph,
-#    'calendar': ViewCalendar,
+    #'calendar': ViewCalendar,
 }
 
 
