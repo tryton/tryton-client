@@ -496,6 +496,7 @@ class DictWidget(WidgetInterface):
                 self.add_line(key)
             widget = self.fields[key]
             widget.set_value(val)
+            widget.set_readonly(self._readonly)
         for key in set(self.fields.keys()) - set(value.keys()):
             self._sig_remove(None, key, modified=False)
 
