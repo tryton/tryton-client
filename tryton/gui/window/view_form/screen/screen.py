@@ -143,7 +143,7 @@ class Screen(SignalEvent):
             change_with = props.get('selection_change_with')
             if change_with:
                 selection = RPCExecute('model', self.model_name,
-                    props['selection'], {p: None for p in change_with})
+                    props['selection'], dict((p, None) for p in change_with))
             else:
                 selection = RPCExecute('model', self.model_name,
                     props['selection'])
