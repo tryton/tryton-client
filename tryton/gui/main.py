@@ -335,8 +335,8 @@ class Main(object):
                 try:
                     result = RPCExecute('model', 'ir.model', 'global_search',
                         search_text, CONFIG['client.limit'],
-                        self.menu_screen.model_name, process_exception=False)
-                except (TrytonError, TrytonServerError):
+                        self.menu_screen.model_name)
+                except RPCException:
                     result = []
                 if search_text != widget.get_text().decode('utf-8'):
                     return False
