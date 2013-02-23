@@ -25,6 +25,7 @@ class Group(SignalEvent, list):
         self.lock_signal = False
         self.parent = parent
         self.parent_name = parent_name or ''
+        self.children = []
         self.child_name = child_name
         self.parent_datetime_field = parent_datetime_field
         self._context = context or {}
@@ -41,6 +42,9 @@ class Group(SignalEvent, list):
         self.exclude_field = None
         self.pool = WeakSet()
         self.skip_model_access = False
+
+        if self.parent and self.parent.model_name == model_name:
+            self.parent.group.children.append(self)
 
     @property
     def readonly(self):
@@ -188,8 +192,11 @@ class Group(SignalEvent, list):
         return ids
 
     def reload(self, ids):
-        for record in self:
-            if record.id in ids and not record.modified:
+        for child in self.children:
+            child.reload(ids)
+        for id_ in ids:
+            record = self.get(id_)
+            if record and not record.modified:
                 record._loaded.clear()
 
     def on_write_ids(self, ids):
@@ -411,6 +418,11 @@ class Group(SignalEvent, list):
         del self.__id2record[old_id]
 
     def destroy(self):
+        if self.parent:
+            try:
+                self.parent.group.children.remove(self)
+            except ValueError:
+                pass
         self.clear()
         super(Group, self).destroy()
         self.parent = None
