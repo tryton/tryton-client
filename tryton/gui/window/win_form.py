@@ -50,13 +50,10 @@ class WinForm(NoModal):
         self.accel_group = gtk.AccelGroup()
         self.win.add_accel_group(self.accel_group)
 
-        self.but_cancel = None
         self.but_ok = None
         self.but_new = None
-        if new or self.save_current:
-            icon_cancel = gtk.STOCK_CANCEL
-            self.but_cancel = self.win.add_button(icon_cancel,
-                    gtk.RESPONSE_CANCEL)
+        self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL,
+            gtk.RESPONSE_CANCEL)
 
         if new and self.many:
             self.but_new = self.win.add_button(gtk.STOCK_NEW,
@@ -389,8 +386,7 @@ class WinForm(NoModal):
 
     def close(self, widget):
         widget.emit_stop_by_name('close')
-        if self.but_cancel:
-            self.response(self.win, gtk.RESPONSE_CANCEL)
+        self.response(self.win, gtk.RESPONSE_CANCEL)
         return True
 
     def response(self, win, response_id):
@@ -424,10 +420,16 @@ class WinForm(NoModal):
             if response_id == gtk.RESPONSE_ACCEPT:
                 self.new()
                 return
-        if (self.but_cancel
-                and self.screen.current_record
+        if (self.screen.current_record
                 and response_id in cancel_responses):
-            self.screen.group.remove(self.screen.current_record, remove=True)
+            if (self.screen.current_record.id < 0
+                    or self.save_current):
+                self.screen.group.remove(self.screen.current_record,
+                    remove=True)
+            elif self.screen.current_record.modified:
+                self.screen.current_record.cancel()
+                self.screen.current_record.reload()
+                self.screen.current_record.signal('record-changed')
             result = False
         else:
             result = response_id not in cancel_responses
