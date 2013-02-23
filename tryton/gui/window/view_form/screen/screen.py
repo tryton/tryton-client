@@ -661,7 +661,7 @@ class Screen(SignalEvent):
 
     def load(self, ids, set_cursor=True, modified=False):
         self.expanded_nodes.clear()
-        self.group.load(ids, display=False, modified=modified)
+        self.group.load(ids, modified=modified)
         self.current_view.reset()
         if ids:
             self.display(ids[0])

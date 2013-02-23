@@ -211,7 +211,7 @@ class Group(SignalEvent, list):
                 return []
         return list({}.fromkeys(res))
 
-    def load(self, ids, display=True, modified=False):
+    def load(self, ids, modified=False):
         if not ids:
             return True
 
@@ -241,9 +241,6 @@ class Group(SignalEvent, list):
         if self.lock_signal:
             self.lock_signal = False
             self.signal('group-cleared')
-
-        if new_records and display:
-            self.signal('group-changed', new_records[0])
 
         if new_records and modified:
             new_records[0].signal('record-modified')

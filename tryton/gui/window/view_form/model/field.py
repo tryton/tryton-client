@@ -588,7 +588,7 @@ class O2MField(CharField):
                 parent_datetime_field=self.attrs.get('datetime_field'))
         group.fields = fields
         record.value[self.name] = group
-        group.load(value, display=False)
+        group.load(value)
         group.signal_connect(group, 'group-changed', self._group_changed)
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
@@ -764,7 +764,7 @@ class M2MField(O2MField):
             group.record_removed.extend(record.value[self.name].record_removed)
         record.value[self.name] = group
         group.fields = fields
-        group.load(value, display=False)
+        group.load(value)
         group.signal_connect(group, 'group-changed', self._group_changed)
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
