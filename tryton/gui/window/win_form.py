@@ -27,15 +27,12 @@ class WinForm(NoModal):
         self.save_current = save_current
         self.prev_view = self.screen.current_view
         self.screen.screen_container.alternate_view = True
-        switch_new = False
-        if view_type == 'form' and not self.screen.current_record:
-            switch_new = True
         if view_type not in (x.view_type for x in self.screen.views) and \
                 view_type not in self.screen.view_to_load:
             self.screen.add_view_id(None, view_type)
         else:
-            self.screen.switch_view(view_type=view_type, context=context)
-        if new and not switch_new:
+            self.screen.switch_view(view_type=view_type)
+        if new:
             self.screen.new()
         self.win = gtk.Dialog(_('Link'), self.parent,
                 gtk.DIALOG_DESTROY_WITH_PARENT)

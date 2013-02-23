@@ -327,7 +327,7 @@ class Screen(SignalEvent):
     def number_of_views(self):
         return len(self.views) + len(self.view_to_load)
 
-    def switch_view(self, view_type=None, default=True, context=None):
+    def switch_view(self, view_type=None):
         if not self.parent and self.modified():
             return
         self.current_view.set_value()
@@ -353,8 +353,6 @@ class Screen(SignalEvent):
                 elif self.current_view.view_type == view_type:
                     break
         self.screen_container.set(self.current_view.widget)
-        if not self.current_record and self.current_view.view_type == 'form':
-            self.new(default=default)
         self.current_view.cancel()
         self.display()
         self.set_cursor()
