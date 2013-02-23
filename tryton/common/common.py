@@ -1084,6 +1084,14 @@ def process_exception(exception, *args, **kwargs):
                 return False
         elif exception.faultCode == 'NotLogged':
             from tryton.gui.main import Main
+            if kwargs.get('session', rpc._SESSION) != rpc._SESSION:
+                if args:
+                    try:
+                        return rpc_execute(*args)
+                    except TrytonServerError, exception:
+                        return process_exception(exception, *args,
+                            rpc_execute=rpc_execute)
+                return
             if not PLOCK.acquire(False):
                 return False
             hostname = rpc._HOST
@@ -1268,6 +1276,7 @@ class RPCProgress(object):
         return True
 
     def run(self, process_exception_p=True, main_iteration_p=True):
+        session = rpc._SESSION
         thread.start_new_thread(self.start, ())
 
         watch = None
@@ -1290,7 +1299,7 @@ class RPCProgress(object):
                     return RPCProgress('execute',
                         args).run(process_exception_p, main_iteration_p)
                 result = process_exception(self.exception, *self.args,
-                    rpc_execute=rpc_execute)
+                    rpc_execute=rpc_execute, session=session)
                 if result is False:
                     raise RPCException(self.exception)
                 return result
