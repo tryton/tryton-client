@@ -109,13 +109,6 @@ class ViewForm(ParserView):
                         field.get_state_attrs(record)['valid'] = True
                         widget.display(record, field)
 
-    def signal_record_changed(self, *args):
-        for widgets in self.widgets.itervalues():
-            for widget in widgets:
-                if hasattr(widget, 'screen'):
-                    for view in widget.screen.views:
-                        view.signal_record_changed(*args)
-
     def display(self):
         record = self.screen.current_record
         if record:
