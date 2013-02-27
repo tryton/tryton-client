@@ -71,24 +71,6 @@ class Notebook(StateMixin, gtk.Notebook):
                     widget.color_set('readonly')
 
 
-class ScrolledWindow(gtk.ScrolledWindow):
-
-    def __init__(self, hadjustment=None, vadjustment=None, attrs=None):
-        super(ScrolledWindow, self).__init__(hadjustment=hadjustment,
-                vadjustment=vadjustment)
-        self.attrs = attrs or {}
-
-    def state_set(self, record):
-        if record:
-            state_changes = record.expr_eval(self.attrs.get('states', {}))
-        else:
-            state_changes = {}
-        if state_changes.get('invisible', self.attrs.get('invisible')):
-            self.hide()
-        else:
-            self.show()
-
-
 class Alignment(gtk.Alignment):
 
     def __init__(self, widget, attrs):
