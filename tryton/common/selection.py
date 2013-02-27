@@ -47,22 +47,25 @@ class SelectionMixin(object):
             self.init_selection(tuple(key))
         else:
             domain = field.domain_get(record)
-            if str(domain) in self._domain_cache:
-                self.selection = self._domain_cache[str(domain)]
-                self._last_domain = domain
-            if domain == self._last_domain:
+            context = record[self.field_name].context_get(record)
+            domain_cache_key = str(domain) + str(context)
+            if domain_cache_key in self._domain_cache:
+                self.selection = self._domain_cache[domain_cache_key]
+                self._last_domain = (domain, context)
+            if (domain, context) == self._last_domain:
                 return
 
             try:
                 result = RPCExecute('model', self.attrs['relation'],
-                    'search_read', domain, 0, None, None, ['rec_name'])
+                    'search_read', domain, 0, None, None, ['rec_name'],
+                    context=context)
             except RPCException:
                 result = False
             if isinstance(result, list):
                 selection = [(x['id'], x['rec_name']) for x in result]
                 selection.append((None, ''))
-                self._last_domain = domain
-                self._domain_cache[str(domain)] = selection
+                self._last_domain = (domain, context)
+                self._domain_cache[domain_cache_key] = selection
             else:
                 selection = []
                 self._last_domain = None
