@@ -9,6 +9,7 @@ from tryton.config import TRYTON_ICON
 import tryton.common as common
 from tryton.common import RPCExecute, RPCException
 from tryton.gui.window.nomodal import NoModal
+import tryton.rpc as rpc
 
 _ = gettext.gettext
 
@@ -64,6 +65,7 @@ class Preference(NoModal):
             self.win = None
             return
         self.screen.current_record.set(preferences)
+        self.screen.current_record.id = rpc._USER
         self.screen.current_record.validate(softvalidation=True)
         self.screen.display(set_cursor=True)
 
