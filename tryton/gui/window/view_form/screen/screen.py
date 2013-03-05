@@ -430,16 +430,9 @@ class Screen(SignalEvent):
                                 'editable')
                             and self.current_view.widget_tree.editable))
                     or self.current_view.view_type == 'graph')):
-            prev_current_record = self.current_record
-            for i in xrange(len(self.views)):
-                self.switch_view()
-                if self.current_view.view_type == 'form':
-                    break
+            self.switch_view('form')
             if self.current_view.view_type != 'form':
                 return None
-            if not prev_current_record and self.current_record:
-                # new already called in switch_view
-                return self.current_record
         if self.current_record:
             group = self.current_record.group
         else:
