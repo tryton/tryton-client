@@ -10,7 +10,6 @@ class Float(Integer):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Float, self).__init__(field_name, model_name, attrs=attrs)
-        self._default_value = ''
         self.entry.connect('key-press-event', self.key_press_event)
 
     def set_value(self, record, field):

@@ -9,7 +9,6 @@ class Integer(Char):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Integer, self).__init__(field_name, model_name, attrs=attrs)
-        self._default_value = ''
         self.entry.set_width_chars(8)
         _, _, padding, pack_type = self.widget.query_child_packing(
             self.entry)

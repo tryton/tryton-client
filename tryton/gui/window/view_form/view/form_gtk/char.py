@@ -15,7 +15,6 @@ class Char(WidgetInterface, TranslateMixin):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Char, self).__init__(field_name, model_name, attrs=attrs)
-        self._default_value = ''
 
         self.widget = gtk.HBox()
         self.autocomplete = bool(attrs.get('autocomplete'))
@@ -80,13 +79,13 @@ class Char(WidgetInterface, TranslateMixin):
     def modified(self):
         if self.record and self.field:
             entry = self.entry.get_child() if self.autocomplete else self.entry
-            value = entry.get_text() or self._default_value
+            value = entry.get_text() or ''
             return self.field.get_client(self.record) != value
         return False
 
     def set_value(self, record, field):
         entry = self.entry.get_child() if self.autocomplete else self.entry
-        value = entry.get_text() or self._default_value
+        value = entry.get_text() or ''
         return field.set_client(record, value)
 
     def display(self, record, field):
