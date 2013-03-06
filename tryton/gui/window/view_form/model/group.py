@@ -170,8 +170,8 @@ class Group(SignalEvent, list):
             self.delete(self.record_deleted)
         return saved
 
-    def delete(self, records, context=None):
-        return Record.delete(records, context=context)
+    def delete(self, records):
+        return Record.delete(records)
 
     @property
     def root_group(self):

@@ -299,7 +299,7 @@ class Record(SignalEvent):
         return self.id
 
     @staticmethod
-    def delete(records, context=None):
+    def delete(records):
         if not records:
             return
         record = records[0]
@@ -308,7 +308,6 @@ class Record(SignalEvent):
         assert all(r.group.root_group == root_group for r in records)
         records = [r for r in records if r.id >= 0]
         ctx = {}
-        ctx.update(context or {})
         ctx['_timestamp'] = {}
         for rec in records:
             ctx['_timestamp'].update(rec.get_timestamp())
