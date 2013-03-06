@@ -26,7 +26,6 @@ class TextBox(WidgetInterface, TranslateMixin):
         self.textview.set_wrap_mode(gtk.WRAP_WORD)
         #TODO better tab solution
         self.textview.set_accepts_tab(False)
-        self.textview.connect('focus-in-event', lambda x, y: self._focus_in())
         self.textview.connect('focus-out-event',
             lambda x, y: self._focus_out())
         self.textview.connect('key-press-event', self.send_modified)

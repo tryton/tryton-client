@@ -30,7 +30,6 @@ class Many2One(WidgetInterface):
         self.wid_text.connect('key-press-event', self.send_modified)
         self.wid_text.connect('key_press_event', self.sig_key_press)
         self.wid_text.connect('populate-popup', self._populate_popup)
-        self.wid_text.connect('focus-in-event', lambda x, y: self._focus_in())
         self.wid_text.connect('focus-out-event',
             lambda x, y: self._focus_out())
         self.wid_text.connect_after('changed', self.sig_changed)

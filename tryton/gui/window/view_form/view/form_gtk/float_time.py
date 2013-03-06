@@ -17,7 +17,6 @@ class FloatTime(WidgetInterface):
         self.entry.set_property('activates_default', True)
 
         self.entry.connect('activate', self.sig_activate)
-        self.entry.connect('focus-in-event', lambda x, y: self._focus_in())
         self.entry.connect('focus-out-event', lambda x, y: self._focus_out())
         self.entry.connect('key-press-event', self.send_modified)
         self.widget.pack_start(self.entry)

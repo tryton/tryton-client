@@ -130,9 +130,6 @@ class WidgetInterface(object):
             self.visible = True
             widget.show()
 
-    def _focus_in(self):
-        pass
-
     def _focus_out(self):
         if not self.field:
             return False
