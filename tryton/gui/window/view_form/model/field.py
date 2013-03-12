@@ -569,43 +569,13 @@ class O2MField(CharField):
                     record2.get_on_change_value())
         return result
 
-    def set(self, record, value):
-        from group import Group
-        group = record.value.get(self.name)
-        fields = {}
-        if group is not None:
-            fields = group.fields.copy()
-            # Unconnect to prevent infinite loop
-            group.signal_unconnect(group)
-            group.destroy()
-        elif record.model_name == self.attrs['relation']:
-            fields = record.group.fields
-        parent_name = self.attrs.get('relation_field', '')
-        group = Group(self.attrs['relation'], {},
-                parent=record, parent_name=parent_name,
-                child_name=self.name,
-                context=self.context,
-                parent_datetime_field=self.attrs.get('datetime_field'))
-        group.fields = fields
-        record.value[self.name] = group
-        group.load(value)
-        group.signal_connect(group, 'group-changed', self._group_changed)
-        group.signal_connect(group, 'group-list-changed',
-            self._group_list_changed)
-        group.signal_connect(group, 'group-cleared', self._group_cleared)
-        group.signal_connect(group, 'record-modified', self._record_modified)
-
-    def set_client(self, record, value, force_change=False):
-        pass
-
-    def set_default(self, record, value):
+    def _set_value(self, record, value, default=False):
         from group import Group
 
-        # value is a list of id
-        if value and len(value) and isinstance(value[0], (int, long)):
-            self.set(record, value)
-            record.modified_fields.setdefault(self.name)
-            return
+        if not value or (len(value) and isinstance(value[0], (int, long))):
+            mode = 'list ids'
+        else:
+            mode = 'list values'
 
         group = record.value.get(self.name)
         fields = {}
@@ -619,7 +589,7 @@ class O2MField(CharField):
         if fields:
             fields = dict((fname, field.attrs)
                 for fname, field in fields.iteritems())
-        if value and len(value):
+        if mode == 'list values' and len(value):
             context = self.context_get(record)
             field_names = set(f for v in value for f in v if f not in fields)
             if field_names:
@@ -628,34 +598,53 @@ class O2MField(CharField):
                             'fields_get', list(field_names),
                             main_iteration=False, context=context))
                 except RPCException:
-                    return False
+                    return
 
         parent_name = self.attrs.get('relation_field', '')
         group = Group(self.attrs['relation'], fields,
-                parent=record, parent_name=parent_name, child_name=self.name,
-                context=self.context,
-                parent_datetime_field=self.attrs.get('datetime_field'))
-        if record.value.get(self.name):
-            group.record_deleted.extend(x for x in record.value[self.name]
-                if x.id >= 0)
-            group.record_deleted.extend(record.value[self.name].record_deleted)
-            group.record_removed.extend(record.value[self.name].record_removed)
+            parent=record, parent_name=parent_name,
+            child_name=self.name,
+            context=self.context,
+            parent_datetime_field=self.attrs.get('datetime_field'))
         record.value[self.name] = group
-        for vals in (value or []):
-            new_record = record.value[self.name].new(default=False)
-            new_record.set_default(vals)
-            group.add(new_record)
+        if mode == 'list ids':
+            group.load(value)
+        else:
+            for vals in value:
+                new_record = record.value[self.name].new(default=False)
+                if default:
+                    new_record.set_default(vals)
+                    group.add(new_record)
+                else:
+                    new_record.id *= -1  # Don't consider record as unsaved
+                    new_record.set(vals)
+                    group.append(new_record)
         group.signal_connect(group, 'group-changed', self._group_changed)
         group.signal_connect(group, 'group-list-changed',
             self._group_list_changed)
         group.signal_connect(group, 'group-cleared', self._group_cleared)
         group.signal_connect(group, 'record-modified', self._record_modified)
-        return True
+        return group
+
+    def set(self, record, value):
+        self._set_value(record, value, default=False)
+
+    def set_client(self, record, value, force_change=False):
+        pass
+
+    def set_default(self, record, value):
+        previous_group = record.value.get(self.name)
+        group = self._set_value(record, value, default=True)
+        if previous_group:
+            group.record_deleted.extend(x for x in previous_group if x.id >= 0)
+            group.record_deleted.extend(previous_group.record_deleted)
+            group.record_removed.extend(previous_group.record_removed)
+        record.modified_fields.setdefault(self.name)
 
     def set_on_change(self, record, value):
         self._set_default_value(record)
         if isinstance(value, (list, tuple)):
-            self.set(record, value)
+            self._set_value(record, value)
             record.modified_fields.setdefault(self.name)
             record.signal('record-modified')
             return True
