@@ -134,6 +134,8 @@ class TextBox(WidgetInterface, TranslateMixin):
         field.set_client(record, self.get_value())
 
     def set_buffer(self, value):
+        if value == self.get_value():
+            return
         buf = self.textview.get_buffer()
         buf.delete(buf.get_start_iter(), buf.get_end_iter())
         iter_start = buf.get_start_iter()
