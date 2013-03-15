@@ -321,48 +321,58 @@ class Main(object):
 
         global_search_completion.connect('match-selected', match_selected)
 
-        def changed(widget):
-            def update(search_text):
-                if search_text != widget.get_text().decode('utf-8'):
-                    return False
-                gmodel = global_search_completion.get_model()
-                if not search_text or not gmodel:
-                    gmodel.clear()
-                    gmodel.search_text = search_text
-                    return False
-                if getattr(gmodel, 'search_text', None) == search_text:
-                    return False
-                try:
-                    result = RPCExecute('model', 'ir.model', 'global_search',
-                        search_text, CONFIG['client.limit'],
-                        self.menu_screen.model_name)
-                except RPCException:
-                    result = []
-                if search_text != widget.get_text().decode('utf-8'):
-                    return False
-                gmodel.clear()
-                for r in result:
-                    _, model, model_name, record_id, record_name, icon = r
-                    if icon:
-                        text = common.to_xml(record_name)
-                        common.ICONFACTORY.register_icon(icon)
-                        pixbuf = widget.render_icon(stock_id=icon,
-                            size=gtk.ICON_SIZE_BUTTON, detail=None)
-                    else:
-                        text = '<b>%s:</b>\n %s' % (
-                            common.to_xml(model_name),
-                            common.to_xml(record_name))
-                        pixbuf = None
-                    gmodel.append([pixbuf, text, model, record_id])
-                gmodel.search_text = search_text
-                # Force display of popup
-                widget.emit('changed')
+        def update(widget, search_text):
+            if search_text != widget.get_text().decode('utf-8'):
                 return False
+            gmodel = global_search_completion.get_model()
+            if not search_text or not gmodel:
+                gmodel.clear()
+                gmodel.search_text = search_text
+                return False
+            if getattr(gmodel, 'search_text', None) == search_text:
+                return False
+            try:
+                result = RPCExecute('model', 'ir.model', 'global_search',
+                    search_text, CONFIG['client.limit'],
+                    self.menu_screen.model_name)
+            except RPCException:
+                result = []
+            if search_text != widget.get_text().decode('utf-8'):
+                return False
+            gmodel.clear()
+            for r in result:
+                _, model, model_name, record_id, record_name, icon = r
+                if icon:
+                    text = common.to_xml(record_name)
+                    common.ICONFACTORY.register_icon(icon)
+                    pixbuf = widget.render_icon(stock_id=icon,
+                        size=gtk.ICON_SIZE_BUTTON, detail=None)
+                else:
+                    text = '<b>%s:</b>\n %s' % (
+                        common.to_xml(model_name),
+                        common.to_xml(record_name))
+                    pixbuf = None
+                gmodel.append([pixbuf, text, model, record_id])
+            gmodel.search_text = search_text
+            # Force display of popup
+            widget.emit('changed')
+            return False
+
+        def changed(widget):
             search_text = widget.get_text().decode('utf-8')
-            gobject.timeout_add(300, update, search_text)
+            gobject.timeout_add(300, update, widget, search_text)
+
+        def activate(widget):
+            search_text = widget.get_text().decode('utf-8')
+            update(widget, search_text)
+            gmodel = global_search_completion.get_model()
+            if not len(gmodel):
+                common.message(_('No result found.'))
+            else:
+                widget.emit('changed')
+
         self.global_search_entry.connect('changed', changed)
-        self.global_search_entry.connect('activate',
-            lambda w: w.emit('changed'))
+        self.global_search_entry.connect('activate', activate)
 
     def show_global_search(self):
         self.pane.get_child1().set_expanded(True)
