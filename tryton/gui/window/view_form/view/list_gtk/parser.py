@@ -156,53 +156,32 @@ class ParserTree(ParserInterface):
 
                 col = gtk.TreeViewColumn(fields[fname].attrs['string'])
 
-                uri_types = ('url', 'email', 'callto', 'sip')
-                if ('icon' in node_attrs
-                        or cell_type in uri_types):
-                    if cell_type in uri_types:
-                        render_pixbuf = CellRendererClickablePixbuf()
-
-                        def clicked(renderer, path, fname, protocol):
-                            store = self.treeview.get_model()
-                            record = store.get_value(store.get_iter(path), 0)
-                            value = record[fname].get(record)
-                            if value:
-                                if protocol == 'email':
-                                    value = 'mailto:%s' % value
-                                elif protocol == 'callto':
-                                    value = 'callto:%s' % value
-                                elif protocol == 'sip':
-                                    value = 'sip:%s' % value
-                                webbrowser.open(value, new=2)
-                        render_pixbuf.connect('clicked', clicked, fname,
-                            cell_type)
+                prefixes = []
+                suffixes = []
+                if cell_type in ('url', 'email', 'callto', 'sip'):
+                    prefixes.append(Affix(fname, self.treeview, node_attrs,
+                            protocol=cell_type))
+                if 'icon' in node_attrs:
+                    prefixes.append(Affix(fname, self.treeview, node_attrs))
+                for affix in node.childNodes:
+                    affix_attrs = node_attributes(affix)
+                    if affix.localName == 'prefix':
+                        list_ = prefixes
                     else:
-                        render_pixbuf = gtk.CellRendererPixbuf()
-                    col.pack_start(render_pixbuf, expand=False)
-                    icon = node_attrs.get('icon', 'tryton-web-browser')
+                        list_ = suffixes
+                    list_.append(Affix(fname, self.treeview, affix_attrs))
 
-                    def setter(column, cell, store, iter, fname):
-                        if (hasattr(self.treeview, 'get_realized')
-                                and not self.treeview.get_realized()):
-                            return
-                        record = store.get_value(iter, 0)
-                        field = record[fname]
-                        field.state_set(record, states=('invisible',))
-                        invisible = field.get_state_attrs(record
-                            ).get('invisible', False)
-                        cell.set_property('visible', not invisible)
-                        if icon in record.group.fields:
-                            value = record[icon].get_client(record) or ''
-                        else:
-                            value = icon
-                        common.ICONFACTORY.register_icon(value)
-                        pixbuf = treeview.render_icon(stock_id=value,
-                                size=gtk.ICON_SIZE_BUTTON, detail=None)
-                        cell.set_property('pixbuf', pixbuf)
-                    col.set_cell_data_func(render_pixbuf, setter, fname)
+                for prefix in prefixes:
+                    col.pack_start(prefix.renderer, expand=False)
+                    col.set_cell_data_func(prefix.renderer, prefix.setter)
 
                 col.pack_start(renderer, expand=True)
+                col.set_cell_data_func(renderer, cell.setter)
                 col.name = fname
+
+                for suffix in suffixes:
+                    col.pack_start(suffix.renderer, expand=False)
+                    col.set_cell_data_func(suffix.renderer, suffix.setter)
 
                 hbox = gtk.HBox(False, 2)
                 label = gtk.Label(fields[fname].attrs['string'])
@@ -221,7 +200,6 @@ class ParserTree(ParserInterface):
                 col.set_widget(hbox)
 
                 col._type = fields[fname].attrs['type']
-                col.set_cell_data_func(renderer, cell.setter)
                 col.set_clickable(True)
                 twidth = {
                     'integer': 60,
@@ -323,6 +301,61 @@ class ParserTree(ParserInterface):
         if len(treeview.get_model()):
             selection.select_path(0)
         return False
+
+
+class Affix(object):
+
+    def __init__(self, field_name, treeview, attrs, protocol=None):
+        super(Affix, self).__init__()
+        self.field_name = attrs.get('name', field_name)
+        self.attrs = attrs
+        self.protocol = protocol
+        self.icon = attrs.get('icon')
+        if protocol:
+            self.renderer = CellRendererClickablePixbuf()
+            self.renderer.connect('clicked', self.clicked)
+            if not self.icon:
+                self.icon = 'tryton-web-browser'
+        elif self.icon:
+            self.renderer = gtk.CellRendererPixbuf()
+        else:
+            self.renderer = gtk.CellRendererText()
+        self.treeview = treeview
+
+    @realized
+    def setter(self, column, cell, store, iter_):
+        record = store.get_value(iter_, 0)
+        field = record[self.field_name]
+        field.state_set(record, states=('invisible',))
+        invisible = field.get_state_attrs(record).get('invisible', False)
+        cell.set_property('visible', not invisible)
+        if self.icon:
+            if self.icon in record.group.fields:
+                value = record[self.icon].get_client(record) or ''
+            else:
+                value = self.icon
+            common.ICONFACTORY.register_icon(value)
+            pixbuf = self.treeview.render_icon(stock_id=value,
+                size=gtk.ICON_SIZE_BUTTON, detail=None)
+            cell.set_property('pixbuf', pixbuf)
+        else:
+            text = self.attrs.get('string', '')
+            if not text:
+                text = field.get_client(record) or ''
+            cell.set_property('text', text)
+
+    def clicked(self, renderer, path):
+        store = self.treeview.get_model()
+        record = store.get_value(store.get_iter(path), 0)
+        value = record[self.field_name].get(record)
+        if value:
+            if self.protocol == 'email':
+                value = 'mailto:%s' % value
+            elif self.protocol == 'callto':
+                value = 'callto:%s' % value
+            elif self.protocol == 'sip':
+                value = 'sip:%s' % value
+            webbrowser.open(value, new=2)
 
 
 class Char(object):

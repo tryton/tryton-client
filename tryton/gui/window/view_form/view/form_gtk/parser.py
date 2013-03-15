@@ -29,7 +29,12 @@ class StateMixin(object):
 
 
 class Label(StateMixin, gtk.Label):
-    pass
+
+    def state_set(self, record):
+        super(Label, self).state_set(record)
+        if not self.attrs.get('string', True) and 'name' in self.attrs:
+            field = record.group.fields[self.attrs['name']]
+            self.set_text(field.get_client(record) or '')
 
 
 class VBox(StateMixin, gtk.VBox):
@@ -238,7 +243,7 @@ class ParserForm(ParserInterface):
                                 and attr_name in fields[attrs['name']].attrs:
                             attrs[attr_name] = fields[attrs['name']
                                     ].attrs[attr_name]
-                    if not text:
+                    if 'string' not in attrs:
                         if gtk.widget_get_default_direction() == \
                                 gtk.TEXT_DIR_RTL:
                             text = _(':') + \
@@ -254,9 +259,6 @@ class ParserForm(ParserInterface):
                             text += node.data
                         else:
                             text += node.toxml()
-                if not text:
-                    container.empty_add(int(attrs.get('colspan', 1)))
-                    continue
                 label = Label(text, attrs=attrs)
                 state_widgets.append(label)
                 if CONFIG['client.modepda']:

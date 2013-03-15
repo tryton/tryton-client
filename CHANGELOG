@@ -1,3 +1,5 @@
+* Manage dynamic label
+* Manage prefix, suffix on tree view
 * Manage selection_change_with on Selection and Reference fields
 * Add Dict fields on form
 * Remove Goto
