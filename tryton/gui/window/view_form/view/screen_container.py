@@ -80,6 +80,7 @@ class ScreenContainer(object):
         self.alternate_view = False
         self.search_window = None
         self.search_table = None
+        self.last_search_text = ''
         self.tab_domain = tab_domain or []
 
         tooltips = common.Tooltips()
@@ -411,6 +412,7 @@ class ScreenContainer(object):
                 if value:
                     text += label + ' ' + value + ' '
             self.set_text(text)
+            self.last_search_text = self.get_text()
             self.do_search()
 
         def date_activate(entry):
@@ -533,6 +535,21 @@ class ScreenContainer(object):
             if page and self.search_window not in page.dialogs:
                 page.dialogs.append(self.search_window)
             self.search_window.show()
+
+            if self.last_search_text.strip() != self.get_text().strip():
+                for label, entry in self.search_table.fields:
+                    if isinstance(entry, gtk.ComboBox):
+                        entry.set_active(-1)
+                    elif isinstance(entry, Dates):
+                        entry.from_.set_text('')
+                        entry.to.set_text('')
+                    elif isinstance(entry, Selection):
+                        entry.treeview.get_selection().unselect_all()
+                    else:
+                        entry.set_text('')
+                if self.search_table.fields:
+                    self.search_table.fields[0][1].grab_focus()
+
         else:
             self.search_window.hide()
             if page and self.search_window in page.dialogs:
