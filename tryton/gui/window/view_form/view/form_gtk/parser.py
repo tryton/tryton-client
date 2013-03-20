@@ -33,8 +33,12 @@ class Label(StateMixin, gtk.Label):
     def state_set(self, record):
         super(Label, self).state_set(record)
         if not self.attrs.get('string', True) and 'name' in self.attrs:
-            field = record.group.fields[self.attrs['name']]
-            self.set_text(field.get_client(record) or '')
+            if record:
+                field = record.group.fields[self.attrs['name']]
+                text = field.get_client(record) or ''
+            else:
+                text = ''
+            self.set_text(text)
 
 
 class VBox(StateMixin, gtk.VBox):
