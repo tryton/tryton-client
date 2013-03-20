@@ -61,6 +61,7 @@ class Screen(SignalEvent):
         else:
             self.row_activate = row_activate
         self.domain = domain
+        self.size_limit = None
         self.views_preload = views_preload
         self.model_name = model_name
         self.context = context

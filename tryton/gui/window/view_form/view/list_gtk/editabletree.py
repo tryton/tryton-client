@@ -86,9 +86,10 @@ class EditableTreeView(TreeView):
 
     def on_create_line(self):
         access = MODELACCESS[self.screen.model_name]
-        if not access['create']:
-            return
         model = self.get_model()
+        if not access['create'] or (self.screen.size_limit is not None
+                and (len(model) >= self.screen.size_limit >= 0)):
+            return
         if self.editable == 'top':
             method = model.prepend
         else:
