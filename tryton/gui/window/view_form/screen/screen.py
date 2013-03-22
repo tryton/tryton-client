@@ -88,8 +88,8 @@ class Screen(SignalEvent):
         self.domain_parser = None
         self.pre_validate = False
         self.view_to_load = mode[:]
-        self.load_view_to_load()
-        self.display()
+        if view_ids or mode:
+            self.switch_view()
 
     def __repr__(self):
         return '<Screen %s at %s>' % (self.model_name, id(self))
@@ -329,18 +329,19 @@ class Screen(SignalEvent):
         return len(self.views) + len(self.view_to_load)
 
     def switch_view(self, view_type=None):
-        if not self.parent and self.modified():
-            return
-        self.current_view.set_value()
-        if (self.current_record and
-                self.current_record not in self.current_record.group):
-            self.current_record = None
-        fields = self.current_view.get_fields()
-        if self.current_record and not self.current_record.validate(fields):
-            self.screen_container.set(self.current_view.widget)
-            self.set_cursor()
-            self.current_view.display()
-            return
+        if self.current_view:
+            if not self.parent and self.modified():
+                return
+            self.current_view.set_value()
+            if (self.current_record and
+                    self.current_record not in self.current_record.group):
+                self.current_record = None
+            fields = self.current_view.get_fields()
+            if self.current_record and not self.current_record.validate(fields):
+                self.screen_container.set(self.current_view.widget)
+                self.set_cursor()
+                self.current_view.display()
+                return
         if not view_type or self.current_view.view_type != view_type:
             for i in xrange(self.number_of_views):
                 if len(self.view_to_load):
@@ -413,9 +414,6 @@ class Screen(SignalEvent):
                 children_field=children_field)
 
         self.views.append(view)
-
-        self.__current_view = len(self.views) - 1
-        self.screen_container.set(self.current_view.widget)
         return view
 
     def editable_get(self):

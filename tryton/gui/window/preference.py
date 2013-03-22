@@ -55,6 +55,7 @@ class Preference(NoModal):
         self.screen.group.readonly = False
         self.screen.group.skip_model_access = True
         self.screen.add_view(view)
+        self.screen.switch_view()
         self.screen.new(default=False)
 
         try:

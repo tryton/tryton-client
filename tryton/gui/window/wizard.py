@@ -167,6 +167,7 @@ class Wizard(object):
 
         self.screen = Screen(view['model'], mode=[], context=self.context)
         self.screen.add_view(view)
+        self.screen.switch_view()
         self.screen.widget.show()
         self.screen.signal_connect(self, 'record-modified',
             self._record_modified)
