@@ -47,6 +47,9 @@ class Calendar(WidgetInterface):
         field.set_client(record, self.entry.get_text())
         return True
 
+    def get_value(self):
+        return self.entry.date_get()
+
     def get_format(self, record, field):
         return date_format()
 

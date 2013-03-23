@@ -45,6 +45,9 @@ class FloatTime(WidgetInterface):
         return field.set_client(record,
             common.text_to_float_time(value, self.conv, digits[1]))
 
+    def get_value(self):
+        return self.entry.get_text()
+
     def display(self, record, field):
         super(FloatTime, self).display(record, field)
         if not field:

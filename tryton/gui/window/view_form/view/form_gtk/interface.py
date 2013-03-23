@@ -66,10 +66,10 @@ class WidgetInterface(object):
         return False
 
     def send_modified(self, *args):
-        def send():
-            if self.record:
+        def send(value):
+            if self.record and self.get_value() == value:
                 self.record.signal('record-modified')
-        gobject.idle_add(send)
+        gobject.timeout_add(300, send, self.get_value())
         return False
 
     def color_set(self, name):

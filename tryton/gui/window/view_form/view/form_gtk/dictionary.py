@@ -399,11 +399,11 @@ class DictWidget(WidgetInterface):
             self.set_value(self.record, self.field)
 
     def set_value(self, record, field):
-        value = {}
-        for key, widget in self.fields.items():
-            wid_value = widget.get_value()
-            value[key] = wid_value
-        field.set_client(record, value)
+        field.set_client(record, self.get_value())
+
+    def get_value(self):
+        return dict((key, widget.get_value())
+            for key, widget in self.fields.items())
 
     @property
     def modified(self):

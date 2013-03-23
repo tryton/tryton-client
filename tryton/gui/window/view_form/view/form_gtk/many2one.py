@@ -317,6 +317,9 @@ class Many2One(WidgetInterface):
             gobject.idle_add(clean)
         return False
 
+    def get_value(self):
+        return self.wid_text.get_text()
+
     def set_value(self, record, field):
         if field.get_client(record) != self.wid_text.get_text():
             field.set_client(record, self.value_from_id(None, ''))

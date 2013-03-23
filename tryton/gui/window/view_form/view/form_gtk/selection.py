@@ -84,7 +84,7 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
     def _color_widget(self):
         return self.entry.child
 
-    def value_get(self):
+    def get_value(self):
         text = self.entry.child.get_text()
         value = None
         if text:
@@ -107,16 +107,16 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
     def sig_activate(self, widget, event=None):
         if not self.field:
             return
-        self.field.set_client(self.record, self.value_get())
+        self.field.set_client(self.record, self.get_value())
 
     @property
     def modified(self):
         if self.record and self.field:
-            return self.field.get(self.record) != self.value_get()
+            return self.field.get(self.record) != self.get_value()
         return False
 
     def set_value(self, record, field):
-        field.set_client(record, self.value_get())
+        field.set_client(record, self.get_value())
 
     def _menu_sig_default_set(self, reset=False):
         self.set_value(self.record, self.field)
