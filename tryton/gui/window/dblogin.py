@@ -401,8 +401,7 @@ class DBLogin(object):
         self.dialog.vbox.pack_start(alignment, True, True, 0)
 
         image = gtk.Image()
-        image.set_from_file(os.path.join(PIXMAPS_DIR,
-            'tryton.png').decode('utf-8'))
+        image.set_from_file(os.path.join(PIXMAPS_DIR, 'tryton.png'))
         image.set_alignment(0.5, 1)
         ebox = gtk.EventBox()
         ebox.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#1b2019"))
