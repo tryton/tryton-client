@@ -481,7 +481,7 @@ class ViewList(ParserView):
                 cell = self.widget_tree.cells[col.name]
                 if cell.get_textual_value(record) != value:
                     cell.value_from_text(record, value)
-                    if cell.get_textual_value(record) != value:
+                    if value and not cell.get_textual_value(record):
                         # Stop setting value if a value is correctly set
                         idx = len(group)
                         break
