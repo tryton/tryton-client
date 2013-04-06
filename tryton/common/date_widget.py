@@ -213,14 +213,15 @@ class DateEntry(gtk.Entry):
             return False
         return True
 
-    def date_get(self):
+    def date_get(self, set_text=True):
         res = None
         date = self.compute_date(self.get_text())
         try:
             res = datetime.datetime(*time.strptime(date, self.format)[:6])
         except ValueError:
             return None
-        self.set_text(date)
+        if set_text:
+            self.set_text(date)
         return res
 
     def delete_text(self, start, end):
