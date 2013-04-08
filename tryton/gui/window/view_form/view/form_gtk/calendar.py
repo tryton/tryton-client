@@ -29,6 +29,10 @@ class Calendar(WidgetInterface):
 
     def _readonly_set(self, value):
         self.entry.set_editable(not value)
+        if value:
+            self.widget.set_focus_chain([])
+        else:
+            self.widget.set_focus_chain([self.entry])
 
     @property
     def modified(self):
