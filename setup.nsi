@@ -65,6 +65,8 @@ Var STARTMENU_FOLDER
 !include "german.nsh"
 !insertmacro MUI_LANGUAGE "Spanish"
 !include "spanish.nsh"
+!insertmacro MUI_LANGUAGE "Russian"
+!include "russian.nsh"
 
 ;Reserve Files
 
