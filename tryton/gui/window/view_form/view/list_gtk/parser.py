@@ -298,7 +298,7 @@ class ParserTree(ParserInterface):
 
     def set_selection(self, treeview, direction):
         selection = treeview.get_selection()
-        if len(treeview.get_model()):
+        if len(treeview.get_model()) and not selection.count_selected_rows():
             selection.select_path(0)
         return False
 
