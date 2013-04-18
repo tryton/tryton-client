@@ -87,10 +87,10 @@ def group_operator(tokens):
             yield cur + nex
             cur = None
         else:
-            if cur:
+            if cur is not None:
                 yield cur
             cur = nex
-    if cur:
+    if cur is not None:
         yield cur
 
 
@@ -440,7 +440,8 @@ def format_value(field, value):
         }
     if isinstance(value, (list, tuple)):
         return ';'.join(format_value(field, x) for x in value)
-    return quote(converts.get(field['type'], lambda: value)())
+    return quote(converts.get(field['type'],
+            lambda: value if value is not None else '')())
 
 
 def test_format_boolean():
@@ -569,15 +570,15 @@ def complete_value(field, value):
             yield True
 
     def complete_selection():
-        test_value = value
+        test_value = value if value is not None else ''
         if isinstance(value, list):
             test_value = value[-1]
         for svalue, test in field['selection']:
             if test.lower().startswith(test_value.lower()):
-                if test_value == value:
-                    yield svalue
-                else:
+                if isinstance(value, list):
                     yield value[:-1] + [svalue]
+                else:
+                    yield svalue
 
     def complete_datetime():
         yield datetime.date.today()
@@ -612,6 +613,7 @@ def test_complete_selection():
             ('m', ['male']),
             ('test', []),
             ('', ['male', 'female']),
+            (None, ['male', 'female']),
             (['male', 'f'], [['male', 'female']]),
             ):
         assert list(complete_value(field, value)) == result
@@ -780,8 +782,13 @@ class DomainParser(object):
                         operator = '!'
                     else:
                         operator = ''
+                formatted_value = format_value(field, value)
+                if (operator in OPERATORS and
+                        field['type'] in ('char', 'text', 'sha', 'selection')
+                        and value == ''):
+                    formatted_value = '""'
                 return '%s: %s%s' % (quote(field['string']), operator,
-                    format_value(field, value))
+                    formatted_value)
             else:
                 return '(%s)' % self.string(clause)
 
@@ -916,7 +923,7 @@ class DomainParser(object):
                         if lvalue:
                             yield name + (lvalue,)
                         else:
-                            yield name + ('',)
+                            yield name + (None,)
                     break
 
         parts = []
@@ -959,7 +966,7 @@ class DomainParser(object):
                         value = likify(value)
                     if field['type'] in ('integer', 'float', 'numeric',
                             'datetime', 'date', 'time'):
-                        if '..' in value:
+                        if value and '..' in value:
                             lvalue, rvalue = value.split('..', 1)
                             lvalue = convert_value(field, lvalue)
                             rvalue = convert_value(field, rvalue)
@@ -991,6 +998,9 @@ def test_string():
                 },
             })
     assert dom.string([('name', '=', 'Doe')]) == 'Name: =Doe'
+    assert dom.string([('name', '=', None)]) == 'Name: ='
+    assert dom.string([('name', '=', '')]) == 'Name: =""'
+    assert dom.string([('name', 'ilike', '%')]) == 'Name: '
     assert dom.string([('name', 'ilike', '%Doe%')]) == 'Name: Doe'
     assert dom.string([('name', 'ilike', 'Doe')]) == 'Name: =Doe'
     assert dom.string([('name', 'ilike', 'Doe%')]) == 'Name: Doe%'
@@ -1088,7 +1098,20 @@ def test_group():
         ('Name', None, 'Doe'),
         ]
     assert rlist(dom.group(udlex(u'Name:'))) == [
-        ('Name', None, ''),
+        ('Name', None, None),
+        ]
+    assert rlist(dom.group(udlex(u'Name: ='))) == [
+        ('Name', '=', None),
+        ]
+    assert rlist(dom.group(udlex(u'Name: =""'))) == [
+        ('Name', '=', ''),
+        ]
+    assert rlist(dom.group(udlex(u'Name: = ""'))) == [
+        ('Name', '=', ''),
+        ]
+    assert rlist(dom.group(udlex(u'Name: = Name: Doe'))) == [
+        ('Name', '=', None),
+        ('Name', None, 'Doe'),
         ]
 
 
@@ -1116,6 +1139,12 @@ def test_parse_clause():
             })
     assert rlist(dom.parse_clause([('John',)])) == [
         ('rec_name', 'ilike', '%John%')]
+    assert rlist(dom.parse_clause([('Name', None, None)])) == [
+        ('name', 'ilike', '%')]
+    assert rlist(dom.parse_clause([('Name', '=', None)])) == [
+        ('name', '=', None)]
+    assert rlist(dom.parse_clause([('Name', '=', '')])) == [
+        ('name', '=', '')]
     assert rlist(dom.parse_clause([('Name', None, 'Doe')])) == [
         ('name', 'ilike', '%Doe%')]
     assert rlist(dom.parse_clause([('Name', '!', 'Doe')])) == [
@@ -1130,6 +1159,9 @@ def test_parse_clause():
         == [
             ('selection', 'in', ['male', 'female'])
             ]
+    assert rlist(dom.parse_clause([('Integer', None, None)])) == [
+        ('integer', '=', None),
+        ]
     assert rlist(dom.parse_clause([('Integer', None, '3..5')])) == [[
             ('integer', '>=', 3),
             ('integer', '<', 5),
