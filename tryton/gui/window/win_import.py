@@ -248,8 +248,8 @@ class WinImport(NoModal):
         if not fname:
             common.message(_('You must select an import file first!'))
             return True
-        csvsep = self.import_csv_sep.get_text()
-        csvdel = self.import_csv_del.get_text()
+        csvsep = self.import_csv_sep.get_text() or None
+        csvdel = self.import_csv_del.get_text() or None
         csvcode = self.import_csv_enc.get_active_text() or 'UTF-8'
 
         self.import_csv_skip.set_value(1)
