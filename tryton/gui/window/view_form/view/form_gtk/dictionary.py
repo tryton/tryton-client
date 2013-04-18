@@ -45,7 +45,7 @@ class DictEntry(object):
         return self.widget.get_text()
 
     def set_value(self, value):
-        return self.widget.set_text(value)
+        return self.widget.set_text(value or '')
 
     def set_readonly(self, readonly):
         self.widget.set_editable(not readonly)
