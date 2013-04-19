@@ -111,7 +111,16 @@ class DictSelectionEntry(DictEntry):
 
     def get_value(self):
         text = self.widget.child.get_text()
-        return self._selection[text]
+        value = None
+        if text:
+            for txt, val in self._selection.items():
+                if not val:
+                    continue
+                if txt[:len(text)].lower() == text.lower():
+                    value = val
+                    if len(txt) == len(text):
+                        break
+        return value
 
     def set_value(self, value):
         values = dict(self.definition['selection'])
