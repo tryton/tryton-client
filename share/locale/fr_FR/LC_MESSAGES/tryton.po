@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 0.0.1\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2013-04-19 23:47+0200\n"
+"POT-Creation-Date: 2013-04-12 19:02+0200\n"
 "PO-Revision-Date: 2013-04-19 23:58+0200\n"
 "Last-Translator: Bertrand Chenal <bch@b2ck.com>\n"
 "Language-Team: fr_FR\n"
@@ -345,7 +345,7 @@ msgstr "_Aide"
 
 #: tryton/gui/main.py:291 tryton/gui/window/win_search.py:26
 #: tryton/gui/window/view_form/view/screen_container.py:100
-#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:329
+#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:320
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:40
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:45
 msgid "Search"
@@ -1727,12 +1727,12 @@ msgstr "Sélectionner un fichier ..."
 msgid "Show plain text"
 msgstr "Montrer en text clair"
 
-#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:345
+#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:336
 msgid "Add value"
 msgstr "Ajouter une valeur"
 
-#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:455
-#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:457
+#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:446
+#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:448
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:195
 #: tryton/gui/window/view_form/view/form_gtk/interface.py:197
 #: tryton/gui/window/view_form/view/form_gtk/parser.py:253
@@ -1740,8 +1740,8 @@ msgstr "Ajouter une valeur"
 msgid ":"
 msgstr " :"
 
-#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:467
-#, python-format, fuzzy
+#: tryton/gui/window/view_form/view/form_gtk/dictionary.py:458
+#, fuzzy, python-format
 msgid "Remove \"%s\""
 msgstr "Supprimer \"%s\""
 
@@ -1895,34 +1895,4 @@ msgstr "Inconnu"
 #: tryton/plugins/translation/__init__.py:18
 msgid "Translate view"
 msgstr "Traduire la vue"
-
-#~ msgid "_Plugins"
-#~ msgstr "_Plugins"
-
-#~ msgid "_Shortcuts"
-#~ msgstr "_Raccourcis"
-
-#~ msgid "_Execute a Plugin"
-#~ msgstr "_Exécuter un plugin"
-
-#~ msgid "Add Shortcut"
-#~ msgstr "Ajouter un raccourci"
-
-#~ msgid "Manage Shortcut"
-#~ msgstr "Gestion des raccourcis"
-
-#~ msgid "_Go to Record ID..."
-#~ msgstr "_Aller à l'Enregistrement..."
-
-#~ msgid "Go to ID"
-#~ msgstr "Aller à l'ID"
-
-#~ msgid "Go to ID:"
-#~ msgstr "Aller à l'ID :"
-
-#~ msgid "No available plugin for this resource!"
-#~ msgstr "Pas de plugin disponible pour cette ressource !"
-
-#~ msgid "Choose a Plugin"
-#~ msgstr "Choisissez un plugin"
 
