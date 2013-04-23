@@ -8,10 +8,10 @@
 !endif
 !define CURLANG ${LANG_RUSSIAN}
 
-LangString LicenseText ${CURLANG} "Tryton СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅСЏРµС‚СЃСЏ РїРѕРґ Р»РёС†РµРЅР·РёРµР№ GNU General Public License, РѕРїСѓР±Р»РёРєРѕРІР°РЅРЅРѕР№ Free Software Foundation, РІРµСЂСЃРёРё 3, Р»РёР±Рѕ (РїРѕ РІР°С€РµРјСѓ РІС‹Р±РѕСЂСѓ) Р»СЋР±РѕР№ Р±РѕР»РµРµ РїРѕР·РґРЅРµР№ РІРµСЂСЃРёРё. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРЅРёРјР°С‚РµР»СЊРЅРѕ РїСЂРѕС‡РёС‚Р°Р№С‚Рµ Р»РёС†РµРЅР·РёСЋ. РќР°Р¶РјРёС‚Рµ РєРЅРѕРїРєСѓ Р”Р°Р»РµРµ, С‡С‚РѕР±С‹ РїСЂРѕРґРѕР»Р¶РёС‚СЊ."
-LangString LicenseNext ${CURLANG} "&Р”Р°Р»РµРµ"
-LangString PreviousInstall ${CURLANG} "РџРѕР¶Р°Р»СѓР№СЃС‚Р° СѓРґР°Р»РёС‚Рµ РїСЂРµРґС‹РґСѓС‰СѓСЋ РІРµСЂСЃРёСЋ Tryton"
+LangString LicenseText ${CURLANG} "Tryton распространяется под лицензией GNU General Public License, опубликованной Free Software Foundation, версии 3, либо (по вашему выбору) любой более поздней версии. Пожалуйста, внимательно прочитайте лицензию. Нажмите кнопку Далее, чтобы продолжить."
+LangString LicenseNext ${CURLANG} "&Далее"
+LangString PreviousInstall ${CURLANG} "Пожалуйста удалите предыдущую версию Tryton"
 LangString SecTrytonName ${CURLANG} "Tryton"
-LangString SecTrytonDesc ${CURLANG} "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ tryton.exe Рё РЅРµРѕР±С…РѕРґРёРјС‹Рµ С„Р°Р№Р»С‹"
-LangString SecStartMenuName ${CURLANG} "РЇСЂР»С‹РєРё РІ РјРµРЅСЋ РџСѓСЃРє Рё РЅР° Р Р°Р±РѕС‡РµРј СЃС‚РѕР»Рµ"
-LangString SecStartMenuDesc ${CURLANG} "РЎРѕР·РґР°С‚СЊ СЏСЂР»С‹РєРё РІ РјРµРЅСЋ РџСѓСЃРє Рё РЅР° СЂР°Р±РѕС‡РµРј СЃС‚РѕР»Рµ"
+LangString SecTrytonDesc ${CURLANG} "Установить tryton.exe и необходимые файлы"
+LangString SecStartMenuName ${CURLANG} "Ярлыки в меню Пуск и на Рабочем столе"
+LangString SecStartMenuDesc ${CURLANG} "Создать ярлыки в меню Пуск и на рабочем столе"
