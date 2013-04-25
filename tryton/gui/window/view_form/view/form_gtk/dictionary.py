@@ -83,7 +83,7 @@ class DictSelectionEntry(DictEntry):
         widget.child.connect('focus-out-event',
             lambda w, e: self.parent_widget._focus_out())
         widget.child.connect('activate',
-            lambda w, e: self.parent_widget._focus_out())
+            lambda w: self.parent_widget._focus_out())
         widget.connect('notify::active',
             lambda w, e: self.parent_widget._focus_out())
         widget.child.connect('key_press_event', self.sig_key_press)
