@@ -4,6 +4,8 @@ import gtk
 import gobject
 import pango
 
+from tryton.common.selection import selection_shortcuts
+
 
 class CellRendererCombo(gtk.GenericCellRenderer):
     __gproperties__ = {
@@ -113,6 +115,6 @@ class CellRendererCombo(gtk.GenericCellRenderer):
                 style.text[gtk.STATE_NORMAL])
             editable.modify_text(gtk.STATE_INSENSITIVE,
                 style.text[gtk.STATE_INSENSITIVE])
-        return editable
+        return selection_shortcuts(editable)
 
 gobject.type_register(CellRendererCombo)

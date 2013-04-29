@@ -1,6 +1,7 @@
 #This file is part of Tryton.  The COPYRIGHT file at the top level of
 #this repository contains the full copyright notices and license terms.
 import operator
+import gtk
 
 from tryton.common import RPCExecute, RPCException
 
@@ -70,3 +71,13 @@ class SelectionMixin(object):
                 selection = []
                 self._last_domain = None
             self.selection = selection[:]
+
+
+def selection_shortcuts(entry):
+    def key_press(widget, event):
+        if (event.type == gtk.gdk.KEY_PRESS
+                and event.state & gtk.gdk.CONTROL_MASK
+                and event.keyval == gtk.keysyms.space):
+            widget.popup()
+    entry.connect('key_press_event', key_press)
+    return entry

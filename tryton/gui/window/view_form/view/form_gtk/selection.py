@@ -4,7 +4,7 @@ import gtk
 import gobject
 import math
 from interface import WidgetInterface
-from tryton.common.selection import SelectionMixin
+from tryton.common.selection import SelectionMixin, selection_shortcuts
 
 
 class PopdownMixin(object):
@@ -60,6 +60,7 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
         child.set_max_length(int(attrs.get('size', 0)))
         child.set_width_chars(10)
 
+        selection_shortcuts(self.entry)
         child.connect('key_press_event', self.sig_key_press)
         child.connect('activate', self.sig_activate)
         child.connect_after('focus-out-event', self.sig_activate)
@@ -98,10 +99,6 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
         return value
 
     def sig_key_press(self, widget, event):
-        if event.type == gtk.gdk.KEY_PRESS \
-                and event.state & gtk.gdk.CONTROL_MASK \
-                and event.keyval == gtk.keysyms.space:
-            self.entry.popup()
         self.send_modified()
 
     def sig_activate(self, widget, event=None):

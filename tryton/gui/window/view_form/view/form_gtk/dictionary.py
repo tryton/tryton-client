@@ -16,6 +16,7 @@ from tryton.common import RPCExecute, RPCException, timezoned_date, \
     datetime_strftime, Tooltips
 from tryton.common.date_widget import DateEntry
 from tryton.common.placeholder_entry import PlaceholderEntry
+from tryton.common.selection import selection_shortcuts
 from tryton.translate import date_format
 
 _ = gettext.gettext
@@ -86,7 +87,7 @@ class DictSelectionEntry(DictEntry):
             lambda w: self.parent_widget._focus_out())
         widget.connect('notify::active',
             lambda w, e: self.parent_widget._focus_out())
-        widget.child.connect('key_press_event', self.sig_key_press)
+        selection_shortcuts(widget)
 
         # setting completion and selection
         model = gtk.ListStore(gobject.TYPE_STRING)
@@ -129,12 +130,6 @@ class DictSelectionEntry(DictEntry):
 
     def set_readonly(self, readonly):
         self.widget.set_sensitive(not readonly)
-
-    def sig_key_press(self, widget, event):
-        if (event.type == gtk.gdk.KEY_PRESS
-                and event.state & gtk.gdk.CONTROL_MASK
-                and event.keyval == gtk.keysyms.space):
-            self.widget.popup()
 
 
 class DictIntegerEntry(DictEntry):
