@@ -316,9 +316,9 @@ class WinExport(NoModal):
             new_id, = RPCExecute('model', 'ir.export', 'create', [{
                     'name': name,
                     'resource': self.model,
-                    'export_fields': ('create', [{
-                                'name': x,
-                                } for x in fields]),
+                    'export_fields': [('create', [{
+                                        'name': x,
+                                        } for x in fields])],
                     }])
         except RPCException:
             return
