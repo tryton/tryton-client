@@ -8,6 +8,8 @@ try:
 except ImportError:
     import json
 import collections
+import urllib
+import urlparse
 import xml.dom.minidom
 import gettext
 
@@ -22,6 +24,7 @@ from tryton.common.domain_parser import DomainParser
 from tryton.common import RPCExecute, RPCException, MODELACCESS, \
     node_attributes, sur
 from tryton.action import Action
+import tryton.rpc as rpc
 
 _ = gettext.gettext
 
@@ -384,6 +387,7 @@ class Screen(SignalEvent):
     def add_view(self, view):
         arch = view['arch']
         fields = view['fields']
+        view_id = view['view_id']
 
         xml_dom = xml.dom.minidom.parseString(arch)
         for node in xml_dom.childNodes:
@@ -412,6 +416,7 @@ class Screen(SignalEvent):
         parser = WidgetParse(parent=self.parent)
         view = parser.parse(self, xml_dom, self.group.fields,
                 children_field=children_field)
+        view.view_id = view_id
 
         self.views.append(view)
         return view
@@ -441,7 +446,6 @@ class Screen(SignalEvent):
         self.current_record = record
         self.display()
         self.set_cursor(new=True)
-        self.request_set()
         return self.current_record
 
     def new_model_position(self):
@@ -488,7 +492,6 @@ class Screen(SignalEvent):
             path = path[:-1] + ((path[-1][0], obj_id),)
         self.current_record = self.group.get_by_path(path)
         self.display()
-        self.request_set()
         return obj_id
 
     def __get_current_view(self):
@@ -537,7 +540,6 @@ class Screen(SignalEvent):
         if self.parent:
             self.parent.reload()
         self.display()
-        self.request_set()
 
     def unremove(self):
         records = self.current_view.selected_records()
@@ -593,7 +595,6 @@ class Screen(SignalEvent):
             self.current_record = self.group[0]
         self.set_cursor()
         self.display()
-        self.request_set()
         return True
 
     def set_tree_state(self):
@@ -660,7 +661,6 @@ class Screen(SignalEvent):
             self.display()
         if set_cursor:
             self.set_cursor()
-        self.request_set()
 
     def display(self, res_id=None, set_cursor=False):
         if res_id:
@@ -789,11 +789,6 @@ class Screen(SignalEvent):
         self.current_record.on_change(fieldname, attr)
         self.display()
 
-    def request_set(self):
-        if self.model_name == 'res.request':
-            from tryton.gui.main import Main
-            Main.get_main().request_set()
-
     def button(self, button):
         'Execute button on the current record'
         if button.get('confirm', False) and not sur(button['confirm']):
@@ -814,3 +809,28 @@ class Screen(SignalEvent):
                     'ids': [record.id],
                     }, context=context)
         self.reload([record.id], written=True)
+
+    def get_url(self):
+        query_string = []
+        if self.domain:
+            query_string.append(('domain', json.dumps(self.domain)))
+        if self.context:
+            query_string.append(('context', json.dumps(self.context)))
+        path = [rpc._DATABASE, 'model', self.model_name]
+        view_ids = [v.view_id for v in self.views] + self.view_ids
+        if self.current_view.view_type == 'tree':
+            search_string = self.screen_container.get_text()
+            search_value = self.domain_parser.parse(search_string)
+            if search_value:
+                query_string.append(('search_value', json.dumps(search_value)))
+        elif self.current_record and self.current_record.id > -1:
+            path.append(str(self.current_record.id))
+            i = view_ids.index(self.current_view.view_id)
+            view_ids = view_ids[i:] + view_ids[:i]
+        if view_ids:
+            query_string.append(('views', json.dumps(view_ids)))
+        query_string = urllib.urlencode(query_string)
+        return urlparse.urlunparse(('tryton',
+                '%s:%s' % (rpc._HOST, rpc._PORT),
+                '/'.join(path), query_string, '', ''))
+

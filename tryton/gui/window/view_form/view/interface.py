@@ -30,6 +30,7 @@ class ParserView(object):
         self.notebooks = notebooks
         self.cursor_widget = cursor_widget
         self.children_field = children_field
+        self.view_id = None
 
     def get_fields(self):
         return self.children.keys()

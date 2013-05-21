@@ -121,6 +121,14 @@ class Form(SignalEvent, TabContent):
 
         self.create_tabcontent()
 
+        self.url_entry = url_entry = gtk.Entry()
+        url_entry.show()
+        url_entry.set_editable(False)
+        style = url_entry.get_style()
+        url_entry.modify_bg(gtk.STATE_ACTIVE,
+            style.bg[gtk.STATE_INSENSITIVE])
+        self.widget.pack_start(url_entry, False, False)
+
         access = common.MODELACCESS[self.model]
         for button, access_type in (
                 ('new', 'create'),
@@ -435,6 +443,7 @@ class Form(SignalEvent, TabContent):
         self.status_label.set_text(msg)
         self.message_info('')
         self.activate_save()
+        self.url_entry.set_text(self.screen.get_url())
 
     def _record_modified(self, screen, signal_data):
         # As it is called via idle_add, the form could have been destroyed in

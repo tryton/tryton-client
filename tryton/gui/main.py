@@ -71,7 +71,7 @@ class Main(object):
             self.window.maximize()
         self.window.set_default_size(self._width, self._height)
         self.window.set_resizable(True)
-        self.window.set_title('Tryton')
+        self.set_title()
         self.window.set_icon(TRYTON_ICON)
         self.window.connect("destroy", Main.sig_quit)
         self.window.connect("delete_event", self.sig_close)
@@ -138,7 +138,6 @@ class Main(object):
         self.vbox = gtk.VBox()
         self.window.add(self.vbox)
 
-        self.status_hbox = None
         self.menubar = None
         self.global_search_entry = None
         self.menuitem_user = None
@@ -172,7 +171,6 @@ class Main(object):
 
         self.pane.add2(self.notebook)
 
-        self.set_statusbar()
         self.set_menubar()
 
         self.window.show_all()
@@ -202,13 +200,9 @@ class Main(object):
         except TypeError:
             pass
 
-        self.sig_statusbar_show()
-
         # Register plugins
         tryton.plugins.register()
 
-        # Adding a timer the check to requests
-        gobject.timeout_add(5 * 60 * 1000, self.request_set)
         _MAIN.append(self)
 
     def set_menubar(self):
@@ -378,35 +372,11 @@ class Main(object):
         self.pane.get_child1().set_expanded(True)
         self.global_search_entry.grab_focus()
 
-    def set_statusbar(self):
-        update = True
-        if not self.status_hbox:
-            self.status_hbox = gtk.HBox(spacing=2)
-            update = False
-            self.vbox.pack_end(self.status_hbox, False, True, padding=2)
-
-        if not update:
-            self.sb_username = gtk.Label()
-            self.sb_username.set_alignment(0.0, 0.5)
-            self.status_hbox.pack_start(self.sb_username, True, True,
-                padding=5)
-
-            self.sb_requests = gtk.Label()
-            self.sb_requests.set_alignment(0.5, 0.5)
-            self.status_hbox.pack_start(self.sb_requests, True, True,
-                    padding=5)
-
-            self.sb_servername = gtk.Label()
-            self.sb_servername.set_alignment(1.0, 0.5)
-            self.status_hbox.pack_start(self.sb_servername, True, True,
-                    padding=5)
-
-            self.secure_img = gtk.Image()
-            self.secure_img.set_from_stock('tryton-lock', gtk.ICON_SIZE_MENU)
-            self.status_hbox.pack_start(self.secure_img, False, True,
-                padding=2)
-
-            self.status_hbox.show_all()
+    def set_title(self, value=''):
+        title = 'Tryton'
+        if value:
+            title += ' - ' + value
+        self.window.set_title(title)
 
     def _set_menu_file(self):
         menu_file = gtk.Menu()
@@ -529,26 +499,6 @@ class Main(object):
         imagemenuitem_global_search.set_accel_path(
             '<tryton>/User/Global Search')
         menu_user.add(imagemenuitem_global_search)
-
-        menu_user.add(gtk.SeparatorMenuItem())
-
-        imagemenuitem_send_request = gtk.ImageMenuItem(_('_Send a Request'))
-        image = gtk.Image()
-        image.set_from_stock('tryton-mail-message-new', gtk.ICON_SIZE_MENU)
-        imagemenuitem_send_request.set_image(image)
-        imagemenuitem_send_request.connect('activate', self.sig_request_new)
-        imagemenuitem_send_request.set_accel_path(
-            '<tryton>/User/Send a Request')
-        menu_user.add(imagemenuitem_send_request)
-
-        imagemenuitem_open_request = gtk.ImageMenuItem(_('_Read my Requests'))
-        image = gtk.Image()
-        image.set_from_stock('tryton-mail-message', gtk.ICON_SIZE_MENU)
-        imagemenuitem_open_request.set_image(image)
-        imagemenuitem_open_request.connect('activate', self.sig_request_open)
-        imagemenuitem_open_request.set_accel_path(
-            '<tryton>/User/Read my Requests')
-        menu_user.add(imagemenuitem_open_request)
         return menu_user
 
     def _set_menu_options(self):
@@ -646,15 +596,6 @@ class Main(object):
         menu_form.set_accel_group(self.accel_group)
         menu_form.set_accel_path('<tryton>/Options/Form')
         menuitem_form.set_submenu(menu_form)
-
-        checkmenuitem_statusbar = gtk.CheckMenuItem(_('Statusbar'))
-        checkmenuitem_statusbar.connect('activate',
-            lambda menuitem: self.sig_statusbar_change(menuitem.get_active()))
-        checkmenuitem_statusbar.set_accel_path(
-            '<tryton>/Options/Form/Statusbar')
-        menu_form.add(checkmenuitem_statusbar)
-        if CONFIG['form.statusbar']:
-            checkmenuitem_statusbar.set_active(True)
 
         checkmenuitem_save_width_height = gtk.CheckMenuItem(
             _('Save Width/Height'))
@@ -863,17 +804,6 @@ class Main(object):
         else:
             settings.set_property('gtk-can-change-accels', False)
 
-    def sig_statusbar_change(self, value):
-        CONFIG['form.statusbar'] = value
-        return self.sig_statusbar_show()
-
-    def sig_statusbar_show(self):
-        statusbar = CONFIG['form.statusbar']
-        if statusbar:
-            self.status_hbox.show()
-        else:
-            self.status_hbox.hide()
-
     def sig_mode_change(self, pda_mode=False):
         CONFIG['client.modepda'] = pda_mode
         return
@@ -923,14 +853,12 @@ class Main(object):
                 translate.set_language_direction(prefs['language_direction'])
                 CONFIG['client.language_direction'] = \
                     prefs['language_direction']
-            self.sb_username.set_text(prefs.get('status_bar', ''))
+            self.set_title(prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
                     self.favorite_unset()
-                    self.set_statusbar()
-                    self.request_set()
                     self.sig_win_menu()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
@@ -940,46 +868,6 @@ class Main(object):
     def sig_win_close(self, widget):
         self._sig_remove_book(widget,
                 self.notebook.get_nth_page(self.notebook.get_current_page()))
-
-    def sig_request_new(self, widget):
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx['active_test'] = False
-        return Window.create(None, 'res.request', False, [],
-            mode=['form', 'tree'], context=ctx)
-
-    def sig_request_open(self, widget):
-        ctx = {}
-        ctx.update(rpc.CONTEXT)
-        ctx['active_test'] = False
-        try:
-            ids1, ids2 = self.request_set(True)
-        except TrytonServerError, exception:
-            if common.process_exception(exception):
-                ids1, ids2 = self.request_set(True)
-            else:
-                raise
-        ids = ids1 + ids2
-        return Window.create(False, 'res.request', ids, [],
-            mode=['tree', 'form'], context=ctx)
-
-    def request_set(self, exception=False):
-        try:
-            if not rpc._USER:
-                return
-            result = rpc.execute_nonblocking('model', 'res.request',
-                'request_get', rpc.CONTEXT)
-            if result is None:
-                return
-            ids, ids2 = result
-            message = _('Waiting requests: %s received - %s sent') % (len(ids),
-                        len(ids2))
-            self.sb_requests.set_text(message)
-            return (ids, ids2)
-        except (TrytonServerError, socket.error):
-            if exception:
-                raise
-            return ([], [])
 
     def sig_login(self, widget=None, res=None):
         if not self.sig_logout(widget, disconnect=False):
@@ -999,7 +887,6 @@ class Main(object):
             common.process_exception(exception)
             return
         rpc.context_reload()
-        self.refresh_ssl()
         if log_response > 0:
             try:
                 prefs = RPCExecute('model', 'res.user', 'get_preferences',
@@ -1016,17 +903,12 @@ class Main(object):
             self.sig_win_menu(prefs=prefs)
             for action_id in prefs.get('actions', []):
                 Action.execute(action_id, {})
-            self.request_set()
-            self.sb_username.set_text(prefs.get('status_bar', ''))
-            self.sb_servername.set_text('%s@%s:%d/%s'
-                % (rpc._USERNAME, rpc._HOST, rpc._PORT, rpc._DATABASE))
+            self.set_title(prefs.get('status_bar', ''))
             if prefs and 'language' in prefs:
                 translate.setlang(prefs['language'], prefs.get('locale'))
                 if CONFIG['client.lang'] != prefs['language']:
                     self.set_menubar()
                     self.favorite_unset()
-                    self.set_statusbar()
-                    self.request_set()
                 CONFIG['client.lang'] = prefs['language']
             CONFIG.save()
         elif log_response == -1:
@@ -1071,24 +953,13 @@ class Main(object):
                 return False
         except TrytonServerUnavailable:
             pass
-        self.sb_username.set_text('')
-        self.sb_servername.set_text('')
-        self.sb_requests.set_text('')
+        self.set_title()
         self.favorite_unset()
         self.menuitem_favorite.set_sensitive(False)
         self.menuitem_user.set_sensitive(False)
         if disconnect:
             rpc.logout()
-        self.refresh_ssl()
         return True
-
-    def refresh_ssl(self):
-        if rpc.CONNECTION is not None and rpc.CONNECTION.ssl:
-            self.tooltips.set_tip(self.secure_img, _('SSL connection'))
-            self.secure_img.show()
-        else:
-            self.secure_img.hide()
-            self.tooltips.set_tip(self.secure_img, '')
 
     def sig_tips(self, *args):
         Tips()
@@ -1423,7 +1294,6 @@ class Main(object):
         url, dbname, passwd = DBBackupDrop(function='drop').run()
         if not dbname:
             rpc.logout()
-            Main.get_main().refresh_ssl()
             return
 
         host, port = url.rsplit(':', 1)
@@ -1436,7 +1306,6 @@ class Main(object):
         try:
             rpcprogress.run(False)
         except TrytonServerError, exception:
-            self.refresh_ssl()
             if exception.faultCode == "AccessDenied":
                 common.warning(_("Wrong Tryton Server Password\n"
                         "Please try again."),
@@ -1446,7 +1315,6 @@ class Main(object):
                 common.warning(_('Database drop failed with error message:\n')
                     + str(exception.faultCode), _('Database drop failed!'))
             return
-        self.refresh_ssl()
         common.message(_("Database dropped successfully!"))
 
     def sig_db_restore(self, widget=None):
@@ -1467,7 +1335,6 @@ class Main(object):
             try:
                 res = rpcprogress.run(False)
             except TrytonServerError, exception:
-                self.refresh_ssl()
                 if exception.faultCode == \
                         "Couldn't restore database with password":
                     common.warning(_("It is not possible to restore a "
@@ -1485,7 +1352,6 @@ class Main(object):
                             'error message:\n') + str(exception.faultCode),
                         _('Database restore failed!'))
                 return
-            self.refresh_ssl()
             if res:
                 common.message(_("Database restored successfully!"))
             else:
@@ -1499,7 +1365,6 @@ class Main(object):
 
         if not (dbname and url and passwd):
             rpc.logout()
-            Main.get_main().refresh_ssl()
             return
 
         host, port = url.rsplit(':', 1)
@@ -1523,10 +1388,7 @@ class Main(object):
                         'error message:\n') + str(exception.faultCode),
                     _('Database dump failed!'))
             rpc.logout()
-            Main.get_main().refresh_ssl()
             return
-
-        self.refresh_ssl()
 
         filename = common.file_selection(_('Save As...'),
             action=gtk.FILE_CHOOSER_ACTION_SAVE, preview=False,
@@ -1538,7 +1400,6 @@ class Main(object):
             common.message(_("Database backuped successfully!"))
         else:
             rpc.logout()
-            Main.get_main().refresh_ssl()
 
     def _open_url(self, url):
         urlp = urlparse(url)
