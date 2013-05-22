@@ -813,16 +813,19 @@ class Screen(SignalEvent):
     def get_url(self):
         query_string = []
         if self.domain:
-            query_string.append(('domain', json.dumps(self.domain)))
+            query_string.append(('domain', json.dumps(self.domain,
+                        cls=JSONEncoder)))
         if self.context:
-            query_string.append(('context', json.dumps(self.context)))
+            query_string.append(('context', json.dumps(self.context,
+                        cls=JSONEncoder)))
         path = [rpc._DATABASE, 'model', self.model_name]
         view_ids = [v.view_id for v in self.views] + self.view_ids
         if self.current_view.view_type == 'tree':
             search_string = self.screen_container.get_text()
             search_value = self.domain_parser.parse(search_string)
             if search_value:
-                query_string.append(('search_value', json.dumps(search_value)))
+                query_string.append(('search_value', json.dumps(search_value,
+                            cls=JSONEncoder)))
         elif self.current_record and self.current_record.id > -1:
             path.append(str(self.current_record.id))
             i = view_ids.index(self.current_view.view_id)
