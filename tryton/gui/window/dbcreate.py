@@ -396,11 +396,7 @@ class DBCreate(object):
                             parent.present()
                             self.dialog.destroy()
                             rpc.logout()
-                            from tryton.gui.main import Main
-                            Main.get_main().refresh_ssl()
                             break
-                        from tryton.gui.main import Main
-                        Main.get_main().refresh_ssl()
                         parent.present()
                         self.dialog.destroy()
                         if self.sig_login:

@@ -650,7 +650,5 @@ class DBLogin(object):
         self.dialog.destroy()
         if res != gtk.RESPONSE_OK:
             rpc.logout()
-            from tryton.gui.main import Main
-            Main.get_main().refresh_ssl()
             raise TrytonError('QueryCanceled')
         return result

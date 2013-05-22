@@ -248,8 +248,6 @@ def refresh_langlist(lang_widget, host, port):
         lang_list = rpc.db_exec(host, port, 'list_lang')
     except socket.error:
         return []
-    from tryton.gui.main import Main
-    Main.get_main().refresh_ssl()
     index = -1
     i = 0
     lang = locale.getdefaultlocale()[0]
@@ -1104,7 +1102,6 @@ def process_exception(exception, *args, **kwargs):
                         return False
                     res = rpc.login(rpc._USERNAME, password, hostname, port,
                             rpc._DATABASE)
-                    Main.get_main().refresh_ssl()
                     if res == -1:
                         message(_('Connection error!\n'
                                 'Unable to connect to the server!'))
@@ -1229,8 +1226,6 @@ class DBProgress(object):
         elif dbs == -1:
             dbs, createdb = -1, False
         else:
-            from tryton.gui.main import Main
-            Main.get_main().refresh_ssl()
             liststore = combo.get_model()
             liststore.clear()
             index = -1
