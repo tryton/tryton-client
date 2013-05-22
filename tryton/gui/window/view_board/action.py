@@ -10,6 +10,7 @@ import gettext
 from tryton.signal_event import SignalEvent
 from tryton.gui.window.win_form import WinForm
 from tryton.common import RPCExecute, RPCException
+from tryton.action import Action as GenericAction
 _ = gettext.gettext
 
 
@@ -92,12 +93,20 @@ class Action(SignalEvent):
         if not self.screen.current_record:
             return
 
-        def callback(result):
-            if result:
-                self.screen.current_record.save()
-            else:
-                self.screen.current_record.cancel()
-        WinForm(self.screen, callback)
+        if (self.screen.current_view.view_type == 'tree' and
+                self.screen.current_view.widget_tree.keyword_open):
+            GenericAction.exec_keyword('tree_open', {
+                'model': self.screen.model_name,
+                'id': self.screen.id_get(),
+                'ids': [self.screen.id_get()],
+                }, context=self.screen.context.copy(), warning=False)
+        else:
+            def callback(result):
+                if result:
+                    self.screen.current_record.save()
+                else:
+                    self.screen.current_record.cancel()
+            WinForm(self.screen, callback)
 
     def set_value(self, mode, model_field):
         self.screen.current_view.set_value()
