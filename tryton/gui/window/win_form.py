@@ -389,8 +389,6 @@ class WinForm(NoModal):
         validate = False
         cancel_responses = (gtk.RESPONSE_CANCEL, gtk.RESPONSE_DELETE_EVENT)
         self.screen.current_view.set_value()
-        if not self.win.get_focus():
-            return
         if (response_id not in cancel_responses
                 and self.screen.current_record is not None):
             validate = self.screen.current_record.validate(

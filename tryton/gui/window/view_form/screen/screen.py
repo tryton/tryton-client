@@ -820,7 +820,7 @@ class Screen(SignalEvent):
                         cls=JSONEncoder)))
         path = [rpc._DATABASE, 'model', self.model_name]
         view_ids = [v.view_id for v in self.views] + self.view_ids
-        if self.current_view.view_type == 'tree':
+        if self.current_view.view_type != 'form':
             search_string = self.screen_container.get_text()
             search_value = self.domain_parser.parse(search_string)
             if search_value:
