@@ -1510,6 +1510,8 @@ class Main(object):
         elif type_ == 'url':
             open_url()
 
+        self.window.present()
+
     def open_url(self, url):
         def idle_open_url():
             with gtk.gdk.lock:
