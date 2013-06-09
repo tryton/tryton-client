@@ -3,6 +3,8 @@
 "Screen"
 import copy
 import gobject
+import datetime
+import calendar
 try:
     import simplejson as json
 except ImportError:
@@ -184,6 +186,12 @@ class Screen(SignalEvent):
                 domain = ['AND', domain, self.domain]
         else:
             domain = self.domain
+
+        if self.current_view.view_type == 'calendar':
+            if domain:
+                domain = ['AND', domain, self.current_view.current_domain()]
+            else:
+                domain = self.current_view.current_domain()
 
         tab_domain = self.screen_container.get_tab_domain()
         if tab_domain:
@@ -428,12 +436,15 @@ class Screen(SignalEvent):
         return False
 
     def new(self, default=True):
+        previous_view = self.current_view
+        if self.current_view.view_type == 'calendar':
+            selected_date = self.current_view.get_selected_date()
         if (self.current_view
                 and ((self.current_view.view_type == 'tree'
                         and not (hasattr(self.current_view.widget_tree,
                                 'editable')
                             and self.current_view.widget_tree.editable))
-                    or self.current_view.view_type == 'graph')):
+                    or self.current_view.view_type in ('graph', 'calendar'))):
             self.switch_view('form')
             if self.current_view.view_type != 'form':
                 return None
@@ -443,6 +454,8 @@ class Screen(SignalEvent):
             group = self.group
         record = group.new(default)
         group.add(record, self.new_model_position())
+        if previous_view.view_type == 'calendar':
+            previous_view.set_default_date(record, selected_date)
         self.current_record = record
         self.display()
         self.set_cursor(new=True)
@@ -674,10 +687,6 @@ class Screen(SignalEvent):
             else:
                 self.current_record = None
         if self.views:
-            #XXX To remove when calendar will be implemented
-            if self.current_view.view_type == 'calendar' and \
-                    len(self.views) > 1:
-                self.switch_view()
             self.search_active(self.current_view.view_type
                 in ('tree', 'graph', 'calendar'))
             for view in self.views:
@@ -731,6 +740,27 @@ class Screen(SignalEvent):
                 record = next
                 break
             self.current_record = record
+        elif view.view_type == 'calendar':
+            record = self.current_record
+            goocalendar = view.children['goocalendar']
+            date = goocalendar.selected_date
+            year = date.year
+            month = date.month
+            start = datetime.datetime(year, month, 1)
+            nb_days = calendar.monthrange(year, month)[1]
+            delta = datetime.timedelta(days=nb_days)
+            end = start + delta
+            events = goocalendar.event_store.get_events(start, end)
+            events.sort()
+            if not record:
+                self.current_record = len(events) and events[0].record
+            else:
+                for idx, event in enumerate(events):
+                    if event.record == record:
+                        next_id = idx + 1
+                        if next_id < len(events):
+                            self.current_record = events[next_id].record
+                        break
         else:
             self.current_record = self.group[0] if len(self.group) else None
         self.set_cursor(reset_view=False)
@@ -765,6 +795,27 @@ class Screen(SignalEvent):
                 if parent:
                     record = parent
             self.current_record = record
+        elif view.view_type == 'calendar':
+            record = self.current_record
+            goocalendar = view.children['goocalendar']
+            date = goocalendar.selected_date
+            year = date.year
+            month = date.month
+            start = datetime.datetime(year, month, 1)
+            nb_days = calendar.monthrange(year, month)[1]
+            delta = datetime.timedelta(days=nb_days)
+            end = start + delta
+            events = goocalendar.event_store.get_events(start, end)
+            events.sort()
+            if not record:
+                self.current_record = len(events) and events[0].record
+            else:
+                for idx, event in enumerate(events):
+                    if event.record == record:
+                        prev_id = idx - 1
+                        if prev_id >= 0:
+                            self.current_record = events[prev_id].record
+                        break
         else:
             self.current_record = self.group[-1] if len(self.group) else None
         self.set_cursor(reset_view=False)

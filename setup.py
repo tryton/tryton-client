@@ -165,6 +165,7 @@ dist = setup(name=PACKAGE,
         'timezone': ['pytz'],
         'simplejson': ['simplejson'],
         'cdecimal': ['cdecimal'],
+        'calendar': ['GooCalendar'],
     },
     **args
 )
