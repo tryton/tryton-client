@@ -312,7 +312,6 @@ class Screen(SignalEvent):
         return False
 
     def destroy(self):
-        self.save_tree_state()
         self.group.destroy()
         for view in self.views:
             view.destroy()
@@ -633,27 +632,29 @@ class Screen(SignalEvent):
             self.expanded_nodes[parent][view.children_field] = expanded_nodes
         view.expand_nodes(expanded_nodes)
 
-    def save_tree_state(self):
-        view = self.current_view
-        if (not CONFIG['client.save_tree_expanded_state']
-                or not view
-                or view.view_type != 'tree'
-                or not view.children_field
-                or not (self.parent is None
-                    or isinstance(self.parent, Record))):
+    def save_tree_state(self, store=True):
+        if not CONFIG['client.save_tree_expanded_state']:
             return
-        parent = self.parent.id if self.parent else None
-        paths = view.get_expanded_paths()
-        self.expanded_nodes[parent][view.children_field] = paths
-        json_domain = self.get_tree_domain(parent)
-        json_paths = json.dumps(paths)
-        try:
-            RPCExecute('model', 'ir.ui.view_tree_expanded_state',
-                'set_expanded', self.model_name, json_domain,
-                self.current_view.children_field, json_paths,
-                process_exception=False)
-        except (TrytonServerError, TrytonServerUnavailable):
-            pass
+        for view in self.views:
+            if view.view_type == 'form':
+                for widgets in view.widgets.itervalues():
+                    for widget in widgets:
+                        if hasattr(widget, 'screen'):
+                            widget.screen.save_tree_state(store)
+            elif (view.view_type == 'tree' and view.children_field):
+                parent = self.parent.id if self.parent else None
+                paths = view.get_expanded_paths()
+                self.expanded_nodes[parent][view.children_field] = paths
+                if store:
+                    json_domain = self.get_tree_domain(parent)
+                    json_paths = json.dumps(paths)
+                    try:
+                        RPCExecute('model', 'ir.ui.view_tree_expanded_state',
+                            'set_expanded', self.model_name, json_domain,
+                            view.children_field, json_paths,
+                            process_exception=False)
+                    except (TrytonServerError, TrytonServerUnavailable):
+                        pass
 
     def get_tree_domain(self, parent):
         if parent:

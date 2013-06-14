@@ -943,6 +943,7 @@ class Main(object):
             else:
                 res = False
         if self.menu_screen:
+            self.menu_screen.save_tree_state()
             self.menu_screen.destroy()
             self.menu_screen = None
         self.menu_expander_clear()
@@ -1023,6 +1024,8 @@ class Main(object):
         vbox.pack_start(self.global_search_entry, False, False)
         vbox.show_all()
 
+        if self.menu_screen:
+            self.menu_screen.save_tree_state()
         self.menu_screen = None
         self.menu_expander_clear()
         action = PYSONDecoder().decode(prefs['pyson_menu'])

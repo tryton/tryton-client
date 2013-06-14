@@ -356,6 +356,7 @@ class Form(SignalEvent, TabContent):
                 return False
         self.screen.cancel_current()
         set_cursor = False
+        self.screen.save_tree_state(store=False)
         if self.screen.current_view.view_type != 'form':
             obj_id = self.id_get()
             self.screen.search_filter(self.screen.screen_container.get_text())
