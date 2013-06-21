@@ -244,6 +244,8 @@ class Record(SignalEvent):
     def get_on_change_value(self):
         value = {}
         for name, field in self.group.fields.iteritems():
+            if name not in self._loaded and self.id >= 0:
+                continue
             value[name] = field.get_on_change_value(self)
         value['id'] = self.id
         return value
