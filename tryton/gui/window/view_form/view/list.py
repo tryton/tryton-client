@@ -859,7 +859,7 @@ class ViewList(ParserView):
             path = self.store.on_get_path(self.screen.current_record)
             if self.store.get_flags() & gtk.TREE_MODEL_LIST_ONLY:
                 path = (path[0],)
-            focus_column = self.widget_tree.next_column(path)
+            focus_column = self.widget_tree.next_column(path, editable=new)
             if path[:-1]:
                 self.widget_tree.expand_to_path(path[:-1])
             self.widget_tree.scroll_to_cell(path, focus_column,

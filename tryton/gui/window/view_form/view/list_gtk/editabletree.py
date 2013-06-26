@@ -18,7 +18,7 @@ class TreeView(gtk.TreeView):
         super(TreeView, self).__init__()
         self.cells = {}
 
-    def next_column(self, path, column=None, _sign=1):
+    def next_column(self, path, column=None, editable=True, _sign=1):
         columns = self.get_columns()
         if column is None:
             column = columns[-1 * _sign]
@@ -34,13 +34,17 @@ class TreeView(gtk.TreeView):
             field = record[column.name]
             field.state_set(record, states=('readonly', 'invisible'))
             invisible = field.get_state_attrs(record).get('invisible', False)
-            readonly = field.get_state_attrs(record).get('readonly', False)
+            if editable:
+                readonly = field.get_state_attrs(record).get('readonly', False)
+            else:
+                readonly = False
             if not (invisible or readonly):
                 break
         return column
 
-    def prev_column(self, path, column=None):
-        return self.next_column(path, column=column, _sign=-1)
+    def prev_column(self, path, column=None, editable=True):
+        return self.next_column(path, column=column, editable=editable,
+            _sign=-1)
 
 
 class EditableTreeView(TreeView):
