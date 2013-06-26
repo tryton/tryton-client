@@ -11,6 +11,7 @@ import time
 import datetime
 import decimal
 from decimal import Decimal
+import math
 from tryton.translate import date_format
 from tryton.common import RPCExecute, RPCException
 
@@ -263,8 +264,9 @@ class TimeField(CharField):
         return record.expr_eval(self.attrs['format'])
 
 
-class NumberField(CharField):
+class FloatField(CharField):
     _default = None
+    default_digits = (16, 2)
 
     def check_required(self, record):
         state_attrs = self.get_state_attrs(record)
@@ -277,71 +279,62 @@ class NumberField(CharField):
     def get(self, record):
         return record.value.get(self.name, self._default)
 
-    def digits(self, record):
-        default = (16, 2)
-        return tuple(y if x is None else x for x, y in zip(
-                record.expr_eval(self.attrs.get('digits', default)), default))
+    def digits(self, record, factor=1):
+        digits = tuple(y if x is None else x for x, y in zip(
+                record.expr_eval(
+                    self.attrs.get('digits', self.default_digits)),
+                self.default_digits))
+        shift = int(round(math.log(factor, 10)))
+        return (digits[0] + shift, digits[1] - shift)
 
+    def convert(self, value):
+        try:
+            return locale.atof
+        except ValueError:
+            return self._default
 
-class FloatField(NumberField):
-
-    def set_client(self, record, value, force_change=False):
+    def set_client(self, record, value, force_change=False, factor=1):
         if isinstance(value, basestring):
-            try:
-                value = locale.atof(value)
-            except ValueError:
-                value = self._default
+            value = self.convert(value)
+        if value is not None:
+            value /= factor
         super(FloatField, self).set_client(record, value,
             force_change=force_change)
 
-    def get_client(self, record):
+    def get_client(self, record, factor=1):
         value = record.value.get(self.name)
         if value is not None:
-            digits = self.digits(record)
-            return locale.format('%.*f', (digits[1], value), True)
+            digit = self.digits(record, factor=factor)[1]
+            return locale.format('%.*f', (digit, value * factor), True)
         else:
             return ''
 
 
-class NumericField(NumberField):
+class NumericField(FloatField):
 
-    def set_client(self, record, value, force_change=False):
-        if isinstance(value, basestring):
-            try:
-                value = locale.atof(value, Decimal)
-            except decimal.InvalidOperation:
-                value = self._default
-        super(NumericField, self).set_client(record, value,
-            force_change=force_change)
+    def convert(self, value):
+        try:
+            return locale.atof(value, Decimal)
+        except decimal.InvalidOperation:
+            return self._default
 
-    def get_client(self, record):
-        value = record.value.get(self.name)
-        if value is not None:
-            digits = self.digits(record)
-            return locale.format('%.*f', (digits[1], value), True)
-        else:
-            return ''
+    def set_client(self, record, value, force_change=False, factor=1):
+        return super(NumericField, self).set_client(record, value,
+            force_change=force_change, factor=Decimal(str(factor)))
+
+    def get_client(self, record, factor=1):
+        return super(NumericField, self).get_client(record,
+            factor=Decimal(str(factor)))
 
 
-class IntegerField(NumberField):
+class IntegerField(FloatField):
+    default_digits = (16, 0)
 
-    def set_client(self, record, value):
-        if isinstance(value, basestring):
-            try:
-                value = locale.atoi(value)
-            except ValueError:
-                value = self._default
-        super(IntegerField, self).set_client(record, value)
-
-    def get_client(self, record):
-        value = record.value.get(self.name)
-        if value is not None:
-            return locale.format('%d', value, True)
-        else:
-            return ''
-
-    def digits(self, record):
-        return (16, 0)
+    def convert(self, value):
+        try:
+            return locale.atoi(value)
+        except ValueError:
+            return self._default
 
 
 class BooleanField(CharField):

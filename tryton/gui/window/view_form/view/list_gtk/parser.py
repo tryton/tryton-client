@@ -9,7 +9,7 @@ import locale
 import gettext
 import webbrowser
 
-from functools import wraps
+from functools import wraps, partial
 
 from editabletree import EditableTreeView, TreeView
 from tryton.gui.window.view_form.view.interface import ParserInterface
@@ -360,12 +360,15 @@ class Affix(object):
 
 class Char(object):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
         super(Char, self).__init__()
         self.field_name = field_name
         self.model_name = model_name
         self.attrs = attrs or {}
-        self.renderer = CellRendererText()
+        if renderer is None:
+            renderer = CellRendererText
+        self.renderer = renderer()
         self.renderer.connect('editing-started', self.editing_started)
         self.treeview = treeview
 
@@ -469,19 +472,34 @@ class Char(object):
 
 class Int(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None:
+            renderer = CellRendererInteger
         super(Int, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        self.renderer = CellRendererInteger()
-        self.renderer.connect('editing-started', self.editing_started)
+            attrs=attrs, renderer=renderer)
+        self.factor = float(attrs.get('factor', 1))
+
+    def get_textual_value(self, record):
+        if not record:
+            return ''
+        return record[self.field_name].get_client(record, factor=self.factor)
+
+    def value_from_text(self, record, text, callback=None):
+        field = record[self.field_name]
+        field.set_client(record, text, factor=self.factor)
+        if callback:
+            callback()
 
 
-class Boolean(Int):
+class Boolean(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None:
+            renderer = CellRendererToggle
         super(Boolean, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        self.renderer = CellRendererToggle()
+            attrs=attrs, renderer=renderer)
         self.renderer.connect('toggled', self._sig_toggled)
 
     def _sig_toggled(self, renderer, path):
@@ -510,18 +528,16 @@ class URL(Char):
 
 class Date(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None:
+            renderer = partial(CellRendererDate, date_format())
         super(Date, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        self.renderer = CellRendererDate(date_format())
+            attrs=attrs, renderer=renderer)
         self.renderer.connect('editing-started', self.editing_started)
 
 
 class Datetime(Date):
-
-    def __init__(self, field_name, model_name, treeview, attrs=None):
-        super(Datetime, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
 
     @realized
     def setter(self, column, cell, store, iter):
@@ -534,10 +550,6 @@ class Datetime(Date):
 
 class Time(Date):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
-        super(Time, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-
     @realized
     def setter(self, column, cell, store, iter):
         super(Time, self).setter(column, cell, store, iter)
@@ -547,28 +559,30 @@ class Time(Date):
         self.renderer.format = time_format
 
 
-class Float(Char):
+class Float(Int):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None:
+            renderer = CellRendererFloat
         super(Float, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        self.renderer = CellRendererFloat()
-        self.renderer.connect('editing-started', self.editing_started)
+            attrs=attrs, renderer=renderer)
 
     @realized
     def setter(self, column, cell, store, iter):
         super(Float, self).setter(column, cell, store, iter)
         record = store.get_value(iter, 0)
         field = record[self.field_name]
-        digits = field.digits(record)
+        digits = field.digits(record, factor=self.factor)
         cell.digits = digits
 
 
 class FloatTime(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
         super(FloatTime, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
+            attrs=attrs, renderer=renderer)
         self.conv = None
         if attrs and attrs.get('float_time'):
             self.conv = rpc.CONTEXT.get(attrs['float_time'])
@@ -588,11 +602,13 @@ class FloatTime(Char):
 
 class Binary(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None:
+            renderer = partial(CellRendererBinary, bool(self.filename))
         super(Binary, self).__init__(field_name, model_name, treeview,
             attrs=attrs)
         self.filename = attrs.get('filename')
-        self.renderer = CellRendererBinary(bool(self.filename))
         self.renderer.connect('new', self.new_binary)
         self.renderer.connect('open', self.open_binary)
         self.renderer.connect('save', self.save_binary)
@@ -657,12 +673,12 @@ class Binary(Char):
 
 class M2O(Char):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
+        if renderer is None and int(attrs.get('completion', 1)):
+            renderer = partial(CellRendererTextCompletion, self.set_completion)
         super(M2O, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        if int(attrs.get('completion', 1)):
-            self.renderer = CellRendererTextCompletion(self.set_completion)
-            self.renderer.connect('editing-started', self.editing_started)
+            attrs=attrs, renderer=renderer)
 
     def value_from_text(self, record, text, callback=None):
         field = record.group.fields[self.field_name]
@@ -937,9 +953,10 @@ class Selection(Char, SelectionMixin):
 
 class Reference(Char, SelectionMixin):
 
-    def __init__(self, field_name, model_name, treeview, attrs=None):
+    def __init__(self, field_name, model_name, treeview, attrs=None,
+            renderer=None):
         super(Reference, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
+            attrs=attrs, renderer=renderer)
         self.init_selection()
         self._selection = dict(self.selection)
 
