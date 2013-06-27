@@ -457,6 +457,7 @@ class ParserForm(ParserInterface):
                     text = fields[attrs['name']].attrs['string']
                 if attrs.get('string'):
                     text = attrs['string']
+                widget.set_homogeneous(bool(int(attrs.get('homogeneous', 0))))
 
                 frame = Frame(text, attrs=attrs, widgets=widgets)
                 frame.add(widget)
