@@ -336,6 +336,13 @@ class IntegerField(FloatField):
         except ValueError:
             return self._default
 
+    def set_client(self, record, value, force_change=False, factor=1):
+        return super(IntegerField, self).set_client(record, value,
+            force_change=force_change, factor=int(factor))
+
+    def get_client(self, record, factor=1):
+        return super(IntegerField, self).get_client(record, factor=int(factor))
+
 
 class BooleanField(CharField):
 
