@@ -289,7 +289,7 @@ class FloatField(CharField):
 
     def convert(self, value):
         try:
-            return locale.atof
+            return locale.atof(value)
         except ValueError:
             return self._default
 
