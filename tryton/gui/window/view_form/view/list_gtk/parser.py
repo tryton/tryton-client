@@ -604,11 +604,11 @@ class Binary(Char):
 
     def __init__(self, field_name, model_name, treeview, attrs=None,
             renderer=None):
+        self.filename = attrs.get('filename')
         if renderer is None:
             renderer = partial(CellRendererBinary, bool(self.filename))
         super(Binary, self).__init__(field_name, model_name, treeview,
-            attrs=attrs)
-        self.filename = attrs.get('filename')
+            attrs=attrs, renderer=renderer)
         self.renderer.connect('new', self.new_binary)
         self.renderer.connect('open', self.open_binary)
         self.renderer.connect('save', self.save_binary)
