@@ -1045,7 +1045,7 @@ def process_exception(exception, *args, **kwargs):
             name, msg, description = exception.args
             res = userwarning(description, msg)
             if res in ('always', 'ok'):
-                args2, = ('model', 'res.user.warning', 'create', [{
+                args2 = ('model', 'res.user.warning', 'create', [{
                             'user': rpc._USER,
                             'name': name,
                             'always': (res == 'always'),
