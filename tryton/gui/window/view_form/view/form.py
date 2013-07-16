@@ -165,7 +165,7 @@ class ViewForm(ParserView):
         record = self.screen.current_record
         fields = self.get_fields()
         if not record.validate(fields):
-            self.screen.display()
+            self.screen.display(set_cursor=True)
             return
         else:
             widget.set_sensitive(False)

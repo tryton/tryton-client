@@ -307,7 +307,7 @@ class One2Many(WidgetInterface):
         if record:
             fields = self.screen.current_view.get_fields()
             if not record.validate(fields):
-                self.screen.display()
+                self.screen.display(set_cursor=True)
                 return False
             if self.screen.pre_validate and not record.pre_validate():
                 return False

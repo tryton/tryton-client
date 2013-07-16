@@ -143,7 +143,7 @@ class Wizard(object):
         self.screen.current_view.set_value()
         if (not self.screen.current_record.validate()
                 and state != self.end_state):
-            self.screen.display()
+            self.screen.display(set_cursor=True)
             return
         self.state = state
         self.process()
