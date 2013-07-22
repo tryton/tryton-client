@@ -100,29 +100,17 @@ class Action(object):
                 'active_ids': data.get('ids', []),
             }
             ctx.update(rpc.CONTEXT)
-            eval_ctx = ctx.copy()
-            eval_ctx['_user'] = rpc._USER
-            action_ctx = PYSONDecoder(eval_ctx).decode(
-                    action.get('pyson_context') or '{}')
+            ctx['_user'] = rpc._USER
+            decoder = PYSONDecoder(ctx)
+            action_ctx = decoder.decode(action.get('pyson_context') or '{}')
             ctx.update(action_ctx)
             ctx.update(context)
 
-            domain_context = ctx.copy()
-            domain_context['context'] = ctx
-            domain_context['_user'] = rpc._USER
-            domain = PYSONDecoder(domain_context).decode(
-                action['pyson_domain'])
-
-            search_context = ctx.copy()
-            search_context['context'] = ctx
-            search_context['_user'] = rpc._USER
-            search_value = PYSONDecoder(search_context).decode(
-                    action['pyson_search_value'] or '[]')
-
-            tab_domain_context = ctx.copy()
-            tab_domain_context['context'] = ctx
-            tab_domain_context['_user'] = rpc._USER
-            decoder = PYSONDecoder(tab_domain_context)
+            ctx['context'] = ctx
+            decoder = PYSONDecoder(ctx)
+            domain = decoder.decode(action['pyson_domain'])
+            order = decoder.decode(action['pyson_order'])
+            search_value = decoder.decode(action['pyson_search_value'] or '[]')
             tab_domain = [(n, decoder.decode(d)) for n, d in action['domains']]
 
             name = False
@@ -133,7 +121,7 @@ class Action(object):
             res_id = action.get('res_id', data.get('res_id'))
 
             Window.create(view_ids, res_model, res_id, domain,
-                    action_ctx, view_mode, name=name,
+                    action_ctx, order, view_mode, name=name,
                     limit=action.get('limit'),
                     auto_refresh=action.get('auto_refresh'),
                     search_value=search_value,

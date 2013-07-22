@@ -40,7 +40,7 @@ class Screen(SignalEvent):
 
     def __init__(self, model_name, view_ids=None, mode=None, context=None,
             views_preload=None, domain=None, row_activate=None, limit=None,
-            readonly=False, exclude_field=None, sort=None, search_value=None,
+            readonly=False, exclude_field=None, order=None, search_value=None,
             tab_domain=None, alternate_view=False):
         if view_ids is None:
             view_ids = []
@@ -86,7 +86,7 @@ class Screen(SignalEvent):
         self.__current_view = 0
         self.search_value = search_value
         self.fields_view_tree = None
-        self.sort = sort
+        self.order = order
         self.view_to_load = []
         self.expanded_nodes = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
@@ -199,7 +199,7 @@ class Screen(SignalEvent):
 
         try:
             ids = RPCExecute('model', self.model_name, 'search', domain,
-                self.offset, self.limit, self.sort, context=self.context)
+                self.offset, self.limit, self.order, context=self.context)
         except RPCException:
             ids = []
         if not only_ids:

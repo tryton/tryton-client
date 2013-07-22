@@ -42,8 +42,6 @@ class AdaptModelGroup(gtk.GenericTreeModel):
     def __init__(self, group, children_field=None):
         super(AdaptModelGroup, self).__init__()
         self.group = group
-        self.last_sort = None
-        self.sort_asc = True
         self.set_property('leak_references', False)
         self.children_field = children_field
         self.__removed = None  # XXX dirty hack to allow update of has_child

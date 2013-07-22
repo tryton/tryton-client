@@ -85,7 +85,7 @@ class Form(SignalEvent, TabContent):
             '<tryton>/Form/Import Data'),
     ]
 
-    def __init__(self, model, res_id=False, domain=None, mode=None,
+    def __init__(self, model, res_id=False, domain=None, order=None, mode=None,
             view_ids=None, context=None, name=False, limit=None,
             auto_refresh=False, search_value=None, tab_domain=None):
         super(Form, self).__init__()
@@ -109,7 +109,7 @@ class Form(SignalEvent, TabContent):
         self.dialogs = []
 
         self.screen = Screen(self.model, mode=mode, context=self.context,
-            view_ids=view_ids, domain=domain, limit=limit,
+            view_ids=view_ids, domain=domain, limit=limit, order=order,
             readonly=bool(auto_refresh), search_value=search_value,
             tab_domain=tab_domain)
         self.screen.widget.show()

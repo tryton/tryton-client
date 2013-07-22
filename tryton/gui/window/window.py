@@ -20,7 +20,7 @@ class Window(object):
 
     @staticmethod
     def create(view_ids, model, res_id=False, domain=None,
-            context=None, mode=None, name=False, limit=None,
+            context=None, order=None, mode=None, name=False, limit=None,
             auto_refresh=False, search_value=None, icon=None, tab_domain=None):
         from tryton.gui import Main
         if context is None:
@@ -28,7 +28,7 @@ class Window(object):
 
         if model:
             from form import Form
-            win = Form(model, res_id, domain, mode=mode,
+            win = Form(model, res_id, domain, order=order, mode=mode,
                 view_ids=(view_ids or []), context=context, name=name,
                 limit=limit, auto_refresh=auto_refresh,
                 search_value=search_value, tab_domain=tab_domain)
