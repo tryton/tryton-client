@@ -457,6 +457,7 @@ class Form(SignalEvent, TabContent):
         self.update_attachment_count()
 
     def modified_save(self):
+        self.screen.save_tree_state()
         self.screen.current_view.set_value()
         if self.screen.modified():
             value = sur_3b(
