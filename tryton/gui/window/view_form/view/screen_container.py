@@ -398,10 +398,6 @@ class ScreenContainer(object):
                 button.set_active(False)
                 window.hide()
 
-        def focus_out(window, event):
-            button.set_active(False)
-            window.hide()
-
         def search():
             button.set_active(False)
             self.search_window.hide()
@@ -435,7 +431,6 @@ class ScreenContainer(object):
             if hasattr(self.search_window, 'set_deletable'):
                 self.search_window.set_deletable(False)
             self.search_window.connect('key-press-event', key_press)
-            self.search_window.connect('focus-out-event', focus_out)
             vbox = gtk.VBox()
             fields = [f for f in self.screen.domain_parser.fields.itervalues()
                 if f.get('searchable', True)]
