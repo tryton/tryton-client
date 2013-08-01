@@ -893,7 +893,7 @@ class Main(object):
                 prefs = RPCExecute('model', 'res.user', 'get_preferences',
                     False)
             except RPCException:
-                prefs = None
+                prefs = {}
             common.ICONFACTORY.load_icons()
             common.MODELACCESS.load_models()
             common.VIEW_SEARCH.load_searches()
