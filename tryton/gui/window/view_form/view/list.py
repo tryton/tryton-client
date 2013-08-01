@@ -750,8 +750,7 @@ class ViewList(ParserView):
         elif tree_sel.get_mode() == gtk.SELECTION_MULTIPLE:
             model, paths = tree_sel.get_selected_rows()
             if model and paths:
-                iter_ = model.get_iter(paths[0])
-                record = model.get_value(iter_, 0)
+                record = model.on_get_iter(paths[0])
                 self.screen.current_record = record
             else:
                 self.screen.current_record = None
@@ -862,7 +861,11 @@ class ViewList(ParserView):
                 self.widget_tree.expand_to_path(path[:-1])
             self.widget_tree.scroll_to_cell(path, focus_column,
                 use_align=False)
-            self.widget_tree.set_cursor(path, focus_column, new)
+            current_path = self.widget_tree.get_cursor()[0]
+            selected_path = \
+                self.widget_tree.get_selection().get_selected_rows()[1]
+            if (current_path != path and path not in selected_path) or new:
+                self.widget_tree.set_cursor(path, focus_column, new)
 
     def sel_ids_get(self):
         def _func_sel_get(store, path, iter, ids):
@@ -895,6 +898,33 @@ class ViewList(ParserView):
                     pass
                 else:
                     renderer.set_property('editable', False)
+
+    def get_selected_paths(self):
+        selection = self.widget_tree.get_selection()
+        model, rows = selection.get_selected_rows()
+        id_paths = []
+        for row in rows:
+            path = ()
+            id_path = []
+            for node in row:
+                path += (node,)
+                id_path.append(model.on_get_iter(path).id)
+            id_paths.append(id_path)
+        return id_paths
+
+    def select_nodes(self, nodes):
+        selection = self.widget_tree.get_selection()
+        if not nodes:
+            return
+        selection.unselect_all()
+        scroll = False
+        for node in nodes:
+            path = path_convert_id2pos(self.store, node)
+            if path:
+                selection.select_path(path)
+                if not scroll:
+                    self.widget_tree.scroll_to_cell(path)
+                    scroll = True
 
     def get_expanded_paths(self, starting_path=None, starting_id_path=None):
         # Use id instead of position

@@ -14,6 +14,7 @@ import urllib
 import urlparse
 import xml.dom.minidom
 import gettext
+import logging
 
 from tryton.gui.window.view_form.model.group import Group
 from tryton.gui.window.view_form.model.record import Record
@@ -88,8 +89,9 @@ class Screen(SignalEvent):
         self.fields_view_tree = None
         self.order = order
         self.view_to_load = []
-        self.expanded_nodes = collections.defaultdict(
+        self.tree_states = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
+        self.tree_states_done = set()
         self.domain_parser = None
         self.pre_validate = False
         self.view_to_load = mode[:]
@@ -611,29 +613,39 @@ class Screen(SignalEvent):
 
     def set_tree_state(self):
         view = self.current_view
-        if (not CONFIG['client.save_tree_expanded_state']
-                or not self.current_view
-                or self.current_view.view_type != 'tree'
-                or not self.current_view.children_field
+        if (not CONFIG['client.save_tree_state']
+                or not view
+                or view.view_type != 'tree'
                 or not self.group):
             return
+        if id(view) in self.tree_states_done:
+            return
         parent = self.parent.id if self.parent else None
-        expanded_nodes = self.expanded_nodes[parent][view.children_field]
-        if expanded_nodes is None:
+        state = self.tree_states[parent][view.children_field]
+        if state is None:
             json_domain = self.get_tree_domain(parent)
             try:
-                expanded_nodes = RPCExecute('model',
-                    'ir.ui.view_tree_expanded_state', 'get_expanded',
+                expanded_nodes, selected_nodes = RPCExecute('model',
+                    'ir.ui.view_tree_state', 'get',
                     self.model_name, json_domain,
                     self.current_view.children_field)
                 expanded_nodes = json.loads(expanded_nodes)
+                selected_nodes = json.loads(selected_nodes)
             except RPCException:
+                logging.getLogger(__name__).warn(
+                    _('Unable to get view tree state'))
                 expanded_nodes = []
-            self.expanded_nodes[parent][view.children_field] = expanded_nodes
+                selected_nodes = []
+            self.tree_states[parent][view.children_field] = (
+                expanded_nodes, selected_nodes)
+        else:
+            expanded_nodes, selected_nodes = state
         view.expand_nodes(expanded_nodes)
+        view.select_nodes(selected_nodes)
+        self.tree_states_done.add(id(view))
 
     def save_tree_state(self, store=True):
-        if not CONFIG['client.save_tree_expanded_state']:
+        if not CONFIG['client.save_tree_state']:
             return
         for view in self.views:
             if view.view_type == 'form':
@@ -644,17 +656,21 @@ class Screen(SignalEvent):
             elif (view.view_type == 'tree' and view.children_field):
                 parent = self.parent.id if self.parent else None
                 paths = view.get_expanded_paths()
-                self.expanded_nodes[parent][view.children_field] = paths
+                selected_paths = view.get_selected_paths()
+                self.tree_states[parent][view.children_field] = (
+                    paths, selected_paths)
                 if store:
                     json_domain = self.get_tree_domain(parent)
                     json_paths = json.dumps(paths)
+                    json_selected_path = json.dumps(selected_paths)
                     try:
-                        RPCExecute('model', 'ir.ui.view_tree_expanded_state',
-                            'set_expanded', self.model_name, json_domain,
-                            view.children_field, json_paths,
+                        RPCExecute('model', 'ir.ui.view_tree_state', 'set',
+                            self.model_name, json_domain, view.children_field,
+                            json_paths, json_selected_path,
                             process_exception=False)
                     except (TrytonServerError, TrytonServerUnavailable):
-                        pass
+                        logging.getLogger(__name__).warn(
+                            _('Unable to set view tree state'))
 
     def get_tree_domain(self, parent):
         if parent:
@@ -665,7 +681,8 @@ class Screen(SignalEvent):
         return json_domain
 
     def load(self, ids, set_cursor=True, modified=False):
-        self.expanded_nodes.clear()
+        self.tree_states.clear()
+        self.tree_states_done.clear()
         self.group.load(ids, modified=modified)
         self.current_view.reset()
         if ids:

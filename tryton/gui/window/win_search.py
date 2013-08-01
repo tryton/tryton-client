@@ -58,6 +58,8 @@ class WinSearch(NoModal):
             row_activate=self.sig_activate)
         self.view = self.screen.current_view
         self.view.unset_editable()
+        # Prevent to set tree_state
+        self.screen.tree_states_done.add(id(self.view))
         sel = self.view.widget_tree.get_selection()
 
         if not sel_multi:

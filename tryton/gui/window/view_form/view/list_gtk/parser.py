@@ -108,7 +108,6 @@ class ParserTree(ParserInterface):
         treeview.sequence = attrs.get('sequence', False)
         treeview.colors = attrs.get('colors', '"black"')
         treeview.keyword_open = attrs.get('keyword_open', False)
-        treeview.connect('focus', self.set_selection)
         self.treeview = treeview
         treeview.set_property('rules-hint', True)
         if not self.title:
@@ -295,12 +294,6 @@ class ParserTree(ParserInterface):
             treeview.append_column(col)
         treeview.set_fixed_height_mode(True)
         return treeview, dict_widget, state_widgets, on_write, [], None
-
-    def set_selection(self, treeview, direction):
-        selection = treeview.get_selection()
-        if len(treeview.get_model()) and not selection.count_selected_rows():
-            selection.select_path(0)
-        return False
 
 
 class Affix(object):

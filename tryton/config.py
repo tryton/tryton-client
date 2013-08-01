@@ -57,7 +57,7 @@ class ConfigManager(object):
             'client.form_tab': form_tab,
             'client.maximize': False,
             'client.save_width_height': True,
-            'client.save_tree_expanded_state': True,
+            'client.save_tree_state': True,
             'client.spellcheck': False,
             'client.default_path': get_home_dir(),
             'client.lang': locale.getdefaultlocale()[0],

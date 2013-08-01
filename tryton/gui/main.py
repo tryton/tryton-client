@@ -610,15 +610,15 @@ class Main(object):
             checkmenuitem_save_width_height.set_active(True)
 
         checkmenuitem_save_tree_state = gtk.CheckMenuItem(
-            _('Save Tree Expanded State'))
+            _('Save Tree State'))
         checkmenuitem_save_tree_state.connect('activate',
             lambda menuitem: CONFIG.__setitem__(
-                'client.save_tree_expanded_state',
+                'client.save_tree_state',
                 menuitem.get_active()))
         checkmenuitem_save_tree_state.set_accel_path(
-            '<tryton>/Options/Form/Save Tree Expanded State')
+            '<tryton>/Options/Form/Save Tree State')
         menu_form.add(checkmenuitem_save_tree_state)
-        if CONFIG['client.save_tree_expanded_state']:
+        if CONFIG['client.save_tree_state']:
             checkmenuitem_save_tree_state.set_active(True)
 
         if gtkspell:

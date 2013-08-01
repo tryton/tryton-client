@@ -8,8 +8,8 @@ from tryton.gui.window.win_form import WinForm
 class Attachment(WinForm):
     "Attachment window"
 
-    def __init__(self, model_name, record_id, callback=None):
-        self.resource = '%s,%s' % (model_name, record_id)
+    def __init__(self, record, callback=None):
+        self.resource = '%s,%s' % (record.model_name, record.id)
         self.attachment_callback = callback
         screen = Screen('ir.attachment', domain=[
             ('resource', '=', self.resource),
@@ -17,7 +17,7 @@ class Attachment(WinForm):
                 'resource': self.resource,
             }, exclude_field='resource')
         screen.search_filter()
-        screen.parent = True
+        screen.parent = record
         super(Attachment, self).__init__(screen, self.callback,
             view_type='tree')
 

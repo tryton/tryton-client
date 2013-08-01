@@ -201,10 +201,10 @@ class Form(SignalEvent, TabContent):
         return self.screen.id_get()
 
     def sig_attach(self, widget=None):
-        record_id = self.id_get()
-        if record_id is False or record_id < 0:
+        record = self.screen.current_record
+        if not record or record.id < 0:
             return
-        Attachment(self.model, record_id,
+        Attachment(record,
             lambda: self.update_attachment_count(reload=True))
 
     def update_attachment_count(self, reload=False):
