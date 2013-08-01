@@ -345,14 +345,7 @@ class Form(SignalEvent, TabContent):
     def sig_reload(self, test_modified=True):
         if not hasattr(self, 'screen'):
             return False
-        if test_modified and self.screen.modified():
-            res = sur_3b(_('This record has been modified\n'
-                    'do you want to save it ?'))
-            if res == 'ok':
-                self.sig_save(None)
-            elif res == 'ko':
-                pass
-            else:
+        if test_modified and not self.modified_save():
                 return False
         self.screen.cancel_current()
         set_cursor = False
