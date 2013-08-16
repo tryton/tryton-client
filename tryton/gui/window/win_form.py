@@ -48,8 +48,14 @@ class WinForm(NoModal):
 
         self.but_ok = None
         self.but_new = None
-        self.but_cancel = self.win.add_button(gtk.STOCK_CANCEL,
-            gtk.RESPONSE_CANCEL)
+
+        if view_type == 'form':
+            if not new and self.screen.current_record.id < 0:
+                stock_id = gtk.STOCK_DELETE
+            else:
+                stock_id = gtk.STOCK_CANCEL
+            self.but_cancel = self.win.add_button(stock_id,
+                gtk.RESPONSE_CANCEL)
 
         if new and self.many:
             self.but_new = self.win.add_button(gtk.STOCK_NEW,
