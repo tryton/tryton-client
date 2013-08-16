@@ -114,6 +114,8 @@ class Record(SignalEvent):
                     record.exception = bool(exception)
                 value = id2value.get(id)
                 if record and not record.destroyed and value:
+                    for key in record.modified_fields:
+                        value.pop(key)
                     record.set(value, signal=False)
         return self.group.fields.get(name, False)
 
@@ -217,7 +219,7 @@ class Record(SignalEvent):
 
     def get_loaded(self, fields=None):
         if fields:
-            return set(fields) <= self._loaded
+            return set(fields) <= (self._loaded | set(self.modified_fields))
         return set(self.group.fields.keys()) == self._loaded
 
     loaded = property(get_loaded)
