@@ -163,6 +163,7 @@ class ViewForm(ParserView):
 
     def button_clicked(self, widget):
         record = self.screen.current_record
+        self.set_value()
         fields = self.get_fields()
         if not record.validate(fields):
             self.screen.display(set_cursor=True)
