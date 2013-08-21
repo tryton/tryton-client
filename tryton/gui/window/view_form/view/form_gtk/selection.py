@@ -14,6 +14,8 @@ class PopdownMixin(object):
         self._selection = {}
 
     def set_popdown(self, selection, entry):
+        if not entry.child:  # entry is destroyed
+            return
         # Don't update popdown if not changed
         if (list(x[0] for x in entry.get_model() or [])
                 == [x[1] for x in selection]):
@@ -85,6 +87,8 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
         return self.entry.child
 
     def get_value(self):
+        if not self.entry.child:  # entry is destroyed
+            return
         text = self.entry.child.get_text()
         value = None
         if text:
