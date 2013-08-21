@@ -112,6 +112,8 @@ class DictSelectionEntry(DictEntry):
         return widget
 
     def get_value(self):
+        if not self.widget.child:  # widget is destroyed
+            return
         text = self.widget.child.get_text()
         value = None
         if text:
