@@ -7,6 +7,7 @@ from tryton.pyson import PYSONDecoder
 import field as fields
 from functools import reduce
 from tryton.common import RPCExecute, RPCException
+from tryton.config import CONFIG
 
 
 class Record(SignalEvent):
@@ -55,31 +56,7 @@ class Record(SignalEvent):
                         break
             else:
                 loading = self.group.fields[name].attrs.get('loading', 'eager')
-            if self in self.group and loading == 'eager':
-                idx = self.group.index(self)
-                length = len(self.group)
-                n = 1
-                while len(id2record) < 80 and (idx - n >= 0
-                        or idx + n < length) and n < 100:
-                    if idx - n >= 0:
-                        record = self.group[idx - n]
-                        if name not in record._loaded and record.id >= 0:
-                            id2record[record.id] = record
-                    if idx + n < length:
-                        record = self.group[idx + n]
-                        if name not in record._loaded and record.id >= 0:
-                            id2record[record.id] = record
-                    n += 1
-            record_context = self.context_get()
-            if loading == 'eager' and len(id2record) < 80:
-                for record in self.pool:
-                    if (name not in record._loaded
-                            and record.id >= 0
-                            and record.id not in id2record
-                            and record.context_get() == record_context):
-                        id2record[record.id] = record
-                        if len(id2record) == 80:
-                            break
+
             if loading == 'eager':
                 fnames = [fname
                     for fname, field in self.group.fields.iteritems()
@@ -93,6 +70,47 @@ class Record(SignalEvent):
             if 'rec_name' not in fnames:
                 fnames.append('rec_name')
             fnames.append('_timestamp')
+
+            record_context = self.context_get()
+            if loading == 'eager':
+                limit = int(CONFIG['client.limit'])
+                if not self.parent:
+                    # If not a children no need to load too much
+                    limit = int(limit / len(fnames))
+
+                def filter_group(record):
+                    return name not in record._loaded and record.id >= 0
+
+                def filter_pool(record):
+                    return (filter_group(record)
+                        and record.id not in id2record
+                        and record.context_get() == record_context)
+
+                if self.parent:
+                    pool = list(self.pool)
+                else:
+                    # Don't look at the pool if it is the root
+                    pool = []
+                for group, filter_ in (
+                        (self.group, filter_group),
+                        (pool, filter_pool),
+                        ):
+                    if self in group:
+                        idx = group.index(self)
+                        length = len(group)
+                        n = 1
+                        while len(id2record) < limit and (idx - n >= 0
+                                or idx + n < length) and n < 2 * limit:
+                            if idx - n >= 0:
+                                record = group[idx - n]
+                                if filter_(record):
+                                    id2record[record.id] = record
+                            if idx + n < length:
+                                record = group[idx + n]
+                                if filter_(record):
+                                    id2record[record.id] = record
+                            n += 1
+
             ctx = record_context.copy()
             ctx.update(dict(('%s.%s' % (self.model_name, fname), 'size')
                     for fname, field in self.group.fields.iteritems()
