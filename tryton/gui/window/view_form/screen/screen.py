@@ -132,12 +132,21 @@ class Screen(SignalEvent):
                 else:
                     odict = dict
                 fields = odict((name, fields[name]) for name in xml_fields)
-                if 'id' not in fields:
-                    fields['id'] = {
-                        'string': _('ID'),
-                        'name': 'id',
-                        'type': 'integer',
-                        }
+                for name, string, type_ in (
+                        ('id', _('ID'), 'integer'),
+                        ('create_uid', _('Creation User'), 'many2one'),
+                        ('create_date', _('Creation Date'), 'datetime'),
+                        ('write_uid', _('Modification User'), 'many2one'),
+                        ('write_date', _('Modification Date'), 'datetime'),
+                        ):
+                    if name not in fields:
+                        fields[name] = {
+                            'string': string,
+                            'name': name,
+                            'type': type_,
+                            }
+                        if type_ == 'datetime':
+                            fields[name]['format'] = '"%H:%M:%S"'
 
                 self.domain_parser = DomainParser(fields)
 
