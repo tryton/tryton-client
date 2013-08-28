@@ -196,8 +196,10 @@ class ParserForm(ParserInterface):
                 continue
             attrs = common.node_attributes(node)
             if not cursor_widget:
-                if attrs.get('name') and fields.get(attrs['name']) \
-                        and attrs['name'] != self.screen.exclude_field:
+                if (attrs.get('name') and fields.get(attrs['name'])
+                        and not int(attrs.get('invisible', 0))
+                        and not int(attrs.get('readonly', 0))
+                        and attrs['name'] != self.screen.exclude_field):
                     cursor_widget = attrs.get('name')
             yexpand = int(attrs.get('yexpand', 0))
             yfill = int(attrs.get('yfill', 0))
