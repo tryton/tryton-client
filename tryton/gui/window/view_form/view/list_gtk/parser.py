@@ -915,7 +915,10 @@ class Selection(Char, SelectionMixin):
         field = record[self.field_name]
         self.update_selection(record, field)
         value = record[self.field_name].get(record)
-        return dict(self.selection).get(value, '')
+        text = dict(self.selection).get(value, '')
+        if value and not text:
+            text = self.get_inactive_selection(value)
+        return text
 
     def value_from_text(self, record, text, callback=None):
         field = record[self.field_name]

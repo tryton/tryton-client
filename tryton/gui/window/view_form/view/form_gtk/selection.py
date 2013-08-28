@@ -100,6 +100,11 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
                     value = val
                     if len(txt) == len(text):
                         break
+            if not value:
+                for val, txt in self.inactive_selection:
+                    if txt == text:
+                        value = val
+                        break
         return value
 
     def sig_key_press(self, widget, event):
@@ -154,5 +159,10 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
                         child.set_text(long_text)
                         found = True
                         break
+            if not found:
+                text = self.get_inactive_selection(value)
+                if text:
+                    child.set_text(text)
+                    found = True
             if not found:
                 child.set_text('')

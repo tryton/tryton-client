@@ -11,6 +11,7 @@ class SelectionMixin(object):
     def __init__(self, *args, **kwargs):
         super(SelectionMixin, self).__init__(*args, **kwargs)
         self.selection = None
+        self.inactive_selection = []
         self._last_domain = None
         self._values2selection = {}
         self._domain_cache = {}
@@ -36,6 +37,7 @@ class SelectionMixin(object):
         if self.attrs.get('sort', True):
             selection.sort(key=operator.itemgetter(1))
         self.selection = selection[:]
+        self.inactive_selection = []
 
     def update_selection(self, record, field):
         if not field:
@@ -71,6 +73,23 @@ class SelectionMixin(object):
                 selection = []
                 self._last_domain = None
             self.selection = selection[:]
+            self.inactive_selection = []
+
+    def get_inactive_selection(self, value):
+        if 'relation' not in self.attrs:
+            return ''
+        for val, text in self.inactive_selection:
+            if str(val) == str(value):
+                return text
+        else:
+            try:
+                result, = RPCExecute('model', self.attrs['relation'], 'read',
+                    [value], ['rec_name'])
+                self.inactive_selection.append((result['id'],
+                        result['rec_name']))
+                return result['rec_name']
+            except RPCException:
+                return ''
 
 
 def selection_shortcuts(entry):
