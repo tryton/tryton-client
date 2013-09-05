@@ -115,7 +115,7 @@ class Record(SignalEvent):
                 value = id2value.get(id)
                 if record and not record.destroyed and value:
                     for key in record.modified_fields:
-                        value.pop(key)
+                        value.pop(key, None)
                     record.set(value, signal=False)
         return self.group.fields.get(name, False)
 
