@@ -18,6 +18,7 @@ Comment[es_ES]=Acceso al servidor Tryton
 Comment[es_CO]=Acceso al servidor Tryton
 Comment[fr]=Accéder au serveur Tryton
 Comment[ru]=Подключение к серверу Tryton
+Keywords=Business;Management;Enterprise;ERP;Framework;Client;
 Exec=tryton
 Icon=tryton-icon
 Terminal=false
