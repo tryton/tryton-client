@@ -5,6 +5,8 @@ from functools import reduce
 import gtk
 import gettext
 from interface import ParserView
+from tryton.common.focus import (get_invisible_ancestor, find_focused_child,
+    next_focus_widget)
 
 _ = gettext.gettext
 
@@ -119,6 +121,7 @@ class ViewForm(ParserView):
             fields.sort(key=operator.itemgetter(1), reverse=True)
             for field, _ in fields:
                 record[field].get(record)
+        focused_widget = find_focused_child(self.widget)
         for name, widgets in self.widgets.iteritems():
             field = None
             if record:
@@ -129,6 +132,12 @@ class ViewForm(ParserView):
                 widget.display(record, field)
         for widget in self.state_widgets:
             widget.state_set(record)
+        if focused_widget:
+            invisible_ancestor = get_invisible_ancestor(focused_widget)
+            if invisible_ancestor:
+                new_focused_widget = next_focus_widget(invisible_ancestor)
+                if new_focused_widget:
+                    new_focused_widget.grab_focus()
         return True
 
     def set_cursor(self, new=False, reset_view=True):
