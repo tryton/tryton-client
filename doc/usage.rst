@@ -105,10 +105,8 @@ Figure: Tryton client application::
                      |             | |                                               ||
                      |             | |                                               ||
                      |             | |                                               ||
-                     |             | |                                               ||
-                     |_____________| |_______________________________________________||
-                     |________________________________________________________________|
-  Status bar         |username company           Waiting requests...         login@...|
+                     |             | |______________________________________________ ||
+  URL                |_____________| |tryton://______________________________________||
                      |________________________________________________________________|
 
 
@@ -188,30 +186,6 @@ usually an item of the `Menu`_ opening when the user calls his
 __ Menu-User-Home_
 
 __ Menu-User-Preferences_
-
-
-Status bar
-++++++++++
-The status bar provides general informations of the state of the
-Tryton client. It is divided in three parts.
-
-* On its left side the real name and company name of the users actual company
-  is shown.
-* In the center of the status bar the number of waiting requests for the
-  actual user are displayed.
-* On its right side are details of the server connection shown including
-  database and user informations if connected. It is also noted there, if
-  there is no connection to a Tryton server at all. The right side information
-  of the status bar is build with the following pattern::
-
-    <user-name>@<tryton-server-address>:<port>/<database-name>
-
-  If the client is connected to the server with an SSL-secured connection, an
-  additional lock icon appears rightmost some certificate details in a mouse
-  hover popup.
-
-The Status bar can be enabled and disabled in the menu at
-Options > Form > Status bar
 
 
 Menu Bar Items
@@ -396,8 +370,7 @@ Server (connection) dialog:
 
 User
 ^^^^
-This menu bar item controls the preferences of the actual user and connects
-to the *request system* in Tryton.
+This menu bar item controls the preferences of the actual user.
 
 .. _Menu-User-Preferences:
 
@@ -432,64 +405,6 @@ Menu Toggle:
 
 Home:
   Opens a new `Home`__ tab.
-
-.. _Menu-User-send-a-request:
-
-Send a Request
-  Opens a tab in :term:`form view` which enables the user to send
-  requests to other users of the same database.
-
-.. _Menu-User-read-my-request:
-
-Read my Requests
-  Opens a tab in :term:`tree view` showing all requests related to the
-  actual user. Fields and actions of requests:
-
-  * On top
-
-    - From: User name of the sender
-    - To: User name of the request recipient
-    - References: Count of the attached references
-    - Subject: The subject of the request.
-    - Priority: An importance priority of the request.
-
-      + High
-      + Low
-      + Normal
-
-  * *Request* tab
-
-    - Body: The textual part of the request.
-    - History: The history of past replies to this request.
-
-      + From: Sender of the past request
-      + To: Receiver of the past request
-      + Summary: Summary of the body text of the past request.
-
-  * Trigger Date: Defines time and date when the request will be sent
-    automatically.
-  * State: State of the request. Possible states for the request are:
-
-    - Draft: The request is saved in the system, but not posted.
-    - Waiting: The request is sent without receiving a reply message.
-    - Chatting: The message is replied or in discussion.
-    - Closed: The message is closed/fulfilled/answered.
-
-  * Actions:
-
-    - Send: Sends the actual message
-    - Reply: Replies or answers the actual message
-    - close: Closes the actual message
-
-  * *References* tab
-
-    - References
-
-      + Reference: The reference type
-      + (Target): Defines an reference attached to the request.
-
-.. note:: When talking about requests, think of an internal system of
-   Tryton, which is very similar to email.
 
 
 Options
@@ -539,8 +454,7 @@ Normal:
 .. _Menu-Options-Mode_PDA:
 
 PDA:
-  Shows the client in a condensed mode. The PDA (Personal Data Assistant) mode
-  hides the shortcut menu in tree views and the system status bar.
+  Shows the client in a condensed mode.
 
 Form
 ++++
@@ -549,11 +463,6 @@ Form
 
 Toolbar:
   Checkbox to disable/enable the tool bar.
-
-.. _Menu-Options-Form-Statusbar:
-
-Statusbar:
-  Checkbox to disable/enable the status bar.
 
 .. _Menu-Options-Form-Save_Columns_Width:
 
