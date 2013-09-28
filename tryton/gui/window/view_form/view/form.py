@@ -178,8 +178,8 @@ class ViewForm(ParserView):
             self.screen.display(set_cursor=True)
             return
         else:
-            widget.set_sensitive(False)
+            widget.handler_block_by_func(self.button_clicked)
             try:
                 self.screen.button(widget.attrs)
             finally:
-                widget.set_sensitive(True)
+                widget.handler_unblock_by_func(self.button_clicked)
