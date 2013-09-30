@@ -441,7 +441,7 @@ class One2Many(WidgetInterface):
         if field is None:
             self.screen.new_group()
             self.screen.current_record = None
-            self.screen.parent = True
+            self.screen.parent = None
             self.screen.display()
             return False
         new_group = field.get_client(record)
