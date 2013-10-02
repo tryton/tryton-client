@@ -58,11 +58,13 @@ def all_languages():
 data_files = [
     ('share/pixmaps/tryton', glob.glob('share/pixmaps/tryton/*.png') +
         glob.glob('share/pixmaps/tryton/*.svg')),
+    ('share/locale', ['share/locale/tryton.pot']),
     ]
 for lang in languages:
     data_files += [
         ('share/locale/%s/LC_MESSAGES' % lang,
-            glob.glob('share/locale/%s/LC_MESSAGES/*.mo' % lang)),
+            glob.glob('share/locale/%s/LC_MESSAGES/*.mo' % lang) +
+            glob.glob('share/locale/%s/LC_MESSAGES/*.po' % lang)),
         ]
 
 if os.name == 'nt':
