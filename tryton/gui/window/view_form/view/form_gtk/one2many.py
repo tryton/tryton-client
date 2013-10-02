@@ -380,8 +380,7 @@ class One2Many(WidgetInterface):
         self.view.set_value()
         domain = self.field.domain_get(self.record)
         context = self.field.context_get(self.record)
-        domain = domain[:]
-        domain.extend(self.record.expr_eval(self.attrs.get('add_remove')))
+        domain = [domain, self.record.expr_eval(self.attrs.get('add_remove'))]
         removed_ids = self.field.get_removed_ids(self.record)
 
         self.focus_out = False
@@ -492,8 +491,7 @@ class One2Many(WidgetInterface):
             return
         model = self.attrs['relation']
         domain = self.field.domain_get(self.record)
-        domain = domain[:]
-        domain.extend(self.record.expr_eval(self.attrs.get('add_remove')))
+        domain = [domain, self.record.expr_eval(self.attrs.get('add_remove'))]
         removed_ids = self.field.get_removed_ids(self.record)
         domain = ['OR', domain, ('id', 'in', removed_ids)]
         update_completion(self.wid_text, self.record, self.field, model,
