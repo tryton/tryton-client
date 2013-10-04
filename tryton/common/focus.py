@@ -59,4 +59,3 @@ def next_focus_widget(widget):
             return focus_widget
         else:
             return next_focus_widget(widget.parent)
-

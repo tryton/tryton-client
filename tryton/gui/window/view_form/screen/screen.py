@@ -17,7 +17,6 @@ import gettext
 import logging
 
 from tryton.gui.window.view_form.model.group import Group
-from tryton.gui.window.view_form.model.record import Record
 from tryton.gui.window.view_form.view.screen_container import ScreenContainer
 from tryton.signal_event import SignalEvent
 from tryton.config import CONFIG
@@ -358,7 +357,8 @@ class Screen(SignalEvent):
                     self.current_record not in self.current_record.group):
                 self.current_record = None
             fields = self.current_view.get_fields()
-            if self.current_record and not self.current_record.validate(fields):
+            if (self.current_record
+                    and not self.current_record.validate(fields)):
                 self.screen_container.set(self.current_view.widget)
                 self.set_cursor()
                 self.current_view.display()
@@ -914,4 +914,3 @@ class Screen(SignalEvent):
         return urlparse.urlunparse(('tryton',
                 '%s:%s' % (rpc._HOST, rpc._PORT),
                 '/'.join(path), query_string, '', ''))
-

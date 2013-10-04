@@ -157,20 +157,20 @@ dist = setup(name=PACKAGE,
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Office/Business',
-    ],
+        ],
     license=LICENSE,
     install_requires=[
-#        "pygtk >= 2.6",
+        #"pygtk >= 2.6",
         "python-dateutil",
-    ] + WEAKREF,
+        ] + WEAKREF,
     extras_require={
         'timezone': ['pytz'],
         'simplejson': ['simplejson'],
         'cdecimal': ['cdecimal'],
         'calendar': ['GooCalendar'],
-    },
+        },
     **args
-)
+    )
 
 if os.name == 'nt':
     def find_gtk_dir():
@@ -391,15 +391,15 @@ elif sys.platform == 'darwin':
                         'immodules', '*.so')),
                 iglob(os.path.join(pango_dist_dir, '*', 'modules', '*.so'))):
             libs = [lib.split('(')[0].strip()
-                    for lib in Popen(['otool', '-L', library],
-                            stdout=PIPE).communicate()[0].splitlines()
-                    if 'compatibility' in lib]
+                for lib in Popen(['otool', '-L', library],
+                    stdout=PIPE).communicate()[0].splitlines()
+                if 'compatibility' in lib]
             libs = dict(((lib, None) for lib in libs if gtk_dir in lib))
             for lib in libs.keys():
                 fixed = lib.replace(gtk_dir + '/lib',
-                        '@executable_path/../Frameworks')
+                    '@executable_path/../Frameworks')
                 Popen(['install_name_tool', '-change', lib, fixed,
-                    library]).wait()
+                        library]).wait()
 
         for file in ('CHANGELOG', 'COPYRIGHT', 'LICENSE', 'README', 'TODO'):
             shutil.copyfile(os.path.join(os.path.dirname(__file__), file),
@@ -415,5 +415,5 @@ elif sys.platform == 'darwin':
                 + '.dmg')
         if os.path.isfile(dmg_file):
             os.remove(dmg_file)
-        Popen(['hdiutil', 'create', dmg_file, '-volname', 'Tryton Client ' +
-            VERSION, '-fs', 'HFS+', '-srcfolder', dist_dir]).wait()
+        Popen(['hdiutil', 'create', dmg_file, '-volname', 'Tryton Client '
+                + VERSION, '-fs', 'HFS+', '-srcfolder', dist_dir]).wait()

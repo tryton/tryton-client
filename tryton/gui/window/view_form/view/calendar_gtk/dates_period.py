@@ -14,8 +14,7 @@ class DatesPeriod():
         self.end = end
 
     def is_in(self, period):
-        return self.start >= period.start \
-               and self.end <= period.end
+        return self.start >= period.start and self.end <= period.end
 
     def get_dates(self, format_datetime=False):
         if not format_datetime:

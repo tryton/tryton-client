@@ -3,7 +3,6 @@
 
 import os
 import sys
-import socket
 import gettext
 from urlparse import urlparse, parse_qsl
 import urllib
