@@ -90,10 +90,8 @@ class Toolbar(gtk.Toolbar):
             gtk.gdk.MODIFIER_MASK, gtk.ACCEL_VISIBLE)
         self.insert(week_button, -1)
 
-        month_view_label = gtk.Label(_('Month View'))
         month_button = gtk.RadioToolButton(week_button)
-        month_button.set_icon_widget(month_view_label)
-        month_button.set_label(_('month_view'))
+        month_button.set_label(_('Month View'))
         month_button.connect("clicked", self.on_month_button_clicked)
         month_button.add_accelerator("clicked", self.accel_group,
             gtk.keysyms.m, gtk.gdk.MODIFIER_MASK, gtk.ACCEL_VISIBLE)
