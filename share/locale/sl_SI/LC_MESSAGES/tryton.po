@@ -7,11 +7,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 3.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2013-09-23 16:53+0200\n"
-"PO-Revision-Date: 2013-09-23 17:25+0200\n"
+"POT-Creation-Date: 2013-10-17 11:31+0200\n"
+"PO-Revision-Date: 2013-10-17 11:35+0200\n"
 "Last-Translator: Venceslav Vezjak <vezjakv@gmail.com>\n"
 "Language-Team: sl_SI <LL@li.org>\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3)\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
+"|| n%100==4 ? 2 : 3)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -92,7 +93,7 @@ msgstr "Izbira"
 msgid "Your selection:"
 msgstr "Vaša izbira:"
 
-#: tryton/common/common.py:497 tryton/gui/main.py:1405
+#: tryton/common/common.py:497 tryton/gui/main.py:1407
 #: tryton/gui/window/win_export.py:402
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:69
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:138
@@ -152,7 +153,7 @@ msgstr "Napaka"
 
 #: tryton/common/common.py:836
 msgid "Report Bug"
-msgstr "Prijavi hrošča"
+msgstr "Prijava programske napake"
 
 #: tryton/common/common.py:843
 msgid "Application Error!"
@@ -165,11 +166,11 @@ msgstr "Napaka: "
 #: tryton/common/common.py:886
 #, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
-msgstr "Za prijavo hroščev morate imeti račun na <u>%s</u>"
+msgstr "Za prijavo programskih napak morate imeti odprt račun pri <u>%s</u>"
 
 #: tryton/common/common.py:916
 msgid "Bug Tracker"
-msgstr "Sledilec hroščev"
+msgstr "Sledilnik programskih napak"
 
 #: tryton/common/common.py:934
 msgid "User:"
@@ -185,14 +186,15 @@ msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
-"Drugi uporabnik je že prijavil isti hrošč.\n"
-"Zaradi obveščanja je vaše uporabniško ime dodano seznam tega hrošča"
+"Drugi uporabnik je že prijavil enako programsko napako.\n"
+"Zaradi obveščanja je vaše uporabniško ime dodano na seznam te programske "
+"napake"
 
 #: tryton/common/common.py:1002
 msgid "Created new bug with ID "
-msgstr "Ustvarjen nov hrošč z ID "
+msgstr "Evidentirana je nova programska napaka z ID "
 
-#: tryton/common/common.py:1010 tryton/gui/main.py:919
+#: tryton/common/common.py:1010 tryton/gui/main.py:921
 msgid ""
 "Connection error!\n"
 "Bad username or password!"
@@ -219,7 +221,7 @@ msgid "Security risk!"
 msgstr "Varnostno tveganje"
 
 #: tryton/common/common.py:1040 tryton/common/common.py:1106
-#: tryton/gui/main.py:916
+#: tryton/gui/main.py:918
 msgid ""
 "Connection error!\n"
 "Unable to connect to the server!"
@@ -321,27 +323,27 @@ msgstr "_Elektronska pošta..."
 msgid "Print..."
 msgstr "_Izpis..."
 
-#: tryton/gui/main.py:218
+#: tryton/gui/main.py:217
 msgid "_File"
 msgstr "_Datoteka"
 
-#: tryton/gui/main.py:226
+#: tryton/gui/main.py:225
 msgid "_User"
 msgstr "_Uporabnik"
 
-#: tryton/gui/main.py:240
+#: tryton/gui/main.py:239
 msgid "_Options"
 msgstr "_Možnosti"
 
-#: tryton/gui/main.py:248
+#: tryton/gui/main.py:247
 msgid "Fa_vorites"
 msgstr "P_riljubljeno"
 
-#: tryton/gui/main.py:264
+#: tryton/gui/main.py:263
 msgid "_Help"
 msgstr "_Pomoč"
 
-#: tryton/gui/main.py:286 tryton/gui/window/win_search.py:26
+#: tryton/gui/main.py:285 tryton/gui/window/win_search.py:26
 #: tryton/gui/window/view_form/view/screen_container.py:100
 #: tryton/gui/window/view_form/view/form_gtk/dictionary.py:333
 #: tryton/gui/window/view_form/view/form_gtk/many2many.py:40
@@ -349,171 +351,171 @@ msgstr "_Pomoč"
 msgid "Search"
 msgstr "Išči"
 
-#: tryton/gui/main.py:365
+#: tryton/gui/main.py:364
 msgid "No result found."
 msgstr "Brez rezultatov."
 
-#: tryton/gui/main.py:385
+#: tryton/gui/main.py:384
 msgid "_Connect..."
 msgstr "_Poveži..."
 
-#: tryton/gui/main.py:394
+#: tryton/gui/main.py:393
 msgid "_Disconnect"
 msgstr "Pre_kini povezavo"
 
-#: tryton/gui/main.py:404
+#: tryton/gui/main.py:403
 msgid "Data_base"
-msgstr "_Zbirka"
+msgstr "Podatkovna _baza"
 
-#: tryton/gui/main.py:415
+#: tryton/gui/main.py:414
 msgid "_New Database..."
-msgstr "_Nova zbirka..."
+msgstr "_Nova podatkovna baza ..."
 
-#: tryton/gui/main.py:424
+#: tryton/gui/main.py:423
 msgid "_Restore Database..."
-msgstr "Po_vrni zbirko..."
+msgstr "_Obnovitev podatkovne baze ..."
 
-#: tryton/gui/main.py:433
+#: tryton/gui/main.py:432
 msgid "_Backup Database..."
-msgstr "_Arhiviraj zbirko..."
+msgstr "Varnostno _kopiranje podatkovne baze ..."
 
-#: tryton/gui/main.py:442
+#: tryton/gui/main.py:441
 msgid "Dro_p Database..."
-msgstr "Zav_rži zbirko..."
+msgstr "_Brisanje podatkovne baze ..."
 
-#: tryton/gui/main.py:451
+#: tryton/gui/main.py:450
 msgid "_Quit..."
 msgstr "_Izhod..."
 
-#: tryton/gui/main.py:466
+#: tryton/gui/main.py:465
 msgid "_Preferences..."
 msgstr "_Nastavitve..."
 
-#: tryton/gui/main.py:477
+#: tryton/gui/main.py:476
 msgid "_Menu Reload"
 msgstr "_Ponovno naloži meni"
 
-#: tryton/gui/main.py:486
+#: tryton/gui/main.py:485
 msgid "_Menu Toggle"
 msgstr "_Preklopi meni"
 
-#: tryton/gui/main.py:493
+#: tryton/gui/main.py:492
 msgid "_Global Search"
 msgstr "_Globalno iskanje"
 
-#: tryton/gui/main.py:508
+#: tryton/gui/main.py:507
 msgid "_Toolbar"
 msgstr "_Orodna vrstica"
 
-#: tryton/gui/main.py:516
+#: tryton/gui/main.py:515
 msgid "_Default"
 msgstr "_Privzeto"
 
-#: tryton/gui/main.py:526
+#: tryton/gui/main.py:525
 msgid "_Text and Icons"
 msgstr "Bese_dilo in ikone"
 
-#: tryton/gui/main.py:536
+#: tryton/gui/main.py:535
 msgid "_Icons"
 msgstr "_Ikone"
 
-#: tryton/gui/main.py:545
+#: tryton/gui/main.py:544
 msgid "_Text"
 msgstr "_Besedilo"
 
-#: tryton/gui/main.py:554
+#: tryton/gui/main.py:553
 msgid "_Menubar"
 msgstr "_Menu vrstica"
 
-#: tryton/gui/main.py:562
+#: tryton/gui/main.py:561
 msgid "Change Accelerators"
 msgstr "Spremeni bližnjice"
 
-#: tryton/gui/main.py:570
+#: tryton/gui/main.py:569
 msgid "_Mode"
 msgstr "_Način"
 
-#: tryton/gui/main.py:578
+#: tryton/gui/main.py:577
 msgid "_Normal"
 msgstr "_Navaden"
 
-#: tryton/gui/main.py:586
+#: tryton/gui/main.py:585
 msgid "_PDA"
 msgstr "_PDA"
 
-#: tryton/gui/main.py:593
+#: tryton/gui/main.py:592
 msgid "_Form"
 msgstr "O_brazec"
 
-#: tryton/gui/main.py:602
+#: tryton/gui/main.py:601
 msgid "Save Width/Height"
 msgstr "Shrani širino/višino"
 
-#: tryton/gui/main.py:613
+#: tryton/gui/main.py:612
 msgid "Save Tree State"
 msgstr "Shrani stanje drevesa"
 
-#: tryton/gui/main.py:625
+#: tryton/gui/main.py:624
 msgid "Spell Checking"
 msgstr "Črkovanje"
 
-#: tryton/gui/main.py:635
+#: tryton/gui/main.py:634
 msgid "Tabs Position"
 msgstr "Položaj zavihkov"
 
-#: tryton/gui/main.py:643
+#: tryton/gui/main.py:642
 msgid "Top"
 msgstr "Zgoraj"
 
-#: tryton/gui/main.py:652
+#: tryton/gui/main.py:651
 msgid "Left"
 msgstr "Levo"
 
-#: tryton/gui/main.py:662
+#: tryton/gui/main.py:661
 msgid "Right"
 msgstr "Desno"
 
-#: tryton/gui/main.py:672
+#: tryton/gui/main.py:671
 msgid "Bottom"
 msgstr "Spodaj"
 
-#: tryton/gui/main.py:681
+#: tryton/gui/main.py:680
 msgid "_Previous Tab"
 msgstr "P_rejšnji zavihek"
 
-#: tryton/gui/main.py:687
+#: tryton/gui/main.py:686
 msgid "_Next Tab"
 msgstr "_Naslednji zavihek"
 
-#: tryton/gui/main.py:693
+#: tryton/gui/main.py:692
 msgid "Search Limit..."
 msgstr "Omejitev iskanja..."
 
-#: tryton/gui/main.py:699
+#: tryton/gui/main.py:698
 msgid "_Email..."
 msgstr "_Epošta..."
 
-#: tryton/gui/main.py:707
+#: tryton/gui/main.py:706
 msgid "_Save Options"
 msgstr "_Shrani možnosti"
 
-#: tryton/gui/main.py:719
+#: tryton/gui/main.py:718
 msgid "_Tips..."
 msgstr "_Nasveti..."
 
-#: tryton/gui/main.py:728
+#: tryton/gui/main.py:727
 msgid "_Keyboard Shortcuts..."
 msgstr "_Bližnjice na tipkovnici..."
 
-#: tryton/gui/main.py:737
+#: tryton/gui/main.py:736
 msgid "_About..."
 msgstr "_Vizitka..."
 
-#: tryton/gui/main.py:785
+#: tryton/gui/main.py:787
 msgid "Manage Favorites"
 msgstr "_Upravljaj zaznamke"
 
-#: tryton/gui/main.py:933
+#: tryton/gui/main.py:935
 msgid ""
 "The following action requires to close all tabs.\n"
 "Do you want to continue?"
@@ -521,19 +523,19 @@ msgstr ""
 "Za naslednji ukrep morajo biti vsi zavihki zaprti.\n"
 "Ali želite nadaljevati?"
 
-#: tryton/gui/main.py:1194
+#: tryton/gui/main.py:1196
 msgid "Close Tab"
 msgstr "Zapri zavihek"
 
-#: tryton/gui/main.py:1312
+#: tryton/gui/main.py:1314
 msgid ""
 "You are going to delete a Tryton database.\n"
 "Are you really sure to proceed?"
 msgstr ""
-"Nameravate zbrisati Tryton zbirko podatkov.\n"
+"Nameravate izbrisati Tryton podatkovno bazo.\n"
 "Ali ste res želite nadaljevati?"
 
-#: tryton/gui/main.py:1322
+#: tryton/gui/main.py:1324
 msgid ""
 "Wrong Tryton Server Password\n"
 "Please try again."
@@ -541,40 +543,40 @@ msgstr ""
 "Napačno geslo za Tryton strežnik.\n"
 "Prosimo, poskusite še enkrat."
 
-#: tryton/gui/main.py:1324 tryton/gui/main.py:1360 tryton/gui/main.py:1396
+#: tryton/gui/main.py:1326 tryton/gui/main.py:1362 tryton/gui/main.py:1398
 #: tryton/gui/window/dbcreate.py:382
 msgid "Access denied!"
 msgstr "Dostop zavrnjen!"
 
-#: tryton/gui/main.py:1327
+#: tryton/gui/main.py:1329
 msgid "Database drop failed with error message:\n"
-msgstr "Brisanje zbirke podatkov je odpovedalo z napako:\n"
-
-#: tryton/gui/main.py:1328
-msgid "Database drop failed!"
-msgstr "Brisanje zbirke podatkov je odpovedalo!"
+msgstr "Brisanje podatkovne baze je odpovedalo z napako:\n"
 
 #: tryton/gui/main.py:1330
-msgid "Database dropped successfully!"
-msgstr "Brisanje zbirke podatkov uspešno!"
+msgid "Database drop failed!"
+msgstr "Brisanje podatkovne baze je odpovedalo!"
 
-#: tryton/gui/main.py:1335
+#: tryton/gui/main.py:1332
+msgid "Database dropped successfully!"
+msgstr "Brisanje podatkovne baze uspešno zaključeno!"
+
+#: tryton/gui/main.py:1337
 msgid "Open Backup File to Restore..."
 msgstr "Odpri varnostno kopijo za obnovitev..."
 
-#: tryton/gui/main.py:1352
+#: tryton/gui/main.py:1354
 msgid ""
 "It is not possible to restore a password protected database.\n"
 "Backup and restore needed to be proceed manual."
 msgstr ""
-"Ni možno obnoviti zbirke podatkov, zaščitene z geslom.\n"
+"Ni možno obnoviti podatkovne baze, ki so zaščitene z geslom.\n"
 "Varnostno kopiranje in obnovitev se mora ročno izvesti."
 
-#: tryton/gui/main.py:1356 tryton/gui/main.py:1392
-msgid "Database is password protected!"
-msgstr "Zbirka podatkov je zaščitena z geslom!"
-
 #: tryton/gui/main.py:1358 tryton/gui/main.py:1394
+msgid "Database is password protected!"
+msgstr "Podatkovna baza je zaščitena z geslom!"
+
+#: tryton/gui/main.py:1360 tryton/gui/main.py:1396
 msgid ""
 "Wrong Tryton Server Password.\n"
 "Please try again."
@@ -582,37 +584,37 @@ msgstr ""
 "Napačno geslo za Tryton strežnik.\n"
 "Prosimo, poskusite še enkrat."
 
-#: tryton/gui/main.py:1363
+#: tryton/gui/main.py:1365
 msgid "Database restore failed with error message:\n"
-msgstr "Obnovitev zbirke podatkov je odpovedala z napako:\n"
+msgstr "Obnovitev podatkovne baze je odpovedala z napako:\n"
 
-#: tryton/gui/main.py:1365 tryton/gui/main.py:1370
+#: tryton/gui/main.py:1367 tryton/gui/main.py:1372
 msgid "Database restore failed!"
-msgstr "Obnovitev zbirke podatkov je odpovedala!"
+msgstr "Obnovitev podatkovne baze je odpovedala!"
 
-#: tryton/gui/main.py:1368
+#: tryton/gui/main.py:1370
 msgid "Database restored successfully!"
-msgstr "Obnovitev zbirke podatkov uspešna!"
+msgstr "Obnovitev podatkovne baze uspešno zaključena!"
 
-#: tryton/gui/main.py:1389
+#: tryton/gui/main.py:1391
 msgid ""
 "It is not possible to dump a password protected Database.\n"
 "Backup and restore needed to be proceed manual."
 msgstr ""
-"Ni možno zapisati zbirke podatkov, zaščitene z geslom.\n"
+"Ni možno zapisati podatkovne baze, ki je zaščitena z geslom.\n"
 "Varnostno kopiranje in obnovitev se mora ročno izvesti."
 
-#: tryton/gui/main.py:1399
-msgid "Database dump failed with error message:\n"
-msgstr "Zapisovanje zbirke podatkov je odpovedalo z napako:\n"
-
 #: tryton/gui/main.py:1401
-msgid "Database dump failed!"
-msgstr "Zapisovanje zbirke podatkov odpovedalo!"
+msgid "Database dump failed with error message:\n"
+msgstr "Zapisovanje podatkovne baze je odpovedalo z napako:\n"
 
-#: tryton/gui/main.py:1412
+#: tryton/gui/main.py:1403
+msgid "Database dump failed!"
+msgstr "Zapisovanje podatkovne baze odpovedalo!"
+
+#: tryton/gui/main.py:1414
 msgid "Database backuped successfully!"
-msgstr "Varnostno kopiranje zbirke podatkov uspešno!"
+msgstr "Varnostno kopiranje podatkovne baze uspešno zaključeno!"
 
 #: tryton/gui/window/board.py:19 tryton/gui/window/form.py:30
 msgid "New"
@@ -679,7 +681,10 @@ msgid ""
 "This is the URL of the Tryton server. Use server 'localhost' and port "
 "'8000' if the server is installed on this computer. Click on 'Change' to "
 "change the address."
-msgstr "To je URL Tryton strežnika. Če je strežnik nameščen na tem računalniku, uporabi strežnik 'localhost' in vrata '8000'. Za spremembo naslova klikni na 'Spremeni'."
+msgstr ""
+"To je URL Tryton strežnika. Če je strežnik nameščen na tem računalniku, "
+"uporabi strežnik 'localhost' in vrata '8000'. Za spremembo naslova klikni"
+" na 'Spremeni'."
 
 #: tryton/gui/window/dbcreate.py:45
 msgid "No connection!"
@@ -697,12 +702,13 @@ msgstr ""
 "Ni se možno povezati s strežnikom!\n"
 "1. Poskusi preveriti, če strežnik teče.\n"
 "2. Preveri, na katerem naslovu in vratih posluša.\n"
-"3. Če je med strežnikom in tem odjemalcem požarni zid, zagotovi, da naslov in vrata (ponavadi 8000) strežnika nista blokirana.\n"
+"3. Če je med strežnikom in tem odjemalcem požarni zid, zagotovi, da "
+"naslov in vrata (ponavadi 8000) strežnika nista blokirana.\n"
 "Za spremembo naslova klikni na 'Spremeni'."
 
 #: tryton/gui/window/dbcreate.py:137
 msgid "Create new database"
-msgstr "Ustvari novo zbirko podatkov"
+msgstr "Ustvari novo podatkovno bazo"
 
 #: tryton/gui/window/dbcreate.py:147
 msgid "C_reate"
@@ -710,7 +716,7 @@ msgstr "_Ustvari"
 
 #: tryton/gui/window/dbcreate.py:155
 msgid "Create the new database."
-msgstr "Ustvari novo zbirko podatkov."
+msgstr "Ustvari novo podatkovno bazo."
 
 #: tryton/gui/window/dbcreate.py:166
 msgid "Server Setup:"
@@ -726,7 +732,10 @@ msgid ""
 "This is the URL of the server. Use server 'localhost' and port '8000' if "
 "the server is installed on this computer. Click on 'Change' to change the"
 " address."
-msgstr "To je URL Tryton strežnika. Če je strežnik nameščen na tem računalniku, uporabi strežnik 'localhost' in vrata '8000'. Za spremembo naslova klikni na 'Spremeni'."
+msgstr ""
+"To je URL Tryton strežnika. Če je strežnik nameščen na tem računalniku, "
+"uporabi strežnik 'localhost' in vrata '8000'. Za spremembo naslova klikni"
+" na 'Spremeni'."
 
 #: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:148
 #: tryton/gui/window/dbrestore.py:91
@@ -753,11 +762,11 @@ msgstr ""
 
 #: tryton/gui/window/dbcreate.py:216
 msgid "New database setup:"
-msgstr "Namestitev nove zbirke podatkov:"
+msgstr "Namestitev nove podatkovne baze:"
 
 #: tryton/gui/window/dbcreate.py:222
 msgid "Database name:"
-msgstr "Ime zbirke podatkov:"
+msgstr "Ime podatkovne baze:"
 
 #: tryton/gui/window/dbcreate.py:234
 msgid ""
@@ -766,7 +775,7 @@ msgid ""
 "You need to avoid all accents, space or special characters! Example: "
 "tryton"
 msgstr ""
-"Izberi ime nove zbirke podatkov.\n"
+"Izberi ime nove podatkovne baze.\n"
 "Dovoljeni so alfanumerični znaki oziroma _ (podčrtaj).\n"
 "Izogibaj se vsem znakom za naglaševanje, presledku ali posebnim znakom! "
 "Primer: tryton"
@@ -781,7 +790,7 @@ msgid ""
 " will be able to install new languages after installation through the "
 "administration menu."
 msgstr ""
-"Izberi privzet jezik, ki bo nameščen za to zbirko podatkov. Po namestitvi"
+"Izberi privzet jezik, ki bo nameščen za to podatkovno bazo. Po namestitvi"
 " lahko nove jezike dodate preko skrbniškega menija."
 
 #: tryton/gui/window/dbcreate.py:255
@@ -795,8 +804,8 @@ msgid ""
 "User name: admin\n"
 "Password: <The password you set here>"
 msgstr ""
-"Izberi geslo za skrbnika nove zbirke podatkov. S to poverilnico se lahko "
-"kasneje prijaviš v zbirko podatkov:\n"
+"Izberi geslo za skrbnika nove podatkovne baze. S to poverilnico se lahko "
+"kasneje prijaviš v podatkovno bazo:\n"
 "Uporabniško ime: admin\n"
 "Geslo: <tu nastavljeno geslo>"
 
@@ -813,13 +822,13 @@ msgid ""
 "The database name is restricted to alpha-nummerical characters and \"_\" "
 "(underscore). Avoid all accents, space and any other special characters."
 msgstr ""
-"Ime zbirke podatkov je omejeno na alfanumerične znake in \"_\" "
+"Ime podatkovne baze je omejeno na alfanumerične znake in \"_\" "
 "(podčrtaj). Izogibaj se vsem znakom za naglaševanje, presledku ali drugim"
 " posebnim znakom."
 
 #: tryton/gui/window/dbcreate.py:335
 msgid "Wrong characters in database name!"
-msgstr "Nedovoljeni znaki v imenu zbirke podatkov!"
+msgstr "Nedovoljeni znaki v imenu podatkovne baze!"
 
 #: tryton/gui/window/dbcreate.py:339
 msgid "The new admin password doesn't match the confirmation field.\n"
@@ -832,8 +841,8 @@ msgstr "Gesli se ne ujemata!"
 #: tryton/gui/window/dbcreate.py:344
 msgid "Admin password and confirmation are required to create a new database."
 msgstr ""
-"Skrbniško geslo in potrditev gesla sta potrebna za stvarjenje zbirke "
-"podatkov."
+"Skrbniško geslo in potrditev gesla sta potrebna za izdelavo podatkovne "
+"baze."
 
 #: tryton/gui/window/dbcreate.py:346
 msgid "Missing admin password!"
@@ -844,12 +853,12 @@ msgid ""
 "A database with the same name already exists.\n"
 "Try another database name."
 msgstr ""
-"Zbirke podatkov s tem imenom že obstaja.\n"
-"Poskusi z novim imenom zbirke podatkov."
+"Podatkovna baza s tem imenom že obstaja.\n"
+"Poskusi z drugim imenom."
 
 #: tryton/gui/window/dbcreate.py:364
 msgid "This database name already exist!"
-msgstr "To ime zbirke podatkov že obstaja!"
+msgstr "To ime podatkovne baze že obstaja!"
 
 #: tryton/gui/window/dbcreate.py:379
 msgid "Sorry, wrong password for the Tryton server. Please try again."
@@ -862,14 +871,14 @@ msgid ""
 "database! Please check the error message for possible informations.\n"
 "Error message:\n"
 msgstr ""
-"Ni možno ustvariti zbirke podatkov zaradi neznanega razloga.\n"
-"Če je zbirka podatkov ustvarjena, je verjetno pokvarjena in jo mogoče "
-"zbriši! Prosimo, preveri sporočilo napake za možne dodatne informacije.\n"
+"Ni možno izdelati podatkovne baze zaradi neznanega razloga.\n"
+"Če je podatkovna baza izdelana, je verjetno pokvarjena in jo morda "
+"zbrišete! Prosimo, preveri sporočilo napake za dodatne informacije.\n"
 "Sporočilo napake:\n"
 
 #: tryton/gui/window/dbcreate.py:395
 msgid "Error creating database!"
-msgstr "Napaka pri ustvarjanju zbirke podatkov!"
+msgstr "Napaka pri izdelavi podatkovne baze!"
 
 #: tryton/gui/window/dbdumpdrop.py:27
 msgid "Could not connect to server!"
@@ -881,27 +890,27 @@ msgstr "Inačica tega odjemalca ni združljiva s strežnikom!"
 
 #: tryton/gui/window/dbdumpdrop.py:37
 msgid "No database found, you must create one!"
-msgstr "Nobene zbirke podatkov ni možno najti, morate jo ustvariti!"
+msgstr "Nobene podatkovne baze ni možno najti, morate jo ustvariti!"
 
 #: tryton/gui/window/dbdumpdrop.py:78
 msgid "Backup a database"
-msgstr "Arhiviraj zbirke podatkov"
+msgstr "Varnostno kopiranje podatkovne baze"
 
 #: tryton/gui/window/dbdumpdrop.py:79
 msgid "Backup"
-msgstr "Arhiviraj"
+msgstr "Varnostno kopiranje"
 
 #: tryton/gui/window/dbdumpdrop.py:80
 msgid "Backup the choosen database."
-msgstr "Arhiviraj izbrano zbirko podatkov."
+msgstr "Varnostno kopiranje izbrane podatkovne baze."
 
 #: tryton/gui/window/dbdumpdrop.py:82
 msgid "Choose a Tryton database to backup:"
-msgstr "Izberi Tryton zbirko podatkov za varnostno kopiranje:"
+msgstr "Izberi Tryton podatkovno bazo za varnostno kopiranje:"
 
 #: tryton/gui/window/dbdumpdrop.py:84
 msgid "Delete a database"
-msgstr "Zbriši zbirko podatkov"
+msgstr "Brisanje podatkovne baze"
 
 #: tryton/gui/window/dbdumpdrop.py:85
 msgid "Delete"
@@ -909,11 +918,11 @@ msgstr "Zbriši"
 
 #: tryton/gui/window/dbdumpdrop.py:86
 msgid "Delete the choosen database."
-msgstr "Zbriši izbrano zbirko podatkov."
+msgstr "Zbriši izbrano podatkovno bazo."
 
 #: tryton/gui/window/dbdumpdrop.py:88
 msgid "Choose a Tryton database to delete:"
-msgstr "Za brisanje izberi Tryton zbirko podatkov:"
+msgstr "Za brisanje izberi Tryton podatkovno bazo:"
 
 #: tryton/gui/window/dbdumpdrop.py:131 tryton/gui/window/dbrestore.py:75
 msgid "Server Connection:"
@@ -922,7 +931,7 @@ msgstr "Povezava do strežnika:"
 #: tryton/gui/window/dbdumpdrop.py:157 tryton/gui/window/dblogin.py:89
 #: tryton/gui/window/dblogin.py:447
 msgid "Database:"
-msgstr "Zbirka podatkov:"
+msgstr "Podatkovna baza:"
 
 #: tryton/gui/window/dblogin.py:31
 msgid "Profile Editor"
@@ -944,7 +953,7 @@ msgstr "_Odstrani"
 
 #: tryton/gui/window/dblogin.py:70
 msgid "Hostname:"
-msgstr "Gostitelj:"
+msgstr "Strežnik:"
 
 #: tryton/gui/window/dblogin.py:107
 msgid "Create"
@@ -952,7 +961,7 @@ msgstr "Ustvari"
 
 #: tryton/gui/window/dblogin.py:110
 msgid "Fetching databases list"
-msgstr "Pridobivanje seznama zbirk podatkov"
+msgstr "Pridobivanje seznama podatkovnih baz"
 
 #: tryton/gui/window/dblogin.py:128
 msgid "Username:"
@@ -996,19 +1005,19 @@ msgstr "_Upravljaj profile"
 
 #: tryton/gui/window/dblogin.py:434
 msgid "Host / Database information"
-msgstr "Informacija o gostitelju / zbirki podatkov"
+msgstr "Strežnik in podatkovna baza"
 
 #: tryton/gui/window/dblogin.py:437
 msgid "Host:"
-msgstr "Gostitelj:"
+msgstr "Strežnik:"
 
 #: tryton/gui/window/dblogin.py:470
 msgid "User name:"
-msgstr "Uporabniško ime:"
+msgstr "Uporabnik:"
 
 #: tryton/gui/window/dbrestore.py:64
 msgid "Restore Database"
-msgstr "Obnovi zbirko podatkov"
+msgstr "Obnovitev podatkovne baze"
 
 #: tryton/gui/window/dbrestore.py:117
 msgid "File to Restore:"
@@ -1021,7 +1030,7 @@ msgid ""
 "You need to avoid all accents, space or special characters! \n"
 "Example: tryton"
 msgstr ""
-"Izberi ime zbirke podatkov za obnovitev.\n"
+"Izberi ime podatkovne baze za obnovitev.\n"
 "Dovoljeni so alfanumerični znaki oziroma \"_\" (podčrtaj). \n"
 "Izogibaj se vsem znakom za naglaševanje, presledku ali drugim posebnim "
 "znakom.\n"
@@ -1029,19 +1038,19 @@ msgstr ""
 
 #: tryton/gui/window/dbrestore.py:137
 msgid "New Database Name:"
-msgstr "Novo ime zbirke podatkov:"
+msgstr "Novo ime podatkovne baze:"
 
 #: tryton/gui/window/dbrestore.py:140
 msgid "Update Database:"
-msgstr "Posodobi zbirko podatkov:"
+msgstr "Posodobitev podatkovne baze:"
 
 #: tryton/gui/window/dbrestore.py:144
 msgid ""
 "Check for an automatic database update after restoring a database from a "
 "previous Tryton version."
 msgstr ""
-"Po obnovitvi zbirke podatkov iz prejšnje Tryton inačice preveri samodejno"
-" posodabljanje zbirke podatkov."
+"Po obnovitvi podatkovne baze iz prejšnje Tryton inačice preveri samodejno"
+" posodabljanje podatkovne baze."
 
 #: tryton/gui/window/dbrestore.py:154
 msgid "Restore"
@@ -1049,7 +1058,7 @@ msgstr "Obnovi"
 
 #: tryton/gui/window/dbrestore.py:163
 msgid "Restore the database from file."
-msgstr "Obnovi zbirko podatkov iz datoteke."
+msgstr "Obnovitev podatkovne baze iz datoteke."
 
 #: tryton/gui/window/email.py:16
 msgid "Email"
@@ -1312,67 +1321,67 @@ msgstr "Trenutno geslo:"
 
 #: tryton/gui/window/shortcuts.py:17
 msgid "Keyboard Shortcuts"
-msgstr "Bližnjice na tipkovnici"
+msgstr "Bližnjice"
 
 #: tryton/gui/window/shortcuts.py:28
 msgid "Text Entries Shortcuts"
-msgstr "Bližnjice vnašanja besedila"
+msgstr "Bližnjice za urejanje"
 
 #: tryton/gui/window/shortcuts.py:29
 msgid "Cut selected text"
-msgstr "Izreži izbrano besedilo"
+msgstr "Izreži vsebino"
 
 #: tryton/gui/window/shortcuts.py:30
 msgid "Copy selected text"
-msgstr "Kopiraj izbrano besedilo"
+msgstr "Kopiraj vsebino"
 
 #: tryton/gui/window/shortcuts.py:31
 msgid "Paste copied text"
-msgstr "Vstavi kopirano besedilo"
+msgstr "Prilepi vsebino"
 
 #: tryton/gui/window/shortcuts.py:32
 msgid "Next widget"
-msgstr "Naslednji gradnik"
+msgstr "Naslednje polje"
 
 #: tryton/gui/window/shortcuts.py:33
 msgid "Previous widget"
-msgstr "Prejšnji gradnik"
+msgstr "Prejšnje polje"
 
 #: tryton/gui/window/shortcuts.py:34
 msgid "Relation Entries Shortcuts"
-msgstr "Bližnjice za vnašanje vez"
+msgstr "Bližnjice za veze"
 
 #: tryton/gui/window/shortcuts.py:35
 msgid "Create new relation"
-msgstr "Ustvari novo vezo"
+msgstr "Dodajanje nove veze"
 
 #: tryton/gui/window/shortcuts.py:36
 msgid "Open/Search relation"
-msgstr "Odpri/išči vezo"
+msgstr "Urejanje/iskanje veze"
 
 #: tryton/gui/window/shortcuts.py:37
 msgid "List Entries Shortcuts"
-msgstr "Bližnjice za vnašanje postavk"
+msgstr "Bližnjice za postavke"
 
 #: tryton/gui/window/shortcuts.py:38
 msgid "Create new line"
-msgstr "Ustvari novo postavko"
+msgstr "Dodajanje postavke"
 
 #: tryton/gui/window/shortcuts.py:39
 msgid "Open relation"
-msgstr "Odpri vezo"
+msgstr "Urejenje postavke"
 
 #: tryton/gui/window/shortcuts.py:40
 msgid "Mark line for deletion"
-msgstr "Označi vrstico za brisanje"
+msgstr "Postavka označena za brisanje"
 
 #: tryton/gui/window/shortcuts.py:41
 msgid "Unmark line for deletion"
-msgstr "Opusti izbor vrtice za brisanje"
+msgstr "Postavka neoznačena za brisanje"
 
 #: tryton/gui/window/shortcuts.py:44
 msgid "Edition Widgets"
-msgstr "Urejevalni gradniki"
+msgstr "Vnašanje podatkov"
 
 #: tryton/gui/window/tips.py:17
 msgid ""
@@ -1638,23 +1647,23 @@ msgstr "Čarovnik"
 msgid "No String Attr."
 msgstr "Ni atributov."
 
-#: tryton/gui/window/view_form/screen/screen.py:136
+#: tryton/gui/window/view_form/screen/screen.py:135
 msgid "ID"
 msgstr "ID"
 
-#: tryton/gui/window/view_form/screen/screen.py:137
+#: tryton/gui/window/view_form/screen/screen.py:136
 msgid "Creation User"
 msgstr "Ustvaril"
 
-#: tryton/gui/window/view_form/screen/screen.py:138
+#: tryton/gui/window/view_form/screen/screen.py:137
 msgid "Creation Date"
 msgstr "Ustvarjeno"
 
-#: tryton/gui/window/view_form/screen/screen.py:139
+#: tryton/gui/window/view_form/screen/screen.py:138
 msgid "Modification User"
 msgstr "Popravil"
 
-#: tryton/gui/window/view_form/screen/screen.py:140
+#: tryton/gui/window/view_form/screen/screen.py:139
 msgid "Modification Date"
 msgstr "Popravljeno"
 
@@ -1663,11 +1672,10 @@ msgid "Unable to get view tree state"
 msgstr "Stanja obrazca ni možno dobiti"
 
 #: tryton/gui/window/view_form/screen/screen.py:682
-#, python-format
 msgid "Unable to set view tree state"
 msgstr "Ni možno nastaviti stanja obrazca"
 
-#: tryton/gui/window/view_form/view/list.py:647
+#: tryton/gui/window/view_form/view/list.py:648
 msgid "You must select a record to use the relation!"
 msgstr "Za uporabo te veze morate izbrati zapis!"
 
@@ -1707,15 +1715,11 @@ msgstr "Danes"
 msgid "Week View"
 msgstr "Tedensko"
 
-#: tryton/gui/window/view_form/view/calendar_gtk/toolbar.py:93
+#: tryton/gui/window/view_form/view/calendar_gtk/toolbar.py:94
 msgid "Month View"
 msgstr "Mesečno"
 
-#: tryton/gui/window/view_form/view/calendar_gtk/toolbar.py:96
-msgid "month_view"
-msgstr "Mesečni pogled"
-
-#: tryton/gui/window/view_form/view/calendar_gtk/toolbar.py:117
+#: tryton/gui/window/view_form/view/calendar_gtk/toolbar.py:115
 msgid "Week"
 msgstr "Teden"
 
