@@ -328,8 +328,7 @@ class One2Many(WidgetInterface):
             if sequence:
                 self.screen.group.set_sequence(field=sequence)
 
-        if (self.screen.current_view.view_type == 'form') \
-                or self.screen.editable_get():
+        if self.screen.current_view.editable:
             self.screen.new()
             self.screen.current_view.widget.set_sensitive(True)
             update_sequence()
@@ -448,7 +447,7 @@ class One2Many(WidgetInterface):
         if id(self.screen.group) != id(new_group):
             self.screen.group = new_group
             if (self.screen.current_view.view_type == 'tree') \
-                    and self.screen.editable_get():
+                    and self.screen.current_view.editable:
                 self.screen.current_record = None
             readonly = False
             domain = []

@@ -357,7 +357,7 @@ class Screen(SignalEvent):
                     self.current_record not in self.current_record.group):
                 self.current_record = None
             fields = self.current_view.get_fields()
-            if (self.current_record
+            if (self.current_record and self.current_view.editable
                     and not self.current_record.validate(fields)):
                 self.screen_container.set(self.current_view.widget)
                 self.set_cursor()
@@ -439,22 +439,11 @@ class Screen(SignalEvent):
         self.views.append(view)
         return view
 
-    def editable_get(self):
-        if hasattr(self.current_view, 'widget_tree'):
-            if hasattr(self.current_view.widget_tree, 'editable'):
-                return self.current_view.widget_tree.editable
-        return False
-
     def new(self, default=True):
         previous_view = self.current_view
         if self.current_view.view_type == 'calendar':
             selected_date = self.current_view.get_selected_date()
-        if (self.current_view
-                and ((self.current_view.view_type == 'tree'
-                        and not (hasattr(self.current_view.widget_tree,
-                                'editable')
-                            and self.current_view.widget_tree.editable))
-                    or self.current_view.view_type in ('graph', 'calendar'))):
+        if self.current_view and not self.current_view.editable:
             self.switch_view('form')
             if self.current_view.view_type != 'form':
                 return None

@@ -333,6 +333,10 @@ class ViewList(ParserView):
     def modified(self):
         return False
 
+    @property
+    def editable(self):
+        return bool(getattr(self.widget_tree, 'editable', False))
+
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]
 
@@ -447,8 +451,7 @@ class ViewList(ParserView):
         return
 
     def on_paste(self):
-        if (not hasattr(self.widget_tree, 'editable')
-                or not self.widget_tree.editable):
+        if not self.editable:
             return
 
         def unquote(value):
@@ -756,9 +759,7 @@ class ViewList(ParserView):
             else:
                 self.screen.current_record = None
 
-        if (hasattr(self.widget_tree, 'editable')
-                and self.widget_tree.editable
-                and previous_record):
+        if self.editable and previous_record:
             def go_previous():
                 self.screen.current_record = previous_record
                 self.set_cursor()
@@ -787,8 +788,7 @@ class ViewList(ParserView):
         self.update_children()
 
     def set_value(self):
-        if hasattr(self.widget_tree, 'editable') \
-                and self.widget_tree.editable:
+        if self.editable:
             self.widget_tree.set_value()
 
     def reset(self):
@@ -811,8 +811,7 @@ class ViewList(ParserView):
             if self.store:
                 self.widget_tree.set_model(self.store)
         self.widget_tree.queue_draw()
-        if hasattr(self.widget_tree, 'editable') \
-                and self.widget_tree.editable:
+        if self.editable:
             self.set_state()
         self.update_children()
 

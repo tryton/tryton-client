@@ -11,6 +11,7 @@ class ViewGraph(ParserView):
             state_widgets, notebooks, cursor_widget, children_field)
         self.view_type = 'graph'
         self.widgets = children
+        self.editable = False
 
     def __getitem__(self, name):
         return None

@@ -18,6 +18,7 @@ class ViewForm(ParserView):
         super(ViewForm, self).__init__(screen, widget, children, state_widgets,
             notebooks, cursor_widget, children_field)
         self.view_type = 'form'
+        self.editable = True
 
         for widget in self.state_widgets:
             if isinstance(widget, gtk.Button):

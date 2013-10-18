@@ -22,6 +22,7 @@ class ViewCalendar(ParserView):
         super(ViewCalendar, self).__init__(screen, widget, children, buttons,
             notebooks, cursor_widget, children_field)
         self.view_type = 'calendar'
+        self.editable = False
 
     def __getitem__(self, name):
         return None
