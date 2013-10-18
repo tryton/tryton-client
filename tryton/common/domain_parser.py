@@ -747,6 +747,25 @@ class DomainParser(object):
             if exception.message == 'No closing quotation':
                 return self.parse(input_ + '"')
 
+    def stringable(self, domain):
+
+        def stringable_(clause):
+            if not clause:
+                return True
+            if (((clause[0] in ('AND', 'OR'))
+                        or isinstance(clause[0], (list, tuple)))
+                    and all(isinstance(c, (list, tuple)) for c in clause[1:])):
+                return self.stringable(clause)
+            if clause[0] in self.fields or clause[0] == 'rec_name':
+                return True
+            return False
+
+        if not domain:
+            return True
+        if domain[0] in ('AND', 'OR'):
+            domain = domain[1:]
+        return all(stringable_(clause) for clause in domain)
+
     def string(self, domain):
         "Return string for the domain"
 
@@ -982,6 +1001,23 @@ class DomainParser(object):
                     else:
                         value = convert_value(field, value)
                     yield field['name'], operator, value
+
+
+def test_stringable():
+    dom = DomainParser({
+            'name': {
+                'string': 'Name',
+                'type': 'char',
+                },
+            })
+    valid = ('name', '=', 'Doe')
+    invalid = ('surname', '=', 'John')
+    assert dom.stringable([valid])
+    assert not dom.stringable([invalid])
+    assert dom.stringable(['AND', valid])
+    assert not dom.stringable(['AND', valid, invalid])
+    assert dom.stringable([[valid]])
+    assert not dom.stringable([[valid], [invalid]])
 
 
 def test_string():

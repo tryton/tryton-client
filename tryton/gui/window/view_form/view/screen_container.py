@@ -133,8 +133,7 @@ class ScreenContainer(object):
                     False
                 )
 
-            for id_, name, domain in common.VIEW_SEARCH[
-                    self.screen.model_name]:
+            for id_, name, domain in self.bookmarks():
                 menuitem = gtk.MenuItem(name)
                 menuitem.connect('activate', self.bookmark_activate, domain)
                 menu.add(menuitem)
@@ -227,8 +226,7 @@ class ScreenContainer(object):
 
     def set_screen(self, screen):
         self.screen = screen
-        self.but_bookmark.set_sensitive(
-            bool(common.VIEW_SEARCH[screen.model_name]))
+        self.but_bookmark.set_sensitive(bool(list(self.bookmarks())))
         self.bookmark_match()
 
     def show_filter(self):
@@ -287,6 +285,11 @@ class ScreenContainer(object):
         self.search_entry.set_text(value)
         self.bookmark_match()
 
+    def bookmarks(self):
+        for id_, name, domain in common.VIEW_SEARCH[self.screen.model_name]:
+            if self.screen.domain_parser.stringable(domain):
+                yield id_, name, domain
+
     def bookmark_activate(self, menuitem, domain):
         self.set_text(self.screen.domain_parser.string(domain))
         self.do_search()
@@ -299,7 +302,7 @@ class ScreenContainer(object):
         self.search_entry.set_icon_sensitive(gtk.ENTRY_ICON_SECONDARY,
             bool(current_text))
         icon_stock = self.search_entry.get_icon_stock(gtk.ENTRY_ICON_SECONDARY)
-        for id_, name, domain in common.VIEW_SEARCH[self.screen.model_name]:
+        for id_, name, domain in self.bookmarks():
             text = self.screen.domain_parser.string(domain)
             domain = self.screen.domain_parser.parse(text.decode('utf-8'))
             if (text == current_text
@@ -385,8 +388,7 @@ class ScreenContainer(object):
                 common.VIEW_SEARCH.remove(model_name, id_)
             # Refresh icon and bookmark button
             self.bookmark_match()
-            self.but_bookmark.set_sensitive(
-                bool(common.VIEW_SEARCH[model_name]))
+            self.but_bookmark.set_sensitive(bool(list(self.bookmarks())))
 
     def focus_in(self, widget, event):
         self.update()
