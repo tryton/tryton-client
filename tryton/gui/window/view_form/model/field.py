@@ -107,18 +107,20 @@ class CharField(object):
                     # XXX to remove once server domains are fixed
                     value = None
                 setdefault = True
+                original_domain = merge(record.group.domain)
+                domain_readonly = original_domain[0] == 'AND'
                 if '.' in leftpart:
                     recordpart, localpart = leftpart.split('.', 1)
-                    original_domain = merge(record.group.domain)
                     constraintfields = set()
-                    if original_domain[0] == 'AND':
+                    if domain_readonly:
                         for leaf in localize_domain(original_domain[1:]):
                             constraintfields.add(leaf[0])
                     if localpart != 'id' or recordpart not in constraintfields:
                         setdefault = False
                 if setdefault:
                     self.set_client(record, value)
-                    self.get_state_attrs(record)['domain_readonly'] = True
+                    self.get_state_attrs(record)['domain_readonly'] = (
+                        domain_readonly)
             res = res and eval_domain(domain, EvalEnvironment(record))
         self.get_state_attrs(record)['valid'] = res
         return res
