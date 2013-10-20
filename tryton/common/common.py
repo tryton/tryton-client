@@ -1193,20 +1193,18 @@ def generateColorscheme(masterColor, keys, light=0.06):
 class DBProgress(object):
 
     def __init__(self, host, port):
-        self.dbs, self.createdb = None, None
+        self.dbs = None, None
         self.host, self.port = host, port
         self.updated = threading.Event()
-        self.db_info = None
 
     def start(self):
-        dbs, createdb = None, False
+        dbs = None
         try:
             dbs = refresh_dblist(self.host, self.port)
-            createdb = True
         except Exception:
             pass
         finally:
-            self.db_info = (dbs, createdb)
+            self.dbs = dbs
             self.updated.set()
 
     def update(self, combo, progressbar, callback, dbname=''):
@@ -1221,13 +1219,9 @@ class DBProgress(object):
             progressbar.pulse()
             return True
         progressbar.hide()
-        dbs, createdb = self.db_info
+        dbs = self.dbs
 
-        if dbs is None:
-            dbs, createdb = None, False
-        elif dbs == -1:
-            dbs, createdb = -1, False
-        else:
+        if dbs is not None and dbs not in (-1, -2):
             liststore = combo.get_model()
             liststore.clear()
             index = -1
@@ -1240,7 +1234,7 @@ class DBProgress(object):
             combo.set_active(index)
             dbs = len(dbs)
 
-        callback(dbs, createdb)
+        callback(dbs)
         return False
 
 

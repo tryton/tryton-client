@@ -299,13 +299,11 @@ class DBListEditor(object):
         self.port_entry.set_sensitive(False)
         self.updating_db = True
 
-        def callback(dbs, createdb):
+        def callback(dbs):
             self.updating_db = False
             self.db_cache = (host, port, self.current_profile['name'])
 
-            if dbs is None and createdb is None:
-                pass
-            elif dbs is None or dbs == -1:
+            if dbs is None or dbs == -1:
                 if dbs is None:
                     label = _(u'Could not connect to the server')
                 else:
@@ -313,10 +311,9 @@ class DBListEditor(object):
                 self.database_label.set_label('<b>%s</b>' % label)
                 self.database_label.show()
             elif dbs == 0:
-                if createdb:
-                    self.database_button.show()
-                else:
-                    self.database_entry.show()
+                self.database_button.show()
+            elif dbs == -2:
+                self.database_entry.show()
             else:
                 self.database_entry.set_text(dbname if dbname else '')
                 self.database_combo.show()
