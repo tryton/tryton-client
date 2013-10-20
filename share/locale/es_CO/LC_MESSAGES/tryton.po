@@ -8,16 +8,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 2.4.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2013-10-17 14:04-0500\n"
+"POT-Creation-Date: 2013-10-20 16:34+0200\n"
 "PO-Revision-Date: 2013-10-17 14:37-0500\n"
 "Last-Translator: Oscar Alvarez <oscar.alvarez.montero@gmail.com>\n"
 "Language-Team: Colombia\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"X-Generator: Poedit 1.5.4\n"
+"Generated-By: Babel 0.9.6\n"
 
 #: tryton/config.py:83
 msgid "specify alternate config file"
@@ -74,27 +73,27 @@ msgstr "Seleccione su acción"
 msgid "No action defined!"
 msgstr "¡No se ha definido ninguna acción!"
 
-#: tryton/common/common.py:269
+#: tryton/common/common.py:270
 msgid "Tryton Connection"
 msgstr "Conexión a Tryton"
 
-#: tryton/common/common.py:280
+#: tryton/common/common.py:281
 msgid "Server:"
 msgstr "Servidor:"
 
-#: tryton/common/common.py:298 tryton/gui/window/dblogin.py:79
+#: tryton/common/common.py:299 tryton/gui/window/dblogin.py:79
 msgid "Port:"
 msgstr "Puerto:"
 
-#: tryton/common/common.py:368
+#: tryton/common/common.py:369
 msgid "Selection"
 msgstr "Selección"
 
-#: tryton/common/common.py:377
+#: tryton/common/common.py:378
 msgid "Your selection:"
 msgstr "Su selección:"
 
-#: tryton/common/common.py:497 tryton/gui/main.py:1407
+#: tryton/common/common.py:498 tryton/gui/main.py:1407
 #: tryton/gui/window/win_export.py:402
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:69
 #: tryton/gui/window/view_form/view/form_gtk/binary.py:138
@@ -105,23 +104,23 @@ msgstr "Su selección:"
 msgid "Save As..."
 msgstr "Guardar como..."
 
-#: tryton/common/common.py:648
+#: tryton/common/common.py:649
 msgid "Always ignore this warning."
 msgstr "Ignorar siempre esta advertencia."
 
-#: tryton/common/common.py:653
+#: tryton/common/common.py:654
 msgid "Do you want to proceed?"
 msgstr "¿Desea continuar?"
 
-#: tryton/common/common.py:672
+#: tryton/common/common.py:673
 msgid "Confirmation"
 msgstr "Confirmación"
 
-#: tryton/common/common.py:778 tryton/common/common.py:1081
+#: tryton/common/common.py:779 tryton/common/common.py:1083
 msgid "Concurrency Exception"
 msgstr "Excepción de concurrencia"
 
-#: tryton/common/common.py:792
+#: tryton/common/common.py:793
 msgid ""
 "<b>Write Concurrency Warning:</b>\n"
 "\n"
@@ -139,63 +138,63 @@ msgstr ""
 "   - \"Comparar\" para ver la versión modificada:\n"
 "   - \"Guardar de todas formas\" para guardar sus cambios."
 
-#: tryton/common/common.py:801
+#: tryton/common/common.py:802
 msgid "Compare"
 msgstr "Comparar"
 
-#: tryton/common/common.py:806
+#: tryton/common/common.py:807
 msgid "Write Anyway"
 msgstr "Guardar de todas formas"
 
-#: tryton/common/common.py:832 tryton/gui/window/win_export.py:435
+#: tryton/common/common.py:833 tryton/gui/window/win_export.py:435
 #: tryton/gui/window/win_import.py:260 tryton/gui/window/win_import.py:288
 msgid "Error"
 msgstr "Error"
 
-#: tryton/common/common.py:836
+#: tryton/common/common.py:837
 msgid "Report Bug"
 msgstr "Informar de un fallo"
 
-#: tryton/common/common.py:843
+#: tryton/common/common.py:844
 msgid "Application Error!"
 msgstr "¡Error de aplicación!"
 
-#: tryton/common/common.py:866
+#: tryton/common/common.py:867
 msgid "Error: "
 msgstr "Error: "
 
-#: tryton/common/common.py:886
+#: tryton/common/common.py:887
 #, python-format
 msgid "To report bugs you must have an account on <u>%s</u>"
 msgstr "Para informar de fallos debe tener una cuenta en <u>%s</u>"
 
-#: tryton/common/common.py:916
+#: tryton/common/common.py:917
 msgid "Bug Tracker"
 msgstr "Seguimiento de fallos"
 
-#: tryton/common/common.py:934
+#: tryton/common/common.py:935
 msgid "User:"
 msgstr "Usuario:"
 
-#: tryton/common/common.py:942 tryton/common/common.py:1099
-#: tryton/gui/window/dblogin.py:465
+#: tryton/common/common.py:943 tryton/common/common.py:1101
+#: tryton/gui/window/dblogin.py:462
 msgid "Password:"
 msgstr "Contraseña:"
 
-#: tryton/common/common.py:991
+#: tryton/common/common.py:993
 msgid ""
 "The same bug was already reported by another user.\n"
 "To keep you informed your username is added to the nosy-list of this issue"
 msgstr ""
 "El mismo fallo ya fue notificado por otro usuario.\n"
-"Para mantenerle informado añadiremos su usuario a la lista de interesados en "
-"este asunto."
+"Para mantenerle informado añadiremos su usuario a la lista de interesados"
+" en este asunto."
 
-#: tryton/common/common.py:1002
+#: tryton/common/common.py:1004
 msgid "Created new bug with ID "
 msgstr "Se creó un nuevo fallo con ID "
 
-#: tryton/common/common.py:1010 tryton/gui/main.py:921
+#: tryton/common/common.py:1012 tryton/gui/main.py:921
 msgid ""
 "Connection error!\n"
 "Bad username or password!"
@@ -203,25 +202,26 @@ msgstr ""
 "¡Error de conexión!\n"
 "¡Nombre de usuario o contraseña incorrectos!"
 
-#: tryton/common/common.py:1015
+#: tryton/common/common.py:1017
 msgid "Exception:"
 msgstr "Excepción:"
 
-#: tryton/common/common.py:1032
+#: tryton/common/common.py:1034
 msgid ""
 "The server fingerprint has changed since last connection!\n"
-"The application will stop connecting to this server until its fingerprint is "
-"fixed."
+"The application will stop connecting to this server until its fingerprint"
+" is fixed."
 msgstr ""
-"¡La huella de seguridad del servidor ha cambiado desde la última conexión!\n"
-"La aplicación no se podrá conectar a este servidor hasta que se corrija la "
-"huella de seguridad del servidor."
+"¡La huella de seguridad del servidor ha cambiado desde la última "
+"conexión!\n"
+"La aplicación no se podrá conectar a este servidor hasta que se corrija "
+"la huella de seguridad del servidor."
 
-#: tryton/common/common.py:1034
+#: tryton/common/common.py:1036
 msgid "Security risk!"
 msgstr "¡Riesgo de seguridad!"
 
-#: tryton/common/common.py:1040 tryton/common/common.py:1106
+#: tryton/common/common.py:1042 tryton/common/common.py:1108
 #: tryton/gui/main.py:918
 msgid ""
 "Connection error!\n"
@@ -230,31 +230,31 @@ msgstr ""
 "¡Error de conexión!\n"
 "¡No ha sido posible conectarse al servidor!"
 
-#: tryton/common/common.py:1121
+#: tryton/common/common.py:1123
 msgid "Network Error!"
 msgstr "¡Error de Red!"
 
-#: tryton/common/common.py:1358
+#: tryton/common/common.py:1354
 msgid "Y"
 msgstr "A"
 
-#: tryton/common/common.py:1359
+#: tryton/common/common.py:1355
 msgid "M"
 msgstr "M"
 
-#: tryton/common/common.py:1360
+#: tryton/common/common.py:1356
 msgid "w"
 msgstr "s"
 
-#: tryton/common/common.py:1361
+#: tryton/common/common.py:1357
 msgid "d"
 msgstr "d"
 
-#: tryton/common/common.py:1362
+#: tryton/common/common.py:1358
 msgid "h"
 msgstr "h"
 
-#: tryton/common/common.py:1363
+#: tryton/common/common.py:1359
 msgid "m"
 msgstr "m"
 
@@ -291,12 +291,12 @@ msgid "t"
 msgstr "v"
 
 #: tryton/common/domain_parser.py:383
-#: tryton/gui/window/view_form/view/screen_container.py:460
+#: tryton/gui/window/view_form/view/screen_container.py:462
 msgid "True"
 msgstr "Verdadero"
 
 #: tryton/common/domain_parser.py:383
-#: tryton/gui/window/view_form/view/screen_container.py:460
+#: tryton/gui/window/view_form/view/screen_container.py:462
 msgid "False"
 msgstr "Falso"
 
@@ -551,8 +551,7 @@ msgstr "¡Acceso denegado!"
 
 #: tryton/gui/main.py:1329
 msgid "Database drop failed with error message:\n"
-msgstr ""
-"La eliminación de la base de datos ha fallado con el mensaje de error:\n"
+msgstr "La eliminación de la base de datos ha fallado con el mensaje de error:\n"
 
 #: tryton/gui/main.py:1330
 msgid "Database drop failed!"
@@ -608,8 +607,7 @@ msgstr ""
 
 #: tryton/gui/main.py:1401
 msgid "Database dump failed with error message:\n"
-msgstr ""
-"La extracción de la base de datos ha fallado con el mensaje de error:\n"
+msgstr "La extracción de la base de datos ha fallado con el mensaje de error:\n"
 
 #: tryton/gui/main.py:1403
 msgid "Database dump failed!"
@@ -617,8 +615,7 @@ msgstr "¡La extracción de la base de datos ha fallado!"
 
 #: tryton/gui/main.py:1414
 msgid "Database backuped successfully!"
-msgstr ""
-"¡La copia de seguridad de la base de datos ha finalizado correctamente!"
+msgstr "¡La copia de seguridad de la base de datos ha finalizado correctamente!"
 
 #: tryton/gui/window/board.py:19 tryton/gui/window/form.py:30
 msgid "New"
@@ -682,13 +679,13 @@ msgstr "_Cerrar pestaña"
 
 #: tryton/gui/window/dbcreate.py:32
 msgid ""
-"This is the URL of the Tryton server. Use server 'localhost' and port '8000' "
-"if the server is installed on this computer. Click on 'Change' to change the "
-"address."
+"This is the URL of the Tryton server. Use server 'localhost' and port "
+"'8000' if the server is installed on this computer. Click on 'Change' to "
+"change the address."
 msgstr ""
-"Esta es la URL del servidor Tryton. Use el servidor «localhost» y el puerto "
-"«8000» si el servidor está instalado en este ordenador. Pulse en «Cambiar» "
-"para cambiar la dirección."
+"Esta es la URL del servidor Tryton. Use el servidor «localhost» y el "
+"puerto «8000» si el servidor está instalado en este ordenador. Pulse en "
+"«Cambiar» para cambiar la dirección."
 
 #: tryton/gui/window/dbcreate.py:45
 msgid "No connection!"
@@ -699,15 +696,16 @@ msgid ""
 "Can not connect to the server!\n"
 "1. Try to check if the server is running.\n"
 "2. Find out on which address and port it is listening.\n"
-"3. If there is a firewall between the server and this client, make sure that "
-"the server address and port (usually 8000) are not blocked.\n"
+"3. If there is a firewall between the server and this client, make sure "
+"that the server address and port (usually 8000) are not blocked.\n"
 "Click on 'Change' to change the address."
 msgstr ""
 "¡No se ha podido conectar al servidor!\n"
 "1. Revise si el servidor se está ejecutando.\n"
 "2. Averigüe en qué dirección y puerto está escuchando.\n"
-"3. Si hay un cortafuegos entre el servidor y este cliente, asegúrese que la "
-"dirección y el puerto (normalmente 8000) del servidor no están bloqueados.\n"
+"3. Si hay un cortafuegos entre el servidor y este cliente, asegúrese que "
+"la dirección y el puerto (normalmente 8000) del servidor no están "
+"bloqueados.\n"
 "Pulse en «Cambiar» para cambiar la dirección."
 
 #: tryton/gui/window/dbcreate.py:137
@@ -730,18 +728,18 @@ msgstr "Configuración del Servidor:"
 msgid "Server connection:"
 msgstr "Conexión con el servidor:"
 
-#: tryton/gui/window/dbcreate.py:180 tryton/gui/window/dbdumpdrop.py:141
+#: tryton/gui/window/dbcreate.py:180 tryton/gui/window/dbdumpdrop.py:140
 #: tryton/gui/window/dbrestore.py:86
 msgid ""
-"This is the URL of the server. Use server 'localhost' and port '8000' if the "
-"server is installed on this computer. Click on 'Change' to change the "
-"address."
+"This is the URL of the server. Use server 'localhost' and port '8000' if "
+"the server is installed on this computer. Click on 'Change' to change the"
+" address."
 msgstr ""
-"Esta es la URL del servidor. Use el servidor «localhost» y el puerto «8000» "
-"si el servidor está instalado en este ordenador. Pulse en «Cambiar» para "
-"cambiar la dirección."
+"Esta es la URL del servidor. Use el servidor «localhost» y el puerto "
+"«8000» si el servidor está instalado en este ordenador. Pulse en "
+"«Cambiar» para cambiar la dirección."
 
-#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:148
+#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:147
 #: tryton/gui/window/dbrestore.py:91
 msgid "C_hange"
 msgstr "C_ambiar"
@@ -750,19 +748,19 @@ msgstr "C_ambiar"
 msgid "Setup the server connection..."
 msgstr "Configurar la conexión con el servidor..."
 
-#: tryton/gui/window/dbcreate.py:195 tryton/gui/window/dbdumpdrop.py:185
+#: tryton/gui/window/dbcreate.py:195 tryton/gui/window/dbdumpdrop.py:186
 #: tryton/gui/window/dbrestore.py:100
 msgid "Tryton Server Password:"
 msgstr "Contraseña del servidor Tryton:"
 
-#: tryton/gui/window/dbcreate.py:205 tryton/gui/window/dbdumpdrop.py:195
+#: tryton/gui/window/dbcreate.py:205 tryton/gui/window/dbdumpdrop.py:196
 #: tryton/gui/window/dbrestore.py:109
 msgid ""
-"This is the password of the Tryton server. It doesn't belong to a real user. "
-"This password is usually defined in the trytond configuration."
+"This is the password of the Tryton server. It doesn't belong to a real "
+"user. This password is usually defined in the trytond configuration."
 msgstr ""
-"Esta es la contraseña del servidor Tryton. No corresponde a un usuario real. "
-"Esta contraseña se suele definir en la configuración de trytond."
+"Esta es la contraseña del servidor Tryton. No corresponde a un usuario "
+"real. Esta contraseña se suele definir en la configuración de trytond."
 
 #: tryton/gui/window/dbcreate.py:216
 msgid "New database setup:"
@@ -776,7 +774,8 @@ msgstr "Nombre de la base de datos:"
 msgid ""
 "Choose the name of the new database.\n"
 "Allowed characters are alphanumerical or _ (underscore)\n"
-"You need to avoid all accents, space or special characters! Example: tryton"
+"You need to avoid all accents, space or special characters! Example: "
+"tryton"
 msgstr ""
 "Elija un nombre para la nueva base de datos.\n"
 "Puede utilizar caracteres alfanuméricos o _ (subrayado)\n"
@@ -788,13 +787,13 @@ msgstr "Idioma por defecto:"
 
 #: tryton/gui/window/dbcreate.py:251
 msgid ""
-"Choose the default language that will be installed for this database. You "
-"will be able to install new languages after installation through the "
+"Choose the default language that will be installed for this database. You"
+" will be able to install new languages after installation through the "
 "administration menu."
 msgstr ""
-"Escoja el idioma por defecto que se instalará para esta base de datos. Podrá "
-"instalar nuevos idiomas después de la instalación, a través del menú de "
-"administración."
+"Escoja el idioma por defecto que se instalará para esta base de datos. "
+"Podrá instalar nuevos idiomas después de la instalación, a través del "
+"menú de administración."
 
 #: tryton/gui/window/dbcreate.py:255
 msgid "Admin password:"
@@ -822,17 +821,16 @@ msgstr "Teclee la contraseña del administrador de nuevo"
 
 #: tryton/gui/window/dbcreate.py:330
 msgid ""
-"The database name is restricted to alpha-nummerical characters and \"_"
-"\" (underscore). Avoid all accents, space and any other special characters."
+"The database name is restricted to alpha-nummerical characters and \"_\" "
+"(underscore). Avoid all accents, space and any other special characters."
 msgstr ""
-"El nombre de la base de datos está restringido a caracteres alfanuméricos y "
-"\"_\" (subrayado). Evite todos los acentos, espacios y cualquier otro "
+"El nombre de la base de datos está restringido a caracteres alfanuméricos"
+" y \"_\" (subrayado). Evite todos los acentos, espacios y cualquier otro "
 "carácter especial."
 
 #: tryton/gui/window/dbcreate.py:335
 msgid "Wrong characters in database name!"
-msgstr ""
-"¡Ha introducido caracteres incorrectos en el nombre de la base de datos!"
+msgstr "¡Ha introducido caracteres incorrectos en el nombre de la base de datos!"
 
 #: tryton/gui/window/dbcreate.py:339
 msgid "The new admin password doesn't match the confirmation field.\n"
@@ -847,8 +845,8 @@ msgstr "¡Las contraseñas no coinciden!"
 #: tryton/gui/window/dbcreate.py:344
 msgid "Admin password and confirmation are required to create a new database."
 msgstr ""
-"La contraseña del administrador y su confirmación son necesarias para crear "
-"una nueva base de datos."
+"La contraseña del administrador y su confirmación son necesarias para "
+"crear una nueva base de datos."
 
 #: tryton/gui/window/dbcreate.py:346
 msgid "Missing admin password!"
@@ -887,7 +885,7 @@ msgstr ""
 msgid "Error creating database!"
 msgstr "¡Se ha producido un error al crear la base de datos!"
 
-#: tryton/gui/window/dbdumpdrop.py:27
+#: tryton/gui/window/dbdumpdrop.py:26
 msgid "Could not connect to server!"
 msgstr "¡No se ha podido conectar al servidor!"
 
@@ -895,48 +893,48 @@ msgstr "¡No se ha podido conectar al servidor!"
 msgid "This client version is not compatible with the server!"
 msgstr "¡Esta versión del cliente no es compatible con el servidor!"
 
-#: tryton/gui/window/dbdumpdrop.py:37
+#: tryton/gui/window/dbdumpdrop.py:39
 msgid "No database found, you must create one!"
 msgstr "¡No se ha encontrado ninguna base de datos, debe crear una!"
 
-#: tryton/gui/window/dbdumpdrop.py:78
+#: tryton/gui/window/dbdumpdrop.py:77
 msgid "Backup a database"
 msgstr "Realizar copia de seguridad de una base de datos"
 
-#: tryton/gui/window/dbdumpdrop.py:79
+#: tryton/gui/window/dbdumpdrop.py:78
 msgid "Backup"
 msgstr "Copia de seguridad"
 
-#: tryton/gui/window/dbdumpdrop.py:80
+#: tryton/gui/window/dbdumpdrop.py:79
 msgid "Backup the choosen database."
 msgstr "Hacer copia de seguridad de la base de datos elegida."
 
-#: tryton/gui/window/dbdumpdrop.py:82
+#: tryton/gui/window/dbdumpdrop.py:81
 msgid "Choose a Tryton database to backup:"
 msgstr "Elija una base de datos Tryton para hacer una copia de seguridad:"
 
-#: tryton/gui/window/dbdumpdrop.py:84
+#: tryton/gui/window/dbdumpdrop.py:83
 msgid "Delete a database"
 msgstr "Eliminar una base de datos"
 
-#: tryton/gui/window/dbdumpdrop.py:85
+#: tryton/gui/window/dbdumpdrop.py:84
 msgid "Delete"
 msgstr "Eliminar"
 
-#: tryton/gui/window/dbdumpdrop.py:86
+#: tryton/gui/window/dbdumpdrop.py:85
 msgid "Delete the choosen database."
 msgstr "Eliminar la base de datos elegida."
 
-#: tryton/gui/window/dbdumpdrop.py:88
+#: tryton/gui/window/dbdumpdrop.py:87
 msgid "Choose a Tryton database to delete:"
 msgstr "Elija la base de datos Tryton a eliminar:"
 
-#: tryton/gui/window/dbdumpdrop.py:131 tryton/gui/window/dbrestore.py:75
+#: tryton/gui/window/dbdumpdrop.py:130 tryton/gui/window/dbrestore.py:75
 msgid "Server Connection:"
 msgstr "Conexión al servidor:"
 
-#: tryton/gui/window/dbdumpdrop.py:157 tryton/gui/window/dblogin.py:89
-#: tryton/gui/window/dblogin.py:447
+#: tryton/gui/window/dbdumpdrop.py:156 tryton/gui/window/dblogin.py:89
+#: tryton/gui/window/dblogin.py:444
 msgid "Database:"
 msgstr "Base de datos:"
 
@@ -974,51 +972,51 @@ msgstr "Recuperando lista de bases de datos"
 msgid "Username:"
 msgstr "Nombre de usuario:"
 
-#: tryton/gui/window/dblogin.py:310
+#: tryton/gui/window/dblogin.py:308
 msgid "Could not connect to the server"
 msgstr "No se ha podido conectar al servidor"
 
-#: tryton/gui/window/dblogin.py:312 tryton/gui/window/dblogin.py:634
+#: tryton/gui/window/dblogin.py:310 tryton/gui/window/dblogin.py:631
 msgid "Incompatible version of the server"
 msgstr "Incompatible versión del servidor"
 
-#: tryton/gui/window/dblogin.py:373
+#: tryton/gui/window/dblogin.py:370
 msgid "Login"
 msgstr "Usuario"
 
-#: tryton/gui/window/dblogin.py:380
+#: tryton/gui/window/dblogin.py:377
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: tryton/gui/window/dblogin.py:385
+#: tryton/gui/window/dblogin.py:382
 msgid "Cancel connection to the Tryton server"
 msgstr "Cancelar conexión al servidor Tryton"
 
-#: tryton/gui/window/dblogin.py:387
+#: tryton/gui/window/dblogin.py:384
 msgid "C_onnect"
 msgstr "C_onectar"
 
-#: tryton/gui/window/dblogin.py:392
+#: tryton/gui/window/dblogin.py:389
 msgid "Connect the Tryton server"
 msgstr "Conectar al servidor Tryton"
 
-#: tryton/gui/window/dblogin.py:420
+#: tryton/gui/window/dblogin.py:417
 msgid "Profile:"
 msgstr "Perfil:"
 
-#: tryton/gui/window/dblogin.py:424
+#: tryton/gui/window/dblogin.py:421
 msgid "_Manage profiles"
 msgstr "_Administrar perfiles"
 
-#: tryton/gui/window/dblogin.py:434
+#: tryton/gui/window/dblogin.py:431
 msgid "Host / Database information"
 msgstr "Información del Servidor / Base de datos"
 
-#: tryton/gui/window/dblogin.py:437
+#: tryton/gui/window/dblogin.py:434
 msgid "Host:"
 msgstr "Servidor:"
 
-#: tryton/gui/window/dblogin.py:470
+#: tryton/gui/window/dblogin.py:467
 msgid "User name:"
 msgstr "Nombre de usuario:"
 
@@ -1055,8 +1053,8 @@ msgid ""
 "Check for an automatic database update after restoring a database from a "
 "previous Tryton version."
 msgstr ""
-"Seleccionar para realizar una actualización automática de la base de datos "
-"desde una versión anterior de Tryton, después de restaurarla."
+"Seleccionar para realizar una actualización automática de la base de "
+"datos desde una versión anterior de Tryton, después de restaurarla."
 
 #: tryton/gui/window/dbrestore.py:154
 msgid "Restore"
@@ -1104,7 +1102,7 @@ msgstr "Adjunto:"
 
 #: tryton/gui/window/form.py:39 tryton/gui/window/tips.py:74
 #: tryton/gui/window/win_form.py:201
-#: tryton/gui/window/view_form/view/screen_container.py:166
+#: tryton/gui/window/view_form/view/screen_container.py:165
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:128
 msgid "Previous"
 msgstr "Anterior"
@@ -1115,7 +1113,7 @@ msgstr "Registro Anterior"
 
 #: tryton/gui/window/form.py:41 tryton/gui/window/tips.py:81
 #: tryton/gui/window/win_form.py:215
-#: tryton/gui/window/view_form/view/screen_container.py:178
+#: tryton/gui/window/view_form/view/screen_container.py:177
 #: tryton/gui/window/view_form/view/form_gtk/one2many.py:142
 msgid "Next"
 msgstr "Siguiente"
@@ -1422,7 +1420,8 @@ msgstr ""
 "con una órbita retrógrada, esto es, que orbita en dirección opuesta\n"
 "a la rotación del planeta.  Con 2.700 km de diámetro. es la séptima luna\n"
 "en tamaño del Sistema Solar. Triton cuenta con más del 99.5 porciento\n"
-"de toda la masa que orbita a Neptuno, incluyendo los anillos del planeta y\n"
+"de toda la masa que orbita a Neptuno, incluyendo los anillos del planeta "
+"y\n"
 "veinte lunas conocidas.  Tiene más masa que todas las otras 159 lunas\n"
 "más pequeñas del Sistema Solar combinadas.\n"
 
@@ -1674,16 +1673,15 @@ msgstr "Modificado por Usuario"
 msgid "Modification Date"
 msgstr "Fecha de Modificación"
 
-#: tryton/gui/window/view_form/screen/screen.py:645
+#: tryton/gui/window/view_form/screen/screen.py:634
 msgid "Unable to get view tree state"
 msgstr ""
 
-#: tryton/gui/window/view_form/screen/screen.py:682
-#, python-format
+#: tryton/gui/window/view_form/screen/screen.py:671
 msgid "Unable to set view tree state"
 msgstr "No se puede fijar la vista de estado del árbol"
 
-#: tryton/gui/window/view_form/view/list.py:648
+#: tryton/gui/window/view_form/view/list.py:651
 msgid "You must select a record to use the relation!"
 msgstr "¡Debe seleccionar un registro para usar la relación!"
 
@@ -1695,23 +1693,23 @@ msgstr ".."
 msgid "F_ilters"
 msgstr "F_iltros"
 
-#: tryton/gui/window/view_form/view/screen_container.py:150
+#: tryton/gui/window/view_form/view/screen_container.py:149
 msgid "Show bookmarks of filters"
 msgstr "Mostrar marcadores de filtros"
 
-#: tryton/gui/window/view_form/view/screen_container.py:311
+#: tryton/gui/window/view_form/view/screen_container.py:314
 msgid "Remove this bookmark"
 msgstr "Eliminar este marcador"
 
-#: tryton/gui/window/view_form/view/screen_container.py:318
+#: tryton/gui/window/view_form/view/screen_container.py:321
 msgid "Bookmark this filter"
 msgstr "Marcar este filtro"
 
-#: tryton/gui/window/view_form/view/screen_container.py:377
+#: tryton/gui/window/view_form/view/screen_container.py:380
 msgid "Bookmark Name:"
 msgstr "Nombre del Marcador:"
 
-#: tryton/gui/window/view_form/view/screen_container.py:488
+#: tryton/gui/window/view_form/view/screen_container.py:490
 msgid "Find"
 msgstr "Buscar"
 
@@ -1908,17 +1906,3 @@ msgstr "Desconocido"
 msgid "Translate view"
 msgstr "Traducir vista"
 
-#~ msgid "_Send a Request"
-#~ msgstr "_Enviar solicitud"
-
-#~ msgid "_Read my Requests"
-#~ msgstr "_Leer mis Solicitudes"
-
-#~ msgid "Statusbar"
-#~ msgstr "Barra de estado"
-
-#~ msgid "Waiting requests: %s received - %s sent"
-#~ msgstr "Solicitudes en espera: %s recibidas - %s enviadas"
-
-#~ msgid "SSL connection"
-#~ msgstr "Conexión SSL"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tryton 3.0.0\n"
 "Report-Msgid-Bugs-To: issue_tracker@tryton.org\n"
-"POT-Creation-Date: 2013-10-18 19:34-0300\n"
+"POT-Creation-Date: 2013-10-20 16:34+0200\n"
 "PO-Revision-Date: 2013-10-18 01:20-0300\n"
 "Last-Translator: Bruno M. Villasanti <bvillasanti@thymbra.com>\n"
 "Language-Team: Argentina\n"
@@ -176,7 +176,7 @@ msgid "User:"
 msgstr "Usuario:"
 
 #: tryton/common/common.py:943 tryton/common/common.py:1101
-#: tryton/gui/window/dblogin.py:465
+#: tryton/gui/window/dblogin.py:462
 msgid "Password:"
 msgstr "Contraseña:"
 
@@ -233,27 +233,27 @@ msgstr ""
 msgid "Network Error!"
 msgstr "¡Error de red!"
 
-#: tryton/common/common.py:1360
+#: tryton/common/common.py:1354
 msgid "Y"
 msgstr "A"
 
-#: tryton/common/common.py:1361
+#: tryton/common/common.py:1355
 msgid "M"
 msgstr "M"
 
-#: tryton/common/common.py:1362
+#: tryton/common/common.py:1356
 msgid "w"
 msgstr "s"
 
-#: tryton/common/common.py:1363
+#: tryton/common/common.py:1357
 msgid "d"
 msgstr "d"
 
-#: tryton/common/common.py:1364
+#: tryton/common/common.py:1358
 msgid "h"
 msgstr "h"
 
-#: tryton/common/common.py:1365
+#: tryton/common/common.py:1359
 msgid "m"
 msgstr "m"
 
@@ -727,7 +727,7 @@ msgstr "Configuración del servidor:"
 msgid "Server connection:"
 msgstr "Conexión con el servidor:"
 
-#: tryton/gui/window/dbcreate.py:180 tryton/gui/window/dbdumpdrop.py:141
+#: tryton/gui/window/dbcreate.py:180 tryton/gui/window/dbdumpdrop.py:140
 #: tryton/gui/window/dbrestore.py:86
 msgid ""
 "This is the URL of the server. Use server 'localhost' and port '8000' if "
@@ -738,7 +738,7 @@ msgstr ""
 "«8000» si el servidor está instalado en este ordenador. Pulse en "
 "«Cambiar» para cambiar la dirección."
 
-#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:148
+#: tryton/gui/window/dbcreate.py:183 tryton/gui/window/dbdumpdrop.py:147
 #: tryton/gui/window/dbrestore.py:91
 msgid "C_hange"
 msgstr "C_ambiar"
@@ -747,12 +747,12 @@ msgstr "C_ambiar"
 msgid "Setup the server connection..."
 msgstr "Configurar la conexión con el servidor..."
 
-#: tryton/gui/window/dbcreate.py:195 tryton/gui/window/dbdumpdrop.py:185
+#: tryton/gui/window/dbcreate.py:195 tryton/gui/window/dbdumpdrop.py:186
 #: tryton/gui/window/dbrestore.py:100
 msgid "Tryton Server Password:"
 msgstr "Contraseña del servidor Tryton:"
 
-#: tryton/gui/window/dbcreate.py:205 tryton/gui/window/dbdumpdrop.py:195
+#: tryton/gui/window/dbcreate.py:205 tryton/gui/window/dbdumpdrop.py:196
 #: tryton/gui/window/dbrestore.py:109
 msgid ""
 "This is the password of the Tryton server. It doesn't belong to a real "
@@ -884,7 +884,7 @@ msgstr ""
 msgid "Error creating database!"
 msgstr "¡Se ha producido un error al crear la base de datos!"
 
-#: tryton/gui/window/dbdumpdrop.py:27
+#: tryton/gui/window/dbdumpdrop.py:26
 msgid "Could not connect to server!"
 msgstr "¡No se ha podido conectar al servidor!"
 
@@ -892,48 +892,48 @@ msgstr "¡No se ha podido conectar al servidor!"
 msgid "This client version is not compatible with the server!"
 msgstr "¡Esta versión del cliente no es compatible con el servidor!"
 
-#: tryton/gui/window/dbdumpdrop.py:37
+#: tryton/gui/window/dbdumpdrop.py:39
 msgid "No database found, you must create one!"
 msgstr "¡No se ha encontrado ninguna base de datos, debe crear una!"
 
-#: tryton/gui/window/dbdumpdrop.py:78
+#: tryton/gui/window/dbdumpdrop.py:77
 msgid "Backup a database"
 msgstr "Realizar copia de seguridad de una base de datos"
 
-#: tryton/gui/window/dbdumpdrop.py:79
+#: tryton/gui/window/dbdumpdrop.py:78
 msgid "Backup"
 msgstr "Copia de seguridad"
 
-#: tryton/gui/window/dbdumpdrop.py:80
+#: tryton/gui/window/dbdumpdrop.py:79
 msgid "Backup the choosen database."
 msgstr "Hacer copia de seguridad de la base de datos elegida."
 
-#: tryton/gui/window/dbdumpdrop.py:82
+#: tryton/gui/window/dbdumpdrop.py:81
 msgid "Choose a Tryton database to backup:"
 msgstr "Elija una base de datos Tryton para hacer una copia de seguridad:"
 
-#: tryton/gui/window/dbdumpdrop.py:84
+#: tryton/gui/window/dbdumpdrop.py:83
 msgid "Delete a database"
 msgstr "Eliminar una base de datos"
 
-#: tryton/gui/window/dbdumpdrop.py:85
+#: tryton/gui/window/dbdumpdrop.py:84
 msgid "Delete"
 msgstr "Eliminar"
 
-#: tryton/gui/window/dbdumpdrop.py:86
+#: tryton/gui/window/dbdumpdrop.py:85
 msgid "Delete the choosen database."
 msgstr "Eliminar la base de datos elegida."
 
-#: tryton/gui/window/dbdumpdrop.py:88
+#: tryton/gui/window/dbdumpdrop.py:87
 msgid "Choose a Tryton database to delete:"
 msgstr "Elija la base de datos Tryton a eliminar:"
 
-#: tryton/gui/window/dbdumpdrop.py:131 tryton/gui/window/dbrestore.py:75
+#: tryton/gui/window/dbdumpdrop.py:130 tryton/gui/window/dbrestore.py:75
 msgid "Server Connection:"
 msgstr "Conexión al servidor:"
 
-#: tryton/gui/window/dbdumpdrop.py:157 tryton/gui/window/dblogin.py:89
-#: tryton/gui/window/dblogin.py:447
+#: tryton/gui/window/dbdumpdrop.py:156 tryton/gui/window/dblogin.py:89
+#: tryton/gui/window/dblogin.py:444
 msgid "Database:"
 msgstr "Base de datos:"
 
@@ -971,51 +971,51 @@ msgstr "Recuperando lista de bases de datos"
 msgid "Username:"
 msgstr "Nombre de usuario:"
 
-#: tryton/gui/window/dblogin.py:310
+#: tryton/gui/window/dblogin.py:308
 msgid "Could not connect to the server"
 msgstr "No se ha podido conectar al servidor"
 
-#: tryton/gui/window/dblogin.py:312 tryton/gui/window/dblogin.py:634
+#: tryton/gui/window/dblogin.py:310 tryton/gui/window/dblogin.py:631
 msgid "Incompatible version of the server"
 msgstr "El cliente no es compatible con la versión del servidor"
 
-#: tryton/gui/window/dblogin.py:373
+#: tryton/gui/window/dblogin.py:370
 msgid "Login"
 msgstr "Usuario"
 
-#: tryton/gui/window/dblogin.py:380
+#: tryton/gui/window/dblogin.py:377
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: tryton/gui/window/dblogin.py:385
+#: tryton/gui/window/dblogin.py:382
 msgid "Cancel connection to the Tryton server"
 msgstr "Cancelar conexión al servidor Tryton"
 
-#: tryton/gui/window/dblogin.py:387
+#: tryton/gui/window/dblogin.py:384
 msgid "C_onnect"
 msgstr "C_onectar"
 
-#: tryton/gui/window/dblogin.py:392
+#: tryton/gui/window/dblogin.py:389
 msgid "Connect the Tryton server"
 msgstr "Conectar al servidor Tryton"
 
-#: tryton/gui/window/dblogin.py:420
+#: tryton/gui/window/dblogin.py:417
 msgid "Profile:"
 msgstr "Perfil:"
 
-#: tryton/gui/window/dblogin.py:424
+#: tryton/gui/window/dblogin.py:421
 msgid "_Manage profiles"
 msgstr "_Administrar perfiles"
 
-#: tryton/gui/window/dblogin.py:434
+#: tryton/gui/window/dblogin.py:431
 msgid "Host / Database information"
 msgstr "Información del Servidor / Base de datos"
 
-#: tryton/gui/window/dblogin.py:437
+#: tryton/gui/window/dblogin.py:434
 msgid "Host:"
 msgstr "Servidor:"
 
-#: tryton/gui/window/dblogin.py:470
+#: tryton/gui/window/dblogin.py:467
 msgid "User name:"
 msgstr "Nombre de usuario:"
 
