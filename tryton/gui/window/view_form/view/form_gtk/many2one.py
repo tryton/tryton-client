@@ -195,7 +195,8 @@ class Many2One(WidgetInterface):
         context = self.field.context_get(self.record)
         return Screen(self.get_model(), domain=domain, context=context,
             mode=['form'], view_ids=self.attrs.get('view_ids', '').split(','),
-            views_preload=self.attrs.get('views', {}), readonly=self._readonly)
+            views_preload=self.attrs.get('views', {}), readonly=self._readonly,
+            exclude_field=self.attrs.get('relation_field'))
 
     def sig_new(self, *args):
         model = self.get_model()

@@ -415,6 +415,8 @@ class Record(SignalEvent):
         for fieldname, value in val.items():
             if fieldname not in self.group.fields:
                 continue
+            if fieldname == self.group.exclude_field:
+                continue
             if isinstance(self.group.fields[fieldname], (fields.M2OField,
                         fields.ReferenceField)):
                 field_rec_name = fieldname + '.rec_name'
