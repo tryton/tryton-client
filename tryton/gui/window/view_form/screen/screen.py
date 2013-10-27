@@ -140,7 +140,7 @@ class Screen(SignalEvent):
                         ):
                     if name not in fields:
                         fields[name] = {
-                            'string': string,
+                            'string': string.decode('utf-8'),
                             'name': name,
                             'type': type_,
                             }
