@@ -146,6 +146,9 @@ class Many2Many(WidgetInterface):
         if not self.focus_out:
             return
         domain = self.field.domain_get(self.record)
+        add_remove = self.record.expr_eval(self.attrs.get('add_remove'))
+        if add_remove:
+            domain = [domain, add_remove]
         context = self.field.context_get(self.record)
         value = self.wid_text.get_text()
 
@@ -263,6 +266,9 @@ class Many2Many(WidgetInterface):
         elif index == 1:
             model = self.attrs['relation']
             domain = self.field.domain_get(self.record)
+            add_remove = self.record.expr_eval(self.attrs.get('add_remove'))
+            if add_remove:
+                domain = [domain, add_remove]
             context = self.field.context_get(self.record)
 
             screen = Screen(model, domain, context=context, mode=['form'])
