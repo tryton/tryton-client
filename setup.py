@@ -164,7 +164,6 @@ dist = setup(name=PACKAGE,
         "python-dateutil",
         ] + WEAKREF,
     extras_require={
-        'timezone': ['pytz'],
         'simplejson': ['simplejson'],
         'cdecimal': ['cdecimal'],
         'calendar': ['GooCalendar'],

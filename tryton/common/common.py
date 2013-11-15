@@ -38,10 +38,7 @@ try:
 except ImportError:
     ssl = None
 from threading import Lock
-try:
-    import pytz
-except ImportError:
-    pytz = None
+import dateutil.tz
 
 from tryton.exceptions import (TrytonServerError, TrytonError,
     TrytonServerUnavailable)
@@ -1463,15 +1460,11 @@ def filter_domain(domain):
 
 
 def timezoned_date(date, reverse=False):
-    if pytz and rpc.CONTEXT.get('timezone') and rpc.TIMEZONE:
-        lzone = pytz.timezone(rpc.CONTEXT['timezone'])
-        szone = pytz.timezone(rpc.TIMEZONE)
-        if reverse:
-            lzone, szone = szone, lzone
-        sdt = szone.localize(date, is_dst=True)
-        ldt = sdt.astimezone(lzone)
-        date = ldt
-    return date
+    lzone = dateutil.tz.tzlocal()
+    szone = dateutil.tz.tzutc()
+    if reverse:
+        lzone, szone = szone, lzone
+    return date.replace(tzinfo=szone).astimezone(lzone)
 
 
 def untimezoned_date(date):

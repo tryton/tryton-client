@@ -24,7 +24,6 @@ CONTEXT = {}
 _VIEW_CACHE = {}
 _TOOLBAR_CACHE = {}
 _KEYWORD_CACHE = {}
-TIMEZONE = 'utc'
 _SEMAPHORE = Semaphore()
 _CA_CERTS = os.path.join(get_config_dir(), 'ca_certs')
 if not os.path.isfile(_CA_CERTS):
@@ -137,21 +136,13 @@ def logout():
 
 
 def context_reload():
-    global CONTEXT, TIMEZONE, _HOST, _PORT
+    global CONTEXT
     try:
         context = execute('model', 'res.user', 'get_preferences', True, {})
     except Fault:
         return
     CONTEXT = {}
-    for i in context:
-        value = context[i]
-        CONTEXT[i] = value
-        if i == 'timezone':
-            try:
-                connection = ServerProxy(_HOST, _PORT)
-                TIMEZONE = connection.common.server.timezone_get(None, None)
-            except Fault:
-                pass
+    CONTEXT.update(context)
 
 
 def _execute(blocking, *args):
