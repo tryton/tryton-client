@@ -9,7 +9,7 @@ import tempfile
 import os
 import webbrowser
 from tryton.pyson import PYSONEncoder
-from tryton.common import RPCProgress, RPCExecute, RPCException
+from tryton.common import RPCProgress, RPCExecute, RPCException, slugify
 
 _ = gettext.gettext
 
@@ -40,10 +40,9 @@ class Action(object):
         if not print_p and direct_print:
             print_p = True
         dtemp = tempfile.mkdtemp(prefix='tryton_')
+
         fp_name = os.path.join(dtemp,
-            name.replace(os.sep, '_').replace(os.altsep or os.sep, '_')
-            + os.extsep
-            + type.replace(os.sep, '_').replace(os.altsep or os.sep, '_'))
+            slugify(name) + os.extsep + slugify(type))
         with open(fp_name, 'wb') as file_d:
             file_d.write(data)
         if email_print:
