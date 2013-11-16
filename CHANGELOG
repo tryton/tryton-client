@@ -1,3 +1,4 @@
+* Allow to search on rec_name of Reference fields
 * Use local timezone
 * Sanitize report file extension
 
