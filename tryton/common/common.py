@@ -992,10 +992,15 @@ def send_bugtracker(title, msg):
                 title = '[no title]'
             issue_id = None
             msg_ids = server.filter('msg', None, {'summary': str(msg_md5)})
-            if msg_ids:
-                issue_ids = server.filter('issue', None, {'messages': msg_ids})
-                if issue_ids:
-                    issue_id = issue_ids[0]
+            for msg_id in msg_ids:
+                summary = server.display(
+                    'msg%s' % msg_id, 'summary')['summary']
+                if summary == msg_md5:
+                    issue_ids = server.filter(
+                        'issue', None, {'messages': msg_id})
+                    if issue_ids:
+                        issue_id = issue_ids[0]
+                        break
             if issue_id:
                 # issue to same message already exists, add user to nosy-list
                 server.set('issue' + str(issue_id), *['nosy=+' + user])
