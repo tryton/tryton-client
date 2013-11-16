@@ -73,7 +73,7 @@ class Record(SignalEvent):
 
             record_context = self.context_get()
             if loading == 'eager':
-                limit = int(CONFIG['client.limit'])
+                limit = CONFIG['client.limit']
                 if not self.parent:
                     # If not a children no need to load too much
                     limit = int(limit / len(fnames))
