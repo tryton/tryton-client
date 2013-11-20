@@ -516,7 +516,7 @@ class Record(SignalEvent):
             scope = values
             for i in arg.split('.'):
                 if i not in scope:
-                    scope = False
+                    scope = None
                     break
                 scope = scope[i]
             res[arg] = scope
