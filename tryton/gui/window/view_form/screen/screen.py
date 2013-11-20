@@ -53,7 +53,7 @@ class Screen(SignalEvent):
         if domain is None:
             domain = []
 
-        self.limit = limit or int(CONFIG['client.limit'])
+        self.limit = limit or CONFIG['client.limit']
         self.offset = 0
         super(Screen, self).__init__()
 

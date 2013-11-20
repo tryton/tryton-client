@@ -10,7 +10,6 @@ Prerequisites
  * python-dateutil (http://labix.org/python-dateutil)
  * weakrefset for Python 2.6 (https://code.google.com/p/weakrefset/)
  * Optional: simplejson (http://undefined.org/python/#simplejson)
- * Optional: pytz (http://pytz.sourceforge.net/)
  * Optional: cdecimal (http://www.bytereef.org/mpdecimal/index.html)
  * Optional: GooCalendar (http://code.google.com/p/goocalendar/)
 

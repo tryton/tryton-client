@@ -155,7 +155,9 @@ class ConfigManager(object):
                 elif value.lower() == 'false':
                     value = False
                 if section == 'client' and name == 'limit':
-                    value = float(value)
+                    # First convert to float to be backward compatible with old
+                    # configuration
+                    value = int(float(value))
                 self.config[section + '.' + name] = value
         return True
 
