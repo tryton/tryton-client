@@ -841,32 +841,36 @@ class Main(object):
         page = self.notebook.get_current_page()
         self.notebook.set_current_page(page - 1)
 
+    def get_preferences(self):
+        rpc.context_reload()
+        try:
+            prefs = RPCExecute('model', 'res.user', 'get_preferences',
+                False)
+        except RPCException:
+            prefs = {}
+        common.ICONFACTORY.load_icons()
+        common.MODELACCESS.load_models()
+        common.VIEW_SEARCH.load_searches()
+        if prefs and 'language_direction' in prefs:
+            translate.set_language_direction(prefs['language_direction'])
+            CONFIG['client.language_direction'] = \
+                prefs['language_direction']
+        self.sig_win_menu(prefs=prefs)
+        for action_id in prefs.get('actions', []):
+            Action.execute(action_id, {})
+        self.set_title(prefs.get('status_bar', ''))
+        if prefs and 'language' in prefs:
+            translate.setlang(prefs['language'], prefs.get('locale'))
+            if CONFIG['client.lang'] != prefs['language']:
+                self.set_menubar()
+                self.favorite_unset()
+            CONFIG['client.lang'] = prefs['language']
+        CONFIG.save()
+
     def sig_user_preferences(self, widget):
         if not self.close_pages():
             return False
-
-        def callback():
-            rpc.context_reload()
-            try:
-                prefs = RPCExecute('model', 'res.user', 'get_preferences',
-                    False)
-            except RPCException:
-                prefs = None
-            if prefs and 'language_direction' in prefs:
-                translate.set_language_direction(prefs['language_direction'])
-                CONFIG['client.language_direction'] = \
-                    prefs['language_direction']
-            self.set_title(prefs.get('status_bar', ''))
-            if prefs and 'language' in prefs:
-                translate.setlang(prefs['language'], prefs.get('locale'))
-                if CONFIG['client.lang'] != prefs['language']:
-                    self.set_menubar()
-                    self.favorite_unset()
-                    self.sig_win_menu()
-                CONFIG['client.lang'] = prefs['language']
-            CONFIG.save()
-            self.sig_win_menu()
-        Preference(rpc._USER, callback)
+        Preference(rpc._USER, self.get_preferences)
 
     def sig_win_close(self, widget):
         self._sig_remove_book(widget,
@@ -889,31 +893,8 @@ class Main(object):
         except TrytonServerError, exception:
             common.process_exception(exception)
             return
-        rpc.context_reload()
         if log_response > 0:
-            try:
-                prefs = RPCExecute('model', 'res.user', 'get_preferences',
-                    False)
-            except RPCException:
-                prefs = {}
-            common.ICONFACTORY.load_icons()
-            common.MODELACCESS.load_models()
-            common.VIEW_SEARCH.load_searches()
-            if prefs and 'language_direction' in prefs:
-                translate.set_language_direction(prefs['language_direction'])
-                CONFIG['client.language_direction'] = \
-                    prefs['language_direction']
-            self.sig_win_menu(prefs=prefs)
-            for action_id in prefs.get('actions', []):
-                Action.execute(action_id, {})
-            self.set_title(prefs.get('status_bar', ''))
-            if prefs and 'language' in prefs:
-                translate.setlang(prefs['language'], prefs.get('locale'))
-                if CONFIG['client.lang'] != prefs['language']:
-                    self.set_menubar()
-                    self.favorite_unset()
-                CONFIG['client.lang'] = prefs['language']
-            CONFIG.save()
+            self.get_preferences()
         elif log_response == -1:
             common.message(_('Connection error!\n'
                     'Unable to connect to the server!'))
