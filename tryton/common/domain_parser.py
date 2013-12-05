@@ -377,7 +377,8 @@ def test_convert_datetime():
         }
     for value, result in (
             ('12/04/2002', datetime.datetime(2002, 12, 4)),
-            ('12/04/2002 12:30:00', datetime.datetime(2002, 12, 4, 12, 30)),
+            ('12/04/2002 12:30:00', untimezoned_date(
+                    datetime.datetime(2002, 12, 4, 12, 30))),
             ('test', None),
             (None, None),
             ):
