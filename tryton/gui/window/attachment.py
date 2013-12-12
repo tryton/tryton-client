@@ -27,6 +27,9 @@ class Attachment(WinForm):
 
     def callback(self, result):
         if result:
+            resource = self.screen.group.fields['resource']
+            for record in self.screen.group:
+                resource.set_client(record, self.resource)
             self.screen.group.save()
         if self.attachment_callback:
             self.attachment_callback()
