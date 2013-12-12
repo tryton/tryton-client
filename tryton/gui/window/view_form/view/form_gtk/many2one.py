@@ -12,6 +12,7 @@ from tryton.config import CONFIG
 from tryton.common.popup_menu import populate
 from tryton.common import RPCExecute, RPCException
 from tryton.common.completion import get_completion, update_completion
+from tryton.common.entry_position import manage_entry_position
 
 _ = gettext.gettext
 
@@ -33,6 +34,7 @@ class Many2One(WidgetInterface):
         self.wid_text.connect('focus-out-event',
             lambda x, y: self._focus_out())
         self.wid_text.connect_after('changed', self.sig_changed)
+        manage_entry_position(self.wid_text)
         self.changed = True
         self.focus_out = True
 

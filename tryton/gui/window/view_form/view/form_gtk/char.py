@@ -6,6 +6,7 @@ import gobject
 import gtk
 from interface import WidgetInterface, TranslateMixin
 from tryton.common import Tooltips
+from tryton.common.entry_position import manage_entry_position
 
 _ = gettext.gettext
 
@@ -36,6 +37,7 @@ class Char(WidgetInterface, TranslateMixin):
         focus_entry.connect('activate', self.sig_activate)
         focus_entry.connect('focus-out-event', lambda x, y: self._focus_out())
         focus_entry.connect('key-press-event', self.send_modified)
+        manage_entry_position(focus_entry)
         expand, fill = True, True
         if attrs.get('size'):
             expand, fill = False, False
