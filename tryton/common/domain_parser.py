@@ -1038,10 +1038,13 @@ class DomainParser(object):
                 else:
                     name, operator, value = clause
                     field = self.strings[name.lower()]
+                    field_name = field['name']
 
                     target = None
                     if field['type'] == 'reference':
                         target, value = split_target_value(field, value)
+                        if target:
+                            field_name += '.rec_name'
 
                     if operator is None:
                         operator = default_operator(field)
@@ -1059,21 +1062,23 @@ class DomainParser(object):
                             lvalue = convert_value(field, lvalue)
                             rvalue = convert_value(field, rvalue)
                             yield iter([
-                                    (field['name'], '>=', lvalue),
-                                    (field['name'], '<', rvalue),
+                                    (field_name, '>=', lvalue),
+                                    (field_name, '<', rvalue),
                                     ])
                             continue
                     if isinstance(value, list):
                         value = [convert_value(field, v) for v in value]
+                        if field['type'] in ('many2one', 'one2many',
+                                'many2many', 'one2one'):
+                            field_name += '.rec_name'
                     else:
                         value = convert_value(field, value)
                     if 'like' in operator:
                         value = likify(value)
                     if target:
-                        yield (field['name'] + '.rec_name', operator, value,
-                            target)
+                        yield (field_name, operator, value, target)
                     else:
-                        yield field['name'], operator, value
+                        yield field_name, operator, value
 
 
 def test_stringable():
@@ -1115,6 +1120,11 @@ def test_string():
                     ('ham', 'Ham'),
                     ]
                 },
+            'many2one': {
+                'string': 'Many2One',
+                'name': 'many2one',
+                'type': 'many2one',
+                },
             })
     assert dom.string([('name', '=', 'Doe')]) == 'Name: =Doe'
     assert dom.string([('name', '=', None)]) == 'Name: ='
@@ -1153,6 +1163,9 @@ def test_string():
         'Reference: Spam,bar'
     assert dom.string([('reference', 'in', ['foo', 'bar'])]) == \
         'Reference: foo;bar'
+    assert dom.string([('many2one', 'ilike', '%John%')]) == 'Many2One: John'
+    assert dom.string([('many2one.rec_name', 'in', ['John', 'Jane'])]) == \
+        'Many2One: John;Jane'
 
 
 def test_group():
@@ -1270,6 +1283,11 @@ def test_parse_clause():
                     ('ham', 'Ham'),
                     ]
                 },
+            'many2one': {
+                'string': 'Many2One',
+                'name': 'many2one',
+                'type': 'many2one',
+                },
             })
     assert rlist(dom.parse_clause([('John',)])) == [
         ('rec_name', 'ilike', '%John%')]
@@ -1311,4 +1329,10 @@ def test_parse_clause():
         ]
     assert rlist(dom.parse_clause([('Reference', None, ['foo', 'bar'])])) == [
         ('reference', 'in', ['foo', 'bar']),
+        ]
+    assert rlist(dom.parse_clause([('Many2One', None, 'John')])) == [
+        ('many2one', 'ilike', '%John%'),
+        ]
+    assert rlist(dom.parse_clause([('Many2One', None, ['John', 'Jane'])])) == [
+        ('many2one.rec_name', 'in', ['John', 'Jane']),
         ]
