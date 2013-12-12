@@ -412,7 +412,7 @@ class ScreenContainer(object):
                 else:
                     value = quote(entry.get_text())
                 if value:
-                    text += label + ' ' + value + ' '
+                    text += quote(label) + ': ' + value + ' '
             self.set_text(text)
             self.last_search_text = self.get_text()
             self.do_search()
@@ -481,7 +481,7 @@ class ScreenContainer(object):
                     entry.connect('activate', lambda *a: search())
                 self.search_table.attach(entry, 1, 2, i, i + 1,
                     yoptions=yoptions)
-                self.search_table.fields.append((field['string'] + ':', entry))
+                self.search_table.fields.append((field['string'], entry))
 
             scrolled = gtk.ScrolledWindow()
             scrolled.add_with_viewport(self.search_table)
