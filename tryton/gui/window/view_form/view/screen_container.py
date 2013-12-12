@@ -107,6 +107,7 @@ class ScreenContainer(object):
             self.completion.props.inline_selection = True
         if hasattr(self.completion.props, 'popup_set_width'):
             self.completion.props.popup_set_width = False
+        self.completion.set_match_func(lambda *a: True)
         self.completion.connect('match-selected', self.match_selected)
         self.search_entry.connect('activate', self.activate)
         self.search_entry.set_completion(self.completion)
