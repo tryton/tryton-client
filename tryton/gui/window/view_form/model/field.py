@@ -517,9 +517,11 @@ class O2MField(CharField):
             return []
         record_removed = record.value[self.name].record_removed
         record_deleted = record.value[self.name].record_deleted
-        result = [('add', [])]
+        result = []
         parent_name = self.attrs.get('relation_field', '')
+        to_add = []
         to_create = []
+        to_write = []
         for record2 in record.value[self.name]:
             if record2 in record_removed or record2 in record_deleted:
                 continue
@@ -527,16 +529,18 @@ class O2MField(CharField):
                 values = record2.get()
                 values.pop(parent_name, None)
                 if record2.modified and values:
-                    result.append(('write', [record2.id], values))
-                result[0][1].append(record2.id)
+                    to_write.extend(([record2.id], values))
+                to_add.append(record2.id)
             else:
                 values = record2.get()
                 values.pop(parent_name, None)
                 to_create.append(values)
+        if to_add:
+            result.append(('add', to_add))
         if to_create:
             result.append(('create', to_create))
-        if not result[0][1]:
-            del result[0]
+        if to_write:
+            result.append(('write',) + tuple(to_write))
         if record_removed:
             result.append(('unlink', [x.id for x in record_removed]))
         if record_deleted:
