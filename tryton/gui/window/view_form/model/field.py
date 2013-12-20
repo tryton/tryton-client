@@ -542,7 +542,7 @@ class O2MField(CharField):
         if to_write:
             result.append(('write',) + tuple(to_write))
         if record_removed:
-            result.append(('unlink', [x.id for x in record_removed]))
+            result.append(('remove', [x.id for x in record_removed]))
         if record_deleted:
             result.append(('delete', [x.id for x in record_deleted]))
         return result
