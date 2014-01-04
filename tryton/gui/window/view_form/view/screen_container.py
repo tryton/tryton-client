@@ -487,6 +487,7 @@ class ScreenContainer(object):
             scrolled = gtk.ScrolledWindow()
             scrolled.add_with_viewport(self.search_table)
             scrolled.set_shadow_type(gtk.SHADOW_NONE)
+            scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             vbox.pack_start(scrolled, expand=True, fill=True)
             find_button = gtk.Button(_('Find'))
             find_button.connect('clicked', lambda *a: search())
@@ -501,26 +502,19 @@ class ScreenContainer(object):
             self.search_window.add(vbox)
             vbox.show_all()
 
-            # Disable scrolling:
-            scrolled.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-            # See what changed:
-            new_size = self.search_window.size_request()
-            # Reenable scrolling:
-            scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            new_size = map(sum, zip(self.search_table.size_request(),
+                    scrolled.size_request()))
             self.search_window.set_default_size(*new_size)
 
         parent = button.get_toplevel()
-        button_x, button_y = button.translate_coordinates(parent,
-            *parent.window.get_origin())
+        button_x, button_y = button.translate_coordinates(parent, 0, 0)
         button_allocation = button.get_allocation()
 
-        # Resize the window to not be out of the screen
+        # Resize the window to not be out of the parent
         width, height = self.search_window.get_default_size()
-        screen = self.search_window.get_screen()
-        screen_width = screen.get_width()
-        screen_height = screen.get_height()
-        delta_width = screen_width - (button_x + width)
-        delta_height = screen_height - (button_y + button_allocation.height
+        allocation = parent.get_allocation()
+        delta_width = allocation.width - (button_x + width)
+        delta_height = allocation.height - (button_y + button_allocation.height
             + height)
         if delta_width < 0:
             width += delta_width
@@ -529,8 +523,8 @@ class ScreenContainer(object):
         self.search_window.resize(width, height)
 
         # Move the window under the button
-        self.search_window.move(button_x,
-            button_y + button_allocation.height)
+        x, y = button.window.get_origin()
+        self.search_window.move(x, y + button_allocation.height)
 
         from tryton.gui.main import Main
         page = Main.get_main().get_page()
