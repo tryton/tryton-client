@@ -103,10 +103,8 @@ class ScreenContainer(object):
         self.completion.set_model(gtk.ListStore(str))
         self.completion.set_text_column(0)
         self.completion.props.inline_completion = True
-        if hasattr(self.completion.props, 'inline_selection'):
-            self.completion.props.inline_selection = True
-        if hasattr(self.completion.props, 'popup_set_width'):
-            self.completion.props.popup_set_width = False
+        self.completion.props.inline_selection = True
+        self.completion.props.popup_set_width = False
         self.completion.set_match_func(lambda *a: True)
         self.completion.connect('match-selected', self.match_selected)
         self.search_entry.connect('activate', self.activate)
@@ -431,8 +429,7 @@ class ScreenContainer(object):
             self.search_window.set_title('Tryton')
             self.search_window.set_icon(TRYTON_ICON)
             self.search_window.set_decorated(False)
-            if hasattr(self.search_window, 'set_deletable'):
-                self.search_window.set_deletable(False)
+            self.search_window.set_deletable(False)
             self.search_window.connect('key-press-event', key_press)
             vbox = gtk.VBox()
             fields = [f for f in self.screen.domain_parser.fields.itervalues()

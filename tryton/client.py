@@ -116,8 +116,7 @@ class TrytonClient(object):
                 gtk.main()
         except KeyboardInterrupt:
             CONFIG.save()
-            if hasattr(gtk, 'accel_map_save'):
-                gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
+            gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
 
 if __name__ == "__main__":
     CLIENT = TrytonClient()

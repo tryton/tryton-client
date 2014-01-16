@@ -938,9 +938,7 @@ class Selection(Char, SelectionMixin):
         if hasattr(editable, 'set_text_column'):
             editable.set_text_column(0)
         completion = gtk.EntryCompletion()
-        #Only available in PyGTK 2.6 and above.
-        if hasattr(completion, 'set_inline_selection'):
-            completion.set_inline_selection(True)
+        completion.set_inline_selection(True)
         completion.set_model(model)
         editable.get_child().set_completion(completion)
         completion.set_text_column(0)

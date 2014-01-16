@@ -633,12 +633,8 @@ class WarningDialog(UniqueDialog):
     def build_dialog(self, parent, message, title, buttons=gtk.BUTTONS_OK):
         dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_WARNING, buttons)
-        if hasattr(dialog, 'format_secondary_markup'):
-            dialog.set_markup('<b>%s</b>' % (to_xml(title)))
-            dialog.format_secondary_markup(to_xml(message))
-        else:
-            dialog.set_markup(
-                '<b>%s</b>\n%s' % (to_xml(title), to_xml(message)))
+        dialog.set_markup('<b>%s</b>' % (to_xml(title)))
+        dialog.format_secondary_markup(to_xml(message))
         return dialog
 
 warning = WarningDialog()

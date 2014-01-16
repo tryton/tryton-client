@@ -61,11 +61,10 @@ class DateEntry(gtk.Entry):
         self.connect('focus-in-event', self._focus_in)
         self.connect('focus-out-event', self._focus_out)
 
-        if hasattr(self, 'set_icon_from_stock'):
-            self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, 'tryton-find')
-            self.set_icon_tooltip_text(gtk.ENTRY_ICON_SECONDARY,
-                _('Open the calendar <F2>'))
-            self.connect('icon-press', DateEntry.cal_open)
+        self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, 'tryton-find')
+        self.set_icon_tooltip_text(gtk.ENTRY_ICON_SECONDARY,
+            _('Open the calendar <F2>'))
+        self.connect('icon-press', DateEntry.cal_open)
 
         self._interactive_input = True
         self.idle_set_position(0)

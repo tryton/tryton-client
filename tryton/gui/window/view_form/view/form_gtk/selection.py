@@ -29,9 +29,7 @@ class PopdownMixin(object):
         entry.set_model(model)
         entry.set_text_column(0)
         completion = gtk.EntryCompletion()
-        #Only available in PyGTK 2.6 and above.
-        if hasattr(completion, 'set_inline_selection'):
-            completion.set_inline_selection(True)
+        completion.set_inline_selection(True)
         completion.set_model(model)
         entry.child.set_completion(completion)
         if self._selection:

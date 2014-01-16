@@ -295,8 +295,7 @@ class WizardDialog(Wizard, NoModal):
             gtk.DIALOG_DESTROY_WITH_PARENT)
         self.dia.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         self.dia.set_icon(TRYTON_ICON)
-        if hasattr(self.dia, 'set_deletable'):
-            self.dia.set_deletable(False)
+        self.dia.set_deletable(False)
         self.dia.connect('close', self.close)
         self.dia.connect('response', self.response)
         self.dia.connect('state-changed', self.state_changed)

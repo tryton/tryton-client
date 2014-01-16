@@ -17,8 +17,7 @@ def get_completion():
     completion.set_match_func(lambda *a: True)
     completion.set_model(gtk.ListStore(str, int))
     completion.set_text_column(0)
-    if hasattr(completion.props, 'popup_set_width'):
-        completion.props.popup_set_width = False
+    completion.props.popup_set_width = False
     completion.insert_action_markup(0, _('<i>Search...</i>'))
     completion.insert_action_markup(1, _('<i>Create...</i>'))
     return completion

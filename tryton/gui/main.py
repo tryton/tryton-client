@@ -130,8 +130,7 @@ class Main(object):
         gtk.accel_map_add_entry('<tryton>/Form/Search', gtk.keysyms.F,
             gtk.gdk.CONTROL_MASK)
 
-        if hasattr(gtk, 'accel_map_load'):
-            gtk.accel_map_load(os.path.join(get_config_dir(), 'accel.map'))
+        gtk.accel_map_load(os.path.join(get_config_dir(), 'accel.map'))
 
         self.tooltips = common.Tooltips()
 
@@ -293,8 +292,7 @@ class Main(object):
         text_cell = gtk.CellRendererText()
         global_search_completion.pack_start(text_cell)
         global_search_completion.add_attribute(text_cell, "markup", 1)
-        if hasattr(global_search_completion.props, 'popup_set_width'):
-            global_search_completion.props.popup_set_width = True
+        global_search_completion.props.popup_set_width = True
         self.global_search_entry.set_completion(global_search_completion)
         self.global_search_entry.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY,
             'gtk-find')
@@ -1090,8 +1088,7 @@ class Main(object):
         CONFIG['client.default_width'] = Main.get_main()._width
         CONFIG['client.default_height'] = Main.get_main()._height
         CONFIG.save()
-        if hasattr(gtk, 'accel_map_save'):
-            gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
+        gtk.accel_map_save(os.path.join(get_config_dir(), 'accel.map'))
 
         cls.tryton_client.quit_mainloop()
 
@@ -1186,8 +1183,7 @@ class Main(object):
         label_menu = gtk.Label(page.name)
         label_menu.set_alignment(0.0, 0.5)
         self.notebook.insert_page_menu(page.widget, hbox, label_menu, page_id)
-        if hasattr(self.notebook, 'set_tab_reorderable'):
-            self.notebook.set_tab_reorderable(page.widget, True)
+        self.notebook.set_tab_reorderable(page.widget, True)
         self.notebook.set_current_page(page_id)
 
     def _sig_remove_book(self, widget, page_widget):

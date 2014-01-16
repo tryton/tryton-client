@@ -104,8 +104,7 @@ class DictSelectionEntry(DictEntry):
         widget.set_text_column(0)
         widget.child.set_width_chars(width)
         completion = gtk.EntryCompletion()
-        if hasattr(completion, 'set_inline_selection'):
-            completion.set_inline_selection(True)
+        completion.set_inline_selection(True)
         completion.set_model(model)
         widget.child.set_completion(completion)
         completion.set_text_column(0)

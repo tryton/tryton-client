@@ -89,8 +89,7 @@ class Time(Calendar):
 
     def __init__(self, field_name, model_name, attrs=None):
         super(Time, self).__init__(field_name, model_name, attrs=attrs)
-        if hasattr(self.entry, 'set_icon_from_stock'):
-            self.entry.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
+        self.entry.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
 
     def get_format(self, record, field):
         return field.time_format(record)
