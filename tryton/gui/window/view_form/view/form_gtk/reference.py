@@ -34,7 +34,7 @@ class Reference(Many2One, SelectionMixin, PopdownMixin):
     def get_model(self):
         child = self.widget_combo.get_child()
         res = child.get_text()
-        return self._selection.get(res, False)
+        return self._selection.get(res, '')
 
     def _readonly_set(self, value):
         super(Reference, self)._readonly_set(value)
