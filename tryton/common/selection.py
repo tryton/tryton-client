@@ -45,7 +45,9 @@ class SelectionMixin(object):
 
         if 'relation' not in self.attrs:
             change_with = self.attrs.get('selection_change_with') or []
-            key = record._get_on_change_args(change_with).items()
+            args = record._get_on_change_args(change_with)
+            del args['id']
+            key = args.items()
             key.sort()
             self.init_selection(tuple(key))
         else:

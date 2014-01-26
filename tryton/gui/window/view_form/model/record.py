@@ -516,10 +516,11 @@ class Record(SignalEvent):
             scope = values
             for i in arg.split('.'):
                 if i not in scope:
-                    scope = None
                     break
                 scope = scope[i]
-            res[arg] = scope
+            else:
+                res[arg] = scope
+        res['id'] = self.id
         return res
 
     def on_change(self, fieldname, attr):
