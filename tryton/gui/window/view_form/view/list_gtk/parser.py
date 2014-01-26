@@ -617,8 +617,25 @@ class Binary(Char):
     @realized
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
+        field = record[self.field_name]
+
         size = record[self.field_name].get_size(record)
         cell.set_property('size', common.humanize(size) if size else '')
+
+        states = ('invisible',)
+        if getattr(self.treeview, 'editable', False):
+            states = ('readonly', 'required', 'invisible')
+
+        field.state_set(record, states=states)
+        invisible = field.get_state_attrs(record).get('invisible', False)
+        cell.set_property('visible', not invisible)
+
+        if getattr(self.treeview, 'editable', False):
+            readonly = self.attrs.get('readonly',
+                field.get_state_attrs(record).get('readonly', False))
+            if invisible:
+                readonly = True
+            cell.set_property('editable', not readonly)
 
     def new_binary(self, renderer, path):
         filename = file_selection(_('Open...'))
