@@ -76,6 +76,9 @@ class Screen(SignalEvent):
         self.parent_name = None
         self.exclude_field = exclude_field
         self.filter_widget = None
+        self.tree_states = collections.defaultdict(
+            lambda: collections.defaultdict(lambda: None))
+        self.tree_states_done = set()
         self.__group = None
         self.new_group()
         self.__current_record = None
@@ -88,9 +91,6 @@ class Screen(SignalEvent):
         self.fields_view_tree = None
         self.order = order
         self.view_to_load = []
-        self.tree_states = collections.defaultdict(
-            lambda: collections.defaultdict(lambda: None))
-        self.tree_states_done = set()
         self.domain_parser = None
         self.pre_validate = False
         self.view_to_load = mode[:]
@@ -242,6 +242,7 @@ class Screen(SignalEvent):
             self.group.signal_unconnect(self)
             for name, field in self.group.fields.iteritems():
                 fields[name] = field.attrs
+        self.tree_states_done.clear()
         self.__group = group
         self.parent = group.parent
         self.parent_name = group.parent_name
