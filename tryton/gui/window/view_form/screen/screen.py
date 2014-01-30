@@ -126,11 +126,8 @@ class Screen(SignalEvent):
                 xml_fields = [node_attributes(node).get('name')
                     for node in root_node.childNodes
                     if node.nodeName == 'field']
-                if hasattr(collections, 'OrderedDict'):
-                    odict = collections.OrderedDict
-                else:
-                    odict = dict
-                fields = odict((name, fields[name]) for name in xml_fields)
+                fields = collections.OrderedDict(
+                    (name, fields[name]) for name in xml_fields)
                 for name, string, type_ in (
                         ('id', _('ID'), 'integer'),
                         ('create_uid', _('Creation User'), 'many2one'),

@@ -4,7 +4,6 @@ import gtk
 import gettext
 import operator
 import gobject
-import collections
 
 import tryton.common as common
 from tryton.common.domain_parser import quote
@@ -434,10 +433,6 @@ class ScreenContainer(object):
             vbox = gtk.VBox()
             fields = [f for f in self.screen.domain_parser.fields.itervalues()
                 if f.get('searchable', True)]
-            if (not hasattr(collections, 'OrderedDict')
-                    or not isinstance(self.screen.domain_parser.fields,
-                        collections.OrderedDict)):
-                fields.sort(key=operator.itemgetter('string'))
             self.search_table = gtk.Table(rows=len(fields), columns=2)
             self.search_table.set_homogeneous(False)
             self.search_table.set_border_width(5)

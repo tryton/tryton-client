@@ -13,7 +13,6 @@ import socket
 import gzip
 import StringIO
 import hashlib
-import sys
 import base64
 
 __all__ = ["ResponseError", "Fault", "ProtocolError", "Transport",
@@ -227,52 +226,6 @@ class Transport(xmlrpclib.Transport, xmlrpclib.SafeTransport):
         self._connection[1].timeout = DEFAULT_TIMEOUT
         self._connection[1].sock.settimeout(DEFAULT_TIMEOUT)
         return self._connection[1]
-
-    if sys.version_info[:2] <= (2, 6):
-
-        def request(self, host, handler, request_body, verbose=0):
-            h = self.make_connection(host)
-            if verbose:
-                h.set_debuglevel(1)
-
-            self.send_request(h, handler, request_body)
-            self.send_host(h, host)
-            self.send_user_agent(h)
-            self.send_content(h, request_body)
-
-            response = h.getresponse()
-
-            if response.status != 200:
-                raise ProtocolError(
-                    host + handler,
-                    response.status,
-                    response.reason,
-                    response.getheaders()
-                    )
-
-            self.verbose = verbose
-
-            try:
-                sock = h._conn.sock
-            except AttributeError:
-                sock = None
-
-            if response.getheader("Content-Encoding", "") == "gzip":
-                response = gzip.GzipFile(mode="rb",
-                    fileobj=StringIO.StringIO(response.read()))
-                sock = None
-
-            return self._parse_response(response, sock)
-
-        def send_request(self, connection, handler, request_body):
-            xmlrpclib.Transport.send_request(self, connection, handler,
-                request_body)
-            connection.putheader("Accept-Encoding", "gzip")
-
-        def close(self):
-            if self._connection[1]:
-                self._connection[1].close()
-                self._connection = (None, None)
 
 
 class ServerProxy(xmlrpclib.ServerProxy):
