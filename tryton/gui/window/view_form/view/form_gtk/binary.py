@@ -5,7 +5,7 @@ import gettext
 import os
 import tempfile
 from tryton.common import common
-from tryton.common import file_selection, Tooltips, file_open
+from tryton.common import file_selection, Tooltips, file_open, slugify
 from interface import WidgetInterface
 
 _ = gettext.gettext
@@ -78,6 +78,8 @@ class Binary(WidgetInterface):
         self.tooltips.set_tip(self.but_remove, _('Clear'))
         self.widget.pack_start(self.but_remove, expand=False, fill=False)
 
+        self.last_open_file = None
+
         self.tooltips.enable()
 
     @property
@@ -108,7 +110,12 @@ class Binary(WidgetInterface):
             return self.wid_size.grab_focus()
 
     def sig_new(self, widget=None):
-        filename = file_selection(_('Open...'))
+        filename = ''
+        if self.last_open_file:
+            last_id, last_filename = self.last_open_file
+            if last_id == self.record.id:
+                filename = last_filename
+        filename = file_selection(_('Open...'), filename=filename)
         if filename and self.field:
             self.field.set_client(self.record, open(filename, 'rb').read())
             if self.filename_field:
@@ -119,10 +126,11 @@ class Binary(WidgetInterface):
         if not self.filename_field:
             return
         dtemp = tempfile.mkdtemp(prefix='tryton_')
-        filename = self.filename_field.get(self.record).replace(
-                os.sep, '_').replace(os.altsep or os.sep, '_')
+        filename = self.filename_field.get(self.record)
         if not filename:
             return
+        root, ext = os.path.splitext(filename)
+        filename = ''.join([slugify(root), os.extsep, slugify(ext)])
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
             fp.write(self.field.get_data(self.record))
@@ -130,6 +138,7 @@ class Binary(WidgetInterface):
         if type_:
             type_ = type_[1:]
         file_open(file_path, type_)
+        self.last_open_file = (self.record.id, file_path)
 
     def sig_save_as(self, widget=None):
         filename = ''

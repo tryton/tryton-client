@@ -18,7 +18,7 @@ from tryton.gui.window.win_form import WinForm
 from tryton.gui.window.view_form.screen import Screen
 import tryton.rpc as rpc
 from tryton.common import COLORS, node_attributes, \
-        file_selection, file_open
+        file_selection, file_open, slugify
 import tryton.common as common
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrendererdate import CellRendererDate
@@ -606,6 +606,7 @@ class Binary(Char):
         self.renderer.connect('open', self.open_binary)
         self.renderer.connect('save', self.save_binary)
         self.renderer.connect('clear', self.clear_binary)
+        self.last_open_file = None
 
     def get_textual_value(self, record):
         pass
@@ -638,8 +639,13 @@ class Binary(Char):
             cell.set_property('editable', not readonly)
 
     def new_binary(self, renderer, path):
-        filename = file_selection(_('Open...'))
         record, field = self._get_record_field(path)
+        filename = ''
+        if self.last_open_file:
+            last_id, last_filename = self.last_open_file
+            if last_id == record.id:
+                filename = last_filename
+        filename = file_selection(_('Open...'), filename=filename)
         if filename:
             field.set_client(record, open(filename, 'rb').read())
             if self.filename:
@@ -652,10 +658,11 @@ class Binary(Char):
         dtemp = tempfile.mkdtemp(prefix='tryton_')
         record, field = self._get_record_field(path)
         filename_field = record.group.fields.get(self.filename)
-        filename = filename_field.get(record).replace(
-            os.sep, '_').replace(os.altsep or os.sep, '_')
+        filename = filename_field.get(record)
         if not filename:
             return
+        root, ext = os.path.splitext(filename)
+        filename = ''.join([slugify(root), os.extsep, slugify(ext)])
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
             fp.write(field.get_data(record))
@@ -663,6 +670,7 @@ class Binary(Char):
         if type_:
             type_ = type_[1:]
         file_open(file_path, type_)
+        self.last_open_file = (record.id, file_path)
 
     def save_binary(self, renderer, path):
         filename = ''

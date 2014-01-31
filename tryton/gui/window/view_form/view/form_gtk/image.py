@@ -5,7 +5,7 @@ import glib
 import gettext
 import os
 import tempfile
-from tryton.common import file_selection, Tooltips, file_open
+from tryton.common import file_selection, Tooltips, file_open, slugify
 from tryton.config import PIXMAPS_DIR
 from interface import WidgetInterface
 import urllib
@@ -141,8 +141,11 @@ class Image(WidgetInterface):
         if not self.filename_field:
             return
         dtemp = tempfile.mkdtemp(prefix='tryton_')
-        filename = self.filename_field.get(self.record).replace(
-                os.sep, '_').replace(os.altsep or os.sep, '_')
+        filename = self.filename_field.get(self.record)
+        if not filename:
+            return
+        root, ext = os.path.splitext(filename)
+        filename = ''.join([slugify(root), os.extsep, slugify(ext)])
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
             fp.write(self.field.get_data(self.record))

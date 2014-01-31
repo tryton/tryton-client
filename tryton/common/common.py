@@ -433,7 +433,11 @@ def file_selection(title, filename='',
     win.set_icon(TRYTON_ICON)
     win.set_current_folder(CONFIG['client.default_path'])
     if filename:
-        win.set_current_name(filename)
+        if action in (gtk.FILE_CHOOSER_ACTION_SAVE,
+                gtk.FILE_CHOOSER_ACTION_CREATE_FOLDER):
+            win.set_current_name(filename)
+        else:
+            win.set_filename(filename)
     win.set_select_multiple(multi)
     win.set_default_response(gtk.RESPONSE_OK)
     if filters is not None:
