@@ -179,15 +179,9 @@ else:
     CURRENT_DIR = os.path.abspath(os.path.normpath(os.path.join(
         unicode(os.path.dirname(__file__), sys.getfilesystemencoding()),
         '..')))
-PREFIX = os.path.abspath(os.path.normpath(os.path.join(
-    os.path.realpath(os.path.dirname(sys.argv[0])), '..')))
 PIXMAPS_DIR = os.path.join(CURRENT_DIR, 'share', 'pixmaps', 'tryton')
 if not os.path.isdir(PIXMAPS_DIR):
-    PIXMAPS_DIR = os.path.join(PREFIX, 'share', 'pixmaps', 'tryton')
-    if not os.path.isdir(PIXMAPS_DIR):
-        PREFIX = os.path.abspath(os.path.normpath(
-            os.path.dirname(sys.argv[0])))
-        PIXMAPS_DIR = os.path.join(PREFIX, 'share', 'pixmaps', 'tryton')
+    PIXMAPS_DIR = os.path.join(sys.prefix, 'share', 'pixmaps', 'tryton')
 
 TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
         os.path.join(PIXMAPS_DIR, 'tryton-icon.png').encode('utf-8'))
@@ -196,6 +190,6 @@ TRYTON_ICON = gtk.gdk.pixbuf_new_from_file(
 def _data_dir():
     data_dir = os.path.join(CURRENT_DIR, 'share', 'tryton')
     if not os.path.isdir(data_dir):
-        data_dir = os.path.join(PREFIX, 'share', 'tryton')
+        data_dir = os.path.join(sys.prefix, 'share', 'tryton')
     return data_dir
 DATA_DIR = _data_dir()
