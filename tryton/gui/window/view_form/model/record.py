@@ -373,6 +373,7 @@ class Record(SignalEvent):
             if not fieldinfo.attrs.get('autocomplete'):
                 continue
             self.do_autocomplete(fieldname)
+        return vals
 
     def rec_name(self):
         try:

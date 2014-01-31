@@ -474,10 +474,21 @@ class ViewList(ParserView):
         if col in columns:
             idx = columns.index(col)
             columns = columns[idx:]
-        record = self.screen.current_record
-        group = record.group
-        idx = group.index(record)
+        if self.screen.current_record:
+            record = self.screen.current_record
+            group = record.group
+            idx = group.index(record)
+        else:
+            group = self.screen.group
+            idx = len(group)
+        default = None
         for line in data:
+            if idx >= len(group):
+                record = group.new(default=False)
+                if default is None:
+                    default = record.default_get()
+                record.set_default(default)
+                group.add(record)
             record = group[idx]
             for col, value in zip(columns, line):
                 cell = self.widget_tree.cells[col.name]
@@ -490,9 +501,6 @@ class ViewList(ParserView):
             if not record.validate():
                 break
             idx += 1
-            if idx >= len(group):
-                # TODO create new record
-                break
         self.screen.current_record = record
         self.screen.display(set_cursor=True)
 
