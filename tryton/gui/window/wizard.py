@@ -298,7 +298,6 @@ class WizardDialog(Wizard, NoModal):
         self.dia.set_deletable(False)
         self.dia.connect('close', self.close)
         self.dia.connect('response', self.response)
-        self.dia.connect('state-changed', self.state_changed)
 
         self.accel_group = gtk.AccelGroup()
         self.dia.add_accel_group(self.accel_group)
@@ -370,7 +369,3 @@ class WizardDialog(Wizard, NoModal):
 
     def hide(self):
         self.dia.hide()
-
-    def state_changed(self, widget, state):
-        if self.dia.props.sensitive and state == gtk.STATE_INSENSITIVE:
-            self.process()
