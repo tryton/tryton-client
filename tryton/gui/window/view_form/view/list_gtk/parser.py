@@ -619,8 +619,10 @@ class Binary(Char):
     def setter(self, column, cell, store, iter):
         record = store.get_value(iter, 0)
         field = record[self.field_name]
-
-        size = record[self.field_name].get_size(record)
+        if hasattr(field, 'get_size'):
+            size = field.get_size(record)
+        else:
+            size = len(field.get(record))
         cell.set_property('size', common.humanize(size) if size else '')
 
         states = ('invisible',)
@@ -665,7 +667,10 @@ class Binary(Char):
         filename = ''.join([slugify(root), os.extsep, slugify(ext)])
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
-            fp.write(field.get_data(record))
+            if hasattr(field, 'get_data'):
+                fp.write(field.get_data(record))
+            else:
+                fp.write(field.get(record))
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
@@ -682,7 +687,10 @@ class Binary(Char):
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename, 'wb') as fp:
-                fp.write(field.get_data(record))
+                if hasattr(field, 'get_data'):
+                    fp.write(field.get_data(record))
+                else:
+                    fp.write(field.get(record))
 
     def clear_binary(self, renderer, path):
         record, field = self._get_record_field(path)

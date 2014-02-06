@@ -133,7 +133,10 @@ class Binary(WidgetInterface):
         filename = ''.join([slugify(root), os.extsep, slugify(ext)])
         file_path = os.path.join(dtemp, filename)
         with open(file_path, 'wb') as fp:
-            fp.write(self.field.get_data(self.record))
+            if hasattr(self.field, 'get_data'):
+                fp.write(self.field.get_data(self.record))
+            else:
+                fp.write(self.field.get(self.record))
         root, type_ = os.path.splitext(filename)
         if type_:
             type_ = type_[1:]
@@ -148,7 +151,10 @@ class Binary(WidgetInterface):
             action=gtk.FILE_CHOOSER_ACTION_SAVE)
         if filename:
             with open(filename, 'wb') as fp:
-                fp.write(self.field.get_data(self.record))
+                if hasattr(self.field, 'get_data'):
+                    fp.write(self.field.get_data(self.record))
+                else:
+                    fp.write(self.field.get(self.record))
 
     def sig_remove(self, widget=None):
         self.field.set_client(self.record, False)
@@ -178,10 +184,14 @@ class Binary(WidgetInterface):
             return False
         if self.wid_text:
             self.wid_text.set_text(self.filename_field.get(record) or '')
-        self.wid_size.set_text(common.humanize(field.get_size(record) or 0))
+        if hasattr(field, 'get_size'):
+            size = field.get_size(record)
+        else:
+            size = len(field.get(record))
+        self.wid_size.set_text(common.humanize(size or 0))
         if self.but_open:
-            self.but_open.set_sensitive(bool(field.get_size(record)))
-        self.but_save_as.set_sensitive(bool(field.get_size(record)))
+            self.but_open.set_sensitive(bool(size))
+        self.but_save_as.set_sensitive(bool(size))
         return True
 
     def set_value(self, record, field):
