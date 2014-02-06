@@ -281,7 +281,9 @@ class Record(SignalEvent):
         return result
 
     def pre_validate(self):
-        values = self.get()
+        if not self.modified_fields:
+            return True
+        values = self._get_on_change_args(self.modified_fields)
         try:
             RPCExecute('model', self.model_name, 'pre_validate', values,
                 main_iteration=False, context=self.context_get())
