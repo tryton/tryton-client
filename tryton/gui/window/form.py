@@ -283,7 +283,7 @@ class Form(SignalEvent, TabContent):
         fields = {}
         for name, field in self.screen.group.fields.iteritems():
             fields[name] = field.attrs
-        WinImport(self.model)
+        WinImport(self.model, self.context)
 
     def sig_save_as(self, widget=None):
         while self.screen.view_to_load:

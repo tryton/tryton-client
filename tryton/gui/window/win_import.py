@@ -15,7 +15,7 @@ _ = gettext.gettext
 class WinImport(NoModal):
     "Window import"
 
-    def __init__(self, model):
+    def __init__(self, model, context):
         super(WinImport, self).__init__()
         self.dialog = gtk.Dialog(title=_("Import from CSV"),
             parent=self.parent, flags=gtk.DIALOG_DESTROY_WITH_PARENT)
@@ -166,6 +166,7 @@ class WinImport(NoModal):
         self.dialog.vbox.pack_start(dialog_vbox)
 
         self.model = model
+        self.context = context
         self.fields_data = {}
 
         self.import_csv_file.set_current_folder(CONFIG['client.default_path'])
@@ -230,7 +231,8 @@ class WinImport(NoModal):
 
     def _get_fields(self, model):
         try:
-            return RPCExecute('model', model, 'fields_get', None)
+            return RPCExecute('model', model, 'fields_get', None,
+                context=self.context)
         except RPCException:
             return ''
 
@@ -356,7 +358,8 @@ class WinImport(NoModal):
             datas.append([x.decode(csv_data['combo']).encode('utf-8')
                     for x in line])
         try:
-            res = RPCExecute('model', model, 'import_data', fields, datas)
+            res = RPCExecute('model', model, 'import_data', fields, datas,
+                context=self.context)
         except RPCException:
             return False
         if res[0] >= 0:

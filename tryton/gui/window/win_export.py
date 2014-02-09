@@ -241,7 +241,8 @@ class WinExport(NoModal):
 
     def _get_fields(self, model):
         try:
-            return RPCExecute('model', model, 'fields_get', None)
+            return RPCExecute('model', model, 'fields_get', None,
+                context=self.context)
         except RPCException:
             return ''
 
@@ -279,17 +280,19 @@ class WinExport(NoModal):
     def fill_predefwin(self):
         try:
             export_ids = RPCExecute('model', 'ir.export', 'search',
-                [('resource', '=', self.model)], 0, None, None)
+                [('resource', '=', self.model)], 0, None, None,
+                context=self.context)
         except RPCException:
             return
         try:
             exports = RPCExecute('model', 'ir.export', 'read', export_ids,
-                None)
+                None, context=self.context)
         except RPCException:
             return
         try:
             lines = RPCExecute('model', 'ir.export.line', 'read',
-                sum((x['export_fields'] for x in exports), []), None)
+                sum((x['export_fields'] for x in exports), []), None,
+                context=self.context)
         except RPCException:
             return
         id2lines = {}
@@ -319,7 +322,7 @@ class WinExport(NoModal):
                     'export_fields': [('create', [{
                                         'name': x,
                                         } for x in fields])],
-                    }])
+                    }], context=self.context)
         except RPCException:
             return
         self.predef_model.append((
@@ -337,7 +340,8 @@ class WinExport(NoModal):
             return None
         export_id = model.get_value(i, 0)
         try:
-            RPCExecute('model', 'ir.export', 'delete', [export_id])
+            RPCExecute('model', 'ir.export', 'delete', [export_id],
+                context=self.context)
         except RPCException:
             return
         for i in range(len(self.predef_model)):
@@ -389,8 +393,11 @@ class WinExport(NoModal):
                 iter = self.model2.iter_next(iter)
             action = self.wid_action.get_active()
             self.destroy()
-            result = self.datas_read(self.ids, self.model, fields,
-                    context=self.context)
+            try:
+                result = RPCExecute('model', self.model, 'export_data',
+                    self.ids, fields, context=self.context)
+            except RPCException:
+                result = []
 
             if action == 0:
                 fileno, fname = tempfile.mkstemp('.csv', 'tryton_')
@@ -434,11 +441,3 @@ class WinExport(NoModal):
             common.warning(_("Operation failed!\nError message:\n%s")
                 % (exception.faultCode,), _('Error'))
             return False
-
-    def datas_read(self, ids, model, fields, context=None):
-        try:
-            datas = RPCExecute('model', model, 'export_data', ids, fields,
-                context=context)
-        except RPCException:
-            return []
-        return datas
