@@ -321,8 +321,11 @@ class One2Many(WidgetInterface):
         ctx = {}
         ctx.update(self.field.context_get(self.record))
         sequence = None
-        if self.screen.current_view.view_type == 'tree':
-            sequence = self.screen.current_view.widget_tree.sequence
+        for view in self.screen.views:
+            if view.view_type == 'tree':
+                sequence = view.widget_tree.sequence
+                if sequence:
+                    break
 
         def update_sequence():
             if sequence:
