@@ -727,9 +727,6 @@ class ViewList(ParserView):
     def destroy(self):
         self.save_width_height()
         self.widget_tree.destroy()
-        self.screen = None
-        self.widget_tree = None
-        self.widget = None
 
     def __sig_switch(self, treeview, path, column):
         if column._type == 'button':

@@ -186,10 +186,6 @@ class Form(SignalEvent, TabContent):
 
     def destroy(self):
         self.screen.destroy()
-        self.screen = None
-        self.widget = None
-        #self.scrolledwindow.destroy()
-        #self.scrolledwindow = None
 
     def sel_ids_get(self):
         return self.screen.sel_ids_get()

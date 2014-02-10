@@ -622,8 +622,5 @@ class Record(SignalEvent):
             if hasattr(v, 'destroy'):
                 v.destroy()
         super(Record, self).destroy()
-        self.group = None
-        self.value = None
-        self.next = None
         self.destroyed = True
         pool.remove(self)

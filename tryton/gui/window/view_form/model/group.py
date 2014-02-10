@@ -416,7 +416,6 @@ class Group(SignalEvent, list):
                 pass
         self.clear()
         super(Group, self).destroy()
-        self.parent = None
 
     def get_by_path(self, path):
         'return record by path'

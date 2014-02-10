@@ -324,11 +324,6 @@ class Screen(SignalEvent):
         for view in self.views:
             view.destroy()
         super(Screen, self).destroy()
-        self.parent = None
-        self.__group = None
-        self.__current_record = None
-        self.screen_container = None
-        self.widget = None
 
     def default_row_activate(self):
         if (self.current_view.view_type == 'tree' and

@@ -21,9 +21,6 @@ class ViewGraph(ParserView):
         for widget in self.widgets.keys():
             self.widgets[widget].destroy()
             del self.widgets[widget]
-        self.widget = None
-        self.screen = None
-        self.state_widgets = None
 
     def cancel(self):
         pass

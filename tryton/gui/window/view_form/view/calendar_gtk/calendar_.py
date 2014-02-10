@@ -21,9 +21,6 @@ class Calendar_(goocalendar.Calendar):
         self.event_store = event_store
         self.current_domain_period = self.get_displayed_period()
 
-    def destroy(self):
-        super(Calendar_, self).destroy()
-
     def set_default_date(self, record, selected_date):
         attrs = common.node_attributes(self.root_node)
         dtstart = attrs.get('dtstart')

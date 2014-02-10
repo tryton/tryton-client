@@ -119,8 +119,6 @@ class Wizard(object):
     def destroy(self):
         if self.screen:
             self.screen.destroy()
-            del self.screen
-        del self.widget
 
     def end(self):
         try:
