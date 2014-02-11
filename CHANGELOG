@@ -1,3 +1,4 @@
+* Don't evaluate anymore relate action with the record
 * Paste on editable list create new records if needed
 * Drop support of Python 2.6
 * Allow to search on rec_name of Reference fields

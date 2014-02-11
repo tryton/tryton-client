@@ -8,7 +8,6 @@ import gettext
 import tempfile
 import os
 import webbrowser
-from tryton.pyson import PYSONEncoder
 from tryton.common import RPCProgress, RPCExecute, RPCException, slugify
 
 _ = gettext.gettext
@@ -175,25 +174,12 @@ class Action(object):
         Evaluate the action with the record.
         '''
         action = action.copy()
-        if atype in ('print', 'action'):
-            email = {}
-            if 'pyson_email' in action:
-                email = record.expr_eval(action['pyson_email'])
-                if not email:
-                    email = {}
-            if 'subject' not in email:
-                email['subject'] = action['name'].replace('_', '')
-            action['email'] = email
-        elif atype == 'relate':
-            encoder = PYSONEncoder()
-            if 'pyson_domain' in action:
-                action['pyson_domain'] = encoder.encode(
-                    record.expr_eval(action['pyson_domain']))
-            if 'pyson_context' in action:
-                action['pyson_context'] = encoder.encode(
-                    record.expr_eval(action['pyson_context']))
-
-        else:
-            raise NotImplementedError("Action type '%s' is not supported" %
-                atype)
+        email = {}
+        if 'pyson_email' in action:
+            email = record.expr_eval(action['pyson_email'])
+            if not email:
+                email = {}
+        if 'subject' not in email:
+            email['subject'] = action['name'].replace('_', '')
+        action['email'] = email
         return action
