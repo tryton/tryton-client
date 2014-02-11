@@ -340,6 +340,10 @@ class ViewList(ParserView):
     def get_fields(self):
         return [col.name for col in self.widget_tree.get_columns() if col.name]
 
+    def get_buttons(self):
+        return [b for b in self.state_widgets
+            if isinstance(b.renderer, CellRendererButton)]
+
     def on_keypress(self, widget, event):
         if (event.keyval == gtk.keysyms.c
                 and event.state & gtk.gdk.CONTROL_MASK):
@@ -829,7 +833,7 @@ class ViewList(ParserView):
                     field.state_set(record)
 
     def update_children(self):
-        ids = self.sel_ids_get()
+        selected_records = self.selected_records
         for child in self.children:
             value = 0
             value_selected = 0
@@ -842,7 +846,7 @@ class ViewList(ParserView):
                 field_value = record.fields_get()[child_fieldname].get(record)
                 if field_value is not None:
                     value += field_value
-                    if record.id in ids or not ids:
+                    if record in selected_records or not selected_records:
                         value_selected += field_value
 
             if loaded:
@@ -872,17 +876,7 @@ class ViewList(ParserView):
             if (current_path != path and path not in selected_path) or new:
                 self.widget_tree.set_cursor(path, focus_column, new)
 
-    def sel_ids_get(self):
-        def _func_sel_get(store, path, iter, ids):
-            record = store.on_get_iter(path)
-            if record and record.id >= 0:
-                ids.append(record.id)
-        ids = []
-        sel = self.widget_tree.get_selection()
-        if sel:
-            sel.selected_foreach(_func_sel_get, ids)
-        return ids
-
+    @property
     def selected_records(self):
         def _func_sel_get(store, path, iter, records):
             records.append(store.on_get_iter(path))

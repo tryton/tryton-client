@@ -187,9 +187,6 @@ class Form(SignalEvent, TabContent):
     def destroy(self):
         self.screen.destroy()
 
-    def sel_ids_get(self):
-        return self.screen.sel_ids_get()
-
     def ids_get(self):
         return self.screen.ids_get()
 
@@ -304,9 +301,9 @@ class Form(SignalEvent, TabContent):
             return
         if not self.modified_save():
             return
-        res_ids = self.sel_ids_get()
+        ids = [r.id for r in self.selected_records]
         try:
-            new_ids = RPCExecute('model', self.model, 'copy', res_ids, {},
+            new_ids = RPCExecute('model', self.model, 'copy', ids, {},
                 context=self.context)
         except RPCException:
             return
@@ -469,7 +466,7 @@ class Form(SignalEvent, TabContent):
         if not self.screen.save_current():
             return
         record_id = self.screen.id_get()
-        record_ids = self.screen.sel_ids_get()
+        record_ids = [r.id for r in self.selected_records]
         action = Action.evaluate(action, atype, self.screen.current_record)
         data = {
             'model': self.screen.model_name,
@@ -521,6 +518,9 @@ class Form(SignalEvent, TabContent):
         menu = gtk.Menu()
         menu.connect('deactivate', self._popup_menu_hide, widget)
 
+        if keyword == 'action':
+            widget.connect('toggled', self._update_action_popup, menu)
+
         for action in actions:
             new_action = action.copy()
             if special_action == 'print':
@@ -535,18 +535,6 @@ class Form(SignalEvent, TabContent):
             menuitem.connect('activate', self._popup_menu_selected, widget,
                 new_action, keyword)
             menu.add(menuitem)
-        if keyword == 'action':
-            menu.add(gtk.SeparatorMenuItem())
-            for plugin in plugins.MODULES:
-                for name, func in plugin.get_plugins(self.model):
-                    menuitem = gtk.MenuItem('_' + name)
-                    menuitem.set_use_underline(True)
-                    menuitem.connect('activate', lambda m, func: func({
-                                'model': self.model,
-                                'ids': self.id_get(),
-                                'id': self.id_get(),
-                                }), func)
-                    menu.add(menuitem)
         return menu
 
     def _popup_menu_selected(self, menuitem, togglebutton, action, keyword):
@@ -561,6 +549,37 @@ class Form(SignalEvent, TabContent):
 
     def _popup_menu_hide(self, menuitem, togglebutton):
         togglebutton.props.active = False
+
+    def _update_action_popup(self, tbutton, menu):
+        for item in menu.get_children():
+            if (getattr(item, '_update_action', False)
+                    or isinstance(item, gtk.SeparatorMenuItem)):
+                menu.remove(item)
+
+        buttons = self.screen.get_buttons()
+        if buttons:
+            menu.add(gtk.SeparatorMenuItem())
+        for button in buttons:
+            menuitem = gtk.ImageMenuItem(button.attrs.get('icon'))
+            menuitem.set_label('_' + button.attrs.get('string', _('Unknown')))
+            menuitem.set_use_underline(True)
+            menuitem.connect('activate',
+                lambda m, attrs: self.screen.button(attrs), button.attrs)
+            menuitem._update_action = True
+            menu.add(menuitem)
+
+        menu.add(gtk.SeparatorMenuItem())
+        for plugin in plugins.MODULES:
+            for name, func in plugin.get_plugins(self.model):
+                menuitem = gtk.MenuItem('_' + name)
+                menuitem.set_use_underline(True)
+                menuitem.connect('activate', lambda m, func: func({
+                            'model': self.model,
+                            'ids': self.id_get(),
+                            'id': self.id_get(),
+                            }), func)
+                menuitem._update_action = True
+                menu.add(menuitem)
 
     def set_cursor(self):
         if self.screen:

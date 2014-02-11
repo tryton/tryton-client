@@ -258,6 +258,7 @@ class ParserTree(ParserInterface):
                 string = node_attrs.get('string', _('Unknown'))
                 col = gtk.TreeViewColumn(string, renderer)
                 col.name = None
+                col.set_visible(not node_attrs.get('tree_invisible', False))
 
                 label = gtk.Label(string)
                 label.show()

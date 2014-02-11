@@ -107,7 +107,7 @@ class WinSearch(NoModal):
     def response(self, win, response_id):
         res = None
         if response_id == gtk.RESPONSE_OK:
-            res = self.screen.sel_ids_get()
+            res = [r.id for r in self.screen.selected_records]
         elif response_id == gtk.RESPONSE_APPLY:
             self.screen.search_filter(self.screen.screen_container.get_text())
             return

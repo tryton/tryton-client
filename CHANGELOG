@@ -1,3 +1,5 @@
+* Add tree_invisible attribute to button in tree view
+* Add buttons of the view in actions menu
 * Don't evaluate anymore relate action with the record
 * Paste on editable list create new records if needed
 * Drop support of Python 2.6

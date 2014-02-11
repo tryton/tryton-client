@@ -20,9 +20,8 @@ class ViewForm(ParserView):
         self.view_type = 'form'
         self.editable = True
 
-        for widget in self.state_widgets:
-            if isinstance(widget, gtk.Button):
-                widget.connect('clicked', self.button_clicked)
+        for button in self.get_buttons():
+            button.connect('clicked', self.button_clicked)
 
         # Force to display the first time it switches on a page
         # This avoids glitch in position of widgets
@@ -83,11 +82,7 @@ class ViewForm(ParserView):
                                     and widget.widget.get_focus_child())):
                             widget.set_value(record, field)
 
-    def sel_ids_get(self):
-        if self.screen.current_record:
-            return [self.screen.current_record.id]
-        return []
-
+    @property
     def selected_records(self):
         if self.screen.current_record:
             return [self.screen.current_record]
@@ -97,6 +92,9 @@ class ViewForm(ParserView):
     def modified(self):
         return any(w.modified for widgets in self.widgets.itervalues()
             for w in widgets)
+
+    def get_buttons(self):
+        return [b for b in self.state_widgets if isinstance(b, gtk.Button)]
 
     def reset(self):
         record = self.screen.current_record

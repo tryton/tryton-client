@@ -547,16 +547,12 @@ class Screen(SignalEvent):
         self.display()
 
     def unremove(self):
-        records = self.current_view.selected_records()
+        records = self.selected_records
         for record in records:
             self.group.unremove(record)
 
     def remove(self, delete=False, remove=False, force_remove=False):
-        records = None
-        if self.current_view.view_type == 'form' and self.current_record:
-            records = [self.current_record]
-        elif self.current_view.view_type == 'tree':
-            records = self.current_view.selected_records()
+        records = self.selected_records
         if not records:
             return
         if delete:
@@ -830,8 +826,9 @@ class Screen(SignalEvent):
         self.set_cursor(reset_view=False)
         view.display()
 
-    def sel_ids_get(self):
-        return self.current_view.sel_ids_get()
+    @property
+    def selected_records(self):
+        return self.current_view.selected_records
 
     def id_get(self):
         if not self.current_record:
@@ -849,6 +846,20 @@ class Screen(SignalEvent):
         self.current_record.on_change(fieldname, attr)
         self.display()
 
+    def get_buttons(self):
+        'Return active buttons for the current view'
+        def is_active(record, button):
+            states = record.expr_eval(button.attrs.get('states', {}))
+            return not (states.get('invisible') or states.get('readonly'))
+
+        buttons = self.current_view.get_buttons()
+
+        for record in self.selected_records:
+            buttons = [b for b in buttons if is_active(record, b)]
+            if not buttons:
+                break
+        return buttons
+
     def button(self, button):
         'Execute button on the current record'
         if button.get('confirm', False) and not sur(button['confirm']):
@@ -856,19 +867,19 @@ class Screen(SignalEvent):
         record = self.current_record
         if not record.save(force_reload=False):
             return
-        context = record.context_get()
+        ids = [r.id for r in self.selected_records]
         try:
             action_id = RPCExecute('model', self.model_name, button['name'],
-                [record.id], context=context)
+                ids, context=self.context)
         except RPCException:
             action_id = None
         if action_id:
             Action.execute(action_id, {
                     'model': self.model_name,
                     'id': record.id,
-                    'ids': [record.id],
-                    }, context=context)
-        self.reload([record.id], written=True)
+                    'ids': ids,
+                    }, context=self.context)
+        self.reload(ids, written=True)
 
     def get_url(self):
         query_string = []

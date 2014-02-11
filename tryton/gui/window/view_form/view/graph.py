@@ -28,9 +28,6 @@ class ViewGraph(ParserView):
     def set_value(self):
         pass
 
-    def sel_ids_get(self):
-        return []
-
     def reset(self):
         pass
 
