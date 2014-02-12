@@ -301,7 +301,7 @@ class Form(SignalEvent, TabContent):
             return
         if not self.modified_save():
             return
-        ids = [r.id for r in self.selected_records]
+        ids = [r.id for r in self.screen.selected_records]
         try:
             new_ids = RPCExecute('model', self.model, 'copy', ids, {},
                 context=self.context)
@@ -466,7 +466,7 @@ class Form(SignalEvent, TabContent):
         if not self.screen.save_current():
             return
         record_id = self.screen.id_get()
-        record_ids = [r.id for r in self.selected_records]
+        record_ids = [r.id for r in self.screen.selected_records]
         action = Action.evaluate(action, atype, self.screen.current_record)
         data = {
             'model': self.screen.model_name,
