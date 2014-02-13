@@ -359,7 +359,11 @@ class WizardDialog(Wizard, NoModal):
         self.destroy()
 
     def close(self, widget, event=None):
-        widget.emit_stop_by_name('close')
+        if self.end_state in self.states:
+            self.state = self.end_state
+            self.process()
+        else:
+            widget.emit_stop_by_name('close')
         return True
 
     def show(self):
