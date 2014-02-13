@@ -63,11 +63,6 @@ class ViewForm(ParserView):
                 widget.destroy()
         self.widget.destroy()
 
-    def cancel(self):
-        for widgets in self.widgets.itervalues():
-            for widget in widgets:
-                widget.cancel()
-
     def set_value(self, focused_widget=False):
         record = self.screen.current_record
         if record:

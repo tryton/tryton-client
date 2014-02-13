@@ -47,9 +47,6 @@ class ViewCalendar(ParserView):
             # No need to load any record as nothing will be shown
             return [('id', '=', -1)]
 
-    def cancel(self):
-        pass
-
     def set_value(self):
         pass
 

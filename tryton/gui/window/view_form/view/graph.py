@@ -22,9 +22,6 @@ class ViewGraph(ParserView):
             self.widgets[widget].destroy()
             del self.widgets[widget]
 
-    def cancel(self):
-        pass
-
     def set_value(self):
         pass
 

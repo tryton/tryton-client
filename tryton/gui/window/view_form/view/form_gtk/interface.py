@@ -163,9 +163,6 @@ class WidgetInterface(object):
     def set_value(self, record, field):
         pass
 
-    def cancel(self):
-        pass
-
 
 class TranslateDialog(NoModal):
 

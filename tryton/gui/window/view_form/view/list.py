@@ -61,9 +61,6 @@ class AdaptModelGroup(gtk.GenericTreeModel):
                 iter_ = self.get_iter(path)
                 self.row_has_child_toggled(path, iter_)
 
-    def cancel(self):
-        pass
-
     def removed(self, group, record):
         if (group is self.group
                 and (record.group is self.group
@@ -691,9 +688,6 @@ class ViewList(ParserView):
             elif signal[0] == 'record-removed':
                 self.store.removed(group, signal[1])
         self.display()
-
-    def cancel(self):
-        pass
 
     def __str__(self):
         return 'ViewList (%d)' % id(self)
