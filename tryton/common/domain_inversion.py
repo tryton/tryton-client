@@ -8,7 +8,10 @@ import datetime
 
 def in_(a, b):
     if isinstance(a, (list, tuple)):
-        return any(operator.contains(b, x) for x in a)
+        if isinstance(b, (list, tuple)):
+            return any(operator.contains(b, x) for x in a)
+        else:
+            return operator.contains(a, b)
     else:
         return operator.contains(b, a)
 
@@ -31,9 +34,9 @@ OPERATORS = {
 }
 
 
-def locale_part(expression, field_name):
+def locale_part(expression, field_name, locale_name='id'):
     if expression == field_name:
-        return 'id'
+        return locale_name
     if '.' in expression:
         fieldname, local = expression.split('.', 1)
         return local
@@ -80,6 +83,13 @@ def eval_leaf(part, context, boolop=operator.and_):
             context_field = '%s,%s' % context_field
         except TypeError:
             pass
+    if (operand in ('=', '!=')
+            and isinstance(context_field, (list, tuple))
+            and isinstance(value, (int, long))):
+        operand = {
+            '=': 'in',
+            '!=': 'not in',
+            }[operand]
     return OPERATORS[operand](context_field, value)
 
 
@@ -124,7 +134,11 @@ def localize_domain(domain, field_name=None):
                 return domain
             else:
                 return [domain[3]] + list(domain[1:-1])
-        return [locale_part(domain[0], field_name)] + list(domain[1:])
+        locale_name = 'id'
+        if isinstance(domain[2], basestring):
+            locale_name = 'rec_name'
+        return [locale_part(domain[0], field_name, locale_name)] \
+            + list(domain[1:])
     else:
         return [localize_domain(part, field_name) for part in domain]
 
@@ -494,6 +508,10 @@ def test_evaldomain():
     assert not eval_domain(domain, {'x': ('test', 2)})
     assert not eval_domain(domain, {'x': 'test,2'})
 
+    domain = [['x', '=', 1]]
+    assert eval_domain(domain, {'x': [1, 2]})
+    assert not eval_domain(domain, {'x': [2]})
+
 
 def test_localize():
     domain = [['x', '=', 5]]
@@ -501,6 +519,10 @@ def test_localize():
 
     domain = [['x', '=', 5], ['x.code', '=', 7]]
     assert localize_domain(domain, 'x') == [['id', '=', 5], ['code', '=', 7]]
+
+    domain = [['x', 'ilike', 'foo%'], ['x.code', '=', 'test']]
+    assert localize_domain(domain, 'x') == \
+        [['rec_name', 'ilike', 'foo%'], ['code', '=', 'test']]
 
     domain = ['OR', ['AND', ['x', '>', 7], ['x', '<', 15]], ['x.code', '=', 8]]
     assert localize_domain(domain, 'x') == \

@@ -470,10 +470,12 @@ class O2MField(CharField):
     def _group_changed(self, group, record):
         if not record.parent:
             return
-        record.parent.modified_fields.setdefault(self.name)
-        self.sig_changed(record.parent)
-        record.parent.validate(softvalidation=True)
-        record.parent.signal('record-changed')
+        # Store parent as it could be removed by validation
+        parent = record.parent
+        parent.modified_fields.setdefault(self.name)
+        self.sig_changed(parent)
+        parent.validate(softvalidation=True)
+        parent.signal('record-changed')
 
     def _group_list_changed(self, group, signal):
         if group.model_name == group.parent.model_name:
@@ -636,7 +638,22 @@ class O2MField(CharField):
         self._set_value(record, value, default=False)
 
     def set_client(self, record, value, force_change=False):
-        pass
+        # domain inversion could try to set id as value
+        if isinstance(value, (int, long)):
+            value = [value]
+
+        previous_ids = [r.id for r in record.value.get(self.name) or []]
+        self._set_value(record, value)
+        if previous_ids != value:
+            record.modified_fields.setdefault(self.name)
+            record.signal('record-modified')
+            self.sig_changed(record)
+            record.validate(softvalidation=True)
+            record.signal('record-changed')
+        elif force_change:
+            self.sig_changed(record)
+            record.validate(softvalidation=True)
+            record.signal('record-changed')
 
     def set_default(self, record, value):
         previous_group = record.value.get(self.name)
@@ -731,7 +748,8 @@ class O2MField(CharField):
 
     def domain_get(self, record):
         screen_domain, attr_domain = self.domains_get(record)
-        return [localize_domain(inverse_leaf(screen_domain)), attr_domain]
+        return [localize_domain(inverse_leaf(screen_domain), self.name),
+            attr_domain]
 
 
 class M2MField(O2MField):
