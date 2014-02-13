@@ -1263,9 +1263,13 @@ class Main(object):
 
         self.current_page = self.notebook.get_current_page()
         current_form = self.get_page(self.current_page)
+
+        def set_cursor():
+            if self.current_page == self.notebook.get_current_page():
+                current_form.set_cursor()
         # Using idle_add because the gtk.TreeView grabs the focus at the
         # end of the event
-        gobject.idle_add(current_form.set_cursor)
+        gobject.idle_add(set_cursor)
         for dialog in current_form.dialogs:
             dialog.show()
 
