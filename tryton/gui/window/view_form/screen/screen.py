@@ -369,7 +369,6 @@ class Screen(SignalEvent):
                 elif self.current_view.view_type == view_type:
                     break
         self.screen_container.set(self.current_view.widget)
-        self.current_view.cancel()
         self.display()
         self.set_cursor()
 
