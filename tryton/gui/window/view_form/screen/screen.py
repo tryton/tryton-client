@@ -469,8 +469,6 @@ class Screen(SignalEvent):
             self.current_record.cancel()
             if self.current_record.id < 0:
                 self.remove()
-        if self.current_view:
-            self.current_view.cancel()
 
     def save_current(self):
         if not self.current_record:
