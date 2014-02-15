@@ -595,6 +595,15 @@ class Screen(SignalEvent):
         self.display()
         return True
 
+    def copy(self):
+        res_ids = self.sel_ids_get()
+        try:
+            new_ids = RPCExecute('model', self.model_name, 'copy', res_ids, {},
+                context=self.context)
+        except RPCException:
+            return
+        self.load(new_ids)
+
     def set_tree_state(self):
         view = self.current_view
         if (not CONFIG['client.save_tree_state']
@@ -729,7 +738,7 @@ class Screen(SignalEvent):
                     record = group[idx]
                     break
                 parent = record.parent
-                if not parent:
+                if not parent or record.model_name != parent.model_name:
                     break
                 next = parent.next.get(id(parent.group))
                 while not next:
@@ -794,7 +803,7 @@ class Screen(SignalEvent):
                         record = children[-1]
             else:
                 parent = record.parent
-                if parent:
+                if parent and record.model_name == parent.model_name:
                     record = parent
             self.current_record = record
         elif view.view_type == 'calendar':
@@ -866,17 +875,45 @@ class Screen(SignalEvent):
             return
         ids = [r.id for r in self.selected_records]
         try:
-            action_id = RPCExecute('model', self.model_name, button['name'],
+            action = RPCExecute('model', self.model_name, button['name'],
                 ids, context=self.context)
         except RPCException:
-            action_id = None
-        if action_id:
-            Action.execute(action_id, {
+            action = None
+        self.reload(ids, written=True)
+        if isinstance(action, basestring):
+            self.client_action(action)
+        elif action:
+            Action.execute(action, {
                     'model': self.model_name,
                     'id': record.id,
                     'ids': ids,
                     }, context=self.context)
-        self.reload(ids, written=True)
+
+    def client_action(self, action):
+        access = MODELACCESS[self.model_name]
+        if action == 'new':
+            if access['create']:
+                self.new()
+        elif action == 'delete':
+            if access['delete']:
+                self.remove(delete=not self.parent,
+                    force_remove=not self.parent)
+        elif action == 'remove':
+            if access['write'] and access['read'] and self.parent:
+                self.remove(remove=True)
+        elif action == 'copy':
+            if access['create']:
+                self.copy()
+        elif action == 'next':
+            self.display_next()
+        elif action == 'previous':
+            self.display_prev()
+        elif action == 'close':
+            from tryton.gui import Main
+            Main.get_main().sig_win_close()
+        elif action.startswith('switch'):
+            _, view_type = action.split(None, 1)
+            self.switch_view(view_type=view_type)
 
     def get_url(self):
         query_string = []

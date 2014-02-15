@@ -870,9 +870,9 @@ class Main(object):
             return False
         Preference(rpc._USER, self.get_preferences)
 
-    def sig_win_close(self, widget):
+    def sig_win_close(self, widget=None):
         self._sig_remove_book(widget,
-                self.notebook.get_nth_page(self.notebook.get_current_page()))
+            self.notebook.get_nth_page(self.notebook.get_current_page()))
 
     def sig_login(self, widget=None, res=None):
         if not self.sig_logout(widget, disconnect=False):
