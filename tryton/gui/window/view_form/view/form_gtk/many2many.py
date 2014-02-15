@@ -186,13 +186,25 @@ class Many2Many(WidgetInterface):
         self._sig_edit()
 
     def _sig_edit(self):
-        if self.screen.current_record:
-            def callback(result):
-                if result:
-                    self.screen.current_record.save()
-                else:
-                    self.screen.current_record.cancel()
-            WinForm(self.screen, callback)
+        if not self.screen.current_record:
+            return
+        # Create a new screen that is not linked to the parent otherwise on the
+        # save of the record will trigger the save of the parent
+        domain = self.field.domain_get(self.record)
+        add_remove = self.record.expr_eval(self.attrs.get('add_remove'))
+        if add_remove:
+            domain = [domain, add_remove]
+        screen = Screen(self.attrs['relation'], domain=domain,
+            view_ids=self.attrs.get('view_ids', '').split(','),
+            mode=['form'], views_preload=self.attrs.get('views', {}))
+        screen.load([self.screen.current_record.id])
+
+        def callback(result):
+            if result:
+                screen.current_record.save()
+                # Force a reload on next display
+                self.screen.current_record.cancel()
+        WinForm(screen, callback)
 
     def _readonly_set(self, value):
         self._readonly = value
