@@ -1,3 +1,4 @@
+* Use a pool of connection
 * Manage client actions from button and wizard
 * Add tree_invisible attribute to button in tree view
 * Add buttons of the view in actions menu

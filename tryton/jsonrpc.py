@@ -14,9 +14,12 @@ import gzip
 import StringIO
 import hashlib
 import base64
+import threading
+from functools import partial
+from contextlib import contextmanager
 
 __all__ = ["ResponseError", "Fault", "ProtocolError", "Transport",
-    "ServerProxy"]
+    "ServerProxy", "ServerPool"]
 CONNECT_TIMEOUT = 5
 DEFAULT_TIMEOUT = None
 
@@ -284,3 +287,43 @@ class ServerProxy(xmlrpclib.ServerProxy):
     def ssl(self):
         return isinstance(self.__transport.make_connection(self.__host),
             httplib.HTTPSConnection)
+
+
+class ServerPool(object):
+
+    def __init__(self, *args, **kwargs):
+        self.ServerProxy = partial(ServerProxy, *args, **kwargs)
+        self._lock = threading.Lock()
+        self._pool = []
+        self._used = {}
+
+    def getconn(self):
+        with self._lock:
+            if self._pool:
+                conn = self._pool.pop()
+            else:
+                conn = self.ServerProxy()
+            self._used[id(conn)] = conn
+            return conn
+
+    def putconn(self, conn):
+        with self._lock:
+            self._pool.append(conn)
+            del self._used[id(conn)]
+
+    def close(self):
+        with self._lock:
+            for conn in self._pool + self._used.values():
+                conn.close()
+
+    @property
+    def ssl(self):
+        for conn in self._pool + self._used.values():
+            return conn.ssl
+        return False
+
+    @contextmanager
+    def __call__(self):
+        conn = self.getconn()
+        yield conn
+        self.putconn(conn)

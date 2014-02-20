@@ -13,6 +13,8 @@ try:
 except ImportError:
     import json
 import webbrowser
+import threading
+
 import tryton.rpc as rpc
 from tryton.common import RPCExecute, RPCException
 from tryton.config import CONFIG, TRYTON_ICON, get_config_dir
@@ -846,9 +848,17 @@ class Main(object):
                 False)
         except RPCException:
             prefs = {}
-        common.ICONFACTORY.load_icons()
-        common.MODELACCESS.load_models()
-        common.VIEW_SEARCH.load_searches()
+        threads = []
+        for target in (
+                common.ICONFACTORY.load_icons,
+                common.MODELACCESS.load_models,
+                common.VIEW_SEARCH.load_searches,
+                ):
+            t = threading.Thread(target=target)
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
         if prefs and 'language_direction' in prefs:
             translate.set_language_direction(prefs['language_direction'])
             CONFIG['client.language_direction'] = \

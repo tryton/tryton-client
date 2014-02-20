@@ -4,9 +4,8 @@ import httplib
 import logging
 import socket
 import os
-from threading import Semaphore
 from functools import partial
-from tryton.jsonrpc import ServerProxy, Fault
+from tryton.jsonrpc import ServerProxy, ServerPool, Fault
 from tryton.fingerprints import Fingerprints
 from tryton.config import get_config_dir
 from tryton.ipc import Server as IPCServer
@@ -24,13 +23,14 @@ CONTEXT = {}
 _VIEW_CACHE = {}
 _TOOLBAR_CACHE = {}
 _KEYWORD_CACHE = {}
-_SEMAPHORE = Semaphore()
 _CA_CERTS = os.path.join(get_config_dir(), 'ca_certs')
 if not os.path.isfile(_CA_CERTS):
     _CA_CERTS = None
 _FINGERPRINTS = Fingerprints()
 
 ServerProxy = partial(ServerProxy, fingerprints=_FINGERPRINTS,
+    ca_certs=_CA_CERTS)
+ServerPool = partial(ServerPool, fingerprints=_FINGERPRINTS,
     ca_certs=_CA_CERTS)
 
 
@@ -78,17 +78,14 @@ def login(username, password, host, port, database):
     _TOOLBAR_CACHE = {}
     _KEYWORD_CACHE = {}
     try:
-        _SEMAPHORE.acquire()
-        try:
-            if CONNECTION is not None:
-                CONNECTION.close()
-            CONNECTION = ServerProxy(host, port, database)
-            logging.getLogger(__name__).info('common.db.login(%s, %s)' %
-                (username, 'x' * 10))
-            result = CONNECTION.common.db.login(username, password)
-            logging.getLogger(__name__).debug(repr(result))
-        finally:
-            _SEMAPHORE.release()
+        if CONNECTION is not None:
+            CONNECTION.close()
+        CONNECTION = ServerPool(host, port, database)
+        logging.getLogger(__name__).info('common.db.login(%s, %s)' %
+            (username, 'x' * 10))
+        with CONNECTION() as conn:
+            result = conn.common.db.login(username, password)
+        logging.getLogger(__name__).debug(repr(result))
     except socket.error:
         _USER = None
         _SESSION = ''
@@ -113,15 +110,13 @@ def logout():
     if IPCServer.instance:
         IPCServer.instance.stop()
     if CONNECTION is not None:
-        _SEMAPHORE.acquire()
         try:
             logging.getLogger(__name__).info('common.db.logout(%s, %s)' %
                 (_USER, _SESSION))
-            CONNECTION.common.db.logout(_USER, _SESSION)
+            with CONNECTION() as conn:
+                conn.common.db.logout(_USER, _SESSION)
         except (Fault, socket.error, httplib.CannotSendRequest):
             pass
-        finally:
-            _SEMAPHORE.release()
         CONNECTION.close()
         CONNECTION = None
     _USER = None
@@ -165,18 +160,14 @@ def _execute(blocking, *args):
             key = str(args)
             if key in _KEYWORD_CACHE:
                 return _KEYWORD_CACHE[key]
-    res = _SEMAPHORE.acquire(blocking)
-    if not res:
-        return
     try:
         name = '.'.join(args[:3])
         args = (_USER, _SESSION) + args[3:]
         logging.getLogger(__name__).info('%s%s' % (name, args))
-        result = getattr(CONNECTION, name)(*args)
+        with CONNECTION() as conn:
+            result = getattr(conn, name)(*args)
     except (httplib.CannotSendRequest, socket.error), exception:
         raise TrytonServerUnavailable(*exception.args)
-    finally:
-        _SEMAPHORE.release()
     if not CONFIG['dev']:
         if key and method == 'fields_view_get':
             _VIEW_CACHE[key] = result
