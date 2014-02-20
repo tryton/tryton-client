@@ -415,7 +415,7 @@ class Form(SignalEvent, TabContent):
         name = '_'
         if signal_data[0]:
             name = str(signal_data[0])
-        for button_id in ('print', 'action', 'relate', 'email', 'open', 'save',
+        for button_id in ('print', 'relate', 'email', 'open', 'save',
                 'attach'):
             button = self.buttons[button_id]
             can_be_sensitive = getattr(button, '_can_be_sensitive', True)
@@ -465,7 +465,8 @@ class Form(SignalEvent, TabContent):
         action = action.copy()
         if not self.screen.save_current():
             return
-        record_id = self.screen.id_get()
+        record_id = (self.screen.current_record.id
+            if self.screen.current_record else None)
         record_ids = [r.id for r in self.screen.selected_records]
         action = Action.evaluate(action, atype, self.screen.current_record)
         data = {
@@ -507,7 +508,9 @@ class Form(SignalEvent, TabContent):
                 tbutton.connect('toggled', self.action_popup)
                 self.tooltips.set_tip(tbutton, tooltip)
                 self.buttons[special_action] = tbutton
-                tbutton._can_be_sensitive = bool(tbutton._menu.get_children())
+                if action_type != 'action':
+                    tbutton._can_be_sensitive = bool(
+                        tbutton._menu.get_children())
             else:
                 tbutton = gtk.SeparatorToolItem()
             gtktoolbar.insert(tbutton, -1)

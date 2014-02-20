@@ -858,6 +858,9 @@ class Screen(SignalEvent):
             states = record.expr_eval(button.attrs.get('states', {}))
             return not (states.get('invisible') or states.get('readonly'))
 
+        if not self.selected_records:
+            return []
+
         buttons = self.current_view.get_buttons()
 
         for record in self.selected_records:
