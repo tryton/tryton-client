@@ -9,13 +9,10 @@ except ImportError:
     import json
 import locale
 from interface import ParserView
-from tryton.action import Action
-from tryton.common import message
 import gettext
 from tryton.config import CONFIG
 from tryton.common.cellrendererbutton import CellRendererButton
 from tryton.common.cellrenderertoggle import CellRendererToggle
-from tryton.pyson import PYSONEncoder
 from tryton.gui.window import Window
 from tryton.common.popup_menu import populate
 from tryton.common import RPCExecute, RPCException
@@ -651,35 +648,6 @@ class ViewList(ParserView):
             treeview.emit('button-press-event', event)
             return True
         return False
-
-    def click_and_relate(self, action, value, path):
-        data = {}
-        context = {}
-        act = action.copy()
-        if not(value):
-            message(_('You must select a record to use the relation!'))
-            return False
-        from tryton.gui.window.view_form.screen import Screen
-        screen = Screen(self.screen.group.fields[
-            path[1].name].attrs['relation'])
-        screen.load([value])
-        encoder = PYSONEncoder()
-        act['domain'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('domain', [])))
-        act['context'] = encoder.encode(screen.current_record.expr_eval(
-            act.get('context', {})))
-        data['model'] = self.screen.model_name
-        data['id'] = value
-        data['ids'] = [value]
-        return Action._exec_action(act, data, context)
-
-    def click_and_action(self, atype, value, path):
-        return Action.exec_keyword(atype, {
-            'model': self.screen.group.fields[
-                path[1].name].attrs['relation'],
-            'id': value or False,
-            'ids': [value],
-            }, alwaysask=True)
 
     def group_list_changed(self, group, signal):
         if self.store is not None:
