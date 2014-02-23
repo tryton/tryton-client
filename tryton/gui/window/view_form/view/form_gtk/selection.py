@@ -122,10 +122,6 @@ class Selection(WidgetInterface, SelectionMixin, PopdownMixin):
     def set_value(self, record, field):
         field.set_client(record, self.get_value())
 
-    def _menu_sig_default_set(self, reset=False):
-        self.set_value(self.record, self.field)
-        super(Selection, self)._menu_sig_default_set(reset=reset)
-
     def display(self, record, field):
         self.update_selection(record, field)
         self.set_popdown(self.selection, self.entry)
