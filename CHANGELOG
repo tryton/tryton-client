@@ -1,3 +1,4 @@
+* Add Len to PYSON
 * Use a pool of connection
 * Manage client actions from button and wizard
 * Add tree_invisible attribute to button in tree view
