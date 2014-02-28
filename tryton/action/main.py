@@ -83,6 +83,7 @@ class Action(object):
         if 'type' not in (action or {}):
             return
 
+        data['action_id'] = action['id']
         if action['type'] == 'ir.action.act_window':
             view_ids = False
             view_mode = None

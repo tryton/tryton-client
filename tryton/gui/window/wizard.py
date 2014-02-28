@@ -28,6 +28,7 @@ class Wizard(object):
         self.id = None
         self.ids = None
         self.action = None
+        self.action_id = None
         self.direct_print = False
         self.email_print = False
         self.email = False
@@ -46,6 +47,7 @@ class Wizard(object):
     def run(self, action, data, direct_print=False, email_print=False,
             email=None, context=None):
         self.action = action
+        self.action_id = data.get('action_id')
         self.id = data.get('id')
         self.ids = data.get('ids')
         self.model = data.get('model')
@@ -72,6 +74,7 @@ class Wizard(object):
                 ctx['active_id'] = self.id
                 ctx['active_ids'] = self.ids
                 ctx['active_model'] = self.model
+                ctx['action_id'] = self.action_id
                 if self.screen:
                     data = {
                         self.screen_state: self.screen.get_on_change_value(),
