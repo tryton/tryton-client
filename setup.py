@@ -250,8 +250,8 @@ if os.name == 'nt':
                 str(os.path.join(os.path.dirname(__file__),
                     'setup-single.nsi'))]).wait()
         else:
-            print "makensis.exe not found: installers can not be created, "\
-                "skip setup.nsi and setup-single.nsi"
+            print("makensis.exe not found: installers can not be created, "\
+                "skip setup.nsi and setup-single.nsi")
 elif sys.platform == 'darwin':
 
     def find_gtk_dir():
